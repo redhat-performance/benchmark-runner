@@ -1,0 +1,42 @@
+shared_data:
+  db_num_workers: 2
+  db_warehouses: 2
+  es_cnv_version: 2.6.2
+  es_db_version: 10.3.0
+  es_ocp_version: 4.7.3
+  es_os_version: centos8
+  index_name: ripsaw-hammer
+  pin: true
+  pin_node: {{ pin_node1 }}
+  transactions: 100000
+  url: {{ elasticsearch }}
+mariadb:
+  db_image: centos8-mariadb103-container-disk:latest
+  db_pass: mysql
+  db_port: 3306
+  db_type: mariadb
+  db_user: root
+  db_server_pod: mariadb-deployment.mariadb-db
+mssql:
+  db_image: centos8-mssql2019-container-disk:latest
+  db_pass: s3curePasswordString
+  db_port: 1433
+  db_type: mssql
+  db_user: SA
+  db_server_pod: mssql-deployment.mssql-db
+postgres:
+  db_image: centos8-postgres10-container-disk:latest
+  db_pass: postgres
+  db_port: 5432
+  db_type: pg
+  db_user: postgres
+  db_server_pod: postgres-deployment.postgres-db
+pod:
+  es_kind: pod
+  resources: true
+  limits_cpu: 4
+  limits_memory_GB: 16
+vm:
+  cores: 4
+  es_kind: vm
+  limits_memory_GB: 16

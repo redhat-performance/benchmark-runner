@@ -1,0 +1,47 @@
+apiVersion: ripsaw.cloudbulldozer.io/v1alpha1
+kind: Benchmark
+metadata:
+  name: uperf-benchmark
+  namespace: my-ripsaw
+spec:
+  elasticsearch:
+    url: {{ url }}
+    index_name: {{ index_name }}
+  workload:
+    name: uperf
+    args:
+      client_resources:
+        requests:
+          cpu: 500m
+          memory: 500Mi
+        limits:
+          cpu: {{ client_limits_cpu }}
+          memory: {{ client_limits_memory_GB }}Gi
+      server_resources:
+        requests:
+          cpu: 500m
+          memory: 500Mi
+        limits:
+          cpu: {{ server_limits_cpu }}
+          memory: {{ server_limits_memory_GB }}Gi
+      pin: {{ pin }}
+      pin_server: "{{ pin_server }}"
+      pin_client: "{{ pin_client }}"
+      serviceip: {{ serviceip }}
+      hostnetwork: {{ hostnetwork }}
+      networkpolicy: {{ networkpolicy }}
+      multus:
+        enabled: {{ multus }}
+      samples: {{ samples }}
+      pair: {{ pair }}
+      test_types:
+        - {{ test_type }}
+      protos:
+        - {{ proto }}
+      sizes:
+        - {{ size }}
+      nthrs:
+        - {{ nthr }}
+      runtime: {{ runtime }}
+      #runtime_class: class_name
+      kind: pod

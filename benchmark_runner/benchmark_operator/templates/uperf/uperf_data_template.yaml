@@ -1,0 +1,29 @@
+shared_data:
+  url: http://{{ elasticsearch }}:{{ elasticsearch_port }}
+  index_name: ripsaw-uperf
+  pin: true
+  pin_client: {{ pin_node1 }}
+  pin_server: {{ pin_node2 }}
+  serviceip: false
+  hostnetwork: false
+  networkpolicy: false
+  multus: false
+  samples: 1
+  pair: 1
+  test_type: stream
+  proto: tcp
+  size: 16384
+  nthr: 1
+  runtime: 60
+pod:
+  es_kind: pod
+  client_limits_cpu: 4
+  client_limits_memory_GB: 16
+  server_limits_cpu: 4
+  server_limits_memory_GB: 16
+vm:
+  es_kind: vm
+  server_cores: 4
+  server_limits_memory_GB: 16
+  client_cores: 4
+  client_limits_memory_GB: 16
