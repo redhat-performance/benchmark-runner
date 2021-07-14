@@ -13,7 +13,7 @@ This tool support the following workloads:
 * [stressng](https://wiki.ubuntu.com/Kernel/Reference/stress-ng): running stressng workload on Pod or VM with [Configuration](benchmark_runner/benchmark_operator/templates/stressng)
 * [uperf](http://uperf.org/): running uperf workload on Pod or VM with [Configuration](benchmark_runner/benchmark_operator/templates/uperf)
 
-** First Phase: support [benchmark-operator workload](https://github.com/cloud-bulldozer/benchmark-operator)
+** First Phase: support [benchmark-operator workloads](https://github.com/cloud-bulldozer/benchmark-operator)
 
 Hammerdb Kibana dashboard:
 ![](media/kiban.png)
