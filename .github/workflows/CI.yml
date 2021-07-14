@@ -35,7 +35,7 @@ jobs:
     - name: UNITTEST with pytest
       run: |
         pytest --cov=benchmark_runner --cov-report=term-missing
-        coverage run -m pytest tests/unittest
+        coverage run -m pytest -v tests/unittest
         coverage report -m
     - name: Publish to coveralls.io
       env:
