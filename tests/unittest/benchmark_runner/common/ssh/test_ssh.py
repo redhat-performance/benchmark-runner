@@ -13,14 +13,5 @@ def test_run_cmd():
     assert ssh.run(cmd='ls')
 
 
-def test_run_cmd_error():
-    """
-    This method test run ssh cmd with error
-    :return:
-    """
-    ssh = SSH()
-    with pytest.raises(TypeError) as err:
-        ssh.run(cmd='lsl')
-
 
 
