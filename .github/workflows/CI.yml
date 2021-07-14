@@ -1,0 +1,86 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  #pull_request:
+  #  branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 pytest pytest-cov
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        if [ -f tests_requirments.txt ]; then pip install -r tests_requirments.txt; fi
+    - name: Lint with flake8
+      run: |
+        # stop the build if there are Python syntax errors or undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    - name: Test with pytest
+      run: |
+        pytest --cov=benchmark_runner --cov-report=term-missing
+        coverage run -m pytest
+        coverage report -m
+    - name: Publish to coveralls.io
+      env:
+        GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+      run: |
+        pip install coveralls
+        COVERALLS_REPO_TOKEN=${{ secrets.COVERALLS_REPO_TOKEN }} coveralls
+    - name: Build and publish distribution 📦 to PyPI
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+      run: |
+        pip install setuptools wheel twine
+        python setup.py sdist bdist_wheel
+        twine upload dist/*
+        echo 'Wait 30 sec till package will be updated'
+        sleep 30
+    - name: Upload to 🐋 quay.io
+      run: |
+        version=$(python3 setup.py --version)
+        sudo podman build --layers=false -t ${{ secrets.PACKAGE_NAME }}:v$version .
+        sudo podman login quay.io -u ${{ secrets.QAUYIO_ROBOT_USER }} -p ${{ secrets.QAUYIO_ROBOT_TOKEN }}
+        sudo podman push localhost/${{ secrets.PACKAGE_NAME }}:v$version quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:v$version
+        sudo podman push localhost/${{ secrets.PACKAGE_NAME }}:v$version quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}
+        echo 'Wait 30 sec till image will be updated in quay.io'
+        sleep 30
+    - name: ✔️ E2E tests using latest quay.io
+      run: |
+        #kubeadmin_password=
+        #elasticsearch=
+        #elasticsearch_port=
+        #pin_node1=
+        #sudo podman run --rm -e WORKLOAD=stressng_pod -e KUBEADMIN_PASSWORD=$kubeadmin_password -e ELASTICSEARCH=$elasticsearch -e ELASTICSEARCH_PORT=$elasticsearch_port -e PIN_NODE1=$pin_node1 -v /root/.kube/config:/root/.kube/config -e log_level=INFO --privileged quay.io/ebattat/benchmark-runner:latest
+    - name: Bump Version
+      run: |
+        version=$(python3 setup.py --version)
+        git checkout master
+        pip install bumpversion
+        git config --global user.email ${{ secrets.EMAIL }}
+        git config --global user.name  ${{ secrets.NAME }}
+        bumpversion patch
+        # GITHUB_REPOSITORY already taken => GIT_REPOSITORY
+        git commit .bumpversion.cfg setup.py -m 'bump version to exist version v'$version
+        git pull https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} master
+        git push https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} master
+        git push https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} --tag
+
+
