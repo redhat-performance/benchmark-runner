@@ -51,7 +51,7 @@ Choose one from the following list:
 
 `['stressng_pod', 'stressng_vm','uperf_pod', 'uperf_vm', 'hammerdb_pod_mariadb', 'hammerdb_pod_mssql', 'hammerdb_pod_postgres', 'hammerdb_vm_mariadb', 'hammerdb_vm_mssql', 'hammerdb_vm_postgres']`
 
-`mandatory:`ELASTICSEARCH=$elasticsearch
+`mandatory:`ELASTICSEARCH=$elasticsearch  # IP
 
 `mandatory:`ELASTICSEARCH_PORT=$elasticsearch_port
 
@@ -67,7 +67,8 @@ sudo podman run --rm -it -e WORKLOAD=stressng_pod -e KUBEADMIN_PASSWORD=$kubeadm
 -v /home/user/stressng/stressng_data.yaml:/benchmark_runner/benchmark_operator/template/stressng/stressng_data.yaml
 ```
 ![](media/demo1.gif)
-## Run workload in Pod using Kubernetes/OpenShift]
+## Run workload in Pod using Kubernetes/OpenShift
+
 [TBD]
 
 ## Post Installation
