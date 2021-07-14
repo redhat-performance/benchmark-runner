@@ -2,9 +2,7 @@
 [![Actions Status](https://github.com/redhat-performance/cloud-governance/workflows/CI/badge.svg)](https://github.com/redhat-performance/cloud-governance/actions)
 [![Coverage Status](https://coveralls.io/repos/github/redhat-performance/cloud-governance/badge.svg?branch=master)](https://coveralls.io/github/redhat-performance/cloud-governance?branch=master)
 
-<h3 align="right">![](media/op.png)
-
-<h3 align="center">Benchmark-Runner ![](media/run.png) </h3>
+<h3 align="center">Benchmark-Runner </h3>
 
 This tool provides a lightweight and flexible framework for running benchmark workloads 
 on Kubernetes/OpenShift Pod or VM.
