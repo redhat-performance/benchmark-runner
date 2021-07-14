@@ -51,7 +51,7 @@ Choose one from the following list:
 
 `['stressng_pod', 'stressng_vm','uperf_pod', 'uperf_vm', 'hammerdb_pod_mariadb', 'hammerdb_pod_mssql', 'hammerdb_pod_postgres', 'hammerdb_vm_mariadb', 'hammerdb_vm_mssql', 'hammerdb_vm_postgres']`
 
-`mandatory:`ELASTICSEARCH=$elasticsearch
+`mandatory:`ELASTICSEARCH=$elasticsearch  # IP
 
 `mandatory:`ELASTICSEARCH_PORT=$elasticsearch_port
 
