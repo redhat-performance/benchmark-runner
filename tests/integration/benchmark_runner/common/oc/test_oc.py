@@ -5,7 +5,7 @@ import pytest
 import os
 from benchmark_runner.common.oc.oc import OC
 from benchmark_runner.common.oc.oc_exceptions import PodNotCreateTimeout, PodTerminateTimeout, VMNotCreateTimeout, YAMLNotExist
-from benchmark_runner.common.elasticshearch.es_operations import ESOperations
+from benchmark_runner.common.elasticsearch.es_operations import ESOperations
 from benchmark_runner.main.update_data_template_yaml_with_environment_variables import delete_generate_file, update_environment_variable
 from benchmark_runner.benchmark_operator.benchmark_operator_workloads import BenchmarkOperatorWorkloads
 
