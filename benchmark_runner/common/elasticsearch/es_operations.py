@@ -5,7 +5,7 @@ from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search
 from datetime import datetime
 
-from benchmark_runner.common.elasticshearch.elasticsearch_exceptions import ElasticSearchDataNotUploaded
+from benchmark_runner.common.elasticsearch.elasticsearch_exceptions import ElasticSearchDataNotUploaded
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 
 

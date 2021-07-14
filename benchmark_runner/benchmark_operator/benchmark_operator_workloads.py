@@ -4,10 +4,10 @@ import time
 
 from typeguard import typechecked
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
-from benchmark_runner.common.elasticshearch.elasticsearch_exceptions import ElasticSearchDataNotUploaded
+from benchmark_runner.common.elasticsearch.elasticsearch_exceptions import ElasticSearchDataNotUploaded
 from benchmark_runner.common.oc.oc import OC
 from benchmark_runner.benchmark_operator.templates.generate_yaml_from_templates import TemplateOperations
-from benchmark_runner.common.elasticshearch.es_operations import ESOperations
+from benchmark_runner.common.elasticsearch.es_operations import ESOperations
 from benchmark_runner.common.ssh.ssh import SSH
 
 
