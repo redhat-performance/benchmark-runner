@@ -37,7 +37,7 @@ jobs:
         #pytest --cov=benchmark_runner --cov-report=term-missing
         #coverage run -m pytest
         #coverage report -m
-    - name: Publish to coveralls.io
+    - name: 🎥 Publish to coveralls.io
       env:
         GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
       run: |
@@ -51,7 +51,7 @@ jobs:
         pip install setuptools wheel twine
         python setup.py sdist bdist_wheel
         twine upload dist/*
-        echo 'Wait 30 sec till package will be updated'
+        echo '⌛ Wait 30 sec till package will be updated'
         sleep 30
     - name: Upload 🐋 to quay.io
       run: |
