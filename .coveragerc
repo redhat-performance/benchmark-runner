@@ -1,0 +1,11 @@
+# unittests path
+[run]
+include=
+    benchmark-runner/*
+
+omit=
+        *__init__*
+        */usr/local/lib*
+        *Test*
+        *init_logger*
+
