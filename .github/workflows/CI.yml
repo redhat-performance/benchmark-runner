@@ -72,13 +72,13 @@ jobs:
     - name: Bump Version
       run: |
         version=$(python3 setup.py --version)
-        git checkout master
+        git checkout main
         pip install bumpversion
         git config --global user.email ${{ secrets.EMAIL }}
         git config --global user.name  ${{ secrets.NAME }}
         bumpversion patch
         # GITHUB_REPOSITORY already taken => GIT_REPOSITORY
         git commit .bumpversion.cfg setup.py -m 'bump version to exist version v'$version
-        git pull https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} master
-        git push https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} master
+        git pull https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} main
+        git push https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} main
         git push https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} --tag
