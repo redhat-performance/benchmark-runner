@@ -32,7 +32,7 @@ jobs:
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: Test with pytest 📃
+    - name: 📃 Test with pytest
       run: |
         #pytest --cov=benchmark_runner --cov-report=term-missing
         #coverage run -m pytest
@@ -60,16 +60,16 @@ jobs:
         sudo podman login quay.io -u ${{ secrets.QAUYIO_ROBOT_USER }} -p ${{ secrets.QAUYIO_ROBOT_TOKEN }}
         sudo podman push localhost/${{ secrets.PACKAGE_NAME }}:v$version quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:v$version
         sudo podman push localhost/${{ secrets.PACKAGE_NAME }}:v$version quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}
-        echo 'Wait 30 sec till image will be updated in quay.io'
-        sleep 30 ⌛
-    - name: E2E tests using latest quay.io ✔️
+        echo '⌛ Wait 30 sec till image will be updated in quay.io'
+        sleep 30
+    - name: ✔️ E2E tests using latest quay.io
       run: |
         #kubeadmin_password=
         #elasticsearch=
         #elasticsearch_port=
         #pin_node1=
         #sudo podman run --rm -e WORKLOAD=stressng_pod -e KUBEADMIN_PASSWORD=$kubeadmin_password -e ELASTICSEARCH=$elasticsearch -e ELASTICSEARCH_PORT=$elasticsearch_port -e PIN_NODE1=$pin_node1 -v /root/.kube/config:/root/.kube/config -e log_level=INFO --privileged quay.io/ebattat/benchmark-runner:latest
-    - name: Bump Version 🎁
+    - name: 🎁 Bump Version
       run: |
         version=$(python3 setup.py --version)
         git checkout main
