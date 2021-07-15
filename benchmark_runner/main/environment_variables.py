@@ -19,6 +19,8 @@ class EnvironmentVariables:
         self._environment_variables_dict['workload'] = os.environ.get('WORKLOAD', '')
         self._environment_variables_dict['elasticsearch'] = os.environ.get('ELASTICSEARCH', '')
         self._environment_variables_dict['elasticsearch_port'] = os.environ.get('ELASTICSEARCH_PORT', '')
+        self._environment_variables_dict['pin_node1'] = os.environ.get('PIN_NODE1', '')
+        self._environment_variables_dict['pin_node2'] = os.environ.get('PIN_NODE2', '')
         if self._environment_variables_dict['elasticsearch'] and self._environment_variables_dict['elasticsearch_port']:
             self._environment_variables_dict['elasticsearch_url'] = f"http://{self._environment_variables_dict['elasticsearch']}:{self._environment_variables_dict['elasticsearch_port']}"
         # in case no port
@@ -26,8 +28,6 @@ class EnvironmentVariables:
             self._environment_variables_dict['elasticsearch'] = self._environment_variables_dict['elasticsearch']
         else:
             self._environment_variables_dict['elasticsearch_url'] = ''
-        self._environment_variables_dict['pin_node1'] = os.environ.get('PIN_NODE1', '')
-        self._environment_variables_dict['pin_node2'] = os.environ.get('PIN_NODE2', '')
 
     @property
     def workloads_list(self):
