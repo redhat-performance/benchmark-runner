@@ -9,7 +9,7 @@ shared_data:
   pin: true
   pin_node: {{ pin_node1 }}
   transactions: 100000
-  url: {{ elasticsearch }}
+  url: {{ elasticsearch_url }}
 mariadb:
   db_image: centos8-mariadb103-container-disk:latest
   db_pass: mysql

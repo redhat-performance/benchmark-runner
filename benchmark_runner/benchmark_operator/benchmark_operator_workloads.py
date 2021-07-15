@@ -9,23 +9,38 @@ from benchmark_runner.common.oc.oc import OC
 from benchmark_runner.benchmark_operator.templates.generate_yaml_from_templates import TemplateOperations
 from benchmark_runner.common.elasticsearch.es_operations import ESOperations
 from benchmark_runner.common.ssh.ssh import SSH
+from benchmark_runner.benchmark_operator.benchmark_operator_exceptions import VMWorkloadNeedElasticSearch
 
 
 class BenchmarkOperatorWorkloads:
     """
     This class contains all the custom_workloads
     """
-    def __init__(self, kubeadmin_password: str = '', es_host: str = '', es_port: str = ''):
+    def __init__(self, kubeadmin_password: str = '', es_host: str = '', es_port: str = '', workload: str = ''):
         self.__ssh = SSH()
         self.__kubeadmin_password = kubeadmin_password
         self.__oc = OC(kubeadmin_password=self.__kubeadmin_password)
         self.__dir_path = os.path.dirname(os.path.realpath(__file__))
+        self.__workload = workload
+        self.__es_host = es_host
+        self.__es_port = es_port
         self.__current_run_path = os.path.join(self.__dir_path, 'current_run')
         if es_host and es_port:
-            self.__es_operations = ESOperations(es_host=es_host, es_port=es_port)
+            self.__es_operations = ESOperations(es_host=self.__es_host, es_port=self.__es_port)
+        else:
+            self.__verify_elasticsearch_exist_for_vm_workload(workload=self.__workload)
         # Generate templates class
         self.__template = TemplateOperations()
         self.__oc.login()
+
+    @typechecked()
+    def __verify_elasticsearch_exist_for_vm_workload(self, workload: str):
+        """
+        This method verify that elastic search exist for vm workloads to verify completed status
+        :return: error in case no elasticsearch
+        """
+        if 'vm' in workload and not self.__es_host:
+            raise VMWorkloadNeedElasticSearch
 
     def __get_run_yamls(self, extension='.yaml'):
         """
@@ -106,9 +121,9 @@ class BenchmarkOperatorWorkloads:
             self.__oc.wait_for_initialized(label='app=stressng_workload')
             self.__oc.wait_for_ready(label='app=stressng_workload')
             self.__oc.wait_for_completed(label='app=stressng_workload')
-            print(self.__oc.get_long_uuid())
-            # verify that data upload to elastic search according to uniq uuid
-            self.__es_operations.verify_es_data_uploaded(index='ripsaw-stressng-results', uuid=self.__oc.get_long_uuid())
+            if self.__es_host:
+                # verify that data upload to elastic search according to uniq uuid
+                self.__es_operations.verify_es_data_uploaded(index='ripsaw-stressng-results', uuid=self.__oc.get_long_uuid())
         except ElasticSearchDataNotUploaded as err:
             self.__oc.delete_pod_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.stressng_pod.__name__}.yaml'),
                                       pod_name='stressng-workload')
@@ -161,8 +176,9 @@ class BenchmarkOperatorWorkloads:
             self.__oc.wait_for_initialized(label='app=uperf-bench-client')
             self.__oc.wait_for_ready(label='app=uperf-bench-client')
             self.__oc.wait_for_completed(label='app=uperf-bench-client')
-            # verify that data upload to elastic search
-            self.__es_operations.verify_es_data_uploaded(index='ripsaw-uperf-results', uuid=self.__oc.get_long_uuid(), workload=self.uperf_pod.__name__)
+            if self.__es_host:
+                # verify that data upload to elastic search
+                self.__es_operations.verify_es_data_uploaded(index='ripsaw-uperf-results', uuid=self.__oc.get_long_uuid(), workload=self.uperf_pod.__name__)
         except ElasticSearchDataNotUploaded as err:
             self.__oc.delete_pod_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.uperf_pod.__name__}.yaml'), pod_name='uperf-client')
             raise err
@@ -223,8 +239,9 @@ class BenchmarkOperatorWorkloads:
             self.__oc.wait_for_initialized(label='app=hammerdb_workload')
             self.__oc.wait_for_ready(label='app=hammerdb_workload')
             self.__oc.wait_for_completed(label='app=hammerdb_workload')
-            # verify that data upload to elastic search
-            self.__es_operations.verify_es_data_uploaded(index='ripsaw-hammer-results', uuid=self.__oc.get_long_uuid())
+            if self.__es_host:
+                # verify that data upload to elastic search
+                self.__es_operations.verify_es_data_uploaded(index='ripsaw-hammer-results', uuid=self.__oc.get_long_uuid())
         except ElasticSearchDataNotUploaded as err:
             # delete hammerdb
             self.__oc.delete_pod_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.hammerdb_pod.__name__}_{database}.yaml'),
@@ -232,7 +249,6 @@ class BenchmarkOperatorWorkloads:
             # delete database
             self.__oc.delete_pod_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{database}.yaml'), pod_name=database,
                                       namespace=f'{database}-db')
-
             raise err
         except Exception as err:
             # delete hammerdb
@@ -300,20 +316,21 @@ class BenchmarkOperatorWorkloads:
         # remove workload yaml at the end of run
         self.__remove_run_workload_yaml_file(workload_full_name=workload_full_name)
 
-    @typechecked
     @logger_time_stamp
-    def run_workload(self, workload: str):
+    def run_workload(self):
         """
         This method run the input workload
-        :param workload:
         :return:
         """
+
+        # elasticsearch is must for VM workload for completed status verifications
+        self.__verify_elasticsearch_exist_for_vm_workload(workload=self.__workload)
 
         # install benchmark operator
         self.helm_install_benchmark_operator()
 
         # run workload
-        self.run_workload_func(workload_full_name=workload)
+        self.run_workload_func(workload_full_name=self.__workload)
 
         # delete benchmark operator
         self.helm_delete_benchmark_operator()

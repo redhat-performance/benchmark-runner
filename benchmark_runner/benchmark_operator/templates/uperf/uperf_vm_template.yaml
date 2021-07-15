@@ -7,7 +7,7 @@ spec:
  clustername: test-cluster
  test_user: user # user is a key that points to user triggering ripsaw, useful to search results in ES
  elasticsearch:
-    url: {{ url }}
+    url: "{{ url }}"
     index_name: {{ index_name }}
  cleanup: false
  workload:

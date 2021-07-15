@@ -1,7 +1,7 @@
 shared_data:
   index_name: ripsaw-stressng
   pin_client: {{ pin_node1 }}
-  url: http://{{ elasticsearch }}:{{ elasticsearch_port }}
+  url: {{ elasticsearch_url }}
   pin: true
   runtype: parallel
   timeout: 30
