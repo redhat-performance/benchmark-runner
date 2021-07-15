@@ -1,5 +1,5 @@
 shared_data:
-  url: http://{{ elasticsearch }}:{{ elasticsearch_port }}
+  url: {{ elasticsearch_url }}
   index_name: ripsaw-uperf
   pin: true
   pin_client: {{ pin_node1 }}
