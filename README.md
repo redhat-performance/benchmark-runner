@@ -66,7 +66,7 @@ sudo podman run --rm -e WORKLOAD=stressng_pod -e KUBEADMIN_PASSWORD=$kubeadmin_p
 # For custom workload data configuration add:
 -v /home/user/stressng/stressng_data.yaml:/benchmark_runner/benchmark_operator/template/stressng/stressng_data.yaml
 ```
-![](media/demo1.gif)
+![](media/demo.gif)
 ## Run workload in Pod using Kubernetes/OpenShift
 
 [TBD]
