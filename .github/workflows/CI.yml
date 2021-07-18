@@ -43,7 +43,7 @@ jobs:
       run: |
         #pip install coveralls
         #COVERALLS_REPO_TOKEN=${{ secrets.COVERALLS_REPO_TOKEN }} coveralls
-    - name: Build and publish distribution 📦 to PyPI
+    - name: 🔨 Build and publish distribution 📦 to PyPI
       env:
         TWINE_USERNAME: __token__
         TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
@@ -51,9 +51,7 @@ jobs:
         pip install setuptools wheel twine
         python setup.py sdist bdist_wheel
         twine upload dist/*
-        #echo '⌛ Wait 60 sec till package will be updated'
-        #sleep 60
-    - name: Upload 🐋 to quay.io
+    - name: ⌛ Upload 🐋 to quay.io
       run: |
         version=$(python3 setup.py --version)
         sudo podman build --build-arg VERSION=$version --layers=false -t ${{ secrets.PACKAGE_NAME }}:v$version .

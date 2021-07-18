@@ -1,5 +1,6 @@
 FROM centos:centos8
 
+#benchmark-runner latest version
 ARG VERSION
 
 # Update
