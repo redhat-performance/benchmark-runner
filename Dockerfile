@@ -10,12 +10,13 @@ RUN dnf install -y python3.9 \
 # install & run benchmark-runner
 RUN python3.9 -m pip install --upgrade pip && pip install benchmark-runner
 
-# install oc Client tools for OpenShift
+# install oc/kubectl Client tools for OpenShift/Kubernetes
 ARG oc_version=4.7.0-0.okd-2021-05-22-050008
 RUN  curl -L https://github.com/openshift/okd/releases/download/${oc_version}/openshift-client-linux-${oc_version}.tar.gz -o ~/openshift-client-linux-${oc_version}.tar.gz \
      && tar -xzvf ~/openshift-client-linux-${oc_version}.tar.gz -C ~/ \
      && rm ~/openshift-client-linux-${oc_version}.tar.gz \
-     && echo alias oc=~/./oc >> ~/.bashrc
+     && echo alias oc=~/./oc >> ~/.bashrc \
+     && echo alias kubectl=~/./kubectl >> ~/.bashrc
 
 # install virtctl for VNC
 ARG virtctl_version=0.34.2

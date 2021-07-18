@@ -13,10 +13,10 @@ This tool support the following workloads:
 * [stressng](https://wiki.ubuntu.com/Kernel/Reference/stress-ng): running stressng workload on Pod or VM with [Configuration](benchmark_runner/benchmark_operator/templates/stressng)
 * [uperf](http://uperf.org/): running uperf workload on Pod or VM with [Configuration](benchmark_runner/benchmark_operator/templates/uperf)
 
-** First Phase: support [benchmark-operator workloads](https://github.com/cloud-bulldozer/benchmark-operator)
+** First Phase: supports [benchmark-operator workloads](https://github.com/cloud-bulldozer/benchmark-operator)
 
 Hammerdb Kibana dashboard:
-![](media/kiban.png)
+![](media/kibana.png)
 
 Reference:
 * The benchmark-runner package is located in [PyPi](https://pypi.org/project/benchmark-runner)
@@ -51,7 +51,7 @@ Choose one from the following list:
 
 `['stressng_pod', 'stressng_vm','uperf_pod', 'uperf_vm', 'hammerdb_pod_mariadb', 'hammerdb_pod_mssql', 'hammerdb_pod_postgres', 'hammerdb_vm_mariadb', 'hammerdb_vm_mssql', 'hammerdb_vm_postgres']`
 
-`mandatory:`ELASTICSEARCH=$elasticsearch  # IP
+`mandatory:`ELASTICSEARCH=$elasticsearch [IP]
 
 `mandatory:`ELASTICSEARCH_PORT=$elasticsearch_port
 
