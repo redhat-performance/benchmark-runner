@@ -51,12 +51,12 @@ jobs:
         pip install setuptools wheel twine
         python setup.py sdist bdist_wheel
         twine upload dist/*
-        echo '⌛ Wait 60 sec till package will be updated'
-        sleep 60
+        #echo '⌛ Wait 60 sec till package will be updated'
+        #sleep 60
     - name: Upload 🐋 to quay.io
       run: |
         version=$(python3 setup.py --version)
-        sudo podman build --layers=false -t ${{ secrets.PACKAGE_NAME }}:v$version .
+        sudo podman build --build-arg VERSION=$version --layers=false -t ${{ secrets.PACKAGE_NAME }}:v$version .
         sudo podman login quay.io -u ${{ secrets.QAUYIO_ROBOT_USER }} -p ${{ secrets.QAUYIO_ROBOT_TOKEN }}
         sudo podman push localhost/${{ secrets.PACKAGE_NAME }}:v$version quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:v$version
         sudo podman push localhost/${{ secrets.PACKAGE_NAME }}:v$version quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}
