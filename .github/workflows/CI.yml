@@ -32,11 +32,18 @@ jobs:
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    - name: Configure openShift cluster credentials for pytest
+       uses: azure/k8s-actions/k8s-set-context@master
+       with:
+         kubeconfig: ${{ secrets.KUBE_CONFIG }}
     - name: 📃 Test with pytest
       run: |
-        #pytest --cov=benchmark_runner --cov-report=term-missing
-        #coverage run -m pytest
-        #coverage report -m
+        kubeadmin_password=secrets.KUBEADMIN_PASSWORD
+        pin_node1=secrets.PIN_NODE1
+        pin_node2=secrets.PIN_NODE2
+        pytest --cov=benchmark_runner --cov-report=term-missing
+        coverage run -m pytest
+        coverage report -m
     - name: 🎥 Publish to coveralls.io
       env:
         GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
