@@ -35,7 +35,7 @@ jobs:
     - name: OpenShift cluster context
       uses: actions-hub/kubectl@master
       env:
-        KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
+        KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }} | base64
       with:
         args: get pods
     - name: 📃 Test with pytest
