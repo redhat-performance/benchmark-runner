@@ -68,8 +68,8 @@ jobs:
         pip install setuptools wheel twine
         python setup.py sdist bdist_wheel
         twine upload dist/*
-        #echo 'Wait 90 sec till package will be updated in PyPI'
-        #sleep 90
+        echo 'Wait 60 sec till package will be updated in PyPI'
+        sleep 60
     - name: ⌛ Upload 🐋 to quay.io
       run: |
         version=$(python3 setup.py --version)
