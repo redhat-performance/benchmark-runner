@@ -42,7 +42,14 @@ jobs:
         kubeadmin_password=secrets.KUBEADMIN_PASSWORD
         pin_node1=secrets.PIN_NODE1
         pin_node2=secrets.PIN_NODE2
-        kubectl login -u kubeadmin -p $kubeadmin_password
+        oc_version=4.7.0-0.okd-2021-05-22-050008
+        curl -L https://github.com/openshift/okd/releases/download/${oc_version}/openshift-client-linux-${oc_version}.tar.gz -o ~/openshift-client-linux-${oc_version}.tar.gz
+        tar -xzvf ~/openshift-client-linux-${oc_version}.tar.gz -C ~/
+        rm ~/openshift-client-linux-${oc_version}.tar.gz
+        echo alias oc=~/./oc >> ~/.bashrc
+        echo alias kubectl=~/./kubectl >> ~/.bashrc
+        . ~/.bashrc
+        oc login -u kubeadmin -p $kubeadmin_password
         #pytest --cov=benchmark_runner --cov-report=term-missing
         #coverage run -m pytest
         #coverage report -m
