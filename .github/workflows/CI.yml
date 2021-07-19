@@ -34,10 +34,10 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: 📃 Test with pytest
       run: |
-        KUBECONFIG_DATA= ${{ secrets.KUBECONFIG_DATA }}
-        kubeadmin_password=secrets.KUBEADMIN_PASSWORD
-        pin_node1=secrets.PIN_NODE1
-        pin_node2=secrets.PIN_NODE2
+        KUBECONFIG_DATA=${{ secrets.KUBECONFIG_DATA }}
+        kubeadmin_password=${{ secrets.KUBEADMIN_PASSWORD }}
+        pin_node1=${{ secrets.PIN_NODE1 }}
+        pin_node2=${{ secrets.PIN_NODE2 }}
         oc_version=4.7.0-0.okd-2021-05-22-050008
         curl -L https://github.com/openshift/okd/releases/download/${oc_version}/openshift-client-linux-${oc_version}.tar.gz -o ~/openshift-client-linux-${oc_version}.tar.gz
         tar -xzvf ~/openshift-client-linux-${oc_version}.tar.gz -C ~/
