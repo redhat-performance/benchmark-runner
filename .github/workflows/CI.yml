@@ -32,10 +32,13 @@ jobs:
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    - uses: azure/k8s-set-context@v1
+      with:
+        method: kubeconfig
+        kubeconfig: ${{ secrets.KUBECONFIG }} # Use secret (https://developer.github.com/actions/managing-workflows/storing-secrets/)
+      id: setcontext
     - name: 📃 Test with pytest
       run: |
-        pwd
-        ls
         export KUBECONFIG=${{ secrets.KUBECONFIG }}
         kubeadmin_password=${{ secrets.KUBEADMIN_PASSWORD }}
         pin_node1=${{ secrets.PIN_NODE1 }}
