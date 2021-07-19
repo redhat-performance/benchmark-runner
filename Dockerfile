@@ -11,7 +11,7 @@ RUN dnf install -y python3.9 \
     && echo alias python=python3.9 >> ~/.bashrc
 
 # install & run benchmark-runner
-RUN python3.9 -m pip install --upgrade pip && pip install benchmark-runner==$VERSION
+RUN python3.9 -m pip --no-cache-dir  install --upgrade pip && pip --no-cache-dir install benchmark-runner==$VERSION
 
 # install oc/kubectl Client tools for OpenShift/Kubernetes
 ARG oc_version=4.7.0-0.okd-2021-05-22-050008
