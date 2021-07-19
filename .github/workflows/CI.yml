@@ -39,6 +39,7 @@ jobs:
         kubeconfig: ${{ secrets.KUBE_CONFIG }}
     - name: 📃 Test with pytest
       run: |
+        export KUBECONFIG=${{ secrets.KUBE_CONFIG }}
         kubeadmin_password=secrets.KUBEADMIN_PASSWORD
         pin_node1=secrets.PIN_NODE1
         pin_node2=secrets.PIN_NODE2
