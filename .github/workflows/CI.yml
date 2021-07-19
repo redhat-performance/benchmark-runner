@@ -36,8 +36,6 @@ jobs:
       uses: actions-hub/kubectl@master
       env:
         KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }} | base64
-      with:
-        args: get pods
     - name: 📃 Test with pytest
       run: |
         kubeadmin_password=secrets.KUBEADMIN_PASSWORD
