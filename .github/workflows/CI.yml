@@ -32,12 +32,9 @@ jobs:
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: OpenShift cluster context
-      uses: Consensys/kubernetes-action@master
-      env:
-        KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG }} | base64
     - name: 📃 Test with pytest
       run: |
+        KUBECONFIG_DATA= ${{ secrets.KUBECONFIG_DATA }}
         kubeadmin_password=secrets.KUBEADMIN_PASSWORD
         pin_node1=secrets.PIN_NODE1
         pin_node2=secrets.PIN_NODE2
@@ -48,7 +45,8 @@ jobs:
         echo alias oc=~/./oc >> ~/.bashrc
         echo alias kubectl=~/./kubectl >> ~/.bashrc
         . ~/.bashrc
-        oc login -u kubeadmin -p $kubeadmin_password
+        oc --kubeconfig <(echo $KUBECONFIG_DATA | base64 --decode)  get pod -n my-ripaw
+        #oc login -u kubeadmin -p $kubeadmin_password
         #pytest --cov=benchmark_runner --cov-report=term-missing
         #coverage run -m pytest
         #coverage report -m
