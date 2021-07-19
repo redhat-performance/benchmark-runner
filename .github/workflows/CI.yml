@@ -42,6 +42,7 @@ jobs:
         kubeadmin_password=${{ secrets.KUBEADMIN_PASSWORD }}
         pin_node1=${{ secrets.PIN_NODE1 }}
         pin_node2=${{ secrets.PIN_NODE2 }}
+        # install oc/kubctl
         oc_version=4.7.0-0.okd-2021-05-22-050008
         curl -L https://github.com/openshift/okd/releases/download/${oc_version}/openshift-client-linux-${oc_version}.tar.gz -o /home/runner/openshift-client-linux-${oc_version}.tar.gz
         tar -xzvf /home/runner/openshift-client-linux-${oc_version}.tar.gz -C /home/runner/
@@ -50,10 +51,10 @@ jobs:
         echo alias kubectl=/home/runner/./kubectl >> /home/runner/.bashrc
         source /home/runner/.bashrc
         oc get pods
-        #oc login -u kubeadmin -p $kubeadmin_password
-        #pytest --cov=benchmark_runner --cov-report=term-missing
-        #coverage run -m pytest
-        #coverage report -m
+        oc login -u kubeadmin -p $kubeadmin_password
+        pytest --cov=benchmark_runner --cov-report=term-missing
+        coverage run -m pytest
+        coverage report -m
     - name: 🎥 Publish to coveralls.io
       env:
         GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
@@ -68,8 +69,8 @@ jobs:
         pip install setuptools wheel twine
         python setup.py sdist bdist_wheel
         twine upload dist/*
-        echo 'Wait 60 sec till package will be updated in PyPI'
-        sleep 60
+        echo 'Wait 120 sec till package will be updated in PyPI'
+        sleep 120
     - name: ⌛ Upload 🐋 to quay.io
       run: |
         version=$(python3 setup.py --version)
