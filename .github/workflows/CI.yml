@@ -38,6 +38,10 @@ jobs:
         kubeconfig: ${{ secrets.KUBECONFIG }} # Use secret (https://developer.github.com/actions/managing-workflows/storing-secrets/)
       id: setcontext
     - name: 📃 Test with pytest
+      env:
+        kubeadmin_password: ${{ secrets.KUBEADMIN_PASSWORD }}
+        pin_node1: ${{ secrets.PIN_NODE1 }}
+        pin_node2: ${{ secrets.PIN_NODE2 }}
       run: |
         kubeadmin_password=${{ secrets.KUBEADMIN_PASSWORD }}
         pin_node1=${{ secrets.PIN_NODE1 }}
