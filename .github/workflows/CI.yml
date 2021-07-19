@@ -33,14 +33,14 @@ jobs:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Configure credentials for pytest
-#      uses: azure/k8s-actions/k8s-set-context@master
-#        with:
-#          kubeconfig: ${{ secrets.KUBE_CONFIG }}
+      #uses: azure/k8s-actions/k8s-set-context@master
+      #  with:
+      #    kubeconfig: ${{ secrets.KUBE_CONFIG }}
     - name: 📃 Test with pytest
       run: |
-#        pytest --cov=benchmark_runner --cov-report=term-missing
-#        coverage run -m pytest
-#        coverage report -m
+        #pytest --cov=benchmark_runner --cov-report=term-missing
+        #coverage run -m pytest
+        #coverage report -m
     - name: 🎥 Publish to coveralls.io
       env:
         GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
