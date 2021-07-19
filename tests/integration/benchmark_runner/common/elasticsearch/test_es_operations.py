@@ -7,7 +7,7 @@ from benchmark_runner.common.elasticsearch.elasticsearch_exceptions import Elast
 from benchmark_runner.main.update_data_template_yaml_with_environment_variables import delete_generate_file, \
     update_environment_variable
 from benchmark_runner.benchmark_operator.benchmark_operator_workloads import BenchmarkOperatorWorkloads
-from tests.integration.benchmark_runner.get_environment_parameters import *
+from tests.integration.benchmark_runner.test_environment_parameters import *
 
 
 def __delete_pod_and_yamls():
