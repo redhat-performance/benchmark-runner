@@ -32,6 +32,24 @@ jobs:
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    - uses: actions/checkout@v2
+    - name: install k8s
+    run: |
+      curl -sfL https://get.k3s.io | K3S_KUBECONFIG_MODE=777 sh -
+      cat /etc/rancher/k3s/k3s.yaml
+      mkdir -p ~/.kube
+      cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
+
+    - run: 'echo -e "$KUBECONFIG" > ~/.tmpfile.json'
+        shell: bash
+        env:
+          KUBECONFIG: ${{secrets.KUBECONFIG}}
+
+    - name: example
+      shell: bash
+      run: |
+        cd /home/runner/
+        kubectl create secret generic project-kubecfg --from-file=/home/runner/.tmpfile.json -n default
     - name: 📃 Test with pytest
       run: |
         KUBECONFIG=${{ secrets.KUBECONFIG }}
