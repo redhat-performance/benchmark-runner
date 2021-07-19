@@ -34,17 +34,17 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - uses: actions/checkout@v2
     - name: install k8s
-    run: |
-      curl -sfL https://get.k3s.io | K3S_KUBECONFIG_MODE=777 sh -
-      cat /etc/rancher/k3s/k3s.yaml
-      mkdir -p ~/.kube
-      cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
-
-    - run: 'echo -e "$KUBECONFIG" > ~/.tmpfile.json'
-        shell: bash
-        env:
-          KUBECONFIG: ${{secrets.KUBECONFIG}}
-
+      run: |
+        curl -sfL https://get.k3s.io | K3S_KUBECONFIG_MODE=777 sh -
+        cat /etc/rancher/k3s/k3s.yaml
+        mkdir -p /home/runner/.kube
+        cp /etc/rancher/k3s/k3s.yaml /home/runner/.kube/config
+    - name: example1
+      run: |
+          'echo -e "$KUBECONFIG" > /home/runner/.tmpfile.json'
+          shell: bash
+          env:
+            KUBECONFIG: ${{secrets.KUBECONFIG}}
     - name: example
       shell: bash
       run: |
