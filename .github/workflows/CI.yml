@@ -36,6 +36,7 @@ jobs:
       uses: azure/k8s-actions/k8s-set-context@master
       with:
         kubeconfig: ${{ secrets.KUBE_CONFIG }}
+      id: login
     - name: 📃 Test with pytest
       run: |
         kubeadmin_password=secrets.KUBEADMIN_PASSWORD
