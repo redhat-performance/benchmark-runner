@@ -43,8 +43,9 @@ jobs:
         pin_node1=secrets.PIN_NODE1
         pin_node2=secrets.PIN_NODE2
         pytest --cov=benchmark_runner --cov-report=term-missing
-        coverage run -m pytest
-        coverage report -m
+        kubectl login -u kubeadmin -p $kubeadmin_password
+        #coverage run -m pytest
+        #coverage report -m
     - name: 🎥 Publish to coveralls.io
       env:
         GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
