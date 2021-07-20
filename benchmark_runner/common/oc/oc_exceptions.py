@@ -19,6 +19,27 @@ class PodNotCreateTimeout(OCError):
         super(PodNotCreateTimeout, self).__init__(self.message)
 
 
+class PodNotInitializedTimeout(OCError):
+    """This exception return pod initialized timeout error"""
+    def __init__(self, label):
+        self.message = f'Pod with label: {label} does not ready'
+        super(PodNotInitializedTimeout, self).__init__(self.message)
+
+
+class PodNotReadyTimeout(OCError):
+    """This exception return pod ready timeout error"""
+    def __init__(self, label):
+        self.message = f'Pod with label: {label} does not ready'
+        super(PodNotReadyTimeout, self).__init__(self.message)
+
+
+class PodNotCompletedTimeout(OCError):
+    """This exception return pod completed timeout error"""
+    def __init__(self, label):
+        self.message = f'Pod with label: {label} does not completed'
+        super(PodNotCompletedTimeout, self).__init__(self.message)
+
+
 class PodTerminateTimeout(OCError):
     """This exception return pod terminate timeout error"""
     def __init__(self, pod_name):

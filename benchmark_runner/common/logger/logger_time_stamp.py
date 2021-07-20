@@ -8,6 +8,9 @@ datetime_format = '%Y-%m-%d %H:%M:%S'
 
 
 def logger_time_stamp(method):
+    """
+    This method log every method with its parameters
+    """
     @wraps(method)  # solve method help doc
     def method_wrapper(*args, **kwargs):
         time_start = time.time()
