@@ -67,7 +67,7 @@ class BenchmarkOperatorWorkloads:
         else:
             logger.info('yaml file {} does not exist')
 
-    def __remove_run_yamls(self, extension: str = '.yaml'):
+    def __delete_run_yamls(self, extension: str = '.yaml'):
         """
         This method remove all run yaml files in yaml folder
         :return:
@@ -123,6 +123,27 @@ class BenchmarkOperatorWorkloads:
         self.__oc.login()
 
     @logger_time_stamp
+    def tear_down_pod_after_error(self, yaml: str, pod_name: str):
+        """
+        This method tear down pod in case of error
+        @param yaml:
+        @param pod_name:
+        @return:
+        """
+        self.__oc.delete_pod_sync(yaml=yaml, pod_name=pod_name)
+        self.__delete_run_yamls()
+        self.helm_delete_benchmark_operator()
+
+    @logger_time_stamp
+    def tear_down_vm_after_error(self, yaml: str, pod_name: str):
+        """
+        This method tear down vm in case of error
+        """
+        self.__oc.delete_vm_sync(yaml=yaml, vm_name=pod_name)
+        self.__delete_run_yamls()
+        self.helm_delete_benchmark_operator()
+
+    @logger_time_stamp
     def stressng_pod(self):
         """
         This method run stressng workload
@@ -130,7 +151,6 @@ class BenchmarkOperatorWorkloads:
         """
         try:
             self.__oc.create_pod_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.stressng_pod.__name__}.yaml'), pod_name='stressng-workload')
-
             self.__oc.wait_for_initialized(label='app=stressng_workload')
             self.__oc.wait_for_ready(label='app=stressng_workload')
             self.__oc.wait_for_completed(label='app=stressng_workload')
@@ -138,14 +158,12 @@ class BenchmarkOperatorWorkloads:
                 # verify that data upload to elastic search according to uniq uuid
                 self.__es_operations.verify_es_data_uploaded(index='ripsaw-stressng-results', uuid=self.__oc.get_long_uuid())
         except ElasticSearchDataNotUploaded as err:
-            self.__oc.delete_pod_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.stressng_pod.__name__}.yaml'),
-                                      pod_name='stressng-workload')
-            self.helm_delete_benchmark_operator()
+            self.tear_down_pod_after_error(yaml=os.path.join(f'{self.__current_run_path}', f'{self.stressng_pod.__name__}.yaml'),
+                                           pod_name='stressng-workload')
             raise err
         except Exception as err:
-            self.__oc.delete_pod_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.stressng_pod.__name__}.yaml'),
-                                      pod_name='stressng-workload')
-            self.helm_delete_benchmark_operator()
+            self.tear_down_pod_after_error(yaml=os.path.join(f'{self.__current_run_path}', f'{self.stressng_pod.__name__}.yaml'),
+                                           pod_name='stressng-workload')
             raise err
         self.__oc.delete_pod_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.stressng_pod.__name__}.yaml'),
                                   pod_name='stressng-workload')
@@ -165,14 +183,12 @@ class BenchmarkOperatorWorkloads:
             # verify that data upload to elastic search, vm completed status
             self.__es_operations.verify_es_data_uploaded(index='ripsaw-stressng-results', uuid=self.__oc.get_long_uuid())
         except ElasticSearchDataNotUploaded as err:
-            self.__oc.delete_vm_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.stressng_vm.__name__}.yaml'),
-                                     vm_name='stressng-vm-benchmark-workload')
-            self.helm_delete_benchmark_operator()
+            self.tear_down_vm_after_error(yaml=os.path.join(f'{self.__current_run_path}', f'{self.stressng_vm.__name__}.yaml'),
+                                          vm_name='stressng-vm-benchmark-workload')
             raise err
         except Exception as err:
-            self.__oc.delete_vm_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.stressng_vm.__name__}.yaml'),
-                                     vm_name='stressng-vm-benchmark-workload')
-            self.helm_delete_benchmark_operator()
+            self.tear_down_vm_after_error(yaml=os.path.join(f'{self.__current_run_path}', f'{self.stressng_vm.__name__}.yaml'),
+                                          vm_name='stressng-vm-benchmark-workload')
             raise err
         self.__oc.delete_vm_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.stressng_vm.__name__}.yaml'),
                                  vm_name='stressng-vm-benchmark-workload')
@@ -197,12 +213,10 @@ class BenchmarkOperatorWorkloads:
                 # verify that data upload to elastic search
                 self.__es_operations.verify_es_data_uploaded(index='ripsaw-uperf-results', uuid=self.__oc.get_long_uuid(), workload=self.uperf_pod.__name__)
         except ElasticSearchDataNotUploaded as err:
-            self.__oc.delete_pod_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.uperf_pod.__name__}.yaml'), pod_name='uperf-client')
-            self.helm_delete_benchmark_operator()
+            self.tear_down_pod_after_error(yaml=os.path.join(f'{self.__current_run_path}', f'{self.uperf_pod.__name__}.yaml'), pod_name='uperf-client')
             raise err
         except Exception as err:
-            self.__oc.delete_pod_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.uperf_pod.__name__}.yaml'), pod_name='uperf-client')
-            self.helm_delete_benchmark_operator()
+            self.tear_down_pod_after_error(yaml=os.path.join(f'{self.__current_run_path}', f'{self.uperf_pod.__name__}.yaml'), pod_name='uperf-client')
             raise err
         self.__oc.delete_pod_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.uperf_pod.__name__}.yaml'),
                                   pod_name='uperf-client')
@@ -226,12 +240,10 @@ class BenchmarkOperatorWorkloads:
             # verify that data upload to elastic search, vm completed status
             self.__es_operations.verify_es_data_uploaded(index='ripsaw-uperf-results', uuid=self.__oc.get_long_uuid(), workload=self.uperf_vm.__name__)
         except ElasticSearchDataNotUploaded as err:
-            self.__oc.delete_vm_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.uperf_vm.__name__}.yaml'), vm_name='uperf-server')
-            self.helm_delete_benchmark_operator()
+            self.tear_down_vm_after_error(yaml=os.path.join(f'{self.__current_run_path}', f'{self.uperf_vm.__name__}.yaml'), vm_name='uperf-server')
             raise err
         except Exception as err:
-            self.__oc.delete_vm_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.uperf_vm.__name__}.yaml'), vm_name='uperf-server')
-            self.helm_delete_benchmark_operator()
+            self.tear_down_vm_after_error(yaml=os.path.join(f'{self.__current_run_path}', f'{self.uperf_vm.__name__}.yaml'), vm_name='uperf-server')
             raise err
         self.__oc.delete_vm_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.uperf_vm.__name__}.yaml'),
                                  vm_name='uperf-server')
@@ -265,21 +277,19 @@ class BenchmarkOperatorWorkloads:
                 self.__es_operations.verify_es_data_uploaded(index='ripsaw-hammer-results', uuid=self.__oc.get_long_uuid())
         except ElasticSearchDataNotUploaded as err:
             # delete hammerdb
-            self.__oc.delete_pod_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.hammerdb_pod.__name__}_{database}.yaml'),
-                                      pod_name='hammerdb-benchmark-creator')
+            self.tear_down_pod_after_error(yaml=os.path.join(f'{self.__current_run_path}', f'{self.hammerdb_pod.__name__}_{database}.yaml'),
+                                           pod_name='hammerdb-benchmark-creator')
             # delete database
             self.__oc.delete_pod_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{database}.yaml'), pod_name=database,
                                       namespace=f'{database}-db')
-            self.helm_delete_benchmark_operator()
             raise err
         except Exception as err:
             # delete hammerdb
-            self.__oc.delete_pod_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.hammerdb_pod.__name__}_{database}.yaml'),
-                                      pod_name='hammerdb-benchmark-creator')
+            self.tear_down_pod_after_error(yaml=os.path.join(f'{self.__current_run_path}', f'{self.hammerdb_pod.__name__}_{database}.yaml'),
+                                           pod_name='hammerdb-benchmark-creator')
             # delete database
             self.__oc.delete_pod_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{database}.yaml'), pod_name=database,
                                       namespace=f'{database}-db')
-            self.helm_delete_benchmark_operator()
             raise err
         # delete hammerdb
         self.__oc.delete_pod_sync(
@@ -305,14 +315,12 @@ class BenchmarkOperatorWorkloads:
             # verify that data upload to elastic search, vm completed status
             self.__es_operations.verify_es_data_uploaded(index='ripsaw-hammer-results', uuid=self.__oc.get_long_uuid())
         except ElasticSearchDataNotUploaded as err:
-            self.__oc.delete_vm_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.hammerdb_vm.__name__}_{database}.yaml'),
-                                     vm_name='hammerdb-vm-benchmark-workload')
-            self.helm_delete_benchmark_operator()
+            self.tear_down_vm_after_error(yaml=os.path.join(f'{self.__current_run_path}', f'{self.hammerdb_vm.__name__}_{database}.yaml'),
+                                          vm_name='hammerdb-vm-benchmark-workload')
             raise err
         except Exception as err:
-            self.__oc.delete_vm_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.hammerdb_vm.__name__}_{database}.yaml'),
-                                     vm_name='hammerdb-vm-benchmark-workload')
-            self.helm_delete_benchmark_operator()
+            self.tear_down_vm_after_error(yaml=os.path.join(f'{self.__current_run_path}', f'{self.hammerdb_vm.__name__}_{database}.yaml'),
+                                          vm_name='hammerdb-vm-benchmark-workload')
             raise err
         self.__oc.delete_vm_sync(
             yaml=os.path.join(f'{self.__current_run_path}', f'{self.hammerdb_vm.__name__}_{database}.yaml'),
@@ -327,7 +335,7 @@ class BenchmarkOperatorWorkloads:
         :return:
         """
         # remove running workloads if exist
-        self.__remove_run_yamls()
+        self.__delete_run_yamls()
         workload_name = workload_full_name.split('_')
         if 'hammerdb' in workload_full_name:
             self.__template.generate_hammerdb_yamls(workload=f'{workload_name[0]}_{workload_name[1]}', database=workload_name[2])

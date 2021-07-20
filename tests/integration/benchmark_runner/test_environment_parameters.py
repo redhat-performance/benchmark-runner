@@ -8,7 +8,7 @@ def __get_test_environment_variable():
     """
     test_environment_variable = {}
     test_environment_variable['kubeadmin_password'] = os.environ.get('KUBEADMIN_PASSWORD', '')
-    test_environment_variable['workload'] = os.environ.get('WORKLOAD', 'stressng_pod')
+    test_environment_variable['workload'] = os.environ.get('WORKLOAD', '')
     test_environment_variable['pin_node1'] = os.environ.get('PIN_NODE1', '')
     test_environment_variable['elasticsearch'] = os.environ.get('ELASTICSEARCH', '')
     test_environment_variable['elasticsearch_port'] = os.environ.get('ELASTICSEARCH_PORT', '')
