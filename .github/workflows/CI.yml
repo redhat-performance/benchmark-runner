@@ -45,6 +45,7 @@ jobs:
         INSTALL_PATH: ${{ secrets.INSTALL_PATH }}
       run: |
         # Dockerfile preparation
+
         # install oc/kubctl
         oc_version=4.7.0-0.okd-2021-05-22-050008
         curl -L https://github.com/openshift/okd/releases/download/${oc_version}/openshift-client-linux-${oc_version}.tar.gz -o $INSTALL_PATH/openshift-client-linux-${oc_version}.tar.gz
@@ -53,10 +54,17 @@ jobs:
         echo alias oc=$INSTALL_PATH/./oc >> $INSTALL_PATH/.bashrc
         echo alias kubectl=$INSTALL_PATH/./kubectl >> $INSTALL_PATH/.bashrc
         source $INSTALL_PATH/.bashrc
+
         # install helm
         curl -fsSL -o $INSTALL_PATH/get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
         chmod 700 $INSTALL_PATH/get_helm.sh
         $INSTALL_PATH/./get_helm.sh
+
+        # clone benchmark-operator
+        dnf install -y git
+        git clone https://github.com/cloud-bulldozer/benchmark-operator
+
+        # pytest
         pytest --cov=benchmark_runner --cov-report=term-missing
         coverage run -m pytest
         coverage report -m
