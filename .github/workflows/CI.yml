@@ -61,7 +61,7 @@ jobs:
         $INSTALL_PATH/./get_helm.sh
 
         # clone benchmark-operator
-        git clone https://github.com/cloud-bulldozer/benchmark-operator $INSTALL_PATH
+        git clone https://github.com/cloud-bulldozer/benchmark-operator $INSTALL_PATH/benchamrk-operator
 
         # pytest
         pytest --cov=benchmark_runner --cov-report=term-missing
