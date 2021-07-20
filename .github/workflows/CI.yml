@@ -44,7 +44,7 @@ jobs:
         PIN_NODE2: ${{ secrets.PIN_NODE2 }}
         INSTALL_PATH: ${{ secrets.INSTALL_PATH }}
       run: |
-        # Dockerfile preparation
+        # Install Dockerfile content
 
         # install oc/kubctl
         oc_version=4.7.0-0.okd-2021-05-22-050008
