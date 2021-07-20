@@ -24,12 +24,14 @@ def __delete_pod_and_yamls():
 @pytest.fixture(scope="session", autouse=True)
 def before_after_all_tests_fixture():
     """
-    This method is clearing yaml before and after test
+    This method is create benchmark operator pod once for ALL tests
     :return:
     """
     print('Install benchmark-operator pod')
+    # delete benchmark-operator pod if exist
     benchmark_operator = BenchmarkOperatorWorkloads(kubeadmin_password=environment_variable['kubeadmin_password'], es_host=environment_variable['elasticsearch'],
                                                     es_port=environment_variable['elasticsearch_port'], workload=environment_variable['workload'])
+    benchmark_operator.delete_benchmark_operator_if_exist()
     benchmark_operator.helm_install_benchmark_operator(install_path=environment_variable['install_path'])
     yield
     print('Delete benchmark-operator pod')
@@ -39,7 +41,7 @@ def before_after_all_tests_fixture():
 @pytest.fixture(autouse=True)
 def before_after_each_test_fixture():
     """
-    This method is clearing yaml before and after test
+    This method is clearing yaml before and after EACH test
     :return:
     """
     # before each test

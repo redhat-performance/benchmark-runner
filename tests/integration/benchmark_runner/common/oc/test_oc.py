@@ -10,32 +10,48 @@ from benchmark_runner.benchmark_operator.benchmark_operator_workloads import Ben
 from tests.integration.benchmark_runner.test_environment_parameters import *
 
 
-def __create_pod_vm_yamls():
+def __generate_pod_yamls():
     """
-    This method create pod vm and yamls from template and inject environment variable inside
+    This method create pod yaml from template and inject environment variable inside
     :return:
     """
     update_environment_variable(dir_path=templates_path, yaml_file='stressng_template.yaml', environment_variable_dict=environment_variable)
+
+
+def __generate_vm_yamls():
+    """
+    This method create vm yaml from template and inject environment variable inside
+    :return:
+    """
     update_environment_variable(dir_path=templates_path, yaml_file='stressng_vm_template.yaml', environment_variable_dict=environment_variable)
 
 
-def __delete_pod_vm_yamls():
+def __delete_pod_yamls():
     """
-    This method delete vm, pod and yamls if exist
+    This method delete pod yamls if exist
     :return:
     """
     oc = OC(kubeadmin_password=environment_variable['kubeadmin_password'])
     oc.login()
     oc.delete_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng.yaml'), pod_name='stressng-workload')
-    oc.delete_vm_sync(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'), vm_name='stressng-vm-benchmark-workload')
     delete_generate_file(full_path_yaml=os.path.join(f'{templates_path}', 'stressng.yaml'))
+
+
+def __delete_vm_yamls():
+    """
+    This method delete vm yamls if exist
+    :return:
+    """
+    oc = OC(kubeadmin_password=environment_variable['kubeadmin_password'])
+    oc.login()
+    oc.delete_vm_sync(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'), vm_name='stressng-vm-benchmark-workload')
     delete_generate_file(full_path_yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'))
 
 
 @pytest.fixture(scope="session", autouse=True)
 def before_after_all_tests_fixture():
     """
-    This method is clearing yaml before and after test
+    This method is create benchmark operator pod once for ALL tests
     :return:
     """
     print('Install benchmark-operator pod')
@@ -43,6 +59,7 @@ def before_after_all_tests_fixture():
                                                     es_host=environment_variable['elasticsearch'],
                                                     es_port=environment_variable['elasticsearch_port'],
                                                     workload=environment_variable['workload'])
+    benchmark_operator.delete_benchmark_operator_if_exist()
     benchmark_operator.helm_install_benchmark_operator(install_path=environment_variable['install_path'])
     yield
     print('Delete benchmark-operator pod')
@@ -52,14 +69,16 @@ def before_after_all_tests_fixture():
 @pytest.fixture(autouse=True)
 def before_after_each_test_fixture():
     """
-    This method is clearing yaml before and after test
+    This method is clearing yaml before and after EACH test
     :return:
     """
     # before all test: setup
-    __create_pod_vm_yamls()
+    __generate_pod_yamls()
+    __generate_vm_yamls()
     yield
     # After all tests
-    __delete_pod_vm_yamls()
+    __delete_pod_yamls()
+    __delete_vm_yamls()
     print('Test End')
 
 
@@ -69,12 +88,14 @@ def test_login():
     :return:
     """
     oc = OC(kubeadmin_password=environment_variable['kubeadmin_password'])
-    assert 'Login successful' in oc.login()
+    # byte to string
+    result = oc.login().decode("utf-8")
+    assert 'Login successful' in result
 
 
 def test_oc_get_pods():
     """
-    This method get pods
+    This method test get pods
     :return:
     """
     oc = OC(kubeadmin_password=environment_variable['kubeadmin_password'])
@@ -92,6 +113,16 @@ def test_oc_get_pod_name():
     assert oc._get_pod_name(pod_name='benchmark-operator', namespace='my-ripsaw')
 
 
+def test_oc_is_pod_exist():
+    """
+    This method check if pod exist
+    :return:
+    """
+    oc = OC(kubeadmin_password=environment_variable['kubeadmin_password'])
+    oc.login()
+    assert oc._is_pod_exist(pod_name='benchmark-operator', namespace='my-ripsaw')
+
+
 def test_wait_for_pod_created():
     """
     This method wait for pod to be created
@@ -105,7 +136,7 @@ def test_wait_for_pod_created():
 
 def test_create_pod_sync():
     """
-    This method create pod in synchronized
+    This method create pod synchronized
     :return:
     """
     oc = OC(kubeadmin_password=environment_variable['kubeadmin_password'])
@@ -113,9 +144,10 @@ def test_create_pod_sync():
     assert oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng.yaml'), pod_name='stressng-workload')
 
 
+@pytest.mark.skip(reason="No Elastic Search support yet")
 def test_oc_get_vmi_name():
     """
-    This method wait for pod to be created
+    This method wait for vm to be created
     :return:
     """
     oc = OC(kubeadmin_password=environment_variable['kubeadmin_password'])
@@ -123,12 +155,27 @@ def test_oc_get_vmi_name():
     oc._create_async(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'))
     # wait 30 sec till vm will be created
     time.sleep(30)
-    oc._get_vmi_name(vm_name='stressng-vm-benchmark-workload', namespace='my-ripsaw')
+    assert oc._get_vmi_name(vm_name='stressng-vm-benchmark-workload', namespace='my-ripsaw')
 
 
+@pytest.mark.skip(reason="No Elastic Search support yet")
+def test_oc_is_vmi_exist():
+    """
+    This method check if vm exist
+    :return:
+    """
+    oc = OC(kubeadmin_password=environment_variable['kubeadmin_password'])
+    oc.login()
+    oc._create_async(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'))
+    # wait 30 sec till vm will be created
+    time.sleep(30)
+    assert oc._is_vmi_exist(vm_name='stressng-vm-benchmark-workload', namespace='my-ripsaw')
+
+
+@pytest.mark.skip(reason="No Elastic Search support yet")
 def test_wait_for_vm_created():
     """
-    This method wait for pod to be created
+    This method wait for vm to be created
     :return:
     """
     oc = OC(kubeadmin_password=environment_variable['kubeadmin_password'])
@@ -137,9 +184,10 @@ def test_wait_for_vm_created():
     assert oc.wait_for_vm_create(vm_name='stressng-vm-benchmark-workload')
 
 
+@pytest.mark.skip(reason="No Elastic Search support yet")
 def test_oc_get_vmi():
     """
-    This method run oc get vmi
+    This method run get vmi
     :return:
     """
     oc = OC(kubeadmin_password=environment_variable['kubeadmin_password'])
@@ -148,9 +196,10 @@ def test_oc_get_vmi():
     assert oc.get_vmi()
 
 
+@pytest.mark.skip(reason="No Elastic Search support yet")
 def test_create_vm_sync():
     """
-    This method create pod in synchronized
+    This method create vm synchronized
     :return:
     """
     oc = OC(kubeadmin_password=environment_variable['kubeadmin_password'])
@@ -158,20 +207,9 @@ def test_create_vm_sync():
     assert oc.create_vm_sync(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'), vm_name='stressng-vm-benchmark-workload')
 
 
-def test_get_sort_uuid():
-    """
-    This method test run ssh cmd
-    :return:
-    """
-    oc = OC(kubeadmin_password=environment_variable['kubeadmin_password'])
-    oc.login()
-    oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng.yaml'), pod_name='stressng-workload')
-    assert len(oc._OC__get_uuid()) == 8
-
-
 def test_get_long_uuid():
     """
-    This method test run ssh cmd
+    This method test long uuid
     :return:
     """
     oc = OC(kubeadmin_password=environment_variable['kubeadmin_password'])
@@ -180,9 +218,20 @@ def test_get_long_uuid():
     assert len(oc.get_long_uuid()) == 36
 
 
+def test_get_sort_uuid():
+    """
+    This method test sort uuid
+    :return:
+    """
+    oc = OC(kubeadmin_password=environment_variable['kubeadmin_password'])
+    oc.login()
+    oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng.yaml'), pod_name='stressng-workload')
+    assert len(oc._OC__get_short_uuid()) == 8
+
+
 def test_delete_pod_sync():
     """
-    This method delete pod in synchronized way
+    This method delete pod synchronized
     :return:
     """
     oc = OC(kubeadmin_password=environment_variable['kubeadmin_password'])
@@ -191,9 +240,10 @@ def test_delete_pod_sync():
     assert oc.delete_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng.yaml'), pod_name='stressng-workload')
 
 
+@pytest.mark.skip(reason="No Elastic Search support yet")
 def test_delete_vm_sync():
     """
-    This method delete vm in synchronized way
+    This method delete vm synchronized
     :return:
     """
     oc = OC(kubeadmin_password=environment_variable['kubeadmin_password'])
@@ -226,7 +276,7 @@ def test_create_sync_pod_timeout_error():
 
 def test_delete_sync_pod_timeout_error():
     """
-    This method create pod with timeout error
+    This method delete pod with timeout error
     :return:
     """
     oc = OC(kubeadmin_password=environment_variable['kubeadmin_password'])
@@ -236,9 +286,10 @@ def test_delete_sync_pod_timeout_error():
         oc.delete_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng.yaml'), pod_name='stressng-workload', timeout=0)
 
 
+@pytest.mark.skip(reason="No Elastic Search support yet")
 def test_create_sync_vm_timeout_error():
     """
-    This method create pod with timeout error
+    This method create vm with timeout error
     :return:
     """
     oc = OC(kubeadmin_password=environment_variable['kubeadmin_password'])
@@ -255,7 +306,7 @@ def test_wait_for_pod_initialized():
     oc = OC(kubeadmin_password=environment_variable['kubeadmin_password'])
     oc.login()
     oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng.yaml'), pod_name='stressng-workload')
-    assert 'condition met' in oc.wait_for_initialized(label='app=stressng_workload')
+    assert oc.wait_for_initialized(label='app=stressng_workload')
 
 
 def test_wait_for_pod_ready():
@@ -267,10 +318,11 @@ def test_wait_for_pod_ready():
     oc.login()
     oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng.yaml'), pod_name='stressng-workload')
     oc.wait_for_initialized(label='app=stressng_workload')
-    assert 'condition met' in oc.wait_for_ready(label='app=stressng_workload')
+    assert oc.wait_for_ready(label='app=stressng_workload')
 
 
-@pytest.mark.skipIf("Need to fix it after updating labels in stressng vm ")
+@pytest.mark.skipIf("Stressng only: Need to fix it after updating labels in stressng vm ")
+@pytest.mark.skip(reason="No Elastic Search support yet")
 def test_wait_for_vm_initialized():
     """
     This method test wait for vm to be initialized
@@ -279,10 +331,11 @@ def test_wait_for_vm_initialized():
     oc = OC(kubeadmin_password=environment_variable['kubeadmin_password'])
     oc.login()
     oc.create_vm_sync(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'), vm_name='stressng-vm-benchmark-workload')
-    assert 'condition met' in oc.wait_for_initialized(label='kubevirt.io=virt-launcher', label_uuid=False)
+    assert oc.wait_for_initialized(label='kubevirt.io=virt-launcher', label_uuid=False)
 
 
-@pytest.mark.skipIf("Need to fix it after updating labels in stressng vm ")
+@pytest.mark.skipIf("Stressng only: Need to fix it after updating labels in stressng vm ")
+@pytest.mark.skip(reason="No Elastic Search support yet")
 def test_wait_for_vm_ready():
     """
     This method test wait for vm to be ready
@@ -292,7 +345,7 @@ def test_wait_for_vm_ready():
     oc.login()
     oc.create_vm_sync(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'), vm_name='stressng-vm-benchmark-workload')
     oc.wait_for_initialized(label='kubevirt.io=virt-launcher')
-    assert 'condition met' in oc.wait_for_ready(label='kubevirt.io=virt-launcher', label_uuid=False)
+    assert oc.wait_for_ready(label='kubevirt.io=virt-launcher', label_uuid=False)
 
 
 def test_wait_for_pod_completed():
@@ -304,13 +357,15 @@ def test_wait_for_pod_completed():
     oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng.yaml'), pod_name='stressng-workload')
     oc.wait_for_initialized(label='app=stressng_workload')
     oc.wait_for_ready(label='app=stressng_workload')
-    assert 'condition met' in oc.wait_for_completed(label='app=stressng_workload')
+    assert oc.wait_for_completed(label='app=stressng_workload')
 
 
-@pytest.mark.skipIf("Need to fix it after updating labels in stressng vm ")
+@pytest.mark.skipIf("Stressng only: Need to fix it after updating labels in stressng vm ")
+@pytest.mark.skip(reason="No Elastic Search support yet")
 def test_wait_for_vm_completed():
     """
-    This method test wait for vm to be completed
+    This method test wait for vm to be completed by verify ElasticSearch was populated with data
+    Must have running ElasticSearch server
     :return:
     """
     if environment_variable['elasticsearch'] and environment_variable['elasticsearch_port']:
@@ -340,6 +395,7 @@ def test_wait_for_pod_terminated():
     assert oc.wait_for_pod_terminate(pod_name='stressng-workload')
 
 
+@pytest.mark.skip(reason="No Elastic Search support yet")
 def test_wait_for_vm_terminated():
     """
     This method test wait for vm to be terminated
