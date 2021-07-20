@@ -43,7 +43,7 @@ def before_after_all_tests_fixture():
                                                     es_host=environment_variable['elasticsearch'],
                                                     es_port=environment_variable['elasticsearch_port'],
                                                     workload=environment_variable['workload'])
-    benchmark_operator.helm_install_benchmark_operator()
+    benchmark_operator.helm_install_benchmark_operator(install_path=environment_variable['install_path'])
     yield
     print('Delete benchmark-operator pod')
     benchmark_operator.helm_delete_benchmark_operator()
