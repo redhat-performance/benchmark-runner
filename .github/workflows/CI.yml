@@ -54,7 +54,7 @@ jobs:
         echo alias kubectl=$INSTALL_PATH/./kubectl >> $INSTALL_PATH/.bashrc
         source $INSTALL_PATH/.bashrc
         # install helm
-        curl -fsSL -o $INSTALL_PATH/get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 \
+        curl -fsSL -o $INSTALL_PATH/get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
         chmod 700 $INSTALL_PATH/get_helm.sh
         $INSTALL_PATH/./get_helm.sh
         pytest --cov=benchmark_runner --cov-report=term-missing
