@@ -61,7 +61,6 @@ jobs:
         $INSTALL_PATH/./get_helm.sh
 
         # clone benchmark-operator
-        yum install -y git
         git clone https://github.com/cloud-bulldozer/benchmark-operator
 
         # pytest
