@@ -80,15 +80,19 @@ class BenchmarkOperatorWorkloads:
                 os.remove(os.path.join(self.__current_run_path, file))
 
     @logger_time_stamp
-    def helm_install_benchmark_operator(self, install_path: str = '/benchmark-operator/charts/benchmark-operator'):
+    def helm_install_benchmark_operator(self, install_path: str = ''):
         """
         This function install benchmark operator
         :return:
         """
+        benchmark_operator_path = 'benchmark-operator/charts/benchmark-operator'
         # create if not exist
         if not self.__oc._get_pod_name(pod_name='benchmark-operator', namespace='my-ripsaw'):
             current_dir = os.getcwd()
-            os.chdir(install_path)
+            if install_path:
+                os.chdir(os.path.join(install_path, benchmark_operator_path))
+            else:
+                os.chdir(benchmark_operator_path)
             self.__ssh.run('/usr/local/bin/helm install benchmark-operator . -n my-ripsaw --create-namespace')
             self.__oc.wait_for_pod_create(pod_name='benchmark-operator')
             self.__ssh.run('~/./oc adm policy -n my-ripsaw add-scc-to-user privileged -z benchmark-operator')

@@ -7,13 +7,13 @@ def __get_test_environment_variable():
     This method generate environment variable for test
     """
     test_environment_variable = {}
-    test_environment_variable['kubeadmin_password'] = os.environ.get('KUBEADMIN_PASSWORD', 'NP4se-sMadS-wSpH5-YPnnx')
+    test_environment_variable['kubeadmin_password'] = os.environ.get('KUBEADMIN_PASSWORD', '')
     test_environment_variable['workload'] = os.environ.get('WORKLOAD', 'stressng_pod')
-    test_environment_variable['pin_node1'] = os.environ.get('PIN_NODE1', 'ocp48-ci-27ws6-master-0')
+    test_environment_variable['pin_node1'] = os.environ.get('PIN_NODE1', '')
     test_environment_variable['elasticsearch'] = os.environ.get('ELASTICSEARCH', '')
     test_environment_variable['elasticsearch_port'] = os.environ.get('ELASTICSEARCH_PORT', '')
     # This path is for benchmark-operator path
-    test_environment_variable['install_path'] = os.environ.get('INSTALL_PATH', '/benchmark-operator/charts/benchmark-operator')
+    test_environment_variable['install_path'] = os.environ.get('INSTALL_PATH', '')
     if test_environment_variable['elasticsearch'] and test_environment_variable['elasticsearch_port']:
         test_environment_variable[
             'elasticsearch_url'] = f"http://{test_environment_variable['elasticsearch']}:{test_environment_variable['elasticsearch_port']}"
