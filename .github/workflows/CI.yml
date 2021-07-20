@@ -51,8 +51,6 @@ jobs:
         echo alias oc=/home/runner/./oc >> /home/runner/.bashrc
         echo alias kubectl=/home/runner/./kubectl >> /home/runner/.bashrc
         source /home/runner/.bashrc
-        oc get pods
-        oc login -u kubeadmin -p $kubeadmin_password
         pytest --cov=benchmark_runner --cov-report=term-missing
         coverage run -m pytest
         coverage report -m
