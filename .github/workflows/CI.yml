@@ -42,15 +42,21 @@ jobs:
         KUBEADMIN_PASSWORD: ${{ secrets.KUBEADMIN_PASSWORD }}
         PIN_NODE1: ${{ secrets.PIN_NODE1 }}
         PIN_NODE2: ${{ secrets.PIN_NODE2 }}
+        INSTALL_PATH: ${{ secrets.INSTALL_PATH }}
       run: |
+        # Dockerfile preparation
         # install oc/kubctl
         oc_version=4.7.0-0.okd-2021-05-22-050008
-        curl -L https://github.com/openshift/okd/releases/download/${oc_version}/openshift-client-linux-${oc_version}.tar.gz -o /home/runner/openshift-client-linux-${oc_version}.tar.gz
-        tar -xzvf /home/runner/openshift-client-linux-${oc_version}.tar.gz -C /home/runner/
-        rm /home/runner/openshift-client-linux-${oc_version}.tar.gz
-        echo alias oc=/home/runner/./oc >> /home/runner/.bashrc
-        echo alias kubectl=/home/runner/./kubectl >> /home/runner/.bashrc
-        source /home/runner/.bashrc
+        curl -L https://github.com/openshift/okd/releases/download/${oc_version}/openshift-client-linux-${oc_version}.tar.gz -o $INSTALL_PATH/openshift-client-linux-${oc_version}.tar.gz
+        tar -xzvf $INSTALL_PATH/openshift-client-linux-${oc_version}.tar.gz -C $INSTALL_PATH/
+        rm $INSTALL_PATH/openshift-client-linux-${oc_version}.tar.gz
+        echo alias oc=$INSTALL_PATH/./oc >> $INSTALL_PATH/.bashrc
+        echo alias kubectl=$INSTALL_PATH/./kubectl >> $INSTALL_PATH/.bashrc
+        source $INSTALL_PATH/.bashrc
+        # install helm
+        curl -fsSL -o $INSTALL_PATH/get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 \
+        chmod 700 $INSTALL_PATH/get_helm.sh
+        $INSTALL_PATH/./get_helm.sh
         pytest --cov=benchmark_runner --cov-report=term-missing
         coverage run -m pytest
         coverage report -m

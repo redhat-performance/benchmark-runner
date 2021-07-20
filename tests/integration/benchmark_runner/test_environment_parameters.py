@@ -12,6 +12,8 @@ def __get_test_environment_variable():
     test_environment_variable['pin_node1'] = os.environ.get('PIN_NODE1', '')
     test_environment_variable['elasticsearch'] = os.environ.get('ELASTICSEARCH', '')
     test_environment_variable['elasticsearch_port'] = os.environ.get('ELASTICSEARCH_PORT', '')
+    # This path is for benchmark-operator path
+    test_environment_variable['path'] = os.environ.get('PATH', '')
     if test_environment_variable['elasticsearch'] and test_environment_variable['elasticsearch_port']:
         test_environment_variable[
             'elasticsearch_url'] = f"http://{test_environment_variable['elasticsearch']}:{test_environment_variable['elasticsearch_port']}"
