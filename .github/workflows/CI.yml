@@ -39,13 +39,10 @@ jobs:
       id: setcontext
     - name: 📃 Test with pytest
       env:
-        kubeadmin_password: ${{ secrets.KUBEADMIN_PASSWORD }}
-        pin_node1: ${{ secrets.PIN_NODE1 }}
-        pin_node2: ${{ secrets.PIN_NODE2 }}
+        KUBEADMIN_PASSWORD: ${{ secrets.KUBEADMIN_PASSWORD }}
+        PIN_NODE1: ${{ secrets.PIN_NODE1 }}
+        PIN_NODE2: ${{ secrets.PIN_NODE2 }}
       run: |
-        kubeadmin_password=${{ secrets.KUBEADMIN_PASSWORD }}
-        pin_node1=${{ secrets.PIN_NODE1 }}
-        pin_node2=${{ secrets.PIN_NODE2 }}
         # install oc/kubctl
         oc_version=4.7.0-0.okd-2021-05-22-050008
         curl -L https://github.com/openshift/okd/releases/download/${oc_version}/openshift-client-linux-${oc_version}.tar.gz -o /home/runner/openshift-client-linux-${oc_version}.tar.gz
