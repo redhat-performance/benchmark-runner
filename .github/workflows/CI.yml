@@ -59,9 +59,9 @@ jobs:
         curl -fsSL -o $INSTALL_PATH/get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
         chmod 700 $INSTALL_PATH/get_helm.sh
         $INSTALL_PATH/./get_helm.sh
-        /usr/local/bin/helm
+
         # clone benchmark-operator
-        git clone https://github.com/cloud-bulldozer/benchmark-operator
+        git clone https://github.com/cloud-bulldozer/benchmark-operator $INSTALL_PATH
 
         # pytest
         pytest --cov=benchmark_runner --cov-report=term-missing
