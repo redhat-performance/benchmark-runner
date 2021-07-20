@@ -321,7 +321,7 @@ def test_wait_for_pod_ready():
     assert oc.wait_for_ready(label='app=stressng_workload')
 
 
-@pytest.mark.skipIf("Stressng only: Need to fix it after updating labels in stressng vm ")
+# Stressng labels only: Need to fix it after updating labels in stressng vm
 @pytest.mark.skip(reason="No Elastic Search support yet")
 def test_wait_for_vm_initialized():
     """
@@ -334,7 +334,7 @@ def test_wait_for_vm_initialized():
     assert oc.wait_for_initialized(label='kubevirt.io=virt-launcher', label_uuid=False)
 
 
-@pytest.mark.skipIf("Stressng only: Need to fix it after updating labels in stressng vm ")
+# Stressng labels only: Need to fix it after updating labels in stressng vm 
 @pytest.mark.skip(reason="No Elastic Search support yet")
 def test_wait_for_vm_ready():
     """
@@ -360,7 +360,7 @@ def test_wait_for_pod_completed():
     assert oc.wait_for_completed(label='app=stressng_workload')
 
 
-@pytest.mark.skipIf("Stressng only: Need to fix it after updating labels in stressng vm ")
+# Stressng labels only: Need to fix it after updating labels in stressng vm
 @pytest.mark.skip(reason="No Elastic Search support yet")
 def test_wait_for_vm_completed():
     """

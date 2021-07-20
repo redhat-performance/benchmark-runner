@@ -1,11 +1,6 @@
 # unittests path
 [run]
-include=
-    benchmark-runner/*
+include= */benchmark_runner/*
 
-omit=
-        *__init__*
-        */usr/local/lib*
-        *Test*
-        *init_logger*
+omit= *__init__*, */usr/local/lib*, *Test*, *init_logger*
 
