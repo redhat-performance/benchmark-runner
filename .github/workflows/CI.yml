@@ -42,26 +42,26 @@ jobs:
         KUBEADMIN_PASSWORD: ${{ secrets.KUBEADMIN_PASSWORD }}
         PIN_NODE1: ${{ secrets.PIN_NODE1 }}
         PIN_NODE2: ${{ secrets.PIN_NODE2 }}
-        INSTALL_PATH: ${{ secrets.INSTALL_PATH }}
+        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
       run: |
         # Install Dockerfile content
 
         # install oc/kubctl
         oc_version=4.7.0-0.okd-2021-05-22-050008
         curl -L https://github.com/openshift/okd/releases/download/${oc_version}/openshift-client-linux-${oc_version}.tar.gz -o $INSTALL_PATH/openshift-client-linux-${oc_version}.tar.gz
-        tar -xzvf $RUNNER_TEMP/openshift-client-linux-${oc_version}.tar.gz -C $RUNNER_TEMP/
-        rm $RUNNER_TEMP/openshift-client-linux-${oc_version}.tar.gz
-        echo alias oc=$RUNNER_TEMP/./oc >> $RUNNER_TEMP/.bashrc
-        echo alias kubectl=$RUNNER_TEMP/./kubectl >> $RUNNER_TEMP/.bashrc
-        source $RUNNER_TEMP/.bashrc
+        tar -xzvf $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz -C $RUNNER_PATH/
+        rm $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz
+        echo alias oc=$RUNNER_PATH/./oc >> $RUNNER_PATH/.bashrc
+        echo alias kubectl=$RUNNER_PATH/./kubectl >> $RUNNER_PATH/.bashrc
+        source $RUNNER_PATH/.bashrc
 
         # install helm
-        curl -fsSL -o $RUNNER_TEMP/get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
-        chmod 700 $RUNNER_TEMP/get_helm.sh
-        $RUNNER_TEMP/./get_helm.sh
+        curl -fsSL -o $RUNNER_PATH/get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+        chmod 700 $RUNNER_PATH/get_helm.sh
+        $RUNNER_PATH/./get_helm.sh
 
         # clone benchmark-operator
-        git clone https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_TEMP/benchmark-operator
+        git clone https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
 
         # pytest
         pytest --cov=benchmark_runner --cov-report=term-missing
