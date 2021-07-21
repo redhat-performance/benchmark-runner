@@ -5,24 +5,6 @@ from benchmark_runner.common.oc.oc import OC
 from benchmark_runner.common.oc.oc_exceptions import YAMLNotExist, LoginFailed
 
 
-def test_oc_get_pods():
-    """
-    This test run oc get pods
-    :return:
-    """
-    oc = OC()
-    assert oc.get_pods()
-
-
-def test_oc_get_pod_name():
-    """
-    This test run oc get pod by name
-    :return:
-    """
-    oc = OC()
-    assert oc._get_pod_name(pod_name='wcwcwcwc', namespace='my-ripsaw') == ''
-
-
 def test_incorrect_kubeadmin_password():
     """
     This method test incorrect kubeadmin password
