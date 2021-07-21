@@ -61,6 +61,7 @@ jobs:
         curl -fsSL -o $RUNNER_PATH/get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
         chmod 700 $RUNNER_PATH/get_helm.sh
         $RUNNER_PATH/./get_helm.sh
+        helm
 
         # clone benchmark-operator
         git clone https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
