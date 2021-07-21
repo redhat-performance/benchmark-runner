@@ -118,7 +118,7 @@ def test_oc_get_pod_name():
     :return:
     """
     oc = OC(kubeadmin_password=environment_variable['kubeadmin_password'])
-    assert oc._get_pod_name(pod_name='wcwcwcwc', namespace='my-ripsaw') == ''
+    assert oc._get_pod_name(pod_name='wcwcwcwc', namespace='benchmark-operator') == ''
 
 def test_oc_get_pod_name():
     """
@@ -127,7 +127,7 @@ def test_oc_get_pod_name():
     """
     oc = OC(kubeadmin_password=environment_variable['kubeadmin_password'])
     oc.login()
-    assert oc._get_pod_name(pod_name='benchmark-operator', namespace='my-ripsaw')
+    assert oc._get_pod_name(pod_name='benchmark-operator', namespace='benchmark-operator')
 
 
 def test_oc_is_pod_exist():
@@ -137,7 +137,7 @@ def test_oc_is_pod_exist():
     """
     oc = OC(kubeadmin_password=environment_variable['kubeadmin_password'])
     oc.login()
-    assert oc._is_pod_exist(pod_name='benchmark-operator', namespace='my-ripsaw')
+    assert oc._is_pod_exist(pod_name='benchmark-operator', namespace='benchmark-operator')
 
 
 def test_wait_for_pod_created():
@@ -172,7 +172,7 @@ def test_oc_get_vmi_name():
     oc._create_async(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'))
     # wait 30 sec till vm will be created
     time.sleep(30)
-    assert oc._get_vmi_name(vm_name='stressng-vm-benchmark-workload', namespace='my-ripsaw')
+    assert oc._get_vmi_name(vm_name='stressng-vm-benchmark-workload', namespace='benchmark-operator')
 
 
 @pytest.mark.skip(reason="No Elastic Search support yet")
@@ -186,7 +186,7 @@ def test_oc_is_vmi_exist():
     oc._create_async(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'))
     # wait 30 sec till vm will be created
     time.sleep(30)
-    assert oc._is_vmi_exist(vm_name='stressng-vm-benchmark-workload', namespace='my-ripsaw')
+    assert oc._is_vmi_exist(vm_name='stressng-vm-benchmark-workload', namespace='benchmark-operator')
 
 
 @pytest.mark.skip(reason="No Elastic Search support yet")
@@ -408,6 +408,7 @@ def test_wait_for_pod_terminated():
     oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng.yaml'), pod_name='stressng-workload')
     oc.wait_for_initialized(label='app=stressng_workload')
     oc.wait_for_ready(label='app=stressng_workload')
+    oc.wait_for_completed(label='app=stressng_workload')
     oc._delete_async(yaml=os.path.join(f'{templates_path}', 'stressng.yaml'))
     assert oc.wait_for_pod_terminate(pod_name='stressng-workload')
 

@@ -43,8 +43,8 @@ RUN curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master
 RUN dnf install -y git \
     && git clone https://github.com/cloud-bulldozer/benchmark-operator
 #   && cd benchmark-operator/charts/benchmark-operator \
-#    && helm install benchmark-operator . -n my-ripsaw --create-namespace
-#    && oc adm policy -n my-ripsaw add-scc-to-user privileged -z benchmark-operator
+#    && helm install benchmark-operator . -n benchmark-operator --create-namespace
+#    && oc adm policy -n benchmark-operator add-scc-to-user privileged -z benchmark-operator
 
 # Add main
 ADD benchmark_runner/benchmark_operator/templates /usr/local/benchmark_runner/benchmark_operator/templates/
