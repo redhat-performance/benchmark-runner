@@ -67,9 +67,9 @@ jobs:
         git clone https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
 
         # pytest
-        pytest --cov=benchmark_runner --cov-report=term-missing
-        coverage run -m pytest
-        coverage report -m
+        #pytest --cov=benchmark_runner --cov-report=term-missing
+        #coverage run -m pytest
+        #coverage report -m
     - name: 🎥 Publish to coveralls.io
       env:
         GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
@@ -96,6 +96,13 @@ jobs:
         echo '⌛ Wait 30 sec till image will be updated in quay.io'
         sleep 30
     - name: ✔️ E2E tests using latest quay.io
+      env:
+        KUBEADMIN_PASSWORD: ${{ secrets.KUBEADMIN_PASSWORD }}
+        PIN_NODE1: ${{ secrets.PIN_NODE1 }}
+        PIN_NODE2: ${{ secrets.PIN_NODE2 }}
+        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+        #ELASTICSEARCH: ${{ secrets.ELASTICSEARCH }}
+        #ELASTICSRACH_PORT: ${{ secrets.ELASTICSRACH_PORT }}
       run: |
         sudo podman run --rm -e WORKLOAD=stressng_pod -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE1=$PIN_NODE1 -v $KUBECONFIG:/root/.kube/config -e log_level=INFO --privileged quay.io/ebattat/benchmark-runner:latest
     - name: 🎁 Bump Version
