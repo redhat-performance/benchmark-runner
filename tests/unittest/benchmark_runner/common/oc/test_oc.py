@@ -38,3 +38,4 @@ def test_short_uuid():
     with mock.patch.object(OC, 'get_long_uuid', new=dummy_long_uuid):
         oc = OC()
         assert oc._OC__get_short_uuid() == 'bb2be20e'
+
