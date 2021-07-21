@@ -103,6 +103,17 @@ class BenchmarkOperatorWorkloads:
         os.chdir(current_dir)
 
     @logger_time_stamp
+    def delete_benchmark_operator_if_exist(self):
+        """
+        This method delete benchmark operator if exist
+        @return:
+        """
+        # delete benchmark-operator pod if exist
+        if self.__oc._is_pod_exist(pod_name='benchmark-operator', namespace='benchmark-operator'):
+            logger.info('delete benchmark operator running pod')
+            self.helm_delete_benchmark_operator()
+
+    @logger_time_stamp
     def helm_delete_benchmark_operator(self):
         """
         This function delete benchmark operator
@@ -359,10 +370,7 @@ class BenchmarkOperatorWorkloads:
         :return:
         """
 
-        # delete benchmark-operator pod if exist
-        if self.__oc._is_pod_exist(pod_name='benchmark-operator', namespace='benchmark-operator'):
-            logger.info('delete benchmark operator running pod')
-            self.helm_delete_benchmark_operator()
+        self.delete_benchmark_operator_if_exist()
 
         # elasticsearch is must for VM workload for completed status verifications
         self.__verify_elasticsearch_exist_for_vm_workload(workload=self.__workload)
