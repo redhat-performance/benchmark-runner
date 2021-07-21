@@ -105,6 +105,7 @@ jobs:
         #ELASTICSRACH_PORT: ${{ secrets.ELASTICSRACH_PORT }}
       run: |
         sudo podman run --rm -e WORKLOAD=stressng_pod -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE1=$PIN_NODE1 -v $KUBECONFIG:/root/.kube/config -e log_level=INFO --privileged quay.io/ebattat/benchmark-runner:latest
+        sudo podman run --rm -e WORKLOAD=hammerdb_pod_mariadb -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE1=$PIN_NODE1 -v $KUBECONFIG:/root/.kube/config -e log_level=INFO --privileged quay.io/ebattat/benchmark-runner:latest
     - name: 🎁 Bump Version
       run: |
         version=$(python3 setup.py --version)
@@ -118,4 +119,3 @@ jobs:
         git pull https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} main
         git push https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} main
         git push https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} --tag
-

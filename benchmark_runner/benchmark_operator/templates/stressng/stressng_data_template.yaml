@@ -1,5 +1,4 @@
 shared_data:
-  index_name: ripsaw-stressng
   pin_client: {{ pin_node1 }}
   url: {{ elasticsearch_url }}
   pin: true
@@ -15,11 +14,13 @@ shared_data:
   # mem stressor options
   mem_stressors: 1
 pod:
+  index_name_pod: stressng-pod
   es_kind: pod
   resources: true
   limits_cpu: 4
   limits_memory_GB: 16
 vm:
+  index_name_vm: stressng-vm
   es_kind: vm
   cores: 4
   limits_memory_GB: 16

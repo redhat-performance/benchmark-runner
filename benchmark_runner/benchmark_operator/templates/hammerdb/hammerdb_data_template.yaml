@@ -5,7 +5,6 @@ shared_data:
   es_db_version: 10.3.0
   es_ocp_version: 4.7.3
   es_os_version: centos8
-  index_name: ripsaw-hammer
   pin: true
   pin_node: {{ pin_node1 }}
   transactions: 100000
@@ -32,11 +31,13 @@ postgres:
   db_user: postgres
   db_server_pod: postgres-deployment.postgres-db
 pod:
+  index_name_pod: hammerdb-pod
   es_kind: pod
   resources: true
   limits_cpu: 4
   limits_memory_GB: 16
 vm:
+  index_name_pod: hammerdb-vm
   cores: 4
   es_kind: vm
   limits_memory_GB: 16

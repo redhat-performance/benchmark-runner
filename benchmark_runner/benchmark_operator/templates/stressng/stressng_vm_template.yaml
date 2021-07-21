@@ -6,7 +6,7 @@ metadata:
 spec:
   elasticsearch:
     url: "{{ url }}"
-    index_name: {{ index_name }}
+    index_name: {{ index_name_vm }}
   metadata:
     collection: false
   workload:
