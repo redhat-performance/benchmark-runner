@@ -54,9 +54,9 @@ Choose one from the following list:
 
 `mandatory:`ELASTICSEARCH_PORT=$elasticsearch_port
 
-`optional:`PIN_NODE1=$pin_node1
+`optional:`PIN_NODE1=$pin_node1 [node1 selector for running the workload]
 
-`optional:`PIN_NODE2=$pin_node2
+`optional:`PIN_NODE2=$pin_node2 [node2 selector for running the workload, i.e. uperf there are client and server]
 
 ## Run workload using Podman/Docker 
 ```sh
