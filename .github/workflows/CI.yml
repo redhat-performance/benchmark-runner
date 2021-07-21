@@ -42,7 +42,7 @@ jobs:
         KUBEADMIN_PASSWORD: ${{ secrets.KUBEADMIN_PASSWORD }}
         PIN_NODE1: ${{ secrets.PIN_NODE1 }}
         PIN_NODE2: ${{ secrets.PIN_NODE2 }}
-        #RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
         #ELASTICSEARCH: ${{ secrets.ELASTICSEARCH }}
         #ELASTICSRACH_PORT: ${{ secrets.ELASTICSRACH_PORT }}
       run: |
