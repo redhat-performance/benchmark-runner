@@ -55,12 +55,15 @@ jobs:
         rm $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz
         echo alias oc=$RUNNER_PATH/./oc >> $RUNNER_PATH/.bashrc
         echo alias kubectl=$RUNNER_PATH/./kubectl >> $RUNNER_PATH/.bashrc
-        source $RUNNER_PATH/.bashrc
+
 
         # install helm
         curl -fsSL -o $RUNNER_PATH/get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
         chmod 700 $RUNNER_PATH/get_helm.sh
         $RUNNER_PATH/./get_helm.sh
+        echo alias helm=/usr/local/bin/helm >> $RUNNER_PATH/.bashrc
+        source $RUNNER_PATH/.bashrc
+        oc
         helm
 
         # clone benchmark-operator
