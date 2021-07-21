@@ -104,7 +104,7 @@ class OC(SSH):
         This method return uuid
         :return:
         """
-        long_uuid = self.run("~/./oc -n my-ripsaw get benchmarks -o jsonpath='{.items[0].status.uuid}'")
+        long_uuid = self.run("~/./oc -n benchmark-operator get benchmarks -o jsonpath='{.items[0].status.uuid}'")
         return long_uuid
 
     @logger_time_stamp
@@ -140,7 +140,7 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def wait_for_pod_create(self, pod_name: str, namespace: str = "my-ripsaw", timeout: int = 300, sleep_time: int = 3):
+    def wait_for_pod_create(self, pod_name: str, namespace: str = "benchmark-operator", timeout: int = 300, sleep_time: int = 3):
         """
         This method is wait till pod name is creating or throw exception after timeout
         :param namespace:
@@ -160,7 +160,7 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def wait_for_vm_create(self, vm_name: str, namespace: str = "my-ripsaw", timeout: int = 300, sleep_time: int = 3):
+    def wait_for_vm_create(self, vm_name: str, namespace: str = "benchmark-operator", timeout: int = 300, sleep_time: int = 3):
         """
         This method is wait till vm name is creating or throw exception after timeout
         :param vm_name:
@@ -180,7 +180,7 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def wait_for_pod_terminate(self, pod_name: str, namespace: str = "my-ripsaw", timeout: int = 300, sleep_time: int = 3):
+    def wait_for_pod_terminate(self, pod_name: str, namespace: str = "benchmark-operator", timeout: int = 300, sleep_time: int = 3):
         """
         This method is wait till pod name is terminating or throw exception after timeout
         :param namespace:
@@ -200,7 +200,7 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def wait_for_vm_terminate(self, vm_name: str, namespace: str = "my-ripsaw", timeout: int = 300, sleep_time: int = 3):
+    def wait_for_vm_terminate(self, vm_name: str, namespace: str = "benchmark-operator", timeout: int = 300, sleep_time: int = 3):
         """
         This method is wait till vm name is terminating or throw exception after timeout
         :param vm_name:
@@ -220,7 +220,7 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def create_pod_sync(self, yaml: str, pod_name: str, namespace: str = 'my-ripsaw', timeout: int = 300):
+    def create_pod_sync(self, yaml: str, pod_name: str, namespace: str = 'benchmark-operator', timeout: int = 300):
         """
         This method create pod yaml in async
         :param namespace:
@@ -247,7 +247,7 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def delete_pod_sync(self, yaml: str, pod_name: str, namespace: str = 'my-ripsaw', timeout: int = 300):
+    def delete_pod_sync(self, yaml: str, pod_name: str, namespace: str = 'benchmark-operator', timeout: int = 300):
         """
         This method delete pod yaml in async, only if exist and return false if not exist
         :param namespace:
@@ -264,7 +264,7 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def delete_vm_sync(self, yaml: str, vm_name: str, namespace: str = 'my-ripsaw', timeout: int = 300):
+    def delete_vm_sync(self, yaml: str, vm_name: str, namespace: str = 'benchmark-operator', timeout: int = 300):
         """
         This method delete vm yaml in async, only if exist and return false if not exist
         :param namespace:
@@ -281,7 +281,7 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def wait_for_initialized(self, label: str, status: str = 'Initialized', label_uuid: bool = True, namespace: str = 'my-ripsaw', timeout: int = 300):
+    def wait_for_initialized(self, label: str, status: str = 'Initialized', label_uuid: bool = True, namespace: str = 'benchmark-operator', timeout: int = 300):
         """
         This method wait to pod to be initialized
         :param namespace:
@@ -305,7 +305,7 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def wait_for_ready(self, label: str, status: str = 'ready', label_uuid: bool = True, namespace: str = 'my-ripsaw', timeout: int = 300):
+    def wait_for_ready(self, label: str, status: str = 'ready', label_uuid: bool = True, namespace: str = 'benchmark-operator', timeout: int = 300):
         """
         This method wait to pod to be ready
         :param namespace:
@@ -329,7 +329,7 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def wait_for_completed(self, label: str, namespace: str = 'my-ripsaw', timeout: int = 500):
+    def wait_for_completed(self, label: str, namespace: str = 'benchmark-operator', timeout: int = 500):
         """
         This method wait to pod to be completed
         :param namespace:
