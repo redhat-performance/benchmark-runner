@@ -102,6 +102,22 @@
 #     oc.login()
 #     assert oc.get_pods()
 #
+# def test_oc_get_pods():
+#     """
+#     This test run oc get pods
+#     :return:
+#     """
+#     oc = OC(kubeadmin_password=environment_variable['kubeadmin_password'])
+#     assert oc.get_pods()
+#
+#
+# def test_oc_get_pod_name():
+#     """
+#     This test run oc get pod by name
+#     :return:
+#     """
+#     oc = OC(kubeadmin_password=environment_variable['kubeadmin_password'])
+#     assert oc._get_pod_name(pod_name='wcwcwcwc', namespace='my-ripsaw') == ''
 #
 # def test_oc_get_pod_name():
 #     """
