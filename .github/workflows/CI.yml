@@ -43,12 +43,14 @@ jobs:
         PIN_NODE1: ${{ secrets.PIN_NODE1 }}
         PIN_NODE2: ${{ secrets.PIN_NODE2 }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+        #ELASTICSEARCH: ${{ secrets.ELASTICSEARCH }}
+        #ELASTICSRACH_PORT: ${{ secrets.ELASTICSRACH_PORT }}
       run: |
         # Install Dockerfile content
 
         # install oc/kubctl
         oc_version=4.7.0-0.okd-2021-05-22-050008
-        curl -L https://github.com/openshift/okd/releases/download/${oc_version}/openshift-client-linux-${oc_version}.tar.gz -o $INSTALL_PATH/openshift-client-linux-${oc_version}.tar.gz
+        curl -L https://github.com/openshift/okd/releases/download/${oc_version}/openshift-client-linux-${oc_version}.tar.gz -o $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz
         tar -xzvf $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz -C $RUNNER_PATH/
         rm $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz
         echo alias oc=$RUNNER_PATH/./oc >> $RUNNER_PATH/.bashrc
@@ -93,12 +95,6 @@ jobs:
         echo '⌛ Wait 30 sec till image will be updated in quay.io'
         sleep 30
     - name: ✔️ E2E tests using latest quay.io
-      env:
-        KUBEADMIN_PASSWORD: ${{ secrets.KUBEADMIN_PASSWORD }}
-        PIN_NODE1: ${{ secrets.PIN_NODE1 }}
-        PIN_NODE2: ${{ secrets.PIN_NODE2 }}
-        #ELASTICSEARCH: ${{ secrets.ELASTICSEARCH }}
-        #ELASTICSRACH_PORT: ${{ secrets.ELASTICSRACH_PORT }}
       run: |
         sudo podman run --rm -e WORKLOAD=stressng_pod -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE1=$PIN_NODE1 -v $KUBECONFIG:/root/.kube/config -e log_level=INFO --privileged quay.io/ebattat/benchmark-runner:latest
     - name: 🎁 Bump Version
