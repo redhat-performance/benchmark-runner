@@ -37,16 +37,6 @@ jobs:
         method: kubeconfig
         kubeconfig: ${{ secrets.KUBECONFIG }} # Use secret (https://developer.github.com/actions/managing-workflows/storing-secrets/)
       id: setcontext
-    - name: ✔️ E2E tests using latest quay.io
-      env:
-        KUBEADMIN_PASSWORD: ${{ secrets.KUBEADMIN_PASSWORD }}
-        PIN_NODE1: ${{ secrets.PIN_NODE1 }}
-        PIN_NODE2: ${{ secrets.PIN_NODE2 }}
-        INSTALL_PATH: ${{ secrets.INSTALL_PATH }}
-        #ELASTICSEARCH: ${{ secrets.ELASTICSEARCH }}
-        #ELASTICSRACH_PORT: ${{ secrets.ELASTICSRACH_PORT }}
-      run: |
-        sudo podman run --rm -e WORKLOAD=stressng_pod -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE1=$PIN_NODE1 -v $KUBECONFIG:/root/.kube/config -e log_level=INFO --privileged quay.io/ebattat/benchmark-runner:latest
     - name: 📃 Test with pytest
       env:
         KUBEADMIN_PASSWORD: ${{ secrets.KUBEADMIN_PASSWORD }}
@@ -59,19 +49,19 @@ jobs:
         # install oc/kubctl
         oc_version=4.7.0-0.okd-2021-05-22-050008
         curl -L https://github.com/openshift/okd/releases/download/${oc_version}/openshift-client-linux-${oc_version}.tar.gz -o $INSTALL_PATH/openshift-client-linux-${oc_version}.tar.gz
-        tar -xzvf $INSTALL_PATH/openshift-client-linux-${oc_version}.tar.gz -C $INSTALL_PATH/
-        rm $INSTALL_PATH/openshift-client-linux-${oc_version}.tar.gz
-        echo alias oc=$INSTALL_PATH/./oc >> $INSTALL_PATH/.bashrc
-        echo alias kubectl=$INSTALL_PATH/./kubectl >> $INSTALL_PATH/.bashrc
-        source $INSTALL_PATH/.bashrc
+        tar -xzvf $RUNNER_TEMP/openshift-client-linux-${oc_version}.tar.gz -C $RUNNER_TEMP/
+        rm $RUNNER_TEMP/openshift-client-linux-${oc_version}.tar.gz
+        echo alias oc=$RUNNER_TEMP/./oc >> $RUNNER_TEMP/.bashrc
+        echo alias kubectl=$RUNNER_TEMP/./kubectl >> $RUNNER_TEMP/.bashrc
+        source $RUNNER_TEMP/.bashrc
 
         # install helm
-        curl -fsSL -o $INSTALL_PATH/get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
-        chmod 700 $INSTALL_PATH/get_helm.sh
-        $INSTALL_PATH/./get_helm.sh
+        curl -fsSL -o $RUNNER_TEMP/get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+        chmod 700 $RUNNER_TEMP/get_helm.sh
+        $RUNNER_TEMP/./get_helm.sh
 
         # clone benchmark-operator
-        git clone https://github.com/cloud-bulldozer/benchmark-operator $INSTALL_PATH/benchmark-operator
+        git clone https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_TEMP/benchmark-operator
 
         # pytest
         pytest --cov=benchmark_runner --cov-report=term-missing
@@ -107,13 +97,10 @@ jobs:
         KUBEADMIN_PASSWORD: ${{ secrets.KUBEADMIN_PASSWORD }}
         PIN_NODE1: ${{ secrets.PIN_NODE1 }}
         PIN_NODE2: ${{ secrets.PIN_NODE2 }}
-        INSTALL_PATH: ${{ secrets.INSTALL_PATH }}
+        #ELASTICSEARCH: ${{ secrets.ELASTICSEARCH }}
+        #ELASTICSRACH_PORT: ${{ secrets.ELASTICSRACH_PORT }}
       run: |
-        #kubeadmin_password=
-        #elasticsearch=
-        #elasticsearch_port=
-        #pin_node1=
-        #sudo podman run --rm -e WORKLOAD=stressng_pod -e KUBEADMIN_PASSWORD=$kubeadmin_password -e ELASTICSEARCH=$elasticsearch -e ELASTICSEARCH_PORT=$elasticsearch_port -e PIN_NODE1=$pin_node1 -v /root/.kube/config:/root/.kube/config -e log_level=INFO --privileged quay.io/ebattat/benchmark-runner:latest
+        sudo podman run --rm -e WORKLOAD=stressng_pod -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE1=$PIN_NODE1 -v $KUBECONFIG:/root/.kube/config -e log_level=INFO --privileged quay.io/ebattat/benchmark-runner:latest
     - name: 🎁 Bump Version
       run: |
         version=$(python3 setup.py --version)
