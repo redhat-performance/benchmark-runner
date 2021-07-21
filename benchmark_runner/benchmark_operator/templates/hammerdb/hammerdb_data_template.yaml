@@ -37,7 +37,7 @@ pod:
   limits_cpu: 4
   limits_memory_GB: 16
 vm:
-  index_name_pod: hammerdb-vm
+  index_name_vm: hammerdb-vm
   cores: 4
   es_kind: vm
   limits_memory_GB: 16

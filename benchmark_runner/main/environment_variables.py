@@ -14,12 +14,12 @@ class EnvironmentVariables:
                           'stressng_pod', 'stressng_vm',
                           'uperf_pod', 'uperf_vm']
 
-        self._environment_variables_dict['kubeadmin_password'] = os.environ.get('KUBEADMIN_PASSWORD', 'NP4se-sMadS-wSpH5-YPnnx')
-        self._environment_variables_dict['workload'] = os.environ.get('WORKLOAD', 'hammerdb_pod_mariadb')
+        self._environment_variables_dict['kubeadmin_password'] = os.environ.get('KUBEADMIN_PASSWORD', '')
+        self._environment_variables_dict['workload'] = os.environ.get('WORKLOAD', '')
         self._environment_variables_dict['elasticsearch'] = os.environ.get('ELASTICSEARCH', '')
         self._environment_variables_dict['elasticsearch_port'] = os.environ.get('ELASTICSEARCH_PORT', '')
-        self._environment_variables_dict['pin_node1'] = os.environ.get('PIN_NODE1', 'ocp48-ci-27ws6-master-0')
-        self._environment_variables_dict['pin_node2'] = os.environ.get('PIN_NODE2', 'ocp48-ci-27ws6-master-1')
+        self._environment_variables_dict['pin_node1'] = os.environ.get('PIN_NODE1', '')
+        self._environment_variables_dict['pin_node2'] = os.environ.get('PIN_NODE2', '')
         if self._environment_variables_dict['elasticsearch'] and self._environment_variables_dict['elasticsearch_port']:
             self._environment_variables_dict['elasticsearch_url'] = f"http://{self._environment_variables_dict['elasticsearch']}:{self._environment_variables_dict['elasticsearch_port']}"
         # in case no port
