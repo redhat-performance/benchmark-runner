@@ -90,15 +90,15 @@ class BenchmarkOperatorWorkloads:
 
     @typechecked()
     @logger_time_stamp
-    def helm_install_benchmark_operator(self, install_path: str = ''):
+    def helm_install_benchmark_operator(self, runner_path: str = ''):
         """
         This function install benchmark operator
         :return:
         """
         benchmark_operator_path = 'benchmark-operator/charts/benchmark-operator'
         current_dir = os.getcwd()
-        if install_path:
-            os.chdir(os.path.join(install_path, benchmark_operator_path))
+        if runner_path:
+            os.chdir(os.path.join(runner_path, benchmark_operator_path))
         else:
             os.chdir(os.path.join('/', benchmark_operator_path))
         self.__ssh.run('/usr/local/bin/helm install benchmark-operator . -n my-ripsaw --create-namespace')
