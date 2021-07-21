@@ -1,9 +1,8 @@
 shared_data:
   url: {{ elasticsearch_url }}
-  index_name: ripsaw-uperf
   pin: true
-  pin_client: {{ pin_node1 }}
-  pin_server: {{ pin_node2 }}
+  pin_server: {{ pin_node1 }}
+  pin_client: {{ pin_node2 }}
   serviceip: false
   hostnetwork: false
   networkpolicy: false
@@ -16,12 +15,14 @@ shared_data:
   nthr: 1
   runtime: 60
 pod:
+  index_name_pod: uperf-pod
   es_kind: pod
   client_limits_cpu: 4
   client_limits_memory_GB: 16
   server_limits_cpu: 4
   server_limits_memory_GB: 16
 vm:
+  index_name_vm: uperf-vm
   es_kind: vm
   server_cores: 4
   server_limits_memory_GB: 16

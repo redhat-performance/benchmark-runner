@@ -10,6 +10,7 @@ from benchmark_runner.benchmark_operator.templates.generate_yaml_from_templates 
 from benchmark_runner.common.elasticsearch.es_operations import ESOperations
 from benchmark_runner.common.ssh.ssh import SSH
 from benchmark_runner.benchmark_operator.benchmark_operator_exceptions import VMWorkloadNeedElasticSearch
+from benchmark_runner.main.environment_variables import environment_variables
 
 
 class BenchmarkOperatorWorkloads:
@@ -32,6 +33,8 @@ class BenchmarkOperatorWorkloads:
         # Generate templates class
         self.__template = TemplateOperations()
         self.__oc.login()
+        # environment variables
+        self.__environment_variables_dict = environment_variables.environment_variables_dict
 
     @typechecked()
     def __verify_elasticsearch_exist_for_vm_workload(self, workload: str):
@@ -67,7 +70,8 @@ class BenchmarkOperatorWorkloads:
         else:
             logger.info('yaml file {} does not exist')
 
-    def __delete_run_yamls(self, extension: str = '.yaml'):
+    @logger_time_stamp
+    def check_if_exist_run_yaml(self, extension: str = '.yaml'):
         """
         This method remove all run yaml files in yaml folder
         :return:
@@ -78,15 +82,7 @@ class BenchmarkOperatorWorkloads:
                 # wait 10 sec till terminate
                 time.sleep(10)
                 os.remove(os.path.join(self.__current_run_path, file))
-
-    @logger_time_stamp
-    def delete_benchmark_operator_if_exist(self):
-        """
-        This method delete benchmark operator if exist
-        """
-        # delete benchmark-operator pod if exist
-        if self.__oc._is_pod_exist(pod_name='benchmark-operator', namespace='benchmark-operator'):
-            self.helm_delete_benchmark_operator()
+                logger.info(f'Delete exist workload file {file}')
 
     @typechecked()
     @logger_time_stamp
@@ -131,7 +127,7 @@ class BenchmarkOperatorWorkloads:
         @return:
         """
         self.__oc.delete_pod_sync(yaml=yaml, pod_name=pod_name)
-        self.__delete_run_yamls()
+        self.check_if_exist_run_yaml()
         self.helm_delete_benchmark_operator()
 
     @logger_time_stamp
@@ -140,7 +136,7 @@ class BenchmarkOperatorWorkloads:
         This method tear down vm in case of error
         """
         self.__oc.delete_vm_sync(yaml=yaml, vm_name=pod_name)
-        self.__delete_run_yamls()
+        self.check_if_exist_run_yaml()
         self.helm_delete_benchmark_operator()
 
     @logger_time_stamp
@@ -204,8 +200,12 @@ class BenchmarkOperatorWorkloads:
         try:
             self.__oc.create_pod_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.uperf_pod.__name__}.yaml'), pod_name='uperf-server')
             # uperf server
-            self.__oc.wait_for_initialized(label='app=uperf-bench-server-perf-sm5039-5-6.perf.lab.en-0')
-            self.__oc.wait_for_ready(label='app=uperf-bench-server-perf-sm5039-5-6.perf.lab.en-0')
+            server_name = self.__environment_variables_dict.get('pin_node1', '')
+            # name up to 27 chars
+            if len(server_name) > 27:
+                server_name = server_name[:28]
+            self.__oc.wait_for_initialized(label=f'app=uperf-bench-server-{server_name}-0')
+            self.__oc.wait_for_ready(label=f'app=uperf-bench-server-{server_name}-0')
             # uperf client
             self.__oc.wait_for_pod_create(pod_name='uperf-client')
             self.__oc.wait_for_initialized(label='app=uperf-bench-client')
@@ -261,8 +261,8 @@ class BenchmarkOperatorWorkloads:
         try:
             # database
             self.__oc.create_pod_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{database}.yaml'), pod_name=database, namespace=f'{database}-db')
-            self.__oc.wait_for_initialized(label=f'app={database}', namespace=f'{database}-db')
-            self.__oc.wait_for_ready(label=f'app={database}', namespace=f'{database}-db')
+            self.__oc.wait_for_initialized(label=f'app={database}', namespace=f'{database}-db', label_uuid=False)
+            self.__oc.wait_for_ready(label=f'app={database}', namespace=f'{database}-db', label_uuid=False)
             # hammerdb
             self.__oc.create_pod_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.hammerdb_pod.__name__}_{database}.yaml'), pod_name='hammerdb-benchmark-creator')
             # hammerdb creator
@@ -339,7 +339,7 @@ class BenchmarkOperatorWorkloads:
         :return:
         """
         # remove running workloads if exist
-        self.__delete_run_yamls()
+        self.check_if_exist_run_yaml()
         workload_name = workload_full_name.split('_')
         if 'hammerdb' in workload_full_name:
             self.__template.generate_hammerdb_yamls(workload=f'{workload_name[0]}_{workload_name[1]}', database=workload_name[2])
@@ -359,7 +359,10 @@ class BenchmarkOperatorWorkloads:
         :return:
         """
 
-        self.delete_benchmark_operator_if_exist()
+        # delete benchmark-operator pod if exist
+        if self.__oc._is_pod_exist(pod_name='benchmark-operator', namespace='benchmark-operator'):
+            logger.info('delete benchmark operator running pod')
+            self.helm_delete_benchmark_operator()
 
         # elasticsearch is must for VM workload for completed status verifications
         self.__verify_elasticsearch_exist_for_vm_workload(workload=self.__workload)
@@ -372,5 +375,4 @@ class BenchmarkOperatorWorkloads:
 
         # delete benchmark operator
         self.helm_delete_benchmark_operator()
-
 
