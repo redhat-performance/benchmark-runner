@@ -18,7 +18,10 @@ class ESOperations:
         self.__es_fetch_last_x_minutes = es_fetch_last_x_minutes  # MUST BE 15 MIN AT LEAST
         self.__es_host = es_host
         self.__es_port = es_port
-        self.__es = Elasticsearch([{'host': self.__es_host, 'port': self.__es_port}])
+        if self.__es_port:
+            self.__es = Elasticsearch([{'host': self.__es_host, 'port': self.__es_port}])
+        else:
+            self.__es = Elasticsearch([{'host': self.__es_host}])
         self._hits = 0
 
     @property

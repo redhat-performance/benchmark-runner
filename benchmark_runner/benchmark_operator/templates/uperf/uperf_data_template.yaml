@@ -1,4 +1,5 @@
 shared_data:
+  namespace: {{ namespace }}
   url: {{ elasticsearch_url }}
   pin: true
   pin_server: {{ pin_node1 }}

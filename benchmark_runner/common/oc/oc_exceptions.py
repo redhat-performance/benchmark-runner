@@ -21,22 +21,22 @@ class PodNotCreateTimeout(OCError):
 
 class PodNotInitializedTimeout(OCError):
     """This exception return pod initialized timeout error"""
-    def __init__(self, label):
-        self.message = f'Pod with label: {label} does not ready'
+    def __init__(self, workload):
+        self.message = f'Pod : {workload} does not ready'
         super(PodNotInitializedTimeout, self).__init__(self.message)
 
 
 class PodNotReadyTimeout(OCError):
     """This exception return pod ready timeout error"""
-    def __init__(self, label):
-        self.message = f'Pod with label: {label} does not ready'
+    def __init__(self, workload):
+        self.message = f'Pod : {workload} does not ready'
         super(PodNotReadyTimeout, self).__init__(self.message)
 
 
 class PodNotCompletedTimeout(OCError):
     """This exception return pod completed timeout error"""
-    def __init__(self, label):
-        self.message = f'Pod with label: {label} does not completed'
+    def __init__(self, workload):
+        self.message = f'Pod with label: {workload} does not completed'
         super(PodNotCompletedTimeout, self).__init__(self.message)
 
 
@@ -70,8 +70,8 @@ class VMTerminateTimeout(OCError):
 
 class VMNameNotExist(OCError):
     """This exception return pod name does not exist"""
-    def __init__(self, pod_name):
-        self.message = f'VM name: {pod_name} does not exist'
+    def __init__(self, vm_name):
+        self.message = f'VM name: {vm_name} does not exist'
         super(VMNameNotExist, self).__init__(self.message)
 
 
@@ -82,5 +82,22 @@ class YAMLNotExist(OCError):
         super(YAMLNotExist, self).__init__(self.message)
 
 
+class VMNotInitializedTimeout(OCError):
+    """This exception return vm initialized timeout error"""
+    def __init__(self, workload):
+        self.message = f'VM {workload} does not ready'
+        super(VMNotInitializedTimeout, self).__init__(self.message)
 
 
+class VMNotReadyTimeout(OCError):
+    """This exception return vm ready timeout error"""
+    def __init__(self, workload):
+        self.message = f'VM : {workload} does not ready'
+        super(VMNotReadyTimeout, self).__init__(self.message)
+
+
+class VMNotCompletedTimeout(OCError):
+    """This exception return vm completed error"""
+    def __init__(self, workload):
+        self.message = f'VM : {workload} does not completed'
+        super(VMNotCompletedTimeout, self).__init__(self.message)

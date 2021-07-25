@@ -8,18 +8,22 @@ class EnvironmentVariables:
     """
     def __init__(self):
         self._environment_variables_dict = {}
-        self._workloads_list = []
-        self._workloads_list = ['hammerdb_pod_mariadb', 'hammerdb_pod_mssql', 'hammerdb_pod_postgres',
+        # hard coded parameters
+        self._environment_variables_dict['workloads'] = ['hammerdb_pod_mariadb', 'hammerdb_pod_mssql', 'hammerdb_pod_postgres',
                           'hammerdb_vm_mariadb', 'hammerdb_vm_mssql', 'hammerdb_vm_postgres',
                           'stressng_pod', 'stressng_vm',
                           'uperf_pod', 'uperf_vm']
+        self._environment_variables_dict['namespace'] = os.environ.get('namespace', 'benchmark-operator')
 
+        # dynamic parameters
         self._environment_variables_dict['kubeadmin_password'] = os.environ.get('KUBEADMIN_PASSWORD', '')
         self._environment_variables_dict['workload'] = os.environ.get('WORKLOAD', '')
         self._environment_variables_dict['elasticsearch'] = os.environ.get('ELASTICSEARCH', '')
         self._environment_variables_dict['elasticsearch_port'] = os.environ.get('ELASTICSEARCH_PORT', '')
         self._environment_variables_dict['pin_node1'] = os.environ.get('PIN_NODE1', '')
         self._environment_variables_dict['pin_node2'] = os.environ.get('PIN_NODE2', '')
+        # This path is for benchmark-operator path
+        self._environment_variables_dict['runner_path'] = os.environ.get('RUNNER_PATH', '')
         if self._environment_variables_dict['elasticsearch'] and self._environment_variables_dict['elasticsearch_port']:
             self._environment_variables_dict['elasticsearch_url'] = f"http://{self._environment_variables_dict['elasticsearch']}:{self._environment_variables_dict['elasticsearch_port']}"
         # in case no port
@@ -33,7 +37,7 @@ class EnvironmentVariables:
         """
         This method is getter
         """
-        return self._workloads_list
+        return self._environment_variables_dict['workloads']
 
     @property
     def environment_variables_dict(self):

@@ -1,4 +1,5 @@
 shared_data:
+  namespace: {{ namespace }}
   db_num_workers: 2
   db_warehouses: 2
   es_cnv_version: 2.6.2
