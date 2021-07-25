@@ -85,6 +85,7 @@ def test_verify_es_data_uploaded_stressng_pod():
         raise err
 
 
+@pytest.mark.skip(reason="No Elastic Search support yet")
 def test_upload_to_es():
     """
     This method test upload to es
