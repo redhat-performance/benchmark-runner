@@ -3,8 +3,9 @@ import os
 import time
 from typeguard import typechecked
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp
-from benchmark_runner.common.oc.oc_exceptions import PodNotCreateTimeout, PodNotInitializedTimeout, PodNotReadyTimeout, PodNotCompletedTimeout, PodTerminateTimeout, PodNameNotExist, LoginFailed, VMNotCreateTimeout, VMTerminateTimeout, YAMLNotExist
+from benchmark_runner.common.oc.oc_exceptions import PodNotCreateTimeout, PodNotInitializedTimeout, PodNotReadyTimeout, PodNotCompletedTimeout, PodTerminateTimeout, PodNameNotExist, LoginFailed, VMNotCreateTimeout, VMTerminateTimeout, YAMLNotExist, VMNameNotExist, VMNotInitializedTimeout, VMNotReadyTimeout, VMNotCompletedTimeout
 from benchmark_runner.common.ssh.ssh import SSH
+from benchmark_runner.main.environment_variables import environment_variables
 
 
 class OC(SSH):
@@ -16,12 +17,12 @@ class OC(SSH):
         super().__init__()
         self.__kubeadmin_password = kubeadmin_password
 
-    def __get_short_uuid(self):
+    def __get_short_uuid(self, workload: str):
         """
         This method return uuid
         :return:
         """
-        long_uuid = self.get_long_uuid()
+        long_uuid = self.get_long_uuid(workload=workload)
         uuids = long_uuid.split('-')
         short_uuid = uuids[0]
         return short_uuid
@@ -51,7 +52,7 @@ class OC(SSH):
             raise YAMLNotExist(yaml)
 
     @typechecked
-    def _get_pod_name(self, pod_name: str, namespace: str):
+    def _get_pod_name(self, pod_name: str, namespace: str = environment_variables.environment_variables_dict['namespace']):
         """
         This method return pod name if exist or raise error
         :param pod_name:
@@ -61,9 +62,9 @@ class OC(SSH):
         try:
             return self.run(f'~/./oc get -n {namespace} pods -o name | grep {pod_name}')
         except Exception as err:
-            raise PodNameNotExist
+            raise PodNameNotExist(pod_name=pod_name)
 
-    def _is_pod_exist(self, pod_name: str, namespace: str):
+    def _is_pod_exist(self, pod_name: str, namespace: str = environment_variables.environment_variables_dict['namespace']):
         """
         This method return True if exist or False if not
         :param pod_name:
@@ -85,7 +86,7 @@ class OC(SSH):
         try:
             return self.run(f'~/./oc get -n {namespace} vmi -o name | grep {vm_name}', is_check=True)
         except Exception as err:
-            raise PodNameNotExist
+            raise VMNameNotExist(vm_name=vm_name)
 
     @typechecked
     def _is_vmi_exist(self, vm_name: str, namespace: str):
@@ -99,12 +100,13 @@ class OC(SSH):
         else:
             return False
 
-    def get_long_uuid(self):
+    @typechecked()
+    def get_long_uuid(self, workload: str):
         """
         This method return uuid
         :return:
         """
-        long_uuid = self.run("~/./oc -n benchmark-operator get benchmarks -o jsonpath='{.items[0].status.uuid}'")
+        long_uuid = self.run(f"~/./oc -n {environment_variables.environment_variables_dict['namespace']} get benchmark/{workload} -o jsonpath={{.status.uuid}}")
         return long_uuid
 
     @logger_time_stamp
@@ -140,7 +142,7 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def wait_for_pod_create(self, pod_name: str, namespace: str = "benchmark-operator", timeout: int = 300, sleep_time: int = 3):
+    def wait_for_pod_create(self, pod_name: str, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = 300, sleep_time: int = 3):
         """
         This method is wait till pod name is creating or throw exception after timeout
         :param namespace:
@@ -160,7 +162,7 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def wait_for_vm_create(self, vm_name: str, namespace: str = "benchmark-operator", timeout: int = 300, sleep_time: int = 3):
+    def wait_for_vm_create(self, vm_name: str, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = 300, sleep_time: int = 3):
         """
         This method is wait till vm name is creating or throw exception after timeout
         :param vm_name:
@@ -180,7 +182,7 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def wait_for_pod_terminate(self, pod_name: str, namespace: str = "benchmark-operator", timeout: int = 300, sleep_time: int = 3):
+    def wait_for_pod_terminate(self, pod_name: str, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = 300, sleep_time: int = 10):
         """
         This method is wait till pod name is terminating or throw exception after timeout
         :param namespace:
@@ -200,7 +202,7 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def wait_for_vm_terminate(self, vm_name: str, namespace: str = "benchmark-operator", timeout: int = 300, sleep_time: int = 3):
+    def wait_for_vm_terminate(self, vm_name: str, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = 300, sleep_time: int = 3):
         """
         This method is wait till vm name is terminating or throw exception after timeout
         :param vm_name:
@@ -220,7 +222,7 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def create_pod_sync(self, yaml: str, pod_name: str, namespace: str = 'benchmark-operator', timeout: int = 300):
+    def create_pod_sync(self, yaml: str, pod_name: str, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = 300):
         """
         This method create pod yaml in async
         :param namespace:
@@ -247,7 +249,7 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def delete_pod_sync(self, yaml: str, pod_name: str, namespace: str = 'benchmark-operator', timeout: int = 300):
+    def delete_pod_sync(self, yaml: str, pod_name: str, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = 300):
         """
         This method delete pod yaml in async, only if exist and return false if not exist
         :param namespace:
@@ -264,7 +266,7 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def delete_vm_sync(self, yaml: str, vm_name: str, namespace: str = 'benchmark-operator', timeout: int = 300):
+    def delete_vm_sync(self, yaml: str, vm_name: str, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = 300):
         """
         This method delete vm yaml in async, only if exist and return false if not exist
         :param namespace:
@@ -281,7 +283,7 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def wait_for_initialized(self, label: str, status: str = 'Initialized', label_uuid: bool = True, namespace: str = 'benchmark-operator', timeout: int = 300):
+    def wait_for_initialized(self, label: str, workload: str, status: str = 'Initialized', label_uuid: bool = True, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = 300):
         """
         This method wait to pod to be initialized
         :param namespace:
@@ -289,23 +291,27 @@ class OC(SSH):
         :param status:
         :param label_uuid: The label include uuid
         :param timeout:
+        :param workload:
         :return:
         """
         try:
             if label_uuid:
                 result = self.run(
-                    f"~/./oc --namespace {namespace} wait --for=condition={status} pod -l {label}-{self.__get_short_uuid()} --timeout={timeout}s", is_check=True)
+                    f"~/./oc --namespace {namespace} wait --for=condition={status} pod -l {label}-{self.__get_short_uuid(workload=workload)} --timeout={timeout}s", is_check=True)
             else:
                 return self.run(
                     f"~/./oc --namespace {namespace} wait --for=condition={status} pod -l {label} --timeout={timeout}s", is_check=True)
             if 'met' in result.decode("utf-8"):
                 return True
         except Exception as err:
-            raise PodNotInitializedTimeout(label)
+            if 'pod' in workload:
+                raise PodNotInitializedTimeout(workload=workload)
+            else:
+                raise VMNotInitializedTimeout(workload=workload)
 
     @typechecked
     @logger_time_stamp
-    def wait_for_ready(self, label: str, status: str = 'ready', label_uuid: bool = True, namespace: str = 'benchmark-operator', timeout: int = 300):
+    def wait_for_ready(self, label: str, workload: str, status: str = 'ready', label_uuid: bool = True, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = 300):
         """
         This method wait to pod to be ready
         :param namespace:
@@ -318,18 +324,21 @@ class OC(SSH):
         try:
             if label_uuid:
                 result = self.run(
-                    f"~/./oc --namespace {namespace} wait --for=condition={status} pod -l {label}-{self.__get_short_uuid()} --timeout={timeout}s", is_check=True)
+                    f"~/./oc --namespace {namespace} wait --for=condition={status} pod -l {label}-{self.__get_short_uuid(workload=workload)} --timeout={timeout}s", is_check=True)
             else:
                 result = self.run(
                     f"~/./oc --namespace {namespace} wait --for=condition={status} pod -l {label} --timeout={timeout}s", is_check=True)
             if 'met' in result.decode("utf-8"):
                 return True
         except Exception as err:
-            raise PodNotReadyTimeout(label)
+            if 'pod' in workload:
+                raise PodNotReadyTimeout(workload=workload)
+            else:
+                raise VMNotReadyTimeout(workload=workload)
 
     @typechecked
     @logger_time_stamp
-    def wait_for_completed(self, label: str, namespace: str = 'benchmark-operator', timeout: int = 500):
+    def wait_for_completed(self, label: str, workload: str, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = 500):
         """
         This method wait to pod to be completed
         :param namespace:
@@ -339,8 +348,9 @@ class OC(SSH):
         """
         try:
             result = self.run(
-                f"~/./oc --namespace {namespace} wait --for=condition=complete -l {label}-{self.__get_short_uuid()} jobs --timeout={timeout}s")
+                f"~/./oc --namespace {namespace} wait --for=condition=complete -l {label}-{self.__get_short_uuid(workload=workload)} jobs --timeout={timeout}s")
             if 'met' in result:
                 return True
         except Exception as err:
-            raise PodNotCompletedTimeout(label)
+            raise PodNotCompletedTimeout(workload=workload)
+

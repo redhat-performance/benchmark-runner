@@ -6,6 +6,7 @@ from typeguard import typechecked
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 from benchmark_runner.common.elasticsearch.elasticsearch_exceptions import ElasticSearchDataNotUploaded
 from benchmark_runner.common.oc.oc import OC
+from benchmark_runner.common.oc.oc_exceptions import VMNotCompletedTimeout
 from benchmark_runner.benchmark_operator.templates.generate_yaml_from_templates import TemplateOperations
 from benchmark_runner.common.elasticsearch.es_operations import ESOperations
 from benchmark_runner.common.ssh.ssh import SSH
@@ -42,8 +43,8 @@ class BenchmarkOperatorWorkloads:
         This method verify that elastic search exist for vm workloads to verify completed status
         :return: error in case no elasticsearch
         """
-        if 'vm' in workload and not self.__es_host:
-            raise VMWorkloadNeedElasticSearch
+        #if 'vm' in workload and not self.__es_host:
+        #    raise VMWorkloadNeedElasticSearch
 
     def __get_run_yamls(self, extension='.yaml'):
         """
@@ -86,17 +87,53 @@ class BenchmarkOperatorWorkloads:
 
     @typechecked()
     @logger_time_stamp
-    def helm_install_benchmark_operator(self, runner_path: str = ''):
+    def make_deploy_benchmark_controller_manager(self, runner_path: str = environment_variables.environment_variables_dict['runner_path']):
         """
-        This function install benchmark operator
+        This method make deploy benchmark operator
+        :return:
+        """
+        benchmark_operator_path = 'benchmark-operator'
+        current_dir = os.getcwd()
+        os.chdir(os.path.join(runner_path, benchmark_operator_path))
+        self.__ssh.run('make deploy')
+        self.__oc.wait_for_pod_create(pod_name='benchmark-controller-manager')
+        os.chdir(current_dir)
+
+    @logger_time_stamp
+    def make_undeploy_benchmark_controller_manager_if_exist(self, runner_path: str = environment_variables.environment_variables_dict['runner_path']):
+        """
+        This method make undeploy benchmark controller manager if exist
+        @return:
+        """
+        # delete benchmark-operator pod if exist
+        if self.__oc._is_pod_exist(pod_name='benchmark-controller-manager', namespace=environment_variables.environment_variables_dict['namespace']):
+            logger.info('make undeploy benchmark operator running pod')
+            self.make_undeploy_benchmark_controller_manager(runner_path=runner_path)
+
+    @typechecked()
+    @logger_time_stamp
+    def make_undeploy_benchmark_controller_manager(self, runner_path: str = environment_variables.environment_variables_dict['runner_path']):
+        """
+        This method make undeploy benchmark operator
+        :return:
+        """
+        benchmark_operator_path = 'benchmark-operator'
+        current_dir = os.getcwd()
+        os.chdir(os.path.join(runner_path, benchmark_operator_path))
+        self.__ssh.run('make undeploy')
+        self.__oc.wait_for_pod_terminate(pod_name='benchmark-controller-manager')
+        os.chdir(current_dir)
+
+    @typechecked()
+    @logger_time_stamp
+    def helm_install_benchmark_operator(self, runner_path: str = environment_variables.environment_variables_dict['runner_path']):
+        """
+        This method install benchmark operator
         :return:
         """
         benchmark_operator_path = 'benchmark-operator/charts/benchmark-operator'
         current_dir = os.getcwd()
-        if runner_path:
-            os.chdir(os.path.join(runner_path, benchmark_operator_path))
-        else:
-            os.chdir(os.path.join('/', benchmark_operator_path))
+        os.chdir(os.path.join(runner_path, benchmark_operator_path))
         self.__ssh.run('/usr/local/bin/helm install benchmark-operator . -n benchmark-operator --create-namespace')
         self.__oc.wait_for_pod_create(pod_name='benchmark-operator')
         self.__ssh.run('~/./oc adm policy -n benchmark-operator add-scc-to-user privileged -z benchmark-operator')
@@ -109,14 +146,14 @@ class BenchmarkOperatorWorkloads:
         @return:
         """
         # delete benchmark-operator pod if exist
-        if self.__oc._is_pod_exist(pod_name='benchmark-operator', namespace='benchmark-operator'):
+        if self.__oc._is_pod_exist(pod_name='benchmark-operator', namespace=environment_variables.environment_variables_dict['namespace']):
             logger.info('delete benchmark operator running pod')
             self.helm_delete_benchmark_operator()
 
     @logger_time_stamp
     def helm_delete_benchmark_operator(self):
         """
-        This function delete benchmark operator
+        This method delete benchmark operator
         :return:
         """
         self.__ssh.run('/usr/local/bin/helm delete benchmark-operator -n benchmark-operator')
@@ -139,16 +176,20 @@ class BenchmarkOperatorWorkloads:
         """
         self.__oc.delete_pod_sync(yaml=yaml, pod_name=pod_name)
         self.check_if_exist_run_yaml()
-        self.helm_delete_benchmark_operator()
+        self.make_undeploy_benchmark_controller_manager(runner_path=environment_variables.environment_variables_dict['runner_path'])
 
     @logger_time_stamp
-    def tear_down_vm_after_error(self, yaml: str, pod_name: str):
+    def tear_down_vm_after_error(self, yaml: str, vm_name: str):
         """
         This method tear down vm in case of error
         """
-        self.__oc.delete_vm_sync(yaml=yaml, vm_name=pod_name)
+        self.__oc.delete_vm_sync(yaml=yaml, vm_name=vm_name)
         self.check_if_exist_run_yaml()
-        self.helm_delete_benchmark_operator()
+        self.make_undeploy_benchmark_controller_manager(runner_path=environment_variables.environment_variables_dict['runner_path'])
+
+#***********************************************************************************************
+######################################## Workloads #############################################
+#***********************************************************************************************
 
     @logger_time_stamp
     def stressng_pod(self):
@@ -157,23 +198,24 @@ class BenchmarkOperatorWorkloads:
         :return:
         """
         try:
-            self.__oc.create_pod_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.stressng_pod.__name__}.yaml'), pod_name='stressng-workload')
-            self.__oc.wait_for_initialized(label='app=stressng_workload')
-            self.__oc.wait_for_ready(label='app=stressng_workload')
-            self.__oc.wait_for_completed(label='app=stressng_workload')
+            workload = self.stressng_pod.__name__.replace('_', '-')
+            self.__oc.create_pod_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.stressng_pod.__name__}.yaml'), pod_name=f'{workload}-workload')
+            self.__oc.wait_for_initialized(label='app=stressng_workload', workload=workload)
+            self.__oc.wait_for_ready(label='app=stressng_workload', workload=workload)
+            self.__oc.wait_for_completed(label='app=stressng_workload', workload=workload)
             if self.__es_host:
-                # verify that data upload to elastic search according to uniq uuid
-                self.__es_operations.verify_es_data_uploaded(index='ripsaw-stressng-results', uuid=self.__oc.get_long_uuid())
+                # verify that data upload to elastic search according to unique uuid
+                self.__es_operations.verify_es_data_uploaded(index='ripsaw-stressng-results', uuid=self.__oc.get_long_uuid(workload=workload))
             self.__oc.delete_pod_sync(
                 yaml=os.path.join(f'{self.__current_run_path}', f'{self.stressng_pod.__name__}.yaml'),
-                pod_name='stressng-workload')
+                pod_name=f'{workload}-workload')
         except ElasticSearchDataNotUploaded as err:
             self.tear_down_pod_after_error(yaml=os.path.join(f'{self.__current_run_path}', f'{self.stressng_pod.__name__}.yaml'),
-                                           pod_name='stressng-workload')
+                                           pod_name=f'{workload}-workload')
             raise err
         except Exception as err:
             self.tear_down_pod_after_error(yaml=os.path.join(f'{self.__current_run_path}', f'{self.stressng_pod.__name__}.yaml'),
-                                           pod_name='stressng-workload')
+                                           pod_name=f'{workload}-workload')
             raise err
 
     @logger_time_stamp
@@ -183,23 +225,23 @@ class BenchmarkOperatorWorkloads:
         :return:
         """
         try:
-            self.__oc.create_vm_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.stressng_vm.__name__}.yaml'), vm_name='stressng-vm-benchmark-workload')
-            # stressng workload and database
-            self.__oc.wait_for_vm_create(vm_name='stressng-vm-benchmark-workload')
-            self.__oc.wait_for_initialized(label='kubevirt.io=virt-launcher')
-            self.__oc.wait_for_ready(label='kubevirt.io=virt-launcher')
+            workload = self.stressng_vm.__name__.replace('_', '-')
+            self.__oc.create_vm_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.stressng_vm.__name__}.yaml'), vm_name=f'{workload}-workload')
+            self.__oc.wait_for_initialized(label='kubevirt.io=virt-launcher', workload=workload, label_uuid=False)
+            self.__oc.wait_for_ready(label='kubevirt.io=virt-launcher', workload=workload, label_uuid=False)
             # verify that data upload to elastic search, vm completed status
-            self.__es_operations.verify_es_data_uploaded(index='ripsaw-stressng-results', uuid=self.__oc.get_long_uuid())
+            if self.__es_host:
+                self.__es_operations.verify_es_data_uploaded(index=f'{workload}-results', uuid=self.__oc.get_long_uuid(workload=workload))
             self.__oc.delete_vm_sync(
                 yaml=os.path.join(f'{self.__current_run_path}', f'{self.stressng_vm.__name__}.yaml'),
-                vm_name='stressng-vm-benchmark-workload')
+                vm_name=f'{workload}-workload')
         except ElasticSearchDataNotUploaded as err:
             self.tear_down_vm_after_error(yaml=os.path.join(f'{self.__current_run_path}', f'{self.stressng_vm.__name__}.yaml'),
-                                          vm_name='stressng-vm-benchmark-workload')
+                                          vm_name=f'{workload}-workload')
             raise err
         except Exception as err:
             self.tear_down_vm_after_error(yaml=os.path.join(f'{self.__current_run_path}', f'{self.stressng_vm.__name__}.yaml'),
-                                          vm_name='stressng-vm-benchmark-workload')
+                                          vm_name=f'{workload}-workload')
             raise err
 
     @logger_time_stamp
@@ -209,30 +251,31 @@ class BenchmarkOperatorWorkloads:
         :return:
         """
         try:
-            self.__oc.create_pod_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.uperf_pod.__name__}.yaml'), pod_name='uperf-server')
+            workload = self.uperf_pod.__name__.replace('_', '-')
+            self.__oc.create_pod_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.uperf_pod.__name__}.yaml'), pod_name=f'uperf-server')
             # uperf server
             server_name = self.__environment_variables_dict.get('pin_node1', '')
             # name up to 27 chars
             if len(server_name) > 27:
                 server_name = server_name[:28]
-            self.__oc.wait_for_initialized(label=f'app=uperf-bench-server-{server_name}-0')
-            self.__oc.wait_for_ready(label=f'app=uperf-bench-server-{server_name}-0')
+            self.__oc.wait_for_initialized(label=f'app=uperf-bench-server-{server_name}-0', workload=workload)
+            self.__oc.wait_for_ready(label=f'app=uperf-bench-server-{server_name}-0', workload=workload)
             # uperf client
-            self.__oc.wait_for_pod_create(pod_name='uperf-client')
-            self.__oc.wait_for_initialized(label='app=uperf-bench-client')
-            self.__oc.wait_for_ready(label='app=uperf-bench-client')
-            self.__oc.wait_for_completed(label='app=uperf-bench-client')
+            self.__oc.wait_for_pod_create(pod_name=f'uperf-client')
+            self.__oc.wait_for_initialized(label='app=uperf-bench-client', workload=workload)
+            self.__oc.wait_for_ready(label='app=uperf-bench-client', workload=workload)
+            self.__oc.wait_for_completed(label='app=uperf-bench-client', workload=workload)
             if self.__es_host:
                 # verify that data upload to elastic search
-                self.__es_operations.verify_es_data_uploaded(index='ripsaw-uperf-results', uuid=self.__oc.get_long_uuid(), workload=self.uperf_pod.__name__)
+                self.__es_operations.verify_es_data_uploaded(index=f'{workload}-results', uuid=self.__oc.get_long_uuid(workload=workload), workload=self.uperf_pod.__name__)
             self.__oc.delete_pod_sync(
                 yaml=os.path.join(f'{self.__current_run_path}', f'{self.uperf_pod.__name__}.yaml'),
-                pod_name='uperf-client')
+                pod_name=f'uperf-client')
         except ElasticSearchDataNotUploaded as err:
-            self.tear_down_pod_after_error(yaml=os.path.join(f'{self.__current_run_path}', f'{self.uperf_pod.__name__}.yaml'), pod_name='uperf-client')
+            self.tear_down_pod_after_error(yaml=os.path.join(f'{self.__current_run_path}', f'{self.uperf_pod.__name__}.yaml'), pod_name=f'uperf-client')
             raise err
         except Exception as err:
-            self.tear_down_pod_after_error(yaml=os.path.join(f'{self.__current_run_path}', f'{self.uperf_pod.__name__}.yaml'), pod_name='uperf-client')
+            self.tear_down_pod_after_error(yaml=os.path.join(f'{self.__current_run_path}', f'{self.uperf_pod.__name__}.yaml'), pod_name=f'uperf-client')
             raise err
 
     @logger_time_stamp
@@ -242,17 +285,19 @@ class BenchmarkOperatorWorkloads:
         :return:
         """
         try:
+            workload = self.uperf_vm.__name__.replace('_', '-')
             self.__oc.create_vm_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.uperf_vm.__name__}.yaml'), vm_name='uperf-server')
             # uperf server
             self.__oc.wait_for_vm_create(vm_name='uperf-server')
-            self.__oc.wait_for_initialized(label='app=uperf-bench-server-0')
-            self.__oc.wait_for_ready(label='app=uperf-bench-server-0')
+            self.__oc.wait_for_initialized(label='app=uperf-bench-server-0', workload=workload)
+            self.__oc.wait_for_ready(label='app=uperf-bench-server-0', workload=workload)
             # client server
             self.__oc.wait_for_vm_create(vm_name='uperf-client')
-            self.__oc.wait_for_initialized(label='app=uperf-bench-client')
-            self.__oc.wait_for_ready(label='app=uperf-bench-client')
+            self.__oc.wait_for_initialized(label='app=uperf-bench-client', workload=workload)
+            self.__oc.wait_for_ready(label='app=uperf-bench-client', workload=workload)
             # verify that data upload to elastic search, vm completed status
-            self.__es_operations.verify_es_data_uploaded(index='ripsaw-uperf-results', uuid=self.__oc.get_long_uuid(), workload=self.uperf_vm.__name__)
+            if self.__es_host:
+                self.__es_operations.verify_es_data_uploaded(index=f'{workload}-results', uuid=self.__oc.get_long_uuid(workload='uperf'), workload=self.uperf_vm.__name__)
             self.__oc.delete_vm_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.uperf_vm.__name__}.yaml'),
                                      vm_name='uperf-server')
         except ElasticSearchDataNotUploaded as err:
@@ -270,29 +315,30 @@ class BenchmarkOperatorWorkloads:
         :return:
         """
         try:
+            workload = self.hammerdb_pod.__name__.replace('_', '-')
             # database
             self.__oc.create_pod_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{database}.yaml'), pod_name=database, namespace=f'{database}-db')
-            self.__oc.wait_for_initialized(label=f'app={database}', namespace=f'{database}-db', label_uuid=False)
-            self.__oc.wait_for_ready(label=f'app={database}', namespace=f'{database}-db', label_uuid=False)
+            self.__oc.wait_for_initialized(label=f'app={database}', workload=database, namespace=f'{database}-db', label_uuid=False)
+            self.__oc.wait_for_ready(label=f'app={database}', workload=database, namespace=f'{database}-db', label_uuid=False)
             # hammerdb
-            self.__oc.create_pod_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.hammerdb_pod.__name__}_{database}.yaml'), pod_name='hammerdb-benchmark-creator')
+            self.__oc.create_pod_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.hammerdb_pod.__name__}_{database}.yaml'), pod_name=f'{workload}-creator')
             # hammerdb creator
-            self.__oc.wait_for_pod_create(pod_name='hammerdb-benchmark-creator')
-            self.__oc.wait_for_initialized(label='app=hammerdb_creator')
-            self.__oc.wait_for_ready(label='app=hammerdb_creator')
-            self.__oc.wait_for_completed(label='app=hammerdb_creator')
+            self.__oc.wait_for_pod_create(pod_name=f'{workload}-creator')
+            self.__oc.wait_for_initialized(label='app=hammerdb_creator', workload=workload)
+            self.__oc.wait_for_ready(label='app=hammerdb_creator', workload=workload)
+            self.__oc.wait_for_completed(label='app=hammerdb_creator', workload=workload)
             # hammerdb workload
-            self.__oc.wait_for_pod_create(pod_name='hammerdb-benchmark-workload')
-            self.__oc.wait_for_initialized(label='app=hammerdb_workload')
-            self.__oc.wait_for_ready(label='app=hammerdb_workload')
-            self.__oc.wait_for_completed(label='app=hammerdb_workload')
+            self.__oc.wait_for_pod_create(pod_name=f'{workload}-workload')
+            self.__oc.wait_for_initialized(label='app=hammerdb_workload', workload=workload)
+            self.__oc.wait_for_ready(label='app=hammerdb_workload', workload=workload)
+            self.__oc.wait_for_completed(label='app=hammerdb_workload', workload=workload)
             if self.__es_host:
                 # verify that data upload to elastic search
-                self.__es_operations.verify_es_data_uploaded(index='ripsaw-hammer-results', uuid=self.__oc.get_long_uuid())
+                self.__es_operations.verify_es_data_uploaded(index=f'{workload}-results', uuid=self.__oc.get_long_uuid(workload=workload))
             # delete hammerdb
             self.__oc.delete_pod_sync(
                 yaml=os.path.join(f'{self.__current_run_path}', f'{self.hammerdb_pod.__name__}_{database}.yaml'),
-                pod_name='hammerdb-benchmark-creator')
+                pod_name=f'{workload}-creator')
             # delete database
             self.__oc.delete_pod_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{database}.yaml'),
                                       pod_name=database,
@@ -300,7 +346,7 @@ class BenchmarkOperatorWorkloads:
         except ElasticSearchDataNotUploaded as err:
             # delete hammerdb
             self.tear_down_pod_after_error(yaml=os.path.join(f'{self.__current_run_path}', f'{self.hammerdb_pod.__name__}_{database}.yaml'),
-                                           pod_name='hammerdb-benchmark-creator')
+                                           pod_name=f'{workload}-creator')
             # delete database
             self.__oc.delete_pod_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{database}.yaml'), pod_name=database,
                                       namespace=f'{database}-db')
@@ -308,7 +354,7 @@ class BenchmarkOperatorWorkloads:
         except Exception as err:
             # delete hammerdb
             self.tear_down_pod_after_error(yaml=os.path.join(f'{self.__current_run_path}', f'{self.hammerdb_pod.__name__}_{database}.yaml'),
-                                           pod_name='hammerdb-benchmark-creator')
+                                           pod_name=f'{workload}-creator')
             # delete database
             self.__oc.delete_pod_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{database}.yaml'), pod_name=database,
                                       namespace=f'{database}-db')
@@ -322,24 +368,30 @@ class BenchmarkOperatorWorkloads:
         :return:
         """
         try:
-            self.__oc.create_vm_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.hammerdb_vm.__name__}_{database}.yaml'), vm_name='hammerdb-vm-benchmark-workload')
+            workload = self.hammerdb_vm.__name__.replace('_', '-')
+            self.__oc.create_vm_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.hammerdb_vm.__name__}_{database}.yaml'), vm_name=f'{workload}-workload')
             # hammerdb workload and database
-            self.__oc.wait_for_vm_create(vm_name='hammerdb-vm-benchmark-workload')
-            self.__oc.wait_for_initialized(label='app=hammerdb_workload')
-            self.__oc.wait_for_ready(label='app=hammerdb_workload')
+            self.__oc.wait_for_vm_create(vm_name=f'{workload}-workload')
+            self.__oc.wait_for_initialized(label='app=hammerdb_workload', workload=workload)
+            self.__oc.wait_for_ready(label='app=hammerdb_workload', workload=workload)
             # verify that data upload to elastic search, vm completed status
-            self.__es_operations.verify_es_data_uploaded(index='ripsaw-hammer-results', uuid=self.__oc.get_long_uuid())
+            if self.__es_host:
+                self.__es_operations.verify_es_data_uploaded(index=f'{workload}-results', uuid=self.__oc.get_long_uuid(workload=workload))
             self.__oc.delete_vm_sync(
                 yaml=os.path.join(f'{self.__current_run_path}', f'{self.hammerdb_vm.__name__}_{database}.yaml'),
-                vm_name='hammerdb-vm-benchmark-workload')
+                vm_name=f'{workload}-workload')
         except ElasticSearchDataNotUploaded as err:
             self.tear_down_vm_after_error(yaml=os.path.join(f'{self.__current_run_path}', f'{self.hammerdb_vm.__name__}_{database}.yaml'),
-                                          vm_name='hammerdb-vm-benchmark-workload')
-            raise err
+                                          vm_name=f'{workload}-workload')
+            raise VMNotCompletedTimeout(workload=workload)
         except Exception as err:
             self.tear_down_vm_after_error(yaml=os.path.join(f'{self.__current_run_path}', f'{self.hammerdb_vm.__name__}_{database}.yaml'),
-                                          vm_name='hammerdb-vm-benchmark-workload')
+                                          vm_name=f'{workload}-workload')
             raise err
+
+# ***********************************************************************************************
+######################################## End Workloads #############################################
+# ***********************************************************************************************
 
     @typechecked
     @logger_time_stamp
@@ -370,17 +422,17 @@ class BenchmarkOperatorWorkloads:
         :return:
         """
 
-        self.delete_benchmark_operator_if_exist()
+        self.make_undeploy_benchmark_controller_manager_if_exist(runner_path=environment_variables.environment_variables_dict['runner_path'])
 
         # elasticsearch is must for VM workload for completed status verifications
-        self.__verify_elasticsearch_exist_for_vm_workload(workload=self.__workload)
+        #self.__verify_elasticsearch_exist_for_vm_workload(workload=self.__workload)
 
-        # install benchmark operator
-        self.helm_install_benchmark_operator()
+        # make deploy benchmark controller manager
+        self.make_deploy_benchmark_controller_manager(runner_path=environment_variables.environment_variables_dict['runner_path'])
 
         # run workload
         self.run_workload_func(workload_full_name=self.__workload)
 
-        # delete benchmark operator
-        self.helm_delete_benchmark_operator()
+        # make undeploy benchmark controller manager
+        self.make_undeploy_benchmark_controller_manager(runner_path=environment_variables.environment_variables_dict['runner_path'])
 

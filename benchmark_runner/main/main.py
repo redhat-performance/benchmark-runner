@@ -8,6 +8,9 @@ from benchmark_runner.main.environment_variables import environment_variables
 log_level = os.environ.get('log_level', 'INFO').upper()
 logger.setLevel(level=log_level)
 
+# venv
+# python -m venv venv
+# . venv/bin/activate
 
 @logger_time_stamp
 def main():

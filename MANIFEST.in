@@ -1,7 +1,8 @@
 include benchmark_runner/benchmark_operator/templates/hammerdb/*.yaml
 include benchmark_runner/benchmark_operator/templates/stressng/*.yaml
 include benchmark_runner/benchmark_operator/templates/uperf/*.yaml
-include tests/integrations/benchmark_runner/templates/*.yaml
+include tests/integrations/benchmark_runner/templates/stressng_pod_template.yaml
+include tests/integrations/benchmark_runner/templates/stressng_vm_template.yaml
 
 
 

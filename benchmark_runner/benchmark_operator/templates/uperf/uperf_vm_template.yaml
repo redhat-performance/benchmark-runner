@@ -1,14 +1,22 @@
 apiVersion: ripsaw.cloudbulldozer.io/v1alpha1
 kind: Benchmark
 metadata:
- name: uperf-vm-benchmark
- namespace: benchmark-operator
+ name: uperf-vm
+ namespace: {{ namespace }}
 spec:
  clustername: test-cluster
- test_user: user # user is a key that points to user triggering ripsaw, useful to search results in ES
+ test_user: user # user is a key that points to user triggering benchmark-operator, useful to search results in ES
+ system_metrics:
+   collection: false
+   prom_url: ""
+   es_url: "{{ url }}"
+   prom_token: ""
+   metrics_profile: ""
  elasticsearch:
     url: "{{ url }}"
     index_name: {{ index_name_vm }}
+ metadata:
+   collection: false
  cleanup: false
  workload:
    name: uperf

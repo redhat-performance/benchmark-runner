@@ -1,9 +1,15 @@
 apiVersion: ripsaw.cloudbulldozer.io/v1alpha1
 kind: Benchmark
 metadata:
-  name: stressng-vm-benchmark
-  namespace: benchmark-operator
+  name: stressng-vm
+  namespace: {{ namespace }}
 spec:
+  system_metrics:
+    collection: false
+    prom_url: ""
+    es_url: "{{ url }}"
+    prom_token: ""
+    metrics_profile: ""
   elasticsearch:
     url: "{{ url }}"
     index_name: {{ index_name_vm }}

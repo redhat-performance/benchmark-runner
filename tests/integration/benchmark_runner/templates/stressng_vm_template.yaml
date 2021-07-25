@@ -1,16 +1,22 @@
 apiVersion: ripsaw.cloudbulldozer.io/v1alpha1
 kind: Benchmark
 metadata:
-  name: stressng-vm-benchmark
+  name: stressng-vm
   namespace: benchmark-operator
 spec:
+  system_metrics:
+    collection: false
+    prom_url: ""
+    es_url: "{{ elasticsearch_url }}"
+    prom_token: ""
+    metrics_profile: ""
   elasticsearch:
     url: "{{ elasticsearch_url }}"
-    index_name: ripsaw-stressng
+    index_name: stressng-vm
   metadata:
     collection: false
   workload:
-    name: "stressng"
+    name: stressng
     args:
       pin: true # enable for nodeSelector
       pin_client: "{{ pin_node1 }}"
