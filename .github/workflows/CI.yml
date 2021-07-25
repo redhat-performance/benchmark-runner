@@ -100,7 +100,6 @@ jobs:
         KUBEADMIN_PASSWORD: ${{ secrets.KUBEADMIN_PASSWORD }}
         PIN_NODE1: ${{ secrets.PIN_NODE1 }}
         PIN_NODE2: ${{ secrets.PIN_NODE2 }}
-        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
         #ELASTICSEARCH: ${{ secrets.ELASTICSEARCH }}
         #ELASTICSRACH_PORT: ${{ secrets.ELASTICSRACH_PORT }}
       run: |
@@ -108,7 +107,7 @@ jobs:
         declare -a workloads=('stressng_pod' 'stressng_vm' 'uperf_pod' 'uperf_vm' 'hammerdb_pod_mariadb' 'hammerdb_pod_postgres' 'hammerdb_pod_mssql' 'hammerdb_vm_mariadb' 'hammerdb_vm_postgres' 'hammerdb_vm_mssql')
         for workload in "${workloads[@]}"
         do
-            podman run --rm -e WORKLOAD=$workload -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e RUNNER_PATH=$RUNNER_PATH -v $KUBECONFIG:$RUNNER_PATH/.kube/config -e log_level=INFO --privileged quay.io/ebattat/benchmark-runner:latest
+            podman run --rm -e WORKLOAD=$workload -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -v $KUBECONFIG:/root/.kube/config -e log_level=INFO --privileged quay.io/ebattat/benchmark-runner:latest
         done
     - name: 🎁 Bump Version
       run: |
