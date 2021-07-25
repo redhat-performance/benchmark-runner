@@ -67,9 +67,9 @@ jobs:
         git clone https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
 
         # pytest
-        pytest --cov=benchmark_runner --cov-report=term-missing
-        coverage run -m pytest
-        coverage report -m
+        #pytest --cov=benchmark_runner --cov-report=term-missing
+        #coverage run -m pytest
+        #coverage report -m
     - name: 🎥 Publish to coveralls.io
       env:
         GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
@@ -104,20 +104,20 @@ jobs:
         #ELASTICSEARCH: ${{ secrets.ELASTICSEARCH }}
         #ELASTICSRACH_PORT: ${{ secrets.ELASTICSRACH_PORT }}
       run: |
-        # Test POD only without elasticsearch
+        # Test without elasticsearch
         # stressng
-        sudo podman run --rm -e WORKLOAD=stressng_pod -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE1=$PIN_NODE1 -v $KUBECONFIG:/root/.kube/config -e log_level=INFO --privileged quay.io/ebattat/benchmark-runner:latest
-        sudo podman run --rm -e WORKLOAD=stressng_vm -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE1=$PIN_NODE1 -v $KUBECONFIG:/root/.kube/config -e log_level=INFO --privileged quay.io/ebattat/benchmark-runner:latest
+        sudo podman run --rm -e WORKLOAD=stressng_pod -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE1=$PIN_NODE1 -e RUNNER_PATH=$RUNNER_PATH -v $KUBECONFIG:/root/.kube/config -e log_level=INFO --privileged quay.io/ebattat/benchmark-runner:latest
+        sudo podman run --rm -e WORKLOAD=stressng_vm -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE1=$PIN_NODE1 -e RUNNER_PATH=$RUNNER_PATH -v $KUBECONFIG:/root/.kube/config -e log_level=INFO --privileged quay.io/ebattat/benchmark-runner:latest
         # uperf
-        sudo podman run --rm -e WORKLOAD=uperf_pod -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -v $KUBECONFIG:/root/.kube/config -e log_level=INFO --privileged quay.io/ebattat/benchmark-runner:latest
-        sudo podman run --rm -e WORKLOAD=uperf_vm -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -v $KUBECONFIG:/root/.kube/config -e log_level=INFO --privileged quay.io/ebattat/benchmark-runner:latest
+        sudo podman run --rm -e WORKLOAD=uperf_pod -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e RUNNER_PATH=$RUNNER_PATH -v $KUBECONFIG:/root/.kube/config -e log_level=INFO --privileged quay.io/ebattat/benchmark-runner:latest
+        sudo podman run --rm -e WORKLOAD=uperf_vm -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e RUNNER_PATH=$RUNNER_PATH -v $KUBECONFIG:/root/.kube/config -e log_level=INFO --privileged quay.io/ebattat/benchmark-runner:latest
         # hammerdb
-        sudo podman run --rm -e WORKLOAD=hammerdb_pod_mariadb -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE1=$PIN_NODE1 -v $KUBECONFIG:/root/.kube/config -e log_level=INFO --privileged quay.io/ebattat/benchmark-runner:latest
-        sudo podman run --rm -e WORKLOAD=hammerdb_pod_postgres -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE1=$PIN_NODE1 -v $KUBECONFIG:/root/.kube/config -e log_level=INFO --privileged quay.io/ebattat/benchmark-runner:latest
-        sudo podman run --rm -e WORKLOAD=hammerdb_pod_mssql -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE1=$PIN_NODE1 -v $KUBECONFIG:/root/.kube/config -e log_level=INFO --privileged quay.io/ebattat/benchmark-runner:latest
-        sudo podman run --rm -e WORKLOAD=hammerdb_vm_mariadb -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE1=$PIN_NODE1 -v $KUBECONFIG:/root/.kube/config -e log_level=INFO --privileged quay.io/ebattat/benchmark-runner:latest
-        sudo podman run --rm -e WORKLOAD=hammerdb_vm_postgres -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE1=$PIN_NODE1 -v $KUBECONFIG:/root/.kube/config -e log_level=INFO --privileged quay.io/ebattat/benchmark-runner:latest
-        sudo podman run --rm -e WORKLOAD=hammerdb_vm_mssql -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE1=$PIN_NODE1 -v $KUBECONFIG:/root/.kube/config -e log_level=INFO --privileged quay.io/ebattat/benchmark-runner:latest
+        sudo podman run --rm -e WORKLOAD=hammerdb_pod_mariadb -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE1=$PIN_NODE1 -e RUNNER_PATH=$RUNNER_PATH -v $KUBECONFIG:/root/.kube/config -e log_level=INFO --privileged quay.io/ebattat/benchmark-runner:latest
+        sudo podman run --rm -e WORKLOAD=hammerdb_pod_postgres -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE1=$PIN_NODE1 -e RUNNER_PATH=$RUNNER_PATH -v $KUBECONFIG:/root/.kube/config -e log_level=INFO --privileged quay.io/ebattat/benchmark-runner:latest
+        sudo podman run --rm -e WORKLOAD=hammerdb_pod_mssql -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE1=$PIN_NODE1 -e RUNNER_PATH=$RUNNER_PATH -v $KUBECONFIG:/root/.kube/config -e log_level=INFO --privileged quay.io/ebattat/benchmark-runner:latest
+        sudo podman run --rm -e WORKLOAD=hammerdb_vm_mariadb -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE1=$PIN_NODE1 -e RUNNER_PATH=$RUNNER_PATH -v $KUBECONFIG:/root/.kube/config -e log_level=INFO --privileged quay.io/ebattat/benchmark-runner:latest
+        sudo podman run --rm -e WORKLOAD=hammerdb_vm_postgres -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE1=$PIN_NODE1 -e RUNNER_PATH=$RUNNER_PATH -v $KUBECONFIG:/root/.kube/config -e log_level=INFO --privileged quay.io/ebattat/benchmark-runner:latest
+        sudo podman run --rm -e WORKLOAD=hammerdb_vm_mssql -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE1=$PIN_NODE1 -e RUNNER_PATH=$RUNNER_PATH -v $KUBECONFIG:/root/.kube/config -e log_level=INFO --privileged quay.io/ebattat/benchmark-runner:latest
     - name: 🎁 Bump Version
       run: |
         version=$(python3 setup.py --version)
