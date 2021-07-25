@@ -38,25 +38,17 @@ RUN curl -L https://github.com/kubevirt/kubevirt/releases/download/v${virtctl_ve
 # Activate root alias
 RUN source ~/.bashrc
 
-# Add User for make deploy - cannot run as root
-RUN useradd -ms /bin/bash runner
-USER runner
-WORKDIR /home/runner
-
-# Activate runner alias
-RUN source /home/runner/.bashrc
-
 # Create folder for config file (kubeconfig)
-RUN mkdir -p /home/runner/.kube
+RUN mkdir -p ~/.kube
 
 # download benchmark-operator
 RUN git clone https://github.com/cloud-bulldozer/benchmark-operator
 
 # Add main
-ADD benchmark_runner/benchmark_operator/templates /home/runner/benchmark_runner/benchmark_operator/templates/
-COPY benchmark_runner/main/main.py /home/runner/benchmark_runner/main.py
+ADD benchmark_runner/benchmark_operator/templates ~/benchmark_runner/benchmark_operator/templates/
+COPY benchmark_runner/main/main.py ~/benchmark_runner/main.py
 
-CMD [ "python3.9", "/home/runner/benchmark_runner/main.py"]
+CMD [ "python3.9", "~/benchmark_runner/main.py"]
 
 # oc: https://www.ibm.com/docs/en/fci/6.5.1?topic=steps-setting-up-installation-server
 # sudo podman build -t quay.io/ebattat/benchmark-runner:latest . --no-cache
