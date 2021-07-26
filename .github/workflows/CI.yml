@@ -44,7 +44,7 @@ jobs:
         PIN_NODE2: ${{ secrets.PIN_NODE2 }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
         ELASTICSEARCH: ${{ secrets.ELASTICSEARCH }}
-         ELASTICSEARCH_PORT: ${{ secrets. ELASTICSEARCH_PORT }}
+        ELASTICSEARCH_PORT: ${{ secrets. ELASTICSEARCH_PORT }}
       run: |
         # Install Dockerfile content
 
@@ -102,7 +102,7 @@ jobs:
         PIN_NODE1: ${{ secrets.PIN_NODE1 }}
         PIN_NODE2: ${{ secrets.PIN_NODE2 }}
         ELASTICSEARCH: ${{ secrets.ELASTICSEARCH }}
-         ELASTICSEARCH_PORT: ${{ secrets. ELASTICSEARCH_PORT }}
+        ELASTICSEARCH_PORT: ${{ secrets. ELASTICSEARCH_PORT }}
       run: |
         # Test without elasticsearch
         declare -a workloads=('stressng_pod' 'stressng_vm' 'uperf_pod' 'uperf_vm' 'hammerdb_pod_mariadb' 'hammerdb_vm_mariadb' 'hammerdb_pod_postgres' 'hammerdb_vm_postgres' 'hammerdb_pod_mssql' 'hammerdb_vm_mssql')

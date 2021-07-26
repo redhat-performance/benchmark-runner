@@ -28,8 +28,8 @@ _**Table of Contents**_
 
 <!-- TOC -->
 - [Installation](#installation)
-- [Run workload using Podman/Docker](#run-policy-using-docker-podman)
-- [Run workload in Pod using Kubernetes/OpenShift](#run-policy-using-pod)
+- [Run workload using Podman or Docker](#run-workload-using-podman-or-docker)
+- [Run workload in Pod using Kubernetes or OpenShift](#run-workload-in-pod-using-kubernetes-or-openshift)
 - [Post Installation](#post-installation)
 
 <!-- /TOC -->
