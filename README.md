@@ -28,7 +28,7 @@ _**Table of Contents**_
 
 <!-- TOC -->
 - [Installation](#installation)
-- [Run workload using Docker/Podman](#run-policy-using-docker-podman)
+- [Run workload using Podman/Docker](#run-policy-using-docker-podman)
 - [Run workload in Pod using Kubernetes/OpenShift](#run-policy-using-pod)
 - [Post Installation](#post-installation)
 
@@ -70,6 +70,7 @@ sudo podman run --rm -e WORKLOAD=stressng_pod -e KUBEADMIN_PASSWORD=$kubeadmin_p
 -v /home/user/stressng/stressng_data.yaml:/benchmark_runner/benchmark_operator/template/stressng/stressng_data.yaml
 ```
 ![](media/demo.gif)
+
 ## Run workload in Pod using Kubernetes/OpenShift
 
 [TBD]

@@ -41,8 +41,8 @@ class BenchmarkOperatorWorkloads:
         This method verify that elastic search exist for vm workloads to verify completed status
         :return: error in case no elasticsearch
         """
-        #if 'vm' in workload and not self.__es_host:
-        #    raise VMWorkloadNeedElasticSearch
+        if 'vm' in workload and not self.__es_host:
+           raise VMWorkloadNeedElasticSearch
 
     def __get_run_yamls(self, extension='.yaml'):
         """
@@ -447,9 +447,8 @@ class BenchmarkOperatorWorkloads:
 
         self.make_undeploy_benchmark_controller_manager_if_exist(runner_path=environment_variables.environment_variables_dict['runner_path'])
 
-        # elasticsearch is must for VM workload for completed status verifications
-        # if 'vm' in workload and not self.__es_host:
-        #    raise VMWorkloadNeedElasticSearch
+        #elasticsearch is must for VM workload for completed status verifications
+        self.__verify_elasticsearch_exist_for_vm_workload(workload)
 
         # make deploy benchmark controller manager
         self.make_deploy_benchmark_controller_manager(runner_path=environment_variables.environment_variables_dict['runner_path'])
