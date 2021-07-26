@@ -1,7 +1,8 @@
 
 [![Actions Status](https://github.com/redhat-performance/benchmark-runner/workflows/CI/badge.svg)](https://github.com/redhat-performance/benchmark-runner/actions)
 [![Coverage Status](https://coveralls.io/repos/github/redhat-performance/benchmark-runner/badge.svg?branch=main)](https://coveralls.io/github/redhat-performance/benchmark-runner?branch=main)
-<h3 align="center">Benchmark-Runner </h3>
+
+# Benchmark-Runner
 
 This tool provides a lightweight and flexible framework for running benchmark workloads 
 on Kubernetes/OpenShift Pod or VM.
@@ -34,11 +35,13 @@ _**Table of Contents**_
 <!-- /TOC -->
 
 ## Installation
-
+**optional:**
 #### Download benchmark-runner image from quay.io
 ```sh
 sudo podman pull quay.io/ebattat/benchmark-runner:latest
 ```
+
+## Run workload using Podman/Docker 
 
 #### Environment variables description:
 
@@ -56,11 +59,10 @@ Choose one from the following list:
 
 **mandatory:** PIN_NODE2=$pin_node2 [node2 selector for running the workload, i.e. uperf there are server and client]
 
-**optional:** ELASTICSEARCH=$elasticsearch [service name]
+**optional:** ELASTICSEARCH=$elasticsearch [ elasticsearch service name]
 
 **optional:** ELASTICSEARCH_PORT=$elasticsearch_port
 
-## Run workload using Podman/Docker 
 ```sh
 sudo podman run --rm -e WORKLOAD=stressng_pod -e KUBEADMIN_PASSWORD=$kubeadmin_password -e ELASTICSEARCH=$elasticsearch -e ELASTICSEARCH_PORT=$elasticsearch_port -e PIN_NODE1=$pin_node1 -v /root/.kube/config:/root/.kube/config -e log_level=INFO --privileged quay.io/ebattat/benchmark-runner:latest
 
@@ -73,7 +75,7 @@ sudo podman run --rm -e WORKLOAD=stressng_pod -e KUBEADMIN_PASSWORD=$kubeadmin_p
 [TBD]
 
 ## Post Installation
-
+**optional:**
 #### Delete benchmark-runner image
 ```sh
 sudo podman rmi quay.io/ebattat/benchmark-runner:latest
