@@ -28,8 +28,9 @@ def main():
     es_host = environment_variables_dict.get('elasticsearch', '')
     es_port = environment_variables_dict.get('elasticsearch_port', '')
     kubeadmin_password = environment_variables_dict.get('kubeadmin_password', '')
-    benchmark_operator_workload = BenchmarkOperatorWorkloads(kubeadmin_password=kubeadmin_password, es_host=es_host, es_port=es_port, workload=workload)
-    benchmark_operator_workload.run_workload()
+    benchmark_operator_workload = BenchmarkOperatorWorkloads(kubeadmin_password=kubeadmin_password, es_host=es_host, es_port=es_port)
+    benchmark_operator_workload.update_benchmark_operator_node_selector()
+    benchmark_operator_workload.run_workload(workload=workload)
 
 
 main()

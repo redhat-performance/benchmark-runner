@@ -11,4 +11,4 @@ def test_empty_elasticsearch_environment_parameter():
     This method raise error when elasticsearch not exist in VM workload
     """
     with pytest.raises(VMWorkloadNeedElasticSearch):
-        BenchmarkOperatorWorkloads(workload='stressng_vm')
+        BenchmarkOperatorWorkloads()
