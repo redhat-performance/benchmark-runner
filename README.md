@@ -42,21 +42,23 @@ sudo podman pull quay.io/ebattat/benchmark-runner:latest
 
 #### Environment variables description:
 
-`mandatory:`KUBEADMIN_PASSWORD=$kubeadmin_password
+**mandatory:** KUBEADMIN_PASSWORD=$kubeadmin_password
 
-`mandatory:`WORKLOAD=$workload
+**mandatory:** WORKLOAD=$workload
 
 Choose one from the following list:
 
 `['stressng_pod', 'stressng_vm','uperf_pod', 'uperf_vm', 'hammerdb_pod_mariadb', 'hammerdb_pod_mssql', 'hammerdb_pod_postgres', 'hammerdb_vm_mariadb', 'hammerdb_vm_mssql', 'hammerdb_vm_postgres']`
 
-`mandatory:`ELASTICSEARCH=$elasticsearch [IP]
+**mandatory:** PIN_NODE_BENCHMARK_OPERATOR=$pin_node_benchmark_operator [node selector for benchmark operator pod]
 
-`mandatory:`ELASTICSEARCH_PORT=$elasticsearch_port
+**mandatory:** PIN_NODE1=$pin_node1 [node1 selector for running the workload]
 
-`optional:`PIN_NODE1=$pin_node1 [node1 selector for running the workload]
+**mandatory:** PIN_NODE2=$pin_node2 [node2 selector for running the workload, i.e. uperf there are server and client]
 
-`optional:`PIN_NODE2=$pin_node2 [node2 selector for running the workload, i.e. uperf there are client and server]
+**optional:** ELASTICSEARCH=$elasticsearch [service name]
+
+**optional:** ELASTICSEARCH_PORT=$elasticsearch_port
 
 ## Run workload using Podman/Docker 
 ```sh

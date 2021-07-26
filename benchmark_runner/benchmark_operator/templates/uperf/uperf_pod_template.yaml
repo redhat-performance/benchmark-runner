@@ -14,7 +14,7 @@ spec:
     url: "{{ url }}"
     index_name: {{ index_name_pod }}
   metadata:
-    collection: false
+    collection: true
   cleanup: false
   workload:
     name: uperf
