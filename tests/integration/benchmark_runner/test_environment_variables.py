@@ -19,7 +19,7 @@ def __get_test_environment_variable():
     test_environment_variable['elasticsearch_port'] = os.environ.get('ELASTICSEARCH_PORT', '')
     if test_environment_variable['elasticsearch'] and test_environment_variable['elasticsearch_port']:
         test_environment_variable[
-            'elasticsearch_url'] = f"http://{test_environment_variable['elasticsearch']}:{test_environment_variable['elasticsearch_port']}"
+            'elasticsearch_url'] = f"{test_environment_variable['elasticsearch']}:{test_environment_variable['elasticsearch_port']}"
     else:
         test_environment_variable['elasticsearch_url'] = ''
     return test_environment_variable
