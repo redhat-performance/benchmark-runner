@@ -9,7 +9,7 @@ class EnvironmentVariables:
     def __init__(self):
         self._environment_variables_dict = {}
         # hard coded parameters
-        self._environment_variables_dict['workloads'] = ['stressng_pod', 'stressng_vm', 'uperf_pod', 'uperf_vm', 'hammerdb_pod_mariadb', 'hammerdb_pod_mssql', 'hammerdb_pod_postgres', 'hammerdb_vm_mariadb', 'hammerdb_vm_mssql', 'hammerdb_vm_postgres']
+        self._environment_variables_dict['workloads'] = ['stressng_pod', 'stressng_vm', 'uperf_pod', 'uperf_vm', 'hammerdb_pod_mariadb', 'hammerdb_vm_mariadb',  'hammerdb_pod_postgres', 'hammerdb_vm_postgres', 'hammerdb_pod_mssql', 'hammerdb_vm_mssql']
         self._environment_variables_dict['namespace'] = os.environ.get('namespace', 'benchmark-operator')
 
         # dynamic parameters
@@ -24,9 +24,6 @@ class EnvironmentVariables:
         self._environment_variables_dict['elasticsearch_port'] = os.environ.get('ELASTICSEARCH_PORT', '')
         if self._environment_variables_dict['elasticsearch'] and self._environment_variables_dict['elasticsearch_port']:
             self._environment_variables_dict['elasticsearch_url'] = f"http://{self._environment_variables_dict['elasticsearch']}:{self._environment_variables_dict['elasticsearch_port']}"
-        # in case no port
-        elif self._environment_variables_dict['elasticsearch'] and not self._environment_variables_dict['elasticsearch_port']:
-            self._environment_variables_dict['elasticsearch'] = self._environment_variables_dict['elasticsearch']
         else:
             self._environment_variables_dict['elasticsearch_url'] = ''
 

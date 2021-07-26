@@ -20,9 +20,6 @@ def __get_test_environment_variable():
     if test_environment_variable['elasticsearch'] and test_environment_variable['elasticsearch_port']:
         test_environment_variable[
             'elasticsearch_url'] = f"http://{test_environment_variable['elasticsearch']}:{test_environment_variable['elasticsearch_port']}"
-    # in case no port
-    elif test_environment_variable['elasticsearch'] and not test_environment_variable['elasticsearch_port']:
-        test_environment_variable['elasticsearch_url'] = test_environment_variable['elasticsearch']
     else:
         test_environment_variable['elasticsearch_url'] = ''
     return test_environment_variable

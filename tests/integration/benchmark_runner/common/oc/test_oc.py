@@ -35,7 +35,7 @@ def __delete_pod_yamls():
     oc.login()
     if oc._is_pod_exist(pod_name='stressng-pod-workload', namespace=test_environment_variable['namespace']):
         oc.delete_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_pod.yaml'), pod_name='stressng-pod-workload')
-        delete_generate_file(full_path_yaml=os.path.join(f'{templates_path}', 'stressng_pod.yaml'))
+    delete_generate_file(full_path_yaml=os.path.join(f'{templates_path}', 'stressng_pod.yaml'))
 
 
 def __delete_vm_yamls():
@@ -47,7 +47,7 @@ def __delete_vm_yamls():
     oc.login()
     if oc._is_vmi_exist(vm_name='stressng-vm-workload', namespace=test_environment_variable['namespace']):
         oc.delete_vm_sync(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'), vm_name='stressng-vm-workload')
-        delete_generate_file(full_path_yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'))
+    delete_generate_file(full_path_yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'))
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -249,7 +249,29 @@ def test_wait_for_vm_created():
     assert oc.wait_for_vm_create(vm_name='stressng-vm-workload')
 
 
-# Stressng labels only: Need to fix it after updating labels in stressng vm
+def test_vm_create_initialized_ready_completed_deleted():
+    """
+    This method test create, get_vmi, initialize, ready, completed, deleted
+    Must have running ElasticSearch server
+    :return:
+    """
+    workload = 'stressng-vm'
+    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
+    oc.login()
+    assert oc.create_vm_sync(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'), vm_name='stressng-vm-workload')
+    assert oc.get_vmi()
+    oc.wait_for_initialized(label='app=stressng_workload', workload='stressng-vm')
+    oc.wait_for_ready(label='app=stressng_workload', workload='stressng-vm')
+    if test_environment_variable['elasticsearch']:
+        es = ESOperations(es_host=test_environment_variable['elasticsearch'],
+                           es_port=test_environment_variable['elasticsearch_port'])
+        assert es.verify_es_data_uploaded(index='stressng-vm-results', uuid=oc.get_long_uuid(workload=workload))
+    else:
+        print('There is no elastic search to verify VM completed status')
+    assert oc.delete_vm_sync(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'),
+                             vm_name='stressng-vm-workload')
+
+
 def test_wait_for_vm_terminated():
     """
     This method test wait for vm to be terminated
@@ -258,33 +280,7 @@ def test_wait_for_vm_terminated():
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
     oc.create_vm_sync(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'), vm_name='stressng-vm-workload')
-    oc.wait_for_initialized(label='kubevirt.io=virt-launcher', workload='stressng-vm', label_uuid=False)
-    oc.wait_for_ready(label='kubevirt.io=virt-launcher', workload='stressng-vm', label_uuid=False)
+    oc.wait_for_initialized(label='app=stressng_workload', workload='stressng-vm')
+    oc.wait_for_ready(label='app=stressng_workload', workload='stressng-vm')
     oc._delete_async(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'))
     assert oc.wait_for_vm_terminate(vm_name='stressng-vm-workload')
-
-
-# Stressng labels only: Need to fix it after updating labels in stressng vm
-# Enable ElasticSearch once fix
-def test_vm_create_initialized_ready_completed_deleted():
-    """
-    This method test create, get_vmi, initialize, ready, completed, deleted
-    Must have running ElasticSearch server
-    :return:
-    """
-    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
-    assert oc.create_vm_sync(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'), vm_name='stressng-vm-workload')
-    assert oc.get_vmi()
-    assert oc.wait_for_initialized(label='kubevirt.io=virt-launcher', workload='stressng-vm', label_uuid=False)
-    assert oc.wait_for_ready(label='kubevirt.io=virt-launcher', workload='stressng-vm', label_uuid=False)
-    if test_environment_variable['elasticsearch']:
-        es = ESOperations(es_host=test_environment_variable['elasticsearch'],
-                           es_port=test_environment_variable['elasticsearch_port'])
-        assert es.verify_es_data_uploaded(index='stressng-vm-results', uuid=oc.get_long_uuid())
-    else:
-        print('There is no elastic search to verify VM completed status')
-    assert oc.delete_vm_sync(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'),
-                             vm_name='stressng-vm-workload')
-
-

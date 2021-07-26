@@ -228,7 +228,7 @@ class BenchmarkOperatorWorkloads:
             self.__oc.wait_for_completed(label='app=stressng_workload', workload=workload)
             if self.__es_host:
                 # verify that data upload to elastic search according to unique uuid
-                self.__es_operations.verify_es_data_uploaded(index='ripsaw-stressng-results', uuid=self.__oc.get_long_uuid(workload=workload))
+                self.__es_operations.verify_es_data_uploaded(index=f'{workload}-results', uuid=self.__oc.get_long_uuid(workload=workload))
             self.__oc.delete_pod_sync(
                 yaml=os.path.join(f'{self.__current_run_path}', f'{self.stressng_pod.__name__}.yaml'),
                 pod_name=f'{workload}-workload')
@@ -250,8 +250,8 @@ class BenchmarkOperatorWorkloads:
         try:
             workload = self.stressng_vm.__name__.replace('_', '-')
             self.__oc.create_vm_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.stressng_vm.__name__}.yaml'), vm_name=f'{workload}-workload')
-            self.__oc.wait_for_initialized(label='kubevirt.io=virt-launcher', workload=workload, label_uuid=False)
-            self.__oc.wait_for_ready(label='kubevirt.io=virt-launcher', workload=workload, label_uuid=False)
+            self.__oc.wait_for_initialized(label='app=stressng_workload', workload=workload)
+            self.__oc.wait_for_ready(label='app=stressng_workload', workload=workload)
             # verify that data upload to elastic search, vm completed status
             if self.__es_host:
                 self.__es_operations.verify_es_data_uploaded(index=f'{workload}-results', uuid=self.__oc.get_long_uuid(workload=workload))

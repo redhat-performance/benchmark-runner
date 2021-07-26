@@ -1,6 +1,6 @@
 shared_data:
   namespace: {{ namespace }}
-  pin_client: {{ pin_node1 }}
+  pin_node: {{ pin_node1 }}
   url: {{ elasticsearch_url }}
   pin: true
   runtype: parallel
@@ -15,7 +15,7 @@ shared_data:
   # mem stressor options
   mem_stressors: 1
 pod:
-  index_name_pod: ripsaw-stressng
+  index_name_pod: stressng-pod
   es_kind: pod
   resources: true
   limits_cpu: 4
