@@ -39,7 +39,7 @@ def before_after_all_tests_fixture():
     print('Install benchmark-operator pod')
     # delete benchmark-operator pod if exist
     benchmark_operator = BenchmarkOperatorWorkloads(kubeadmin_password=test_environment_variable['kubeadmin_password'], es_host=test_environment_variable['elasticsearch'],
-                                                    es_port=test_environment_variable['elasticsearch_port'], workload=test_environment_variable['workload'])
+                                                    es_port=test_environment_variable['elasticsearch_port'])
     benchmark_operator.make_undeploy_benchmark_controller_manager_if_exist(runner_path=test_environment_variable['runner_path'])
     benchmark_operator.make_deploy_benchmark_controller_manager(runner_path=test_environment_variable['runner_path'])
     yield

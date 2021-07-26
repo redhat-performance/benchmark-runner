@@ -1,6 +1,7 @@
 
 import os
 import time
+import yaml
 
 from typeguard import typechecked
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
@@ -18,19 +19,16 @@ class BenchmarkOperatorWorkloads:
     """
     This class contains all the custom_workloads
     """
-    def __init__(self, kubeadmin_password: str = '', es_host: str = '', es_port: str = '', workload: str = ''):
+    def __init__(self, kubeadmin_password: str = '', es_host: str = '', es_port: str = ''):
         self.__ssh = SSH()
         self.__kubeadmin_password = kubeadmin_password
         self.__oc = OC(kubeadmin_password=self.__kubeadmin_password)
         self.__dir_path = os.path.dirname(os.path.realpath(__file__))
-        self.__workload = workload
         self.__es_host = es_host
         self.__es_port = es_port
         self.__current_run_path = os.path.join(self.__dir_path, 'current_run')
         if es_host and es_port:
             self.__es_operations = ESOperations(es_host=self.__es_host, es_port=self.__es_port)
-        else:
-            self.__verify_elasticsearch_exist_for_vm_workload(workload=self.__workload)
         # Generate templates class
         self.__template = TemplateOperations()
         self.__oc.login()
@@ -70,6 +68,31 @@ class BenchmarkOperatorWorkloads:
                 os.remove(os.path.join(self.__current_run_path, f'{names[-1]}.yaml'))
         else:
             logger.info('yaml file {} does not exist')
+
+    @logger_time_stamp
+    def update_benchmark_operator_node_selector(self):
+        """
+        This method update benchmark operator node selector
+        @return:
+        """
+        data = []
+        # Read YAML file and inject node selector in the right place
+        with open(os.path.join(self.__environment_variables_dict.get('runner_path', ''),
+                               'benchmark-operator/config/manager/manager.yaml'), 'r') as stream:
+            try:
+                documents = yaml.safe_load_all(stream)
+                for doc in documents:
+                    if doc.get('spec'):
+                        doc['spec']['template']['spec']['nodeSelector'] = {
+                            'kubernetes.io/hostname': f"{self.__environment_variables_dict.get('pin_node_benchmark_operator', '')}"}
+                    data.append(doc)
+            except yaml.YAMLError as exc:
+                print(exc)
+
+        # Write YAML file
+        with open(os.path.join(self.__environment_variables_dict.get('runner_path', ''),
+                               'benchmark-operator/config/manager/manager.yaml'), 'w', encoding='utf8') as outfile:
+            yaml.safe_dump_all(data, outfile, default_flow_style=False, allow_unicode=True)
 
     @logger_time_stamp
     def check_if_exist_run_yaml(self, extension: str = '.yaml'):
@@ -416,7 +439,7 @@ class BenchmarkOperatorWorkloads:
         self.__remove_run_workload_yaml_file(workload_full_name=workload_full_name)
 
     @logger_time_stamp
-    def run_workload(self):
+    def run_workload(self, workload: str):
         """
         This method run the input workload
         :return:
@@ -425,13 +448,14 @@ class BenchmarkOperatorWorkloads:
         self.make_undeploy_benchmark_controller_manager_if_exist(runner_path=environment_variables.environment_variables_dict['runner_path'])
 
         # elasticsearch is must for VM workload for completed status verifications
-        #self.__verify_elasticsearch_exist_for_vm_workload(workload=self.__workload)
+        # if 'vm' in workload and not self.__es_host:
+        #    raise VMWorkloadNeedElasticSearch
 
         # make deploy benchmark controller manager
         self.make_deploy_benchmark_controller_manager(runner_path=environment_variables.environment_variables_dict['runner_path'])
 
         # run workload
-        self.run_workload_func(workload_full_name=self.__workload)
+        self.run_workload_func(workload_full_name=workload)
 
         # make undeploy benchmark controller manager
         self.make_undeploy_benchmark_controller_manager(runner_path=environment_variables.environment_variables_dict['runner_path'])
