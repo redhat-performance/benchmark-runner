@@ -57,7 +57,7 @@ Choose one from the following list:
 
 **mandatory:** PIN_NODE1=$PIN_NODE1 [node1 selector for running the workload]
 
-**mandatory:** PIN_NODE2=$PIN_NODE2 [node2 selector for running the workload, i.e. uperf there are server and client]
+**mandatory:** PIN_NODE2=$PIN_NODE2 [node2 selector for running the workload, i.e. uperf server and client, hammerdb database and workload]
 
 **optional:** ELASTICSEARCH=$ELASTICSEARCH [ elasticsearch service name]
 

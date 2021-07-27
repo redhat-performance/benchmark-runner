@@ -18,7 +18,6 @@ spec:
   workload:
     name: hammerdb
     args:
-      #image: quay.io/user/hammerdb:latest
       pin: {{ pin }} # enable for nodeSelector
       pin_node: "{{ pin_node }}"
       db_type: "{{ db_type }}"
