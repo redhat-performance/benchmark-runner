@@ -14,7 +14,7 @@ RUN dnf install -y python3.9 \
     && echo alias python=python3.9 >> ~/.bashrc
 
 # install & run benchmark-runner (--no-cache-dir for take always the latest)
-RUN python3.9 -m pip --no-cache-dir install --upgrade pip && pip --no-cache-dir install benchmark-runner==$VERSION
+RUN python3.9 -m pip --no-cache-dir install --upgrade pip && pip --no-cache-dir install benchmark-runner --upgrade
 
 # install helm
 RUN curl -fsSL -o ~/get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 \
