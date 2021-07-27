@@ -38,33 +38,33 @@ _**Table of Contents**_
 **optional:**
 #### Download benchmark-runner image from quay.io
 ```sh
-sudo podman pull quay.io/ebattat/benchmark-runner:latest
+podman pull quay.io/ebattat/benchmark-runner:latest
 ```
 
 ## Run workload using Podman or Docker 
 
 #### Environment variables description:
 
-**mandatory:** KUBEADMIN_PASSWORD=$kubeadmin_password
+**mandatory:** KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD
 
-**mandatory:** WORKLOAD=$workload
+**mandatory:** WORKLOAD=$WORKLOAD
 
 Choose one from the following list:
 
 `['stressng_pod', 'stressng_vm','uperf_pod', 'uperf_vm', 'hammerdb_pod_mariadb', 'hammerdb_pod_mssql', 'hammerdb_pod_postgres', 'hammerdb_vm_mariadb', 'hammerdb_vm_mssql', 'hammerdb_vm_postgres']`
 
-**mandatory:** PIN_NODE_BENCHMARK_OPERATOR=$pin_node_benchmark_operator [node selector for benchmark operator pod]
+**mandatory:** PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR [node selector for benchmark operator pod]
 
-**mandatory:** PIN_NODE1=$pin_node1 [node1 selector for running the workload]
+**mandatory:** PIN_NODE1=$PIN_NODE1 [node1 selector for running the workload]
 
-**mandatory:** PIN_NODE2=$pin_node2 [node2 selector for running the workload, i.e. uperf there are server and client]
+**mandatory:** PIN_NODE2=$PIN_NODE2 [node2 selector for running the workload, i.e. uperf there are server and client]
 
-**optional:** ELASTICSEARCH=$elasticsearch [ elasticsearch service name]
+**optional:** ELASTICSEARCH=$ELASTICSEARCH [ elasticsearch service name]
 
-**optional:** ELASTICSEARCH_PORT=$elasticsearch_port
+**optional:** ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT
 
 ```sh
-sudo podman run --rm -e WORKLOAD=stressng_pod -e KUBEADMIN_PASSWORD=$kubeadmin_password -e ELASTICSEARCH=$elasticsearch -e ELASTICSEARCH_PORT=$elasticsearch_port -e PIN_NODE1=$pin_node1 -v /root/.kube/config:/root/.kube/config -e log_level=INFO --privileged quay.io/ebattat/benchmark-runner:latest
+podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:latest
 
 # For custom workload data configuration add:
 -v /home/user/stressng/stressng_data.yaml:/benchmark_runner/benchmark_operator/template/stressng/stressng_data.yaml
@@ -79,5 +79,5 @@ sudo podman run --rm -e WORKLOAD=stressng_pod -e KUBEADMIN_PASSWORD=$kubeadmin_p
 **optional:**
 #### Delete benchmark-runner image
 ```sh
-sudo podman rmi quay.io/ebattat/benchmark-runner:latest
+podman rmi quay.io/ebattat/benchmark-runner:latest
 ```

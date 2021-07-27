@@ -320,7 +320,7 @@ class BenchmarkOperatorWorkloads:
             self.__oc.wait_for_ready(label='app=uperf-bench-client', workload=workload)
             # verify that data upload to elastic search, vm completed status
             if self.__es_host:
-                self.__es_operations.verify_es_data_uploaded(index=f'{workload}-results', uuid=self.__oc.get_long_uuid(workload='uperf'), workload=self.uperf_vm.__name__)
+                self.__es_operations.verify_es_data_uploaded(index=f'{workload}-results', uuid=self.__oc.get_long_uuid(workload=workload), workload=self.uperf_vm.__name__)
             self.__oc.delete_vm_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.uperf_vm.__name__}.yaml'),
                                      vm_name='uperf-server')
         except ElasticSearchDataNotUploaded as err:
