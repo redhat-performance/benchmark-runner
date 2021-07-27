@@ -1,7 +1,7 @@
 
 ## RELEASE NOTES
 
-#### Benchmark-Runner V1.0.62
+#### Benchmark-Runner V1.0.63
 
 There is a new stable version for Benchmark-Runner, it includes:
 
