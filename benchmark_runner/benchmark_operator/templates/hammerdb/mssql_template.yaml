@@ -21,7 +21,7 @@ spec:
         type: mssql-database-server
     spec:
       nodeSelector:
-              kubernetes.io/hostname: "{{ pin_node1 }}"
+              kubernetes.io/hostname: "{{ pin_node2 }}"
       terminationGracePeriodSeconds: 10
       containers:
       - name: mssql

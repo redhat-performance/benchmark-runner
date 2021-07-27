@@ -338,7 +338,7 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def wait_for_completed(self, label: str, workload: str, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = 500):
+    def wait_for_completed(self, label: str, workload: str, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = 1000):
         """
         This method wait to pod to be completed
         :param namespace:

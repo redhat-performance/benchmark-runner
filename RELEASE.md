@@ -1,12 +1,13 @@
 
 ## RELEASE NOTES
 
-#### Benchmark-Runner V1.0.60
+#### Benchmark-Runner V1.0.61
 
 There is a new stable version for Benchmark-Runner, it includes:
 
 1. Benchmark-Runner new feature support:
    
+* Adding support for VM workloads
 * Adding support for running Benchmark runner without active Elasticsearch server
 * Adding node selector support for Benchmark-Operator pod [PIN_NODE_BENCHMARK_OPERATOR]
 * [Github Actions](https://github.com/redhat-performance/benchmark-runner/runs/3169383450?check_suite_focus=true) - adding Azure cluster support for integration and E2E tests
