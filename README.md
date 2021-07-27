@@ -41,7 +41,7 @@ _**Table of Contents**_
 sudo podman pull quay.io/ebattat/benchmark-runner:latest
 ```
 
-## Run workload using Podman/Docker 
+## Run workload using Podman or Docker 
 
 #### Environment variables description:
 
@@ -71,7 +71,7 @@ sudo podman run --rm -e WORKLOAD=stressng_pod -e KUBEADMIN_PASSWORD=$kubeadmin_p
 ```
 ![](media/demo.gif)
 
-## Run workload in Pod using Kubernetes/OpenShift
+## Run workload in Pod using Kubernetes or OpenShift
 
 [TBD]
 
