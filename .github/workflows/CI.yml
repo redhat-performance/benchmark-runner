@@ -67,25 +67,25 @@ jobs:
         git clone https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
 
         # pytest
-        pytest --cov=benchmark_runner --cov-report=term-missing
-        coverage run -m pytest
-        coverage report -m
+        #pytest --cov=benchmark_runner --cov-report=term-missing
+        #coverage run -m pytest
+        #coverage report -m
     - name: 🎥 Publish to coveralls.io
       env:
         GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
       run: |
-        pip install coveralls
-        COVERALLS_REPO_TOKEN=${{ secrets.COVERALLS_REPO_TOKEN }} coveralls
+        #pip install coveralls
+        #COVERALLS_REPO_TOKEN=${{ secrets.COVERALLS_REPO_TOKEN }} coveralls
     - name: 🔨 Build and publish distribution 📦 to PyPI
       env:
         TWINE_USERNAME: __token__
         TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
       run: |
-        pip install setuptools wheel twine
-        python setup.py sdist bdist_wheel
-        twine upload dist/*
-        echo '⌛ Wait 120 sec till package will be updated in PyPI'
-        sleep 120
+        #pip install setuptools wheel twine
+        #python setup.py sdist bdist_wheel
+        #twine upload dist/*
+        #echo '⌛ Wait 180 sec till package will be updated in PyPI'
+        #sleep 180
     - name: ⌛ Upload 🐋 to quay.io
       run: |
         version=$(python3 setup.py --version)
