@@ -142,7 +142,7 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def wait_for_pod_create(self, pod_name: str, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = 800, sleep_time: int = 3):
+    def wait_for_pod_create(self, pod_name: str, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = 1000, sleep_time: int = 3):
         """
         This method is wait till pod name is creating or throw exception after timeout
         :param namespace:
@@ -162,7 +162,7 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def wait_for_vm_create(self, vm_name: str, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = 300, sleep_time: int = 3):
+    def wait_for_vm_create(self, vm_name: str, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = 1000, sleep_time: int = 3):
         """
         This method is wait till vm name is creating or throw exception after timeout
         :param vm_name:
