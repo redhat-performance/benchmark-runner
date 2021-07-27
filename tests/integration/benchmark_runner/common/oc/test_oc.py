@@ -196,20 +196,6 @@ def test_wait_for_pod_create_initialized_ready_completed_deleted():
     assert oc.delete_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_pod.yaml'), pod_name='stressng-pod-workload')
 
 
-def test_wait_for_pod_terminated():
-    """
-    This method test wait for pod to be terminated
-    :return:
-    """
-    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
-    oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_pod.yaml'), pod_name='stressng-pod-workload')
-    oc.wait_for_initialized(label='app=stressng_workload', workload='stressng-pod')
-    oc.wait_for_ready(label='app=stressng_workload', workload='stressng-pod')
-    oc.wait_for_completed(label='app=stressng_workload', workload='stressng-pod')
-    oc._delete_async(yaml=os.path.join(f'{templates_path}', 'stressng_pod.yaml'))
-    assert oc.wait_for_pod_terminate(pod_name='stressng-pod-workload')
-
 ###################################################### VM Tests ##################################################
 
 
@@ -270,17 +256,3 @@ def test_vm_create_initialized_ready_completed_deleted():
         print('There is no elastic search to verify VM completed status')
     assert oc.delete_vm_sync(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'),
                              vm_name='stressng-vm-workload')
-
-
-def test_wait_for_vm_terminated():
-    """
-    This method test wait for vm to be terminated
-    :return:
-    """
-    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
-    oc.create_vm_sync(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'), vm_name='stressng-vm-workload')
-    oc.wait_for_initialized(label='app=stressng_workload', workload='stressng-vm')
-    oc.wait_for_ready(label='app=stressng_workload', workload='stressng-vm')
-    oc._delete_async(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'))
-    assert oc.wait_for_vm_terminate(vm_name='stressng-vm-workload')
