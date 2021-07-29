@@ -5,15 +5,27 @@ import yaml
 from jinja2 import Template
 from benchmark_runner.main.update_data_template_yaml_with_environment_variables import delete_generate_file, update_environment_variable
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp
+from benchmark_runner.main.environment_variables import environment_variables
 
 
 class TemplateOperations:
     """This class is responsible for template operations"""
 
-    def __init__(self):
-        self.__dir_path = os.path.dirname(os.path.realpath(__file__))
-        self.__dir_path_up = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-        self.__current_run_path = f'{self.__dir_path_up}/current_run'
+    def __init__(self, storage_type: str = ''):
+        # if mount is exist - path inside Dockerfile
+        if os.path.exists('/benchmark_runner/benchmark_operator/templates/'):
+            self.__dir_path = '/benchmark_runner/benchmark_operator/templates/'
+        else:
+            self.__dir_path = os.path.dirname(os.path.realpath(__file__))
+        self.__current_run_path = f'{self.__dir_path}/current_run'
+        self.__hammerdb_dir_path = os.path.join(self.__dir_path, 'hammerdb')
+        # environment variables
+        self.__environment_variables_dict = environment_variables.environment_variables_dict
+        # hammerdb storage
+        if self.__environment_variables_dict.get('ocs_pvc', ''):
+            self.__storage_type = 'ocs_pvc'
+        else:
+            self.__storage_type = 'ephemeral'
 
     def __get_yaml_template_by_workload(self, workload: str, extension='.yaml', skip: str = 'data'):
         """
@@ -28,16 +40,20 @@ class TemplateOperations:
     @logger_time_stamp
     def generate_hammerdb_yamls(self, workload: str, database: str):
         """
-        This method generate hammerdb yaml from templates
+        This method generate hammerdb yaml from templates,
+        special generator for 2 yaml file: database and workload
         :return:
         """
-        update_environment_variable(dir_path=os.path.join(self.__dir_path, 'hammerdb'), yaml_file='hammerdb_data_template.yaml')
+        # replace environment variables
+        update_environment_variable(dir_path=self.__hammerdb_dir_path, yaml_file='hammerdb_data_template.yaml')
+        # handle database pod yaml
         if 'pod' in workload:
-            update_environment_variable(dir_path=os.path.join(self.__dir_path, 'hammerdb'), yaml_file=f'{database}_template.yaml')
-            shutil.move(os.path.join(self.__dir_path, 'hammerdb', f'{database}.yaml'), os.path.join(self.__current_run_path, f'{database}.yaml'))
-            delete_generate_file(full_path_yaml=os.path.join(self.__dir_path, 'hammerdb', f'{database}.yaml'))
+            # replace environment variables
+            update_environment_variable(dir_path=self.__hammerdb_dir_path, yaml_file=f'{database}_{self.__storage_type}_template.yaml')
+            shutil.move(os.path.join(self.__hammerdb_dir_path, f'{database}_{self.__storage_type}.yaml'), os.path.join(self.__current_run_path, f'{database}.yaml'))
+            delete_generate_file(full_path_yaml=os.path.join(self.__hammerdb_dir_path, f'{database}.yaml'))
         # Get hammerdb data
-        with open(os.path.join(self.__dir_path, 'hammerdb', 'hammerdb_data.yaml'), 'r') as file:
+        with open(os.path.join(self.__hammerdb_dir_path, 'hammerdb_data.yaml'), 'r') as file:
             hammerdb_data = yaml.load(file, Loader=yaml.FullLoader)
         shared_data = hammerdb_data['shared_data']
         shared_data_pod = hammerdb_data['pod']
@@ -45,7 +61,7 @@ class TemplateOperations:
         database_data = hammerdb_data[database]
 
         hammerdb_template = self.__get_yaml_template_by_workload(workload=workload, skip='data')
-        with open(os.path.join(f'{self.__dir_path}', 'hammerdb', f'{hammerdb_template}.yaml')) as f:
+        with open(os.path.join(self.__hammerdb_dir_path, f'{hammerdb_template}.yaml')) as f:
             template_str = f.read()
         tm = Template(template_str)
         # merge 3 dictionaries
@@ -61,7 +77,8 @@ class TemplateOperations:
         with open(os.path.join(f'{self.__current_run_path}', f'{hammerdb_name}{database}.yaml'), 'w') as f:
             f.write(data)
         # delete the generate data file with environment variable
-        delete_generate_file(os.path.join(self.__dir_path, 'hammerdb', 'hammerdb_data.yaml'))
+        delete_generate_file(os.path.join(self.__hammerdb_dir_path, 'hammerdb_data.yaml'))
+        # removing current_run yaml folder is occurred at the end of run: BenchmarkOperatorWorkloads__remove_run_workload_yaml_file
 
     @logger_time_stamp
     def generate_workload_yamls(self, workload: str):
@@ -94,7 +111,8 @@ class TemplateOperations:
 
         data = tm.render(render_data)
         workload_file_name = workload_template.replace('_template', '')
-        with open(os.path.join(f'{self.__dir_path_up}', 'current_run', f'{workload_file_name}.yaml'), 'w') as f:
+        with open(os.path.join(f'{self.__current_run_path}', f'{workload_file_name}.yaml'), 'w') as f:
             f.write(data)
         # delete the generate data file with environment variable
         delete_generate_file(os.path.join(workload_dir_path, f'{workload_name}_data.yaml'))
+        # removing current_run yaml folder is occurred at the end of run: BenchmarkOperatorWorkloads__remove_run_workload_yaml_file

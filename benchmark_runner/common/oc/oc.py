@@ -283,7 +283,7 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def wait_for_initialized(self, label: str, workload: str, status: str = 'Initialized', label_uuid: bool = True, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = 300):
+    def wait_for_initialized(self, label: str, workload: str = '', status: str = 'Initialized', label_uuid: bool = True, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = 300):
         """
         This method wait to pod to be initialized
         :param namespace:
@@ -311,11 +311,12 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def wait_for_ready(self, label: str, workload: str, status: str = 'ready', label_uuid: bool = True, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = 300):
+    def wait_for_ready(self, label: str, workload: str = '', status: str = 'ready', label_uuid: bool = True, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = 300):
         """
         This method wait to pod to be ready
         :param namespace:
         :param label:
+        :param workload:
         :param status:
         :param label_uuid:  The label include uuid
         :param timeout:
@@ -338,11 +339,12 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def wait_for_completed(self, label: str, workload: str, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = 1000):
+    def wait_for_completed(self, label: str, workload: str = '', namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = 1000):
         """
         This method wait to pod to be completed
         :param namespace:
         :param label:
+        :param workload:
         :param timeout:
         :return:
         """

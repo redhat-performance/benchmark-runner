@@ -45,7 +45,7 @@ RUN mkdir -p ~/.kube
 RUN git clone https://github.com/cloud-bulldozer/benchmark-operator
 
 # Add main
-ADD benchmark_runner/benchmark_operator/templates ~/benchmark_runner/benchmark_operator/templates/
+ADD benchmark_runner/benchmark_operator/templates benchmark_runner/benchmark_operator/templates/
 COPY benchmark_runner/main/main.py ~/benchmark_runner/main.py
 
 CMD [ "python3.9", "~/benchmark_runner/main.py"]

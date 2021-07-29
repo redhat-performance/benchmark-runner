@@ -2,7 +2,7 @@ shared_data:
   namespace: {{ namespace }}
   pin_node: {{ pin_node1 }}
   url: {{ elasticsearch_url }}
-  pin: true
+  pin: {{ pin }}
   runtype: parallel
   timeout: 30
   instances: 1

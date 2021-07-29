@@ -23,10 +23,14 @@ class BenchmarkOperatorWorkloads:
         self.__ssh = SSH()
         self.__kubeadmin_password = kubeadmin_password
         self.__oc = OC(kubeadmin_password=self.__kubeadmin_password)
-        self.__dir_path = os.path.dirname(os.path.realpath(__file__))
+        # if mount is exist - path inside Dockerfile
+        if os.path.exists('/benchmark_runner/benchmark_operator/templates/'):
+            self.__dir_path = '/benchmark_runner/benchmark_operator/templates/'
+        else:
+            self.__dir_path = os.path.dirname(os.path.realpath(__file__))
+        self.__current_run_path = f'{self.__dir_path}/templates/current_run'
         self.__es_host = es_host
         self.__es_port = es_port
-        self.__current_run_path = os.path.join(self.__dir_path, 'current_run')
         if es_host and es_port:
             self.__es_operations = ESOperations(es_host=self.__es_host, es_port=self.__es_port)
         # Generate templates class
@@ -44,9 +48,9 @@ class BenchmarkOperatorWorkloads:
         if 'vm' in workload and not self.__es_host:
            raise VMWorkloadNeedElasticSearch
 
-    def __get_run_yamls(self, extension='.yaml'):
+    def __remove_current_run_yamls(self, extension='.yaml'):
         """
-        This method get all run yamls files
+        This method remove all current run yamls files
         :return:
         """
         name_list = []
@@ -70,21 +74,20 @@ class BenchmarkOperatorWorkloads:
             logger.info('yaml file {} does not exist')
 
     @logger_time_stamp
-    def update_benchmark_operator_node_selector(self):
+    def update_node_selector(self, base_path: str = '', yaml_path: str = '', pin_node: str = ''):
         """
-        This method update benchmark operator node selector
+        This method update node selector in yaml
         @return:
         """
         data = []
         # Read YAML file and inject node selector in the right place
-        with open(os.path.join(self.__environment_variables_dict.get('runner_path', ''),
-                               'benchmark-operator/config/manager/manager.yaml'), 'r') as stream:
+        with open(os.path.join(base_path, yaml_path), 'r') as stream:
             try:
                 documents = yaml.safe_load_all(stream)
                 for doc in documents:
                     if doc.get('spec'):
                         doc['spec']['template']['spec']['nodeSelector'] = {
-                            'kubernetes.io/hostname': f"{self.__environment_variables_dict.get('pin_node_benchmark_operator', '')}"}
+                            'kubernetes.io/hostname': f"{self.__environment_variables_dict.get(pin_node, '')}"}
                     data.append(doc)
             except yaml.YAMLError as exc:
                 print(exc)
@@ -95,7 +98,30 @@ class BenchmarkOperatorWorkloads:
             yaml.safe_dump_all(data, outfile, default_flow_style=False, allow_unicode=True)
 
     @logger_time_stamp
-    def check_if_exist_run_yaml(self, extension: str = '.yaml'):
+    def change_resource_limit_cpu_benchmark_operator_temp_patch(self, base_path: str = '', yaml_path: str = '', pin_node: str = ''):
+        """
+        # This method is for update resources limit in manager.yaml
+        @return:
+        """
+        data = []
+        # Read YAML file and inject node selector in the right place
+        with open(os.path.join(base_path, yaml_path), 'r') as stream:
+            try:
+                documents = yaml.safe_load_all(stream)
+                for doc in documents:
+                    if doc.get('spec'):
+                        doc['spec']['template']['spec']['containers'][1]['resources']['limits']['cpu']=  "0.0"
+                    data.append(doc)
+            except yaml.YAMLError as exc:
+                print(exc)
+
+        # Write YAML file
+        with open(os.path.join(self.__environment_variables_dict.get('runner_path', ''),
+                               'benchmark-operator/config/manager/manager.yaml'), 'w', encoding='utf8') as outfile:
+            yaml.safe_dump_all(data, outfile, default_flow_style=False, allow_unicode=True)
+
+    @logger_time_stamp
+    def remove_if_exist_run_yaml(self, extension: str = '.yaml'):
         """
         This method remove all run yaml files in yaml folder
         :return:
@@ -120,6 +146,8 @@ class BenchmarkOperatorWorkloads:
         os.chdir(os.path.join(runner_path, benchmark_operator_path))
         self.__ssh.run('make deploy')
         self.__oc.wait_for_pod_create(pod_name='benchmark-controller-manager')
+        self.__oc.wait_for_initialized(label='control-plane=controller-manager', label_uuid=False)
+        self.__oc.wait_for_ready(label='control-plane=controller-manager', label_uuid=False)
         os.chdir(current_dir)
 
     @logger_time_stamp
@@ -198,7 +226,7 @@ class BenchmarkOperatorWorkloads:
         @return:
         """
         self.__oc.delete_pod_sync(yaml=yaml, pod_name=pod_name)
-        self.check_if_exist_run_yaml()
+        self.remove_if_exist_run_yaml()
         self.make_undeploy_benchmark_controller_manager(runner_path=environment_variables.environment_variables_dict['runner_path'])
 
     @logger_time_stamp
@@ -207,7 +235,7 @@ class BenchmarkOperatorWorkloads:
         This method tear down vm in case of error
         """
         self.__oc.delete_vm_sync(yaml=yaml, vm_name=vm_name)
-        self.check_if_exist_run_yaml()
+        self.remove_if_exist_run_yaml()
         self.make_undeploy_benchmark_controller_manager(runner_path=environment_variables.environment_variables_dict['runner_path'])
 
 #***********************************************************************************************
@@ -425,7 +453,7 @@ class BenchmarkOperatorWorkloads:
         :return:
         """
         # remove running workloads if exist
-        self.check_if_exist_run_yaml()
+        self.remove_if_exist_run_yaml()
         workload_name = workload_full_name.split('_')
         if 'hammerdb' in workload_full_name:
             self.__template.generate_hammerdb_yamls(workload=f'{workload_name[0]}_{workload_name[1]}', database=workload_name[2])
@@ -447,7 +475,7 @@ class BenchmarkOperatorWorkloads:
 
         self.make_undeploy_benchmark_controller_manager_if_exist(runner_path=environment_variables.environment_variables_dict['runner_path'])
 
-        #elasticsearch is must for VM workload for completed status verifications
+        #  elasticsearch is must for VM workload for completed status verifications
         self.__verify_elasticsearch_exist_for_vm_workload(workload)
 
         # make deploy benchmark controller manager

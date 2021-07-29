@@ -27,23 +27,17 @@ Reference:
 _**Table of Contents**_
 
 <!-- TOC -->
-- [Installation](#installation)
 - [Run workload using Podman or Docker](#run-workload-using-podman-or-docker)
 - [Run workload in Pod using Kubernetes or OpenShift](#run-workload-in-pod-using-kubernetes-or-openshift)
-- [Post Installation](#post-installation)
-
 <!-- /TOC -->
-
-## Installation
-**optional:**
-#### Download benchmark-runner image from quay.io
-```sh
-podman pull quay.io/ebattat/benchmark-runner:latest
-```
 
 ## Run workload using Podman or Docker 
 
 #### Environment variables description:
+
+**auto:** namespace=benchmark-operator [ namespace is benchmark-operator ]
+
+**auto:** ocs_pvc=true [ hammerdb workload run using OCS PVC ]
 
 **mandatory:** KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD
 
@@ -53,11 +47,11 @@ Choose one from the following list:
 
 `['stressng_pod', 'stressng_vm','uperf_pod', 'uperf_vm', 'hammerdb_pod_mariadb', 'hammerdb_pod_mssql', 'hammerdb_pod_postgres', 'hammerdb_vm_mariadb', 'hammerdb_vm_mssql', 'hammerdb_vm_postgres']`
 
-**mandatory:** PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR [node selector for benchmark operator pod]
+**optional:** PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR [node selector for benchmark operator pod]
 
-**mandatory:** PIN_NODE1=$PIN_NODE1 [node1 selector for running the workload]
+**optional:** PIN_NODE1=$PIN_NODE1 [node1 selector for running the workload]
 
-**mandatory:** PIN_NODE2=$PIN_NODE2 [node2 selector for running the workload, i.e. uperf server and client, hammerdb database and workload]
+**optional:** PIN_NODE2=$PIN_NODE2 [node2 selector for running the workload, i.e. uperf server and client, hammerdb database and workload]
 
 **optional:** ELASTICSEARCH=$ELASTICSEARCH [ elasticsearch service name]
 
@@ -75,9 +69,3 @@ podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD 
 
 [TBD]
 
-## Post Installation
-**optional:**
-#### Delete benchmark-runner image
-```sh
-podman rmi quay.io/ebattat/benchmark-runner:latest
-```
