@@ -66,7 +66,7 @@ jobs:
         # clone benchmark-operator
         git clone https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
         # Patch for functional Azure env with 8 cpu - resource limit cpu 0 instead of 2 (also in Dockerfile)
-        sed -i -e 's/2.0/0.0/g' /benchmark-operator/config/manager/manager.yaml
+        sed -i -e 's/2.0/0.0/g' $RUNNER_PATH/benchmark-operator/config/manager/manager.yaml
 
         # pytest
         #pytest --cov=benchmark_runner --cov-report=term-missing
