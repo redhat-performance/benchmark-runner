@@ -9,8 +9,12 @@ def __get_test_environment_variable():
     test_environment_variable = {}
     # hard coded parameters
     test_environment_variable['namespace'] = os.environ.get('namespace', 'benchmark-operator')
+    # run Hammerdb workload with ocs pvc
     test_environment_variable['ocs_pvc'] = os.environ.get('ocs_pvc', 'true')
+    #  TODO: CPU issue in functional environment, need to walk around only in Azure functional environment
+    test_environment_variable['functional_resource_limit'] = os.environ.get('functional_resource_limit', 'true')
 
+    ##################################################################################################
     # dynamic parameters - configure for local run
     test_environment_variable['kubeadmin_password'] = os.environ.get('KUBEADMIN_PASSWORD', '')
     # Node Selector
@@ -21,6 +25,7 @@ def __get_test_environment_variable():
     # This path is for benchmark-operator path
     test_environment_variable['runner_path'] = os.environ.get('RUNNER_PATH', '')
     # end dynamic parameters - configure for local run
+    ##################################################################################################
 
     # update node_selector
     if test_environment_variable['pin_node1']:
