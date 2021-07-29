@@ -98,28 +98,6 @@ class BenchmarkOperatorWorkloads:
             yaml.safe_dump_all(data, outfile, default_flow_style=False, allow_unicode=True)
 
     @logger_time_stamp
-    def change_resource_limit_cpu_benchmark_operator_temp_patch(self, base_path: str = '', yaml_path: str = ''):
-        """
-        # This method is for update resources limit to 0 in manager.yaml
-        @return:
-        """
-        data = []
-        # Read YAML file and inject node selector in the right place
-        with open(os.path.join(base_path, yaml_path), 'r') as stream:
-            try:
-                documents = yaml.safe_load_all(stream)
-                for doc in documents:
-                    if doc.get('spec'):
-                        doc['spec']['template']['spec']['containers'][1]['resources']['limits']['cpu'] = "0.0"
-                    data.append(doc)
-            except yaml.YAMLError as exc:
-                print(exc)
-
-        # Write YAML file
-        with open(os.path.join(base_path, yaml_path), 'w', encoding='utf8') as outfile:
-            yaml.safe_dump_all(data, outfile, default_flow_style=False, allow_unicode=True)
-
-    @logger_time_stamp
     def remove_if_exist_run_yaml(self, extension: str = '.yaml'):
         """
         This method remove all run yaml files in yaml folder

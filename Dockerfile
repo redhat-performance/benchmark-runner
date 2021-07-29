@@ -43,7 +43,8 @@ RUN mkdir -p ~/.kube
 
 # download benchmark-operator
 RUN git clone https://github.com/cloud-bulldozer/benchmark-operator
-
+# Patch for functional Azure env with 8 cpu - resource limit cpu 0 instead of 2 (also in CI.yal)
+RUN sed -i -e 's/2.0/0.0/g' /benchmark-operator/config/manager/manager.yaml
 # Add main
 ADD benchmark_runner/benchmark_operator/templates benchmark_runner/benchmark_operator/templates/
 COPY benchmark_runner/main/main.py ~/benchmark_runner/main.py

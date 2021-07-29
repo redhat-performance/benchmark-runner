@@ -15,8 +15,6 @@ class EnvironmentVariables:
         self._environment_variables_dict['namespace'] = os.environ.get('namespace', 'benchmark-operator')
         # run Hammerdb workload with ocs pvc
         self._environment_variables_dict['ocs_pvc'] = os.environ.get('ocs_pvc', 'true')
-        #  TODO: CPU issue in functional environment, need to walk around only in Azure functional environment
-        self._environment_variables_dict['functional_resource_limit'] = os.environ.get('functional_resource_limit', 'true')
 
         ##################################################################################################
         # dynamic parameters - configure for local run
