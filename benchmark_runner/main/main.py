@@ -29,7 +29,16 @@ def main():
     es_port = environment_variables_dict.get('elasticsearch_port', '')
     kubeadmin_password = environment_variables_dict.get('kubeadmin_password', '')
     benchmark_operator_workload = BenchmarkOperatorWorkloads(kubeadmin_password=kubeadmin_password, es_host=es_host, es_port=es_port)
-    benchmark_operator_workload.update_benchmark_operator_node_selector()
+    # benchmark-operator node selector
+    if environment_variables_dict.get('pin_node_benchmark_operator'):
+        benchmark_operator_workload.update_node_selector(base_path=environment_variables_dict.get('runner_path', ''),
+                                                         yaml_path='benchmark-operator/config/manager/manager.yaml',
+                                                         pin_node='pin_node_benchmark_operator')
+    # only for functional environment
+    if environment_variables_dict.get('functional_resource_limit'):
+        benchmark_operator_workload.change_resource_limit_cpu_benchmark_operator_temp_patch(base_path=environment_variables_dict.get('runner_path', ''),
+                                                             yaml_path='benchmark-operator/config/manager/manager.yaml',
+                                                             pin_node='pin_node_benchmark_operator')
     benchmark_operator_workload.run_workload(workload=workload)
 
 

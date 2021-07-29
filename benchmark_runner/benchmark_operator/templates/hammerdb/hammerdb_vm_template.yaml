@@ -96,15 +96,15 @@ spec:
         extra_options:
           - none
           #- hostpassthrough
-        ## OCS PVC
-        #pvc: false # enable for OCS PVC
-        #pvc_storageclass: ocs-storagecluster-ceph-rbd
+        # OCS PVC
+        pvc: {{ ocs_pvc }} # enable for OCS PVC
+        pvc_storageclass: ocs-storagecluster-ceph-rbd
         # Can be one of ReadWriteOnce,ReadOnlyMany,ReadWriteMany Default: ReadWriteOnce
-        #pvc_pvcaccessmode: ReadWriteMany
+        pvc_pvcaccessmode: ReadWriteMany
         # Can be one of Filesystem,Block Default: Filesystem
-        #pvc_pvcvolumemode: Block
-        #pvc_storagesize: 10Gi
-        ## HostPath - Configuring SELinux on cluster workers
-        #hostpath: false # enable for hostpath
-        #hostpath_path: /var/tmp/disk.img
-        #hostpath_storagesize: 10Gi
+        pvc_pvcvolumemode: Block
+        pvc_storagesize: 10Gi
+        # HostPath - Configuring SELinux on cluster workers
+        hostpath: false # enable for hostpath
+        hostpath_path: /var/tmp/disk.img
+        hostpath_storagesize: 10Gi

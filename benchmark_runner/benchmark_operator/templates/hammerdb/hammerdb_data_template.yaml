@@ -6,10 +6,11 @@ shared_data:
   es_db_version: 10.3.0
   es_ocp_version: 4.7.3
   es_os_version: centos8
-  pin: true
+  pin: {{ pin }}
   pin_node: {{ pin_node1 }}
   transactions: 100000
   url: {{ elasticsearch_url }}
+  ocs_pvc: {{ ocs_pvc }}
 mariadb:
   db_image: centos8-mariadb103-container-disk:latest
   db_pass: mysql

@@ -1,7 +1,7 @@
 shared_data:
   namespace: {{ namespace }}
   url: {{ elasticsearch_url }}
-  pin: true
+  pin: {{ pin }}
   pin_server: {{ pin_node1 }}
   pin_client: {{ pin_node2 }}
   serviceip: false
