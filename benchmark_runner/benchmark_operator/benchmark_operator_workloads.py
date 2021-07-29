@@ -100,7 +100,7 @@ class BenchmarkOperatorWorkloads:
     @logger_time_stamp
     def change_resource_limit_cpu_benchmark_operator_temp_patch(self, base_path: str = '', yaml_path: str = ''):
         """
-        # This method is for update resources limit in manager.yaml
+        # This method is for update resources limit to 0 in manager.yaml
         @return:
         """
         data = []
