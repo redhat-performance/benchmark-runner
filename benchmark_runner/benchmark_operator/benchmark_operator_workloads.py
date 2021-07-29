@@ -100,7 +100,7 @@ class BenchmarkOperatorWorkloads:
     @logger_time_stamp
     def change_resource_limit_cpu_benchmark_operator_temp_patch(self, base_path: str = '', yaml_path: str = ''):
         """
-        # This method is for update resources limit in manager.yaml
+        # This method is for update resources limit to 0 in manager.yaml
         @return:
         """
         data = []
@@ -116,8 +116,7 @@ class BenchmarkOperatorWorkloads:
                 print(exc)
 
         # Write YAML file
-        with open(os.path.join(self.__environment_variables_dict.get('runner_path', ''),
-                               'benchmark-operator/config/manager/manager.yaml'), 'w', encoding='utf8') as outfile:
+        with open(os.path.join(base_path, yaml_path), 'w', encoding='utf8') as outfile:
             yaml.safe_dump_all(data, outfile, default_flow_style=False, allow_unicode=True)
 
     @logger_time_stamp

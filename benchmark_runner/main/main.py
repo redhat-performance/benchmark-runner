@@ -34,7 +34,7 @@ def main():
         benchmark_operator_workload.update_node_selector(base_path=environment_variables_dict.get('runner_path', ''),
                                                          yaml_path='benchmark-operator/config/manager/manager.yaml',
                                                          pin_node='pin_node_benchmark_operator')
-    # only for functional environment
+    # only for functional environment - put resources limit 0 in manager.yaml
     if environment_variables_dict.get('functional_resource_limit'):
         benchmark_operator_workload.change_resource_limit_cpu_benchmark_operator_temp_patch(base_path=environment_variables_dict.get('runner_path', ''),
                                                              yaml_path='/benchmark-operator/config/manager/manager.yaml')
