@@ -18,11 +18,6 @@ def before_after_all_tests_fixture():
     :return:
     """
     print('Install benchmark-operator pod')
-    # only for functional environment - put resources limit 0 in manager.yaml
-    if test_environment_variable.get('functional_resource_limit'):
-        benchmark_operator.change_resource_limit_cpu_benchmark_operator_temp_patch(
-            base_path=test_environment_variable.get('runner_path', ''),
-            yaml_path='/benchmark-operator/config/manager/manager.yaml')
     # delete benchmark-operator pod if exist
     benchmark_operator.make_undeploy_benchmark_controller_manager_if_exist(runner_path=test_environment_variable['runner_path'])
     benchmark_operator.make_deploy_benchmark_controller_manager(runner_path=test_environment_variable['runner_path'])
