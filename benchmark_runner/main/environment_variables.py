@@ -18,6 +18,7 @@ class EnvironmentVariables:
         #  TODO: CPU issue in functional environment, need to walk around only in Azure functional environment
         self._environment_variables_dict['functional_resource_limit'] = os.environ.get('functional_resource_limit', 'true')
 
+        ##################################################################################################
         # dynamic parameters - configure for local run
         self._environment_variables_dict['workload'] = os.environ.get('WORKLOAD', '')
         self._environment_variables_dict['kubeadmin_password'] = os.environ.get('KUBEADMIN_PASSWORD', '')
@@ -34,6 +35,7 @@ class EnvironmentVariables:
         # This path is for benchmark-operator path
         self._environment_variables_dict['runner_path'] = os.environ.get('RUNNER_PATH', '')
         # end dynamic parameters - configure for local run
+        ##################################################################################################
 
         # Node Selector functionality
         if self._environment_variables_dict['pin_node1']:
