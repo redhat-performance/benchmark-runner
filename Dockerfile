@@ -48,9 +48,9 @@ RUN sed -i -e 's/2.0/0.0/g' /benchmark-operator/config/manager/manager.yaml
 
 # Add main
 ADD benchmark_runner/benchmark_operator/templates benchmark_runner/benchmark_operator/templates/
-COPY benchmark_runner/main/main.py ~/benchmark_runner/main.py
+COPY benchmark_runner/main/main.py /benchmark_runner/main/main.py
 
-CMD [ "python3.9", "~/benchmark_runner/main.py"]
+CMD [ "python3.9", "/benchmark_runner/main/main.py"]
 
 # oc: https://www.ibm.com/docs/en/fci/6.5.1?topic=steps-setting-up-installation-server
 # sudo podman build -t quay.io/ebattat/benchmark-runner:latest . --no-cache
