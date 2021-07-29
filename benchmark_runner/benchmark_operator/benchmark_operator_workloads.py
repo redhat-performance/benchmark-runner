@@ -116,8 +116,7 @@ class BenchmarkOperatorWorkloads:
                 print(exc)
 
         # Write YAML file
-        with open(os.path.join(self.__environment_variables_dict.get('runner_path', ''),
-                               'benchmark-operator/config/manager/manager.yaml'), 'w', encoding='utf8') as outfile:
+        with open(os.path.join(base_path, yaml_path), 'w', encoding='utf8') as outfile:
             yaml.safe_dump_all(data, outfile, default_flow_style=False, allow_unicode=True)
 
     @logger_time_stamp
