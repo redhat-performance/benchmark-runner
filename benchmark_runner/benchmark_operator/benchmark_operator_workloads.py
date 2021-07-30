@@ -121,6 +121,7 @@ class BenchmarkOperatorWorkloads:
         benchmark_operator_path = 'benchmark-operator'
         current_dir = os.getcwd()
         os.chdir(os.path.join(runner_path, benchmark_operator_path))
+        self.__ssh.run('sleep 30')
         self.__ssh.run('make deploy')
         self.__oc.wait_for_pod_create(pod_name='benchmark-controller-manager')
         self.__oc.wait_for_initialized(label='control-plane=controller-manager', label_uuid=False)
