@@ -69,9 +69,9 @@ jobs:
         sed -i -e 's/2.0/0.0/g' $RUNNER_PATH/benchmark-operator/config/manager/manager.yaml
 
         # pytest
-        #pytest --cov=benchmark_runner --cov-report=term-missing
-        #coverage run -m pytest
-        #coverage report -m
+        pytest --cov=benchmark_runner --cov-report=term-missing
+        coverage run -m pytest
+        coverage report -m
     - name: 🎥 Publish to coveralls.io
       env:
         GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
@@ -106,8 +106,8 @@ jobs:
         ELASTICSEARCH: ${{ secrets.ELASTICSEARCH }}
         ELASTICSEARCH_PORT: ${{ secrets. ELASTICSEARCH_PORT }}
       run: |
-        #declare -a WORKLOADS=('stressng_pod' 'stressng_vm' 'uperf_pod' 'uperf_vm' 'hammerdb_pod_mariadb' 'hammerdb_vm_mariadb' 'hammerdb_pod_postgres' 'hammerdb_vm_postgres' 'hammerdb_pod_mssql' 'hammerdb_vm_mssql')
-        declare -a WORKLOADS=('stressng_pod')
+        declare -a WORKLOADS=('stressng_pod' 'stressng_vm' 'uperf_pod' 'uperf_vm' 'hammerdb_pod_mariadb' 'hammerdb_vm_mariadb' 'hammerdb_pod_postgres' 'hammerdb_vm_postgres' 'hammerdb_pod_mssql' 'hammerdb_vm_mssql')
+        #declare -a WORKLOADS=('stressng_pod')
         for WORKLOAD in "${WORKLOADS[@]}"
         do
             echo 'Run E2E workload:' $WORKLOAD
