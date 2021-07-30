@@ -127,17 +127,6 @@ class BenchmarkOperatorWorkloads:
         self.__oc.wait_for_ready(label='control-plane=controller-manager', label_uuid=False)
         os.chdir(current_dir)
 
-    @logger_time_stamp
-    def make_undeploy_benchmark_controller_manager_if_exist(self, runner_path: str = environment_variables.environment_variables_dict['runner_path']):
-        """
-        This method make undeploy benchmark controller manager if exist
-        @return:
-        """
-        # delete benchmark-operator pod if exist
-        if self.__oc._is_pod_exist(pod_name='benchmark-controller-manager', namespace=environment_variables.environment_variables_dict['namespace']):
-            logger.info('make undeploy benchmark operator running pod')
-            self.make_undeploy_benchmark_controller_manager(runner_path=runner_path)
-
     @typechecked()
     @logger_time_stamp
     def make_undeploy_benchmark_controller_manager(self, runner_path: str = environment_variables.environment_variables_dict['runner_path']):
@@ -151,6 +140,17 @@ class BenchmarkOperatorWorkloads:
         self.__ssh.run('make undeploy')
         self.__oc.wait_for_pod_terminate(pod_name='benchmark-controller-manager')
         os.chdir(current_dir)
+
+    @logger_time_stamp
+    def make_undeploy_benchmark_controller_manager_if_exist(self, runner_path: str = environment_variables.environment_variables_dict['runner_path']):
+        """
+        This method make undeploy benchmark controller manager if exist
+        @return:
+        """
+        # delete benchmark-operator pod if exist
+        if self.__oc._is_pod_exist(pod_name='benchmark-controller-manager', namespace=environment_variables.environment_variables_dict['namespace']):
+            logger.info('make undeploy benchmark operator running pod')
+            self.make_undeploy_benchmark_controller_manager(runner_path=runner_path)
 
     @typechecked()
     @logger_time_stamp

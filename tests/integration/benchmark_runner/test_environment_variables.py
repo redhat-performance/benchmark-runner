@@ -8,9 +8,11 @@ def __get_test_environment_variable():
     """
     test_environment_variable = {}
     # hard coded parameters
-    test_environment_variable['namespace'] = os.environ.get('namespace', 'benchmark-operator')
+    test_environment_variable['namespace'] = os.environ.get('NAMESPACE', 'benchmark-operator')
     # run Hammerdb workload with ocs pvc
-    test_environment_variable['ocs_pvc'] = os.environ.get('ocs_pvc', 'true')
+    test_environment_variable['ocs_pvc'] = os.environ.get('OCS_PVC', 'true')
+    # This path is for benchmark-operator path
+    test_environment_variable['runner_path'] = os.environ.get('RUNNER_PATH', '/')
 
     ##################################################################################################
     # dynamic parameters - configure for local run
@@ -20,8 +22,6 @@ def __get_test_environment_variable():
     # ElasticSearch
     test_environment_variable['elasticsearch'] = os.environ.get('ELASTICSEARCH', '')
     test_environment_variable['elasticsearch_port'] = os.environ.get('ELASTICSEARCH_PORT', '')
-    # This path is for benchmark-operator path
-    test_environment_variable['runner_path'] = os.environ.get('RUNNER_PATH', '')
     # end dynamic parameters - configure for local run
     ##################################################################################################
 
