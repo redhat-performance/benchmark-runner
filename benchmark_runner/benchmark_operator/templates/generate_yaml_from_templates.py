@@ -13,10 +13,10 @@ class TemplateOperations:
 
     def __init__(self, storage_type: str = ''):
         # if mount is exist - path inside Dockerfile
-        if os.path.exists('/benchmark_runner/benchmark_operator/templates/'):
-            self.__dir_path = '/benchmark_runner/benchmark_operator/templates/'
-        else:
-            self.__dir_path = os.path.dirname(os.path.realpath(__file__))
+        # if os.path.exists('/benchmark_runner/benchmark_operator/templates/'):
+        #     self.__dir_path = '/benchmark_runner/benchmark_operator/templates/'
+        # else:
+        self.__dir_path = os.path.dirname(os.path.realpath(__file__))
         self.__current_run_path = f'{self.__dir_path}/current_run'
         self.__hammerdb_dir_path = os.path.join(self.__dir_path, 'hammerdb')
         # environment variables
