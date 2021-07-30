@@ -74,14 +74,14 @@ class BenchmarkOperatorWorkloads:
             logger.info('yaml file {} does not exist')
 
     @logger_time_stamp
-    def update_node_selector(self, base_path: str = '', yaml_path: str = '', pin_node: str = ''):
+    def update_node_selector(self, runner_path: str = environment_variables.environment_variables_dict['runner_path'], yaml_path: str = '', pin_node: str = ''):
         """
         This method update node selector in yaml
         @return:
         """
         data = []
         # Read YAML file and inject node selector in the right place
-        with open(os.path.join(base_path, yaml_path), 'r') as stream:
+        with open(os.path.join(runner_path, yaml_path), 'r') as stream:
             try:
                 documents = yaml.safe_load_all(stream)
                 for doc in documents:
