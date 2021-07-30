@@ -20,8 +20,8 @@ class EnvironmentVariables:
 
         ##################################################################################################
         # dynamic parameters - configure for local run
-        self._environment_variables_dict['workload'] = os.environ.get('WORKLOAD', 'stressng_pod')
-        self._environment_variables_dict['kubeadmin_password'] = os.environ.get('KUBEADMIN_PASSWORD', 'onhFH-w5mkJ-ggYEA-T9Uoq')
+        self._environment_variables_dict['workload'] = os.environ.get('WORKLOAD', '')
+        self._environment_variables_dict['kubeadmin_password'] = os.environ.get('KUBEADMIN_PASSWORD', '')
 
         # PIN=node selector
         self._environment_variables_dict['pin_node_benchmark_operator'] = os.environ.get('PIN_NODE_BENCHMARK_OPERATOR', '')
@@ -29,8 +29,8 @@ class EnvironmentVariables:
         self._environment_variables_dict['pin_node2'] = os.environ.get('PIN_NODE2', '')
 
         # ElasticSearch
-        self._environment_variables_dict['elasticsearch'] = os.environ.get('ELASTICSEARCH', 'perf-results-elastic-q4jvx.apps.ocp48-ci.azure.rhperfscale.org')
-        self._environment_variables_dict['elasticsearch_port'] = os.environ.get('ELASTICSEARCH_PORT', '80')
+        self._environment_variables_dict['elasticsearch'] = os.environ.get('ELASTICSEARCH', '')
+        self._environment_variables_dict['elasticsearch_port'] = os.environ.get('ELASTICSEARCH_PORT', '')
 
         # end dynamic parameters - configure for local run
         ##################################################################################################
