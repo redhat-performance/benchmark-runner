@@ -12,9 +12,11 @@ class EnvironmentVariables:
 
         # hard coded parameters
         self._environment_variables_dict['workloads'] = ['stressng_pod', 'stressng_vm', 'uperf_pod', 'uperf_vm', 'hammerdb_pod_mariadb', 'hammerdb_vm_mariadb',  'hammerdb_pod_postgres', 'hammerdb_vm_postgres', 'hammerdb_pod_mssql', 'hammerdb_vm_mssql']
-        self._environment_variables_dict['namespace'] = os.environ.get('namespace', 'benchmark-operator')
+        self._environment_variables_dict['namespace'] = os.environ.get('NAMESPACE', 'benchmark-operator')
         # run Hammerdb workload with ocs pvc
-        self._environment_variables_dict['ocs_pvc'] = os.environ.get('ocs_pvc', 'true')
+        self._environment_variables_dict['ocs_pvc'] = os.environ.get('OCS_PVC', 'true')
+        # This path is for benchmark-operator path
+        self._environment_variables_dict['runner_path'] = os.environ.get('RUNNER_PATH', '/')
 
         ##################################################################################################
         # dynamic parameters - configure for local run
@@ -30,8 +32,6 @@ class EnvironmentVariables:
         self._environment_variables_dict['elasticsearch'] = os.environ.get('ELASTICSEARCH', '')
         self._environment_variables_dict['elasticsearch_port'] = os.environ.get('ELASTICSEARCH_PORT', '')
 
-        # This path is for benchmark-operator path
-        self._environment_variables_dict['runner_path'] = os.environ.get('RUNNER_PATH', '')
         # end dynamic parameters - configure for local run
         ##################################################################################################
 

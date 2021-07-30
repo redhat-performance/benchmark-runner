@@ -35,9 +35,11 @@ _**Table of Contents**_
 
 #### Environment variables description:
 
-**auto:** namespace=benchmark-operator [ namespace is benchmark-operator ]
+**auto:** NAMESPACE=benchmark-operator [ The default namespace is benchmark-operator ]
 
-**auto:** ocs_pvc=true [ hammerdb workload run using OCS PVC ]
+**auto:** OCS_PVC=true [ The default is OCS PVC ]
+
+**auto:** RUNNER_PATH=/ [ The default work space is / ]
 
 **mandatory:** KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD
 
