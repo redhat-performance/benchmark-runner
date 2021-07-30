@@ -23,6 +23,7 @@ class EnvironmentVariables:
         self._environment_variables_dict['workload'] = os.environ.get('WORKLOAD', '')
         self._environment_variables_dict['kubeadmin_password'] = os.environ.get('KUBEADMIN_PASSWORD', '')
 
+
         # PIN=node selector
         self._environment_variables_dict['pin_node_benchmark_operator'] = os.environ.get('PIN_NODE_BENCHMARK_OPERATOR', '')
         self._environment_variables_dict['pin_node1'] = os.environ.get('PIN_NODE1', '')
