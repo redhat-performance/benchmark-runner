@@ -31,7 +31,7 @@ def main():
     benchmark_operator_workload = BenchmarkOperatorWorkloads(kubeadmin_password=kubeadmin_password, es_host=es_host, es_port=es_port)
     # benchmark-operator node selector
     if environment_variables_dict.get('pin_node_benchmark_operator'):
-        benchmark_operator_workload.update_node_selector(base_path=environment_variables_dict.get('runner_path', ''),
+        benchmark_operator_workload.update_node_selector(runner_path=environment_variables_dict.get('runner_path', ''),
                                                          yaml_path='benchmark-operator/config/manager/manager.yaml',
                                                          pin_node='pin_node_benchmark_operator')
     benchmark_operator_workload.run_workload(workload=workload)
