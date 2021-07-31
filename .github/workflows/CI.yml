@@ -106,8 +106,8 @@ jobs:
         ELASTICSEARCH: ${{ secrets.ELASTICSEARCH }}
         ELASTICSEARCH_PORT: ${{ secrets. ELASTICSEARCH_PORT }}
       run: |
-        declare -a WORKLOADS=('stressng_pod' 'stressng_vm' 'uperf_pod' 'uperf_vm' 'hammerdb_pod_mariadb' 'hammerdb_vm_mariadb' 'hammerdb_pod_postgres' 'hammerdb_vm_postgres' 'hammerdb_pod_mssql' 'hammerdb_vm_mssql')
-        #declare -a WORKLOADS=('stressng_pod')
+        declare -a WORKLOADS=('stressng_pod' 'stressng_vm' 'uperf_pod' 'uperf_vm' 'hammerdb_pod_mariadb' 'hammerdb_vm_mariadb' 'hammerdb_pod_postgres' 'hammerdb_vm_postgres' 'hammerdb_pod_mssql')
+        # except 'hammerdb_vm_mssql' - need performance environment
         for WORKLOAD in "${WORKLOADS[@]}"
         do
             echo 'Run E2E workload:' $WORKLOAD
