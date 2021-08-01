@@ -80,14 +80,14 @@ class ESOperations:
 
     @typechecked()
     @logger_time_stamp
-    def verify_es_data_uploaded(self, index: str, uuid: str = '', workload: str = '', timeout: int = 3600,
+    def verify_es_data_uploaded(self, index: str, uuid: str = '', workload: str = '', timeout: int = 5000,
                                 sleep_time: int = 30):
         """
         The method wait till data upload to elastic search and wait if there is new data, search in last 15 minutes
         :param uuid: the current workload uuid
         :param workload: workload name only if there is a different timestamp parameter name in elasticsearch
         :param index:
-        :param timeout:
+        :param timeout: 5000 sec because mssql vm took 3700 sec
         :param sleep_time:
         :return:
         """

@@ -35,12 +35,6 @@ _**Table of Contents**_
 
 #### Environment variables description:
 
-**auto:** NAMESPACE=benchmark-operator [ The default namespace is benchmark-operator ]
-
-**auto:** OCS_PVC=true [ The default is OCS PVC ]
-
-**auto:** RUNNER_PATH=/ [ The default work space is / ]
-
 **mandatory:** KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD
 
 **mandatory:** WORKLOAD=$WORKLOAD
@@ -48,6 +42,12 @@ _**Table of Contents**_
 Choose one from the following list:
 
 `['stressng_pod', 'stressng_vm','uperf_pod', 'uperf_vm', 'hammerdb_pod_mariadb', 'hammerdb_pod_mssql', 'hammerdb_pod_postgres', 'hammerdb_vm_mariadb', 'hammerdb_vm_mssql', 'hammerdb_vm_postgres']`
+
+**auto:** NAMESPACE=benchmark-operator [ The default namespace is benchmark-operator ]
+
+**auto:** OCS_PVC=true [ The default is used OCS PVC ]
+
+**auto:** RUNNER_PATH=/ [ The default work space is / ]
 
 **optional:** PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR [node selector for benchmark operator pod]
 
