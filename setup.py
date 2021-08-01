@@ -39,7 +39,7 @@ setup(
 
     install_requires=[
         'typing==3.7.4.3',
-        'typeguard',  # required latest
+        'typeguard',  # required manual installation
         'elasticsearch==7.13.2',
         'elasticsearch_dsl==7.3.0',  # for deep search
         'pandas',  # required latest
