@@ -37,6 +37,23 @@ jobs:
         method: kubeconfig
         kubeconfig: ${{ secrets.KUBECONFIG }} # Use secret (https://developer.github.com/actions/managing-workflows/storing-secrets/)
       id: setcontext
+    - name: ✔️ DEMO - E2E tests using latest quay.io
+      env:
+        KUBEADMIN_PASSWORD: ${{ secrets.KUBEADMIN_PASSWORD }}
+        PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.PIN_NODE_BENCHMARK_OPERATOR }}
+        PIN_NODE1: ${{ secrets.PIN_NODE1 }}
+        PIN_NODE2: ${{ secrets.PIN_NODE2 }}
+        ELASTICSEARCH: ${{ secrets.ELASTICSEARCH }}
+        ELASTICSEARCH_PORT: ${{ secrets. ELASTICSEARCH_PORT }}
+      run: |
+        BUILD_VERSION=$(python3 setup.py --version)
+        #declare -a WORKLOADS=('stressng_pod' 'stressng_vm' 'uperf_pod' 'uperf_vm' 'hammerdb_pod_mariadb' 'hammerdb_vm_mariadb' 'hammerdb_pod_postgres' 'hammerdb_vm_postgres' 'hammerdb_pod_mssql' 'hammerdb_vm_mssql')
+        declare -a WORKLOADS=('hammerdb_vm_mariadb')
+        for WORKLOAD in "${WORKLOADS[@]}"
+        do
+            echo 'Run E2E workload:' $WORKLOAD
+            podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e BUILD_VERSION=$BUILD_VERSION -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:latest
+        done
     - name: 📃 Test with pytest
       env:
         KUBEADMIN_PASSWORD: ${{ secrets.KUBEADMIN_PASSWORD }}
