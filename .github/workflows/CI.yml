@@ -65,13 +65,13 @@ jobs:
 
         # clone benchmark-operator
         git clone https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
-        # Patch for functional Azure env with 8 cpu - resource limit cpu 0 instead of 2 (also in Dockerfile)
+        # Insufficient cpu - Patch for functional Azure env with 8 cpu - resource limit cpu 0 instead of 2 (also in Dockerfile)
         sed -i -e 's/2.0/0.0/g' $RUNNER_PATH/benchmark-operator/config/manager/manager.yaml
 
         # pytest
-        pytest --cov=benchmark_runner --cov-report=term-missing
-        coverage run -m pytest
-        coverage report -m
+        #pytest --cov=benchmark_runner --cov-report=term-missing
+        #coverage run -m pytest
+        #coverage report -m
     - name: 🎥 Publish to coveralls.io
       env:
         GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
@@ -107,12 +107,12 @@ jobs:
         ELASTICSEARCH_PORT: ${{ secrets. ELASTICSEARCH_PORT }}
       run: |
         BUILD_VERSION=$(python3 setup.py --version)
-        declare -a WORKLOADS=('stressng_pod' 'stressng_vm' 'uperf_pod' 'uperf_vm' 'hammerdb_pod_mariadb' 'hammerdb_vm_mariadb' 'hammerdb_pod_postgres' 'hammerdb_vm_postgres' 'hammerdb_pod_mssql' 'hammerdb_vm_mssql')
-        # declare -a WORKLOADS=('hammerdb_vm_mariadb')
+        #declare -a WORKLOADS=('stressng_pod' 'stressng_vm' 'uperf_pod' 'uperf_vm' 'hammerdb_pod_mariadb' 'hammerdb_vm_mariadb' 'hammerdb_pod_postgres' 'hammerdb_vm_postgres' 'hammerdb_pod_mssql' 'hammerdb_vm_mssql')
+        declare -a WORKLOADS=('hammerdb_vm_mariadb')
         for WORKLOAD in "${WORKLOADS[@]}"
         do
             echo 'Run E2E workload:' $WORKLOAD
-            podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e BUILD_VERSION=$BUILD_VERSION -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:latest
+            podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e BUILD_VERSION=$BUILD_VERSION -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:v$BUILD_VERSION
         done
     - name: 🎁 Bump Version
       run: |
