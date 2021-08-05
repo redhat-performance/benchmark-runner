@@ -15,12 +15,12 @@ class EnvironmentVariables:
         self._environment_variables_dict['namespace'] = os.environ.get('NAMESPACE', 'benchmark-operator')
         # run Hammerdb workload with ocs pvc
         self._environment_variables_dict['ocs_pvc'] = os.environ.get('OCS_PVC', 'true')
-        # This path is for benchmark-operator path
-        self._environment_variables_dict['runner_path'] = os.environ.get('RUNNER_PATH', '/')
         # This parameter get from CI.yml file
         self._environment_variables_dict['build_version'] = os.environ.get('BUILD_VERSION', '1.0.0')
         # collect system metrics
         self._environment_variables_dict['system_metrics'] = os.environ.get('SYSTEM_METRICS', 'true')
+        # This path is for benchmark-operator path
+        self._environment_variables_dict['runner_path'] = os.environ.get('RUNNER_PATH', '/')
 
         ##################################################################################################
 
