@@ -39,15 +39,6 @@ class BenchmarkOperatorWorkloads:
         # environment variables
         self.__environment_variables_dict = environment_variables.environment_variables_dict
 
-    @typechecked()
-    def __verify_elasticsearch_exist_for_vm_workload(self, workload: str):
-        """
-        This method verify that elastic search exist for vm workloads to verify completed status
-        :return: error in case no elasticsearch
-        """
-        if 'vm' in workload and not self.__es_host:
-           raise VMWorkloadNeedElasticSearch
-
     def __remove_current_run_yamls(self, extension='.yaml'):
         """
         This method remove all current run yamls files
@@ -121,6 +112,7 @@ class BenchmarkOperatorWorkloads:
         benchmark_operator_path = 'benchmark-operator'
         current_dir = os.getcwd()
         os.chdir(os.path.join(runner_path, benchmark_operator_path))
+        # Patch for custom image: export IMG=quay.io/user/benchmark-operator:latest;
         self.__ssh.run('make deploy')
         self.__oc.wait_for_pod_create(pod_name='benchmark-controller-manager')
         self.__oc.wait_for_initialized(label='control-plane=controller-manager', label_uuid=False)
@@ -210,10 +202,23 @@ class BenchmarkOperatorWorkloads:
     def tear_down_vm_after_error(self, yaml: str, vm_name: str):
         """
         This method tear down vm in case of error
+        @param yaml:
+        @param vm_name:
         """
         self.__oc.delete_vm_sync(yaml=yaml, vm_name=vm_name)
         self.remove_if_exist_run_yaml()
         self.make_undeploy_benchmark_controller_manager(runner_path=environment_variables.environment_variables_dict['runner_path'])
+
+    @logger_time_stamp
+    def system_metrics_collector(self, workload: str):
+        """
+        This method run system metrics collector
+        @param workload:
+        :return:
+        """
+        self.__oc.wait_for_pod_create(pod_name='system-metrics-collector')
+        self.__oc.wait_for_initialized(label='app=system-metrics-collector', workload=workload)
+        self.__oc.wait_for_pod_completed(label='app=system-metrics-collector', workload=workload)
 
 #***********************************************************************************************
 ######################################## Workloads #############################################
@@ -230,7 +235,10 @@ class BenchmarkOperatorWorkloads:
             self.__oc.create_pod_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.stressng_pod.__name__}.yaml'), pod_name=f'{workload}-workload')
             self.__oc.wait_for_initialized(label='app=stressng_workload', workload=workload)
             self.__oc.wait_for_ready(label='app=stressng_workload', workload=workload)
-            self.__oc.wait_for_completed(label='app=stressng_workload', workload=workload)
+            self.__oc.wait_for_pod_completed(label='app=stressng_workload', workload=workload)
+            # system metrics
+            if environment_variables.environment_variables_dict['system_metrics']:
+                self.system_metrics_collector(workload=workload)
             if self.__es_host:
                 # verify that data upload to elastic search according to unique uuid
                 self.__es_operations.verify_es_data_uploaded(index=f'{workload}-results', uuid=self.__oc.get_long_uuid(workload=workload))
@@ -257,6 +265,10 @@ class BenchmarkOperatorWorkloads:
             self.__oc.create_vm_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.stressng_vm.__name__}.yaml'), vm_name=f'{workload}-workload')
             self.__oc.wait_for_initialized(label='app=stressng_workload', workload=workload)
             self.__oc.wait_for_ready(label='app=stressng_workload', workload=workload)
+            self.__oc.wait_for_vm_completed(workload=workload)
+            # system metrics
+            if environment_variables.environment_variables_dict['system_metrics']:
+               self.system_metrics_collector(workload=workload)
             # verify that data upload to elastic search, vm completed status
             if self.__es_host:
                 self.__es_operations.verify_es_data_uploaded(index=f'{workload}-results', uuid=self.__oc.get_long_uuid(workload=workload))
@@ -292,7 +304,10 @@ class BenchmarkOperatorWorkloads:
             self.__oc.wait_for_pod_create(pod_name=f'uperf-client')
             self.__oc.wait_for_initialized(label='app=uperf-bench-client', workload=workload)
             self.__oc.wait_for_ready(label='app=uperf-bench-client', workload=workload)
-            self.__oc.wait_for_completed(label='app=uperf-bench-client', workload=workload)
+            self.__oc.wait_for_pod_completed(label='app=uperf-bench-client', workload=workload)
+            # system metrics
+            if environment_variables.environment_variables_dict['system_metrics']:
+                self.system_metrics_collector(workload=workload)
             if self.__es_host:
                 # verify that data upload to elastic search
                 self.__es_operations.verify_es_data_uploaded(index=f'{workload}-results', uuid=self.__oc.get_long_uuid(workload=workload), workload=self.uperf_pod.__name__)
@@ -323,6 +338,10 @@ class BenchmarkOperatorWorkloads:
             self.__oc.wait_for_vm_create(vm_name='uperf-client')
             self.__oc.wait_for_initialized(label='app=uperf-bench-client', workload=workload)
             self.__oc.wait_for_ready(label='app=uperf-bench-client', workload=workload)
+            self.__oc.wait_for_vm_completed(workload=workload)
+            # system metrics
+            if environment_variables.environment_variables_dict['system_metrics']:
+                self.system_metrics_collector(workload=workload)
             # verify that data upload to elastic search, vm completed status
             if self.__es_host:
                 self.__es_operations.verify_es_data_uploaded(index=f'{workload}-results', uuid=self.__oc.get_long_uuid(workload=workload), workload=self.uperf_vm.__name__)
@@ -354,12 +373,15 @@ class BenchmarkOperatorWorkloads:
             self.__oc.wait_for_pod_create(pod_name=f'{workload}-creator')
             self.__oc.wait_for_initialized(label='app=hammerdb_creator', workload=workload)
             self.__oc.wait_for_ready(label='app=hammerdb_creator', workload=workload)
-            self.__oc.wait_for_completed(label='app=hammerdb_creator', workload=workload)
+            self.__oc.wait_for_pod_completed(label='app=hammerdb_creator', workload=workload)
             # hammerdb workload
             self.__oc.wait_for_pod_create(pod_name=f'{workload}-workload')
             self.__oc.wait_for_initialized(label='app=hammerdb_workload', workload=workload)
             self.__oc.wait_for_ready(label='app=hammerdb_workload', workload=workload)
-            self.__oc.wait_for_completed(label='app=hammerdb_workload', workload=workload)
+            self.__oc.wait_for_pod_completed(label='app=hammerdb_workload', workload=workload)
+            # system metrics
+            if environment_variables.environment_variables_dict['system_metrics']:
+                self.system_metrics_collector(workload=workload)
             if self.__es_host:
                 # verify that data upload to elastic search
                 self.__es_operations.verify_es_data_uploaded(index=f'{workload}-results', uuid=self.__oc.get_long_uuid(workload=workload))
@@ -402,6 +424,10 @@ class BenchmarkOperatorWorkloads:
             self.__oc.wait_for_vm_create(vm_name=f'{workload}-workload')
             self.__oc.wait_for_initialized(label='app=hammerdb_workload', workload=workload)
             self.__oc.wait_for_ready(label='app=hammerdb_workload', workload=workload)
+            self.__oc.wait_for_vm_completed(workload=workload)
+            # system metrics
+            if environment_variables.environment_variables_dict['system_metrics']:
+                self.system_metrics_collector(workload=workload)
             # verify that data upload to elastic search, vm completed status
             if self.__es_host:
                 self.__es_operations.verify_es_data_uploaded(index=f'{workload}-results', uuid=self.__oc.get_long_uuid(workload=workload))
@@ -450,10 +476,8 @@ class BenchmarkOperatorWorkloads:
         :return:
         """
 
+        # make undeploy benchmark controller manager if exist
         self.make_undeploy_benchmark_controller_manager_if_exist(runner_path=environment_variables.environment_variables_dict['runner_path'])
-
-        #  elasticsearch is must for VM workload for completed status verifications
-        self.__verify_elasticsearch_exist_for_vm_workload(workload)
 
         # make deploy benchmark controller manager
         self.make_deploy_benchmark_controller_manager(runner_path=environment_variables.environment_variables_dict['runner_path'])

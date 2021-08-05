@@ -142,7 +142,7 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def wait_for_pod_create(self, pod_name: str, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = 2000, sleep_time: int = 3):
+    def wait_for_pod_create(self, pod_name: str, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = 300, sleep_time: int = 3):
         """
         This method is wait till pod name is creating or throw exception after timeout
         :param namespace:
@@ -162,7 +162,7 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def wait_for_vm_create(self, vm_name: str, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = 2000, sleep_time: int = 3):
+    def wait_for_vm_create(self, vm_name: str, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = 300, sleep_time: int = 3):
         """
         This method is wait till vm name is creating or throw exception after timeout
         :param vm_name:
@@ -314,9 +314,9 @@ class OC(SSH):
     def wait_for_ready(self, label: str, workload: str = '', status: str = 'ready', label_uuid: bool = True, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = 300):
         """
         This method wait to pod to be ready
+        :param workload:
         :param namespace:
         :param label:
-        :param workload:
         :param status:
         :param label_uuid:  The label include uuid
         :param timeout:
@@ -339,12 +339,12 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def wait_for_completed(self, label: str, workload: str = '', namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = 2000):
+    def wait_for_pod_completed(self, label: str, workload: str = '', namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = 500):
         """
         This method wait to pod to be completed
+        :param workload:
         :param namespace:
         :param label:
-        :param workload:
         :param timeout:
         :return:
         """
@@ -355,4 +355,23 @@ class OC(SSH):
                 return True
         except Exception as err:
             raise PodNotCompletedTimeout(workload=workload)
+
+    @logger_time_stamp
+    def wait_for_vm_completed(self, workload: str = '', namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = 5000, sleep_time: int =10,):
+        """
+        This method wait to pod to be completed
+        :param workload:
+        :param namespace:
+        :param label:
+        :param timeout:
+        :return:
+        """
+        current_wait_time = 0
+        while current_wait_time <= timeout:
+            if self.run(f"~/./oc --namespace {namespace} get benchmark {workload} -o jsonpath={{.status.complete}}") == 'true':
+                    return True
+            # sleep for x seconds
+            time.sleep(sleep_time)
+            current_wait_time += sleep_time
+        raise VMNotCompletedTimeout(workload=workload)
 

@@ -37,23 +37,6 @@ jobs:
         method: kubeconfig
         kubeconfig: ${{ secrets.KUBECONFIG }} # Use secret (https://developer.github.com/actions/managing-workflows/storing-secrets/)
       id: setcontext
-    - name: ✔️ DEMO - E2E tests using latest quay.io
-      env:
-        KUBEADMIN_PASSWORD: ${{ secrets.KUBEADMIN_PASSWORD }}
-        PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.PIN_NODE_BENCHMARK_OPERATOR }}
-        PIN_NODE1: ${{ secrets.PIN_NODE1 }}
-        PIN_NODE2: ${{ secrets.PIN_NODE2 }}
-        ELASTICSEARCH: ${{ secrets.ELASTICSEARCH }}
-        ELASTICSEARCH_PORT: ${{ secrets. ELASTICSEARCH_PORT }}
-      run: |
-        BUILD_VERSION=$(python3 setup.py --version)
-        #declare -a WORKLOADS=('stressng_pod' 'stressng_vm' 'uperf_pod' 'uperf_vm' 'hammerdb_pod_mariadb' 'hammerdb_vm_mariadb' 'hammerdb_pod_postgres' 'hammerdb_vm_postgres' 'hammerdb_pod_mssql' 'hammerdb_vm_mssql')
-        declare -a WORKLOADS=('hammerdb_vm_mariadb')
-        for WORKLOAD in "${WORKLOADS[@]}"
-        do
-            echo 'Run E2E workload:' $WORKLOAD
-            podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e BUILD_VERSION=$BUILD_VERSION -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:latest
-        done
     - name: 📃 Test with pytest
       env:
         KUBEADMIN_PASSWORD: ${{ secrets.KUBEADMIN_PASSWORD }}
@@ -61,8 +44,22 @@ jobs:
         PIN_NODE2: ${{ secrets.PIN_NODE2 }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
         ELASTICSEARCH: ${{ secrets.ELASTICSEARCH }}
-        ELASTICSEARCH_PORT: ${{ secrets. ELASTICSEARCH_PORT }}
+        ELASTICSEARCH_PORT: ${{ secrets.ELASTICSEARCH_PORT }}
+        PROM_TOKEN: ${{ secrets.PROM_TOKEN }}
+        SYSTEM_METRICS: ${{ secrets.SYSTEM_METRICS }}
+        AZURE_CLIENTID: ${{ secrets.AZURE_CLIENTID }}
+        AZURE_SECRET: ${{ secrets.AZURE_SECRET }}
+        AZURE_TENANTID: ${{ secrets.AZURE_TENANTID }}
+        AZURE_SUBSCRIPTIONID: ${{ secrets.AZURE_SUBSCRIPTIONID }}
+        AZURE_RESOURCE_GROUP_NAME: ${{ secrets.AZURE_RESOURCE_GROUP_NAME }}
+        AZURE_VM_NAME_LIST: ${{ secrets.AZURE_VM_NAME_LIST }}
+        AZURE_CLUSTER_STOP: ${{ secrets.AZURE_CLUSTER_STOP }}
+        AZURE_CLUSTER_START: ${{ secrets.AZURE_CLUSTER_START }}
       run: |
+        # echo 'Start Azure cluster before tests - ~1000s'
+        # podman run --rm -e AZURE_CLUSTER_START=true -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e BUILD_VERSION=$BUILD_VERSION -e PROM_TOKEN=$PROM_TOKEN -e SYSTEM_METRICS=$SYSTEM_METRICS -e AZURE_CLIENTID=$AZURE_CLIENTID -e AZURE_SECRET=$AZURE_SECRET -e AZURE_TENANTID=$AZURE_TENANTID -e AZURE_SUBSCRIPTIONID=$AZURE_SUBSCRIPTIONID -e AZURE_RESOURCE_GROUP_NAME=$AZURE_RESOURCE_GROUP_NAME -e AZURE_VM_NAME_LIST=$AZURE_VM_NAME_LIST -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:v$BUILD_VERSION
+
+        # pytest
         # Install Dockerfile content
 
         # install oc/kubctl
@@ -85,16 +82,15 @@ jobs:
         # Insufficient cpu - Patch for functional Azure env with 8 cpu - resource limit cpu 0 instead of 2 (also in Dockerfile)
         sed -i -e 's/2.0/0.0/g' $RUNNER_PATH/benchmark-operator/config/manager/manager.yaml
 
-        # pytest
-        #pytest --cov=benchmark_runner --cov-report=term-missing
-        #coverage run -m pytest
-        #coverage report -m
+        pytest --cov=benchmark_runner --cov-report=term-missing
+        coverage run -m pytest
+        coverage report -m
     - name: 🎥 Publish to coveralls.io
       env:
         GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
       run: |
-        #pip install coveralls
-        #COVERALLS_REPO_TOKEN=${{ secrets.COVERALLS_REPO_TOKEN }} coveralls
+        pip install coveralls
+        COVERALLS_REPO_TOKEN=${{ secrets.COVERALLS_REPO_TOKEN }} coveralls
     - name: 🔨 Build and publish distribution 📦 to PyPI
       env:
         TWINE_USERNAME: __token__
@@ -122,15 +118,24 @@ jobs:
         PIN_NODE2: ${{ secrets.PIN_NODE2 }}
         ELASTICSEARCH: ${{ secrets.ELASTICSEARCH }}
         ELASTICSEARCH_PORT: ${{ secrets. ELASTICSEARCH_PORT }}
+        PROM_TOKEN: ${{ secrets.PROM_TOKEN }}
+        SYSTEM_METRICS: ${{ secrets.SYSTEM_METRICS }}
+        AZURE_CLIENTID: ${{ secrets.AZURE_CLIENTID }}
+        AZURE_SECRET: ${{ secrets.AZURE_SECRET }}
+        AZURE_TENANTID: ${{ secrets.AZURE_TENANTID }}
+        AZURE_SUBSCRIPTIONID: ${{ secrets.AZURE_SUBSCRIPTIONID }}
+        AZURE_RESOURCE_GROUP_NAME: ${{ secrets.AZURE_RESOURCE_GROUP_NAME }}
+        AZURE_VM_NAME_LIST: ${{ secrets.AZURE_VM_NAME_LIST }}
       run: |
         BUILD_VERSION=$(python3 setup.py --version)
-        #declare -a WORKLOADS=('stressng_pod' 'stressng_vm' 'uperf_pod' 'uperf_vm' 'hammerdb_pod_mariadb' 'hammerdb_vm_mariadb' 'hammerdb_pod_postgres' 'hammerdb_vm_postgres' 'hammerdb_pod_mssql' 'hammerdb_vm_mssql')
-        declare -a WORKLOADS=('hammerdb_vm_mariadb')
+        declare -a WORKLOADS=('stressng_pod' 'stressng_vm' 'uperf_pod' 'uperf_vm' 'hammerdb_pod_mariadb' 'hammerdb_vm_mariadb' 'hammerdb_pod_postgres' 'hammerdb_vm_postgres' 'hammerdb_pod_mssql' 'hammerdb_vm_mssql')
         for WORKLOAD in "${WORKLOADS[@]}"
         do
             echo 'Run E2E workload:' $WORKLOAD
-            podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e BUILD_VERSION=$BUILD_VERSION -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:v$BUILD_VERSION
+            podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e BUILD_VERSION=$BUILD_VERSION -e PROM_TOKEN=$PROM_TOKEN -e SYSTEM_METRICS=$SYSTEM_METRICS -e AZURE_CLIENTID=$AZURE_CLIENTID -e AZURE_SECRET=$AZURE_SECRET -e AZURE_TENANTID=$AZURE_TENANTID -e AZURE_SUBSCRIPTIONID=$AZURE_SUBSCRIPTIONID -e AZURE_RESOURCE_GROUP_NAME=$AZURE_RESOURCE_GROUP_NAME -e AZURE_VM_NAME_LIST=$AZURE_VM_NAME_LIST -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:v$BUILD_VERSION
         done
+        # echo 'Stop Azure cluster after tests - ~1000s'
+        # podman run --rm -e AZURE_CLUSTER_STOP=true -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e BUILD_VERSION=$BUILD_VERSION -e PROM_TOKEN=$PROM_TOKEN -e SYSTEM_METRICS=$SYSTEM_METRICS -e AZURE_CLIENTID=$AZURE_CLIENTID -e AZURE_SECRET=$AZURE_SECRET -e AZURE_TENANTID=$AZURE_TENANTID -e AZURE_SUBSCRIPTIONID=$AZURE_SUBSCRIPTIONID -e AZURE_RESOURCE_GROUP_NAME=$AZURE_RESOURCE_GROUP_NAME -e AZURE_VM_NAME_LIST=$AZURE_VM_NAME_LIST -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:v$BUILD_VERSION
     - name: 🎁 Bump Version
       run: |
         version=$(python3 setup.py --version)

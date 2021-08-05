@@ -5,11 +5,11 @@ metadata:
   namespace: benchmark-operator
 spec:
   system_metrics:
-    collection: false
-    prom_url: ""
-    es_url: "{{ elasticsearch_url }}"
-    prom_token: ""
-    metrics_profile: ""
+    collection: {{ system_metrics }}
+    prom_url: "https://prometheus-k8s.openshift-monitoring.svc.cluster.local:9091"
+    es_url: "http://{{ elasticsearch_url }}"
+    prom_token: "{{ prom_token }}"
+    metrics_profile: "https://raw.githubusercontent.com/cloud-bulldozer/benchmark-operator/master/roles/kube-burner/files/metrics.yaml"
   elasticsearch:
     url: "{{ elasticsearch_url }}"
     index_name: stressng-vm

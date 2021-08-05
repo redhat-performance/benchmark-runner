@@ -182,9 +182,9 @@ def test_get_long_short_uuid():
     assert len(oc._OC__get_short_uuid(workload='stressng-pod')) == 8
 
 
-def test_wait_for_pod_create_initialized_ready_completed_deleted():
+def test_wait_for_pod_create_initialized_ready_completed_system_metrics_deleted():
     """
-    This method test wait for pod create, initialized, ready, completed, delete
+    This method test wait for pod create, initialized, ready, completed, system-metrics, delete
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
@@ -192,7 +192,11 @@ def test_wait_for_pod_create_initialized_ready_completed_deleted():
     assert oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_pod.yaml'), pod_name='stressng-pod-workload')
     assert oc.wait_for_initialized(label='app=stressng_workload', workload='stressng-pod')
     assert oc.wait_for_ready(label='app=stressng_workload', workload='stressng-pod')
-    assert oc.wait_for_completed(label='app=stressng_workload', workload='stressng-pod')
+    assert oc.wait_for_pod_completed(label='app=stressng_workload', workload='stressng-pod')
+    # system-metrics
+    assert oc.wait_for_pod_create(pod_name='system-metrics-collector')
+    assert oc.wait_for_initialized(label='app=system-metrics-collector', workload='stressng-pod')
+    assert oc.wait_for_pod_completed(label='app=system-metrics-collector', workload='stressng-pod')
     assert oc.delete_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_pod.yaml'), pod_name='stressng-pod-workload')
 
 
@@ -235,9 +239,9 @@ def test_wait_for_vm_created():
     assert oc.wait_for_vm_create(vm_name='stressng-vm-workload')
 
 
-def test_vm_create_initialized_ready_completed_deleted():
+def test_vm_create_initialized_ready_completed_system_metrics_deleted():
     """
-    This method test create, get_vmi, initialize, ready, completed, deleted
+    This method test create, get_vmi, initialize, ready, completed, system-metrics, deleted
     Must have running ElasticSearch server
     :return:
     """
@@ -246,8 +250,13 @@ def test_vm_create_initialized_ready_completed_deleted():
     oc.login()
     assert oc.create_vm_sync(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'), vm_name='stressng-vm-workload')
     assert oc.get_vmi()
-    oc.wait_for_initialized(label='app=stressng_workload', workload='stressng-vm')
-    oc.wait_for_ready(label='app=stressng_workload', workload='stressng-vm')
+    assert oc.wait_for_initialized(label='app=stressng_workload', workload='stressng-vm')
+    assert oc.wait_for_ready(label='app=stressng_workload', workload='stressng-vm')
+    assert oc.wait_for_vm_completed(workload='stressng-vm')
+    # system-metrics
+    assert oc.wait_for_pod_create(pod_name='system-metrics-collector')
+    assert oc.wait_for_initialized(label='app=system-metrics-collector', workload='stressng-vm')
+    assert oc.wait_for_pod_completed(label='app=system-metrics-collector', workload='stressng-vm')
     if test_environment_variable['elasticsearch']:
         es = ESOperations(es_host=test_environment_variable['elasticsearch'],
                            es_port=test_environment_variable['elasticsearch_port'])
