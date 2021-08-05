@@ -45,7 +45,8 @@ setup(
         'pandas',  # required latest
         'jinja2==3.0.1',
         'typeguard==2.12.1',
-        'PyYAML==5.4.1'
+        'PyYAML==5.4.1',
+         'azure==4.0.0'
     ],
 
     setup_requires=['pytest', 'pytest-runner', 'wheel', 'coverage'],

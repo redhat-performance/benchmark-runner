@@ -74,7 +74,7 @@ def test_verify_es_data_uploaded_stressng_pod():
         oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_pod.yaml'), pod_name=f'{workload}-workload')
         oc.wait_for_initialized(label='app=stressng_workload', workload=workload)
         oc.wait_for_ready(label='app=stressng_workload', workload=workload)
-        oc.wait_for_completed(label='app=stressng_workload', workload=workload)
+        oc.wait_for_pod_completed(label='app=stressng_workload', workload=workload)
         if test_environment_variable['elasticsearch']:
             # verify that data upload to elastic search
             es = ESOperations(es_host=test_environment_variable['elasticsearch'],

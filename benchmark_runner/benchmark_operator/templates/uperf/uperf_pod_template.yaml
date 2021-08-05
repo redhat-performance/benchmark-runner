@@ -5,13 +5,14 @@ metadata:
   namespace: {{ namespace }}
 spec:
   system_metrics:
-    collection: false
-    prom_url: ""
-    es_url: "{{ url }}"
-    prom_token: ""
-    metrics_profile: ""
+    collection: {{ system_metrics }}
+    prom_url: "{{ prom_url }}"
+    es_url: "{{ es_url }}"
+    prom_token: "{{ prom_token }}"
+    metrics_profile: "{{ metrics_profile }}"
+    index_name: {{ sm_index_name }}
   elasticsearch:
-    url: "{{ url }}"
+    url: "{{ es_url }}"
     index_name: {{ index_name_pod }}
   metadata:
     collection: true

@@ -15,6 +15,7 @@ def update_environment_variable(dir_path: str, yaml_file: str, environment_varia
     if not environment_variable_dict:
         environment_variable = EnvironmentVariables()
         environment_variable_dict = environment_variable.environment_variables_dict
+
     with open(os.path.join(dir_path, yaml_file)) as f:
         template_str = f.read()
     tm = Template(template_str)

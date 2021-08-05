@@ -13,6 +13,7 @@ def __get_test_environment_variable():
     test_environment_variable['ocs_pvc'] = os.environ.get('OCS_PVC', 'true')
     # This path is for benchmark-operator path
     test_environment_variable['runner_path'] = os.environ.get('RUNNER_PATH', '/')
+    test_environment_variable['system_metrics'] = os.environ.get('SYSTEM_METRICS', 'true')
 
     ##################################################################################################
     # dynamic parameters - configure for local run
@@ -22,6 +23,20 @@ def __get_test_environment_variable():
     # ElasticSearch
     test_environment_variable['elasticsearch'] = os.environ.get('ELASTICSEARCH', '')
     test_environment_variable['elasticsearch_port'] = os.environ.get('ELASTICSEARCH_PORT', '')
+
+    # Prometheus token: $ oc -n openshift-monitoring sa get-token prometheus-k8s
+    test_environment_variable['prom_token'] = os.environ.get('PROM_TOKEN', '')
+
+    # Azure details
+    test_environment_variable['azure_cluster_stop'] = os.environ.get('AZURE_CLUSTER_STOP', '')
+    test_environment_variable['azure_cluster_start'] = os.environ.get('AZURE_CLUSTER_START', '')
+    test_environment_variable['azure_clientid'] = os.environ.get('AZURE_CLIENTID', '')
+    test_environment_variable['azure_secret'] = os.environ.get('AZURE_SECRET', '')
+    test_environment_variable['azure_tenantid'] = os.environ.get('AZURE_TENANTID', '')
+    test_environment_variable['azure_subscriptionid'] = os.environ.get('AZURE_SUBSCRIPTIONID', '')
+    test_environment_variable['azure_resource_group_name'] = os.environ.get('AZURE_RESOURCE_GROUP_NAME', '')
+    test_environment_variable['azure_vm_name_list'] = os.environ.get('AZURE_VM_NAME_LIST', '')
+
     # end dynamic parameters - configure for local run
     ##################################################################################################
 

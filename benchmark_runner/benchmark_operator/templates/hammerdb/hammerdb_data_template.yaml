@@ -8,8 +8,15 @@ shared_data:
   pin: {{ pin }}
   pin_node: {{ pin_node1 }}
   transactions: 100000
-  url: {{ elasticsearch_url }}
   ocs_pvc: {{ ocs_pvc }}
+  es_url: {{ elasticsearch_url }}
+  # enable/disable system metrics
+  system_metrics: {{ system_metrics }}
+  prom_url: https://prometheus-k8s.openshift-monitoring.svc.cluster.local:9091
+  prom_token: {{ prom_token }}
+  sm_index_name: system-metrics
+  #metrics_profile: node-metrics.yml
+  metrics_profile: https://raw.githubusercontent.com/cloud-bulldozer/benchmark-operator/master/roles/kube-burner/files/metrics.yaml
 mariadb:
   db_image: centos8-mariadb103-container-disk:latest
   db_pass: mysql
