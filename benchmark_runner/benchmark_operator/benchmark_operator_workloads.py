@@ -219,6 +219,10 @@ class BenchmarkOperatorWorkloads:
         self.__oc.wait_for_pod_create(pod_name='system-metrics-collector')
         self.__oc.wait_for_initialized(label='app=system-metrics-collector', workload=workload)
         self.__oc.wait_for_pod_completed(label='app=system-metrics-collector', workload=workload)
+        # verify that data upload to elastic search
+        if self.__es_host:
+            self.__es_operations.verify_es_data_uploaded(index=f'system-metrics',
+                                                         uuid=self.__oc.get_long_uuid(workload=workload))
 
 #***********************************************************************************************
 ######################################## Workloads #############################################
@@ -269,7 +273,7 @@ class BenchmarkOperatorWorkloads:
             # system metrics
             if environment_variables.environment_variables_dict['system_metrics']:
                self.system_metrics_collector(workload=workload)
-            # verify that data upload to elastic search, vm completed status
+            # verify that data upload to elastic search
             if self.__es_host:
                 self.__es_operations.verify_es_data_uploaded(index=f'{workload}-results', uuid=self.__oc.get_long_uuid(workload=workload))
             self.__oc.delete_vm_sync(
@@ -342,7 +346,7 @@ class BenchmarkOperatorWorkloads:
             # system metrics
             if environment_variables.environment_variables_dict['system_metrics']:
                 self.system_metrics_collector(workload=workload)
-            # verify that data upload to elastic search, vm completed status
+            # verify that data upload to elastic search
             if self.__es_host:
                 self.__es_operations.verify_es_data_uploaded(index=f'{workload}-results', uuid=self.__oc.get_long_uuid(workload=workload), workload=self.uperf_vm.__name__)
             self.__oc.delete_vm_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.uperf_vm.__name__}.yaml'),
@@ -428,7 +432,7 @@ class BenchmarkOperatorWorkloads:
             # system metrics
             if environment_variables.environment_variables_dict['system_metrics']:
                 self.system_metrics_collector(workload=workload)
-            # verify that data upload to elastic search, vm completed status
+            # verify that data upload to elastic search
             if self.__es_host:
                 self.__es_operations.verify_es_data_uploaded(index=f'{workload}-results', uuid=self.__oc.get_long_uuid(workload=workload))
             self.__oc.delete_vm_sync(
