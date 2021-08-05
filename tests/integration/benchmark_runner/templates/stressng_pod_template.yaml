@@ -11,7 +11,7 @@ spec:
     prom_token: "{{ prom_token }}"
     metrics_profile: "https://raw.githubusercontent.com/cloud-bulldozer/benchmark-operator/master/roles/kube-burner/files/metrics.yaml"
   elasticsearch:
-    url: "{{ elasticsearch_url }}"
+    url: "http://{{ elasticsearch_url }}"
     index_name: stressng-pod
   metadata:
     collection: false

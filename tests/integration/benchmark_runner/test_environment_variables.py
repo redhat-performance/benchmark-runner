@@ -11,10 +11,10 @@ def __get_test_environment_variable():
     test_environment_variable['namespace'] = os.environ.get('NAMESPACE', 'benchmark-operator')
     # run Hammerdb workload with ocs pvc
     test_environment_variable['ocs_pvc'] = os.environ.get('OCS_PVC', 'true')
-    # This path is for benchmark-operator path
-    test_environment_variable['runner_path'] = os.environ.get('RUNNER_PATH', '/')
     test_environment_variable['system_metrics'] = os.environ.get('SYSTEM_METRICS', 'true')
 
+    # This path is for benchmark-operator path
+    test_environment_variable['runner_path'] = os.environ.get('RUNNER_PATH', '/')
     ##################################################################################################
     # dynamic parameters - configure for local run
     test_environment_variable['kubeadmin_password'] = os.environ.get('KUBEADMIN_PASSWORD', '')
