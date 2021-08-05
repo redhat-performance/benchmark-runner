@@ -4,4 +4,5 @@ elasticsearch_dsl==7.3.0
 pandas
 jinja2==3.0.1
 PyYAML==5.4.1
+azure==4.0.0
 mock

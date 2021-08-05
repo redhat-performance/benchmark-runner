@@ -46,7 +46,7 @@ setup(
         'jinja2==3.0.1',
         'typeguard==2.12.1',
         'PyYAML==5.4.1',
-         'azure==4.0.0'
+         'azure==4.0.0'  # add new package inside requirements.txt  requirements.txt
     ],
 
     setup_requires=['pytest', 'pytest-runner', 'wheel', 'coverage'],
