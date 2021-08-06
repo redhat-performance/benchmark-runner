@@ -54,7 +54,7 @@ jobs:
         AZURE_VM_NAME: ${{ secrets.AZURE_VM_NAME }}
         AZURE_CLUSTER_VM_NAME_LIST: ${{ secrets.AZURE_CLUSTER_VM_NAME_LIST }}
       run: |
-        echo "Stop Azure cluster after tests - ~1000s"
+        #echo "Stop Azure cluster after tests - ~1000s"
         for i in ${!${AZURE_CLUSTER_VM_NAME_LIST[@]}; do
         do
             AZURE_VM_NAME=${${AZURE_CLUSTER_VM_NAME_LIST[$i]}
