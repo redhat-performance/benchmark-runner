@@ -12,6 +12,10 @@ class OC(SSH):
     """
     This class run OC commands
     """
+    # time out for all waits is 5000 sec
+    TIME_OUT = 5000
+    # sleep time between checks is 5 sec
+    SLEEP_TIME = 5
 
     def __init__(self, kubeadmin_password: str = ''):
         super().__init__()
@@ -142,7 +146,7 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def wait_for_pod_create(self, pod_name: str, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = 300, sleep_time: int = 3):
+    def wait_for_pod_create(self, pod_name: str, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = TIME_OUT, sleep_time: int = SLEEP_TIME):
         """
         This method is wait till pod name is creating or throw exception after timeout
         :param namespace:
@@ -162,7 +166,7 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def wait_for_vm_create(self, vm_name: str, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = 300, sleep_time: int = 3):
+    def wait_for_vm_create(self, vm_name: str, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = TIME_OUT, sleep_time: int = SLEEP_TIME):
         """
         This method is wait till vm name is creating or throw exception after timeout
         :param vm_name:
@@ -182,7 +186,7 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def wait_for_pod_terminate(self, pod_name: str, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = 300, sleep_time: int = 10):
+    def wait_for_pod_terminate(self, pod_name: str, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = TIME_OUT, sleep_time: int = SLEEP_TIME):
         """
         This method is wait till pod name is terminating or throw exception after timeout
         :param namespace:
@@ -202,7 +206,7 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def wait_for_vm_terminate(self, vm_name: str, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = 300, sleep_time: int = 3):
+    def wait_for_vm_terminate(self, vm_name: str, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = TIME_OUT, sleep_time: int = SLEEP_TIME):
         """
         This method is wait till vm name is terminating or throw exception after timeout
         :param vm_name:
@@ -222,7 +226,7 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def create_pod_sync(self, yaml: str, pod_name: str, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = 300):
+    def create_pod_sync(self, yaml: str, pod_name: str, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = TIME_OUT):
         """
         This method create pod yaml in async
         :param namespace:
@@ -236,7 +240,7 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def create_vm_sync(self, yaml: str, vm_name: str, timeout: int = 300):
+    def create_vm_sync(self, yaml: str, vm_name: str, timeout: int = TIME_OUT):
         """
         This method create vm yaml in async
         :param timeout:
@@ -249,7 +253,7 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def delete_pod_sync(self, yaml: str, pod_name: str, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = 300):
+    def delete_pod_sync(self, yaml: str, pod_name: str, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = TIME_OUT):
         """
         This method delete pod yaml in async, only if exist and return false if not exist
         :param namespace:
@@ -266,7 +270,7 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def delete_vm_sync(self, yaml: str, vm_name: str, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = 300):
+    def delete_vm_sync(self, yaml: str, vm_name: str, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = TIME_OUT):
         """
         This method delete vm yaml in async, only if exist and return false if not exist
         :param namespace:
@@ -283,7 +287,7 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def wait_for_initialized(self, label: str, workload: str = '', status: str = 'Initialized', label_uuid: bool = True, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = 300):
+    def wait_for_initialized(self, label: str, workload: str = '', status: str = 'Initialized', label_uuid: bool = True, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = TIME_OUT):
         """
         This method wait to pod to be initialized
         :param namespace:
@@ -311,7 +315,7 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def wait_for_ready(self, label: str, workload: str = '', status: str = 'ready', label_uuid: bool = True, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = 300):
+    def wait_for_ready(self, label: str, workload: str = '', status: str = 'ready', label_uuid: bool = True, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = TIME_OUT):
         """
         This method wait to pod to be ready
         :param workload:
@@ -339,7 +343,7 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def wait_for_pod_completed(self, label: str, workload: str = '', namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = 500):
+    def wait_for_pod_completed(self, label: str, workload: str = '', namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = TIME_OUT):
         """
         This method wait to pod to be completed
         :param workload:
@@ -357,7 +361,7 @@ class OC(SSH):
             raise PodNotCompletedTimeout(workload=workload)
 
     @logger_time_stamp
-    def wait_for_vm_completed(self, workload: str = '', namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = 5000, sleep_time: int =10,):
+    def wait_for_vm_completed(self, workload: str = '', namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = TIME_OUT, sleep_time: int = SLEEP_TIME):
         """
         This method wait to pod to be completed
         :param workload:
