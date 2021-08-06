@@ -13,8 +13,16 @@ class ESOperations:
     """
     This class contains elastic search operations
     """
+    # time out for all waits is 5000 sec
+    TIME_OUT = 5000
+    # sleep time between checks is 30 sec
+    SLEEP_TIME = 30
+    # ElasticSearch fetch data of last 15 minutes
+    ES_FETCH_TIME = 15
+    # max search results
+    MAX_SEARCH_RESULTS = 1000
 
-    def __init__(self, es_host: str, es_port: str, es_fetch_last_x_minutes: int = 15):
+    def __init__(self, es_host: str, es_port: str, es_fetch_last_x_minutes: int = ES_FETCH_TIME):
         self.__es_fetch_last_x_minutes = es_fetch_last_x_minutes  # MUST BE 15 MIN AT LEAST
         self.__es_host = es_host
         self.__es_port = es_port
@@ -39,7 +47,7 @@ class ESOperations:
         self._hits = self.__es_get_index_hits(index=index, uuid=uuid, workload=workload)
 
     def __es_get_index_hits(self, index: str, uuid: str = '', workload: str = '',
-                            max_search_results: int = 1000):
+                            max_search_results: int = MAX_SEARCH_RESULTS):
         """
         This method search for data per index in last 2 minutes and return the number of docs or zero
         :param index:
@@ -80,8 +88,8 @@ class ESOperations:
 
     @typechecked()
     @logger_time_stamp
-    def verify_es_data_uploaded(self, index: str, uuid: str = '', workload: str = '', timeout: int = 5000,
-                                sleep_time: int = 30):
+    def verify_es_data_uploaded(self, index: str, uuid: str = '', workload: str = '', timeout: int = TIME_OUT,
+                                sleep_time: int = SLEEP_TIME):
         """
         The method wait till data upload to elastic search and wait if there is new data, search in last 15 minutes
         :param uuid: the current workload uuid

@@ -9,10 +9,11 @@ spec:
     prom_url: "https://prometheus-k8s.openshift-monitoring.svc.cluster.local:9091"
     es_url: "http://{{ elasticsearch_url }}"
     prom_token: "{{ prom_token }}"
-    metrics_profile: "https://raw.githubusercontent.com/cloud-bulldozer/benchmark-operator/master/roles/kube-burner/files/metrics.yaml"
+    metrics_profile: node-metrics.yml
+    index_name: system-metrics-test
   elasticsearch:
     url: "http://{{ elasticsearch_url }}"
-    index_name: stressng-pod
+    index_name: stressng-pod-test
   metadata:
     collection: false
   workload:
