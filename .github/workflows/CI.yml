@@ -80,9 +80,9 @@ jobs:
         # Insufficient cpu - Patch for functional Azure env with 8 cpu - resource limit cpu 0 instead of 2 (also in Dockerfile)
         sed -i -e 's/2.0/0.0/g' $RUNNER_PATH/benchmark-operator/config/manager/manager.yaml
 
-        pytest --cov=benchmark_runner --cov-report=term-missing
-        coverage run -m pytest
-        coverage report -m
+        #pytest --cov=benchmark_runner --cov-report=term-missing
+        #coverage run -m pytest
+        #coverage report -m
     - name: 🎥 Publish to coveralls.io
       env:
         GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
@@ -130,6 +130,7 @@ jobs:
         for WORKLOAD in "${WORKLOADS[@]}"
         do
             echo 'Run E2E workload:' $WORKLOAD
+            echo podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e BUILD_VERSION=$BUILD_VERSION -e PROM_TOKEN=$PROM_TOKEN -e SYSTEM_METRICS=$SYSTEM_METRICS -e AZURE_CLIENTID=$AZURE_CLIENTID -e AZURE_SECRET=$AZURE_SECRET -e AZURE_TENANTID=$AZURE_TENANTID -e AZURE_SUBSCRIPTIONID=$AZURE_SUBSCRIPTIONID -e AZURE_RESOURCE_GROUP_NAME=$AZURE_RESOURCE_GROUP_NAME -e AZURE_VM_NAME_LIST=$AZURE_VM_NAME_LIST -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:v$BUILD_VERSION
             podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e BUILD_VERSION=$BUILD_VERSION -e PROM_TOKEN=$PROM_TOKEN -e SYSTEM_METRICS=$SYSTEM_METRICS -e AZURE_CLIENTID=$AZURE_CLIENTID -e AZURE_SECRET=$AZURE_SECRET -e AZURE_TENANTID=$AZURE_TENANTID -e AZURE_SUBSCRIPTIONID=$AZURE_SUBSCRIPTIONID -e AZURE_RESOURCE_GROUP_NAME=$AZURE_RESOURCE_GROUP_NAME -e AZURE_VM_NAME_LIST=$AZURE_VM_NAME_LIST -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:v$BUILD_VERSION
         done
         # echo 'Stop Azure cluster after tests - ~1000s'
