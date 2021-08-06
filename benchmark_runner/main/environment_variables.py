@@ -19,9 +19,9 @@ class EnvironmentVariables:
         self._environment_variables_dict['build_version'] = os.environ.get('BUILD_VERSION', '1.0.0')
         # collect system metrics
         self._environment_variables_dict['system_metrics'] = os.environ.get('SYSTEM_METRICS', 'true')
+
         # This path is for benchmark-operator path
         self._environment_variables_dict['runner_path'] = os.environ.get('RUNNER_PATH', '/')
-
         ##################################################################################################
 
         # Azure details for start/stop Azure mechanism only
@@ -33,7 +33,6 @@ class EnvironmentVariables:
         self._environment_variables_dict['azure_subscriptionid'] = os.environ.get('AZURE_SUBSCRIPTIONID', '')
         self._environment_variables_dict['azure_resource_group_name'] = os.environ.get('AZURE_RESOURCE_GROUP_NAME', '')
         self._environment_variables_dict['azure_vm_name_list'] = os.environ.get('AZURE_VM_NAME_LIST', '')
-
 
         # dynamic parameters - configure for local run
         self._environment_variables_dict['workload'] = os.environ.get('WORKLOAD', '')
