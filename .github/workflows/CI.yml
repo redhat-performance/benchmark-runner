@@ -117,7 +117,7 @@ jobs:
         ELASTICSEARCH: ${{ secrets.ELASTICSEARCH }}
         ELASTICSEARCH_PORT: ${{ secrets. ELASTICSEARCH_PORT }}
         PROM_TOKEN: ${{ secrets.PROM_TOKEN }}
-        SYSTEM_METRICS: ${{ secrets.SYSTEM_METRICS }}
+        SYSTEM_METRICS: true
         AZURE_CLIENTID: ${{ secrets.AZURE_CLIENTID }}
         AZURE_SECRET: ${{ secrets.AZURE_SECRET }}
         AZURE_TENANTID: ${{ secrets.AZURE_TENANTID }}
