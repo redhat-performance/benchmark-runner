@@ -1,5 +1,4 @@
 
-import ast  # convert str list to list
 import time
 
 from benchmark_runner.main.environment_variables import *
@@ -32,18 +31,11 @@ def main():
                                           azure_tenantid=environment_variables_dict.get('azure_tenantid', ''),
                                           azure_subscriptionid=environment_variables_dict.get('azure_subscriptionid', ''),
                                           azure_resource_group_name=environment_variables_dict.get('azure_resource_group_name', ''))
-        # convert str list to list
-        azure_vm_name_list = ast.literal_eval((environment_variables_dict.get('azure_vm_name_list', '')))
-        for num, vm_name in enumerate(azure_vm_name_list):
-            if azure_cluster_stop:
-                logger.info(f'Stop cluster node {num+1} from {len(azure_vm_name_list)}')
-                print(azure_operation.stop_vm(vm_name=vm_name))
-            elif azure_cluster_start:
-                logger.info(f'Start cluster node {num+1} from {len(azure_vm_name_list)}')
-                print(azure_operation.start_vm(vm_name=vm_name))
-        # Wait 1000 sec till cluster will be up with CNV/OCS/ECK/Grafana
+        azure_vm_name = (environment_variables_dict.get('azure_vm_name', ''))
         if azure_cluster_start:
-            time.sleep(1000)
+            print(azure_operation.start_vm(vm_name=azure_vm_name))
+        elif azure_cluster_stop:
+            print(azure_operation.stop_vm(vm_name=azure_vm_name))
     # Workloads
     else:
         workload = environment_variables_dict.get('workload', '')

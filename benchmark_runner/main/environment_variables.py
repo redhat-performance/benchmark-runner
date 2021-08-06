@@ -32,7 +32,7 @@ class EnvironmentVariables:
         self._environment_variables_dict['azure_tenantid'] = os.environ.get('AZURE_TENANTID', '')
         self._environment_variables_dict['azure_subscriptionid'] = os.environ.get('AZURE_SUBSCRIPTIONID', '')
         self._environment_variables_dict['azure_resource_group_name'] = os.environ.get('AZURE_RESOURCE_GROUP_NAME', '')
-        self._environment_variables_dict['azure_vm_name_list'] = os.environ.get('AZURE_VM_NAME_LIST', '')
+        self._environment_variables_dict['azure_vm_name'] = os.environ.get('AZURE_VM_NAME', '')
 
         # dynamic parameters - configure for local run
         self._environment_variables_dict['workload'] = os.environ.get('WORKLOAD', '')
