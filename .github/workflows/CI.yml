@@ -54,7 +54,7 @@ jobs:
         AZURE_VM_NAME: ${{ secrets.AZURE_VM_NAME }}
         AZURE_CLUSTER_VM_NAME_LIST: ${{ secrets.AZURE_CLUSTER_VM_NAME_LIST }}
       run: |
-        echo 'Stop Azure cluster after tests - ~1000s'
+        echo "Stop Azure cluster after tests - ~1000s"
         for i in ${!${AZURE_CLUSTER_VM_NAME_LIST[@]}; do
         do
             AZURE_VM_NAME=${${AZURE_CLUSTER_VM_NAME_LIST[$i]}
@@ -135,7 +135,7 @@ jobs:
             echo 'Run E2E workload:' $WORKLOAD
             podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e BUILD_VERSION=$BUILD_VERSION -e PROM_TOKEN=$PROM_TOKEN -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:v$BUILD_VERSION
         done
-        # echo 'Stop Azure cluster after tests - ~1000s'
+        echo "Stop Azure cluster after tests - ~1000s"
         for i in ${!${AZURE_CLUSTER_VM_NAME_LIST[@]}; do
         do
             AZURE_VM_NAME=${${AZURE_CLUSTER_VM_NAME_LIST[$i]}
