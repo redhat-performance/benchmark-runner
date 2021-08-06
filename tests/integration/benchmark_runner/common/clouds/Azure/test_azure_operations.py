@@ -16,7 +16,6 @@ def test_get_vm_status():
                                       azure_resource_group_name=test_environment_variable.get(
                                           'azure_resource_group_name', ''))
     # convert str list to list
-    azure_vm_name_list = ast.literal_eval((test_environment_variable.get('azure_vm_name_list', '')))
-    for vm_name in azure_vm_name_list:
-            assert azure_operation.get_vm_status(vm_name=vm_name)
+    azure_vm_name = (test_environment_variable.get('azure_vm_name', ''))
+    assert azure_operation.get_vm_status(vm_name=azure_vm_name)
 

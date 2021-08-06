@@ -35,7 +35,7 @@ def __get_test_environment_variable():
     test_environment_variable['azure_tenantid'] = os.environ.get('AZURE_TENANTID', '')
     test_environment_variable['azure_subscriptionid'] = os.environ.get('AZURE_SUBSCRIPTIONID', '')
     test_environment_variable['azure_resource_group_name'] = os.environ.get('AZURE_RESOURCE_GROUP_NAME', '')
-    test_environment_variable['azure_vm_name_list'] = os.environ.get('AZURE_VM_NAME_LIST', '')
+    test_environment_variable['azure_vm_name'] = os.environ.get('AZURE_VM_NAME', '')
 
     # end dynamic parameters - configure for local run
     ##################################################################################################
