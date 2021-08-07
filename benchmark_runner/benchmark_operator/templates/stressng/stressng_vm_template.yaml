@@ -43,7 +43,7 @@ spec:
         limits:
           memory: {{ limits_memory_GB }}Gi
         requests:
-          memory: 100Mi
+          memory: {{ requests_memory_GB }}Gi
         network:
           front_end: bridge # or masquerade
           multiqueue:

@@ -54,16 +54,14 @@ jobs:
         AZURE_VM_NAME: ${{ secrets.AZURE_VM_NAME }}
         AZURE_CLUSTER_VM_NAME_LIST: ${{ secrets.AZURE_CLUSTER_VM_NAME_LIST }}
       run: |
-        echo ">>>>>>> Start Azure cluster after tests, time to start ~1000s"
+        echo ">>>>>>> Start Azure cluster VMs before tests"
         declare -a AZURE_CLUSTER_VM_NAME_LIST=$AZURE_CLUSTER_VM_NAME_LIST
         for AZURE_VM_NAME in "${AZURE_CLUSTER_VM_NAME_LIST[@]}"
         do
             echo 'START vm:' $AZURE_VM_NAME
-            podman run --rm -e AZURE_CLUSTER_START=true -e AZURE_CLIENTID=$AZURE_CLIENTID -e AZURE_SECRET=$AZURE_SECRET -e AZURE_TENANTID=$AZURE_TENANTID -e AZURE_SUBSCRIPTIONID=$AZURE_SUBSCRIPTIONID -e AZURE_RESOURCE_GROUP_NAME=$AZURE_RESOURCE_GROUP_NAME -e AZURE_VM_NAME=$AZURE_VM_NAME -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:latest
-            sleep 30
+            #podman run --rm -e AZURE_CLUSTER_START=true -e AZURE_CLIENTID=$AZURE_CLIENTID -e AZURE_SECRET=$AZURE_SECRET -e AZURE_TENANTID=$AZURE_TENANTID -e AZURE_SUBSCRIPTIONID=$AZURE_SUBSCRIPTIONID -e AZURE_RESOURCE_GROUP_NAME=$AZURE_RESOURCE_GROUP_NAME -e AZURE_VM_NAME=$AZURE_VM_NAME -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:latest
+            sleep 60
         done
-        echo 'wait 1000 seconds till OpenShift cluster will be up'
-        sleep 1000
 
         # Install Dockerfile content for pytest
         # install oc/kubctl
@@ -87,9 +85,9 @@ jobs:
         sed -i -e 's/2.0/0.0/g' $RUNNER_PATH/benchmark-operator/config/manager/manager.yaml
 
         # run pytest
-        pytest --cov=benchmark_runner --cov-report=term-missing
-        coverage run -m pytest
-        coverage report -m
+        #pytest --cov=benchmark_runner --cov-report=term-missing
+        #coverage run -m pytest
+        #coverage report -m
     - name: 🎥 Publish to coveralls.io
       env:
         GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
@@ -139,7 +137,7 @@ jobs:
             podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e BUILD_VERSION=$BUILD_VERSION -e PROM_TOKEN=$PROM_TOKEN -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:v$BUILD_VERSION
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End E2E workload:' $WORKLOAD '>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
         done
-        echo ">>>>>>> Stop Azure cluster after tests - time to stop ~1000s"
+        echo ">>>>>>> Stop Azure cluster after tests"
         declare -a AZURE_CLUSTER_VM_NAME_LIST=$AZURE_CLUSTER_VM_NAME_LIST
         for AZURE_VM_NAME in "${AZURE_CLUSTER_VM_NAME_LIST[@]}"
         do
@@ -169,10 +167,10 @@ jobs:
         AZURE_CLUSTER_VM_NAME_LIST: ${{ secrets.AZURE_CLUSTER_VM_NAME_LIST }}
       if: ${{ failure() }}
       run: |
-        echo ">>>>>>> Stop Azure cluster after failure - time to stop ~1000s"
+        echo ">>>>>>> Stop Azure cluster after failure"
         declare -a AZURE_CLUSTER_VM_NAME_LIST=$AZURE_CLUSTER_VM_NAME_LIST
         for AZURE_VM_NAME in "${AZURE_CLUSTER_VM_NAME_LIST[@]}"
         do
             echo 'STOP vm:' $AZURE_VM_NAME
-            podman run --rm -e AZURE_CLUSTER_STOP=true -e AZURE_CLIENTID=$AZURE_CLIENTID -e AZURE_SECRET=$AZURE_SECRET -e AZURE_TENANTID=$AZURE_TENANTID -e AZURE_SUBSCRIPTIONID=$AZURE_SUBSCRIPTIONID -e AZURE_RESOURCE_GROUP_NAME=$AZURE_RESOURCE_GROUP_NAME -e AZURE_VM_NAME=$AZURE_VM_NAME -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:latest
+            #podman run --rm -e AZURE_CLUSTER_STOP=true -e AZURE_CLIENTID=$AZURE_CLIENTID -e AZURE_SECRET=$AZURE_SECRET -e AZURE_TENANTID=$AZURE_TENANTID -e AZURE_SUBSCRIPTIONID=$AZURE_SUBSCRIPTIONID -e AZURE_RESOURCE_GROUP_NAME=$AZURE_RESOURCE_GROUP_NAME -e AZURE_VM_NAME=$AZURE_VM_NAME -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:latest
         done

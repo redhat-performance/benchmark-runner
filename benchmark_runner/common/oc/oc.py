@@ -15,7 +15,7 @@ class OC(SSH):
     # time out for all waits is 5000 sec
     TIME_OUT = 5000
     # sleep time between checks is 5 sec
-    SLEEP_TIME = 5
+    SLEEP_TIME = 3
 
     def __init__(self, kubeadmin_password: str = ''):
         super().__init__()

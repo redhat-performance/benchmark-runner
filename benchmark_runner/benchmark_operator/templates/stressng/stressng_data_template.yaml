@@ -27,8 +27,11 @@ pod:
   resources: true
   limits_cpu: 4
   limits_memory_GB: 16
+  requests_cpu: 4
+  requests_memory: 16
 vm:
   index_name_vm: stressng-vm
   es_kind: vm
   cores: 4
   limits_memory_GB: 16
+  requests_memory_GB: 16
