@@ -22,15 +22,15 @@ spec:
     args:
       client_resources:
         requests:
-          cpu: 100m
-          memory: 100Mi
+          cpu: 10m
+          memory: 10Mi
         limits:
           cpu: {{ client_limits_cpu }}
           memory: {{ client_limits_memory_GB }}Gi
       server_resources:
         requests:
-          cpu: 100m
-          memory: 100Mi
+          cpu: 10m
+          memory: 10Mi
         limits:
           cpu: {{ server_limits_cpu }}
           memory: {{ server_limits_memory_GB }}Gi

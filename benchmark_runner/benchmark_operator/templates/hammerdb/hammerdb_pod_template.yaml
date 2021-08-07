@@ -22,8 +22,8 @@ spec:
       pin: {{ pin }} # enable for nodeSelector
       pin_node: "{{ pin_node }}"
       resources: {{ resources }} # enable for resources requests/limits
-      requests_cpu: 100m
-      requests_memory: 100Mi
+      requests_cpu: 10m
+      requests_memory: 10Mi
       limits_cpu: {{ limits_cpu }}
       limits_memory: {{ limits_memory_GB }}Gi
       db_type: "{{ db_type }}"
