@@ -22,7 +22,7 @@ spec:
       pin: {{ pin }} # enable for nodeSelector
       pin_node: "{{ pin_node }}"
       resources: {{ resources }} # enable for resources requests/limits
-      requests_cpu: 200m
+      requests_cpu: 100m
       requests_memory: 100Mi
       limits_cpu: {{ limits_cpu }}
       limits_memory: {{ limits_memory_GB }}Gi
