@@ -14,6 +14,8 @@ class OC(SSH):
     """
     # time out for all waits is 5000 sec
     TIME_OUT = 5000
+    # wait time out
+    SHORT_WAIT_TIME = 300
     # sleep time between checks is 5 sec
     SLEEP_TIME = 3
 
@@ -287,7 +289,7 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def wait_for_initialized(self, label: str, workload: str = '', status: str = 'Initialized', label_uuid: bool = True, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = TIME_OUT):
+    def wait_for_initialized(self, label: str, workload: str = '', status: str = 'Initialized', label_uuid: bool = True, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = SHORT_WAIT_TIME):
         """
         This method wait to pod to be initialized
         :param namespace:
@@ -315,7 +317,7 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def wait_for_ready(self, label: str, workload: str = '', status: str = 'ready', label_uuid: bool = True, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = TIME_OUT):
+    def wait_for_ready(self, label: str, workload: str = '', status: str = 'ready', label_uuid: bool = True, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = SHORT_WAIT_TIME):
         """
         This method wait to pod to be ready
         :param workload:
