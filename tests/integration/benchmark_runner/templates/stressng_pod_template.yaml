@@ -26,8 +26,8 @@ spec:
       pin: true # enable for nodeSelector
       pin_node: "{{ pin_node1 }}"
       resources: true # enable for resources requests/limits
-      requests_cpu: 200m
-      requests_memory: 100Mi
+      requests_cpu: 10m
+      requests_memory: 10Mi
       limits_cpu: 4
       limits_memory: 16Gi
       # cpu stressor options
