@@ -47,7 +47,7 @@ RUN git clone https://github.com/cloud-bulldozer/benchmark-operator
 RUN sed -i -e 's/2.0/0.0/g' /benchmark-operator/config/manager/manager.yaml
 
 # Add main
-ADD benchmark_runner/benchmark_operator/templates /benchmark_runner/templates/
+ADD benchmark_runner/benchmark_operator/templates /benchmark_runner/templates
 COPY benchmark_runner/main/main.py /benchmark_runner/main/main.py
 
 CMD [ "python3.9", "/benchmark_runner/main/main.py"]
