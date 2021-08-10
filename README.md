@@ -63,8 +63,10 @@ Choose one from the following list:
 podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:latest
 
 # For custom workload data configuration add:
--v /home/user/stressng/stressng_data.yaml:/benchmark_runner/benchmark_operator/template/stressng/stressng_data.yaml
+-v /home/user/templates:/benchmark_runner/templates
 ```
+** Important: Template folder hierachy should be the same as [Templates](benchmark_runner/benchmark_operator/templates)
+
 ![](media/demo.gif)
 
 ## Run workload in Pod using Kubernetes or OpenShift

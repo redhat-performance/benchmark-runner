@@ -12,7 +12,11 @@ shared_data:
   pair: 1
   test_type: stream
   proto: tcp
-  size: 16384
+  size1: 64
+  size2: 256
+  size3: 1024
+  size4: 4096
+  size5: 16384
   nthr: 1
   runtime: 60
   # enable/disable system metrics

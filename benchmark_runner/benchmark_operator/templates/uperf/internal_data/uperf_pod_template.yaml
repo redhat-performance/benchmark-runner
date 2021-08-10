@@ -49,7 +49,11 @@ spec:
       protos:
         - {{ proto }}
       sizes:
-        - {{ size }}
+        - {{ size1 }}
+        - {{ size2 }}
+        - {{ size3 }}
+        - {{ size4 }}
+        - {{ size5 }}
       nthrs:
         - {{ nthr }}
       runtime: {{ runtime }}
