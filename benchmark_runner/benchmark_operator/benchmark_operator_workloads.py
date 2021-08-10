@@ -23,11 +23,11 @@ class BenchmarkOperatorWorkloads:
         self.__ssh = SSH()
         self.__kubeadmin_password = kubeadmin_password
         self.__oc = OC(kubeadmin_password=self.__kubeadmin_password)
-        # if mount is exist - path inside Dockerfile
-        # if os.path.exists('/benchmark_runner/benchmark_operator/templates/'):
-        #     self.__dir_path = '/benchmark_runner/benchmark_operator/templates/'
-        # else:
-        self.__dir_path = os.path.dirname(os.path.realpath(__file__))
+        #  if mount is exist - path inside Dockerfile
+        if os.path.exists('/benchmark_runner/templates/'):
+            self.__dir_path = '/benchmark_runner/templates/'
+        else:
+            self.__dir_path = os.path.dirname(os.path.realpath(__file__))
         self.__current_run_path = f'{self.__dir_path}/templates/current_run'
         self.__es_host = es_host
         self.__es_port = es_port

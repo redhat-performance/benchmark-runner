@@ -12,13 +12,14 @@ class TemplateOperations:
     """This class is responsible for template operations"""
 
     def __init__(self, storage_type: str = ''):
-        # if mount is exist - path inside Dockerfile
-        # if os.path.exists('/benchmark_runner/benchmark_operator/templates/'):
-        #     self.__dir_path = '/benchmark_runner/benchmark_operator/templates/'
-        # else:
-        self.__dir_path = os.path.dirname(os.path.realpath(__file__))
+        #  if mount is exist - path inside Dockerfile
+        if os.path.exists('/benchmark_runner/templates/'):
+            self.__dir_path = '/benchmark_runner/templates/'
+        else:
+            self.__dir_path = os.path.dirname(os.path.realpath(__file__))
         self.__current_run_path = f'{self.__dir_path}/current_run'
         self.__hammerdb_dir_path = os.path.join(self.__dir_path, 'hammerdb')
+        self.__hammerdb__internal_dir_path = os.path.join(self.__dir_path, 'hammerdb', 'internal_data')
         # environment variables
         self.__environment_variables_dict = environment_variables.environment_variables_dict
         # hammerdb storage
@@ -32,7 +33,7 @@ class TemplateOperations:
         This method return yaml names in benchmark_operator folder
         :return:
         """
-        for file in os.listdir(os.path.join(self.__dir_path, workload.split('_')[0])):
+        for file in os.listdir(os.path.join(self.__dir_path, workload.split('_')[0], 'internal_data')):
             if file.endswith(extension):
                 if workload and workload in file and skip not in file:
                     return os.path.splitext(file)[0]
@@ -44,14 +45,14 @@ class TemplateOperations:
         special generator for 2 yaml file: database and workload
         :return:
         """
-        # replace environment variables
+        # replace environment variables and generate hammerdb_data.yaml
         update_environment_variable(dir_path=self.__hammerdb_dir_path, yaml_file='hammerdb_data_template.yaml')
         # handle database pod yaml
         if 'pod' in workload:
             # replace environment variables
-            update_environment_variable(dir_path=self.__hammerdb_dir_path, yaml_file=f'{database}_{self.__storage_type}_template.yaml')
-            shutil.move(os.path.join(self.__hammerdb_dir_path, f'{database}_{self.__storage_type}.yaml'), os.path.join(self.__current_run_path, f'{database}.yaml'))
-            delete_generate_file(full_path_yaml=os.path.join(self.__hammerdb_dir_path, f'{database}.yaml'))
+            update_environment_variable(dir_path=self.__hammerdb__internal_dir_path, yaml_file=f'{database}_{self.__storage_type}_template.yaml')
+            shutil.move(os.path.join(self.__hammerdb__internal_dir_path, f'{database}_{self.__storage_type}.yaml'), os.path.join(self.__current_run_path, f'{database}.yaml'))
+            delete_generate_file(full_path_yaml=os.path.join(self.__hammerdb__internal_dir_path, f'{database}.yaml'))
         # Get hammerdb data
         with open(os.path.join(self.__hammerdb_dir_path, 'hammerdb_data.yaml'), 'r') as file:
             hammerdb_data = yaml.load(file, Loader=yaml.FullLoader)
@@ -60,8 +61,8 @@ class TemplateOperations:
         shared_data_vm = hammerdb_data['vm']
         database_data = hammerdb_data[database]
 
-        hammerdb_template = self.__get_yaml_template_by_workload(workload=workload, skip='data')
-        with open(os.path.join(self.__hammerdb_dir_path, f'{hammerdb_template}.yaml')) as f:
+        hammerdb_template = self.__get_yaml_template_by_workload(workload=workload)
+        with open(os.path.join(self.__hammerdb_dir_path, 'internal_data', f'{hammerdb_template}.yaml')) as f:
             template_str = f.read()
         tm = Template(template_str)
         # merge 3 dictionaries
@@ -98,7 +99,7 @@ class TemplateOperations:
         shared_data_vm = workload_data['vm']
 
         workload_template = self.__get_yaml_template_by_workload(workload=workload)
-        template_file_path = os.path.join(f'{workload_dir_path}', f'{workload_template}.yaml')
+        template_file_path = os.path.join(f'{workload_dir_path}', 'internal_data', f'{workload_template}.yaml')
         with open(template_file_path) as f:
             template_str = f.read()
         tm = Template(template_str)

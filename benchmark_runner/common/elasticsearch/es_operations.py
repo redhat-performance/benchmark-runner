@@ -108,7 +108,6 @@ class ESOperations:
             if current_hits < new_hits:
                 logger.info(f'Data with index: {index} and uuid={uuid} was uploaded to ElasticSearch successfully')
                 return True
-
             # sleep for x seconds
             time.sleep(sleep_time)
             current_wait_time += sleep_time
