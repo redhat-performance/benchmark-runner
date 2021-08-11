@@ -10,8 +10,8 @@ def __get_test_environment_variable():
     # hard coded parameters
     test_environment_variable['namespace'] = os.environ.get('NAMESPACE', 'benchmark-operator')
     # run Hammerdb workload with ocs pvc
-    test_environment_variable['ocs_pvc'] = os.environ.get('OCS_PVC', 'true')
-    test_environment_variable['system_metrics'] = os.environ.get('SYSTEM_METRICS', 'true')
+    test_environment_variable['ocs_pvc'] = os.environ.get('OCS_PVC', 'True')
+    test_environment_variable['system_metrics'] = os.environ.get('SYSTEM_METRICS', 'True')
 
     # This path is for benchmark-operator path
     test_environment_variable['runner_path'] = os.environ.get('RUNNER_PATH', '/')

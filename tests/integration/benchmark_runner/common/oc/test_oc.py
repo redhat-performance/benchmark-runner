@@ -255,14 +255,17 @@ def test_vm_create_initialized_ready_completed_system_metrics_deleted():
     assert oc.wait_for_ready(label='app=stressng_workload', workload=workload)
     assert oc.wait_for_vm_completed(workload=workload)
     # system-metrics
-    assert oc.wait_for_pod_create(pod_name='system-metrics-collector')
-    assert oc.wait_for_initialized(label='app=system-metrics-collector', workload=workload)
-    assert oc.wait_for_pod_completed(label='app=system-metrics-collector', workload=workload)
+    if test_environment_variable['system_metrics'] == 'True':
+        es = ESOperations(es_host=test_environment_variable['elasticsearch'],
+                          es_port=test_environment_variable['elasticsearch_port'])
+        assert oc.wait_for_pod_create(pod_name='system-metrics-collector')
+        assert oc.wait_for_initialized(label='app=system-metrics-collector', workload=workload)
+        assert oc.wait_for_pod_completed(label='app=system-metrics-collector', workload=workload)
+        assert es.verify_es_data_uploaded(index='system-metrics-test', uuid=oc.get_long_uuid(workload=workload))
     if test_environment_variable['elasticsearch']:
         es = ESOperations(es_host=test_environment_variable['elasticsearch'],
                            es_port=test_environment_variable['elasticsearch_port'])
         assert es.verify_es_data_uploaded(index='stressng-vm-test-results', uuid=oc.get_long_uuid(workload=workload))
-        assert es.verify_es_data_uploaded(index='system-metrics-test', uuid=oc.get_long_uuid(workload=workload))
     else:
         print('There is no elastic search to verify VM completed status')
     assert oc.delete_vm_sync(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'),

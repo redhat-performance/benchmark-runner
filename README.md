@@ -45,7 +45,9 @@ Choose one from the following list:
 
 **auto:** NAMESPACE=benchmark-operator [ The default namespace is benchmark-operator ]
 
-**auto:** OCS_PVC=true [ The default is used OCS PVC ]
+**auto:** OCS_PVC=True [ True=OCS PVC storage, False=Ephemeral storage, default True ]
+
+**auto:** SYSTEM_METRICS=True [ True=collect metric, False=not collect metrics, default True ]
 
 **auto:** RUNNER_PATH=/ [ The default work space is / ]
 
@@ -58,6 +60,8 @@ Choose one from the following list:
 **optional:** ELASTICSEARCH=$ELASTICSEARCH [ elasticsearch service name]
 
 **optional:** ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT
+
+**optional:** PROM_TOKEN=PROM_TOKEN [prometheus token: related for system_metrics: $ oc -n openshift-monitoring sa get-token prometheus-k8s ]
 
 ```sh
 podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:latest

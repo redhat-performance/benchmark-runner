@@ -242,7 +242,7 @@ class BenchmarkOperatorWorkloads:
             self.__oc.wait_for_ready(label='app=stressng_workload', workload=workload)
             self.__oc.wait_for_pod_completed(label='app=stressng_workload', workload=workload)
             # system metrics
-            if environment_variables.environment_variables_dict['system_metrics']:
+            if environment_variables.environment_variables_dict['system_metrics'] == 'True':
                 self.system_metrics_collector(workload=workload)
             if self.__es_host:
                 # verify that data upload to elastic search according to unique uuid
@@ -272,7 +272,7 @@ class BenchmarkOperatorWorkloads:
             self.__oc.wait_for_ready(label='app=stressng_workload', workload=workload)
             self.__oc.wait_for_vm_completed(workload=workload)
             # system metrics
-            if environment_variables.environment_variables_dict['system_metrics']:
+            if environment_variables.environment_variables_dict['system_metrics'] == 'True':
                self.system_metrics_collector(workload=workload)
             # verify that data upload to elastic search
             if self.__es_host:
@@ -311,7 +311,7 @@ class BenchmarkOperatorWorkloads:
             self.__oc.wait_for_ready(label='app=uperf-bench-client', workload=workload)
             self.__oc.wait_for_pod_completed(label='app=uperf-bench-client', workload=workload)
             # system metrics
-            if environment_variables.environment_variables_dict['system_metrics']:
+            if environment_variables.environment_variables_dict['system_metrics'] == 'True':
                 self.system_metrics_collector(workload=workload)
             if self.__es_host:
                 # verify that data upload to elastic search
@@ -345,7 +345,7 @@ class BenchmarkOperatorWorkloads:
             self.__oc.wait_for_ready(label='app=uperf-bench-client', workload=workload)
             self.__oc.wait_for_vm_completed(workload=workload)
             # system metrics
-            if environment_variables.environment_variables_dict['system_metrics']:
+            if environment_variables.environment_variables_dict['system_metrics'] == 'True':
                 self.system_metrics_collector(workload=workload)
             # verify that data upload to elastic search
             if self.__es_host:
@@ -385,7 +385,7 @@ class BenchmarkOperatorWorkloads:
             self.__oc.wait_for_ready(label='app=hammerdb_workload', workload=workload)
             self.__oc.wait_for_pod_completed(label='app=hammerdb_workload', workload=workload)
             # system metrics
-            if environment_variables.environment_variables_dict['system_metrics']:
+            if environment_variables.environment_variables_dict['system_metrics'] == 'True':
                 self.system_metrics_collector(workload=workload)
             if self.__es_host:
                 # verify that data upload to elastic search
@@ -431,7 +431,7 @@ class BenchmarkOperatorWorkloads:
             self.__oc.wait_for_ready(label='app=hammerdb_workload', workload=workload)
             self.__oc.wait_for_vm_completed(workload=workload)
             # system metrics
-            if environment_variables.environment_variables_dict['system_metrics']:
+            if environment_variables.environment_variables_dict['system_metrics'] == 'True':
                 self.system_metrics_collector(workload=workload)
             # verify that data upload to elastic search
             if self.__es_host:
