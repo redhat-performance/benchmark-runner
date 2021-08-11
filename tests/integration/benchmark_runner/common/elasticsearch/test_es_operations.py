@@ -77,15 +77,18 @@ def test_verify_es_data_uploaded_stressng_pod():
         oc.wait_for_ready(label='app=stressng_workload', workload=workload)
         oc.wait_for_pod_completed(label='app=stressng_workload', workload=workload)
         # system-metrics
-        assert oc.wait_for_pod_create(pod_name='system-metrics-collector')
-        assert oc.wait_for_initialized(label='app=system-metrics-collector', workload=workload)
-        assert oc.wait_for_pod_completed(label='app=system-metrics-collector', workload=workload)
+        if test_environment_variable['system_metrics'] == 'True':
+            es = ESOperations(es_host=test_environment_variable['elasticsearch'],
+                              es_port=test_environment_variable['elasticsearch_port'])
+            assert oc.wait_for_pod_create(pod_name='system-metrics-collector')
+            assert oc.wait_for_initialized(label='app=system-metrics-collector', workload=workload)
+            assert oc.wait_for_pod_completed(label='app=system-metrics-collector', workload=workload)
+            assert es.verify_es_data_uploaded(index='system-metrics-test', uuid=oc.get_long_uuid(workload=workload))
         if test_environment_variable['elasticsearch']:
             # verify that data upload to elastic search
             es = ESOperations(es_host=test_environment_variable['elasticsearch'],
                               es_port=test_environment_variable['elasticsearch_port'])
             assert es.verify_es_data_uploaded(index='stressng-pod-test-results', uuid=oc.get_long_uuid(workload=workload))
-            assert es.verify_es_data_uploaded(index='system-metrics-test', uuid=oc.get_long_uuid(workload=workload))
     except ElasticSearchDataNotUploaded as err:
         raise err
     except Exception as err:
