@@ -191,12 +191,12 @@ def test_wait_for_pod_create_initialized_ready_completed_system_metrics_deleted(
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
     assert oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_pod.yaml'), pod_name='stressng-pod-workload')
-    assert oc.wait_for_initialized(label='app=stressng_workload', workload=workload)
-    assert oc.wait_for_ready(label='app=stressng_workload', workload=workload)
+    #assert oc.wait_for_initialized(label='app=stressng_workload', workload=workload)
+    #assert oc.wait_for_ready(label='app=stressng_workload', workload=workload)
     assert oc.wait_for_pod_completed(label='app=stressng_workload', workload=workload)
     # system-metrics
     assert oc.wait_for_pod_create(pod_name='system-metrics-collector')
-    assert oc.wait_for_initialized(label='app=system-metrics-collector', workload=workload)
+    #assert oc.wait_for_initialized(label='app=system-metrics-collector', workload=workload)
     assert oc.wait_for_pod_completed(label='app=system-metrics-collector', workload=workload)
     assert oc.delete_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_pod.yaml'), pod_name='stressng-pod-workload')
 
@@ -251,15 +251,15 @@ def test_vm_create_initialized_ready_completed_system_metrics_deleted():
     oc.login()
     assert oc.create_vm_sync(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'), vm_name='stressng-vm-workload')
     assert oc.get_vmi()
-    assert oc.wait_for_initialized(label='app=stressng_workload', workload=workload)
-    assert oc.wait_for_ready(label='app=stressng_workload', workload=workload)
+    #assert oc.wait_for_initialized(label='app=stressng_workload', workload=workload)
+    #assert oc.wait_for_ready(label='app=stressng_workload', workload=workload)
     assert oc.wait_for_vm_completed(workload=workload)
     # system-metrics
     if test_environment_variable['system_metrics'] == 'True':
         es = ESOperations(es_host=test_environment_variable['elasticsearch'],
                           es_port=test_environment_variable['elasticsearch_port'])
         assert oc.wait_for_pod_create(pod_name='system-metrics-collector')
-        assert oc.wait_for_initialized(label='app=system-metrics-collector', workload=workload)
+        #assert oc.wait_for_initialized(label='app=system-metrics-collector', workload=workload)
         assert oc.wait_for_pod_completed(label='app=system-metrics-collector', workload=workload)
         assert es.verify_es_data_uploaded(index='system-metrics-test', uuid=oc.get_long_uuid(workload=workload))
     if test_environment_variable['elasticsearch']:
