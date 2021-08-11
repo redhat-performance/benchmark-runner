@@ -87,6 +87,7 @@ jobs:
         # run pytest
         pytest --cov=benchmark_runner --cov-report=term-missing
         coverage run -m pytest
+        sleep 60
         coverage report -m
     - name: 🎥 Publish to coveralls.io
       env:

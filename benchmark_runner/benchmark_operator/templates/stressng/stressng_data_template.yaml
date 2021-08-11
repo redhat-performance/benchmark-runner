@@ -19,8 +19,8 @@ shared_data:
   prom_url: https://prometheus-k8s.openshift-monitoring.svc.cluster.local:9091
   prom_token: {{ prom_token }}
   sm_index_name: system-metrics
-  #metrics_profile: node-metrics.yml
-  metrics_profile: https://raw.githubusercontent.com/cloud-bulldozer/benchmark-operator/master/roles/kube-burner/files/metrics.yaml
+  metrics_profile: node-metrics.yml
+  #metrics_profile: https://raw.githubusercontent.com/cloud-bulldozer/benchmark-operator/master/roles/kube-burner/files/metrics.yaml
 pod:
   index_name_pod: stressng-pod
   es_kind: pod
