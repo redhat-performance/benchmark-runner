@@ -389,7 +389,7 @@ class BenchmarkOperatorWorkloads:
                 self.system_metrics_collector(workload=workload)
             if self.__es_host:
                 # verify that data upload to elastic search
-                self.__es_operations.verify_es_data_uploaded(index=f'{workload}-results', uuid=self.__oc.get_long_uuid(workload=workload))
+                self.__es_operations.verify_es_data_uploaded(index=f'hammerdb-results', uuid=self.__oc.get_long_uuid(workload=workload))
             # delete hammerdb
             self.__oc.delete_pod_sync(
                 yaml=os.path.join(f'{self.__current_run_path}', f'{self.hammerdb_pod.__name__}_{database}.yaml'),
@@ -435,7 +435,7 @@ class BenchmarkOperatorWorkloads:
                 self.system_metrics_collector(workload=workload)
             # verify that data upload to elastic search
             if self.__es_host:
-                self.__es_operations.verify_es_data_uploaded(index=f'{workload}-results', uuid=self.__oc.get_long_uuid(workload=workload))
+                self.__es_operations.verify_es_data_uploaded(index=f'hammerdb-results', uuid=self.__oc.get_long_uuid(workload=workload))
             self.__oc.delete_vm_sync(
                 yaml=os.path.join(f'{self.__current_run_path}', f'{self.hammerdb_vm.__name__}_{database}.yaml'),
                 vm_name=f'{workload}-workload')
