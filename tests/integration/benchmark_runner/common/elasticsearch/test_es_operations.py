@@ -43,10 +43,6 @@ def before_after_all_tests_fixture():
                                                     es_port=test_environment_variable['elasticsearch_port'])
     benchmark_operator.make_undeploy_benchmark_controller_manager_if_exist(runner_path=test_environment_variable['runner_path'])
     benchmark_operator.make_deploy_benchmark_controller_manager(runner_path=test_environment_variable['runner_path'])
-    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
-    # set prom token
-    test_environment_variable['prom_token'] = oc.get_prom_token()
     yield
     print('Delete benchmark-operator pod')
     benchmark_operator.make_undeploy_benchmark_controller_manager(runner_path=test_environment_variable['runner_path'])
@@ -76,15 +72,15 @@ def test_verify_es_data_uploaded_stressng_pod():
     try:
         workload = 'stressng-pod'
         oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_pod.yaml'), pod_name=f'{workload}-workload')
-        #oc.wait_for_initialized(label='app=stressng_workload', workload=workload)
-        #oc.wait_for_ready(label='app=stressng_workload', workload=workload)
+        oc.wait_for_initialized(label='app=stressng_workload', workload=workload)
+        oc.wait_for_ready(label='app=stressng_workload', workload=workload)
         oc.wait_for_pod_completed(label='app=stressng_workload', workload=workload)
         # system-metrics
         if test_environment_variable['system_metrics'] == 'True':
             es = ESOperations(es_host=test_environment_variable['elasticsearch'],
                               es_port=test_environment_variable['elasticsearch_port'])
             assert oc.wait_for_pod_create(pod_name='system-metrics-collector')
-            #assert oc.wait_for_initialized(label='app=system-metrics-collector', workload=workload)
+            assert oc.wait_for_initialized(label='app=system-metrics-collector', workload=workload)
             assert oc.wait_for_pod_completed(label='app=system-metrics-collector', workload=workload)
             assert es.verify_es_data_uploaded(index='system-metrics-test', uuid=oc.get_long_uuid(workload=workload))
         if test_environment_variable['elasticsearch']:

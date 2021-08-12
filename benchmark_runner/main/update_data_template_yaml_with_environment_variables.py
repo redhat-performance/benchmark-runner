@@ -2,6 +2,7 @@
 import os
 from jinja2 import Template
 from benchmark_runner.main.environment_variables import environment_variables
+from benchmark_runner.common.oc.oc import OC
 
 
 def update_environment_variable(dir_path: str, yaml_file: str, environment_variable_dict: dict = None):
@@ -14,7 +15,9 @@ def update_environment_variable(dir_path: str, yaml_file: str, environment_varia
     """
     if not environment_variable_dict:
         environment_variable_dict = environment_variables.environment_variables_dict
-
+    oc = OC(kubeadmin_password=environment_variable_dict.get('kubeadmin_password', ''))
+    # set prom token
+    environment_variable_dict['prom_token'] = oc.get_prom_token()
     with open(os.path.join(dir_path, yaml_file)) as f:
         template_str = f.read()
     tm = Template(template_str)

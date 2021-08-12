@@ -117,7 +117,7 @@ class OC(SSH):
 
     def get_prom_token(self):
         """
-        This method return uuid
+        This method return prometheus token
         :return:
         """
         long_uuid = self.run(f"~/./oc -n openshift-monitoring sa get-token prometheus-k8s")
