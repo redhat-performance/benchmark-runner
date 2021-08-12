@@ -10,6 +10,7 @@ shared_data:
   transactions: 100000
   ocs_pvc: {{ ocs_pvc }}
   es_url: {{ elasticsearch_url }}
+  es_index_name: hammerdb
   # enable/disable system metrics
   system_metrics: {{ system_metrics }}
   prom_url: https://prometheus-k8s.openshift-monitoring.svc.cluster.local:9091
@@ -42,13 +43,11 @@ postgres:
   db_server_pod: postgres-deployment.postgres-db
   es_db_version: 10.0
 pod:
-  index_name_pod: hammerdb
   es_kind: pod
   resources: true
   limits_cpu: 4
   limits_memory_GB: 16
 vm:
-  index_name_vm: hammerdb
   cores: 4
   es_kind: vm
   limits_memory_GB: 16
