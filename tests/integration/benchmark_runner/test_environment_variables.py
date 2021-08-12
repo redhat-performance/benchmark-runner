@@ -24,9 +24,6 @@ def __get_test_environment_variable():
     test_environment_variable['elasticsearch'] = os.environ.get('ELASTICSEARCH', '')
     test_environment_variable['elasticsearch_port'] = os.environ.get('ELASTICSEARCH_PORT', '')
 
-    # Prometheus token: $ oc -n openshift-monitoring sa get-token prometheus-k8s
-    test_environment_variable['prom_token'] = os.environ.get('PROM_TOKEN', '')
-
     # Azure details
     test_environment_variable['azure_cluster_stop'] = os.environ.get('AZURE_CLUSTER_STOP', '')
     test_environment_variable['azure_cluster_start'] = os.environ.get('AZURE_CLUSTER_START', '')

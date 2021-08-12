@@ -62,6 +62,10 @@ def before_after_all_tests_fixture():
                                                     es_port=test_environment_variable['elasticsearch_port'])
     benchmark_operator.make_undeploy_benchmark_controller_manager_if_exist(runner_path=test_environment_variable['runner_path'])
     benchmark_operator.make_deploy_benchmark_controller_manager(runner_path=test_environment_variable['runner_path'])
+    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
+    oc.login()
+    # set prom token
+    test_environment_variable['prom_token'] = oc.get_prom_token()
     yield
     print('Delete benchmark-operator pod')
     benchmark_operator.make_undeploy_benchmark_controller_manager(runner_path=test_environment_variable['runner_path'])
@@ -180,6 +184,16 @@ def test_get_long_short_uuid():
     oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_pod.yaml'), pod_name='stressng-pod-workload')
     assert len(oc.get_long_uuid(workload='stressng-pod')) == 36
     assert len(oc._OC__get_short_uuid(workload='stressng-pod')) == 8
+
+
+def test_get_prom_token():
+    """
+    This method return prom token from cluster
+    :return:
+    """
+    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
+    oc.login()
+    assert oc.get_prom_token()
 
 
 def test_wait_for_pod_create_initialized_ready_completed_system_metrics_deleted():

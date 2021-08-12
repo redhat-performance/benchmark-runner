@@ -1,6 +1,5 @@
 
 import pytest
-import time
 
 from benchmark_runner.common.oc.oc import OC
 from benchmark_runner.common.elasticsearch.es_operations import ESOperations
@@ -44,6 +43,10 @@ def before_after_all_tests_fixture():
                                                     es_port=test_environment_variable['elasticsearch_port'])
     benchmark_operator.make_undeploy_benchmark_controller_manager_if_exist(runner_path=test_environment_variable['runner_path'])
     benchmark_operator.make_deploy_benchmark_controller_manager(runner_path=test_environment_variable['runner_path'])
+    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
+    oc.login()
+    # set prom token
+    test_environment_variable['prom_token'] = oc.get_prom_token()
     yield
     print('Delete benchmark-operator pod')
     benchmark_operator.make_undeploy_benchmark_controller_manager(runner_path=test_environment_variable['runner_path'])

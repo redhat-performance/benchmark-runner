@@ -1,7 +1,7 @@
 
 import os
 from jinja2 import Template
-from benchmark_runner.main.environment_variables import EnvironmentVariables
+from benchmark_runner.main.environment_variables import environment_variables
 
 
 def update_environment_variable(dir_path: str, yaml_file: str, environment_variable_dict: dict = None):
@@ -13,8 +13,7 @@ def update_environment_variable(dir_path: str, yaml_file: str, environment_varia
     :return:
     """
     if not environment_variable_dict:
-        environment_variable = EnvironmentVariables()
-        environment_variable_dict = environment_variable.environment_variables_dict
+        environment_variable_dict = environment_variables.environment_variables_dict
 
     with open(os.path.join(dir_path, yaml_file)) as f:
         template_str = f.read()

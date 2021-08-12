@@ -61,15 +61,13 @@ Choose one from the following list:
 
 **optional:** ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT
 
-**optional:** PROM_TOKEN=PROM_TOKEN [prometheus token: related for system_metrics: $ oc -n openshift-monitoring sa get-token prometheus-k8s ]
-
 ```sh
 podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:latest
 
 # For custom workload data configuration add:
 -v /home/user/templates:/benchmark_runner/templates
 ```
-** Important: Template folder hierachy should be the same as [Templates](benchmark_runner/benchmark_operator/templates)
+** Important: for custom workload template folder hierarchy should be on the same as [Templates](benchmark_runner/benchmark_operator/templates)
 
 ![](media/demo.gif)
 
