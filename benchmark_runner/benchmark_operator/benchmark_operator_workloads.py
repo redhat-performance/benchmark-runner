@@ -38,8 +38,6 @@ class BenchmarkOperatorWorkloads:
         self.__oc.login()
         # environment variables
         self.__environment_variables_dict = environment_variables.environment_variables_dict
-        # set prom token
-        self.__environment_variables_dict['prom_token'] = self.__oc.get_prom_token()
 
     def __remove_current_run_yamls(self, extension='.yaml'):
         """

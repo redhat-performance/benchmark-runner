@@ -16,13 +16,13 @@ class ESOperations:
     # time out for all waits is 5000 sec
     TIME_OUT = 5000
     # sleep time between checks is 30 sec
-    SLEEP_TIME = 30
+    SLEEP_TIME = 10
     # ElasticSearch fetch data of last 15 minutes
-    ES_FETCH_TIME = 15
+    ES_FETCH_MIN_TIME = 15
     # max search results
     MAX_SEARCH_RESULTS = 100
 
-    def __init__(self, es_host: str, es_port: str, es_fetch_last_x_minutes: int = ES_FETCH_TIME):
+    def __init__(self, es_host: str, es_port: str, es_fetch_last_x_minutes: int = ES_FETCH_MIN_TIME):
         self.__es_fetch_last_x_minutes = es_fetch_last_x_minutes  # MUST BE 15 MIN AT LEAST
         self.__es_host = es_host
         self.__es_port = es_port
