@@ -37,9 +37,6 @@ class EnvironmentVariables:
         self._environment_variables_dict['elasticsearch'] = os.environ.get('ELASTICSEARCH', '')
         self._environment_variables_dict['elasticsearch_port'] = os.environ.get('ELASTICSEARCH_PORT', '')
 
-        # Prometheus token: $ oc -n openshift-monitoring sa get-token prometheus-k8s
-        self._environment_variables_dict['prom_token'] = os.environ.get('PROM_TOKEN', '')
-
         # Azure details
         self._environment_variables_dict['azure_cluster_stop'] = os.environ.get('AZURE_CLUSTER_STOP', '')
         self._environment_variables_dict['azure_cluster_start'] = os.environ.get('AZURE_CLUSTER_START', '')

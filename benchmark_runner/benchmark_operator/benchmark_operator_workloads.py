@@ -11,7 +11,6 @@ from benchmark_runner.common.oc.oc_exceptions import VMNotCompletedTimeout
 from benchmark_runner.benchmark_operator.templates.generate_yaml_from_templates import TemplateOperations
 from benchmark_runner.common.elasticsearch.es_operations import ESOperations
 from benchmark_runner.common.ssh.ssh import SSH
-from benchmark_runner.benchmark_operator.benchmark_operator_exceptions import VMWorkloadNeedElasticSearch
 from benchmark_runner.main.environment_variables import environment_variables
 
 
@@ -39,6 +38,8 @@ class BenchmarkOperatorWorkloads:
         self.__oc.login()
         # environment variables
         self.__environment_variables_dict = environment_variables.environment_variables_dict
+        # set prom token
+        self.__environment_variables_dict['prom_token'] = self.__oc.get_prom_token()
 
     def __remove_current_run_yamls(self, extension='.yaml'):
         """

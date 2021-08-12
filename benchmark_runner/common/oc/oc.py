@@ -115,6 +115,14 @@ class OC(SSH):
         long_uuid = self.run(f"~/./oc -n {environment_variables.environment_variables_dict['namespace']} get benchmark/{workload} -o jsonpath={{.status.uuid}}")
         return long_uuid
 
+    def get_prom_token(self):
+        """
+        This method return uuid
+        :return:
+        """
+        long_uuid = self.run(f"~/./oc -n openshift-monitoring sa get-token prometheus-k8s")
+        return long_uuid
+
     @logger_time_stamp
     def login(self):
         """

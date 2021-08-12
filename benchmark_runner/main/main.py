@@ -1,6 +1,4 @@
 
-import time
-
 from benchmark_runner.main.environment_variables import *
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 from benchmark_runner.benchmark_operator.benchmark_operator_workloads import BenchmarkOperatorWorkloads

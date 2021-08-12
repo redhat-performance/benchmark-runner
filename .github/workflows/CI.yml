@@ -45,7 +45,6 @@ jobs:
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
         ELASTICSEARCH: ${{ secrets.ELASTICSEARCH }}
         ELASTICSEARCH_PORT: ${{ secrets.ELASTICSEARCH_PORT }}
-        PROM_TOKEN: ${{ secrets.PROM_TOKEN }}
         AZURE_CLIENTID: ${{ secrets.AZURE_CLIENTID }}
         AZURE_SECRET: ${{ secrets.AZURE_SECRET }}
         AZURE_TENANTID: ${{ secrets.AZURE_TENANTID }}
@@ -122,7 +121,6 @@ jobs:
         PIN_NODE2: ${{ secrets.PIN_NODE2 }}
         ELASTICSEARCH: ${{ secrets.ELASTICSEARCH }}
         ELASTICSEARCH_PORT: ${{ secrets. ELASTICSEARCH_PORT }}
-        PROM_TOKEN: ${{ secrets.PROM_TOKEN }}
         AZURE_CLIENTID: ${{ secrets.AZURE_CLIENTID }}
         AZURE_SECRET: ${{ secrets.AZURE_SECRET }}
         AZURE_TENANTID: ${{ secrets.AZURE_TENANTID }}
@@ -135,7 +133,7 @@ jobs:
         for WORKLOAD in "${WORKLOADS[@]}"
         do
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start E2E workload:' $WORKLOAD '>>>>>>>>>>>>>>>>>>>>>>>>>>'
-            podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e BUILD_VERSION=$BUILD_VERSION -e PROM_TOKEN=$PROM_TOKEN -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:v$BUILD_VERSION
+            podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e BUILD_VERSION=$BUILD_VERSION -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:v$BUILD_VERSION
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End E2E workload:' $WORKLOAD '>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
         done
         echo ">>>>>>> Stop Azure cluster after tests"
