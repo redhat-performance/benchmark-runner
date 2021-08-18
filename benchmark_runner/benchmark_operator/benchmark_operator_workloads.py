@@ -35,9 +35,11 @@ class BenchmarkOperatorWorkloads:
             self.__es_operations = ESOperations(es_host=self.__es_host, es_port=self.__es_port)
         # Generate templates class
         self.__template = TemplateOperations()
-        self.__oc.login()
         # environment variables
         self.__environment_variables_dict = environment_variables.environment_variables_dict
+        # Login when kubeadmin_password
+        if environment_variables.environment_variables_dict['kubeadmin_password']:
+            self.__oc.login()
 
     def __remove_current_run_yamls(self, extension='.yaml'):
         """
@@ -156,7 +158,7 @@ class BenchmarkOperatorWorkloads:
         os.chdir(os.path.join(runner_path, benchmark_operator_path))
         self.__ssh.run('/usr/local/bin/helm install benchmark-operator . -n benchmark-operator --create-namespace')
         self.__oc.wait_for_pod_create(pod_name='benchmark-operator')
-        self.__ssh.run('~/./oc adm policy -n benchmark-operator add-scc-to-user privileged -z benchmark-operator')
+        self.__ssh.run('oc adm policy -n benchmark-operator add-scc-to-user privileged -z benchmark-operator')
         os.chdir(current_dir)
 
     @logger_time_stamp

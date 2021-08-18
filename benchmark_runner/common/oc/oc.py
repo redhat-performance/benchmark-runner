@@ -41,7 +41,7 @@ class OC(SSH):
         :return:
         """
         if os.path.isfile(yaml):
-            return self.run(f'~/./oc create -f {yaml}')
+            return self.run(f'oc create -f {yaml}')
         else:
             raise YAMLNotExist(yaml)
 
@@ -53,7 +53,7 @@ class OC(SSH):
         :return:
         """
         if os.path.isfile(yaml):
-            return self.run(f'~/./oc delete -f {yaml}')
+            return self.run(f'oc delete -f {yaml}')
         else:
             raise YAMLNotExist(yaml)
 
@@ -66,7 +66,7 @@ class OC(SSH):
         :return:
         """
         try:
-            return self.run(f'~/./oc get -n {namespace} pods -o name | grep {pod_name}')
+            return self.run(f'oc get -n {namespace} pods -o name | grep {pod_name}')
         except Exception as err:
             raise PodNameNotExist(pod_name=pod_name)
 
@@ -77,7 +77,7 @@ class OC(SSH):
         :param namespace:
         :return:
         """
-        result = self.run(f'~/./oc get -n {namespace} pods -o name | grep {pod_name}')
+        result = self.run(f'oc get -n {namespace} pods -o name | grep {pod_name}')
         if pod_name in result:
             return True
         else:
@@ -90,7 +90,7 @@ class OC(SSH):
         :return:
         """
         try:
-            return self.run(f'~/./oc get -n {namespace} vmi -o name | grep {vm_name}', is_check=True)
+            return self.run(f'oc get -n {namespace} vmi -o name | grep {vm_name}', is_check=True)
         except Exception as err:
             raise VMNameNotExist(vm_name=vm_name)
 
@@ -100,7 +100,7 @@ class OC(SSH):
         This method return pod name if exist or empty string
         :return:
         """
-        result = self.run(f'~/./oc get -n {namespace} vmi -o name | grep {vm_name}')
+        result = self.run(f'oc get -n {namespace} vmi -o name | grep {vm_name}')
         if vm_name in result:
             return True
         else:
@@ -112,7 +112,7 @@ class OC(SSH):
         This method return uuid
         :return:
         """
-        long_uuid = self.run(f"~/./oc -n {environment_variables.environment_variables_dict['namespace']} get benchmark/{workload} -o jsonpath={{.status.uuid}}")
+        long_uuid = self.run(f"oc -n {environment_variables.environment_variables_dict['namespace']} get benchmark/{workload} -o jsonpath={{.status.uuid}}")
         return long_uuid
 
     def get_prom_token(self):
@@ -120,7 +120,7 @@ class OC(SSH):
         This method return prometheus token
         :return:
         """
-        long_uuid = self.run(f"~/./oc -n openshift-monitoring sa get-token prometheus-k8s")
+        long_uuid = self.run(f"oc -n openshift-monitoring sa get-token prometheus-k8s")
         return long_uuid
 
     @logger_time_stamp
@@ -132,7 +132,7 @@ class OC(SSH):
 
         try:
             if self.__kubeadmin_password:
-                return self.run(f'~/./oc login -u kubeadmin -p {self.__kubeadmin_password}', is_check=True)
+                return self.run(f'oc login -u kubeadmin -p {self.__kubeadmin_password}', is_check=True)
             else:
                 raise LoginFailed
         except Exception as err:
@@ -144,7 +144,7 @@ class OC(SSH):
         This method get pods
         :return:
         """
-        return self.run('~/./oc get pods', is_check=True)
+        return self.run('oc get pods', is_check=True)
 
     @logger_time_stamp
     def get_vmi(self):
@@ -152,7 +152,7 @@ class OC(SSH):
         This method get vmi
         :return:
         """
-        return self.run('~/./oc get vmi', is_check=True)
+        return self.run('oc get vmi', is_check=True)
 
     @typechecked
     @logger_time_stamp
@@ -311,10 +311,10 @@ class OC(SSH):
         try:
             if label_uuid:
                 result = self.run(
-                    f"~/./oc --namespace {namespace} wait --for=condition={status} pod -l {label}-{self.__get_short_uuid(workload=workload)} --timeout={timeout}s", is_check=True)
+                    f"oc --namespace {namespace} wait --for=condition={status} pod -l {label}-{self.__get_short_uuid(workload=workload)} --timeout={timeout}s", is_check=True)
             else:
                 return self.run(
-                    f"~/./oc --namespace {namespace} wait --for=condition={status} pod -l {label} --timeout={timeout}s", is_check=True)
+                    f"oc --namespace {namespace} wait --for=condition={status} pod -l {label} --timeout={timeout}s", is_check=True)
             if 'met' in result.decode("utf-8"):
                 return True
         except Exception as err:
@@ -339,10 +339,10 @@ class OC(SSH):
         try:
             if label_uuid:
                 result = self.run(
-                    f"~/./oc --namespace {namespace} wait --for=condition={status} pod -l {label}-{self.__get_short_uuid(workload=workload)} --timeout={timeout}s", is_check=True)
+                    f"oc --namespace {namespace} wait --for=condition={status} pod -l {label}-{self.__get_short_uuid(workload=workload)} --timeout={timeout}s", is_check=True)
             else:
                 result = self.run(
-                    f"~/./oc --namespace {namespace} wait --for=condition={status} pod -l {label} --timeout={timeout}s", is_check=True)
+                    f"oc --namespace {namespace} wait --for=condition={status} pod -l {label} --timeout={timeout}s", is_check=True)
             if 'met' in result.decode("utf-8"):
                 return True
         except Exception as err:
@@ -364,7 +364,7 @@ class OC(SSH):
         """
         try:
             result = self.run(
-                f"~/./oc --namespace {namespace} wait --for=condition=complete -l {label}-{self.__get_short_uuid(workload=workload)} jobs --timeout={timeout}s")
+                f"oc --namespace {namespace} wait --for=condition=complete -l {label}-{self.__get_short_uuid(workload=workload)} jobs --timeout={timeout}s")
             if 'met' in result:
                 return True
         except Exception as err:
@@ -382,7 +382,7 @@ class OC(SSH):
         """
         current_wait_time = 0
         while current_wait_time <= timeout:
-            if self.run(f"~/./oc --namespace {namespace} get benchmark {workload} -o jsonpath={{.status.complete}}") == 'true':
+            if self.run(f"oc --namespace {namespace} get benchmark {workload} -o jsonpath={{.status.complete}}") == 'true':
                     return True
             # sleep for x seconds
             time.sleep(sleep_time)
