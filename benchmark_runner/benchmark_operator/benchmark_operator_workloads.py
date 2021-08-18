@@ -131,7 +131,7 @@ class BenchmarkOperatorWorkloads:
         benchmark_operator_path = 'benchmark-operator'
         current_dir = os.getcwd()
         os.chdir(os.path.join(runner_path, benchmark_operator_path))
-        # @TODO delete this walk around for PR https://github.com/cloud-bulldozer/benchmark-operator/pull/647
+        # @TODO delete this walk around after fixing PR https://github.com/cloud-bulldozer/benchmark-operator/pull/647
         self.__ssh.run('make kustomize')
         self.__ssh.run('make undeploy')
         self.__oc.wait_for_pod_terminate(pod_name='benchmark-controller-manager')
