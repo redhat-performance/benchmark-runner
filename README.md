@@ -35,8 +35,6 @@ _**Table of Contents**_
 
 #### Environment variables description:
 
-**mandatory:** KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD
-
 **mandatory:** WORKLOAD=$WORKLOAD
 
 Choose one from the following list:
@@ -50,6 +48,8 @@ Choose one from the following list:
 **auto:** SYSTEM_METRICS=True [ True=collect metric, False=not collect metrics, default True ]
 
 **auto:** RUNNER_PATH=/ [ The default work space is / ]
+
+**optional:** KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD
 
 **optional:** PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR [node selector for benchmark operator pod]
 
