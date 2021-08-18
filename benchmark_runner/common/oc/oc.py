@@ -318,7 +318,7 @@ class OC(SSH):
             if 'met' in result.decode("utf-8"):
                 return True
         except Exception as err:
-            if 'pod' in workload:
+            if 'pod' in workload or 'db' in workload:
                 raise PodNotInitializedTimeout(workload=workload)
             else:
                 raise VMNotInitializedTimeout(workload=workload)
