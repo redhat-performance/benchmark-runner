@@ -35,7 +35,11 @@ class EnvironmentVariables:
 
         # default parameter - change only if needed
         # Parameters below related to 'run_workload()'
-        self._environment_variables_dict['workloads'] = ['stressng_pod', 'stressng_vm', 'uperf_pod', 'uperf_vm', 'hammerdb_pod_mariadb', 'hammerdb_vm_mariadb',  'hammerdb_pod_postgres', 'hammerdb_vm_postgres', 'hammerdb_pod_mssql', 'hammerdb_vm_mssql']
+        self._environment_variables_dict['workloads'] = ['stressng_pod', 'stressng_vm', 'stressng_kata',
+                                                         'uperf_pod', 'uperf_vm', 'uperf_kata',
+                                                         'hammerdb_pod_mariadb', 'hammerdb_vm_mariadb', 'hammerdb_kata_mariadb',
+                                                         'hammerdb_pod_postgres', 'hammerdb_vm_postgres', 'hammerdb_kata_postgres',
+                                                         'hammerdb_pod_mssql', 'hammerdb_vm_mssql', 'hammerdb_kata_mssql']
         self._environment_variables_dict['namespace'] = os.environ.get('NAMESPACE', 'benchmark-operator')
         # run Hammerdb workload with ocs pvc True/False. True=OCS, False=Ephemeral
         self._environment_variables_dict['ocs_pvc'] = os.environ.get('OCS_PVC', 'True')

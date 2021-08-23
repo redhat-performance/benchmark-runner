@@ -162,7 +162,7 @@ jobs:
         done
         build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
         build_version="$(cut -d'=' -f2 <<<"$build")"
-        declare -a workloads=('stressng_pod' 'stressng_vm' 'uperf_pod' 'uperf_vm' 'hammerdb_pod_mariadb' 'hammerdb_vm_mariadb' 'hammerdb_pod_postgres' 'hammerdb_vm_postgres' 'hammerdb_pod_mssql' 'hammerdb_vm_mssql')
+        declare -a workloads=('stressng_pod' 'stressng_kata' 'stressng_vm' 'uperf_pod' 'uperf_kata' 'uperf_vm' 'hammerdb_pod_mariadb' 'hammerdb_kata_mariadb' 'hammerdb_vm_mariadb' 'hammerdb_pod_postgres' 'hammerdb_kata_postgres' 'hammerdb_vm_postgres' 'hammerdb_pod_mssql' 'hammerdb_kata_mssql' 'hammerdb_vm_mssql')
         for workload in "${workloads[@]}"
         do
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>'

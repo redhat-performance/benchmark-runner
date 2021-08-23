@@ -34,6 +34,10 @@ spec:
     spec:
       nodeSelector:
         kubernetes.io/hostname: "{{ pin_node2 }}"
+      {% if kind == 'kata' -%}
+      runtimeClassName: kata
+      {% else %}
+      {%- endif -%}
       terminationGracePeriodSeconds: 10
       containers:
         - name: postgres
