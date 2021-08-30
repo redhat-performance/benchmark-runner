@@ -3,7 +3,7 @@ import time
 import pytest
 
 from benchmark_runner.common.oc.oc import OC
-from benchmark_runner.common.oc.oc_exceptions import PodNotCreateTimeout, PodTerminateTimeout, VMNotCreateTimeout, YAMLNotExist
+from benchmark_runner.common.oc.oc_exceptions import LoginFailed, PodNotCreateTimeout, PodTerminateTimeout, VMNotCreateTimeout, YAMLNotExist
 from benchmark_runner.common.elasticsearch.es_operations import ESOperations
 from benchmark_runner.main.update_data_template_yaml_with_environment_variables import delete_generate_file, update_environment_variable
 from benchmark_runner.benchmark_operator.benchmark_operator_workloads import BenchmarkOperatorWorkloads
@@ -89,9 +89,17 @@ def test_login():
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    # byte to string
-    result = oc.login().decode("utf-8")
-    assert 'Login successful' in result
+    assert oc.login()
+
+
+def test_bad_login():
+    """
+    This method tests that login fails with a guaranteed bad kubeadmin password
+    :return:
+    """
+    oc = OC(kubeadmin_password='BAD-PASSWORD')
+    with pytest.raises(LoginFailed) as err:
+        assert not oc.login()
 
 
 ###################################################### POD Tests ##################################################
@@ -134,7 +142,7 @@ def test_yaml_file_not_exist_error():
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
     with pytest.raises(YAMLNotExist) as err:
-        oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng1.yaml'), pod_name='stressng-pod-workload', timeout=0)
+        oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng1.yaml'), pod_name='stressng-pod-workload', timeout=-1)
 
 
 def test_create_sync_pod_timeout_error():
@@ -145,7 +153,7 @@ def test_create_sync_pod_timeout_error():
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
     with pytest.raises(PodNotCreateTimeout) as err:
-        oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_pod.yaml'), pod_name='stressng-pod-workload', timeout=0)
+        oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_pod.yaml'), pod_name='stressng-pod-workload', timeout=-1)
 
 
 def test_delete_sync_pod_timeout_error():
@@ -157,7 +165,7 @@ def test_delete_sync_pod_timeout_error():
     oc.login()
     oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_pod.yaml'), pod_name='stressng-pod-workload')
     with pytest.raises(PodTerminateTimeout) as err:
-        oc.delete_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_pod.yaml'), pod_name='stressng-pod-workload', timeout=0)
+        oc.delete_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_pod.yaml'), pod_name='stressng-pod-workload', timeout=-1)
 
 
 def test_get_long_short_uuid():
@@ -212,7 +220,7 @@ def test_create_sync_vm_timeout_error():
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
     with pytest.raises(VMNotCreateTimeout) as err:
-        oc.create_vm_sync(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'), vm_name='stressng-vm-workload', timeout=0)
+        oc.create_vm_sync(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'), vm_name='stressng-vm-workload', timeout=-1)
 
 
 def test_oc_get_vmi_name_and_is_vmi_exist():

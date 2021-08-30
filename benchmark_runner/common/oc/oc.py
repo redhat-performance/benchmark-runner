@@ -167,12 +167,11 @@ class OC(SSH):
         """
 
         try:
-            if self.__kubeadmin_password:
-                return self.run(f'oc login -u kubeadmin -p {self.__kubeadmin_password}', is_check=True)
-            else:
-                raise LoginFailed
+            if self.__kubeadmin_password and self.__kubeadmin_password != '':
+                self.run(f'oc login -u kubeadmin -p {self.__kubeadmin_password}', is_check=True)
         except Exception as err:
             raise LoginFailed
+        return True
 
     @logger_time_stamp
     def get_pods(self):
