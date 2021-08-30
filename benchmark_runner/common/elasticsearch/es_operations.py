@@ -20,7 +20,7 @@ class ESOperations:
     # ElasticSearch fetch data of last 15 minutes
     ES_FETCH_MIN_TIME = 15
     # max search results
-    MAX_SEARCH_RESULTS = 100
+    MAX_SEARCH_RESULTS = 1000
 
     def __init__(self, es_host: str, es_port: str, es_fetch_last_x_minutes: int = ES_FETCH_MIN_TIME):
         self.__es_fetch_last_x_minutes = es_fetch_last_x_minutes  # MUST BE 15 MIN AT LEAST
