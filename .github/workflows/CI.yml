@@ -61,7 +61,7 @@ jobs:
             podman run --rm -e AZURE_CLUSTER_START=true -e AZURE_CLIENTID=$AZURE_CLIENTID -e AZURE_SECRET=$AZURE_SECRET -e AZURE_TENANTID=$AZURE_TENANTID -e AZURE_SUBSCRIPTIONID=$AZURE_SUBSCRIPTIONID -e AZURE_RESOURCE_GROUP_NAME=$AZURE_RESOURCE_GROUP_NAME -e AZURE_VM_NAME=$AZURE_VM_NAME -e log_level=INFO quay.io/ebattat/benchmark-runner:latest
             sleep 60
         done
-
+        sleep 300
         # Install Dockerfile content for pytest
         # install oc/kubctl
         oc_version=4.7.0-0.okd-2021-05-22-050008
