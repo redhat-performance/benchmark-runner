@@ -1,9 +1,10 @@
 
-import ast  # convert str list to list
+import pytest
 from benchmark_runner.common.clouds.Azure.azure_operations import AzureOperations
 from tests.integration.benchmark_runner.test_environment_variables import *
 
 
+@pytest.mark.skip(reason="no Azure env for testing this")
 def test_get_vm_status():
     """
     This method test fetch vm status from Azure cluster
