@@ -1,6 +1,7 @@
 shared_data:
   namespace: {{ namespace }}
   es_url: {{ elasticsearch_url }}
+  es_index_name: uperf
   pin: {{ pin }}
   pin_server: {{ pin_node1 }}
   pin_client: {{ pin_node2 }}
@@ -27,14 +28,12 @@ shared_data:
   metrics_profile: node-metrics.yml
   #metrics_profile: https://raw.githubusercontent.com/cloud-bulldozer/benchmark-operator/master/roles/kube-burner/files/metrics.yaml
 pod:
-  index_name_pod: uperf-pod
   es_kind: pod
   client_limits_cpu: 4
   client_limits_memory_GB: 16
   server_limits_cpu: 4
   server_limits_memory_GB: 16
 vm:
-  index_name_vm: uperf-vm
   es_kind: vm
   server_cores: 4
   server_limits_memory_GB: 16

@@ -13,7 +13,7 @@ spec:
     index_name: {{ sm_index_name }}
   elasticsearch:
     url: "{{ es_url }}"
-    index_name: {{ index_name_pod }}
+    index_name: {{ es_index_name }}
   metadata:
     collection: true
   cleanup: false
