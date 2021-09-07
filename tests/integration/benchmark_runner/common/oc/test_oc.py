@@ -80,6 +80,7 @@ def before_after_each_test_fixture():
     # After all tests
     __delete_pod_yamls()
     __delete_vm_yamls()
+    time.sleep(3)
     print('Test End')
 
 
