@@ -2,6 +2,7 @@ shared_data:
   namespace: {{ namespace }}
   pin_node: {{ pin_node1 }}
   es_url: {{ elasticsearch_url }}
+  es_index_name: stressng
   pin: {{ pin }}
   runtype: parallel
   timeout: 30
@@ -22,7 +23,6 @@ shared_data:
   metrics_profile: node-metrics.yml
   #metrics_profile: https://raw.githubusercontent.com/cloud-bulldozer/benchmark-operator/master/roles/kube-burner/files/metrics.yaml
 pod:
-  index_name_pod: stressng-pod
   es_kind: pod
   resources: true
   limits_cpu: 4
@@ -30,7 +30,6 @@ pod:
   requests_cpu: 10m
   requests_memory: 10Mi
 vm:
-  index_name_vm: stressng-vm
   es_kind: vm
   cores: 4
   limits_memory_GB: 16
