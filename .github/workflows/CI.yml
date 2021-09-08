@@ -98,8 +98,7 @@ jobs:
         ELASTICSEARCH_PORT: ${{ secrets. ELASTICSEARCH_PORT }}
       run: |
         BUILD_VERSION=$(python3 setup.py --version)
-        # 'uperf_vm' - failed
-        declare -a WORKLOADS=('stressng_pod' 'stressng_vm' 'uperf_pod' 'hammerdb_pod_mariadb' 'hammerdb_vm_mariadb' 'hammerdb_pod_postgres' 'hammerdb_vm_postgres' 'hammerdb_pod_mssql' 'hammerdb_vm_mssql')
+        declare -a WORKLOADS=('stressng_pod' 'stressng_vm' 'uperf_pod' 'uperf_vm' 'hammerdb_pod_mariadb' 'hammerdb_vm_mariadb' 'hammerdb_pod_postgres' 'hammerdb_vm_postgres' 'hammerdb_pod_mssql' 'hammerdb_vm_mssql')
         for WORKLOAD in "${WORKLOADS[@]}"
         do
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start E2E workload:' $WORKLOAD '>>>>>>>>>>>>>>>>>>>>>>>>>>'
