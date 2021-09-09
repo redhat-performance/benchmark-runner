@@ -47,7 +47,7 @@ jobs:
         ELASTICSEARCH_PORT: ${{ secrets.ELASTICSEARCH_PORT_CI }}
       run: |
         # update hosts ci file
-        echo secrets.HOSTS_CI >> /etc/hosts
+        sudo echo secrets.HOSTS_CI >> /etc/hosts
 
         # Install Dockerfile content for pytest
         # install oc/kubctl
