@@ -35,17 +35,20 @@ jobs:
     - uses: azure/k8s-set-context@v1
       with:
         method: kubeconfig
-        kubeconfig: ${{ secrets.KUBECONFIG }} # Use secret (https://developer.github.com/actions/managing-workflows/storing-secrets/)
+        kubeconfig: ${{ secrets.KUBECONFIG_CI }} # Use secret (https://developer.github.com/actions/managing-workflows/storing-secrets/)
       id: setcontext
     - name: 📃 Test with pytest
       env:
-        KUBEADMIN_PASSWORD: ${{ secrets.KUBEADMIN_PASSWORD }}
-        PIN_NODE1: ${{ secrets.PIN_NODE1 }}
-        PIN_NODE2: ${{ secrets.PIN_NODE2 }}
+        KUBEADMIN_PASSWORD: ${{ secrets.KUBEADMIN_PASSWORD_CI }}
+        PIN_NODE1: ${{ secrets.PIN_NODE1_CI }}
+        PIN_NODE2: ${{ secrets.PIN_NODE2_CI }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-        ELASTICSEARCH: ${{ secrets.ELASTICSEARCH }}
-        ELASTICSEARCH_PORT: ${{ secrets.ELASTICSEARCH_PORT }}
+        ELASTICSEARCH: ${{ secrets.ELASTICSEARCH_CI }}
+        ELASTICSEARCH_PORT: ${{ secrets.ELASTICSEARCH_PORT_CI }}
       run: |
+        # update hosts ci file
+        echo secrets.HOSTS_CI >> /etc/hosts
+
         # Install Dockerfile content for pytest
         # install oc/kubctl
         oc_version=4.7.0-0.okd-2021-05-22-050008
@@ -90,12 +93,12 @@ jobs:
         sleep 30
     - name: ✔️ E2E tests using latest quay.io
       env:
-        KUBEADMIN_PASSWORD: ${{ secrets.KUBEADMIN_PASSWORD }}
-        PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.PIN_NODE_BENCHMARK_OPERATOR }}
-        PIN_NODE1: ${{ secrets.PIN_NODE1 }}
-        PIN_NODE2: ${{ secrets.PIN_NODE2 }}
-        ELASTICSEARCH: ${{ secrets.ELASTICSEARCH }}
-        ELASTICSEARCH_PORT: ${{ secrets. ELASTICSEARCH_PORT }}
+        KUBEADMIN_PASSWORD: ${{ secrets.KUBEADMIN_PASSWORD_CI }}
+        PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.PIN_NODE_BENCHMARK_OPERATOR_CI }}
+        PIN_NODE1: ${{ secrets.PIN_NODE1_CI }}
+        PIN_NODE2: ${{ secrets.PIN_NODE2_CI }}
+        ELASTICSEARCH: ${{ secrets.ELASTICSEARCH_CI }}
+        ELASTICSEARCH_PORT: ${{ secrets.ELASTICSEARCH_PORT_CI }}
       run: |
         BUILD_VERSION=$(python3 setup.py --version)
         declare -a WORKLOADS=('stressng_pod' 'stressng_vm' 'uperf_pod' 'uperf_vm' 'hammerdb_pod_mariadb' 'hammerdb_vm_mariadb' 'hammerdb_pod_postgres' 'hammerdb_vm_postgres' 'hammerdb_pod_mssql' 'hammerdb_vm_mssql')
