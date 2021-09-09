@@ -47,7 +47,8 @@ jobs:
         ELASTICSEARCH_PORT: ${{ secrets.ELASTICSEARCH_PORT_CI }}
       run: |
         # update hosts ci file
-        sudo echo secrets.HOSTS_CI | sudo tee -a /etc/hosts
+        sudo echo secrets.HOSTS_CI_1 | sudo tee -a /etc/hosts
+        sudo echo secrets.HOSTS_CI_2 | sudo tee -a /etc/hosts
         # Install Dockerfile content for pytest
         # install oc/kubctl
         oc_version=4.7.0-0.okd-2021-05-22-050008
@@ -56,7 +57,7 @@ jobs:
         rm $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz
         echo alias oc=$RUNNER_PATH/./oc >> $RUNNER_PATH/.bashrc
         echo alias kubectl=$RUNNER_PATH/./kubectl >> $RUNNER_PATH/.bashrc
-
+        oc get nodes
         # clone benchmark-operator
         git clone https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
 
