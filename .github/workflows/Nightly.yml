@@ -18,7 +18,7 @@ jobs:
     - uses: azure/k8s-set-context@v1
       with:
         method: kubeconfig
-        kubeconfig: ${{ secrets.KUBECONFIG_CI }} # Use secret (https://developer.github.com/actions/managing-workflows/storing-secrets/)
+        kubeconfig: ${{ secrets.KUBECONFIG_CI }}
       id: setcontext
     - name: ✔️ E2E tests using latest quay.io
       env:
@@ -29,16 +29,15 @@ jobs:
         ELASTICSEARCH: ${{ secrets.ELASTICSEARCH_CI }}
         ELASTICSEARCH_PORT: ${{ secrets.ELASTICSEARCH_PORT_CI }}
       run: |
-        BUILD_VERSION=$(python3 setup.py --version)
         declare -a WORKLOADS=('stressng_pod' 'stressng_vm' 'uperf_pod' 'uperf_vm' 'hammerdb_pod_mariadb' 'hammerdb_vm_mariadb' 'hammerdb_pod_postgres' 'hammerdb_vm_postgres' 'hammerdb_pod_mssql' 'hammerdb_vm_mssql')
         for WORKLOAD in "${WORKLOADS[@]}"
         do
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start E2E workload:' $WORKLOAD '>>>>>>>>>>>>>>>>>>>>>>>>>>'
-            podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e BUILD_VERSION=$BUILD_VERSION -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:v$BUILD_VERSION
+            podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e BUILD_VERSION=$BUILD_VERSION -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:latest
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End E2E workload:' $WORKLOAD '>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
         done
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Update CI status Pass >>>>>>>>>>>>>>>>>>>>>>>>>>'
-        podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e BUILD_VERSION=$BUILD_VERSION -e CI_STATUS=Pass -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:v$BUILD_VERSION
+        podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e BUILD_VERSION=$BUILD_VERSION -e CI_STATUS=Pass -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:latest
     - name: Update CI status Failed
       env:
         KUBEADMIN_PASSWORD: ${{ secrets.KUBEADMIN_PASSWORD_CI }}
@@ -49,7 +48,6 @@ jobs:
         ELASTICSEARCH_PORT: ${{ secrets.ELASTICSEARCH_PORT_CI }}
       if: ${{ failure() }}
       run: |
-        BUILD_VERSION=$(python3 setup.py --version)
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Update CI status Failed >>>>>>>>>>>>>>>>>>>>>>>>>>'
-        podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e BUILD_VERSION=$BUILD_VERSION -e CI_STATUS=Failed -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:v$BUILD_VERSION
+        podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e BUILD_VERSION=$BUILD_VERSION -e CI_STATUS=Failed -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:latest
 
