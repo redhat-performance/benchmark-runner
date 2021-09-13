@@ -108,8 +108,6 @@ jobs:
             podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e BUILD_VERSION=$BUILD_VERSION -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:v$BUILD_VERSION
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End E2E workload:' $WORKLOAD '>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
         done
-        echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Update CI status Pass >>>>>>>>>>>>>>>>>>>>>>>>>>'
-        podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e BUILD_VERSION=$BUILD_VERSION -e CI_STATUS=Pass -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:v$BUILD_VERSION
     - name: 🎁 Bump Version
       run: |
         version=$(python3 setup.py --version)
