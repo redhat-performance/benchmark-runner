@@ -239,9 +239,9 @@ class BenchmarkOperatorWorkloads:
 
     def get_metadata(self, kind: str = None, database: str = None):
         """
-        This method return run metadata
-        @param kind: pod or vm
-        @param database: mssql, postgres or mariadb
+        This method return metadata kind and database argument are optional
+        @param kind: optional: pod or vm
+        @param database: optional:mssql, postgres or mariadb
         :return:
         """
         metadata = {'ocp version': self.__oc.get_ocp_server_version(),
