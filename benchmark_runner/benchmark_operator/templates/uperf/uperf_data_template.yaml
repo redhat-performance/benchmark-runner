@@ -19,7 +19,7 @@ shared_data:
   size4: 4096
   size5: 16384
   nthr: 1
-  runtime: 60
+  runtime: 10
   # enable/disable system metrics
   system_metrics: {{ system_metrics }}
   prom_url: https://prometheus-k8s.openshift-monitoring.svc.cluster.local:9091

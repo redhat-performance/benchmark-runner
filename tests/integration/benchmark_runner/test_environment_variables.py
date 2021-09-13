@@ -13,7 +13,6 @@ def __get_test_environment_variable():
     test_environment_variable['ocs_pvc'] = os.environ.get('OCS_PVC', 'True')
     test_environment_variable['system_metrics'] = os.environ.get('SYSTEM_METRICS', 'True')
 
-    # This path is for benchmark-operator path
     test_environment_variable['runner_path'] = os.environ.get('RUNNER_PATH', '/')
     ##################################################################################################
     # dynamic parameters - configure for local run

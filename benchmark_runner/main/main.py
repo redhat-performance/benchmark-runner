@@ -20,9 +20,18 @@ def main():
     The main of benchmark-runner handle Azure operations or Workload runs
     """
     environment_variables_dict = environment_variables.environment_variables_dict
+    # environment variables data
+    es_host = environment_variables_dict.get('elasticsearch', '')
+    es_port = environment_variables_dict.get('elasticsearch_port', '')
+    kubeadmin_password = environment_variables_dict.get('kubeadmin_password', '')
+    build_version = environment_variables_dict.get('build_version', '')
+    ci_status = environment_variables_dict.get('ci_status', '')
+    benchmark_operator_workload = BenchmarkOperatorWorkloads(kubeadmin_password=kubeadmin_password, es_host=es_host,
+                                                             es_port=es_port)
+    benchmark_operator_workload.runner_version = build_version
+    # Azure
     azure_cluster_stop = environment_variables_dict.get('azure_cluster_stop', '')
     azure_cluster_start = environment_variables_dict.get('azure_cluster_start', '')
-    # Azure operations
     if azure_cluster_stop or azure_cluster_start:
         azure_operation = AzureOperations(azure_clientid=environment_variables_dict.get('azure_clientid', ''),
                                           azure_secret=environment_variables_dict.get('azure_secret', ''),
@@ -34,6 +43,9 @@ def main():
             print(azure_operation.start_vm(vm_name=azure_vm_name))
         elif azure_cluster_stop:
             print(azure_operation.stop_vm(vm_name=azure_vm_name))
+    # Update CI status
+    elif ci_status == 'Pass' or ci_status == 'Failed':
+        benchmark_operator_workload.update_ci_status(status=ci_status)
     # Workloads
     else:
         workload = environment_variables_dict.get('workload', '')
@@ -42,10 +54,6 @@ def main():
             logger.info(f'Enter valid workload name {environment_variables.workloads_list}')
             raise Exception(f'Not valid workload name: {workload} \n, choose one from the list: {environment_variables.workloads_list}')
 
-        es_host = environment_variables_dict.get('elasticsearch', '')
-        es_port = environment_variables_dict.get('elasticsearch_port', '')
-        kubeadmin_password = environment_variables_dict.get('kubeadmin_password', '')
-        benchmark_operator_workload = BenchmarkOperatorWorkloads(kubeadmin_password=kubeadmin_password, es_host=es_host, es_port=es_port)
         # benchmark-operator node selector
         if environment_variables_dict.get('pin_node_benchmark_operator'):
             benchmark_operator_workload.update_node_selector(runner_path=environment_variables_dict.get('runner_path', ''),

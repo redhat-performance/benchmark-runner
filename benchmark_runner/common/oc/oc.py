@@ -23,6 +23,42 @@ class OC(SSH):
         super().__init__()
         self.__kubeadmin_password = kubeadmin_password
 
+    def get_ocp_server_version(self):
+        """
+        This method return ocp server version
+        :return:
+        """
+        ocp_version_data = self.run('oc version')
+        ocp_version_data = ocp_version_data.split('\n')
+        for line in ocp_version_data:
+            if 'Server Version:' in line:
+                data = line.split(':')
+                return data[1].strip()
+
+    def get_cnv_version(self):
+        """
+        This method return ocp server version
+        :return:
+        """
+        cnv_version_data = self.run('oc get csv -n openshift-cnv')
+        cnv_version_data = cnv_version_data.split('\n')
+        for line in cnv_version_data:
+            if 'kubevirt-hyperconverged-operator' in line:
+                data = line.split()
+                return data[3].strip()
+
+    def get_ocs_version(self):
+        """
+        This method return ocp server version
+        :return:
+        """
+        cnv_version_data = self.run('oc get csv -n openshift-storage')
+        cnv_version_data = cnv_version_data.split('\n')
+        for line in cnv_version_data:
+            if 'ocs-operator' in line:
+                data = line.split()
+                return data[4].strip()
+
     def __get_short_uuid(self, workload: str):
         """
         This method return uuid
