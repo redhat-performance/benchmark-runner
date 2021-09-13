@@ -99,16 +99,6 @@ def test_login():
 
 def test_oc_get_pods():
     """
-    This method test get pods
-    :return:
-    """
-    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
-    assert oc.get_pods()
-
-
-def test_oc_get_pods():
-    """
     This test run oc get pods
     :return:
     """
@@ -122,7 +112,7 @@ def test_oc_get_pod_name():
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    assert oc._get_pod_name(pod_name='wcwcwcwc', namespace=test_environment_variable['namespace']) == ''
+    assert oc._get_pod_name(pod_name='erererer', namespace=test_environment_variable['namespace']) == ''
 
 
 def test_oc_get_pod_name_and_is_pod_exist():

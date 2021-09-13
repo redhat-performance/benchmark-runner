@@ -14,7 +14,7 @@ class ESOperations:
     This class contains elastic search operations
     """
     # time out for all waits is 5000 sec
-    TIME_OUT = 5000
+    TIMEOUT = 5000
     # sleep time between checks is 30 sec
     SLEEP_TIME = 10
     # ElasticSearch fetch data of last 15 minutes
@@ -46,18 +46,19 @@ class ESOperations:
             raise ValueError("Pass an iterable with two items")
         self._hits = self.__es_get_index_hits(index=index, uuid=uuid, workload=workload)
 
-    def __es_get_index_hits(self, index: str, uuid: str = '', workload: str = '',
-                            max_search_results: int = MAX_SEARCH_RESULTS):
+    def __es_get_index_hits(self, index: str, uuid: str = '', workload: str = '', fast_check: bool = False, id: bool = False):
         """
         This method search for data per index in last 2 minutes and return the number of docs or zero
         :param index:
         :param workload: need only if there is different timestamp parameter in Elasticsearch
-        :param max_search_results:
+        :param id: True to return the doc ids
+        :param fast_check: return fast response
         :return:
         """
         """
         :return:
         """
+        ids = []
         # https://github.com/elastic/elasticsearch-dsl-py/issues/49
         self.__es.indices.refresh(index=index)
         # timestamp name in Elasticsearch is different
@@ -67,7 +68,11 @@ class ESOperations:
         else:
             search = Search(using=self.__es, index=index).filter('range', timestamp={
                 'gte': f'now-{self.__es_fetch_last_x_minutes}m', 'lt': 'now'})
-        search = search[0:max_search_results]
+        # reduce the search result
+        if fast_check:
+            search = search[0:10]
+        else:
+            search = search[0:self.MAX_SEARCH_RESULTS]
         search_response = search.execute()
         if search_response.hits:
             if uuid:
@@ -79,8 +84,14 @@ class ESOperations:
                     else:
                         current_uuid = row['uuid'][0]
                     if current_uuid == uuid:
+                        if fast_check:
+                            return 1
+                        ids.append(row.meta.id)
                         count_hits += 1
-                return count_hits
+                if id:
+                    return ids
+                else:
+                    return count_hits
             else:
                 return len(search_response.hits)
         else:
@@ -88,36 +99,37 @@ class ESOperations:
 
     @typechecked()
     @logger_time_stamp
-    def verify_es_data_uploaded(self, index: str, uuid: str = '', workload: str = '', timeout: int = TIME_OUT,
-                                sleep_time: int = SLEEP_TIME):
+    def verify_es_data_uploaded(self, index: str, uuid: str = '', workload: str = '', fast_check: bool = False):
         """
         The method wait till data upload to elastic search and wait if there is new data, search in last 15 minutes
+        :param index:
         :param uuid: the current workload uuid
         :param workload: workload name only if there is a different timestamp parameter name in elasticsearch
-        :param index:
-        :param timeout: 5000 sec because mssql vm took 3700 sec
-        :param sleep_time:
+        :param fast_check: return response on first doc
+
         :return:
         """
         current_wait_time = 0
         current_hits = self._hits
         # waiting for any hits
-        while current_wait_time <= timeout:
+        while current_wait_time <= self.TIMEOUT:
             # waiting for new hits
-            new_hits = self.__es_get_index_hits(index=index, uuid=uuid, workload=workload)
+            new_hits = self.__es_get_index_hits(index=index, uuid=uuid, workload=workload, fast_check=fast_check)
             if current_hits < new_hits:
                 logger.info(f'Data with index: {index} and uuid={uuid} was uploaded to ElasticSearch successfully')
-                return True
+                return self.__es_get_index_hits(index=index, uuid=uuid, workload=workload, id=True, fast_check=fast_check)
             # sleep for x seconds
-            time.sleep(sleep_time)
-            current_wait_time += sleep_time
+            time.sleep(self.SLEEP_TIME)
+            current_wait_time += self.SLEEP_TIME
         raise ElasticSearchDataNotUploaded
 
-    def upload_to_es(self, data: dict, index: str, doc_type: str = '_doc', es_add_items: dict = None):
+    @typechecked()
+    @logger_time_stamp
+    def upload_to_es(self, index: str, data: dict, doc_type: str = '_doc', es_add_items: dict = None):
         """
         This method is upload json data into elasticsearch
-        :param data: data must me in dictionary i.e. {'key': 'value'}
         :param index: index name to be stored in elasticsearch
+        :param data: data must me in dictionary i.e. {'key': 'value'}
         :param doc_type:
         :param es_add_items:
         :return:
@@ -143,3 +155,29 @@ class ESOperations:
             return True
         except Exception as err:
             raise err
+
+    @typechecked()
+    @logger_time_stamp
+    def update_es_index(self, index: str, id: str, metadata: dict = ''):
+        """
+        This method update existing index
+        :param index: index name
+        :param id: The specific index id
+        :param doc_type:
+        :param metadata: The metadata for enrich that existing index according to id
+        :return:
+        """
+        self.__es.update(index=index, id=id, body={"doc": metadata})
+
+    @typechecked()
+    @logger_time_stamp
+    def get_es_index_by_id(self, index: str, id: str):
+        """
+        This method return elastic search index data by id
+        :param index: index name
+        :param id: The specific index id
+        :param doc_type:
+        :param metadata: The metadata for enrich that existing index according to id
+        :return:
+        """
+        return self.__es.get(index=index, id=id)

@@ -2,9 +2,6 @@ shared_data:
   namespace: {{ namespace }}
   db_num_workers: 2
   db_warehouses: 2
-  es_cnv_version: 2.6.2
-  es_ocp_version: 4.7.3
-  es_os_version: {{ build_version }}
   pin: {{ pin }}
   pin_node: {{ pin_node1 }}
   transactions: 100000
@@ -25,7 +22,6 @@ mariadb:
   db_type: mariadb
   db_user: root
   db_server_pod: mariadb-deployment.mariadb-db
-  es_db_version: 10.3.0
 mssql:
   db_image: centos8-mssql2019-container-disk:latest
   db_pass: s3curePasswordString
@@ -33,7 +29,6 @@ mssql:
   db_type: mssql
   db_user: SA
   db_server_pod: mssql-deployment.mssql-db
-  es_db_version: 2019
 postgres:
   db_image: centos8-postgres10-container-disk:latest
   db_pass: postgres
@@ -41,13 +36,10 @@ postgres:
   db_type: pg
   db_user: postgres
   db_server_pod: postgres-deployment.postgres-db
-  es_db_version: 10.0
 pod:
-  es_kind: pod
   resources: true
   limits_cpu: 4
   limits_memory_GB: 16
 vm:
   cores: 4
-  es_kind: vm
   limits_memory_GB: 16

@@ -19,6 +19,8 @@ class EnvironmentVariables:
         self._environment_variables_dict['build_version'] = os.environ.get('BUILD_VERSION', '1.0.0')
         # collect system metrics True/False
         self._environment_variables_dict['system_metrics'] = os.environ.get('SYSTEM_METRICS', 'True')
+        # CI status update once at the end of CI Pass/Failed
+        self._environment_variables_dict['ci_status'] = os.environ.get('CI_STATUS', '')
 
         # This path is for benchmark-operator path
         self._environment_variables_dict['runner_path'] = os.environ.get('RUNNER_PATH', '/')
