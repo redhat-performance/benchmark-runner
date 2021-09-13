@@ -122,4 +122,4 @@ jobs:
         git commit .bumpversion.cfg setup.py -m 'bump version to exist version v'$version
         git pull https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} main
         git push https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} main
-        git push https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} --tagz
+        git push https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} --tag
