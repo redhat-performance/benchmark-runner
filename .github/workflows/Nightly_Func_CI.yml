@@ -5,8 +5,9 @@ on:
   schedule:
     - cron: '*/10 * * * *' # run at 6 AM UTC
     
-build:
-    name: Trigger benchmark runner Func CI
+jobs:
+  nightly:
+    name: Deploy nightly
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
