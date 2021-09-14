@@ -1,13 +1,12 @@
 # Nightly CI https://github.com/marketplace/actions/deploy-nightly
 
-name: Deploy Nightly
+name: Deploy Func Nightly CI
 on:
   schedule:
     - cron: '0 5 * * *' # run at 5 AM UTC
     
-jobs:
-  nightly:
-    name: Deploy nightly
+build:
+    name: Trigger benchmark runner Func CI
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
