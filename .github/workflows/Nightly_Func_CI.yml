@@ -3,7 +3,7 @@
 name: Deploy Func Nightly CI
 on:
   schedule:
-    - cron: '*/5 * * * *' # run at 6 AM UTC
+    - cron: '*/10 * * * *' # run at 6 AM UTC
     
 build:
     name: Trigger benchmark runner Func CI
