@@ -3,8 +3,8 @@
 name: Deploy Nightly
 on:
   schedule:
-    - cron: '0 5 * * *' # run at 5 AM UTC
-
+    #- cron: '0 5 * * *' # run at 5 AM UTC
+    - cron: '*/10 * * * *' # every 10 min
 jobs:
   nightly:
     name: Deploy nightly
