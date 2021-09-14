@@ -40,6 +40,9 @@ jobs:
         ELASTICSEARCH: ${{ secrets.ELASTICSEARCH_CI }}
         ELASTICSEARCH_PORT: ${{ secrets.ELASTICSEARCH_PORT_CI }}
       run: |
+        #Functional CI must update hosts ci file
+        sudo echo "${{ secrets.HOSTS1_CI }}" | sudo tee -a /etc/hosts
+        sudo echo "${{ secrets.HOSTS2_CI }}" | sudo tee -a /etc/hosts
         BUILD=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
         BUILD_VERSION="$(cut -d'=' -f2 <<<"$BUILD")"
         declare -a WORKLOADS=('stressng_pod' 'stressng_vm' 'uperf_pod' 'uperf_vm' 'hammerdb_pod_mariadb' 'hammerdb_vm_mariadb' 'hammerdb_pod_postgres' 'hammerdb_vm_postgres' 'hammerdb_pod_mssql' 'hammerdb_vm_mssql')
