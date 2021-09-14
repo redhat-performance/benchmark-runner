@@ -1,16 +1,10 @@
 # Nightly CI https://github.com/marketplace/actions/deploy-nightly
 
-#name: Deploy Func Nightly CI
-#on:
-#  schedule:
-#    - cron: '0 17 * * *' # run at 16 AM UTC
-name: CI
-
+name: Deploy Func Nightly CI
 on:
-  push:
-    branches: [ main ]
-  #pull_request:
-  #  branches: [ main ]
+  schedule:
+    - cron: '0 18 * * *' # run at 18 AM UTC
+
  
 jobs:
   nightly:
@@ -64,6 +58,9 @@ jobs:
         ELASTICSEARCH_PORT: ${{ secrets.ELASTICSEARCH_PORT_CI }}
       if: ${{ failure() }}
       run: |
+        #Functional CI must update hosts ci file
+        sudo echo "${{ secrets.HOSTS1_CI }}" | sudo tee -a /etc/hosts
+        sudo echo "${{ secrets.HOSTS2_CI }}" | sudo tee -a /etc/hosts
         BUILD=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
         BUILD_VERSION="$(cut -d'=' -f2 <<<"$BUILD")"
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Update CI status Failed >>>>>>>>>>>>>>>>>>>>>>>>>>'
