@@ -3,7 +3,7 @@
 name: Deploy Func Nightly CI
 on:
   schedule:
-    - cron: '0 16 * * *' # run at 7 AM UTC
+    - cron: '0 16 * * *' # run at 16 AM UTC
     
 jobs:
   nightly:
