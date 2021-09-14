@@ -1,10 +1,17 @@
 # Nightly CI https://github.com/marketplace/actions/deploy-nightly
 
-name: Deploy Func Nightly CI
+#name: Deploy Func Nightly CI
+#on:
+#  schedule:
+#    - cron: '0 17 * * *' # run at 16 AM UTC
+name: CI
+
 on:
-  schedule:
-    - cron: '0 17 * * *' # run at 16 AM UTC
-    
+  push:
+    branches: [ main ]
+  #pull_request:
+  #  branches: [ main ]
+ 
 jobs:
   nightly:
     name: Deploy nightly
