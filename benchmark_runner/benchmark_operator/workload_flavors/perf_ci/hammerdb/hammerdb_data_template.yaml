@@ -1,0 +1,45 @@
+shared_data:
+  namespace: {{ namespace }}
+  db_num_workers: 2
+  db_warehouses: 2
+  pin: {{ pin }}
+  pin_node: {{ pin_node1 }}
+  transactions: 100000
+  ocs_pvc: {{ ocs_pvc }}
+  es_url: {{ elasticsearch_url }}
+  es_index_name: hammerdb
+  # enable/disable system metrics
+  system_metrics: {{ system_metrics }}
+  prom_url: https://prometheus-k8s.openshift-monitoring.svc.cluster.local:9091
+  prom_token: {{ prom_token }}
+  sm_index_name: system-metrics
+  metrics_profile: node-metrics.yml
+  #metrics_profile: https://raw.githubusercontent.com/cloud-bulldozer/benchmark-operator/master/roles/kube-burner/files/metrics.yaml
+mariadb:
+  db_image: centos8-mariadb103-container-disk:latest
+  db_pass: mysql
+  db_port: 3306
+  db_type: mariadb
+  db_user: root
+  db_server_pod: mariadb-deployment.mariadb-db
+mssql:
+  db_image: centos8-mssql2019-container-disk:latest
+  db_pass: s3curePasswordString
+  db_port: 1433
+  db_type: mssql
+  db_user: SA
+  db_server_pod: mssql-deployment.mssql-db
+postgres:
+  db_image: centos8-postgres10-container-disk:latest
+  db_pass: postgres
+  db_port: 5432
+  db_type: pg
+  db_user: postgres
+  db_server_pod: postgres-deployment.postgres-db
+pod:
+  resources: true
+  limits_cpu: 4
+  limits_memory_GB: 16
+vm:
+  cores: 4
+  limits_memory_GB: 16

@@ -24,16 +24,16 @@ jobs:
     - uses: azure/k8s-set-context@v1
       with:
         method: kubeconfig
-        kubeconfig: ${{ secrets.KUBECONFIG_CI }}
+        kubeconfig: ${{ secrets.KUBECONFIG }}
       id: setcontext
     - name: ✔️ E2E tests using latest quay.io
       env:
-        KUBEADMIN_PASSWORD: ${{ secrets.KUBEADMIN_PASSWORD_CI }}
-        PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.PIN_NODE_BENCHMARK_OPERATOR_CI }}
-        PIN_NODE1: ${{ secrets.PIN_NODE1_CI }}
-        PIN_NODE2: ${{ secrets.PIN_NODE2_CI }}
-        ELASTICSEARCH: ${{ secrets.ELASTICSEARCH_CI }}
-        ELASTICSEARCH_PORT: ${{ secrets.ELASTICSEARCH_PORT_CI }}
+        KUBEADMIN_PASSWORD: ${{ secrets.KUBEADMIN_PASSWORD }}
+        PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.PIN_NODE_BENCHMARK_OPERATOR }}
+        PIN_NODE1: ${{ secrets.PIN_NODE1 }}
+        PIN_NODE2: ${{ secrets.PIN_NODE2 }}
+        ELASTICSEARCH: ${{ secrets.ELASTICSEARCH }}
+        ELASTICSEARCH_PORT: ${{ secrets.ELASTICSEARCH_PORT }}
       run: |
         BUILD_VERSION=$(python3 setup.py --version)
         start=`date +%s`
@@ -41,7 +41,7 @@ jobs:
         for WORKLOAD in "${WORKLOADS[@]}"
         do
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start E2E workload:' $WORKLOAD '>>>>>>>>>>>>>>>>>>>>>>>>>>'
-            podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e BUILD_VERSION=$BUILD_VERSION -e RUN_TYPE=func_ci -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:v$BUILD_VERSION
+            podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e BUILD_VERSION=$BUILD_VERSION -e RUN_TYPE=perf_ci -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:v$BUILD_VERSION
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End E2E workload:' $WORKLOAD '>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
         done
         end=`date +%s`
@@ -50,12 +50,12 @@ jobs:
         podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e BUILD_VERSION=$BUILD_VERSION -e CI_STATUS=Pass -e CI_MINUTES_TIME=$runtime -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:v$BUILD_VERSION
     - name: Update CI status Failed
       env:
-        KUBEADMIN_PASSWORD: ${{ secrets.KUBEADMIN_PASSWORD_CI }}
-        PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.PIN_NODE_BENCHMARK_OPERATOR_CI }}
-        PIN_NODE1: ${{ secrets.PIN_NODE1_CI }}
-        PIN_NODE2: ${{ secrets.PIN_NODE2_CI }}
-        ELASTICSEARCH: ${{ secrets.ELASTICSEARCH_CI }}
-        ELASTICSEARCH_PORT: ${{ secrets.ELASTICSEARCH_PORT_CI }}
+        KUBEADMIN_PASSWORD: ${{ secrets.KUBEADMIN_PASSWORD }}
+        PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.PIN_NODE_BENCHMARK_OPERATOR }}
+        PIN_NODE1: ${{ secrets.PIN_NODE1 }}
+        PIN_NODE2: ${{ secrets.PIN_NODE2 }}
+        ELASTICSEARCH: ${{ secrets.ELASTICSEARCH }}
+        ELASTICSEARCH_PORT: ${{ secrets.ELASTICSEARCH_PORT }}
       if: ${{ failure() }}
       run: |
         BUILD_VERSION=$(python3 setup.py --version)

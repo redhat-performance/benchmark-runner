@@ -9,9 +9,9 @@ on Kubernetes/OpenShift Pod or VM.
 
 This tool support the following workloads:
 
-* [hammerdb](https://hammerdb.com/): running hammerdb workload on the following databases: MSSQL, Mariadb, Postgresql on Pod and VM with [Configuration](benchmark_runner/benchmark_operator/templates/hammerdb)
-* [stressng](https://wiki.ubuntu.com/Kernel/Reference/stress-ng): running stressng workload on Pod or VM with [Configuration](benchmark_runner/benchmark_operator/templates/stressng)
-* [uperf](http://uperf.org/): running uperf workload on Pod or VM with [Configuration](benchmark_runner/benchmark_operator/templates/uperf)
+* [hammerdb](https://hammerdb.com/): running hammerdb workload on the following databases: MSSQL, Mariadb, Postgresql on Pod and VM with [Configuration](benchmark_runner/benchmark_operator/workload_flavors/func_ci/hammerdb)
+* [stressng](https://wiki.ubuntu.com/Kernel/Reference/stress-ng): running stressng workload on Pod or VM with [Configuration](benchmark_runner/benchmark_operator/workload_flavors/func_ci/stressng)
+* [uperf](http://uperf.org/): running uperf workload on Pod or VM with [Configuration](benchmark_runner/benchmark_operator/workload_flavors/func_ci/uperf)
 
 ** First Phase: supports [benchmark-operator workloads](https://github.com/cloud-bulldozer/benchmark-operator)
 
@@ -64,10 +64,7 @@ Choose one from the following list:
 ```sh
 podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:latest
 
-# For custom workload data configuration add:
--v /home/user/templates:/benchmark_runner/templates
-```
-** Important: for custom workload template folder hierarchy should be on the same as [Templates](benchmark_runner/benchmark_operator/templates)
+** Important: for custom metrics for benchmark-operator workload create a new folder as 'perf_ci' under [workload_flavors](benchmark_runner/benchmark_operator/workload_flavors)
 
 ![](media/demo.gif)
 
