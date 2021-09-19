@@ -255,16 +255,18 @@ class BenchmarkOperatorWorkloads:
             metadata.update({'db_version': 10.3})
         return metadata
 
-    def update_ci_status(self, status: str, ci_minutes_time: int):
+    def update_ci_status(self, status: str, ci_minutes_time: int, benchmark_operator: str, benchmark_wrapper: str):
         """
         This method update ci status Pass/Failed
+        :param benchmark_wrapper:
+        :param benchmark_operator:
+        :param ci_minutes_time: Ci time in minutes
         :param status: Pass/Failed
-        :param ci_time: Ci time in minutes
         :return:
         """
         status_dict = {'Failed': 0, 'Pass': 1}
         metadata = self.get_metadata()
-        metadata.update({'status': status, 'status#': status_dict[status], 'ci_minutes_time': ci_minutes_time})
+        metadata.update({'status': status, 'status#': status_dict[status], 'ci_minutes_time': ci_minutes_time, 'benchmark_operator_id': benchmark_operator, 'benchmark_wrapper_id': benchmark_wrapper})
         self.__es_operations.upload_to_es(index='ci-status', data=metadata)
 
 #***********************************************************************************************

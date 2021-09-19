@@ -25,6 +25,10 @@ class EnvironmentVariables:
         self._environment_variables_dict['run_type'] = os.environ.get('RUN_TYPE', 'func_ci')
         # CI run time
         self._environment_variables_dict['ci_minutes_time'] = os.environ.get('CI_MINUTES_TIME', '')
+        # benchmark-operator last commit id
+        self._environment_variables_dict['benchmark_operator'] = os.environ.get('benchmark_operator', '')
+        # benchmark-wrapper last commit id
+        self._environment_variables_dict['benchmark-wrapper'] = os.environ.get('benchmark-wrapper', '')
 
         # This path is for benchmark-operator path
         self._environment_variables_dict['runner_path'] = os.environ.get('RUNNER_PATH', '/')
