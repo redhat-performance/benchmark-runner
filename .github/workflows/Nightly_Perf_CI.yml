@@ -34,7 +34,18 @@ jobs:
         PIN_NODE2: ${{ secrets.PIN_NODE2 }}
         ELASTICSEARCH: ${{ secrets.ELASTICSEARCH }}
         ELASTICSEARCH_PORT: ${{ secrets.ELASTICSEARCH_PORT }}
+        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
       run: |
+        # get last commit id of benchmark-operator
+        git clone https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
+        cd $RUNNER_PATH/benchmark-operator
+        benchmark_operator=$(git log --format="%H" -n 1)
+        cd -
+        # get last commit id of benchmark-wrapper
+        git clone https://github.com/cloud-bulldozer/benchmark-wrapper $RUNNER_PATH/benchmark-wrapper
+        cd $RUNNER_PATH/benchmark-wrapper
+        benchmark_wrapper=$(git log --format="%H" -n 1)
+        cd -
         BUILD=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
         BUILD_VERSION="$(cut -d'=' -f2 <<<"$BUILD")"
         start=`date +%s`
@@ -48,7 +59,7 @@ jobs:
         end=`date +%s`
         runtime=$(($((end-start))/60))
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Update CI status Pass >>>>>>>>>>>>>>>>>>>>>>>>>>'
-        podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e BUILD_VERSION=$BUILD_VERSION -e CI_STATUS=Pass -e CI_MINUTES_TIME=$runtime -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:v$BUILD_VERSION
+        podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e BUILD_VERSION=$BUILD_VERSION -e CI_STATUS=Pass -e CI_MINUTES_TIME=$runtime -e benchmark_operator=$benchmark_operator -e benchmark_wrapper=$benchmark_wrapper -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:v$BUILD_VERSION
     - name: Update CI status Failed
       env:
         KUBEADMIN_PASSWORD: ${{ secrets.KUBEADMIN_PASSWORD }}
@@ -57,11 +68,22 @@ jobs:
         PIN_NODE2: ${{ secrets.PIN_NODE2 }}
         ELASTICSEARCH: ${{ secrets.ELASTICSEARCH }}
         ELASTICSEARCH_PORT: ${{ secrets.ELASTICSEARCH_PORT }}
+        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
       if: ${{ failure() }}
       run: |
+        # get last commit id of benchmark-operator
+        git clone https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
+        cd $RUNNER_PATH/benchmark-operator
+        benchmark_operator=$(git log --format="%H" -n 1)
+        cd -
+        # get last commit id of benchmark-wrapper
+        git clone https://github.com/cloud-bulldozer/benchmark-wrapper $RUNNER_PATH/benchmark-wrapper
+        cd $RUNNER_PATH/benchmark-wrapper
+        benchmark_wrapper=$(git log --format="%H" -n 1)
+        cd -
         BUILD=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
         BUILD_VERSION="$(cut -d'=' -f2 <<<"$BUILD")"
         end=`date +%s`
         runtime=$(($((end-start))/60))
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Update CI status Failed >>>>>>>>>>>>>>>>>>>>>>>>>>'
-        podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e BUILD_VERSION=$BUILD_VERSION -e CI_STATUS=Failed -e CI_MINUTES_TIME=$runtime -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:v$BUILD_VERSION
+        podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e BUILD_VERSION=$BUILD_VERSION -e CI_STATUS=Failed -e CI_MINUTES_TIME=$runtime -e benchmark_operator=$benchmark_operator -e benchmark_wrapper=$benchmark_wrapper -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:v$BUILD_VERSION

@@ -69,6 +69,7 @@ jobs:
         PIN_NODE2: ${{ secrets.PIN_NODE2_CI }}
         ELASTICSEARCH: ${{ secrets.ELASTICSEARCH_CI }}
         ELASTICSEARCH_PORT: ${{ secrets.ELASTICSEARCH_PORT_CI }}
+        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
       if: ${{ failure() }}
       run: |
         #Functional CI must update hosts ci file
