@@ -1,0 +1,92 @@
+# Nightly CI https://github.com/marketplace/actions/deploy-nightly
+
+name: Deploy Func Nightly CI
+on:
+  schedule:
+    - cron: '0 4 * * *' # run at 4 AM UTC/ 0 AM EST
+
+jobs:
+  nightly:
+    name: Deploy nightly
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: Install latest benchmark-runner
+      run: |
+        python -m pip install --upgrade pip
+        pip install benchmark-runner
+    - uses: azure/k8s-set-context@v1
+      with:
+        method: kubeconfig
+        kubeconfig: ${{ secrets.KUBECONFIG_CI }}
+      id: setcontext
+    - name: ✔️ E2E tests using latest quay.io
+      env:
+        KUBEADMIN_PASSWORD: ${{ secrets.KUBEADMIN_PASSWORD_CI }}
+        PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.PIN_NODE_BENCHMARK_OPERATOR_CI }}
+        PIN_NODE1: ${{ secrets.PIN_NODE1_CI }}
+        PIN_NODE2: ${{ secrets.PIN_NODE2_CI }}
+        ELASTICSEARCH: ${{ secrets.ELASTICSEARCH_CI }}
+        ELASTICSEARCH_PORT: ${{ secrets.ELASTICSEARCH_PORT_CI }}
+        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+      run: |
+        #Functional CI must update hosts ci file
+        sudo echo "${{ secrets.HOSTS1_CI }}" | sudo tee -a /etc/hosts
+        sudo echo "${{ secrets.HOSTS2_CI }}" | sudo tee -a /etc/hosts
+        # get last commit id of benchmark-operator
+        git clone https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
+        cd $RUNNER_PATH/benchmark-operator
+        benchmark_operator=$(git log --format="%H" -n 1)
+        cd -
+        # get last commit id of benchmark-wrapper
+        git clone https://github.com/cloud-bulldozer/benchmark-wrapper $RUNNER_PATH/benchmark-wrapper
+        cd $RUNNER_PATH/benchmark-wrapper
+        benchmark_wrapper=$(git log --format="%H" -n 1)
+        cd -
+        BUILD=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
+        BUILD_VERSION="$(cut -d'=' -f2 <<<"$BUILD")"
+        start=`date +%s
+        declare -a WORKLOADS=('stressng_pod' 'stressng_vm' 'uperf_pod' 'uperf_vm' 'hammerdb_pod_mariadb' 'hammerdb_vm_mariadb' 'hammerdb_pod_postgres' 'hammerdb_vm_postgres' 'hammerdb_pod_mssql' 'hammerdb_vm_mssql')
+        for WORKLOAD in "${WORKLOADS[@]}"
+        do
+            echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start E2E workload:' $WORKLOAD '>>>>>>>>>>>>>>>>>>>>>>>>>>'
+            podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e BUILD_VERSION=$BUILD_VERSION -e RUN_TYPE=func_ci -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:v$BUILD_VERSION
+            echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End E2E workload:' $WORKLOAD '>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
+        done
+        end=`date +%s`
+        runtime=$(($((end-start))/60))
+        echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Update CI status Pass >>>>>>>>>>>>>>>>>>>>>>>>>>'
+        podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e BUILD_VERSION=$BUILD_VERSION -e CI_STATUS=Pass -e CI_MINUTES_TIME=$runtime -e benchmark_operator=$benchmark_operator -e benchmark_wrapper=$benchmark_wrapper -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:v$BUILD_VERSION
+    - name: Update CI status Failed
+      env:
+        KUBEADMIN_PASSWORD: ${{ secrets.KUBEADMIN_PASSWORD_CI }}
+        PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.PIN_NODE_BENCHMARK_OPERATOR_CI }}
+        PIN_NODE1: ${{ secrets.PIN_NODE1_CI }}
+        PIN_NODE2: ${{ secrets.PIN_NODE2_CI }}
+        ELASTICSEARCH: ${{ secrets.ELASTICSEARCH_CI }}
+        ELASTICSEARCH_PORT: ${{ secrets.ELASTICSEARCH_PORT_CI }}
+      if: ${{ failure() }}
+      run: |
+        #Functional CI must update hosts ci file
+        sudo echo "${{ secrets.HOSTS1_CI }}" | sudo tee -a /etc/hosts
+        sudo echo "${{ secrets.HOSTS2_CI }}" | sudo tee -a /etc/hosts
+        # get last commit id of benchmark-operator
+        git clone https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
+        cd $RUNNER_PATH/benchmark-operator
+        benchmark_operator=$(git log --format="%H" -n 1)
+        cd -
+        # get last commit id of benchmark-wrapper
+        git clone https://github.com/cloud-bulldozer/benchmark-wrapper $RUNNER_PATH/benchmark-wrapper
+        cd $RUNNER_PATH/benchmark-wrapper
+        benchmark_wrapper=$(git log --format="%H" -n 1)
+        cd -
+        BUILD=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
+        BUILD_VERSION="$(cut -d'=' -f2 <<<"$BUILD")"
+        end=`date +%s`
+        runtime=$(($((end-start))/60))
+        echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Update CI status Failed >>>>>>>>>>>>>>>>>>>>>>>>>>'
+        podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e BUILD_VERSION=$BUILD_VERSION -e CI_STATUS=Failed -e CI_MINUTES_TIME=$runtime -e benchmark_operator=$benchmark_operator -e benchmark_wrapper=$benchmark_wrapper -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:v$BUILD_VERSION

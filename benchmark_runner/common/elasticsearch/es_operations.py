@@ -110,7 +110,7 @@ class ESOperations:
         :return:
         """
         current_wait_time = 0
-        current_hits = self._hits
+        current_hits = 0
         # waiting for any hits
         while current_wait_time <= self.TIMEOUT:
             # waiting for new hits

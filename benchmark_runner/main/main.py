@@ -26,6 +26,9 @@ def main():
     kubeadmin_password = environment_variables_dict.get('kubeadmin_password', '')
     build_version = environment_variables_dict.get('build_version', '')
     ci_status = environment_variables_dict.get('ci_status', '')
+    ci_minutes_time = environment_variables_dict.get('ci_minutes_time', '')
+    benchmark_operator = environment_variables_dict.get('benchmark_operator', '')
+    benchmark_wrapper = environment_variables_dict.get('benchmark_wrapper', '')
     benchmark_operator_workload = BenchmarkOperatorWorkloads(kubeadmin_password=kubeadmin_password, es_host=es_host,
                                                              es_port=es_port)
     benchmark_operator_workload.runner_version = build_version
@@ -45,7 +48,7 @@ def main():
             print(azure_operation.stop_vm(vm_name=azure_vm_name))
     # Update CI status
     elif ci_status == 'Pass' or ci_status == 'Failed':
-        benchmark_operator_workload.update_ci_status(status=ci_status)
+        benchmark_operator_workload.update_ci_status(status=ci_status, ci_time=int(ci_minutes_time), benchmark_operator=benchmark_operator, benchmark_wrapper=benchmark_wrapper)
     # Workloads
     else:
         workload = environment_variables_dict.get('workload', '')

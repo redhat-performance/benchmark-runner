@@ -8,7 +8,7 @@ from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, 
 from benchmark_runner.common.elasticsearch.elasticsearch_exceptions import ElasticSearchDataNotUploaded
 from benchmark_runner.common.oc.oc import OC
 from benchmark_runner.common.oc.oc_exceptions import VMNotCompletedTimeout
-from benchmark_runner.benchmark_operator.templates.generate_yaml_from_templates import TemplateOperations
+from benchmark_runner.benchmark_operator.workload_flavors.generate_yaml_from_workload_flavors import TemplateOperations
 from benchmark_runner.common.elasticsearch.es_operations import ESOperations
 from benchmark_runner.common.ssh.ssh import SSH
 from benchmark_runner.main.environment_variables import environment_variables
@@ -19,38 +19,31 @@ class BenchmarkOperatorWorkloads:
     This class contains all the custom_workloads
     """
     def __init__(self, kubeadmin_password: str = '', es_host: str = '', es_port: str = ''):
-        self._runner_version = None
+        # environment variables
+        self.__environment_variables_dict = environment_variables.environment_variables_dict
+        self.__runner_version = self.__environment_variables_dict.get('build_version', '')
+        self.__run_type = self.__environment_variables_dict.get('run_type', '')
         self.__ssh = SSH()
         self.__kubeadmin_password = kubeadmin_password
         self.__oc = OC(kubeadmin_password=self.__kubeadmin_password)
         #  if mount is exist - path inside Dockerfile
-        if os.path.exists('/benchmark_runner/templates/'):
-            self.__dir_path = '/benchmark_runner/templates'
+        if os.path.exists('/benchmark_runner/workload_flavors/'):
+            self.__dir_path = '/benchmark_runner/workload_flavors'
             self.__current_run_path = f'{self.__dir_path}/current_run'
+        # default internal path
         else:
-            self.__dir_path = os.path.dirname(os.path.realpath(__file__))
-            self.__current_run_path = f'{self.__dir_path}/templates/current_run'
+            self.__dir_path = f'{os.path.dirname(os.path.realpath(__file__))}'
+            self.__current_run_path = f'{self.__dir_path}/workload_flavors/{self.__run_type}/current_run'
         self.__es_host = es_host
         self.__es_port = es_port
         if es_host and es_port:
             self.__es_operations = ESOperations(es_host=self.__es_host, es_port=self.__es_port)
-        # Generate templates class
+        # Generate workload_flavors class
         self.__template = TemplateOperations()
-        # environment variables
-        self.__environment_variables_dict = environment_variables.environment_variables_dict
+
         # Login when kubeadmin_password
-        if environment_variables.environment_variables_dict['kubeadmin_password']:
+        if self.__environment_variables_dict.get('kubeadmin_password', ''):
             self.__oc.login()
-
-    @property
-    def runner_version(self):
-        """getter"""
-        return self._runner_version
-
-    @runner_version.setter
-    def runner_version(self, value):
-        """setter"""
-        self._runner_version = value
 
     def __remove_current_run_yamls(self, extension='.yaml'):
         """
@@ -239,16 +232,16 @@ class BenchmarkOperatorWorkloads:
 
     def get_metadata(self, kind: str = None, database: str = None):
         """
-        This method return run metadata
-        @param kind: pod or vm
-        @param database: mssql, postgres or mariadb
+        This method return metadata kind and database argument are optional
+        @param kind: optional: pod or vm
+        @param database: optional:mssql, postgres or mariadb
         :return:
         """
         metadata = {'ocp version': self.__oc.get_ocp_server_version(),
                     'cnv version': self.__oc.get_cnv_version(),
                     'ocs version': self.__oc.get_ocs_version(),
-                    'runner version': self._runner_version,
-                    'version#': int(self._runner_version.split('.')[-1])}
+                    'runner version': self.__runner_version,
+                    'version#': int(self.__runner_version.split('.')[-1])}
         if kind:
             metadata.update({'kata_version': '',
                              'kind': kind,
@@ -262,16 +255,18 @@ class BenchmarkOperatorWorkloads:
             metadata.update({'db_version': 10.3})
         return metadata
 
-    def update_ci_status(self, status: str):
+    def update_ci_status(self, status: str, ci_minutes_time: int, benchmark_operator: str, benchmark_wrapper: str):
         """
         This method update ci status Pass/Failed
+        :param benchmark_wrapper:
+        :param benchmark_operator:
+        :param ci_minutes_time: Ci time in minutes
         :param status: Pass/Failed
         :return:
         """
         status_dict = {'Failed': 0, 'Pass': 1}
         metadata = self.get_metadata()
-        metadata.update({'status': status})
-        metadata.update({'status#': status_dict[status]})
+        metadata.update({'status': status, 'status#': status_dict[status], 'ci_minutes_time': ci_minutes_time, 'benchmark_operator_id': benchmark_operator, 'benchmark_wrapper_id': benchmark_wrapper})
         self.__es_operations.upload_to_es(index='ci-status', data=metadata)
 
 #***********************************************************************************************

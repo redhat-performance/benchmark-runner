@@ -1,0 +1,67 @@
+# Nightly CI https://github.com/marketplace/actions/deploy-nightly
+
+name: Deploy Nightly
+on:
+  schedule:
+    - cron: '0 2 * * *' # run at 2 AM UTC
+
+jobs:
+  nightly:
+    name: Deploy nightly
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 pytest pytest-cov
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        if [ -f tests_requirements.txt ]; then pip install -r tests_requirements.txt; fi
+    - uses: azure/k8s-set-context@v1
+      with:
+        method: kubeconfig
+        kubeconfig: ${{ secrets.KUBECONFIG }}
+      id: setcontext
+    - name: ✔️ E2E tests using latest quay.io
+      env:
+        KUBEADMIN_PASSWORD: ${{ secrets.KUBEADMIN_PASSWORD }}
+        PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.PIN_NODE_BENCHMARK_OPERATOR }}
+        PIN_NODE1: ${{ secrets.PIN_NODE1 }}
+        PIN_NODE2: ${{ secrets.PIN_NODE2 }}
+        ELASTICSEARCH: ${{ secrets.ELASTICSEARCH }}
+        ELASTICSEARCH_PORT: ${{ secrets.ELASTICSEARCH_PORT }}
+      run: |
+        BUILD=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
+        BUILD_VERSION="$(cut -d'=' -f2 <<<"$BUILD")"
+        start=`date +%s`
+        declare -a WORKLOADS=('stressng_pod' 'stressng_vm' 'uperf_pod' 'uperf_vm' 'hammerdb_pod_mariadb' 'hammerdb_vm_mariadb' 'hammerdb_pod_postgres' 'hammerdb_vm_postgres' 'hammerdb_pod_mssql' 'hammerdb_vm_mssql')
+        for WORKLOAD in "${WORKLOADS[@]}"
+        do
+            echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start E2E workload:' $WORKLOAD '>>>>>>>>>>>>>>>>>>>>>>>>>>'
+            podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e BUILD_VERSION=$BUILD_VERSION -e RUN_TYPE=perf_ci -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:v$BUILD_VERSION
+            echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End E2E workload:' $WORKLOAD '>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
+        done
+        end=`date +%s`
+        runtime=$(($((end-start))/60))
+        echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Update CI status Pass >>>>>>>>>>>>>>>>>>>>>>>>>>'
+        podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e BUILD_VERSION=$BUILD_VERSION -e CI_STATUS=Pass -e CI_MINUTES_TIME=$runtime -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:v$BUILD_VERSION
+    - name: Update CI status Failed
+      env:
+        KUBEADMIN_PASSWORD: ${{ secrets.KUBEADMIN_PASSWORD }}
+        PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.PIN_NODE_BENCHMARK_OPERATOR }}
+        PIN_NODE1: ${{ secrets.PIN_NODE1 }}
+        PIN_NODE2: ${{ secrets.PIN_NODE2 }}
+        ELASTICSEARCH: ${{ secrets.ELASTICSEARCH }}
+        ELASTICSEARCH_PORT: ${{ secrets.ELASTICSEARCH_PORT }}
+      if: ${{ failure() }}
+      run: |
+        BUILD=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
+        BUILD_VERSION="$(cut -d'=' -f2 <<<"$BUILD")"
+        end=`date +%s`
+        runtime=$(($((end-start))/60))
+        echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Update CI status Failed >>>>>>>>>>>>>>>>>>>>>>>>>>'
+        podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e BUILD_VERSION=$BUILD_VERSION -e CI_STATUS=Failed -e CI_MINUTES_TIME=$runtime -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:v$BUILD_VERSION
