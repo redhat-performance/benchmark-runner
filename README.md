@@ -15,8 +15,8 @@ This tool support the following workloads:
 
 ** First Phase: supports [benchmark-operator workloads](https://github.com/cloud-bulldozer/benchmark-operator)
 
-Hammerdb Kibana dashboard:
-![](media/kibana.png)
+Benchmark-runner grafana dashboard:
+![](media/grafana.png)
 
 Reference:
 * The benchmark-runner package is located in [PyPi](https://pypi.org/project/benchmark-runner)
