@@ -21,15 +21,15 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 1,
-  "iteration": 1631571618362,
+  "id": 2,
+  "iteration": 1632124465877,
   "links": [],
   "panels": [
     {
       "datasource": null,
       "gridPos": {
         "h": 6,
-        "w": 7,
+        "w": 5,
         "x": 8,
         "y": 0
       },
@@ -85,7 +85,7 @@
     {
       "datasource": "Elasticsearch-hammerdb-vm-results",
       "gridPos": {
-        "h": 2,
+        "h": 3,
         "w": 24,
         "x": 0,
         "y": 9
@@ -98,7 +98,7 @@
         }
       ],
       "options": {
-        "content": "## Hammerdb workload results",
+        "content": "## Hammerdb workload results\n![alt text](https://www.hammerdb.com/images/hammerDB-logo-FINAL.jpg \"Tooltip Text\")",
         "mode": "markdown"
       },
       "pluginVersion": "8.1.2",
@@ -168,7 +168,7 @@
         "h": 7,
         "w": 6,
         "x": 0,
-        "y": 11
+        "y": 12
       },
       "id": 9,
       "options": {
@@ -248,7 +248,7 @@
         "h": 7,
         "w": 18,
         "x": 6,
-        "y": 11
+        "y": 12
       },
       "hiddenSeries": false,
       "id": 2,
@@ -438,7 +438,7 @@
         "h": 7,
         "w": 6,
         "x": 0,
-        "y": 18
+        "y": 19
       },
       "id": 10,
       "options": {
@@ -518,7 +518,7 @@
         "h": 7,
         "w": 18,
         "x": 6,
-        "y": 18
+        "y": 19
       },
       "hiddenSeries": false,
       "id": 4,
@@ -707,7 +707,7 @@
         "h": 8,
         "w": 6,
         "x": 0,
-        "y": 25
+        "y": 26
       },
       "id": 8,
       "options": {
@@ -787,7 +787,7 @@
         "h": 8,
         "w": 18,
         "x": 6,
-        "y": 25
+        "y": 26
       },
       "hiddenSeries": false,
       "id": 3,
@@ -975,7 +975,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 33
+        "y": 34
       },
       "id": 22,
       "panels": [],
@@ -988,7 +988,7 @@
         "h": 3,
         "w": 24,
         "x": 0,
-        "y": 34
+        "y": 35
       },
       "id": 25,
       "links": [
@@ -1075,7 +1075,7 @@
         "h": 11,
         "w": 24,
         "x": 0,
-        "y": 37
+        "y": 38
       },
       "hiddenSeries": false,
       "id": 40,
@@ -1440,7 +1440,7 @@
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 48
+        "y": 49
       },
       "hiddenSeries": false,
       "id": 26,
@@ -1803,7 +1803,7 @@
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 58
+        "y": 59
       },
       "hiddenSeries": false,
       "id": 39,
@@ -2169,7 +2169,7 @@
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 68
+        "y": 69
       },
       "hiddenSeries": false,
       "id": 41,
@@ -2533,7 +2533,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 78
+        "y": 79
       },
       "id": 24,
       "panels": [],
@@ -2546,7 +2546,7 @@
         "h": 2,
         "w": 24,
         "x": 0,
-        "y": 79
+        "y": 80
       },
       "id": 12,
       "links": [
@@ -2632,7 +2632,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 81
+        "y": 82
       },
       "hiddenSeries": false,
       "id": 47,
@@ -2880,7 +2880,7 @@
         "h": 4,
         "w": 3,
         "x": 21,
-        "y": 89
+        "y": 90
       },
       "id": 49,
       "links": [],
@@ -2904,8 +2904,8 @@
         "allValue": null,
         "current": {
           "selected": false,
-          "text": "1.0.6",
-          "value": "1.0.6"
+          "text": "1.0.117",
+          "value": "1.0.117"
         },
         "datasource": "Elasticsearch-hammerdb-results",
         "definition": "{\"find\":\"terms\",\"field\":\"runner version.keyword\"}",
@@ -2931,8 +2931,8 @@
         "allValue": null,
         "current": {
           "selected": false,
-          "text": "0bf63d38-a7fc-514c-a73c-5533e3e02b3f",
-          "value": "0bf63d38-a7fc-514c-a73c-5533e3e02b3f"
+          "text": "044dfc52-5c70-5cd9-8484-32925451153b",
+          "value": "044dfc52-5c70-5cd9-8484-32925451153b"
         },
         "datasource": "Elasticsearch-hammerdb-results",
         "definition": "{\"find\":\"terms\",\"field\":\"uuid.keyword\"}",
@@ -2963,6 +2963,6 @@
   "timepicker": {},
   "timezone": "",
   "title": "benchmark-runner report",
-  "uid": "h6smNoInz",
-  "version": 10
+  "uid": "pxnunRNnk",
+  "version": 5
 }
