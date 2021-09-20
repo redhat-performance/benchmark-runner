@@ -21,8 +21,8 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 2,
-  "iteration": 1632124465877,
+  "id": 3,
+  "iteration": 1632137781877,
   "links": [],
   "panels": [
     {
@@ -1131,7 +1131,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:64 and kind=vm",
+          "query": "read_message_size:64 AND kind:'vm'",
           "refId": "C",
           "timeField": "uperf_ts"
         },
@@ -1158,7 +1158,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:64 and kind=pod",
+          "query": "read_message_size:64 AND kind:'pod'",
           "refId": "B",
           "timeField": "uperf_ts"
         },
@@ -1186,7 +1186,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:256 and kind=vm",
+          "query": "read_message_size:256 AND kind:'vm'",
           "refId": "D",
           "timeField": "uperf_ts"
         },
@@ -1213,7 +1213,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:256 and kind=pod",
+          "query": "read_message_size:256 AND kind:'pod'",
           "refId": "E",
           "timeField": "uperf_ts"
         },
@@ -1240,7 +1240,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:1024 and kind=vm",
+          "query": "read_message_size:1024 AND kind:'vm'",
           "refId": "G",
           "timeField": "uperf_ts"
         },
@@ -1268,7 +1268,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:1024 and kind=pod",
+          "query": "read_message_size:1024 AND kind:'pod'",
           "refId": "F",
           "timeField": "uperf_ts"
         },
@@ -1295,7 +1295,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:4096 and kind=vm",
+          "query": "read_message_size:4096 AND kind:'vm'",
           "refId": "A",
           "timeField": "uperf_ts"
         },
@@ -1323,7 +1323,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:4096 and kind=pod",
+          "query": "read_message_size:4096 AND kind:'pod'",
           "refId": "H",
           "timeField": "uperf_ts"
         },
@@ -1350,7 +1350,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 and kind=vm",
+          "query": "read_message_size:16384 AND kind:'vm'",
           "refId": "I",
           "timeField": "uperf_ts"
         },
@@ -1378,7 +1378,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 and kind=pod",
+          "query": "read_message_size:16384 AND kind:'pod'",
           "refId": "J",
           "timeField": "uperf_ts"
         }
@@ -1493,7 +1493,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:64 and kind=vm",
+          "query": "read_message_size:64 AND kind:'vm'",
           "refId": "C",
           "timeField": "uperf_ts"
         },
@@ -1520,7 +1520,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:64 and kind=pod",
+          "query": "read_message_size:64 AND kind:'pod'",
           "refId": "B",
           "timeField": "uperf_ts"
         },
@@ -1548,7 +1548,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:256 and kind=vm",
+          "query": "read_message_size:256 AND kind:'vm'",
           "refId": "D",
           "timeField": "uperf_ts"
         },
@@ -1575,7 +1575,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:256 and kind=pod",
+          "query": "read_message_size:256 AND kind:'pod'",
           "refId": "E",
           "timeField": "uperf_ts"
         },
@@ -1603,7 +1603,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:1024 and kind=vm",
+          "query": "read_message_size:1024 AND kind:'vm'",
           "refId": "H",
           "timeField": "uperf_ts"
         },
@@ -1630,7 +1630,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:1024 and kind=pod",
+          "query": "read_message_size:1024 AND kind:'pod'",
           "refId": "G",
           "timeField": "uperf_ts"
         },
@@ -1658,7 +1658,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:4096 and kind=vm",
+          "query": "read_message_size:4096 AND kind:'vm'",
           "refId": "J",
           "timeField": "uperf_ts"
         },
@@ -1685,7 +1685,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:4096 and kind=pod",
+          "query": "read_message_size:4096 AND kind:'pod'",
           "refId": "A",
           "timeField": "uperf_ts"
         },
@@ -1712,7 +1712,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 and kind=vm",
+          "query": "read_message_size:16384 AND kind:'vm'",
           "refId": "I",
           "timeField": "uperf_ts"
         },
@@ -1740,7 +1740,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 and kind=pod",
+          "query": "read_message_size:16384 AND kind:'pod'",
           "refId": "F",
           "timeField": "uperf_ts"
         }
@@ -1858,7 +1858,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:64 and kind=vm",
+          "query": "read_message_size:64 AND kind:'vm'",
           "refId": "B",
           "timeField": "uperf_ts"
         },
@@ -1886,7 +1886,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:64 and kind=pod",
+          "query": "read_message_size:64 AND kind:'pod'",
           "refId": "C",
           "timeField": "uperf_ts"
         },
@@ -1913,7 +1913,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:256 and kind=vm",
+          "query": "read_message_size:256 AND kind:'vm'",
           "refId": "E",
           "timeField": "uperf_ts"
         },
@@ -1941,7 +1941,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:256 and kind=pod",
+          "query": "read_message_size:256 AND kind:'pod'",
           "refId": "D",
           "timeField": "uperf_ts"
         },
@@ -1968,7 +1968,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:1024 and kind=vm",
+          "query": "read_message_size:1024 AND kind:'vm'",
           "refId": "G",
           "timeField": "uperf_ts"
         },
@@ -1996,7 +1996,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:1024 and kind=pod",
+          "query": "read_message_size:1024 AND kind:'pod'",
           "refId": "F",
           "timeField": "uperf_ts"
         },
@@ -2023,7 +2023,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:4096 and kind=vm",
+          "query": "read_message_size:4096 AND kind:'vm'",
           "refId": "A",
           "timeField": "uperf_ts"
         },
@@ -2051,7 +2051,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:4096 and kind=pod",
+          "query": "read_message_size:4096 AND kind:'pod'",
           "refId": "H",
           "timeField": "uperf_ts"
         },
@@ -2078,7 +2078,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 and kind=vm",
+          "query": "read_message_size:16384 AND kind:'vm'",
           "refId": "I",
           "timeField": "uperf_ts"
         },
@@ -2106,7 +2106,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 and kind=pod",
+          "query": "read_message_size:16384 AND kind:'pod'",
           "refId": "J",
           "timeField": "uperf_ts"
         }
@@ -2224,7 +2224,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:64 and kind=vm",
+          "query": "read_message_size:64 AND kind:'vm'",
           "refId": "B",
           "timeField": "uperf_ts"
         },
@@ -2252,7 +2252,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:64 and kind=pod",
+          "query": "read_message_size:64 AND kind:'pod'",
           "refId": "C",
           "timeField": "uperf_ts"
         },
@@ -2280,7 +2280,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:256 and kind=vm",
+          "query": "read_message_size:256 AND kind:'vm'",
           "refId": "E",
           "timeField": "uperf_ts"
         },
@@ -2308,7 +2308,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:256 and kind=pod",
+          "query": "read_message_size:256 AND kind:'pod'",
           "refId": "D",
           "timeField": "uperf_ts"
         },
@@ -2336,7 +2336,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:1024 and kind=vm",
+          "query": "read_message_size:1024 AND kind:'vm'",
           "refId": "G",
           "timeField": "uperf_ts"
         },
@@ -2364,7 +2364,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:1024 and kind=pod",
+          "query": "read_message_size:1024 AND kind:'pod'",
           "refId": "F",
           "timeField": "uperf_ts"
         },
@@ -2392,7 +2392,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:4096 and kind=vm",
+          "query": "read_message_size:4096 AND kind:'vm'",
           "refId": "A",
           "timeField": "uperf_ts"
         },
@@ -2420,7 +2420,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:4096 and kind=pod",
+          "query": "read_message_size:4096 AND kind:'pod'",
           "refId": "H",
           "timeField": "uperf_ts"
         },
@@ -2448,7 +2448,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 and kind=vm",
+          "query": "read_message_size:16384 AND kind:'vm'",
           "refId": "I",
           "timeField": "uperf_ts"
         },
@@ -2476,7 +2476,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 and kind=pod",
+          "query": "read_message_size:16384 AND kind:'pod'",
           "refId": "J",
           "timeField": "uperf_ts"
         }
@@ -2684,7 +2684,7 @@
               "type": "max"
             }
           ],
-          "query": "kind=vm",
+          "query": "kind:'vm'",
           "refId": "A",
           "timeField": "timestamp"
         },
@@ -2712,7 +2712,7 @@
               "type": "max"
             }
           ],
-          "query": "kind=pod",
+          "query": "kind:'pod'",
           "refId": "B",
           "timeField": "timestamp"
         },
@@ -2740,7 +2740,7 @@
               "type": "max"
             }
           ],
-          "query": "kind=vm",
+          "query": "kind:'vm'",
           "refId": "C",
           "timeField": "timestamp"
         },
@@ -2768,7 +2768,7 @@
               "type": "max"
             }
           ],
-          "query": "kind=pod",
+          "query": "kind:'pod'",
           "refId": "D",
           "timeField": "timestamp"
         },
@@ -2796,7 +2796,7 @@
               "type": "max"
             }
           ],
-          "query": "kind=vm",
+          "query": "kind:'vm'",
           "refId": "E",
           "timeField": "timestamp"
         },
@@ -2824,7 +2824,7 @@
               "type": "max"
             }
           ],
-          "query": "kind=pod",
+          "query": "kind:'pod'",
           "refId": "F",
           "timeField": "timestamp"
         }
@@ -2931,8 +2931,8 @@
         "allValue": null,
         "current": {
           "selected": false,
-          "text": "044dfc52-5c70-5cd9-8484-32925451153b",
-          "value": "044dfc52-5c70-5cd9-8484-32925451153b"
+          "text": "40bf9293-74fd-519c-9cbf-84b5ad8caf59",
+          "value": "40bf9293-74fd-519c-9cbf-84b5ad8caf59"
         },
         "datasource": "Elasticsearch-hammerdb-results",
         "definition": "{\"find\":\"terms\",\"field\":\"uuid.keyword\"}",
@@ -2957,12 +2957,12 @@
     ]
   },
   "time": {
-    "from": "now-24h",
+    "from": "now-12h",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "benchmark-runner report",
-  "uid": "pxnunRNnk",
-  "version": 5
+  "uid": "mjAMHGN7z",
+  "version": 2
 }
