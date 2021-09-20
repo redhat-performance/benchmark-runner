@@ -21,7 +21,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 2,
+  "id": 1,
   "links": [],
   "panels": [
     {
@@ -68,7 +68,7 @@
           "timeField": "timestamp"
         }
       ],
-      "title": "benchmark-runner ci status",
+      "title": "benchmark-runner/ benchmark-operator ci status",
       "type": "text"
     },
     {
@@ -76,10 +76,10 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "continuous-RdYlGr"
+            "mode": "continuous-GrYlRd"
           },
           "custom": {
-            "align": "auto",
+            "align": "center",
             "displayMode": "color-text",
             "filterable": true
           },
@@ -115,7 +115,80 @@
           },
           "unit": "string"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "timestamp"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "dateTimeAsIso"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Max"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Status"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cnv version.keyword"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "cnv version"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ocp version.keyword"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "ocp version"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ocs version.keyword"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "ocs version"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "runner version.keyword"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "benchmark runner version"
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 8,
@@ -125,7 +198,7 @@
       },
       "id": 6,
       "options": {
-        "showHeader": false,
+        "showHeader": true,
         "sortBy": [
           {
             "desc": true,
@@ -141,6 +214,50 @@
             {
               "field": "runner version.keyword",
               "id": "2",
+              "settings": {
+                "min_doc_count": "0",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            },
+            {
+              "field": "ocp version.keyword",
+              "id": "3",
+              "settings": {
+                "min_doc_count": "0",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            },
+            {
+              "field": "cnv version.keyword",
+              "id": "4",
+              "settings": {
+                "min_doc_count": "0",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            },
+            {
+              "field": "ocs version.keyword",
+              "id": "5",
+              "settings": {
+                "min_doc_count": "0",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            },
+            {
+              "field": "timestamp",
+              "id": "6",
               "settings": {
                 "min_doc_count": "0",
                 "order": "desc",
@@ -178,12 +295,12 @@
     "list": []
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-2d",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "benchmark-runner-ci-status",
-  "uid": "5s9L3TSnk",
-  "version": 8
+  "uid": "tUclnRNnz",
+  "version": 9
 }
