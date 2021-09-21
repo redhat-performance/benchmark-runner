@@ -1,0 +1,54 @@
+apiVersion: ripsaw.cloudbulldozer.io/v1alpha1
+kind: Benchmark
+metadata:
+  name: stressng-vm
+  namespace: {{ namespace }}
+spec:
+  system_metrics:
+    collection: {{ system_metrics }}
+    prom_url: "{{ prom_url }}"
+    es_url: "{{ es_url }}"
+    prom_token: "{{ prom_token }}"
+    metrics_profile: "{{ metrics_profile }}"
+    index_name: {{ sm_index_name }}
+  elasticsearch:
+    url: "{{ es_url }}"
+    index_name: {{ es_index_name }}
+  metadata:
+    collection: false
+  workload:
+    name: stressng
+    args:
+      pin: {{ pin }} # enable for nodeSelector
+      pin_node: "{{ pin_node }}"
+      # general options
+      runtype: "{{ runtype }}"
+      timeout: "{{ timeout }}"
+      instances: {{ instances }}
+      # cpu stressor options
+      cpu_stressors: "{{ cpu_stressors }}"
+      cpu_percentage: "{{ cpu_percentage }}"
+      # vm stressor option
+      vm_stressors: "{{ vm_stressors }}"
+      vm_bytes: "{{ vm_bytes }}"
+      # mem stressor options
+      mem_stressors: "{{ mem_stressors }}"
+      kind: vm
+      client_vm:
+        dedicatedcpuplacement: false
+        sockets: 1
+        cores: {{ cores }}
+        threads: 1
+        image: kubevirt/fedora-cloud-container-disk-demo:latest
+        limits:
+          memory: {{ limits_memory_GB }}Gi
+        requests:
+          memory: {{ requests_memory }}
+        network:
+          front_end: bridge # or masquerade
+          multiqueue:
+            enabled: false # if set to true, highly recommend to set selinux to permissive on the nodes where the vms would be scheduled
+            queues: 0 # must be given if enabled is set to true and ideally should be set to vcpus ideally so sockets*threads*cores, your image must've ethtool installed
+        extra_options:
+          - none
+          #- hostpassthrough

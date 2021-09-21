@@ -11,17 +11,18 @@ from benchmark_runner.main.environment_variables import environment_variables
 class TemplateOperations:
     """This class is responsible for template operations"""
 
-    def __init__(self, storage_type: str = ''):
-        #  if mount is exist - path inside Dockerfile
-        if os.path.exists('/benchmark_runner/templates/'):
-            self.__dir_path = '/benchmark_runner/templates'
-        else:
-            self.__dir_path = os.path.dirname(os.path.realpath(__file__))
-        self.__current_run_path = f'{self.__dir_path}/current_run'
-        self.__hammerdb_dir_path = os.path.join(self.__dir_path, 'hammerdb')
-        self.__hammerdb__internal_dir_path = os.path.join(self.__dir_path, 'hammerdb', 'internal_data')
+    def __init__(self):
         # environment variables
         self.__environment_variables_dict = environment_variables.environment_variables_dict
+        self.__run_type = self.__environment_variables_dict.get('run_type', '')
+        #  if mount is exist - path inside Dockerfile
+        if os.path.exists('/benchmark_runner/workload_flavors/'):
+            self.__dir_path = '/benchmark_runner/workload_flavors'
+        else:
+            self.__dir_path = f'{os.path.dirname(os.path.realpath(__file__))}/{self.__run_type}'
+        self.__current_run_path = f'{self.__dir_path}/current_run'
+        self.__hammerdb_dir_path = os.path.join(self.__dir_path, f'hammerdb')
+        self.__hammerdb__internal_dir_path = os.path.join(self.__dir_path, f'hammerdb', 'internal_data')
         # hammerdb storage
         if self.__environment_variables_dict.get('ocs_pvc', '') == 'True':
             self.__storage_type = 'ocs_pvc'
@@ -41,7 +42,7 @@ class TemplateOperations:
     @logger_time_stamp
     def generate_hammerdb_yamls(self, workload: str, database: str):
         """
-        This method generate hammerdb yaml from templates,
+        This method generate hammerdb yaml from workload_flavors,
         special generator for 2 yaml file: database and workload
         :return:
         """

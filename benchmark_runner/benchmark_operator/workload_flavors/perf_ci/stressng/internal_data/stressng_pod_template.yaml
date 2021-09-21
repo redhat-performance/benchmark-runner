@@ -1,0 +1,40 @@
+apiVersion: ripsaw.cloudbulldozer.io/v1alpha1
+kind: Benchmark
+metadata:
+  name: stressng-pod
+  namespace: {{ namespace }}
+spec:
+  system_metrics:
+    collection: {{ system_metrics }}
+    prom_url: "{{ prom_url }}"
+    es_url: "{{ es_url }}"
+    prom_token: "{{ prom_token }}"
+    metrics_profile: "{{ metrics_profile }}"
+    index_name: {{ sm_index_name }}
+  elasticsearch:
+    url: "{{ es_url }}"
+    index_name: {{ es_index_name }}
+  metadata:
+    collection: false
+  workload:
+    name: stressng
+    args:
+      pin: {{ pin }} # enable for nodeSelector
+      pin_node: "{{ pin_node }}"
+      resources: {{ resources }} # enable for resources requests/limits
+      requests_cpu: {{ requests_cpu }}
+      requests_memory: {{ requests_memory }}
+      limits_cpu: {{ limits_cpu }}
+      limits_memory: {{ limits_memory_GB }}Gi
+      # general options
+      runtype: "{{ runtype }}"
+      timeout: "{{ timeout }}"
+      instances: {{ instances }}
+      # cpu stressor options
+      cpu_stressors: "{{ cpu_stressors }}"
+      cpu_percentage: "{{ cpu_percentage }}"
+      # vm stressor option
+      vm_stressors: "{{ vm_stressors }}"
+      vm_bytes: "{{ vm_bytes }}"
+      # mem stressor options
+      mem_stressors: "{{ mem_stressors }}"

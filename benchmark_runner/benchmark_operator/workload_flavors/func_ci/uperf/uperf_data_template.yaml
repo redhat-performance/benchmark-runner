@@ -1,0 +1,41 @@
+shared_data:
+  namespace: {{ namespace }}
+  es_url: {{ elasticsearch_url }}
+  es_index_name: uperf
+  pin: {{ pin }}
+  pin_server: {{ pin_node1 }}
+  pin_client: {{ pin_node2 }}
+  serviceip: false
+  hostnetwork: false
+  networkpolicy: false
+  multus: false
+  samples: 1
+  pair: 1
+  test_type: stream
+  proto: tcp
+  size1: 64
+  size2: 256
+  size3: 1024
+  size4: 4096
+  size5: 16384
+  nthr: 2
+  runtime: 30
+  # enable/disable system metrics
+  system_metrics: {{ system_metrics }}
+  prom_url: https://prometheus-k8s.openshift-monitoring.svc.cluster.local:9091
+  prom_token: {{ prom_token }}
+  sm_index_name: system-metrics
+  metrics_profile: node-metrics.yml
+  #metrics_profile: https://raw.githubusercontent.com/cloud-bulldozer/benchmark-operator/master/roles/kube-burner/files/metrics.yaml
+pod:
+  es_kind: pod
+  client_limits_cpu: 4
+  client_limits_memory_GB: 16
+  server_limits_cpu: 4
+  server_limits_memory_GB: 16
+vm:
+  es_kind: vm
+  server_cores: 4
+  server_limits_memory_GB: 16
+  client_cores: 4
+  client_limits_memory_GB: 16
