@@ -258,8 +258,8 @@ class BenchmarkOperatorWorkloads:
     def update_ci_status(self, status: str, ci_minutes_time: int, benchmark_operator: str, benchmark_wrapper: str):
         """
         This method update ci status Pass/Failed
-        :param benchmark_wrapper:
-        :param benchmark_operator:
+        :param benchmark_wrapper: benchmark_wrapper last repository commit id
+        :param benchmark_operator: benchmark_operator last repository commit id
         :param ci_minutes_time: Ci time in minutes
         :param status: Pass/Failed
         :return:
