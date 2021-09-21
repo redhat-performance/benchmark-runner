@@ -54,15 +54,15 @@ jobs:
             fi
             cd -
         done
-        build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
-        build_version="$(cut -d'=' -f2 <<<"$build")"
-        echo $build_version
+        BUILD=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
+        BUILD_VERSION="$(cut -d'=' -f2 <<<"$BUILD")"
+        echo $BUILD_VERSION
         start=$(printf '%(%s)T' -1)
         declare -a workloads=('stressng_pod' 'stressng_vm' 'uperf_pod' 'uperf_vm' 'hammerdb_pod_mariadb' 'hammerdb_vm_mariadb' 'hammerdb_pod_postgres' 'hammerdb_vm_postgres' 'hammerdb_pod_mssql' 'hammerdb_vm_mssql')
         for workload in "${workloads[@]}"
         do
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>'
-            podman run --rm -e WORKLOAD="$workload" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e BUILD_VERSION="$build_version" -e RUN_TYPE=perf_ci -e log_level=INFO -v $KUBECONFIG:"/root/.kube/config" --privileged quay.io/ebattat/benchmark-runner:v$build_version
+            podman run --rm -e WORKLOAD="$workload" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e BUILD_VERSION="$BUILD_VERSION" -e RUN_TYPE=perf_ci -e log_level=INFO -v $KUBECONFIG:"/root/.kube/config" --privileged quay.io/ebattat/benchmark-runner:v$BUILD_VERSION
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
         done
         end=$(printf '%(%s)T' -1)
