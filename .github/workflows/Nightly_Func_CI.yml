@@ -43,29 +43,29 @@ jobs:
         do
             git clone https://github.com/cloud-bulldozer/$repository $RUNNER_PATH/$repository
             cd $RUNNER_PATH/$repository
-            if [ $repository == 'benchmark-operator' ]
+            if [[ $repository == 'benchmark-operator' ]]
             then
-                benchmark_operator=$(git rev-parse @)
+                benchmark_operator_id=$(git rev-parse @)
             else
-                benchmark_wrapper=$(git rev-parse @)
+                benchmark_wrapper_id=$(git rev-parse @)
             fi
             cd -
         done
-        BUILD=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
-        BUILD_VERSION="$(cut -d'=' -f2 <<<"$BUILD")"
+        build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
+        build_version="$(cut -d'=' -f2 <<<"$build")"
         start=$(printf '%(%s)T' -1)
         declare -a WORKLOADS=('stressng_pod' 'stressng_vm' 'uperf_pod' 'uperf_vm' 'hammerdb_pod_mariadb' 'hammerdb_vm_mariadb' 'hammerdb_pod_postgres' 'hammerdb_vm_postgres' 'hammerdb_pod_mssql' 'hammerdb_vm_mssql')
         for WORKLOAD in "${WORKLOADS[@]}"
         do
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start E2E workload:' $WORKLOAD '>>>>>>>>>>>>>>>>>>>>>>>>>>'
-            podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e BUILD_VERSION=$BUILD_VERSION -e RUN_TYPE=func_ci -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:v$BUILD_VERSION
+            podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e BUILD_VERSION=$build_version -e RUN_TYPE=func_ci -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:v$build_version
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End E2E workload:' $WORKLOAD '>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
         done
         end=$(printf '%(%s)T' -1)
-        runtime=$(($((end-start))/60))
-        echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Update CI status Pass >>>>>>>>>>>>>>>>>>>>>>>>>>'
-        podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e BUILD_VERSION=$BUILD_VERSION -e CI_STATUS=Pass -e CI_MINUTES_TIME=$runtime -e benchmark_operator=$benchmark_operator -e benchmark_wrapper=$benchmark_wrapper -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:v$BUILD_VERSION
-    - name: Update CI status Failed
+        ci_minutes_time=$(($((end-start))/60))
+        echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Update CI status pass >>>>>>>>>>>>>>>>>>>>>>>>>>'
+        podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e BUILD_VERSION=$build_version -e CI_STATUS=pass -e CI_MINUTES_TIME=$ci_minutes_time -e BENCHMARK_OPERATOR_ID=$benchmark_operator_id -e BENCHMARK_WRAPPER_ID=$benchmark_wrapper_id -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:v$build_version
+    - name: Update CI status failed
       env:
         KUBEADMIN_PASSWORD: ${{ secrets.KUBEADMIN_PASSWORD_CI }}
         PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.PIN_NODE_BENCHMARK_OPERATOR_CI }}
@@ -76,9 +76,9 @@ jobs:
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
       if: ${{ failure() }}
       run: |
-        BUILD=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
-        BUILD_VERSION="$(cut -d'=' -f2 <<<"$BUILD")"
+        build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
+        build_version="$(cut -d'=' -f2 <<<"$build")"
         end=$(printf '%(%s)T' -1)
-        runtime=$(($((end-start))/60))
-        echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Update CI status Failed >>>>>>>>>>>>>>>>>>>>>>>>>>'
-        podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e BUILD_VERSION=$BUILD_VERSION -e CI_STATUS=Failed -e CI_MINUTES_TIME=$runtime -e benchmark_operator=$benchmark_operator -e benchmark_wrapper=$benchmark_wrapper -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:v$BUILD_VERSION
+        ci_minutes_time=$(($((end-start))/60))
+        echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Update CI status failed >>>>>>>>>>>>>>>>>>>>>>>>>>'
+        podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e BUILD_VERSION=$build_version -e CI_STATUS=failed -e CI_MINUTES_TIME=$ci_minutes_time -e BENCHMARK_OPERATOR_ID=$benchmark_operator_id -e BENCHMARK_WRAPPER_ID=$benchmark_wrapper_id -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:v$build_version
