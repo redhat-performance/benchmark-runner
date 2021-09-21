@@ -11,7 +11,7 @@ on:
 
 jobs:
   nightly:
-    name: Deploy Perf nightly
+    name: Deploy Perf Nightly
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
