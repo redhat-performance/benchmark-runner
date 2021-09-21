@@ -22,7 +22,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": 3,
-  "iteration": 1632137781877,
+  "iteration": 1632137781895,
   "links": [],
   "panels": [
     {
@@ -1131,7 +1131,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:64 AND kind:'vm'",
+          "query": "read_message_size:64 AND kind:'vm' AND num_threads:1",
           "refId": "C",
           "timeField": "uperf_ts"
         },
@@ -1158,7 +1158,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:64 AND kind:'pod'",
+          "query": "read_message_size:64 AND kind:'pod' AND num_threads:1",
           "refId": "B",
           "timeField": "uperf_ts"
         },
@@ -1186,7 +1186,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:256 AND kind:'vm'",
+          "query": "read_message_size:256 AND kind:'vm' AND num_threads:1",
           "refId": "D",
           "timeField": "uperf_ts"
         },
@@ -1213,7 +1213,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:256 AND kind:'pod'",
+          "query": "read_message_size:256 AND kind:'pod' AND num_threads:1",
           "refId": "E",
           "timeField": "uperf_ts"
         },
@@ -1240,7 +1240,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:1024 AND kind:'vm'",
+          "query": "read_message_size:1024 AND kind:'vm' AND num_threads:1",
           "refId": "G",
           "timeField": "uperf_ts"
         },
@@ -1268,7 +1268,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:1024 AND kind:'pod'",
+          "query": "read_message_size:1024 AND kind:'pod' AND num_threads:1",
           "refId": "F",
           "timeField": "uperf_ts"
         },
@@ -1295,7 +1295,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:4096 AND kind:'vm'",
+          "query": "read_message_size:4096 AND kind:'vm' AND num_threads:1",
           "refId": "A",
           "timeField": "uperf_ts"
         },
@@ -1323,7 +1323,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:4096 AND kind:'pod'",
+          "query": "read_message_size:4096 AND kind:'pod' AND num_threads:1",
           "refId": "H",
           "timeField": "uperf_ts"
         },
@@ -1350,7 +1350,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'vm'",
+          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:1",
           "refId": "I",
           "timeField": "uperf_ts"
         },
@@ -1378,7 +1378,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'pod'",
+          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:1",
           "refId": "J",
           "timeField": "uperf_ts"
         }
@@ -1387,7 +1387,373 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Uperf - norm_ltcy",
+      "title": "Uperf - norm_ltcy - 1 thread",
+      "tooltip": {
+        "shared": false,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "series",
+        "name": null,
+        "show": true,
+        "values": [
+          "total"
+        ]
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:1024",
+          "format": "short",
+          "label": "",
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:1025",
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "Elasticsearch-uperf-results",
+      "decimals": null,
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 11,
+        "w": 24,
+        "x": 0,
+        "y": 49
+      },
+      "hiddenSeries": false,
+      "id": 50,
+      "legend": {
+        "alignAsTable": false,
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "rightSide": false,
+        "show": false,
+        "sideWidth": null,
+        "total": false,
+        "values": false
+      },
+      "lines": false,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.1.2",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "64 vm",
+          "bucketAggs": [
+            {
+              "field": "uperf_ts",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "hide": false,
+          "metrics": [
+            {
+              "field": "norm_ltcy",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "max"
+            }
+          ],
+          "query": "read_message_size:64 AND kind:'vm' AND num_threads:2",
+          "refId": "C",
+          "timeField": "uperf_ts"
+        },
+        {
+          "alias": "64 pod",
+          "bucketAggs": [
+            {
+              "field": "uperf_ts",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "metrics": [
+            {
+              "field": "norm_ltcy",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "max"
+            }
+          ],
+          "query": "read_message_size:64 AND kind:'pod' AND num_threads:2",
+          "refId": "B",
+          "timeField": "uperf_ts"
+        },
+        {
+          "alias": "256 vm",
+          "bucketAggs": [
+            {
+              "field": "uperf_ts",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "hide": false,
+          "metrics": [
+            {
+              "field": "norm_ltcy",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "max"
+            }
+          ],
+          "query": "read_message_size:256 AND kind:'vm' AND num_threads:2",
+          "refId": "D",
+          "timeField": "uperf_ts"
+        },
+        {
+          "alias": "256 pod",
+          "bucketAggs": [
+            {
+              "field": "uperf_ts",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "metrics": [
+            {
+              "field": "norm_ltcy",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "max"
+            }
+          ],
+          "query": "read_message_size:256 AND kind:'pod' AND num_threads:2",
+          "refId": "E",
+          "timeField": "uperf_ts"
+        },
+        {
+          "alias": "1024 vm",
+          "bucketAggs": [
+            {
+              "field": "uperf_ts",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "metrics": [
+            {
+              "field": "norm_ltcy",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "max"
+            }
+          ],
+          "query": "read_message_size:1024 AND kind:'vm' AND num_threads:2",
+          "refId": "G",
+          "timeField": "uperf_ts"
+        },
+        {
+          "alias": "1024 pod",
+          "bucketAggs": [
+            {
+              "field": "uperf_ts",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "hide": false,
+          "metrics": [
+            {
+              "field": "norm_ltcy",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "max"
+            }
+          ],
+          "query": "read_message_size:1024 AND kind:'pod' AND num_threads:2",
+          "refId": "F",
+          "timeField": "uperf_ts"
+        },
+        {
+          "alias": "4096 vm",
+          "bucketAggs": [
+            {
+              "field": "uperf_ts",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "metrics": [
+            {
+              "field": "norm_ltcy",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "max"
+            }
+          ],
+          "query": "read_message_size:4096 AND kind:'vm' AND num_threads:2",
+          "refId": "A",
+          "timeField": "uperf_ts"
+        },
+        {
+          "alias": "4096 pod",
+          "bucketAggs": [
+            {
+              "field": "uperf_ts",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "hide": false,
+          "metrics": [
+            {
+              "field": "norm_ltcy",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "max"
+            }
+          ],
+          "query": "read_message_size:4096 AND kind:'pod' AND num_threads:2",
+          "refId": "H",
+          "timeField": "uperf_ts"
+        },
+        {
+          "alias": "16384 vm",
+          "bucketAggs": [
+            {
+              "field": "uperf_ts",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "metrics": [
+            {
+              "field": "norm_ltcy",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "max"
+            }
+          ],
+          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:2",
+          "refId": "I",
+          "timeField": "uperf_ts"
+        },
+        {
+          "alias": "16384 pod",
+          "bucketAggs": [
+            {
+              "field": "uperf_ts",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "hide": false,
+          "metrics": [
+            {
+              "field": "norm_ltcy",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "max"
+            }
+          ],
+          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:2",
+          "refId": "J",
+          "timeField": "uperf_ts"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Uperf - norm_ltcy - 2 threads",
       "tooltip": {
         "shared": false,
         "sort": 0,
@@ -1440,7 +1806,7 @@
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 49
+        "y": 60
       },
       "hiddenSeries": false,
       "id": 26,
@@ -1493,7 +1859,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:64 AND kind:'vm'",
+          "query": "read_message_size:64 AND kind:'vm' AND num_threads:1",
           "refId": "C",
           "timeField": "uperf_ts"
         },
@@ -1520,7 +1886,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:64 AND kind:'pod'",
+          "query": "read_message_size:64 AND kind:'pod' AND num_threads:1",
           "refId": "B",
           "timeField": "uperf_ts"
         },
@@ -1548,7 +1914,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:256 AND kind:'vm'",
+          "query": "read_message_size:256 AND kind:'vm' AND num_threads:1",
           "refId": "D",
           "timeField": "uperf_ts"
         },
@@ -1575,7 +1941,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:256 AND kind:'pod'",
+          "query": "read_message_size:256 AND kind:'pod' AND num_threads:1",
           "refId": "E",
           "timeField": "uperf_ts"
         },
@@ -1603,7 +1969,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:1024 AND kind:'vm'",
+          "query": "read_message_size:1024 AND kind:'vm' AND num_threads:1",
           "refId": "H",
           "timeField": "uperf_ts"
         },
@@ -1630,7 +1996,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:1024 AND kind:'pod'",
+          "query": "read_message_size:1024 AND kind:'pod' AND num_threads:1",
           "refId": "G",
           "timeField": "uperf_ts"
         },
@@ -1658,7 +2024,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:4096 AND kind:'vm'",
+          "query": "read_message_size:4096 AND kind:'vm' AND num_threads:1",
           "refId": "J",
           "timeField": "uperf_ts"
         },
@@ -1685,7 +2051,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:4096 AND kind:'pod'",
+          "query": "read_message_size:4096 AND kind:'pod' AND num_threads:1",
           "refId": "A",
           "timeField": "uperf_ts"
         },
@@ -1712,7 +2078,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'vm'",
+          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:1",
           "refId": "I",
           "timeField": "uperf_ts"
         },
@@ -1740,7 +2106,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'pod'",
+          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:1",
           "refId": "F",
           "timeField": "uperf_ts"
         }
@@ -1749,7 +2115,369 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Uperf - norm_ops",
+      "title": "Uperf - norm_ops  - 1 thread",
+      "tooltip": {
+        "shared": false,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "series",
+        "name": null,
+        "show": true,
+        "values": [
+          "total"
+        ]
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:971",
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:972",
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "Elasticsearch-uperf-results",
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 70
+      },
+      "hiddenSeries": false,
+      "id": 51,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": false,
+        "total": false,
+        "values": false
+      },
+      "lines": false,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.1.2",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "64 vm",
+          "bucketAggs": [
+            {
+              "field": "uperf_ts",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "hide": false,
+          "metrics": [
+            {
+              "field": "norm_ops",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "max"
+            }
+          ],
+          "query": "read_message_size:64 AND kind:'vm' AND num_threads:2",
+          "refId": "C",
+          "timeField": "uperf_ts"
+        },
+        {
+          "alias": "64 pod",
+          "bucketAggs": [
+            {
+              "field": "uperf_ts",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "metrics": [
+            {
+              "field": "norm_ops",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "max"
+            }
+          ],
+          "query": "read_message_size:64 AND kind:'pod' AND num_threads:2",
+          "refId": "B",
+          "timeField": "uperf_ts"
+        },
+        {
+          "alias": "256 vm",
+          "bucketAggs": [
+            {
+              "field": "uperf_ts",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "hide": false,
+          "metrics": [
+            {
+              "field": "norm_ops",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "max"
+            }
+          ],
+          "query": "read_message_size:256 AND kind:'vm' AND num_threads:2",
+          "refId": "D",
+          "timeField": "uperf_ts"
+        },
+        {
+          "alias": "256 pod",
+          "bucketAggs": [
+            {
+              "field": "uperf_ts",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "metrics": [
+            {
+              "field": "norm_ops",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "max"
+            }
+          ],
+          "query": "read_message_size:256 AND kind:'pod' AND num_threads:2",
+          "refId": "E",
+          "timeField": "uperf_ts"
+        },
+        {
+          "alias": "1024 vm",
+          "bucketAggs": [
+            {
+              "field": "uperf_ts",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "hide": false,
+          "metrics": [
+            {
+              "field": "norm_ops",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "max"
+            }
+          ],
+          "query": "read_message_size:1024 AND kind:'vm' AND num_threads:2",
+          "refId": "H",
+          "timeField": "uperf_ts"
+        },
+        {
+          "alias": "1024 pod",
+          "bucketAggs": [
+            {
+              "field": "uperf_ts",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "metrics": [
+            {
+              "field": "norm_ops",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "max"
+            }
+          ],
+          "query": "read_message_size:1024 AND kind:'pod' AND num_threads:2",
+          "refId": "G",
+          "timeField": "uperf_ts"
+        },
+        {
+          "alias": "4096 vm",
+          "bucketAggs": [
+            {
+              "field": "uperf_ts",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "hide": false,
+          "metrics": [
+            {
+              "field": "norm_ops",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "max"
+            }
+          ],
+          "query": "read_message_size:4096 AND kind:'vm' AND num_threads:2",
+          "refId": "J",
+          "timeField": "uperf_ts"
+        },
+        {
+          "alias": "4096 pod",
+          "bucketAggs": [
+            {
+              "field": "uperf_ts",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "metrics": [
+            {
+              "field": "norm_ops",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "max"
+            }
+          ],
+          "query": "read_message_size:4096 AND kind:'pod' AND num_threads:2",
+          "refId": "A",
+          "timeField": "uperf_ts"
+        },
+        {
+          "alias": "16384 vm",
+          "bucketAggs": [
+            {
+              "field": "uperf_ts",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "metrics": [
+            {
+              "field": "norm_ops",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "max"
+            }
+          ],
+          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:2",
+          "refId": "I",
+          "timeField": "uperf_ts"
+        },
+        {
+          "alias": "16384 pod",
+          "bucketAggs": [
+            {
+              "field": "uperf_ts",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "hide": false,
+          "metrics": [
+            {
+              "field": "norm_ops",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "max"
+            }
+          ],
+          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:2",
+          "refId": "F",
+          "timeField": "uperf_ts"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Uperf - norm_ops  - 2 threads",
       "tooltip": {
         "shared": false,
         "sort": 0,
@@ -1803,7 +2531,7 @@
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 59
+        "y": 80
       },
       "hiddenSeries": false,
       "id": 39,
@@ -1858,7 +2586,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:64 AND kind:'vm'",
+          "query": "read_message_size:64 AND kind:'vm' AND num_threads:1",
           "refId": "B",
           "timeField": "uperf_ts"
         },
@@ -1886,7 +2614,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:64 AND kind:'pod'",
+          "query": "read_message_size:64 AND kind:'pod' AND num_threads:1",
           "refId": "C",
           "timeField": "uperf_ts"
         },
@@ -1913,7 +2641,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:256 AND kind:'vm'",
+          "query": "read_message_size:256 AND kind:'vm' AND num_threads:1",
           "refId": "E",
           "timeField": "uperf_ts"
         },
@@ -1941,7 +2669,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:256 AND kind:'pod'",
+          "query": "read_message_size:256 AND kind:'pod' AND num_threads:1",
           "refId": "D",
           "timeField": "uperf_ts"
         },
@@ -1968,7 +2696,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:1024 AND kind:'vm'",
+          "query": "read_message_size:1024 AND kind:'vm' AND num_threads:1",
           "refId": "G",
           "timeField": "uperf_ts"
         },
@@ -1996,7 +2724,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:1024 AND kind:'pod'",
+          "query": "read_message_size:1024 AND kind:'pod' AND num_threads:1",
           "refId": "F",
           "timeField": "uperf_ts"
         },
@@ -2023,7 +2751,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:4096 AND kind:'vm'",
+          "query": "read_message_size:4096 AND kind:'vm' AND num_threads:1",
           "refId": "A",
           "timeField": "uperf_ts"
         },
@@ -2051,7 +2779,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:4096 AND kind:'pod'",
+          "query": "read_message_size:4096 AND kind:'pod' AND num_threads:1",
           "refId": "H",
           "timeField": "uperf_ts"
         },
@@ -2078,7 +2806,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'vm'",
+          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:1",
           "refId": "I",
           "timeField": "uperf_ts"
         },
@@ -2106,7 +2834,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'pod'",
+          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:1",
           "refId": "J",
           "timeField": "uperf_ts"
         }
@@ -2115,7 +2843,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Uperf - norm_bytes",
+      "title": "Uperf - norm_bytes - 1 thread",
       "tooltip": {
         "shared": false,
         "sort": 0,
@@ -2169,7 +2897,373 @@
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 69
+        "y": 90
+      },
+      "hiddenSeries": false,
+      "id": 52,
+      "legend": {
+        "alignAsTable": false,
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "rightSide": false,
+        "show": false,
+        "sideWidth": null,
+        "total": false,
+        "values": false
+      },
+      "lines": false,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.1.2",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "64 vm",
+          "bucketAggs": [
+            {
+              "field": "uperf_ts",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "metrics": [
+            {
+              "field": "norm_byte",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "max"
+            }
+          ],
+          "query": "read_message_size:64 AND kind:'vm' AND num_threads:2",
+          "refId": "B",
+          "timeField": "uperf_ts"
+        },
+        {
+          "alias": "64 pod",
+          "bucketAggs": [
+            {
+              "field": "uperf_ts",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "hide": false,
+          "metrics": [
+            {
+              "field": "norm_byte",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "max"
+            }
+          ],
+          "query": "read_message_size:64 AND kind:'pod' AND num_threads:2",
+          "refId": "C",
+          "timeField": "uperf_ts"
+        },
+        {
+          "alias": "256 vm",
+          "bucketAggs": [
+            {
+              "field": "uperf_ts",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "metrics": [
+            {
+              "field": "norm_byte",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "max"
+            }
+          ],
+          "query": "read_message_size:256 AND kind:'vm' AND num_threads:2",
+          "refId": "E",
+          "timeField": "uperf_ts"
+        },
+        {
+          "alias": "256 pod",
+          "bucketAggs": [
+            {
+              "field": "uperf_ts",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "hide": false,
+          "metrics": [
+            {
+              "field": "norm_byte",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "max"
+            }
+          ],
+          "query": "read_message_size:256 AND kind:'pod' AND num_threads:2",
+          "refId": "D",
+          "timeField": "uperf_ts"
+        },
+        {
+          "alias": "1024 vm",
+          "bucketAggs": [
+            {
+              "field": "uperf_ts",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "metrics": [
+            {
+              "field": "norm_byte",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "max"
+            }
+          ],
+          "query": "read_message_size:1024 AND kind:'vm' AND num_threads:2",
+          "refId": "G",
+          "timeField": "uperf_ts"
+        },
+        {
+          "alias": "1024 pod",
+          "bucketAggs": [
+            {
+              "field": "uperf_ts",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "hide": false,
+          "metrics": [
+            {
+              "field": "norm_byte",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "max"
+            }
+          ],
+          "query": "read_message_size:1024 AND kind:'pod' AND num_threads:2",
+          "refId": "F",
+          "timeField": "uperf_ts"
+        },
+        {
+          "alias": "4096 vm",
+          "bucketAggs": [
+            {
+              "field": "uperf_ts",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "metrics": [
+            {
+              "field": "norm_byte",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "max"
+            }
+          ],
+          "query": "read_message_size:4096 AND kind:'vm' AND num_threads:2",
+          "refId": "A",
+          "timeField": "uperf_ts"
+        },
+        {
+          "alias": "4096 pod",
+          "bucketAggs": [
+            {
+              "field": "uperf_ts",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "hide": false,
+          "metrics": [
+            {
+              "field": "norm_byte",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "max"
+            }
+          ],
+          "query": "read_message_size:4096 AND kind:'pod' AND num_threads:2",
+          "refId": "H",
+          "timeField": "uperf_ts"
+        },
+        {
+          "alias": "16384 vm",
+          "bucketAggs": [
+            {
+              "field": "uperf_ts",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "metrics": [
+            {
+              "field": "norm_byte",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "max"
+            }
+          ],
+          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:2",
+          "refId": "I",
+          "timeField": "uperf_ts"
+        },
+        {
+          "alias": "16384 pod",
+          "bucketAggs": [
+            {
+              "field": "uperf_ts",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "hide": false,
+          "metrics": [
+            {
+              "field": "norm_byte",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "max"
+            }
+          ],
+          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:2",
+          "refId": "J",
+          "timeField": "uperf_ts"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Uperf - norm_bytes - 2 threads",
+      "tooltip": {
+        "shared": false,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "series",
+        "name": null,
+        "show": true,
+        "values": [
+          "total"
+        ]
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:1391",
+          "format": "short",
+          "label": "",
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:1392",
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "Elasticsearch-uperf-results",
+      "decimals": null,
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 100
       },
       "hiddenSeries": false,
       "id": 41,
@@ -2224,7 +3318,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:64 AND kind:'vm'",
+          "query": "read_message_size:64 AND kind:'vm' AND num_threads:1",
           "refId": "B",
           "timeField": "uperf_ts"
         },
@@ -2252,7 +3346,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:64 AND kind:'pod'",
+          "query": "read_message_size:64 AND kind:'pod' AND num_threads:1",
           "refId": "C",
           "timeField": "uperf_ts"
         },
@@ -2280,7 +3374,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:256 AND kind:'vm'",
+          "query": "read_message_size:256 AND kind:'vm' AND num_threads:1",
           "refId": "E",
           "timeField": "uperf_ts"
         },
@@ -2308,7 +3402,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:256 AND kind:'pod'",
+          "query": "read_message_size:256 AND kind:'pod' AND num_threads:1",
           "refId": "D",
           "timeField": "uperf_ts"
         },
@@ -2336,7 +3430,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:1024 AND kind:'vm'",
+          "query": "read_message_size:1024 AND kind:'vm' AND num_threads:1",
           "refId": "G",
           "timeField": "uperf_ts"
         },
@@ -2364,7 +3458,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:1024 AND kind:'pod'",
+          "query": "read_message_size:1024 AND kind:'pod' AND num_threads:1",
           "refId": "F",
           "timeField": "uperf_ts"
         },
@@ -2392,7 +3486,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:4096 AND kind:'vm'",
+          "query": "read_message_size:4096 AND kind:'vm' AND num_threads:1",
           "refId": "A",
           "timeField": "uperf_ts"
         },
@@ -2420,7 +3514,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:4096 AND kind:'pod'",
+          "query": "read_message_size:4096 AND kind:'pod' AND num_threads:1",
           "refId": "H",
           "timeField": "uperf_ts"
         },
@@ -2448,7 +3542,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'vm'",
+          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:1",
           "refId": "I",
           "timeField": "uperf_ts"
         },
@@ -2476,7 +3570,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'pod'",
+          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:1",
           "refId": "J",
           "timeField": "uperf_ts"
         }
@@ -2485,7 +3579,377 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Uperf - read message size",
+      "title": "Uperf - read message size - 1 thread",
+      "tooltip": {
+        "shared": false,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "series",
+        "name": null,
+        "show": true,
+        "values": [
+          "total"
+        ]
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:1444",
+          "format": "short",
+          "label": "",
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:1445",
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "Elasticsearch-uperf-results",
+      "decimals": null,
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 110
+      },
+      "hiddenSeries": false,
+      "id": 53,
+      "legend": {
+        "alignAsTable": false,
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "rightSide": false,
+        "show": false,
+        "sideWidth": null,
+        "total": false,
+        "values": false
+      },
+      "lines": false,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.1.2",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "64 vm",
+          "bucketAggs": [
+            {
+              "field": "uperf_ts",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "metrics": [
+            {
+              "field": "read_message_size",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "max"
+            }
+          ],
+          "query": "read_message_size:64 AND kind:'vm' AND num_threads:2",
+          "refId": "B",
+          "timeField": "uperf_ts"
+        },
+        {
+          "alias": "64 pod",
+          "bucketAggs": [
+            {
+              "field": "uperf_ts",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "hide": false,
+          "metrics": [
+            {
+              "field": "read_message_size",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "max"
+            }
+          ],
+          "query": "read_message_size:64 AND kind:'pod' AND num_threads:2",
+          "refId": "C",
+          "timeField": "uperf_ts"
+        },
+        {
+          "alias": "256 vm",
+          "bucketAggs": [
+            {
+              "field": "uperf_ts",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "hide": false,
+          "metrics": [
+            {
+              "field": "read_message_size",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "max"
+            }
+          ],
+          "query": "read_message_size:256 AND kind:'vm' AND num_threads:2",
+          "refId": "E",
+          "timeField": "uperf_ts"
+        },
+        {
+          "alias": "256 pod",
+          "bucketAggs": [
+            {
+              "field": "uperf_ts",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "hide": false,
+          "metrics": [
+            {
+              "field": "read_message_size",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "max"
+            }
+          ],
+          "query": "read_message_size:256 AND kind:'pod' AND num_threads:2",
+          "refId": "D",
+          "timeField": "uperf_ts"
+        },
+        {
+          "alias": "1024 vm",
+          "bucketAggs": [
+            {
+              "field": "uperf_ts",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "hide": false,
+          "metrics": [
+            {
+              "field": "read_message_size",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "max"
+            }
+          ],
+          "query": "read_message_size:1024 AND kind:'vm' AND num_threads:2",
+          "refId": "G",
+          "timeField": "uperf_ts"
+        },
+        {
+          "alias": "1024 pod",
+          "bucketAggs": [
+            {
+              "field": "uperf_ts",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "hide": false,
+          "metrics": [
+            {
+              "field": "read_message_size",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "max"
+            }
+          ],
+          "query": "read_message_size:1024 AND kind:'pod' AND num_threads:2",
+          "refId": "F",
+          "timeField": "uperf_ts"
+        },
+        {
+          "alias": "4096 vm",
+          "bucketAggs": [
+            {
+              "field": "uperf_ts",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "hide": false,
+          "metrics": [
+            {
+              "field": "read_message_size",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "max"
+            }
+          ],
+          "query": "read_message_size:4096 AND kind:'vm' AND num_threads:2",
+          "refId": "A",
+          "timeField": "uperf_ts"
+        },
+        {
+          "alias": "4096 pod",
+          "bucketAggs": [
+            {
+              "field": "uperf_ts",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "hide": false,
+          "metrics": [
+            {
+              "field": "read_message_size",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "max"
+            }
+          ],
+          "query": "read_message_size:4096 AND kind:'pod' AND num_threads:2",
+          "refId": "H",
+          "timeField": "uperf_ts"
+        },
+        {
+          "alias": "16384 vm",
+          "bucketAggs": [
+            {
+              "field": "uperf_ts",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "hide": false,
+          "metrics": [
+            {
+              "field": "read_message_size",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "max"
+            }
+          ],
+          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:2",
+          "refId": "I",
+          "timeField": "uperf_ts"
+        },
+        {
+          "alias": "16384 pod",
+          "bucketAggs": [
+            {
+              "field": "uperf_ts",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "hide": false,
+          "metrics": [
+            {
+              "field": "read_message_size",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "max"
+            }
+          ],
+          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:2",
+          "refId": "J",
+          "timeField": "uperf_ts"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Uperf - read message size - 2 threads",
       "tooltip": {
         "shared": false,
         "sort": 0,
@@ -2533,7 +3997,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 79
+        "y": 120
       },
       "id": 24,
       "panels": [],
@@ -2546,7 +4010,7 @@
         "h": 2,
         "w": 24,
         "x": 0,
-        "y": 80
+        "y": 121
       },
       "id": 12,
       "links": [
@@ -2632,7 +4096,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 82
+        "y": 123
       },
       "hiddenSeries": false,
       "id": 47,
@@ -2880,7 +4344,7 @@
         "h": 4,
         "w": 3,
         "x": 21,
-        "y": 90
+        "y": 131
       },
       "id": 49,
       "links": [],
@@ -2931,8 +4395,8 @@
         "allValue": null,
         "current": {
           "selected": false,
-          "text": "40bf9293-74fd-519c-9cbf-84b5ad8caf59",
-          "value": "40bf9293-74fd-519c-9cbf-84b5ad8caf59"
+          "text": "3a95157d-e519-5148-9e28-1b4f565fe4e6",
+          "value": "3a95157d-e519-5148-9e28-1b4f565fe4e6"
         },
         "datasource": "Elasticsearch-hammerdb-results",
         "definition": "{\"find\":\"terms\",\"field\":\"uuid.keyword\"}",
@@ -2957,12 +4421,12 @@
     ]
   },
   "time": {
-    "from": "now-12h",
+    "from": "now-2d",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "benchmark-runner report",
   "uid": "mjAMHGN7z",
-  "version": 2
+  "version": 4
 }
