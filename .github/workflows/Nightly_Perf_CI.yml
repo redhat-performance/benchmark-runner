@@ -11,7 +11,7 @@ on:
 
 jobs:
   nightly:
-    name: Deploy nightly
+    name: Deploy Perf nightly
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -56,6 +56,7 @@ jobs:
         done
         build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
         build_version="$(cut -d'=' -f2 <<<"$build")"
+        echo $build_version
         start=$(printf '%(%s)T' -1)
         declare -a workloads=('stressng_pod' 'stressng_vm' 'uperf_pod' 'uperf_vm' 'hammerdb_pod_mariadb' 'hammerdb_vm_mariadb' 'hammerdb_pod_postgres' 'hammerdb_vm_postgres' 'hammerdb_pod_mssql' 'hammerdb_vm_mssql')
         for workload in "${workloads[@]}"
@@ -84,4 +85,4 @@ jobs:
         end=$(printf '%(%s)T' -1)
         ci_minutes_time=$(($((end-start))/60))
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Update CI status failed >>>>>>>>>>>>>>>>>>>>>>>>>>'
-        podman run --rm -e WORKLOAD="$workload" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e BUILD_VERSION="$build_version" -e CI_STATUS=failed -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$benchmark_operator_id" -e BENCHMARK_WRAPPER_ID="$benchmark_wrapper_id" -e log_level=INFO -v $KUBECONFIG:"/root/.kube/config" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+        podman run --rm -e WORKLOAD="$workload" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e BUILD_VERSION="$build_version" -e CI_STATUS=failed -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$benchmark_operator_id" -e BENCHMARK_WRAPPER_ID="$benchmark_wrapper_id" -e log_level=INFO -v $KUBECONFIG:"/root/.kube/config" --privileged quay.io/ebattat/benchmark-runner:v$build_version
