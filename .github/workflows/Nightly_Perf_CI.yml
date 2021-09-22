@@ -6,7 +6,7 @@ name: Deploy Perf Nightly CI
 #    - cron: '0 4 * * *' # run at 4 AM UTC/ 0 AM EST
 on:
   push:
-    branches: [ main ] 
+    branches: [ main ]  
 
 jobs:
   nightly:
