@@ -15,11 +15,7 @@ class TemplateOperations:
         # environment variables
         self.__environment_variables_dict = environment_variables.environment_variables_dict
         self.__run_type = self.__environment_variables_dict.get('run_type', '')
-        #  if mount is exist - path inside Dockerfile
-        if os.path.exists('/benchmark_runner/workload_flavors/'):
-            self.__dir_path = '/benchmark_runner/workload_flavors'
-        else:
-            self.__dir_path = f'{os.path.dirname(os.path.realpath(__file__))}/{self.__run_type}'
+        self.__dir_path = f'{os.path.dirname(os.path.realpath(__file__))}/{self.__run_type}'
         self.__current_run_path = f'{self.__dir_path}/current_run'
         self.__hammerdb_dir_path = os.path.join(self.__dir_path, f'hammerdb')
         self.__hammerdb__internal_dir_path = os.path.join(self.__dir_path, f'hammerdb', 'internal_data')
