@@ -1,14 +1,15 @@
 include benchmark_runner/benchmark_operator/workload_flavors/func_ci/hammerdb/*.yaml
+include benchmark_runner/benchmark_operator/workload_flavors/func_ci/hammerdb/internal_data/*.yaml
 include benchmark_runner/benchmark_operator/workload_flavors/func_ci/stressng/*.yaml
+include benchmark_runner/benchmark_operator/workload_flavors/func_ci/stressng/internal_data/*.yaml
 include benchmark_runner/benchmark_operator/workload_flavors/func_ci/uperf/*.yaml
+include benchmark_runner/benchmark_operator/workload_flavors/func_ci/uperf/internal_data/*.yaml
 include benchmark_runner/benchmark_operator/workload_flavors/perf_ci/hammerdb/*.yaml
+include benchmark_runner/benchmark_operator/workload_flavors/perf_ci/hammerdb/internal_data/*.yaml
 include benchmark_runner/benchmark_operator/workload_flavors/perf_ci/stressng/*.yaml
+include benchmark_runner/benchmark_operator/workload_flavors/perf_ci/stressng/internal_data/*.yaml
 include benchmark_runner/benchmark_operator/workload_flavors/perf_ci/uperf/*.yaml
-include benchmark_runner/grafana/benchmark-runner-ci-status.json
-include benchmark_runner/grafana/benchmark-runner-report.json
-include tests/integrations/benchmark_runner/templates/stressng_pod_template.yaml
-include tests/integrations/benchmark_runner/templates/stressng_vm_template.yaml
-
+include benchmark_runner/benchmark_operator/workload_flavors/perf_ci/uperf/internal_data/*.yaml
 
 
 
