@@ -221,7 +221,11 @@ class BenchmarkOperatorWorkloads:
         self.__oc.wait_for_pod_completed(label='app=system-metrics-collector', workload=workload)
         # verify that data upload to elastic search
         if self.__es_host:
-            self.__es_operations.verify_es_data_uploaded(index=f'system-metrics',
+            if self.__run_type == 'test_ci':
+                es_index = 'system-metrics-test-ci'
+            else:
+                es_index = 'system-metrics'
+            self.__es_operations.verify_es_data_uploaded(index=es_index,
                                                          uuid=self.__oc.get_long_uuid(workload=workload), fast_check=True)
 
     def get_metadata(self, kind: str = None, database: str = None):
@@ -283,11 +287,15 @@ class BenchmarkOperatorWorkloads:
             if environment_variables.environment_variables_dict['system_metrics'] == 'True':
                 self.system_metrics_collector(workload=workload)
             if self.__es_host:
+                if self.__run_type == 'test_ci':
+                    es_index = 'stressng-test-ci-results'
+                else:
+                    es_index = 'stressng-results'
                 # verify that data upload to elastic search according to unique uuid
-                ids = self.__es_operations.verify_es_data_uploaded(index='stressng-results', uuid=self.__oc.get_long_uuid(workload=workload))
+                ids = self.__es_operations.verify_es_data_uploaded(index=es_index, uuid=self.__oc.get_long_uuid(workload=workload))
                 # update metadata
                 for id in ids:
-                    self.__es_operations.update_es_index(index='stressng-results', id=id, metadata=self.get_metadata(kind='pod'))
+                    self.__es_operations.update_es_index(index=es_index, id=id, metadata=self.get_metadata(kind='pod'))
             self.__oc.delete_pod_sync(
                 yaml=os.path.join(f'{self.__current_run_path}', f'{self.stressng_pod.__name__}.yaml'),
                 pod_name=f'{workload}-workload')
@@ -317,10 +325,14 @@ class BenchmarkOperatorWorkloads:
                self.system_metrics_collector(workload=workload)
             # verify that data upload to elastic search
             if self.__es_host:
-                ids = self.__es_operations.verify_es_data_uploaded(index='stressng-results', uuid=self.__oc.get_long_uuid(workload=workload))
+                if self.__run_type == 'test_ci':
+                    es_index = 'stressng-test-ci-results'
+                else:
+                    es_index = 'stressng-results'
+                ids = self.__es_operations.verify_es_data_uploaded(index=es_index, uuid=self.__oc.get_long_uuid(workload=workload))
                 # update metadata
                 for id in ids:
-                    self.__es_operations.update_es_index(index='stressng-results', id=id, metadata=self.get_metadata(kind='vm'))
+                    self.__es_operations.update_es_index(index=es_index, id=id, metadata=self.get_metadata(kind='vm'))
             self.__oc.delete_vm_sync(
                 yaml=os.path.join(f'{self.__current_run_path}', f'{self.stressng_vm.__name__}.yaml'),
                 vm_name=f'{workload}-workload')
@@ -358,11 +370,15 @@ class BenchmarkOperatorWorkloads:
             if environment_variables.environment_variables_dict['system_metrics'] == 'True':
                 self.system_metrics_collector(workload=workload)
             if self.__es_host:
+                if self.__run_type == 'test_ci':
+                    es_index = 'uperf-test-ci-results'
+                else:
+                    es_index = 'uperf-results'
                 # verify that data upload to elastic search
-                ids = self.__es_operations.verify_es_data_uploaded(index='uperf-results', uuid=self.__oc.get_long_uuid(workload=workload), workload=self.uperf_pod.__name__)
+                ids = self.__es_operations.verify_es_data_uploaded(index=es_index, uuid=self.__oc.get_long_uuid(workload=workload), workload=self.uperf_pod.__name__)
                 # update metadata
                 for id in ids:
-                    self.__es_operations.update_es_index(index='uperf-results', id=id, metadata=self.get_metadata(kind='pod'))
+                    self.__es_operations.update_es_index(index=es_index, id=id, metadata=self.get_metadata(kind='pod'))
             self.__oc.delete_pod_sync(
                 yaml=os.path.join(f'{self.__current_run_path}', f'{self.uperf_pod.__name__}.yaml'),
                 pod_name=f'uperf-client')
@@ -396,10 +412,14 @@ class BenchmarkOperatorWorkloads:
                 self.system_metrics_collector(workload=workload)
             # verify that data upload to elastic search
             if self.__es_host:
-                ids = self.__es_operations.verify_es_data_uploaded(index='uperf-results', uuid=self.__oc.get_long_uuid(workload=workload), workload=self.uperf_vm.__name__)
+                if self.__run_type == 'test_ci':
+                    es_index = 'uperf-test-ci-results'
+                else:
+                    es_index = 'uperf-results'
+                ids = self.__es_operations.verify_es_data_uploaded(index=es_index, uuid=self.__oc.get_long_uuid(workload=workload), workload=self.uperf_vm.__name__)
                 # update metadata
                 for id in ids:
-                    self.__es_operations.update_es_index(index='uperf-results', id=id, metadata=self.get_metadata(kind='vm'))
+                    self.__es_operations.update_es_index(index=es_index, id=id, metadata=self.get_metadata(kind='vm'))
             self.__oc.delete_vm_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.uperf_vm.__name__}.yaml'),
                                      vm_name='uperf-server')
         except ElasticSearchDataNotUploaded as err:
@@ -438,11 +458,15 @@ class BenchmarkOperatorWorkloads:
             if environment_variables.environment_variables_dict['system_metrics'] == 'True':
                 self.system_metrics_collector(workload=workload)
             if self.__es_host:
+                if self.__run_type == 'test_ci':
+                    es_index = 'hammerdb-test-ci-results'
+                else:
+                    es_index = 'hammerdb-results'
                 # verify that data upload to elastic search
-                ids = self.__es_operations.verify_es_data_uploaded(index=f'hammerdb-results', uuid=self.__oc.get_long_uuid(workload=workload))
+                ids = self.__es_operations.verify_es_data_uploaded(index=es_index, uuid=self.__oc.get_long_uuid(workload=workload))
                 # update metadata
                 for id in ids:
-                    self.__es_operations.update_es_index(index='hammerdb-results', id=id, metadata=self.get_metadata(kind='pod', database=database))
+                    self.__es_operations.update_es_index(index=es_index, id=id, metadata=self.get_metadata(kind='pod', database=database))
             # delete hammerdb
             self.__oc.delete_pod_sync(
                 yaml=os.path.join(f'{self.__current_run_path}', f'{self.hammerdb_pod.__name__}_{database}.yaml'),
@@ -488,10 +512,14 @@ class BenchmarkOperatorWorkloads:
                 self.system_metrics_collector(workload=workload)
             # verify that data upload to elastic search
             if self.__es_host:
-                ids = self.__es_operations.verify_es_data_uploaded(index=f'hammerdb-results', uuid=self.__oc.get_long_uuid(workload=workload))
+                if self.__run_type == 'test_ci':
+                    es_index = 'hammerdb-test-ci-results'
+                else:
+                    es_index = 'hammerdb-results'
+                ids = self.__es_operations.verify_es_data_uploaded(index=es_index, uuid=self.__oc.get_long_uuid(workload=workload))
                 # update metadata
                 for id in ids:
-                    self.__es_operations.update_es_index(index='hammerdb-results', id=id, metadata=self.get_metadata(kind='vm', database=database))
+                    self.__es_operations.update_es_index(index=es_index, id=id, metadata=self.get_metadata(kind='vm', database=database))
             self.__oc.delete_vm_sync(
                 yaml=os.path.join(f'{self.__current_run_path}', f'{self.hammerdb_vm.__name__}_{database}.yaml'),
                 vm_name=f'{workload}-workload')

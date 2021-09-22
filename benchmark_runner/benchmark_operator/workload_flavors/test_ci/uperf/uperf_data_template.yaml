@@ -1,7 +1,7 @@
 shared_data:
   namespace: {{ namespace }}
   es_url: {{ elasticsearch_url }}
-  es_index_name: uperf-test_ci
+  es_index_name: uperf-test-ci
   pin: {{ pin }}
   pin_server: {{ pin_node1 }}
   pin_client: {{ pin_node2 }}
@@ -25,7 +25,7 @@ shared_data:
   system_metrics: {{ system_metrics }}
   prom_url: https://prometheus-k8s.openshift-monitoring.svc.cluster.local:9091
   prom_token: {{ prom_token }}
-  sm_index_name: system-metrics
+  sm_index_name: system-metrics-test-ci
   metrics_profile: node-metrics.yml
   #metrics_profile: https://raw.githubusercontent.com/cloud-bulldozer/benchmark-operator/master/roles/kube-burner/files/metrics.yaml
 pod:
