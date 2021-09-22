@@ -15,14 +15,14 @@ class EnvironmentVariables:
         self._environment_variables_dict['namespace'] = os.environ.get('NAMESPACE', 'benchmark-operator')
         # run Hammerdb workload with ocs pvc True/False
         self._environment_variables_dict['ocs_pvc'] = os.environ.get('OCS_PVC', 'True')
-        # This parameter get from CI.yml file
+        # This parameter get from Test_CI.yml file
         self._environment_variables_dict['build_version'] = os.environ.get('BUILD_VERSION', '1.0.0')
         # collect system metrics True/False
         self._environment_variables_dict['system_metrics'] = os.environ.get('SYSTEM_METRICS', 'True')
         # CI status update once at the end of CI Pass/Failed
         self._environment_variables_dict['ci_status'] = os.environ.get('CI_STATUS', '')
-        # Run type func_ci/perf_ci, default is functional ci = func_ci
-        self._environment_variables_dict['run_type'] = os.environ.get('RUN_TYPE', 'func_ci')
+        # Run type test_ci/func_ci/perf_ci, default test_ci same environment as func_ci
+        self._environment_variables_dict['run_type'] = os.environ.get('RUN_TYPE', 'test_ci')
         # CI run time
         self._environment_variables_dict['ci_minutes_time'] = os.environ.get('CI_MINUTES_TIME', '')
         # benchmark-operator last commit id

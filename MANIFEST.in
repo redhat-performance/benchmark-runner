@@ -1,15 +1,26 @@
+# test_ci
+include benchmark_runner/benchmark_operator/workload_flavors/test_ci/current_run/*
+include benchmark_runner/benchmark_operator/workload_flavors/test_ci/hammerdb/*.yaml
+include benchmark_runner/benchmark_operator/workload_flavors/test_ci/hammerdb/internal_data/*.yaml
+include benchmark_runner/benchmark_operator/workload_flavors/test_ci/stressng/*.yaml
+include benchmark_runner/benchmark_operator/workload_flavors/test_ci/stressng/internal_data/*.yaml
+include benchmark_runner/benchmark_operator/workload_flavors/test_ci/uperf/*.yaml
+include benchmark_runner/benchmark_operator/workload_flavors/test_ci/uperf/internal_data/*.yaml
+# func_ci
+include benchmark_runner/benchmark_operator/workload_flavors/func_ci/current_run/*
 include benchmark_runner/benchmark_operator/workload_flavors/func_ci/hammerdb/*.yaml
 include benchmark_runner/benchmark_operator/workload_flavors/func_ci/hammerdb/internal_data/*.yaml
 include benchmark_runner/benchmark_operator/workload_flavors/func_ci/stressng/*.yaml
 include benchmark_runner/benchmark_operator/workload_flavors/func_ci/stressng/internal_data/*.yaml
 include benchmark_runner/benchmark_operator/workload_flavors/func_ci/uperf/*.yaml
 include benchmark_runner/benchmark_operator/workload_flavors/func_ci/uperf/internal_data/*.yaml
+# perf_ci
+include benchmark_runner/benchmark_operator/workload_flavors/perf_ci/current_run/*
 include benchmark_runner/benchmark_operator/workload_flavors/perf_ci/hammerdb/*.yaml
 include benchmark_runner/benchmark_operator/workload_flavors/perf_ci/hammerdb/internal_data/*.yaml
 include benchmark_runner/benchmark_operator/workload_flavors/perf_ci/stressng/*.yaml
 include benchmark_runner/benchmark_operator/workload_flavors/perf_ci/stressng/internal_data/*.yaml
 include benchmark_runner/benchmark_operator/workload_flavors/perf_ci/uperf/*.yaml
 include benchmark_runner/benchmark_operator/workload_flavors/perf_ci/uperf/internal_data/*.yaml
-
 
 

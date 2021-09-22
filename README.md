@@ -15,7 +15,7 @@ This tool support the following workloads:
 
 ** First Phase: supports [benchmark-operator workloads](https://github.com/cloud-bulldozer/benchmark-operator)
 
-Benchmark-runner grafana dashboard:
+Benchmark-runner grafana dashboard example:
 ![](media/grafana.png)
 
 Reference:
@@ -29,6 +29,8 @@ _**Table of Contents**_
 <!-- TOC -->
 - [Run workload using Podman or Docker](#run-workload-using-podman-or-docker)
 - [Run workload in Pod using Kubernetes or OpenShift](#run-workload-in-pod-using-kubernetes-or-openshift)
+- [Grafana dashboards](#grafana-dashboards)
+
 <!-- /TOC -->
 
 ## Run workload using Podman or Docker 
@@ -71,3 +73,10 @@ podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD 
 
 [TBD]
 
+## Grafana dashboards
+
+There are 2 grafana dashboards templates:
+1. [benchmark-runner-ci-status.json](grafana/benchmark-runner-ci-status.json)
+2. [benchmark-runner-report.json](grafana/benchmark-runner-report.json)
+
+** After importing json in grafana, need to configure elasticsearch data source. (elastic url, elastic index)

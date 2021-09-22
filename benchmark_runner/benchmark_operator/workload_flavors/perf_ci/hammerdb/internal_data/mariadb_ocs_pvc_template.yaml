@@ -45,7 +45,7 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
       - name: mariadb
-        image: centos/mariadb-103-centos8:latest
+        image: docker.io/centos/mariadb-103-centos8:latest
         imagePullPolicy: "IfNotPresent"
         ports:
         - containerPort: 3306

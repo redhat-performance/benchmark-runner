@@ -15,6 +15,12 @@
           "type": "dashboard"
         },
         "type": "dashboard"
+      },
+      {
+        "datasource": null,
+        "enable": true,
+        "iconColor": "red",
+        "name": "New annotation"
       }
     ]
   },
@@ -131,7 +137,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Max"
+              "options": "Max status#"
             },
             "properties": [
               {
@@ -179,32 +185,80 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "runner version.keyword"
+              "options": "benchmark_operator_id.keyword"
             },
             "properties": [
               {
                 "id": "displayName",
                 "value": "benchmark runner version"
+              },
+              {
+                "id": "displayName",
+                "value": "benchmark operator id."
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "benchmark_wrapper_id.keyword"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "benchmark wrapper id"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Max ci_minutes_time"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Ci time (minutes)"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Max version#"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Benchmark-runner version (1.0.X)"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Benchmark-runner version (1.0.X)"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 283
               }
             ]
           }
         ]
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 6,
+        "h": 9,
+        "w": 14,
+        "x": 5,
         "y": 7
       },
       "id": 6,
       "options": {
+        "frameIndex": 0,
         "showHeader": true,
-        "sortBy": [
-          {
-            "desc": true,
-            "displayName": "runner version.keyword"
-          }
-        ]
+        "sortBy": []
       },
       "pluginVersion": "8.1.2",
       "targets": [
@@ -212,8 +266,8 @@
           "alias": "",
           "bucketAggs": [
             {
-              "field": "runner version.keyword",
-              "id": "2",
+              "field": "timestamp",
+              "id": "12",
               "settings": {
                 "min_doc_count": "0",
                 "order": "desc",
@@ -224,40 +278,7 @@
             },
             {
               "field": "ocp version.keyword",
-              "id": "3",
-              "settings": {
-                "min_doc_count": "0",
-                "order": "desc",
-                "orderBy": "_term",
-                "size": "10"
-              },
-              "type": "terms"
-            },
-            {
-              "field": "cnv version.keyword",
-              "id": "4",
-              "settings": {
-                "min_doc_count": "0",
-                "order": "desc",
-                "orderBy": "_term",
-                "size": "10"
-              },
-              "type": "terms"
-            },
-            {
-              "field": "ocs version.keyword",
-              "id": "5",
-              "settings": {
-                "min_doc_count": "0",
-                "order": "desc",
-                "orderBy": "_term",
-                "size": "10"
-              },
-              "type": "terms"
-            },
-            {
-              "field": "timestamp",
-              "id": "6",
+              "id": "15",
               "settings": {
                 "min_doc_count": "0",
                 "order": "desc",
@@ -270,20 +291,71 @@
           "hide": false,
           "metrics": [
             {
-              "field": "status#",
+              "field": "version#",
               "id": "1",
               "settings": {},
+              "type": "max"
+            },
+            {
+              "field": "status#",
+              "id": "11",
+              "settings": {},
+              "type": "max"
+            },
+            {
+              "field": "ci_minutes_time",
+              "id": "13",
               "type": "max"
             }
           ],
           "query": "",
           "refId": "A",
           "timeField": "timestamp"
+        },
+        {
+          "alias": "",
+          "bucketAggs": [
+            {
+              "field": "benchmark_operator_id.keyword",
+              "id": "13",
+              "settings": {
+                "min_doc_count": "0",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            },
+            {
+              "field": "benchmark_wrapper_id.keyword",
+              "id": "14",
+              "settings": {
+                "min_doc_count": "0",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            }
+          ],
+          "hide": false,
+          "metrics": [
+            {
+              "field": "version#",
+              "id": "11",
+              "settings": {},
+              "type": "max"
+            }
+          ],
+          "query": "",
+          "refId": "B",
+          "timeField": "timestamp"
         }
       ],
       "timeFrom": null,
       "timeShift": null,
       "title": "Ci Status",
+      "transformations": [],
       "type": "table"
     }
   ],
@@ -295,12 +367,12 @@
     "list": []
   },
   "time": {
-    "from": "now-2d",
+    "from": "now-24h",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "benchmark-runner-ci-status",
   "uid": "tUclnRNnz",
-  "version": 9
+  "version": 13
 }

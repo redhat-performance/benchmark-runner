@@ -17,6 +17,7 @@ jobs:
         python-version: 3.9
     - name: Install latest benchmark-runner
       run: |
+        start=$(printf '%(%s)T' -1)
         python -m pip install --upgrade pip
         pip install benchmark-runner
     - uses: azure/k8s-set-context@v1
@@ -50,7 +51,6 @@ jobs:
         done
         build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
         build_version="$(cut -d'=' -f2 <<<"$build")"
-        start=$(printf '%(%s)T' -1)
         declare -a workloads=('stressng_pod' 'stressng_vm' 'uperf_pod' 'uperf_vm' 'hammerdb_pod_mariadb' 'hammerdb_vm_mariadb' 'hammerdb_pod_postgres' 'hammerdb_vm_postgres' 'hammerdb_pod_mssql' 'hammerdb_vm_mssql')
         for workload in "${workloads[@]}"
         do
