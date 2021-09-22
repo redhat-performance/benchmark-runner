@@ -7,7 +7,7 @@ on:
 
 jobs:
   nightly:
-    name: Deploy nightly
+    name: Deploy Func Nightly
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
