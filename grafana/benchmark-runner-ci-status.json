@@ -245,6 +245,18 @@
                 "value": 283
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Max"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "benchmark-runner version (1.0.X)"
+              }
+            ]
           }
         ]
       },
