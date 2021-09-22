@@ -221,7 +221,7 @@ class BenchmarkOperatorWorkloads:
         self.__oc.wait_for_pod_completed(label='app=system-metrics-collector', workload=workload)
         # verify that data upload to elastic search
         if self.__es_host:
-            if self.__run_type == 'test-ci':
+            if self.__run_type == 'test_ci':
                 es_index = 'system-metrics-test-ci'
             else:
                 es_index = 'system-metrics'
@@ -287,7 +287,7 @@ class BenchmarkOperatorWorkloads:
             if environment_variables.environment_variables_dict['system_metrics'] == 'True':
                 self.system_metrics_collector(workload=workload)
             if self.__es_host:
-                if self.__run_type == 'test-ci':
+                if self.__run_type == 'test_ci':
                     es_index = 'stressng-test-ci-results'
                 else:
                     es_index = 'stressng-results'
@@ -325,7 +325,7 @@ class BenchmarkOperatorWorkloads:
                self.system_metrics_collector(workload=workload)
             # verify that data upload to elastic search
             if self.__es_host:
-                if self.__run_type == 'test-ci':
+                if self.__run_type == 'test_ci':
                     es_index = 'stressng-test-ci-results'
                 else:
                     es_index = 'stressng-results'
@@ -370,7 +370,7 @@ class BenchmarkOperatorWorkloads:
             if environment_variables.environment_variables_dict['system_metrics'] == 'True':
                 self.system_metrics_collector(workload=workload)
             if self.__es_host:
-                if self.__run_type == 'test-ci':
+                if self.__run_type == 'test_ci':
                     es_index = 'uperf-test-ci-results'
                 else:
                     es_index = 'uperf-results'
@@ -412,7 +412,7 @@ class BenchmarkOperatorWorkloads:
                 self.system_metrics_collector(workload=workload)
             # verify that data upload to elastic search
             if self.__es_host:
-                if self.__run_type == 'test-ci':
+                if self.__run_type == 'test_ci':
                     es_index = 'uperf-test-ci-results'
                 else:
                     es_index = 'uperf-results'
@@ -458,7 +458,7 @@ class BenchmarkOperatorWorkloads:
             if environment_variables.environment_variables_dict['system_metrics'] == 'True':
                 self.system_metrics_collector(workload=workload)
             if self.__es_host:
-                if self.__run_type == 'test-ci':
+                if self.__run_type == 'test_ci':
                     es_index = 'hammerdb-test-ci-results'
                 else:
                     es_index = 'hammerdb-results'
@@ -512,7 +512,7 @@ class BenchmarkOperatorWorkloads:
                 self.system_metrics_collector(workload=workload)
             # verify that data upload to elastic search
             if self.__es_host:
-                if self.__run_type == 'test-ci':
+                if self.__run_type == 'test_ci':
                     es_index = 'hammerdb-test-ci-results'
                 else:
                     es_index = 'hammerdb-results'
