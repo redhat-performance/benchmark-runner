@@ -91,17 +91,6 @@ def test_login():
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     assert oc.login()
 
-
-def test_bad_login():
-    """
-    This method tests that login fails with a guaranteed bad kubeadmin password
-    :return:
-    """
-    oc = OC(kubeadmin_password='BAD-PASSWORD')
-    with pytest.raises(LoginFailed) as err:
-        assert not oc.login()
-
-
 ###################################################### POD Tests ##################################################
 
 

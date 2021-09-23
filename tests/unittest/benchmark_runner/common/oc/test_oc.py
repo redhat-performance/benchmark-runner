@@ -5,14 +5,23 @@ from benchmark_runner.common.oc.oc import OC
 from benchmark_runner.common.oc.oc_exceptions import YAMLNotExist, LoginFailed
 
 
-def test_incorrect_kubeadmin_password():
+def test_bad_login():
     """
-    This method test incorrect kubeadmin password
+    This method tests that login fails with a guaranteed bad kubeadmin password
+    :return:
+    """
+    oc = OC(kubeadmin_password='BAD-PASSWORD')
+    with pytest.raises(LoginFailed) as err:
+        assert not oc.login()
+
+
+def test_empty_kubeadmin_password():
+    """
+    This method test empty kubeadmin password
     :return:
     """
     oc = OC(kubeadmin_password='')
-    with pytest.raises(LoginFailed) as err:
-        oc.login()
+    assert oc.login()
 
 
 def test_create_async_pod_yaml_not_exist():
