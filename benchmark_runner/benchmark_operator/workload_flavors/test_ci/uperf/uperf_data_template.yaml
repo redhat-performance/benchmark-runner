@@ -18,7 +18,8 @@ shared_data:
   size3: 1024
   size4: 4096
   size5: 16384
-  nthr: 2
+  nthr1: 1
+  nthr2: 2
   runtime: 30
   # enable/disable system metrics
   system_metrics: {{ system_metrics }}
