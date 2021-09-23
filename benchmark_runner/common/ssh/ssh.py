@@ -30,7 +30,7 @@ class SSH:
                 output = subprocess.getoutput(cmd)
             return output
         except subprocess.CalledProcessError as err:
-            logger.error("subprocess Status : FAIL", err.returncode, err.output)
+            logger.error(f'subprocess Status : FAIL: {err.returncode} {err.output}')
             raise SSHSubprocessError()
         except Exception as err:
              raise err
