@@ -22,7 +22,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": 3,
-  "iteration": 1632137781895,
+  "iteration": 1632394375626,
   "links": [],
   "panels": [
     {
@@ -4368,8 +4368,8 @@
         "allValue": null,
         "current": {
           "selected": false,
-          "text": "1.0.117",
-          "value": "1.0.117"
+          "text": "1.0.125",
+          "value": "1.0.125"
         },
         "datasource": "Elasticsearch-hammerdb-results",
         "definition": "{\"find\":\"terms\",\"field\":\"runner version.keyword\"}",
@@ -4395,8 +4395,8 @@
         "allValue": null,
         "current": {
           "selected": false,
-          "text": "3a95157d-e519-5148-9e28-1b4f565fe4e6",
-          "value": "3a95157d-e519-5148-9e28-1b4f565fe4e6"
+          "text": "005ea895-0b4c-53cd-a618-ea50ac2c8f9e",
+          "value": "005ea895-0b4c-53cd-a618-ea50ac2c8f9e"
         },
         "datasource": "Elasticsearch-hammerdb-results",
         "definition": "{\"find\":\"terms\",\"field\":\"uuid.keyword\"}",
@@ -4421,7 +4421,7 @@
     ]
   },
   "time": {
-    "from": "now-2d",
+    "from": "now-24h",
     "to": "now"
   },
   "timepicker": {},

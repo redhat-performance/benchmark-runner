@@ -41,7 +41,8 @@ spec:
        - {{ size4 }}
        - {{ size5 }}
      nthrs:
-       - {{ nthr }}
+       - {{ nthr1 }}
+       - {{ nthr2 }}
      runtime: {{ runtime }}
      kind: vm
      server_vm:
