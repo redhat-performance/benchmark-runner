@@ -218,7 +218,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Ci time (minutes)"
+                "value": "ci time (minutes)"
               }
             ]
           },
@@ -230,19 +230,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Benchmark-runner version (1.0.X)"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Benchmark-runner version (1.0.X)"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 283
+                "value": "benchmark-runner version (1.0.X)"
               }
             ]
           },
@@ -252,6 +240,10 @@
               "options": "Max"
             },
             "properties": [
+              {
+                "id": "custom.width",
+                "value": 283
+              },
               {
                 "id": "displayName",
                 "value": "benchmark-runner version (1.0.X)"
@@ -268,7 +260,7 @@
       },
       "id": 6,
       "options": {
-        "frameIndex": 0,
+        "frameIndex": 1,
         "showHeader": true,
         "sortBy": []
       },
@@ -309,13 +301,13 @@
               "type": "max"
             },
             {
-              "field": "status#",
+              "field": "ci_minutes_time",
               "id": "11",
               "settings": {},
               "type": "max"
             },
             {
-              "field": "ci_minutes_time",
+              "field": "status#",
               "id": "13",
               "type": "max"
             }
@@ -386,5 +378,5 @@
   "timezone": "",
   "title": "benchmark-runner-ci-status",
   "uid": "tUclnRNnz",
-  "version": 13
+  "version": 17
 }

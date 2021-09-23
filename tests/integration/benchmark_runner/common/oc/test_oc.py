@@ -82,34 +82,7 @@ def before_after_each_test_fixture():
     __delete_vm_yamls()
     print('Test End')
 
-
-def test_login():
-    """
-    This method test login
-    :return:
-    """
-    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    assert oc.login()
-
 ###################################################### POD Tests ##################################################
-
-
-def test_oc_get_pods():
-    """
-    This test run oc get pods
-    :return:
-    """
-    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    assert oc.get_pods()
-
-
-def test_oc_get_pod_name():
-    """
-    This test run oc get pod by name
-    :return:
-    """
-    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    assert oc._get_pod_name(pod_name='erererer', namespace=test_environment_variable['namespace']) == ''
 
 
 def test_oc_get_pod_name_and_is_pod_exist():
@@ -169,16 +142,7 @@ def test_get_long_short_uuid():
     assert len(oc._OC__get_short_uuid(workload='stressng-pod')) == 8
 
 
-def test_get_prom_token():
-    """
-    This method return prom token from cluster
-    :return:
-    """
-    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
-    assert oc.get_prom_token()
-
-
+@pytest.mark.skip(reason="Already verified in 'test_es_operations:test_verify_es_data_uploaded_stressng_pod' ")
 def test_wait_for_pod_create_initialized_ready_completed_system_metrics_deleted():
     """
     This method test wait for pod create, initialized, ready, completed, system-metrics, delete
@@ -212,6 +176,7 @@ def test_create_sync_vm_timeout_error():
         oc.create_vm_sync(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'), vm_name='stressng-vm-workload', timeout=-1)
 
 
+@pytest.mark.skip(reason="Already verified in: test_vm_create_initialized_ready_completed_system_metrics_deleted ")
 def test_oc_get_vmi_name_and_is_vmi_exist():
     """
     This method test get_vmi_name and is_vmi_exist
@@ -220,12 +185,13 @@ def test_oc_get_vmi_name_and_is_vmi_exist():
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
     oc._create_async(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'))
-    # wait 120 sec till vm will be created
-    time.sleep(120)
+    # wait 60 sec till vm will be created
+    time.sleep(60)
     assert oc._get_vmi_name(vm_name='stressng-vm-workload', namespace=test_environment_variable['namespace'])
     assert oc._is_vmi_exist(vm_name='stressng-vm-workload', namespace=test_environment_variable['namespace'])
 
 
+@pytest.mark.skip(reason="Already verified in: test_vm_create_initialized_ready_completed_system_metrics_deleted ")
 def test_wait_for_vm_created():
     """
     This method wait for vm to be created
