@@ -78,5 +78,6 @@ podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD 
 There are 2 grafana dashboards templates:
 1. [benchmark-runner-ci-status.json](grafana/benchmark-runner-ci-status.json)
 2. [benchmark-runner-report.json](grafana/benchmark-runner-report.json)
+3. [system-metrics-report.json](grafana/system-metrics-report.json)
 
 ** After importing json in grafana, need to configure elasticsearch data source. (elastic url, elastic index)

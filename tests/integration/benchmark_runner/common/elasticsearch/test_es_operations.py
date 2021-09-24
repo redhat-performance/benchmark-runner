@@ -93,22 +93,3 @@ def test_verify_es_data_uploaded_stressng_pod():
         raise err
     except Exception as err:
         raise err
-
-
-def test_upload_update_to_es():
-    """
-    This method test upload to es
-    @return:
-    """
-    if test_environment_variable['elasticsearch']:
-        uuid = str(uuid4())
-        # verify that data upload to elastic search
-        es = ESOperations(es_host=test_environment_variable['elasticsearch'], es_port=test_environment_variable['elasticsearch_port'])
-        data = {'tool': 'benchmark-runner', 'uuid': uuid}
-        es.upload_to_es(index='benchmark-runner-test', data=data)
-        assert es.verify_es_data_uploaded(index='benchmark-runner-test', uuid=uuid)
-        id = es.verify_es_data_uploaded(index='benchmark-runner-test', uuid=uuid)
-        es.update_es_index(index='benchmark-runner-test', id=id[0], metadata={'ocp_version': '4.8.3'})
-        result = es.get_es_index_by_id(index='benchmark-runner-test', id=id[0])
-        assert result['_source']['uuid'] == uuid
-        assert result['_source']['ocp_version'] == '4.8.3'
