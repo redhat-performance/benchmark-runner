@@ -28,6 +28,15 @@ jobs:
         method: kubeconfig
         kubeconfig: ${{ secrets.KUBECONFIG_CI }}
       id: setcontext
+    - name: ⌛ Upload 🐋 to quay.io - latest benchmark-operator
+      run: |
+        build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
+        build_version=$(cut -d'=' -f2 <<<"$build")
+        sudo podman build --build-arg VERSION=$build_version --layers=false -t ${{ secrets.PACKAGE_NAME }}:v$build_version .
+        sudo podman login quay.io -u ${{ secrets.QAUYIO_ROBOT_USER }} -p ${{ secrets.QAUYIO_ROBOT_TOKEN }}
+        sudo podman push localhost/${{ secrets.PACKAGE_NAME }}:v$build_version quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}
+        echo '⌛ Wait 30 sec till image will be updated in quay.io'
+        sleep 30
     - name: ✔️ E2E tests using latest quay.io
       env:
         KUBEADMIN_PASSWORD: ${{ secrets.KUBEADMIN_PASSWORD_CI }}
@@ -62,7 +71,7 @@ jobs:
         for workload in "${workloads[@]}"
         do
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>'
-            podman run --rm -e WORKLOAD="$workload" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e BUILD_VERSION="$build_version" -e RUN_TYPE=func_ci -e log_level=INFO -v $KUBECONFIG:"/root/.kube/config" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+            podman run --rm -e WORKLOAD="$workload" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e BUILD_VERSION="$build_version" -e RUN_TYPE=func_ci -e log_level=INFO -v $KUBECONFIG:"/root/.kube/config" --privileged "quay.io/ebattat/benchmark-runner:latest"
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
         done
         end=$(printf '%(%s)T' -1)
