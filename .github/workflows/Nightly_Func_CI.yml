@@ -2,8 +2,10 @@
 
 name: Deploy Func Nightly CI
 on:
-  schedule:
-    - cron: '0 4 * * *' # run at 4 AM UTC/ 0 AM EST
+  push:
+    branches: [ main ] 
+#  schedule:
+#    - cron: '0 4 * * *' # run at 4 AM UTC/ 0 AM EST
 
 jobs:
   nightly:
@@ -28,6 +30,15 @@ jobs:
         method: kubeconfig
         kubeconfig: ${{ secrets.KUBECONFIG_CI }}
       id: setcontext
+    - name: ⌛ Upload 🐋 to quay.io - latest benchmark-operator
+      run: |
+        build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
+        build_version=$(cut -d'=' -f2 <<<"$build")
+        sudo podman build --build-arg VERSION=$build_version --layers=false -t ${{ secrets.PACKAGE_NAME }}:v$build_version .
+        sudo podman login quay.io -u ${{ secrets.QAUYIO_ROBOT_USER }} -p ${{ secrets.QAUYIO_ROBOT_TOKEN }}
+        sudo podman push localhost/${{ secrets.PACKAGE_NAME }}:v$build_version quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}
+        echo '⌛ Wait 30 sec till image will be updated in quay.io'
+        sleep 30
     - name: ✔️ E2E tests using latest quay.io
       env:
         KUBEADMIN_PASSWORD: ${{ secrets.KUBEADMIN_PASSWORD_CI }}
