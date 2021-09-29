@@ -235,11 +235,11 @@ class BenchmarkOperatorWorkloads:
         @param database: optional:mssql, postgres or mariadb
         :return:
         """
-        metadata = {'ocp version': self.__oc.get_ocp_server_version(),
-                    'cnv version': self.__oc.get_cnv_version(),
-                    'ocs version': self.__oc.get_ocs_version(),
-                    'runner version': self.__runner_version,
-                    'version#': int(self.__runner_version.split('.')[-1])}
+        metadata = {'ocp_version': self.__oc.get_ocp_server_version(),
+                    'cnv_version': self.__oc.get_cnv_version(),
+                    'ocs_version': self.__oc.get_ocs_version(),
+                    'runner_version': self.__runner_version,
+                    'version': int(self.__runner_version.split('.')[-1])}
         if kind:
             metadata.update({'kata_version': '',
                              'kind': kind,
