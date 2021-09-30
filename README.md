@@ -30,6 +30,7 @@ _**Table of Contents**_
 - [Run workload using Podman or Docker](#run-workload-using-podman-or-docker)
 - [Run workload in Pod using Kubernetes or OpenShift](#run-workload-in-pod-using-kubernetes-or-openshift)
 - [Grafana dashboards](#grafana-dashboards)
+- [How to add new workload](#how-to-add-new-workload)
 
 <!-- /TOC -->
 
@@ -75,9 +76,16 @@ podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD 
 
 ## Grafana dashboards
 
-There are 2 grafana dashboards templates:
+There are 3 grafana dashboards templates:
 1. [benchmark-runner-ci-status.json](grafana/benchmark-runner-ci-status.json)
+![](media/benchmark-runner-ci-status.png)
 2. [benchmark-runner-report.json](grafana/benchmark-runner-report.json)
+![](media/benchmark-runner-report.png)
 3. [system-metrics-report.json](grafana/system-metrics-report.json)
+![](media/system-metrics-report.png)
 
-** After importing json in grafana, need to configure elasticsearch data source. (elastic url, elastic index)
+** After importing json in grafana, need to configure elasticsearch data source. (for more details: see [HOW_TO.md](HOW_TO.md))
+
+## How to add new workload
+
+see [HOW_TO.md](HOW_TO.md)
