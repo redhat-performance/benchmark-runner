@@ -2,8 +2,10 @@
 
 name: Deploy Func Nightly CI
 on:
-  schedule:
-    - cron: '0 4 * * *' # run at 4 AM UTC/ 0 AM EST 
+  push:
+    branches: [ main ] 
+  #schedule:
+  #  - cron: '0 4 * * *' # run at 4 AM UTC/ 0 AM EST 
 
 jobs:
   nightly:
