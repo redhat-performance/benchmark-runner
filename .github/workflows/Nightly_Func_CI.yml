@@ -36,10 +36,8 @@ jobs:
             if [[ $repository == 'benchmark-operator' ]]
             then
                 echo "BENCHMARK_OPERATOR_ID=$(git rev-parse @)" >> $GITHUB_ENV
-                BENCHMARK_OPERATOR_ID=$(git rev-parse @)
             else
                 echo "BENCHMARK_WRAPPER_ID=$(git rev-parse @)" >> $GITHUB_ENV
-                BENCHMARK_WRAPPER_ID=$(git rev-parse @)
             fi
             cd -
         done
@@ -90,10 +88,11 @@ jobs:
             cd $RUNNER_PATH/$repository
             if [[ $repository == 'benchmark-operator' ]]
             then
-                echo "START_CI=$(printf '%(%s)T' -1)" >> $GITHUB_ENV
                 echo "BENCHMARK_OPERATOR_ID=$(git rev-parse @)" >> $GITHUB_ENV
+                BENCHMARK_OPERATOR_ID=$(git rev-parse @)
             else
                 echo "BENCHMARK_WRAPPER_ID=$(git rev-parse @)" >> $GITHUB_ENV
+                BENCHMARK_WRAPPER_ID=$(git rev-parse @)
             fi
             cd -
         done
