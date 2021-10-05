@@ -23,30 +23,6 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: 3.9
-    - name: set env
-      env:
-          RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-      run: |
-        # get repository last id
-        declare -a repositories=('benchmark-operator' 'benchmark-wrapper')
-        for repository in "${repositories[@]}"
-        do
-            git clone https://github.com/cloud-bulldozer/$repository $RUNNER_PATH/$repository
-            cd $RUNNER_PATH/$repository
-            if [[ $repository == 'benchmark-operator' ]]
-            then
-                echo "BENCHMARK_OPERATOR_ID=$(git rev-parse @)" >> $GITHUB_ENV
-            else
-                echo "BENCHMARK_WRAPPER_ID=$(git rev-parse @)" >> $GITHUB_ENV
-            fi
-            cd -
-        done
-        echo $BENCHMARK_WRAPPER_ID
-        echo $BENCHMARK_OPERATOR_ID
-    - name: test env
-      run: |
-        echo $BENCHMARK_OPERATOR_ID
-        echo $BENCHMARK_WRAPPER_ID
     - name: Set START CI TIME
       run: echo "START_CI=$(printf '%(%s)T' -1)" >> $GITHUB_ENV
     - name: Install latest benchmark-runner
