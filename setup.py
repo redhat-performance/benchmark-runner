@@ -15,6 +15,8 @@ if path.isfile(path.join(here, 'README.md')):
 else:
     long_description = ""
 
+# *** COMMENT FOR TEST PR ***
+
 setup(
     name='benchmark-runner',
     version=__version__,
