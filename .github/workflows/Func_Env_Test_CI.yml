@@ -15,7 +15,7 @@ jobs:
     - name: Update Kubeconfig
       run: |
           mkdir -p ~/.kube/
-          echo "$KUBECONFIG_CI" > ~/.ssh/config        
+          echo "$KUBECONFIG_CI" > ~/.kube/config        
       shell: bash
       env:
         KUBECONFIG_CI: ${{ secrets.KUBECONFIG_CI }}
