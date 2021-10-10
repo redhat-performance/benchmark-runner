@@ -24,7 +24,7 @@ jobs:
           echo "$PERF_PROVISION_SSH_KEY" > $RUNNER_PATH/private_key.txt
           sudo chmod 600 $RUNNER_PATH/private_key.txt
           echo "$PERF_PROVISION_KNOWN_HOSTS" > ~/.ssh/known_hosts
-          ssh -tt $PERF_PROVISION_USER@$PERF_PROVISION_IP -i $RUNNER_PATH/private_key.txt
+          ssh -tt -i $RUNNER_PATH/private_key.txt $PERF_PROVISION_USER@$PERF_PROVISION_IP
     - name: Turnstyle
       uses: softprops/turnstyle@v1
       env:
