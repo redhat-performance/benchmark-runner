@@ -31,7 +31,7 @@ jobs:
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
         PERF_PROVISION_KNOWN_HOSTS: ${{ secrets.PERF_PROVISION_KNOWN_HOSTS }}
       run: |
-        ssh -tt -i $RUNNER_PATH/private_key.txt $PERF_PROVISION_USER@$PERF_PROVISION_IP      
+        ssh -i $RUNNER_PATH/private_key.txt $PERF_PROVISION_USER@$PERF_PROVISION_IP      
     - name: Turnstyle
       uses: softprops/turnstyle@v1
       env:
