@@ -20,7 +20,7 @@ jobs:
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
         KEY: ${{ secrets.KEY }}
       run: |
-        echo $KEY >> $RUNNER_PATH/key.txt
+        echo $PERF_PROVISION_SSH_KEY >> $RUNNER_PATH/key.txt
         cat $RUNNER_PATH/key.txt
     - name: Turnstyle
       uses: softprops/turnstyle@v1
