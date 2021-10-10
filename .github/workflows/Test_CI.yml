@@ -22,7 +22,7 @@ jobs:
       run: |
         echo $PERF_PROVISION_SSH_KEY >> $RUNNER_PATH/key.txt
         chmod 600 $RUNNER_PATH/key.txt
-        ssh -tt $PERF_PROVISION_USER@$PERF_PROVISION_IP -i $RUNNER_PATH/key.txt
+        ssh -tt $PERF_PROVISION_USER@$PERF_PROVISION_IP
     - name: Turnstyle
       uses: softprops/turnstyle@v1
       env:
