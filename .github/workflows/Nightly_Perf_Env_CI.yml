@@ -24,9 +24,9 @@ jobs:
     - name: Set Kubeconfig
       run: |
           mkdir -p ~/.kube/
-          echo "$KUBECONFIG_CI" > ~/.kube/config        
+          echo "$KUBECONFIG" > ~/.kube/config        
       env:
-        KUBECONFIG_CI: ${{ secrets.KUBECONFIG_CI }}
+        KUBECONFIG: ${{ secrets.KUBECONFIG }}
     - name: ✔️ E2E tests using latest quay.io
       env:
         KUBEADMIN_PASSWORD: ${{ secrets.KUBEADMIN_PASSWORD }}
