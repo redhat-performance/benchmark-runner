@@ -14,13 +14,13 @@ jobs:
     - uses: actions/checkout@v2
     - uses: webfactory/ssh-agent@v0.5.3
       with:
-        PERF_PROVISION_SSH_KEY: ${{ secrets.PERF_PROVISION_SSH_KEY }}
+        ssh-private-key: ${{ secrets.PERF_PROVISION_SSH_KEY }}
     - name: Test ssh
       env:
         PERF_PROVISION_IP: ${{ secrets.PERF_PROVISION_IP }}
         PERF_PROVISION_USER: ${{ secrets.PERF_PROVISION_USER }}
       run: |
-        ssh $PERF_PROVISION_USER@$PERF_PROVISION_IP -i $PERF_PROVISION_SSH_KEY
+        ssh $PERF_PROVISION_USER@$PERF_PROVISION_IP -i $ssh-private-key
     - name: Turnstyle
       uses: softprops/turnstyle@v1
       env:
