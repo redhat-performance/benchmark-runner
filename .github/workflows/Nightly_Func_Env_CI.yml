@@ -1,6 +1,6 @@
 # Nightly CI https://github.com/marketplace/actions/deploy-nightly
 
-name: Deploy Func Nightly CI
+name: Deploy Func Env Nightly CI
 
 on:  
   schedule:
