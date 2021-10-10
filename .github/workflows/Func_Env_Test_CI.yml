@@ -33,8 +33,6 @@ jobs:
         curl -L https://github.com/openshift/okd/releases/download/${oc_version}/openshift-client-linux-${oc_version}.tar.gz -o $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz
         tar -xzvf $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz -C $RUNNER_PATH/
         rm $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz
-        echo alias oc=$RUNNER_PATH/./oc >> $RUNNER_PATH/.bashrc
-        echo alias kubectl=$RUNNER_PATH/./kubectl >> $RUNNER_PATH/.bashrc
         cp $RUNNER_PATH/oc /usr/local/bin/oc
         oc login -u kubeadmin -p $KUBEADMIN_PASSWORD_CI
     - name: Turnstyle
