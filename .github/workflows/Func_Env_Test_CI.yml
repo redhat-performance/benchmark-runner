@@ -35,7 +35,8 @@ jobs:
     - name: Set Kubeconfig
       run: |
           mkdir -p ~/.kube/
-          echo "$KUBECONFIG_CI" > ~/.kube/config        
+          echo "$KUBECONFIG_CI" > ~/.kube/config
+          echo "KUBECONFIG_PATH=~/.kube/config" >> $GITHUB_ENV
       env:
         KUBECONFIG_CI: ${{ secrets.KUBECONFIG_CI }}
     - name: 📃 Test with pytest
@@ -47,6 +48,7 @@ jobs:
         ELASTICSEARCH: ${{ secrets.ELASTICSEARCH_CI }}
         ELASTICSEARCH_PORT: ${{ secrets.ELASTICSEARCH_PORT_CI }}
       run: |
+        echo $KUBECONFIG_PATH 
         # update hosts ci file
         sudo echo "${{ secrets.HOSTS1_CI }}" | sudo tee -a /etc/hosts
         sudo echo "${{ secrets.HOSTS2_CI }}" | sudo tee -a /etc/hosts
@@ -106,7 +108,7 @@ jobs:
         for workload in "${workloads[@]}"
         do
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>'
-            podman run --rm -e WORKLOAD="$workload" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e BUILD_VERSION="$build_version" -e RUN_TYPE=test_ci -e log_level=INFO -v $KUBECONFIG:"/root/.kube/config" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+            podman run --rm -e WORKLOAD="$workload" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e BUILD_VERSION="$build_version" -e RUN_TYPE=test_ci -e log_level=INFO -v $KUBECONFIG_PATH:"/root/.kube/config" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
         done
     - name: 🎁 Bump Version
