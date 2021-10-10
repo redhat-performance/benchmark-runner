@@ -30,7 +30,8 @@ jobs:
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
       run: |
         ssh -i $RUNNER_PATH/private_key.txt $PERF_PROVISION_USER@$PERF_PROVISION_IP
-        pwd
+        python -m pip install --upgrade pip
+        pip install paramiko
     - name: Turnstyle
       uses: softprops/turnstyle@v1
       env:
