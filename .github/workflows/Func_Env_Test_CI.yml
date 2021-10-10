@@ -31,7 +31,7 @@ jobs:
       run: |
         ssh -i $RUNNER_PATH/private_key.txt $PERF_PROVISION_USER@$PERF_PROVISION_IP
         python -m pip install --upgrade pip
-        pip install paramiko==2.7.2
+        pip install paramiko
         python -c "import paramiko; k = paramiko.RSAKey.from_private_key_file('$RUNNER_PATH/private_key.txt');c = paramiko.SSHClient();c.set_missing_host_key_policy(paramiko.AutoAddPolicy());c.connect( hostname = '$PERF_PROVISION_IP', username = '$PERF_PROVISION_USER', pkey = k );stdin, stdout, stderr= c.exec_command('ls');out = stdout.read().decode().strip();print(out);c.close()"
     - name: Turnstyle
       uses: softprops/turnstyle@v1
