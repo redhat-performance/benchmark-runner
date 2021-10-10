@@ -21,7 +21,7 @@ jobs:
         KEY: ${{ secrets.KEY }}
       run: |
         echo $PERF_PROVISION_SSH_KEY >> $RUNNER_PATH/key.txt
-        cat $RUNNER_PATH/key.txt
+        chmod 400 $RUNNER_PATH/key.txt
         ssh -tt $PERF_PROVISION_USER@$PERF_PROVISION_IP -i $RUNNER_PATH/key.txt
     - name: Turnstyle
       uses: softprops/turnstyle@v1
