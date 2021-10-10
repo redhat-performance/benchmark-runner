@@ -21,10 +21,10 @@ jobs:
         PERF_PROVISION_KNOWN_HOSTS: ${{ secrets.PERF_PROVISION_KNOWN_HOSTS }}
       run: |
           mkdir -p ~/.ssh/
-          echo "$PERF_PROVISION_SSH_KEY" > ../private.key
-          sudo chmod 600 ../private.key
+          echo "$PERF_PROVISION_SSH_KEY" > $RUNNER_PATH/private.key
+          sudo chmod 600 $RUNNER_PATH/private.key
           echo "$PERF_PROVISION_KNOWN_HOSTS" > ~/.ssh/known_hosts
-          ssh -tt $PERF_PROVISION_USER@$PERF_PROVISION_IP -i $RUNNER_PATH/key.txt
+          ssh -tt $PERF_PROVISION_USER@$PERF_PROVISION_IP -i $RUNNER_PATH/private.key
       shell: bash
     - name: Test ssh
       env:
