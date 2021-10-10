@@ -36,7 +36,6 @@ jobs:
       run: |
           mkdir -p ~/.kube/
           echo "$KUBECONFIG_CI" > ~/.kube/config        
-      shell: bash
       env:
         KUBECONFIG_CI: ${{ secrets.KUBECONFIG_CI }}
     - name: 📃 Test with pytest
