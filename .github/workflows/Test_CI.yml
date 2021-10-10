@@ -17,8 +17,10 @@ jobs:
         PERF_PROVISION_IP: ${{ secrets.PERF_PROVISION_IP }}
         PERF_PROVISION_USER: ${{ secrets.PERF_PROVISION_USER }}
         PERF_PROVISION_SSH_KEY: ${{ secrets.PERF_PROVISION_SSH_KEY }}
+        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
       run: |
-        ssh $PERF_PROVISION_USER@$PERF_PROVISION_IP -i $PERF_PROVISION_SSH_KEY
+        echo $PERF_PROVISION_SSH_KEY >> $RUNNER_PATH/key.txt
+        ssh $PERF_PROVISION_USER@$PERF_PROVISION_IP -i $RUNNER_PATH/key.txt
     - name: Turnstyle
       uses: softprops/turnstyle@v1
       env:
