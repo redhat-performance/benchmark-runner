@@ -26,11 +26,12 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install benchmark-runner
-    - uses: azure/k8s-set-context@v1
-      with:
-        method: kubeconfig
-        kubeconfig: ${{ secrets.KUBECONFIG_CI }}
-      id: setcontext
+    - name: Set Kubeconfig
+      run: |
+          mkdir -p ~/.kube/
+          echo "$KUBECONFIG_CI" > ~/.kube/config        
+      env:
+        KUBECONFIG_CI: ${{ secrets.KUBECONFIG_CI }}
     - name: ⌛ Upload 🐋 to quay.io - latest benchmark-operator
       run: |
         build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
