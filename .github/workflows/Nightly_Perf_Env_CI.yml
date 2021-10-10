@@ -1,6 +1,6 @@
 # Nightly CI https://github.com/marketplace/actions/deploy-nightly
 
-name: Deploy Perf Nightly CI
+name: Deploy Perf Environment Nightly CI
 on:
   schedule:
     - cron: '0 4 * * *' # run at 4 AM UTC/ 0 AM EST
