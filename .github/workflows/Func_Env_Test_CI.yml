@@ -23,7 +23,7 @@ jobs:
       run: |
         echo "$PERF_PROVISION_SSH_KEY" >> $RUNNER_PATH/key.txt
         chmod 600 $RUNNER_PATH/key.txt
-        echo "$PERF_PROVISION_KNOWN_HOSTS" > ~/.ssh/known_hosts
+        echo "$PERF_PROVISION_KNOWN_HOSTS" >> ~/.ssh/known_hosts
         ssh -tt $PERF_PROVISION_USER@$PERF_PROVISION_IP -i $RUNNER_PATH/key.txt
     - name: Turnstyle
       uses: softprops/turnstyle@v1
