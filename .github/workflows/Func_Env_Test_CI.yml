@@ -32,7 +32,7 @@ jobs:
         ssh -i $RUNNER_PATH/private_key.txt $PERF_PROVISION_USER@$PERF_PROVISION_IP
         python -m pip install --upgrade pip
         pip install paramiko
-        python -c "import paramiko; k = paramiko.RSAKey.from_private_key_file($RUNNER_PATH/private_key.txt)"
+        python -c "import paramiko; k = paramiko.RSAKey.from_private_key_file('$RUNNER_PATH/private_key.txt')"
     - name: Turnstyle
       uses: softprops/turnstyle@v1
       env:
