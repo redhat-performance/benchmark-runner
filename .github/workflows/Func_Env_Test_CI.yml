@@ -22,6 +22,7 @@ jobs:
     - name: Test Kubeconfig
       env:
         KUBEADMIN_PASSWORD_CI: ${{ secrets.KUBEADMIN_PASSWORD_CI }}
+        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
       run: |
         # update hosts ci file
         sudo echo "${{ secrets.HOSTS1_CI }}" | sudo tee -a /etc/hosts
