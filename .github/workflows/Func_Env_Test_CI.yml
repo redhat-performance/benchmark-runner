@@ -15,21 +15,19 @@ jobs:
     - name: Create SSH key
       run: |
           mkdir -p ~/.ssh/
-          echo "$PERF_PROVISION_SSH_KEY" > $RUNNER_PATH/private_key.txt
+          echo "$PERF_PROVISION_PRIVATE_KEY" > $RUNNER_PATH/private_key.txt
           sudo chmod 600 $RUNNER_PATH/private_key.txt
           echo "$PERF_PROVISION_KNOWN_HOSTS" > ~/.ssh/known_hosts        
       shell: bash
       env:
-        PERF_PROVISION_SSH_KEY: ${{ secrets.PERF_PROVISION_SSH_KEY }}
+        PERF_PROVISION_PRIVATE_KEY: ${{ secrets.PERF_PROVISION_PRIVATE_KEY }}
         PERF_PROVISION_KNOWN_HOSTS: ${{ secrets.PERF_PROVISION_KNOWN_HOSTS }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
     - name: test ssh
       env:
         PERF_PROVISION_IP: ${{ secrets.PERF_PROVISION_IP }}
         PERF_PROVISION_USER: ${{ secrets.PERF_PROVISION_USER }}
-        PERF_PROVISION_SSH_KEY: ${{ secrets.PERF_PROVISION_SSH_KEY }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-        PERF_PROVISION_KNOWN_HOSTS: ${{ secrets.PERF_PROVISION_KNOWN_HOSTS }}
       run: |
         ssh -i $RUNNER_PATH/private_key.txt $PERF_PROVISION_USER@$PERF_PROVISION_IP      
     - name: Turnstyle
