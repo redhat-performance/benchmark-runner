@@ -157,7 +157,6 @@ class OC(SSH):
         return long_uuid
 
     @logger_time_stamp
-    @retry(stop=stop_after_attempt(3))
     def login(self):
         """
         This method login to the cluster
