@@ -7,7 +7,7 @@ name: Deploy Perf Env Nightly CI
 
 on:
   push:
-    branches: [ main ] 
+    branches: [ main ]  
 
 jobs:
   nightly:
