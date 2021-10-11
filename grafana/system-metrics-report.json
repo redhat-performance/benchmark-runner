@@ -21,8 +21,8 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 4,
-  "iteration": 1632509613861,
+  "id": 3,
+  "iteration": 1633197631607,
   "links": [],
   "panels": [
     {
@@ -75,7 +75,7 @@
         "showHeader": true,
         "sortBy": []
       },
-      "pluginVersion": "8.1.2",
+      "pluginVersion": "8.1.5",
       "targets": [
         {
           "bucketAggs": [],
@@ -222,7 +222,7 @@
         "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "8.1.2",
+      "pluginVersion": "8.1.5",
       "targets": [
         {
           "alias": "",
@@ -317,7 +317,7 @@
         "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "8.1.2",
+      "pluginVersion": "8.1.5",
       "targets": [
         {
           "alias": "",
@@ -408,7 +408,7 @@
         "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "8.1.2",
+      "pluginVersion": "8.1.5",
       "targets": [
         {
           "alias": "Secrets",
@@ -515,7 +515,7 @@
         "text": {},
         "textMode": "value"
       },
-      "pluginVersion": "8.1.2",
+      "pluginVersion": "8.1.5",
       "targets": [
         {
           "alias": "",
@@ -583,7 +583,7 @@
         "text": {},
         "textMode": "value"
       },
-      "pluginVersion": "8.1.2",
+      "pluginVersion": "8.1.5",
       "targets": [
         {
           "alias": "",
@@ -655,7 +655,7 @@
         "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "8.1.2",
+      "pluginVersion": "8.1.5",
       "targets": [
         {
           "alias": "Namespaces",
@@ -3318,7 +3318,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "8.1.2",
+      "pluginVersion": "8.1.5",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -3448,7 +3448,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "8.1.2",
+      "pluginVersion": "8.1.5",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -3577,7 +3577,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "8.1.2",
+      "pluginVersion": "8.1.5",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -3719,7 +3719,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "8.1.2",
+      "pluginVersion": "8.1.5",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -3896,7 +3896,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "8.1.2",
+      "pluginVersion": "8.1.5",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -4028,7 +4028,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "8.1.2",
+      "pluginVersion": "8.1.5",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -4204,7 +4204,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "8.1.2",
+      "pluginVersion": "8.1.5",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -4381,7 +4381,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "8.1.2",
+      "pluginVersion": "8.1.5",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -4575,7 +4575,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "8.1.2",
+      "pluginVersion": "8.1.5",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -4705,7 +4705,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "8.1.2",
+      "pluginVersion": "8.1.5",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -4836,7 +4836,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "8.1.2",
+      "pluginVersion": "8.1.5",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -4970,7 +4970,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "8.1.2",
+      "pluginVersion": "8.1.5",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -5145,7 +5145,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "8.1.2",
+      "pluginVersion": "8.1.5",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -5321,7 +5321,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "8.1.2",
+      "pluginVersion": "8.1.5",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -5501,7 +5501,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "8.1.2",
+      "pluginVersion": "8.1.5",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -6832,7 +6832,7 @@
         "query": "elasticsearch",
         "queryValue": "Elasticsearch-system-metrics",
         "refresh": 1,
-        "regex": "/.*kube-burner.*/",
+        "regex": "/.*system-metrics.*/",
         "skipUrlSync": false,
         "type": "datasource"
       },
@@ -6840,8 +6840,8 @@
         "allValue": null,
         "current": {
           "selected": false,
-          "text": "08a23de0-9aaf-559b-871a-9e9fe15cb90e",
-          "value": "08a23de0-9aaf-559b-871a-9e9fe15cb90e"
+          "text": "0bd0e89f-6efb-57e9-953e-e0b14fe74eb4",
+          "value": "0bd0e89f-6efb-57e9-953e-e0b14fe74eb4"
         },
         "datasource": "$Datasource",
         "definition": "{\"find\": \"terms\", \"field\": \"uuid.keyword\"}",
@@ -6894,8 +6894,8 @@
         "allValue": null,
         "current": {
           "selected": false,
-          "text": "cnvperfdev01",
-          "value": "cnvperfdev01"
+          "text": "worker-0",
+          "value": "worker-0"
         },
         "datasource": "$Datasource",
         "definition": "{ \"find\" : \"terms\", \"field\": \"labels.node.keyword\", \"query\": \"metricName.keyword: nodeRoles AND labels.role.keyword: worker AND uuid.keyword: $uuid\"}",
@@ -6995,5 +6995,5 @@
   "timezone": "",
   "title": "system-metrics report",
   "uid": "Cs7IOoHnk",
-  "version": 4
+  "version": 3
 }

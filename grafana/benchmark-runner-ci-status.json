@@ -27,7 +27,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 1,
+  "id": 2,
   "links": [],
   "panels": [
     {
@@ -49,7 +49,7 @@
         "content": "![alt text](https://github.com/redhat-performance/benchmark-runner/blob/main/media/benchmark_runner.png?raw=true \"Tooltip Text\")",
         "mode": "markdown"
       },
-      "pluginVersion": "8.1.2",
+      "pluginVersion": "8.1.5",
       "targets": [
         {
           "alias": "",
@@ -131,6 +131,10 @@
               {
                 "id": "unit",
                 "value": "dateTimeAsIso"
+              },
+              {
+                "id": "custom.width",
+                "value": 166
               }
             ]
           },
@@ -149,19 +153,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "cnv version.keyword"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "cnv version"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "ocp version.keyword"
+              "options": "ocp_version.keyword"
             },
             "properties": [
               {
@@ -173,12 +165,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "ocs version.keyword"
+              "options": "cnv_version.keyword"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "ocs version"
+                "value": "cnv version"
               }
             ]
           },
@@ -218,68 +210,50 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "ci time (minutes)"
+                "value": "ci time (Min)"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Max version#"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "benchmark-runner version (1.0.X)"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Max"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 283
-              },
-              {
-                "id": "displayName",
-                "value": "benchmark-runner version (1.0.X)"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "benchmark wrapper id"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 362
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "benchmark operator id."
+              "options": "ocs_version.keyword"
             },
             "properties": [
               {
                 "id": "custom.width",
                 "value": 340
+              },
+              {
+                "id": "displayName",
+                "value": "ocs version"
+              },
+              {
+                "id": "custom.filterable"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "runner_version.keyword"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "runner version"
+              },
+              {
+                "id": "displayName"
               }
             ]
           }
         ]
       },
       "gridPos": {
-        "h": 14,
-        "w": 24,
-        "x": 0,
+        "h": 11,
+        "w": 15,
+        "x": 4,
         "y": 7
       },
       "id": 6,
@@ -293,7 +267,7 @@
           }
         ]
       },
-      "pluginVersion": "8.1.2",
+      "pluginVersion": "8.1.5",
       "targets": [
         {
           "alias": "",
@@ -310,7 +284,7 @@
               "type": "terms"
             },
             {
-              "field": "ocp version.keyword",
+              "field": "ocp_version.keyword",
               "id": "15",
               "settings": {
                 "min_doc_count": "0",
@@ -321,7 +295,7 @@
               "type": "terms"
             },
             {
-              "field": "cnv version.keyword",
+              "field": "cnv_version.keyword",
               "id": "16",
               "settings": {
                 "min_doc_count": "0",
@@ -332,7 +306,7 @@
               "type": "terms"
             },
             {
-              "field": "benchmark_operator_id.keyword",
+              "field": "ocs_version.keyword",
               "id": "17",
               "settings": {
                 "min_doc_count": "0",
@@ -343,10 +317,32 @@
               "type": "terms"
             },
             {
-              "field": "benchmark_wrapper_id.keyword",
+              "field": "benchmark_operator_id.keyword",
               "id": "18",
               "settings": {
                 "min_doc_count": "0",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            },
+            {
+              "field": "benchmark_wrapper_id.keyword",
+              "id": "19",
+              "settings": {
+                "min_doc_count": "1",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            },
+            {
+              "field": "runner_version.keyword",
+              "id": "20",
+              "settings": {
+                "min_doc_count": "1",
                 "order": "desc",
                 "orderBy": "_term",
                 "size": "10"
@@ -357,19 +353,22 @@
           "hide": false,
           "metrics": [
             {
-              "field": "version#",
+              "field": "version",
+              "hide": false,
               "id": "1",
               "settings": {},
               "type": "max"
             },
             {
               "field": "ci_minutes_time",
+              "hide": false,
               "id": "11",
               "settings": {},
               "type": "max"
             },
             {
               "field": "status#",
+              "hide": false,
               "id": "13",
               "type": "max"
             }
@@ -382,7 +381,18 @@
       "timeFrom": null,
       "timeShift": null,
       "title": "Ci Status",
-      "transformations": [],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Max version": true
+            },
+            "indexByName": {},
+            "renameByName": {}
+          }
+        }
+      ],
       "type": "table"
     }
   ],
@@ -401,5 +411,5 @@
   "timezone": "",
   "title": "benchmark-runner-ci-status",
   "uid": "tUclnRNnz",
-  "version": 26
+  "version": 4
 }

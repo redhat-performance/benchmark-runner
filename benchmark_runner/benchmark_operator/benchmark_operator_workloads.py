@@ -2,8 +2,10 @@
 import os
 import time
 import yaml
-
+import datetime
 from typeguard import typechecked
+from tenacity import retry, stop_after_attempt
+
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 from benchmark_runner.common.elasticsearch.elasticsearch_exceptions import ElasticSearchDataNotUploaded
 from benchmark_runner.common.oc.oc import OC
@@ -235,11 +237,13 @@ class BenchmarkOperatorWorkloads:
         @param database: optional:mssql, postgres or mariadb
         :return:
         """
+        date_format = '%Y_%m_%d'
         metadata = {'ocp_version': self.__oc.get_ocp_server_version(),
                     'cnv_version': self.__oc.get_cnv_version(),
                     'ocs_version': self.__oc.get_ocs_version(),
                     'runner_version': self.__runner_version,
-                    'version': int(self.__runner_version.split('.')[-1])}
+                    'version': int(self.__runner_version.split('.')[-1]),
+                    'ci_date': datetime.datetime.now().strftime(date_format)}
         if kind:
             metadata.update({'kata_version': '',
                              'kind': kind,
@@ -272,6 +276,7 @@ class BenchmarkOperatorWorkloads:
 #***********************************************************************************************
 
     @logger_time_stamp
+    @retry(stop=stop_after_attempt(3))
     def stressng_pod(self):
         """
         This method run stressng workload
@@ -309,6 +314,7 @@ class BenchmarkOperatorWorkloads:
             raise err
 
     @logger_time_stamp
+    @retry(stop=stop_after_attempt(3))
     def stressng_vm(self):
         """
         This method run stressng vm workload
@@ -346,6 +352,7 @@ class BenchmarkOperatorWorkloads:
             raise err
 
     @logger_time_stamp
+    @retry(stop=stop_after_attempt(3))
     def uperf_pod(self):
         """
         This method run uperf workload
@@ -390,6 +397,7 @@ class BenchmarkOperatorWorkloads:
             raise err
 
     @logger_time_stamp
+    @retry(stop=stop_after_attempt(3))
     def uperf_vm(self):
         """
         This method run uperf vm workload
@@ -431,6 +439,7 @@ class BenchmarkOperatorWorkloads:
 
     @typechecked
     @logger_time_stamp
+    @retry(stop=stop_after_attempt(3))
     def hammerdb_pod(self, database: str):
         """
         This method run hammerdb pod workload
@@ -494,6 +503,7 @@ class BenchmarkOperatorWorkloads:
 
     @typechecked
     @logger_time_stamp
+    @retry(stop=stop_after_attempt(3))
     def hammerdb_vm(self, database: str):
         """
         This method run hammerdb vm workload

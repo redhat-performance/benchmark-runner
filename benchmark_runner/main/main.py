@@ -4,6 +4,8 @@ from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, 
 from benchmark_runner.benchmark_operator.benchmark_operator_workloads import BenchmarkOperatorWorkloads
 from benchmark_runner.main.environment_variables import environment_variables
 from benchmark_runner.common.clouds.Azure.azure_operations import AzureOperations
+from benchmark_runner.common.clouds.IBM.ibm_operations import IBMOperations
+
 
 # logger
 log_level = os.environ.get('log_level', 'INFO').upper()
@@ -21,21 +23,26 @@ def main():
     """
     environment_variables_dict = environment_variables.environment_variables_dict
     # environment variables data
-    es_host = environment_variables_dict.get('elasticsearch', '')
-    es_port = environment_variables_dict.get('elasticsearch_port', '')
-    kubeadmin_password = environment_variables_dict.get('kubeadmin_password', '')
-    build_version = environment_variables_dict.get('build_version', '')
-    ci_status = environment_variables_dict.get('ci_status', '')
-    ci_minutes_time = environment_variables_dict.get('ci_minutes_time', '')
-    benchmark_operator_id = environment_variables_dict.get('benchmark_operator_id', '')
-    benchmark_wrapper_id = environment_variables_dict.get('benchmark_wrapper_id', '')
-    benchmark_operator_workload = BenchmarkOperatorWorkloads(kubeadmin_password=kubeadmin_password, es_host=es_host,
-                                                             es_port=es_port)
-    benchmark_operator_workload.runner_version = build_version
-    # Azure
+    workload = environment_variables_dict.get('workload', '')
     azure_cluster_stop = environment_variables_dict.get('azure_cluster_stop', '')
     azure_cluster_start = environment_variables_dict.get('azure_cluster_start', '')
-    if azure_cluster_stop or azure_cluster_start:
+    ci_status = environment_variables_dict.get('ci_status', '')
+    install_ocp_version = environment_variables_dict.get('install_ocp_version', '')
+    install_ocp_resources = environment_variables_dict.get('install_ocp_resources', '')
+
+    if workload or ci_status:
+        es_host = environment_variables_dict.get('elasticsearch', '')
+        es_port = environment_variables_dict.get('elasticsearch_port', '')
+        kubeadmin_password = environment_variables_dict.get('kubeadmin_password', '')
+        benchmark_operator_workload = BenchmarkOperatorWorkloads(kubeadmin_password=kubeadmin_password, es_host=es_host,
+                                                                 es_port=es_port)
+
+    @logger_time_stamp
+    def azure_cluster_start_stop():
+        """
+        This method start stop azure cluster
+        :return:
+        """
         azure_operation = AzureOperations(azure_clientid=environment_variables_dict.get('azure_clientid', ''),
                                           azure_secret=environment_variables_dict.get('azure_secret', ''),
                                           azure_tenantid=environment_variables_dict.get('azure_tenantid', ''),
@@ -43,14 +50,62 @@ def main():
                                           azure_resource_group_name=environment_variables_dict.get('azure_resource_group_name', ''))
         azure_vm_name = (environment_variables_dict.get('azure_vm_name', ''))
         if azure_cluster_start:
-            print(azure_operation.start_vm(vm_name=azure_vm_name))
+            logger.info(azure_operation.start_vm(vm_name=azure_vm_name))
         elif azure_cluster_stop:
-            print(azure_operation.stop_vm(vm_name=azure_vm_name))
-    # Update CI status
-    elif ci_status == 'pass' or ci_status == 'failed':
+            logger.info(azure_operation.stop_vm(vm_name=azure_vm_name))
+
+    @logger_time_stamp
+    def install_ocp():
+        """
+        This method install ocp version
+        :return:
+        """
+        logger.info(f'Start IBM OCP latest-{install_ocp_version} installation')
+        ibm_operations = IBMOperations(user=environment_variables_dict.get('provision_user', ''))
+        ibm_operations.ibm_connect()
+        ibm_operations.update_ocp_version()
+        if ibm_operations.run_ibm_ocp_ipi_installer():
+            logger.info(f'Installed OCP latest-{install_ocp_version} successfully')
+        else:
+            logger.info(f'Failed to install OCP latest-{install_ocp_version} after 3 retries')
+        logger.info(f'Update GitHub OCP credentials')
+        ibm_operations.update_ocp_github_credentials()
+        ibm_operations.ibm_disconnect()
+        logger.info(f'End IBM OCP latest-{install_ocp_version} installation')
+
+    @logger_time_stamp
+    def install_resources():
+        """
+        This method install ocp resources
+        :return:
+        """
+        logger.info(f'Start IBM OCP resources installation')
+        ibm_oc_operations = IBMOperations(user=environment_variables_dict.get('provision_oc_user', ''))
+        ibm_oc_operations.ibm_connect()
+        ibm_oc_operations.oc_login()
+        # @TODO add kata installation once it works properly
+        # ibm_blk_disk_name for ocs install
+        ibm_oc_operations.install_ocp_resources(resources=['cnv', 'local_storage', 'ocs'], ibm_blk_disk_name=ibm_oc_operations.get_ibm_disks_blk_name())
+        ibm_oc_operations.ibm_disconnect()
+        logger.info(f'End IBM OCP resources installation')
+
+    @logger_time_stamp
+    def update_ci_status():
+        """
+        This method update ci status
+        :return:
+        """
+        ci_minutes_time = environment_variables_dict.get('ci_minutes_time', '')
+        benchmark_operator_id = environment_variables_dict.get('benchmark_operator_id', '')
+        benchmark_wrapper_id = environment_variables_dict.get('benchmark_wrapper_id', '')
         benchmark_operator_workload.update_ci_status(status=ci_status, ci_minutes_time=int(ci_minutes_time), benchmark_operator_id=benchmark_operator_id, benchmark_wrapper_id=benchmark_wrapper_id)
-    # Workloads
-    else:
+
+    @logger_time_stamp
+    def run_workload():
+        """
+        This method run workload
+        :return:
+        """
         workload = environment_variables_dict.get('workload', '')
         # workload name validation
         if workload not in environment_variables.workloads_list:
@@ -63,6 +118,20 @@ def main():
                                                              yaml_path='benchmark-operator/config/manager/manager.yaml',
                                                              pin_node='pin_node_benchmark_operator')
         benchmark_operator_workload.run_workload(workload=workload)
+
+    # azure_cluster_start_stop
+    if azure_cluster_stop or azure_cluster_start:
+        azure_cluster_start_stop()
+    # install_ocp_version
+    elif install_ocp_version:
+        install_ocp()
+    # install_ocp_resource
+    elif install_ocp_resources:
+        install_resources()
+    elif ci_status == 'pass' or ci_status == 'failed':
+        update_ci_status()
+    else:
+        run_workload()
 
 
 main()

@@ -11,6 +11,57 @@ class EnvironmentVariables:
         self._environment_variables_dict = {}
 
         # Constant parameters
+
+        # Parameters below related to 'azure_cluster_start_stop()'
+        # Azure details
+        self._environment_variables_dict['azure_cluster_stop'] = os.environ.get('AZURE_CLUSTER_STOP', '')
+        self._environment_variables_dict['azure_cluster_start'] = os.environ.get('AZURE_CLUSTER_START', '')
+        self._environment_variables_dict['azure_clientid'] = os.environ.get('AZURE_CLIENTID', '')
+        self._environment_variables_dict['azure_secret'] = os.environ.get('AZURE_SECRET', '')
+        self._environment_variables_dict['azure_tenantid'] = os.environ.get('AZURE_TENANTID', '')
+        self._environment_variables_dict['azure_subscriptionid'] = os.environ.get('AZURE_SUBSCRIPTIONID', '')
+        self._environment_variables_dict['azure_resource_group_name'] = os.environ.get('AZURE_RESOURCE_GROUP_NAME', '')
+        self._environment_variables_dict['azure_vm_name'] = os.environ.get('AZURE_VM_NAME', '')
+
+        # Parameters below related to 'install_ocp() and 'install_resource()'
+        # Mandatory: OCP environment flavor PERF or FUNC
+        self._environment_variables_dict['ocp_env_flavor'] = os.environ.get('OCP_ENV_FLAVOR', '')
+        # IBM details
+        self._environment_variables_dict['ibm_api_key'] = os.environ.get('IBM_API_KEY', '')
+        # github token
+        self._environment_variables_dict['github_token'] = os.environ.get('GITHUB_TOKEN', '')
+        # MANDATORY for OCP install: install ocp version - insert version to install i.e. 'latest-4.8'
+        self._environment_variables_dict['install_ocp_version'] = os.environ.get('INSTALL_OCP_VERSION', '')
+        self.__ocp_env_flavor = self._environment_variables_dict['ocp_env_flavor']
+        self._environment_variables_dict['provision_ip'] = os.environ.get(f'{self.__ocp_env_flavor}_PROVISION_IP', '')
+        self._environment_variables_dict['provision_ssh_key'] = os.environ.get(f'{self.__ocp_env_flavor}_PROVISION_PRIVATE_KEY', '')
+        self._environment_variables_dict['provision_user'] = os.environ.get(f'{self.__ocp_env_flavor}_PROVISION_USER', '')
+        self._environment_variables_dict['provision_oc_user'] = os.environ.get(f'{self.__ocp_env_flavor}_PROVISION_OC_USER', '')
+        self._environment_variables_dict['provision_port'] = os.environ.get(f'{self.__ocp_env_flavor}_PROVISION_PORT', '')
+        # 3 hours for installation time
+        self._environment_variables_dict['provision_timeout'] = os.environ.get(f'{self.__ocp_env_flavor}_PROVISION_TIMEOUT', '')
+
+        # Parameters below related to 'install_resource()'
+        # MANDATORY for OCP resource install: 'True' for install resources
+        self._environment_variables_dict['install_ocp_resources'] = os.environ.get('INSTALL_OCP_RESOURCES', '')
+        # cnv version
+        self._environment_variables_dict['cnv_version'] = os.environ.get('CNV_VERSION', '')
+        # ocs version
+        self._environment_variables_dict['ocs_version'] = os.environ.get('OCS_VERSION', '')
+        # number of ocs disk
+        self._environment_variables_dict['num_ocs_disk'] = os.environ.get('NUM_OCS_DISK', '')
+        # github repository
+        self._environment_variables_dict['github_repository_short'] = os.environ.get('GIT_RIPOSITORY_SHORT', '')
+
+        # Parameters below related to 'update_ci_status()'
+        # CI run time
+        self._environment_variables_dict['ci_minutes_time'] = os.environ.get('CI_MINUTES_TIME', '')
+        # benchmark-operator last commit id
+        self._environment_variables_dict['benchmark_operator_id'] = os.environ.get('BENCHMARK_OPERATOR_ID', '')
+        # benchmark-wrapper last commit id
+        self._environment_variables_dict['benchmark_wrapper_id'] = os.environ.get('BENCHMARK_WRAPPER_ID', '')
+
+        # Parameters below related to 'run_workload()'
         self._environment_variables_dict['workloads'] = ['stressng_pod', 'stressng_vm', 'uperf_pod', 'uperf_vm', 'hammerdb_pod_mariadb', 'hammerdb_vm_mariadb',  'hammerdb_pod_postgres', 'hammerdb_vm_postgres', 'hammerdb_pod_mssql', 'hammerdb_vm_mssql']
         self._environment_variables_dict['namespace'] = os.environ.get('NAMESPACE', 'benchmark-operator')
         # run Hammerdb workload with ocs pvc True/False
@@ -23,15 +74,11 @@ class EnvironmentVariables:
         self._environment_variables_dict['ci_status'] = os.environ.get('CI_STATUS', '')
         # Run type test_ci/func_ci/perf_ci, default test_ci same environment as func_ci
         self._environment_variables_dict['run_type'] = os.environ.get('RUN_TYPE', 'test_ci')
-        # CI run time
-        self._environment_variables_dict['ci_minutes_time'] = os.environ.get('CI_MINUTES_TIME', '')
-        # benchmark-operator last commit id
-        self._environment_variables_dict['benchmark_operator_id'] = os.environ.get('BENCHMARK_OPERATOR_ID', '')
-        # benchmark-wrapper last commit id
-        self._environment_variables_dict['benchmark_wrapper_id'] = os.environ.get('BENCHMARK_WRAPPER_ID', '')
-
+        # kata machine config
+        self._environment_variables_dict['kata_machine_config'] = os.environ.get('KATA_MACHINE_CONFIG', 'master')
         # This path is for benchmark-operator path
         self._environment_variables_dict['runner_path'] = os.environ.get('RUNNER_PATH', '/')
+
         ##################################################################################################
 
         # dynamic parameters - configure for local run
@@ -47,19 +94,10 @@ class EnvironmentVariables:
         self._environment_variables_dict['elasticsearch'] = os.environ.get('ELASTICSEARCH', '')
         self._environment_variables_dict['elasticsearch_port'] = os.environ.get('ELASTICSEARCH_PORT', '')
 
-        # Azure details
-        self._environment_variables_dict['azure_cluster_stop'] = os.environ.get('AZURE_CLUSTER_STOP', '')
-        self._environment_variables_dict['azure_cluster_start'] = os.environ.get('AZURE_CLUSTER_START', '')
-        self._environment_variables_dict['azure_clientid'] = os.environ.get('AZURE_CLIENTID', '')
-        self._environment_variables_dict['azure_secret'] = os.environ.get('AZURE_SECRET', '')
-        self._environment_variables_dict['azure_tenantid'] = os.environ.get('AZURE_TENANTID', '')
-        self._environment_variables_dict['azure_subscriptionid'] = os.environ.get('AZURE_SUBSCRIPTIONID', '')
-        self._environment_variables_dict['azure_resource_group_name'] = os.environ.get('AZURE_RESOURCE_GROUP_NAME', '')
-        self._environment_variables_dict['azure_vm_name'] = os.environ.get('AZURE_VM_NAME', '')
-
         # end dynamic parameters - configure for local run
         ##################################################################################################
 
+        # ** NOT CHANGE THE PARAMETERS BELOW **
         # Node Selector functionality
         if self._environment_variables_dict['pin_node1']:
             self._environment_variables_dict['pin'] = 'true'
