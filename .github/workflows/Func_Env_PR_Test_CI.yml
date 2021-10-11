@@ -34,9 +34,9 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Set Kubeconfig
       run: |
-          sudo mkdir -p "/home/runner/.kube/"
-          sudo echo "$KUBECONFIG" > "/home/runner/.kube/config"
-          sudo echo "KUBECONFIG_PATH=/home/runner/.kube/config" >> $GITHUB_ENV
+          mkdir -p "$RUNNER_PATH/.kube/"
+          echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
+          echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> $GITHUB_ENV
       env:
         KUBECONFIG: ${{ secrets.FUNC_KUBECONFIG }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
