@@ -1,7 +1,7 @@
 # This workflow will install Python dependencies, run tests and lint with a single version of Python
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: PR Test CI 
+name: Func Env PR Test CI  
 
 on:
   pull_request:
@@ -32,31 +32,34 @@ jobs:
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - uses: azure/k8s-set-context@v1
-      with:
-        method: kubeconfig
-        kubeconfig: ${{ secrets.KUBECONFIG_CI }} # Use secret (https://developer.github.com/actions/managing-workflows/storing-secrets/)
-      id: setcontext
+    - name: Set Kubeconfig
+      run: |
+          mkdir -p "$RUNNER_PATH/.kube/"
+          echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
+          echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> $GITHUB_ENV
+      env:
+        KUBECONFIG: ${{ secrets.FUNC_KUBECONFIG }}
+        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
     - name: 📃 Test with pytest
       env:
-        KUBEADMIN_PASSWORD: ${{ secrets.KUBEADMIN_PASSWORD_CI }}
-        PIN_NODE1: ${{ secrets.PIN_NODE1_CI }}
-        PIN_NODE2: ${{ secrets.PIN_NODE2_CI }}
+        KUBEADMIN_PASSWORD: ${{ secrets.FUNC_KUBEADMIN_PASSWORD }}
+        PIN_NODE1: ${{ secrets.FUNC_PIN_NODE1 }}
+        PIN_NODE2: ${{ secrets.FUNC_PIN_NODE2 }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-        ELASTICSEARCH: ${{ secrets.ELASTICSEARCH_CI }}
-        ELASTICSEARCH_PORT: ${{ secrets.ELASTICSEARCH_PORT_CI }}
+        ELASTICSEARCH: ${{ secrets.FUNC_ELASTICSEARCH }}
+        ELASTICSEARCH_PORT: ${{ secrets.FUNC_ELASTICSEARCH_PORT }}
       run: |
         # update hosts ci file
-        sudo echo "${{ secrets.HOSTS1_CI }}" | sudo tee -a /etc/hosts
-        sudo echo "${{ secrets.HOSTS2_CI }}" | sudo tee -a /etc/hosts
+        sudo echo "${{ secrets.FUNC_HOSTS_API }}" | sudo tee -a /etc/hosts
+        sudo echo "${{ secrets.FUNC_HOSTS_OAUTH }}" | sudo tee -a /etc/hosts
         # Install Dockerfile content for pytest
         # install oc/kubctl
         oc_version=4.7.0-0.okd-2021-05-22-050008
         curl -L https://github.com/openshift/okd/releases/download/${oc_version}/openshift-client-linux-${oc_version}.tar.gz -o $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz
         tar -xzvf $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz -C $RUNNER_PATH/
         rm $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz
-        echo alias oc=$RUNNER_PATH/./oc >> $RUNNER_PATH/.bashrc
-        echo alias kubectl=$RUNNER_PATH/./kubectl >> $RUNNER_PATH/.bashrc
+        cp $RUNNER_PATH/kubectl /usr/local/bin/kubectl
+        cp $RUNNER_PATH/oc /usr/local/bin/oc
 
         # clone benchmark-operator
         git clone https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
