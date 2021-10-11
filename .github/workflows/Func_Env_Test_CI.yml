@@ -12,6 +12,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - name: ⚙️ SET SSH key
+      run: |
+          mkdir -p "$RUNNER_PATH/.ssh/"
+          echo "$PERF_PROVISION_PRIVATE_KEY" > $RUNNER_PATH/private_key.txt
+          sudo chmod 600 $RUNNER_PATH/private_key.txt
+          echo "$PERF_PROVISION_KNOWN_HOSTS" > "$RUNNER_PATH/.ssh/known_hosts"        
+      #shell: bash
+      env:
+        PERF_PROVISION_PRIVATE_KEY: ${{ secrets.PERF_PROVISION_PRIVATE_KEY }}
+        PERF_PROVISION_KNOWN_HOSTS: ${{ secrets.PERF_PROVISION_KNOWN_HOSTS }}
+        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+    - name: test ssh
+      env:
+        PERF_PROVISION_IP: ${{ secrets.PERF_PROVISION_IP }}
+        PERF_PROVISION_USER: ${{ secrets.PERF_PROVISION_USER }}
+        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+      run: |
+        #ssh -i $RUNNER_PATH/private_key.txt $PERF_PROVISION_USER@$PERF_PROVISION_IP
+        python -m pip install --upgrade pip
+        pip install paramiko
+        python -c "import paramiko; k = paramiko.RSAKey.from_private_key_file('$RUNNER_PATH/private_key.txt');c = paramiko.SSHClient();c.set_missing_host_key_policy(paramiko.AutoAddPolicy());c.connect( hostname = '$PERF_PROVISION_IP', username = '$PERF_PROVISION_USER', pkey = k );stdin, stdout, stderr= c.exec_command('ls');out = stdout.read().decode().strip();print(out);c.close()"
     - name: Turnstyle
       uses: softprops/turnstyle@v1
       env:
@@ -32,7 +53,7 @@ jobs:
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: Set Kubeconfig
+    - name: ⚙️ Set Kubeconfig
       run: |
           mkdir -p "$RUNNER_PATH/.kube/"
           echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
