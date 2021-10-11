@@ -1,13 +1,9 @@
 # Nightly CI https://github.com/marketplace/actions/deploy-nightly
 
 name: Deploy Perf Env Nightly CI
-#on:
-#  schedule:
-#    - cron: '0 4 * * *' # run at 4 AM UTC/ 0 AM EST
-
 on:
-  push:
-    branches: [ main ]  
+  schedule:
+    - cron: '0 4 * * *' # run at 4 AM UTC/ 0 AM EST
 
 jobs:
   nightly:
@@ -27,7 +23,7 @@ jobs:
         pip install benchmark-runner
     - name: Set Kubeconfig
       run: |
-          mkdir -p ~/.kube/
+          mkdir -p "$RUNNER_PATH/.kube/"
           echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
           echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> $GITHUB_ENV
       env:
