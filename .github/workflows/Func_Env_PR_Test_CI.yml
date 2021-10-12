@@ -22,7 +22,6 @@ jobs:
         python-version: 3.9
     - name: Install dependencies
       run: |
-        sudo chown -R $USER:$USER /home/github/actions-runner/_work/redhat-performance/benchmark-runner
         python -m pip install --upgrade pip
         pip install flake8 pytest pytest-cov
         if [[ -f requirements.txt ]]; then pip install -r requirements.txt; fi
@@ -38,6 +37,7 @@ jobs:
         KUBECONFIG: ${{ secrets.FUNC_KUBECONFIG }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
       run: |
+          sudo chown -R $USER:$USER /home/runner/
           mkdir -p "$RUNNER_PATH/.kube/"
           echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
           echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> $GITHUB_ENV
