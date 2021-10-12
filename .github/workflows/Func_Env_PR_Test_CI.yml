@@ -34,8 +34,8 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Set Kubeconfig
       env:
-        KUBECONFIG: ${{ secrets.FUNC_KUBECONFIG }}
-        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+        KUBECONFIG: ${{ secrets.FUNC_KUBECONFIG_ROBERT }}
+        RUNNER_PATH: ${{ secrets.RUNNER_PATH_ROBERT }}
       run: |
           mkdir -p "$RUNNER_PATH/.kube/"
           echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
