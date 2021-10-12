@@ -6,7 +6,7 @@ name: Func Env PR Test CI
 on:
   push:
     branches: [ main ] 
-concurrency: function_environment    
+concurrency: functional_environment
 jobs:
   build:
     runs-on: ubuntu-latest
