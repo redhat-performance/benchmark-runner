@@ -1,18 +1,18 @@
-
 import paramiko
 import os
 import socket
 
-
 from benchmark_runner.common.remote_ssh.connection_data import ConnectionData
-from benchmark_runner.common.remote_ssh.ssh_remote_exceptions import SshConnectionError, SshConnectionFailure, RunCommandError, \
-    SshConnectionTimedOut
+from benchmark_runner.common.remote_ssh.ssh_remote_exceptions import SshConnectionError, SshConnectionFailure, \
+    RunCommandError, \
+    SshConnectionTimedOut, PathNotExist, FileNotExist, SFTPException
 
 
 class RemoteSsh:
     """
     This class is running remote ssh commands
     """
+
     def __init__(self, connection_data: ConnectionData):
         self.__p_client = paramiko.SSHClient()
         self.__p_client.set_missing_host_key_policy(
@@ -85,22 +85,25 @@ class RemoteSsh:
     def put_remote_dir(self, local, remote):
         """
         This method uploads the contents of the local directory to the remote path. The
-        remote directory needs to exists. All subdirectories in py_perf-code are
+        local directory needs to exists. All subdirectories in py_perf-code are
         created under target.
         :param local: local path
         :param remote: remote path
         :return:
         """
-        for file_name in os.listdir(local):
-            if os.path.isfile(os.path.join(local, file_name)):
-                self.put_remote_file(local, remote, file_name)
-            else:
-                self.mkdir(remote, ignore_existing=True)
-                self.put_remote_file(local, remote, file_name)
+        if os.path.isdir(local):
+            for file_name in os.listdir(local):
+                if os.path.isfile(os.path.join(local, file_name)):
+                    self.put_remote_file(local, remote, file_name)
+                else:
+                    self.mkdir(remote, ignore_existing=True)
+                    self.put_remote_file(local, remote, file_name)
+        else:
+            raise PathNotExist(f'Local path does not exist: {local}')
 
     def get_remote_dir(self, remote, local):
         """
-        This method downloads the contents of the local directory to the remote path. The
+        This method downloads the contents of the remote directory to the local path. The
         remote directory needs to exists. All subdirectories in py_perf-code are
         created under target.
         :param local: local path
@@ -108,12 +111,15 @@ class RemoteSsh:
         :return:
         """
 
-        for file_name in os.listdir(local):
-            if os.path.isfile(os.path.join(local, file_name)):
-                self.get_remote_file(remote, local, file_name)
-            else:
-                self.mkdir(remote, ignore_existing=True)
-                self.get_remote_file(remote, local, file_name)
+        if self.exist(remote_path=remote):
+            for file_name in os.listdir(local):
+                if os.path.isfile(os.path.join(local, file_name)):
+                    self.get_remote_file(remote, local, file_name)
+                else:
+                    self.mkdir(remote, ignore_existing=True)
+                    self.get_remote_file(remote, local, file_name)
+        else:
+            raise PathNotExist(f'remote path does not exist: {remote}')
 
     def put_remote_file(self, local, remote, file_name):
         """
@@ -123,7 +129,13 @@ class RemoteSsh:
         :param file_name:
         :return:
         """
-        self.__p_sftp.put(f'{local}/{file_name}', f'{remote}/{file_name}')
+        if os.path.isfile(f'{local}/{file_name}'):
+            try:
+                self.__p_sftp.put(f'{local}/{file_name}', f'{remote}/{file_name}')
+            except Exception as err:
+                raise SFTPException(err)
+        else:
+            raise FileNotExist(f'Local file does not exist: {local}/{file_name}')
 
     def get_remote_file(self, remote, local, file_name):
         """
@@ -133,7 +145,10 @@ class RemoteSsh:
         :param file_name:
         :return:
         """
-        self.__p_sftp.get(f'{remote}/{file_name}', f'{local}/{file_name}')
+        if self.exist(remote_path=f'{remote}/{file_name}'):
+            self.__p_sftp.get(f'{remote}/{file_name}', f'{local}/{file_name}')
+        else:
+            raise FileNotExist(f'Remote file does not exist: {remote}/{file_name}')
 
     def replace_parameter(self, remote_path, file_name, parameter, value, all_line=False):
         """
@@ -178,18 +193,23 @@ class RemoteSsh:
         :param old_remote_path:
         :param new_remote_path:
         """
-        self.__p_sftp.rename(old_remote_path, new_remote_path)
+        if self.exist(old_remote_path):
+            self.__p_sftp.rename(old_remote_path, new_remote_path)
+        else:
+            raise PathNotExist(f'remote path does not exist: {old_remote_path}')
 
     def rmdir(self, remote_path):
         """
-        This method delete entire remote folder recursively
+        This method delete entire remote file
         """
-        if self.exist(remote_path) and len(remote_path) > 10:
-            self.run_command(f'rm -r {remote_path}')
+        if self.exist(remote_path):
+            remote_path_files = self.__p_sftp.listdir(path=remote_path)
+            for file in remote_path_files:
+                self.__p_sftp.remove(f'{remote_path}/{file}')
 
     def copy(self, remote_source, remote_target):
         """
         This method copy from remote source to target folder
         """
         if self.exist(remote_source):
-            self.run_command(f'cp - ar - f {remote_source} {remote_target}')
+            self.run_command(f'cp - arf {remote_source} {remote_target}')

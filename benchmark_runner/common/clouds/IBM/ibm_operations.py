@@ -33,20 +33,21 @@ class IBMOperations:
                                                 ssh_key=self.__environment_variables_dict.get('provision_ssh_key', ''))
         self.__remote_ssh = RemoteSsh(self.__connection_data)
 
-
     def __get_kubeadmin_password(self):
         """
-        This method return kubeadmin password
+        This method return kubeadmin_password if exist
         :return:
         """
-        return self.__remote_ssh.run_command(f'cat /home/{self.__ibm_oc_user}/clusterconfigs/auth/kubeadmin-password')
+        if self.__remote_ssh.exist(remote_path=f'/home/{self.__ibm_oc_user}/clusterconfigs/auth/kubeadmin-password'):
+            return self.__remote_ssh.run_command(f'cat /home/{self.__ibm_oc_user}/clusterconfigs/auth/kubeadmin-password')
 
     def __get_kubeconfig(self):
         """
-        This method return kubeadmin password
+        This method return kubeconfig if exist
         :return:
         """
-        return self.__remote_ssh.run_command(f'cat /home/{self.__ibm_oc_user}/clusterconfigs/auth/kubeconfig')
+        if self.__remote_ssh.exist(remote_path=f'/home/{self.__ibm_oc_user}/clusterconfigs/auth/kubeconfig'):
+            return self.__remote_ssh.run_command(f'cat /home/{self.__ibm_oc_user}/clusterconfigs/auth/kubeconfig')
 
     def __ibm_login_cmd(self):
         """
@@ -63,13 +64,13 @@ class IBMOperations:
         """
         return 'ibmcloud logout'
 
-    @staticmethod
-    def __ibm_ipi_install_ocp_cmd():
+    def __ibm_ipi_install_ocp_cmd(self):
         """
-        This method return ibm ipi installer cmd
+        This method return ibm ipi installer cmd if exist
         :return:
         """
-        return 'pushd /ipi-installer/baremetal-deploy; chmod +x utils/ibmsetup.sh; ./utils/ibmsetup.sh; popd'
+        if self.__remote_ssh.exist(remote_path=f'/ipi-installer/baremetal-deploy/utils/ibmsetup.sh'):
+            return 'pushd /ipi-installer/baremetal-deploy; chmod +x utils/ibmsetup.sh; ./utils/ibmsetup.sh; popd'
 
     @logger_time_stamp
     def get_ibm_disks_blk_name(self):

@@ -38,3 +38,30 @@ class SshConnectionFailure(SshError):
     def __init__(self, err):
         self.message = f'Server connection failure: {err}'
         super(SshConnectionFailure, self).__init__(self.message)
+
+
+class PathNotExist(SshError):
+    """
+    This class error for folder that not exist
+    """
+    def __init__(self, err):
+        self.message = f'{err}'
+        super(PathNotExist, self).__init__(self.message)
+
+
+class FileNotExist(SshError):
+    """
+    This class error for file that not exist
+    """
+    def __init__(self, err):
+        self.message = f'{err}'
+        super(PathNotExist, self).__init__(self.message)
+
+
+class SFTPException(SshError):
+    """
+    This class through sftp exception
+    """
+    def __init__(self, err):
+        self.message = {err}
+        super(PathNotExist, self).__init__(self.message)
