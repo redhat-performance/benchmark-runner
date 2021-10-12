@@ -6,7 +6,7 @@ from tenacity import retry, stop_after_attempt
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger, datetime_format
 from benchmark_runner.main.environment_variables import environment_variables
 from benchmark_runner.common.remote_ssh.remote_ssh import ConnectionData, RemoteSsh
-from benchmark_runner.common.ocp.create_ocp_resource import CreateOcpResource
+from benchmark_runner.common.ocp_resources.create_ocp_resource import CreateOcpResource
 from benchmark_runner.common.oc.oc import OC
 from benchmark_runner.common.github.github_operations import GitHubOperations
 
@@ -32,7 +32,7 @@ class IBMOperations:
                                                     self.__environment_variables_dict.get('provision_timeout', '')),
                                                 ssh_key=self.__environment_variables_dict.get('provision_ssh_key', ''))
         self.__remote_ssh = RemoteSsh(self.__connection_data)
-        self.__github_operations = GitHubOperations()
+
 
     def __get_kubeadmin_password(self):
         """
@@ -152,6 +152,7 @@ class IBMOperations:
         This method update github secrets kubeconfig and kubeadmin_password
         :return:
         """
-        self.__github_operations._create_secret(secret_name=f'{self.__ocp_env_flavor}_KUBECONFIG', unencrypted_value=self.__get_kubeconfig())
-        self.__github_operations._create_secret(secret_name=f'{self.__ocp_env_flavor}_KUBEADMIN_PASSWORD',
+        github_operations = GitHubOperations()
+        github_operations.create_secret(secret_name=f'{self.__ocp_env_flavor}_KUBECONFIG', unencrypted_value=self.__get_kubeconfig())
+        github_operations.create_secret(secret_name=f'{self.__ocp_env_flavor}_KUBEADMIN_PASSWORD',
                                                 unencrypted_value=self.__get_kubeadmin_password())

@@ -18,7 +18,7 @@ class GitHubOperations:
         self.repo = self.g.get_repo(self.__environment_variables_dict.get('github_repository_short', ''))
 
     @typechecked
-    def _create_secret(self, secret_name: str, unencrypted_value: str):
+    def create_secret(self, secret_name: str, unencrypted_value: str):
         """
         This method create a new secret
         :return:
@@ -26,7 +26,7 @@ class GitHubOperations:
         self.repo.create_secret(secret_name=secret_name, unencrypted_value=unencrypted_value)
 
     @typechecked
-    def _delete_secret(self, secret_name: str):
+    def delete_secret(self, secret_name: str):
         """
         This method delete exist secret
         :return:

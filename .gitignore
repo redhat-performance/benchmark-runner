@@ -199,5 +199,6 @@ fabric.properties
 .idea/httpRequests
 
 # custom file configuration
-my_environment_variables.py
+empty_environment_variables.py
+filled_environment_variables.py
 key.txt

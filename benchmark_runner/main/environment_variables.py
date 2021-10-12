@@ -52,6 +52,8 @@ class EnvironmentVariables:
         self._environment_variables_dict['num_ocs_disk'] = os.environ.get('NUM_OCS_DISK', '')
         # github repository
         self._environment_variables_dict['github_repository_short'] = os.environ.get('GIT_RIPOSITORY_SHORT', '')
+        # install resources list
+        self._environment_variables_dict['install_resources_list'] = os.environ.get('INSTALL_RESOURCES_LIST', '')
 
         # Parameters below related to 'update_ci_status()'
         # CI run time
@@ -74,8 +76,7 @@ class EnvironmentVariables:
         self._environment_variables_dict['ci_status'] = os.environ.get('CI_STATUS', '')
         # Run type test_ci/func_ci/perf_ci, default test_ci same environment as func_ci
         self._environment_variables_dict['run_type'] = os.environ.get('RUN_TYPE', 'test_ci')
-        # kata machine config
-        self._environment_variables_dict['kata_machine_config'] = os.environ.get('KATA_MACHINE_CONFIG', 'master')
+
         # This path is for benchmark-operator path
         self._environment_variables_dict['runner_path'] = os.environ.get('RUNNER_PATH', '/')
 

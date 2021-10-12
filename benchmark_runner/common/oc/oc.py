@@ -450,17 +450,17 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def wait_for_ocp_resource_create(self, resource: str, verify_cmd: str, status: str = '', count_local_storage: bool = False, count_openshift_storage: bool = False, timeout: int = TIME_OUT,
+    def wait_for_ocp_resource_create(self, resource: str, verify_cmd: str, status: str = '', count_local_storage: bool = False, count_openshift_storage: bool = False, kata_worker_machine_count: bool = False, timeout: int = TIME_OUT,
                                      sleep_time: int = SLEEP_TIME):
         """
         This method is wait till operator is created or throw exception after timeout
-        :param status: The final success status
-        :param count: Wait for count
+        :param resource: The resource cnv, local storage, ocs, kata
         :param verify_cmd: Verify command that resource was created successfully
-        :param resource: The resource
-        :param sleep_time:
-        :param timeout:
-        :return: True if getting pod name or raise PodNameError
+        :param status: The final success status
+        :param count_local_storage: count local storage
+        :param count_openshift_storage: count openshift storage
+        :param kata_worker_machine_count: count kata worker machine
+        :return: True if met the result
         """
         current_wait_time = 0
         while current_wait_time <= timeout:
@@ -471,6 +471,11 @@ class OC(SSH):
             elif count_local_storage:
                 if int(self.run(verify_cmd)) == 6:
                     return True
+            elif kata_worker_machine_count:
+                if int(self.run(verify_cmd)) > 0:
+                    return True
+                else:
+                    return False
             # verify query return positive result
             if status:
                 if self.run(verify_cmd) == status:
@@ -584,19 +589,37 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
+    @retry(stop=stop_after_attempt(3))
     def create_kata(self, path: str, resource_list: list):
         """
-        This method create kata
+        This method create kata resource
         :param path:path of resource files
         :param resource_list: kata resource lists
         :return:
         """
         for resource in resource_list:
             logger.info(f'run {resource}')
-            if resource.endswith('.sh'):
-                self.run(cmd=f'chmod +x {os.path.join(path, resource)}; {path}/./{resource}')
-            else:  # yaml
-                self._create_async(yaml=os.path.join(path, resource))
-                self.wait_for_ocp_resource_create(resource='ocs',
-                                                  verify_cmd='oc get machineconfigpool')
+            self._create_async(yaml=os.path.join(path, resource))
+            # for first script wait for virt-operator
+            if '01_operator.yaml' in resource:
+                # Wait that cnv operator will be created
+                self.wait_for_ocp_resource_create(resource='kata',
+                                                  verify_cmd='oc -n openshift-sandboxed-containers-operator wait deployment/controller-manager --for=condition=Available',
+                                                  status='deployment.apps/controller-manager condition met')
+            # for second script wait for refresh status
+            else:
+                # verify if there are workers nodes
+                if self.wait_for_ocp_resource_create(resource='ocs',
+                                                  verify_cmd="oc get mcp -n openshift-sandboxed-containers-operator $( oc get mcp -n openshift-sandboxed-containers-operator --no-headers | awk '{ print $1; }' | awk NR==2) -ojsonpath='{.status.machineCount}'",
+                                                  kata_worker_machine_count=True):
+                    # Wait till workers UPDATED==True
+                    self.wait_for_ocp_resource_create(resource='kata',
+                                                      verify_cmd="oc get mcp -n openshift-sandboxed-containers-operator $( oc get mcp -n openshift-sandboxed-containers-operator --no-headers | awk '{ print $1; }' | awk NR==2) -ojsonpath='{.status.conditions[3].status}'",
+                                                      status='True')
+                # There are only master nodes
+                else:
+                    # Wait till masters UPDATED==True
+                    self.wait_for_ocp_resource_create(resource='kata',
+                                                      verify_cmd="oc get mcp -n openshift-sandboxed-containers-operator $( oc get mcp -n openshift-sandboxed-containers-operator --no-headers | awk '{ print $1; }' | awk NR==1) -ojsonpath='{.status.conditions[3].status}'",
+                                                      status='True')
         return True

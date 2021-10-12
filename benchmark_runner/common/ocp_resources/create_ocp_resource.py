@@ -52,7 +52,7 @@ class CreateOcpResource:
         resource_file_list = sorted(resource_file_list, key=lambda x: os.path.splitext(x)[0])
         return resource_file_list
 
-    def create_resource(self, resource: str, ibm_blk_disk_name:list = []):
+    def create_resource(self, resource: str, ibm_blk_disk_name: list = []):
         """
         This method create resource with verification
         :param ibm_blk_disk_name: ibm blk name list

@@ -24,10 +24,9 @@ include benchmark_runner/benchmark_operator/workload_flavors/perf_ci/uperf/*.yam
 include benchmark_runner/benchmark_operator/workload_flavors/perf_ci/uperf/internal_data/*.yaml
 
 # ocp resource
-include benchmark_runner/common/ocp/cnv/template/*.yaml
-include benchmark_runner/common/ocp/kata/template/*.sh
-include benchmark_runner/common/ocp/kata/template/*.yaml
-include benchmark_runner/common/ocp/local_storage/template/*.yaml
-include benchmark_runner/common/ocp/ocs/template/*.sh
-include benchmark_runner/common/ocp/ocs/template/*.yaml
+include benchmark_runner/common/ocp_resources/cnv/template/*.yaml
+include benchmark_runner/common/ocp_resources/kata/template/*.yaml
+include benchmark_runner/common/ocp_resources/local_storage/template/*.yaml
+include benchmark_runner/common/ocp_resources/ocs/template/*.sh
+include benchmark_runner/common/ocp_resources/ocs/template/*.yaml
 

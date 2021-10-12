@@ -1,4 +1,6 @@
 
+import ast  # change string list to list
+
 from benchmark_runner.main.environment_variables import *
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 from benchmark_runner.benchmark_operator.benchmark_operator_workloads import BenchmarkOperatorWorkloads
@@ -79,13 +81,14 @@ def main():
         This method install ocp resources
         :return:
         """
+        install_resources_list = environment_variables_dict.get('install_resources_list', '')
+        resources = ast.literal_eval(install_resources_list)
         logger.info(f'Start IBM OCP resources installation')
         ibm_oc_operations = IBMOperations(user=environment_variables_dict.get('provision_oc_user', ''))
         ibm_oc_operations.ibm_connect()
         ibm_oc_operations.oc_login()
-        # @TODO add kata installation once it works properly
         # ibm_blk_disk_name for ocs install
-        ibm_oc_operations.install_ocp_resources(resources=['cnv', 'local_storage', 'ocs'], ibm_blk_disk_name=ibm_oc_operations.get_ibm_disks_blk_name())
+        ibm_oc_operations.install_ocp_resources(resources=resources, ibm_blk_disk_name=ibm_oc_operations.get_ibm_disks_blk_name())
         ibm_oc_operations.ibm_disconnect()
         logger.info(f'End IBM OCP resources installation')
 
