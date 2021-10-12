@@ -4,7 +4,7 @@
 
 # Benchmark-Runner
 
-This tool provides a lightweight and flexible framework for running benchmark workloads on Kubernetes/OpenShift, using Pods or VMs.
+This tool provides a lightweight and flexible framework for running benchmark workloads on Kubernetes/OpenShift, using Pods or VMs...
 
 This tool support the following workloads:
 
