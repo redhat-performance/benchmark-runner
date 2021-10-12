@@ -6,7 +6,7 @@ name: Func Env PR Test CI
 on:
   pull_request_target:
     branches: [ main ] 
-    
+concurrency: function_environment    
 jobs:
   build:
     runs-on: ubuntu-latest
