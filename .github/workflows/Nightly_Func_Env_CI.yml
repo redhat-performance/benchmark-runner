@@ -17,10 +17,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Turnstyle
-      uses: softprops/turnstyle@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
     - name: Set up Python 3.9
       uses: actions/setup-python@v2
       with:
@@ -83,13 +79,13 @@ jobs:
         for workload in "${workloads[@]}"
         do
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>'
-            podman run --rm -e WORKLOAD="$workload" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e BUILD_VERSION="$build_version" -e RUN_TYPE=func_ci -e log_level=INFO -v "$KUBECONFIG_PATH":"/root/.kube/config" --privileged "quay.io/ebattat/benchmark-runner:latest"
+            podman run --rm -e WORKLOAD='$workload' -e KUBEADMIN_PASSWORD='$KUBEADMIN_PASSWORD' -e PIN_NODE_BENCHMARK_OPERATOR='$PIN_NODE_BENCHMARK_OPERATOR' -e PIN_NODE1='$PIN_NODE1' -e PIN_NODE2='$PIN_NODE2' -e ELASTICSEARCH='$ELASTICSEARCH' -e ELASTICSEARCH_PORT='$ELASTICSEARCH_PORT' -e BUILD_VERSION='$build_version' -e RUN_TYPE='func_ci' -e log_level='INFO' -v '$KUBECONFIG_PATH':'/root/.kube/config' --privileged 'quay.io/ebattat/benchmark-runner:latest'
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
         done
         end=$(printf '%(%s)T' -1)
         ci_minutes_time=$(($((end-$START_CI))/60))
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Update CI status pass >>>>>>>>>>>>>>>>>>>>>>>>>>'
-        podman run --rm -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e BUILD_VERSION="$build_version" -e CI_STATUS=pass -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e log_level=INFO -v "$KUBECONFIG_PATH":"/root/.kube/config" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+        podman run --rm -e KUBEADMIN_PASSWORD='$KUBEADMIN_PASSWORD' -e PIN_NODE_BENCHMARK_OPERATOR='$PIN_NODE_BENCHMARK_OPERATOR' -e PIN_NODE1='$PIN_NODE1' -e PIN_NODE2='$PIN_NODE2' -e ELASTICSEARCH='$ELASTICSEARCH' -e ELASTICSEARCH_PORT='$ELASTICSEARCH_PORT' -e BUILD_VERSION='$build_version' -e CI_STATUS='pass' -e CI_MINUTES_TIME='$ci_minutes_time' -e BENCHMARK_OPERATOR_ID='$BENCHMARK_OPERATOR_ID' -e BENCHMARK_WRAPPER_ID='$BENCHMARK_WRAPPER_ID' -e log_level='INFO' -v '$KUBECONFIG_PATH':'/root/.kube/config' --privileged 'quay.io/ebattat/benchmark-runner:v$build_version'
     - name: Update CI status failed
       env:
         KUBEADMIN_PASSWORD: ${{ secrets.FUNC_KUBEADMIN_PASSWORD }}
@@ -106,4 +102,4 @@ jobs:
         end=$(printf '%(%s)T' -1)
         ci_minutes_time=$(($((end-$START_CI))/60))
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Update CI status failed >>>>>>>>>>>>>>>>>>>>>>>>>>'
-        podman run --rm -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e BUILD_VERSION="$build_version" -e CI_STATUS=failed -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e log_level=INFO -v "$KUBECONFIG_PATH":"/root/.kube/config" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+        podman run --rm -e KUBEADMIN_PASSWORD='$KUBEADMIN_PASSWORD' -e PIN_NODE_BENCHMARK_OPERATOR='$PIN_NODE_BENCHMARK_OPERATOR' -e PIN_NODE1='$PIN_NODE1' -e PIN_NODE2='$PIN_NODE2' -e ELASTICSEARCH='$ELASTICSEARCH' -e ELASTICSEARCH_PORT='$ELASTICSEARCH_PORT' -e BUILD_VERSION='$build_version' -e CI_STATUS='failed' -e CI_MINUTES_TIME='$ci_minutes_time' -e BENCHMARK_OPERATOR_ID='$BENCHMARK_OPERATOR_ID' -e BENCHMARK_WRAPPER_ID='$BENCHMARK_WRAPPER_ID' -e log_level='INFO' -v '$KUBECONFIG_PATH':'/root/.kube/config' --privileged 'quay.io/ebattat/benchmark-runner:v$build_version'
