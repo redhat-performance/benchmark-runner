@@ -68,10 +68,10 @@ def main():
         ibm_operations.update_ocp_version()
         if ibm_operations.run_ibm_ocp_ipi_installer():
             logger.info(f'Installed OCP latest-{install_ocp_version} successfully')
+            logger.info(f'Update GitHub OCP credentials')
+            ibm_operations.update_ocp_github_credentials()
         else:
             logger.info(f'Failed to install OCP latest-{install_ocp_version} after 3 retries')
-        logger.info(f'Update GitHub OCP credentials')
-        ibm_operations.update_ocp_github_credentials()
         ibm_operations.ibm_disconnect()
         logger.info(f'End IBM OCP latest-{install_ocp_version} installation')
 

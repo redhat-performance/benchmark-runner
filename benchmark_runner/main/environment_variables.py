@@ -38,6 +38,10 @@ class EnvironmentVariables:
         self._environment_variables_dict['provision_user'] = os.environ.get(f'{self.__ocp_env_flavor}_PROVISION_USER', '')
         self._environment_variables_dict['provision_oc_user'] = os.environ.get(f'{self.__ocp_env_flavor}_PROVISION_OC_USER', '')
         self._environment_variables_dict['provision_port'] = os.environ.get(f'{self.__ocp_env_flavor}_PROVISION_PORT', '')
+        self._environment_variables_dict['provision_kubeadmin_password_path'] = os.environ.get(f'{self.__ocp_env_flavor}_PROVISION_KUBEADMIN_PASSWORD_PATH', '')
+        self._environment_variables_dict['provision_kubeconfig_path'] = os.environ.get(f'{self.__ocp_env_flavor}_PROVISION_KUBECONFIG_PATH', '')
+        self._environment_variables_dict['provision_installer_path'] = os.environ.get(f'{self.__ocp_env_flavor}_PROVISION_INSTALLER_PATH', '')
+        self._environment_variables_dict['provision_installer_cmd'] = os.environ.get(f'{self.__ocp_env_flavor}_PROVISION_INSTALLER_CMD', '')
         # 3 hours for installation time
         self._environment_variables_dict['provision_timeout'] = os.environ.get(f'{self.__ocp_env_flavor}_PROVISION_TIMEOUT', '')
 

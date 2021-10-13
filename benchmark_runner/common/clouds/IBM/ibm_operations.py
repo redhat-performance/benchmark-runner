@@ -23,6 +23,10 @@ class IBMOperations:
         self.__ibm_oc_user = self.__environment_variables_dict.get('provision_oc_user', '')
         # FUNC or PERF
         self.__ocp_env_flavor = self.__environment_variables_dict.get('ocp_env_flavor', '')
+        self.__provision_kubeadmin_password_path = self.__environment_variables_dict.get('provision_kubeadmin_password_path', '')
+        self.__provision_kubeconfig_path = self.__environment_variables_dict.get('provision_kubeconfig_path', '')
+        self.__provision_installer_path = self.__environment_variables_dict.get('provision_installer_path', '')
+        self.__provision_installer_cmd = self.__environment_variables_dict.get('provision_installer_cmd', '')
         self.__install_ocp_version = self.__environment_variables_dict.get('install_ocp_version', '')
         self.__num_ocs_disks = int(self.__environment_variables_dict.get('num_ocs_disk', ''))
         self.__connection_data = ConnectionData(host_name=self.__environment_variables_dict.get('provision_ip', ''),
@@ -32,22 +36,23 @@ class IBMOperations:
                                                     self.__environment_variables_dict.get('provision_timeout', '')),
                                                 ssh_key=self.__environment_variables_dict.get('provision_ssh_key', ''))
         self.__remote_ssh = RemoteSsh(self.__connection_data)
+        self.__github_operations = GitHubOperations()
 
     def __get_kubeadmin_password(self):
         """
-        This method return kubeadmin_password if exist
+        This method return kubeadmin password if exist
         :return:
         """
-        if self.__remote_ssh.exist(remote_path=f'/home/{self.__ibm_oc_user}/clusterconfigs/auth/kubeadmin-password'):
-            return self.__remote_ssh.run_command(f'cat /home/{self.__ibm_oc_user}/clusterconfigs/auth/kubeadmin-password')
+        if self.__remote_ssh.exist(remote_path=self.__provision_kubeadmin_password_path):
+            return self.__remote_ssh.run_command(f'cat {self.__provision_kubeadmin_password_path}')
 
     def __get_kubeconfig(self):
         """
         This method return kubeconfig if exist
         :return:
         """
-        if self.__remote_ssh.exist(remote_path=f'/home/{self.__ibm_oc_user}/clusterconfigs/auth/kubeconfig'):
-            return self.__remote_ssh.run_command(f'cat /home/{self.__ibm_oc_user}/clusterconfigs/auth/kubeconfig')
+        if self.__remote_ssh.exist(remote_path=self.__provision_kubeconfig_path):
+            return self.__remote_ssh.run_command(f'cat {self.__provision_kubeconfig_path}')
 
     def __ibm_login_cmd(self):
         """
@@ -69,8 +74,8 @@ class IBMOperations:
         This method return ibm ipi installer cmd if exist
         :return:
         """
-        if self.__remote_ssh.exist(remote_path=f'/ipi-installer/baremetal-deploy/utils/ibmsetup.sh'):
-            return 'pushd /ipi-installer/baremetal-deploy; chmod +x utils/ibmsetup.sh; ./utils/ibmsetup.sh; popd'
+        if self.__remote_ssh.exist(remote_path=self.__provision_installer_path):
+            return self.__provision_installer_cmd
 
     @logger_time_stamp
     def get_ibm_disks_blk_name(self):
@@ -106,7 +111,7 @@ class IBMOperations:
         self.__remote_ssh.replace_parameter(remote_path='/ipi-installer/baremetal-deploy/ansible-ipi-install/inventory',
                                             file_name='hosts',
                                             parameter='version=',
-                                            value=self.__install_ocp_version)
+                                            value=f'"{self.__install_ocp_version}"')
 
     @logger_time_stamp
     @retry(stop=stop_after_attempt(3))
@@ -153,7 +158,6 @@ class IBMOperations:
         This method update github secrets kubeconfig and kubeadmin_password
         :return:
         """
-        github_operations = GitHubOperations()
-        github_operations.create_secret(secret_name=f'{self.__ocp_env_flavor}_KUBECONFIG', unencrypted_value=self.__get_kubeconfig())
-        github_operations.create_secret(secret_name=f'{self.__ocp_env_flavor}_KUBEADMIN_PASSWORD',
+        self.__github_operations.create_secret(secret_name=f'{self.__ocp_env_flavor}_KUBECONFIG', unencrypted_value=self.__get_kubeconfig())
+        self.__github_operations.create_secret(secret_name=f'{self.__ocp_env_flavor}_KUBEADMIN_PASSWORD',
                                                 unencrypted_value=self.__get_kubeadmin_password())

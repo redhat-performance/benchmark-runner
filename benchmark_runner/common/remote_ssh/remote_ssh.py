@@ -212,4 +212,4 @@ class RemoteSsh:
         This method copy from remote source to target folder
         """
         if self.exist(remote_source):
-            self.run_command(f'cp - arf {remote_source} {remote_target}')
+            self.run_command(f"cp -arf -- '{remote_source}' '{remote_target}'")
