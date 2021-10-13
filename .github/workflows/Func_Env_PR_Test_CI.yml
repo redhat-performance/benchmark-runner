@@ -17,10 +17,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Turnstyle
-      uses: softprops/turnstyle@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
     - name: Set up Python 3.9
       uses: actions/setup-python@v2
       with:
