@@ -52,16 +52,16 @@ jobs:
             cd $RUNNER_PATH/$repository
             if [[ $repository == 'benchmark-operator' ]]
             then
-                echo 'BENCHMARK_OPERATOR_ID=$(git rev-parse @)' >> $GITHUB_ENV
+                echo "BENCHMARK_OPERATOR_ID=$(git rev-parse @)" >> $GITHUB_ENV
                 BENCHMARK_OPERATOR_ID=$(git rev-parse @)
             else
-                echo 'BENCHMARK_WRAPPER_ID=$(git rev-parse @)' >> $GITHUB_ENV
+                echo "BENCHMARK_WRAPPER_ID=$(git rev-parse @)" >> $GITHUB_ENV
                 BENCHMARK_WRAPPER_ID=$(git rev-parse @)
             fi
             cd -
         done
         build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
-        build_version='$(cut -d'=' -f2 <<<"$build")'
+        build_version="$(cut -d'=' -f2 <<<"$build")"
         declare -a workloads=('stressng_pod' 'stressng_vm' 'uperf_pod' 'uperf_vm' 'hammerdb_pod_mariadb' 'hammerdb_vm_mariadb' 'hammerdb_pod_postgres' 'hammerdb_vm_postgres' 'hammerdb_pod_mssql' 'hammerdb_vm_mssql')
         for workload in "${workloads[@]}"
         do
@@ -85,7 +85,7 @@ jobs:
       if: ${{ failure() }}
       run: |
         build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
-        build_version='$(cut -d'=' -f2 <<<"$build")'
+        build_version="$(cut -d'=' -f2 <<<"$build")"
         end=$(printf '%(%s)T' -1)
         ci_minutes_time=$(($((end-$START_CI))/60))
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Update CI status failed >>>>>>>>>>>>>>>>>>>>>>>>>>'
