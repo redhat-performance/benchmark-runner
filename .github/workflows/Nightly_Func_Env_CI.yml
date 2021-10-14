@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  nightly:
+  e2e:
     name: Deploy Func Nightly
     runs-on: ubuntu-latest
     steps:
