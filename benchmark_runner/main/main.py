@@ -86,7 +86,8 @@ def main():
         logger.info(f'Start IBM OCP resources installation')
         ibm_oc_operations = IBMOperations(user=environment_variables_dict.get('provision_oc_user', ''))
         ibm_oc_operations.ibm_connect()
-        ibm_oc_operations.oc_login()
+        oc = ibm_oc_operations.oc_login()
+        ibm_oc_operations.verify_cluster_is_up(oc)
         # ibm_blk_disk_name for ocs install
         ibm_oc_operations.install_ocp_resources(resources=resources, ibm_blk_disk_name=ibm_oc_operations.get_ibm_disks_blk_name())
         ibm_oc_operations.ibm_disconnect()
@@ -129,7 +130,7 @@ def main():
     elif install_ocp_version:
         install_ocp()
     # install_ocp_resource
-    elif install_ocp_resources:
+    elif install_ocp_resources == 'True':
         install_resources()
     elif ci_status == 'pass' or ci_status == 'failed':
         update_ci_status()

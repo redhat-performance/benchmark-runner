@@ -1,3 +1,5 @@
+
+# Custom exceptions must NOT expose data including hostnames, pathnames, IP addresses, etc. (security risk)
 class SshError(Exception):
     """ Base class for all SSH error classes.
         All exceptions raised by the DSS library should inherit from this class. """
@@ -61,6 +63,15 @@ class FileNotExist(SshError):
 class SFTPException(SshError):
     """
     This class through sftp exception
+    """
+    def __init__(self, err):
+        self.message = {err}
+        super(PathNotExist, self).__init__(self.message)
+
+
+class IllegalFilename(SshError):
+    """
+    This class through Illegal file name error
     """
     def __init__(self, err):
         self.message = {err}

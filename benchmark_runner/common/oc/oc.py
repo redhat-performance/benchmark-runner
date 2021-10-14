@@ -34,24 +34,35 @@ class OC(SSH):
         This method return ocp server version
         :return:
         """
-        ocp_version = self.run("oc version -ojson | jq '.openshiftVersion'")
-        return ocp_version
+        return self.run("oc version -o json | jq '.openshiftVersion'")
 
     def get_cnv_version(self):
         """
         This method return cnv version
         :return:
         """
-        cnv_version = self.run("oc get csv -n openshift-cnv $(oc get csv -n openshift-cnv --no-headers | awk '{ print $1; }') -ojsonpath='{.spec.version}'")
-        return cnv_version
+        return self.run("oc get csv -n openshift-cnv $(oc get csv -n openshift-cnv --no-headers | awk '{ print $1; }') -ojsonpath='{.spec.version}'")
 
     def get_ocs_version(self):
         """
         This method return ocs version
         :return:
         """
-        ocs_version = self.run("oc get csv -n openshift-storage $(oc get csv -n openshift-storage --no-headers | awk '{ print $1; }') -ojsonpath='{.spec.version}'")
-        return ocs_version
+        return self.run("oc get csv -n openshift-storage $(oc get csv -n openshift-storage --no-headers | awk '{ print $1; }') -ojsonpath='{.spec.version}' ")
+
+    def get_master_nodes(self):
+        """
+        This method return master nodes
+        :return:
+        """
+        return self.run(r""" oc get nodes -l node-role.kubernetes.io/master= -o jsonpath="{range .items[*]}{.metadata.name}{'\n'}{end}" """)
+
+    def get_worker_nodes(self):
+        """
+        This method return worker nodes
+        :return:
+        """
+        return self.run(r""" oc get nodes -l node-role.kubernetes.io/worker= -o jsonpath="{range .items[*]}{.metadata.name}{'\n'}{end}" """)
 
     def __get_short_uuid(self, workload: str):
         """
@@ -434,8 +445,6 @@ class OC(SSH):
         This method wait to pod to be completed
         :param workload:
         :param namespace:
-        :param label:
-        :param timeout:
         :return:
         """
         current_wait_time = 0
@@ -457,20 +466,22 @@ class OC(SSH):
         :param resource: The resource cnv, local storage, ocs, kata
         :param verify_cmd: Verify command that resource was created successfully
         :param status: The final success status
-        :param count_local_storage: count local storage
-        :param count_openshift_storage: count openshift storage
+        :param count_local_storage: count local storage disks
+        :param count_openshift_storage: count openshift storage disks
         :param kata_worker_machine_count: count kata worker machine
         :return: True if met the result
         """
         current_wait_time = 0
         while current_wait_time <= timeout:
-            # when need to count resource
+            # Count openshift-storage/ pv
             if count_openshift_storage:
                 if int(self.run(verify_cmd)) == 3 * int(environment_variables.environment_variables_dict['num_ocs_disk']):
                     return True
+                # Count local storage disks
             elif count_local_storage:
                 if int(self.run(verify_cmd)) == 6:
                     return True
+                # Count worker machines
             elif kata_worker_machine_count:
                 if int(self.run(verify_cmd)) > 0:
                     return True

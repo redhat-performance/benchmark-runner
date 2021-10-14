@@ -5,7 +5,7 @@ import socket
 from benchmark_runner.common.remote_ssh.connection_data import ConnectionData
 from benchmark_runner.common.remote_ssh.ssh_remote_exceptions import SshConnectionError, SshConnectionFailure, \
     RunCommandError, \
-    SshConnectionTimedOut, PathNotExist, FileNotExist, SFTPException
+    SshConnectionTimedOut, PathNotExist, FileNotExist, SFTPException, IllegalFilename
 
 
 class RemoteSsh:
@@ -130,10 +130,13 @@ class RemoteSsh:
         :return:
         """
         if os.path.isfile(f'{local}/{file_name}'):
-            try:
-                self.__p_sftp.put(f'{local}/{file_name}', f'{remote}/{file_name}')
-            except Exception as err:
-                raise SFTPException(err)
+            if self.exist(remote_path=f'{remote}/{file_name}'):
+                try:
+                    self.__p_sftp.put(f'{local}/{file_name}', f'{remote}/{file_name}')
+                except Exception as err:
+                    raise SFTPException(err)
+            else:
+                raise FileNotExist(f'Remote file does not exist: {remote}/{file_name}')
         else:
             raise FileNotExist(f'Local file does not exist: {local}/{file_name}')
 
@@ -146,13 +149,16 @@ class RemoteSsh:
         :return:
         """
         if self.exist(remote_path=f'{remote}/{file_name}'):
-            self.__p_sftp.get(f'{remote}/{file_name}', f'{local}/{file_name}')
+            if os.path.isfile(os.path.join(local, file_name)):
+                self.__p_sftp.get(f'{remote}/{file_name}', f'{local}/{file_name}')
+            else:
+                raise FileNotExist(f'Local file does not exist: {local}/{file_name}')
         else:
             raise FileNotExist(f'Remote file does not exist: {remote}/{file_name}')
 
     def replace_parameter(self, remote_path, file_name, parameter, value, all_line=False):
         """
-        This method is replace parameter in remote file
+        This method is replace parameter in remote file (sed "s@home/test=.@home/test=8@g" test.txt)
         :param remote_path: path to file
         :param file_name: file name
         :param parameter: the parameter
@@ -162,6 +168,7 @@ class RemoteSsh:
         """
         if all_line:
             res = False
+            # This finds a safe delimiter character for sed
             for c in ['/', '@', '#', '$', '%', '^', '&', '*', '-', '<', '>', '!', '~', '+', '-']:
                 if c not in parameter:
                     res = True
@@ -212,4 +219,8 @@ class RemoteSsh:
         This method copy from remote source to target folder
         """
         if self.exist(remote_source):
-            self.run_command(f"cp -arf -- '{remote_source}' '{remote_target}'")
+            if "'" in remote_source or "'" in remote_target:
+                raise IllegalFilename("File name with ' ")
+            self.run_command(f"cp -arf -- {remote_source}' '{remote_target}'")
+
+

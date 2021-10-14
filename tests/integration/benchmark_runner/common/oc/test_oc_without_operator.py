@@ -35,6 +35,16 @@ def test_oc_get_ocs_version():
     assert oc.get_ocs_version()
 
 
+def test_oc_get_master_nodes():
+    """
+    This method test get master nodes
+    :return:
+    """
+    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
+    oc.login()
+    assert oc.get_master_nodes()
+
+
 def test_login():
     """
     This method test login

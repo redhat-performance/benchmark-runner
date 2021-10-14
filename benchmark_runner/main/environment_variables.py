@@ -32,7 +32,10 @@ class EnvironmentVariables:
         self._environment_variables_dict['github_token'] = os.environ.get('GITHUB_TOKEN', '')
         # MANDATORY for OCP install: install ocp version - insert version to install i.e. 'latest-4.8'
         self._environment_variables_dict['install_ocp_version'] = os.environ.get('INSTALL_OCP_VERSION', '')
+        # dev or ga (/ocp-dev-preview/ or /ocp/ )
+        self._environment_variables_dict['ocp_version_build'] = os.environ.get('OCP_VERSION_BUILD', '')
         self.__ocp_env_flavor = self._environment_variables_dict['ocp_env_flavor']
+        self._environment_variables_dict['worker_ids'] = os.environ.get(f'{self.__ocp_env_flavor}_WORKER_IDS',  "")
         self._environment_variables_dict['provision_ip'] = os.environ.get(f'{self.__ocp_env_flavor}_PROVISION_IP', '')
         self._environment_variables_dict['provision_ssh_key'] = os.environ.get(f'{self.__ocp_env_flavor}_PROVISION_PRIVATE_KEY', '')
         self._environment_variables_dict['provision_user'] = os.environ.get(f'{self.__ocp_env_flavor}_PROVISION_USER', '')
@@ -102,7 +105,7 @@ class EnvironmentVariables:
         # end dynamic parameters - configure for local run
         ##################################################################################################
 
-        # ** NOT CHANGE THE PARAMETERS BELOW **
+        # ** DO NOT CHANGE THE PARAMETERS BELOW **
         # Node Selector functionality
         if self._environment_variables_dict['pin_node1']:
             self._environment_variables_dict['pin'] = 'true'
