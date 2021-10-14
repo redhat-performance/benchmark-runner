@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: false
   
 jobs:
-  build:
+  pytest:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2

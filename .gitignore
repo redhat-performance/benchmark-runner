@@ -198,6 +198,7 @@ fabric.properties
 # Editor-based Rest Client
 .idea/httpRequests
 
-#excluded folder - local test data
-!.gitignore
-!tests/integration/analyze/rt/data/*
+# custom file configuration
+empty_environment_variables.py
+filled_environment_variables.py
+key.txt

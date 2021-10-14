@@ -4,7 +4,7 @@ from os import path
 from setuptools import setup, find_packages
 
 
-__version__ = '1.0.141'
+__version__ = '1.0.143'
 
 here = path.abspath(path.dirname(__file__))
 
@@ -46,7 +46,11 @@ setup(
         'jinja2==3.0.1',
         'typeguard==2.12.1',
         'PyYAML==5.4.1',
-         'azure==4.0.0'  # add new package inside requirements.txt  requirements.txt
+        'azure==4.0.0',
+        'paramiko==2.8.0',
+        'tenacity==8.0.1',  # retry decorator
+        'PyGitHub==1.55'  # update secrets
+        # add new package inside requirements.txt
     ],
 
     setup_requires=['pytest', 'pytest-runner', 'wheel', 'coverage'],
