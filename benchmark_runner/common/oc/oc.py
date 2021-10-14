@@ -457,6 +457,18 @@ class OC(SSH):
             current_wait_time += sleep_time
         raise VMNotCompletedTimeout(workload=workload)
 
+    def __get_num_active_nodes(self):
+        """
+        This method return the number of active nodes
+        :return:
+        """
+        # count the number of active master/worker nodes
+        if self.get_worker_nodes():
+            count_nodes = len(self.get_worker_nodes().split())
+        else:
+            count_nodes = len(self.get_master_nodes().split())
+        return count_nodes
+
     @typechecked
     @logger_time_stamp
     def wait_for_ocp_resource_create(self, resource: str, verify_cmd: str, status: str = '', count_local_storage: bool = False, count_openshift_storage: bool = False, kata_worker_machine_count: bool = False, timeout: int = TIME_OUT,
@@ -475,11 +487,11 @@ class OC(SSH):
         while current_wait_time <= timeout:
             # Count openshift-storage/ pv
             if count_openshift_storage:
-                if int(self.run(verify_cmd)) == 3 * int(environment_variables.environment_variables_dict['num_ocs_disk']):
+                if int(self.run(verify_cmd)) == self.__get_num_active_nodes() * int(environment_variables.environment_variables_dict['num_ocs_disk']):
                     return True
-                # Count local storage disks
+                # Count local storage disks (worker/master * (discovery+manager)
             elif count_local_storage:
-                if int(self.run(verify_cmd)) == 6:
+                if int(self.run(verify_cmd)) == self.__get_num_active_nodes() * 2:
                     return True
                 # Count worker machines
             elif kata_worker_machine_count:
