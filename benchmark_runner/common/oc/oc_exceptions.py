@@ -101,3 +101,10 @@ class VMNotCompletedTimeout(OCError):
     def __init__(self, workload):
         self.message = f'VM : {workload} does not completed'
         super(VMNotCompletedTimeout, self).__init__(self.message)
+
+
+class OCPResourceNotCreateTimeout(OCError):
+    """This exception return resource create timeout error"""
+    def __init__(self, resource):
+        self.message = f'The {resource} resource does not created'
+        super(OCPResourceNotCreateTimeout, self).__init__(self.message)

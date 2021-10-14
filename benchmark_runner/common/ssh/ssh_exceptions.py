@@ -1,4 +1,5 @@
 
+# Custom exceptions must NOT expose data including hostnames, pathnames, IP addresses, etc. (security risk)
 class SSHError(Exception):
     """ Base class for all SSH error classes.
         All exceptions raised by the benchmark runner library should inherit from this class. """
