@@ -41,6 +41,9 @@ RUN source ~/.bashrc
 # Create folder for config file (kubeconfig)
 RUN mkdir -p ~/.kube
 
+# Create folder for provision private key file (ssh)
+RUN mkdir -p ~/.ssh/
+
 # download benchmark-operator
 RUN git clone https://github.com/cloud-bulldozer/benchmark-operator
 

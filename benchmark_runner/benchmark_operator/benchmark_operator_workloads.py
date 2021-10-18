@@ -257,18 +257,20 @@ class BenchmarkOperatorWorkloads:
             metadata.update({'db_version': 10.3})
         return metadata
 
-    def update_ci_status(self, status: str, ci_minutes_time: int, benchmark_operator_id: str, benchmark_wrapper_id: str):
+    def update_ci_status(self, status: str, ci_minutes_time: int, benchmark_operator_id: str, benchmark_wrapper_id: str, ocp_install_minutes_time: int = 0, ocp_resource_install_minutes_time: int = 0):
         """
         This method update ci status Pass/Failed
+        :param status: Pass/Failed
+        :param ci_minutes_time: ci time in minutes
         :param benchmark_wrapper_id: benchmark_wrapper last repository commit id
         :param benchmark_operator_id: benchmark_operator last repository commit id
-        :param ci_minutes_time: Ci time in minutes
-        :param status: Pass/Failed
+        :param ocp_install_minutes_time: ocp install minutes time, default 0 because ocp install run once a week
+        :param ocp_resource_install_minutes_time: ocp install minutes time, default 0 because ocp install run once a week
         :return:
         """
         status_dict = {'failed': 0, 'pass': 1}
         metadata = self.get_metadata()
-        metadata.update({'status': status, 'status#': status_dict[status], 'ci_minutes_time': ci_minutes_time, 'benchmark_operator_id': benchmark_operator_id, 'benchmark_wrapper_id': benchmark_wrapper_id})
+        metadata.update({'status': status, 'status#': status_dict[status], 'ci_minutes_time': ci_minutes_time, 'benchmark_operator_id': benchmark_operator_id, 'benchmark_wrapper_id': benchmark_wrapper_id, 'ocp_install_minutes_time': ocp_install_minutes_time, 'ocp_resource_install_minutes_time': ocp_resource_install_minutes_time})
         self.__es_operations.upload_to_es(index='ci-status', data=metadata)
 
 #***********************************************************************************************

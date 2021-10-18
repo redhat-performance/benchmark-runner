@@ -3,7 +3,7 @@ import os
 import socket
 
 from benchmark_runner.common.remote_ssh.connection_data import ConnectionData
-from benchmark_runner.common.remote_ssh.ssh_remote_exceptions import SshConnectionError, SshConnectionFailure, \
+from benchmark_runner.common.remote_ssh.remote_ssh_exceptions import SshConnectionError, SshConnectionFailure, \
     RunCommandError, \
     SshConnectionTimedOut, PathNotExist, FileNotExist, SFTPException, IllegalFilename
 

@@ -8,7 +8,7 @@ from benchmark_runner.main.environment_variables import environment_variables
 
 class GitHubOperations:
     """
-    This class resposible for GitHub operations
+    This class responsible for GitHub operations
     """
 
     def __init__(self):
