@@ -44,13 +44,14 @@ class IBMOperations:
         self.__provision_installer_cmd = self.__environment_variables_dict.get('provision_installer_cmd', '')
         self.__install_ocp_version = self.__environment_variables_dict.get('install_ocp_version', '')
         self.__ocp_version_build = self.__environment_variables_dict.get('ocp_version_build', '')
-        self.__num_ocs_disks = int(self.__environment_variables_dict.get('num_ocs_disk', ''))
+        self.__num_ocs_disks = int(self.__environment_variables_dict.get('num_ocs_disk', 1))
+        self.__ssh_key= self.__environment_variables_dict.get('container_private_key_path', '')
         self.__connection_data = ConnectionData(host_name=self.__environment_variables_dict.get('provision_ip', ''),
                                                 user_name=user,
                                                 port=int(self.__environment_variables_dict.get('provision_port', '')),
                                                 timeout=int(
                                                     self.__environment_variables_dict.get('provision_timeout', '')),
-                                                ssh_key=self.__environment_variables_dict.get('provision_ssh_key', ''))
+                                                ssh_key=self.__environment_variables_dict.get('container_private_key_path', ''))
         self.__remote_ssh = RemoteSsh(self.__connection_data)
         self.__github_operations = GitHubOperations()
 

@@ -33,14 +33,14 @@ jobs:
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: Set Kubeconfig
+    - name: ⚙️ Set Kubeconfig
       env:
         KUBECONFIG: ${{ secrets.FUNC_KUBECONFIG }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
       run: |
           mkdir -p "$RUNNER_PATH/.kube/"
           echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
-          echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> $GITHUB_ENV
+          echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
     - name: 📃 Test with pytest
       env:
         KUBEADMIN_PASSWORD: ${{ secrets.FUNC_KUBEADMIN_PASSWORD }}

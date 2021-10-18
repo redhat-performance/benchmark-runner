@@ -53,21 +53,23 @@ _**Table of Contents**_
       1. Need to configure all mandatory parameters in [environment_variables.py](benchmark_runner/main/environment_variables.py)
          1. `workloads` = e.g. stressng_pod
          2. `runner_path` = path to local cloned benchmark-operator (e.g. /home/user/)
+            1. git clone https://github.com/cloud-bulldozer/benchmark-operator  (inside 'runner_path')
          3. `kubeadmin_password`
          4. `pin_node_benchmark_operator` - benchmark-operator node selector
          5. `pin_node1` - workload first node selector
          6. `pin_node2` - workload second node selector (for workload with client server e.g. uperf)
          7. `elasticsearch` - elasticsearch url without http prefix
-         8. `elasticsearch_port`
+         8. `elasticsearch_port` - elasticsearch port
       2. Run [main.py](/benchmark_runner/main/main.py) 
       3. Verify that benchmark-runner run the workload
    2. Run workload through integration/unittest tests [using pytest]
       1. Need to configure all mandatory parameters [test_environment_variables.py](tests/integration/benchmark_runner/test_environment_variables.py)
          1. `runner_path` = path to local cloned benchmark-operator (e.g. /home/user/)
+            1. git clone https://github.com/cloud-bulldozer/benchmark-operator (inside 'runner_path') 
          2. `kubeadmin_password`
          3. `pin_node1` - workload first node selector
          4. `elasticsearch` - elasticsearch url without http prefix
-         5. `elasticsearch_port`
+         5. `elasticsearch_port` - elasticsearch port
       2. Run the selected test using pytest [test_oc.py](/tests/integration/benchmark_runner/common/oc/test_oc.py)
          1. Enable pytest in Pycharm: Configure pytest in Pycharm -> File -> settings -> tools -> Python integrated tools -> Testing -> pytest -> ok), and run the selected test 
          2. Run pytest through terminal: python -m pytest -v tests/ (pip install pytest) 
