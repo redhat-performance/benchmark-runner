@@ -23,7 +23,7 @@ Reference:
 * The benchmark-runner container image is located in [Quay.io](https://quay.io/repository/ebattat/benchmark-runner)
 
 ## Documentation
-Documentation is available at https://benchmark-runner.readthedocs.io/en/latest/
+Documentation is available at [benchmark-runner.readthedocs.io](benchmark-runner.readthedocs.io)
 
 ![](media/docker1.png)
 
@@ -80,12 +80,12 @@ podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD 
 ## Grafana dashboards
 
 There are 3 grafana dashboards templates:
-1. [benchmark-runner-ci-status.json](grafana/benchmark-runner-ci-status.json)
+1. [benchmark-runner-ci-status-report.json](grafana/benchmark-runner-ci-status-report.json)
 ![](media/benchmark-runner-ci-status.png)
 2. [benchmark-runner-report.json](grafana/benchmark-runner-report.json)
 ![](media/benchmark-runner-report.png)
-3. [benchmark-runner-report-compare-3-versions.json](grafana/benchmark-runner-report-compare-3-versions.json)
-![](media/benchmark-runner-report-compare-3-versions.png)
+3. [benchmark-runner-compare-3-ci-dates-report.json](grafana/benchmark-runner-compare-3-ci-dates-report.json)
+![](media/benchmark-runner-compare-3-ci-dates-report.png)
 4. [system-metrics-report.json](grafana/system-metrics-report.json)
 ![](media/system-metrics-report.png)
 

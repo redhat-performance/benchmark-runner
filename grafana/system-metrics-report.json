@@ -22,7 +22,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": 3,
-  "iteration": 1633197631607,
+  "iteration": 1634640829189,
   "links": [],
   "panels": [
     {
@@ -6840,8 +6840,8 @@
         "allValue": null,
         "current": {
           "selected": false,
-          "text": "0bd0e89f-6efb-57e9-953e-e0b14fe74eb4",
-          "value": "0bd0e89f-6efb-57e9-953e-e0b14fe74eb4"
+          "text": "11d8b7ff-8195-5608-83a1-4ada784805eb",
+          "value": "11d8b7ff-8195-5608-83a1-4ada784805eb"
         },
         "datasource": "$Datasource",
         "definition": "{\"find\": \"terms\", \"field\": \"uuid.keyword\"}",
@@ -6993,7 +6993,7 @@
     ]
   },
   "timezone": "",
-  "title": "system-metrics report",
+  "title": "system-metrics-report",
   "uid": "Cs7IOoHnk",
-  "version": 3
+  "version": 4
 }
