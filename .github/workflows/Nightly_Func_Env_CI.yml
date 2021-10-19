@@ -1,5 +1,5 @@
 # Nightly CI https://github.com/marketplace/actions/deploy-nightly
-
+# This is a nightly CI Pipeline against Functional environment
 name: Deploy Func Env Nightly CI
 
 on:  
