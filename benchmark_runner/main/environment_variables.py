@@ -31,6 +31,23 @@ class EnvironmentVariables:
         self._environment_variables_dict['elasticsearch'] = os.environ.get('ELASTICSEARCH', '')
         self._environment_variables_dict['elasticsearch_port'] = os.environ.get('ELASTICSEARCH_PORT', '')
 
+        # This parameter 'True'/'False' for debug workload, when its set to 'True' it will stop the workload when finishing
+        self._environment_variables_dict['stop_when_workload_finish'] = os.environ.get('STOP_WHEN_WORKLOAD_FINISH', '')
+
+        # default parameter - change only if needed
+        # Parameters below related to 'run_workload()'
+        self._environment_variables_dict['workloads'] = ['stressng_pod', 'stressng_vm', 'uperf_pod', 'uperf_vm', 'hammerdb_pod_mariadb', 'hammerdb_vm_mariadb',  'hammerdb_pod_postgres', 'hammerdb_vm_postgres', 'hammerdb_pod_mssql', 'hammerdb_vm_mssql']
+        self._environment_variables_dict['namespace'] = os.environ.get('NAMESPACE', 'benchmark-operator')
+        # run Hammerdb workload with ocs pvc True/False. True=OCS, False=Ephemeral
+        self._environment_variables_dict['ocs_pvc'] = os.environ.get('OCS_PVC', 'True')
+        # This parameter get from Test_CI.yml file
+        self._environment_variables_dict['build_version'] = os.environ.get('BUILD_VERSION', '1.0.0')
+        # collect system metrics True/False
+        self._environment_variables_dict['system_metrics'] = os.environ.get('SYSTEM_METRICS', 'True')
+        # CI status update once at the end of CI Pass/Failed
+        self._environment_variables_dict['ci_status'] = os.environ.get('CI_STATUS', '')
+        # Run type test_ci/func_ci/perf_ci, default test_ci same environment as func_ci
+        self._environment_variables_dict['run_type'] = os.environ.get('RUN_TYPE', 'test_ci')
         # end dynamic parameters - configure for local run
         ##################################################################################################
 
@@ -104,20 +121,6 @@ class EnvironmentVariables:
         self._environment_variables_dict['benchmark_operator_id'] = os.environ.get('BENCHMARK_OPERATOR_ID', '')
         # benchmark-wrapper last commit id
         self._environment_variables_dict['benchmark_wrapper_id'] = os.environ.get('BENCHMARK_WRAPPER_ID', '')
-
-        # Parameters below related to 'run_workload()'
-        self._environment_variables_dict['workloads'] = ['stressng_pod', 'stressng_vm', 'uperf_pod', 'uperf_vm', 'hammerdb_pod_mariadb', 'hammerdb_vm_mariadb',  'hammerdb_pod_postgres', 'hammerdb_vm_postgres', 'hammerdb_pod_mssql', 'hammerdb_vm_mssql']
-        self._environment_variables_dict['namespace'] = os.environ.get('NAMESPACE', 'benchmark-operator')
-        # run Hammerdb workload with ocs pvc True/False
-        self._environment_variables_dict['ocs_pvc'] = os.environ.get('OCS_PVC', 'True')
-        # This parameter get from Test_CI.yml file
-        self._environment_variables_dict['build_version'] = os.environ.get('BUILD_VERSION', '1.0.0')
-        # collect system metrics True/False
-        self._environment_variables_dict['system_metrics'] = os.environ.get('SYSTEM_METRICS', 'True')
-        # CI status update once at the end of CI Pass/Failed
-        self._environment_variables_dict['ci_status'] = os.environ.get('CI_STATUS', '')
-        # Run type test_ci/func_ci/perf_ci, default test_ci same environment as func_ci
-        self._environment_variables_dict['run_type'] = os.environ.get('RUN_TYPE', 'test_ci')
 
         # Node Selector functionality
         if self._environment_variables_dict['pin_node1']:

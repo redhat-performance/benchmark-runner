@@ -1,5 +1,6 @@
 
 import os
+import sys
 import time
 import yaml
 import datetime
@@ -13,6 +14,7 @@ from benchmark_runner.common.oc.oc_exceptions import VMNotCompletedTimeout
 from benchmark_runner.benchmark_operator.workload_flavors.generate_yaml_from_workload_flavors import TemplateOperations
 from benchmark_runner.common.elasticsearch.es_operations import ESOperations
 from benchmark_runner.common.ssh.ssh import SSH
+from benchmark_runner.benchmark_operator.benchmark_operator_exceptions import OCSNonInstalled, SystemMetricsRequiredElasticSearch
 from benchmark_runner.main.environment_variables import environment_variables
 
 
@@ -25,6 +27,9 @@ class BenchmarkOperatorWorkloads:
         self.__environment_variables_dict = environment_variables.environment_variables_dict
         self.__runner_version = self.__environment_variables_dict.get('build_version', '')
         self.__run_type = self.__environment_variables_dict.get('run_type', '')
+        self.__stop_when_workload_finish = self.__environment_variables_dict.get('stop_when_workload_finish', '')
+        self.__system_metrics = self.__environment_variables_dict.get('system_metrics', '')
+        self.__elasticsearch = self.__environment_variables_dict.get('elasticsearch', '')
         self.__ssh = SSH()
         self.__kubeadmin_password = kubeadmin_password
         self.__oc = OC(kubeadmin_password=self.__kubeadmin_password)
@@ -65,6 +70,25 @@ class BenchmarkOperatorWorkloads:
                 os.remove(os.path.join(self.__current_run_path, f'{names[-1]}.yaml'))
         else:
             logger.info('yaml file {} does not exist')
+
+    def __exist_for_debug(self):
+        """
+        This method check for workload exist when complete running
+        :return:
+        """
+        # Stop for debugging workload pod
+        if self.__stop_when_workload_finish == 'True':
+            return sys.exit(0)
+
+    def __check_elasticsearch_exist_for_system_metrics(self):
+        """
+        This method check if elasticsearch exist for system metrics
+        :return:
+        """
+        # Stop for debugging workload pod
+        if self.__system_metrics == 'True':
+            if not self.__elasticsearch:
+                raise SystemMetricsRequiredElasticSearch()
 
     @logger_time_stamp
     def update_node_selector(self, runner_path: str = environment_variables.environment_variables_dict['runner_path'], yaml_path: str = '', pin_node: str = ''):
@@ -290,6 +314,7 @@ class BenchmarkOperatorWorkloads:
             self.__oc.wait_for_initialized(label='app=stressng_workload', workload=workload)
             self.__oc.wait_for_ready(label='app=stressng_workload', workload=workload)
             self.__oc.wait_for_pod_completed(label='app=stressng_workload', workload=workload)
+            self.__exist_for_debug()
             # system metrics
             if environment_variables.environment_variables_dict['system_metrics'] == 'True':
                 self.system_metrics_collector(workload=workload)
@@ -328,6 +353,7 @@ class BenchmarkOperatorWorkloads:
             self.__oc.wait_for_initialized(label='app=stressng_workload', workload=workload)
             self.__oc.wait_for_ready(label='app=stressng_workload', workload=workload)
             self.__oc.wait_for_vm_completed(workload=workload)
+            self.__exist_for_debug()
             # system metrics
             if environment_variables.environment_variables_dict['system_metrics'] == 'True':
                self.system_metrics_collector(workload=workload)
@@ -365,16 +391,24 @@ class BenchmarkOperatorWorkloads:
             self.__oc.create_pod_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.uperf_pod.__name__}.yaml'), pod_name=f'uperf-server')
             # uperf server
             server_name = self.__environment_variables_dict.get('pin_node1', '')
-            # name up to 27 chars
-            if len(server_name) > 27:
-                server_name = server_name[:28]
-            self.__oc.wait_for_initialized(label=f'app=uperf-bench-server-{server_name}-0', workload=workload)
-            self.__oc.wait_for_ready(label=f'app=uperf-bench-server-{server_name}-0', workload=workload)
+            if server_name:
+                # uperf server name is limited up to 27 chars
+                if len(server_name) > 27:
+                    server_name = server_name[:28]
+                label = f'app=uperf-bench-server-{server_name}-0'
+                self.__oc.wait_for_initialized(label=label, workload=workload)
+                self.__oc.wait_for_ready(label=label, workload=workload)
+            # in case that no pin node
+            else:
+                label = f'benchmark-operator-workload=uperf'
+                self.__oc.wait_for_initialized(label=label, workload=workload, label_uuid=False)
+                self.__oc.wait_for_ready(label=label, workload=workload, label_uuid=False)
             # uperf client
             self.__oc.wait_for_pod_create(pod_name=f'uperf-client')
             self.__oc.wait_for_initialized(label='app=uperf-bench-client', workload=workload)
             self.__oc.wait_for_ready(label='app=uperf-bench-client', workload=workload)
             self.__oc.wait_for_pod_completed(label='app=uperf-bench-client', workload=workload)
+            self.__exist_for_debug()
             # system metrics
             if environment_variables.environment_variables_dict['system_metrics'] == 'True':
                 self.system_metrics_collector(workload=workload)
@@ -417,6 +451,7 @@ class BenchmarkOperatorWorkloads:
             self.__oc.wait_for_initialized(label='app=uperf-bench-client', workload=workload)
             self.__oc.wait_for_ready(label='app=uperf-bench-client', workload=workload)
             self.__oc.wait_for_vm_completed(workload=workload)
+            self.__exist_for_debug()
             # system metrics
             if environment_variables.environment_variables_dict['system_metrics'] == 'True':
                 self.system_metrics_collector(workload=workload)
@@ -465,6 +500,7 @@ class BenchmarkOperatorWorkloads:
             self.__oc.wait_for_initialized(label='app=hammerdb_workload', workload=workload)
             self.__oc.wait_for_ready(label='app=hammerdb_workload', workload=workload)
             self.__oc.wait_for_pod_completed(label='app=hammerdb_workload', workload=workload)
+            self.__exist_for_debug()
             # system metrics
             if environment_variables.environment_variables_dict['system_metrics'] == 'True':
                 self.system_metrics_collector(workload=workload)
@@ -519,6 +555,7 @@ class BenchmarkOperatorWorkloads:
             self.__oc.wait_for_initialized(label='app=hammerdb_workload', workload=workload)
             self.__oc.wait_for_ready(label='app=hammerdb_workload', workload=workload)
             self.__oc.wait_for_vm_completed(workload=workload)
+            self.__exist_for_debug()
             # system metrics
             if environment_variables.environment_variables_dict['system_metrics'] == 'True':
                 self.system_metrics_collector(workload=workload)
@@ -560,6 +597,10 @@ class BenchmarkOperatorWorkloads:
         self.remove_if_exist_run_yaml()
         workload_name = workload_full_name.split('_')
         if 'hammerdb' in workload_full_name:
+            # check if ocs is installed
+            if self.__environment_variables_dict.get('ocs_pvc', '') == 'True':
+                if not self.__oc.is_ocs_installed():
+                    raise OCSNonInstalled()
             self.__template.generate_hammerdb_yamls(workload=f'{workload_name[0]}_{workload_name[1]}', database=workload_name[2])
             class_method = getattr(BenchmarkOperatorWorkloads, f'{workload_name[0]}_{workload_name[1]}')
             class_method(self, workload_name[2])
@@ -576,6 +617,10 @@ class BenchmarkOperatorWorkloads:
         This method run the input workload
         :return:
         """
+
+        # check that there is elasticsearch when system metric is True
+        self.__check_elasticsearch_exist_for_system_metrics()
+
         # make undeploy benchmark controller manager if exist
         self.make_undeploy_benchmark_controller_manager_if_exist(runner_path=environment_variables.environment_variables_dict['runner_path'])
 

@@ -16,16 +16,16 @@ This tool support the following workloads:
 ** First Phase: supports [benchmark-operator workloads](https://github.com/cloud-bulldozer/benchmark-operator)
 
 Benchmark-runner grafana dashboard example:
-![](media/grafana.png)
+![](../media/grafana.png)
 
 Reference:
 * The benchmark-runner package is located in [PyPi](https://pypi.org/project/benchmark-runner)
 * The benchmark-runner container image is located in [Quay.io](https://quay.io/repository/ebattat/benchmark-runner)
 
 ## Documentation
-Documentation is available at https://benchmark-runner.readthedocs.io/en/latest/
+Documentation is available at [benchmark-runner.readthedocs.io](benchmark-runner.readthedocs.io)
 
-![](media/docker1.png)
+![](../media/docker1.png)
 
 _**Table of Contents**_
 
@@ -71,7 +71,7 @@ Choose one from the following list:
 podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:latest
 ```
 
-![](media/demo.gif)
+![](../media/demo.gif)
 
 ## Run workload in Pod using Kubernetes or OpenShift
 
@@ -80,14 +80,16 @@ podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD 
 ## Grafana dashboards
 
 There are 3 grafana dashboards templates:
-1. [benchmark-runner-ci-status.json](grafana/benchmark-runner-ci-status.json)
-![](media/benchmark-runner-ci-status.png)
+1. [benchmark-runner-ci-status-report.json](grafana/benchmark-runner-ci-status-report.json)
+![](../media/benchmark-runner-ci-status.png)
 2. [benchmark-runner-report.json](grafana/benchmark-runner-report.json)
-![](media/benchmark-runner-report.png)
-3. [benchmark-runner-report-compare-3-versions.json](grafana/benchmark-runner-report-compare-3-versions.json)
-![](media/benchmark-runner-report-compare-3-versions.png)
-4. [system-metrics-report.json](grafana/system-metrics-report.json)
-![](media/system-metrics-report.png)
+![](../media/benchmark-runner-report.png)
+3. [benchmark-runner-compare-3-ci-dates-report.json](grafana/benchmark-runner-compare-3-ci-dates-report.json)
+![](../media/benchmark-runner-compare-3-ci-dates-report.png)
+4. [benchmark-runner-compare-3-ocp-versions-report.json](grafana/benchmark-runner-compare-3-ocp-versions-report.json)
+![](../media/benchmark-runner-compare-3-ocp-versions-report.png)
+5. [system-metrics-report.json](grafana/system-metrics-report.json)
+![](../media/system-metrics-report.png)
 
 ** After importing json in grafana, need to configure elasticsearch data source. (for more details: see [HOW_TO.md](HOW_TO.md))
 

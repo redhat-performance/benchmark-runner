@@ -99,12 +99,10 @@ def main():
         This method update ci status
         :return:
         """
-        ci_minutes_time = environment_variables_dict.get('ci_minutes_time', 0)
+        ci_minutes_time = environment_variables_dict.get('ci_minutes_time', '')
         benchmark_operator_id = environment_variables_dict.get('benchmark_operator_id', '')
         benchmark_wrapper_id = environment_variables_dict.get('benchmark_wrapper_id', '')
-        ocp_install_minutes_time = environment_variables_dict.get('ocp_install_minutes_time', 0)
-        ocp_resource_install_minutes_time = environment_variables_dict.get('ocp_resource_install_minutes_time', 0)
-        benchmark_operator_workload.update_ci_status(status=ci_status, ci_minutes_time=int(ci_minutes_time), benchmark_operator_id=benchmark_operator_id, benchmark_wrapper_id=benchmark_wrapper_id, ocp_install_minutes_time=int(ocp_install_minutes_time), ocp_resource_install_minutes_time=int(ocp_resource_install_minutes_time))
+        benchmark_operator_workload.update_ci_status(status=ci_status, ci_minutes_time=int(ci_minutes_time), benchmark_operator_id=benchmark_operator_id, benchmark_wrapper_id=benchmark_wrapper_id)
 
     @logger_time_stamp
     def run_workload():
