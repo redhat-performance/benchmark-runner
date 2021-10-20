@@ -7,14 +7,13 @@ from datetime import datetime
 
 from benchmark_runner.common.elasticsearch.elasticsearch_exceptions import ElasticSearchDataNotUploaded
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
-
+from benchmark_runner.main.environment_variables import environment_variables
 
 class ESOperations:
     """
     This class contains elastic search operations
     """
-    # time out for all waits is 5000 sec
-    TIMEOUT = 5000
+
     # sleep time between checks is 30 sec
     SLEEP_TIME = 10
     # ElasticSearch fetch data of last 15 minutes
@@ -31,6 +30,8 @@ class ESOperations:
         else:
             self.__es = Elasticsearch([{'host': self.__es_host}])
         self._hits = 0
+        self.__environment_variables_dict = environment_variables.environment_variables_dict
+        self.__timeout = environment_variables.environment_variables_dict['timeout']
 
     @property
     def hits(self):
@@ -112,7 +113,7 @@ class ESOperations:
         current_wait_time = 0
         current_hits = 0
         # waiting for any hits
-        while current_wait_time <= self.TIMEOUT:
+        while current_wait_time <= self.__timeout:
             # waiting for new hits
             new_hits = self.__es_get_index_hits(index=index, uuid=uuid, workload=workload, fast_check=fast_check)
             if current_hits < new_hits:

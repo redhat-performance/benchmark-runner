@@ -1,7 +1,8 @@
 shared_data:
   namespace: {{ namespace }}
-  db_num_workers: 2
-  db_warehouses: 2
+  db_num_workers: 24
+  db_warehouses: 100
+  storage: 100
   pin: {{ pin }}
   pin_node: {{ pin_node1 }}
   transactions: 100000
@@ -38,8 +39,8 @@ postgres:
   db_server_pod: postgres-deployment.postgres-db
 pod:
   resources: true
-  limits_cpu: 4
+  limits_cpu: 16
   limits_memory_GB: 16
 vm:
-  cores: 4
+  cores: 16
   limits_memory_GB: 16
