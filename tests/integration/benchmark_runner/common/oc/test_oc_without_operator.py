@@ -80,3 +80,33 @@ def test_get_prom_token():
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
     assert oc.get_prom_token()
+
+
+def test_is_cnv_installed():
+    """
+    This method check if cnv operator is installed
+    :return:
+    """
+    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
+    oc.login()
+    assert oc.is_cnv_installed()
+
+
+def test_is_ocs_installed():
+    """
+    This method check if ocs operator is installed
+    :return:
+    """
+    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
+    oc.login()
+    assert oc.is_ocs_installed()
+
+
+def test_is_kata_installed():
+    """
+    This method check if kata operator is installed
+    :return:
+    """
+    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
+    oc.login()
+    assert oc.is_kata_installed()

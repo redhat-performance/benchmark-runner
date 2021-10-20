@@ -9,3 +9,4 @@ azure==4.0.0
 paramiko==2.8.0
 tenacity==8.0.1
 PyGitHub==1.55
+myst-parser==0.15.2

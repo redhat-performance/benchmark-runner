@@ -55,6 +55,36 @@ class OC(SSH):
         """
         return self.run("oc get csv -n openshift-storage $(oc get csv -n openshift-storage --no-headers | awk '{ print $1; }') -ojsonpath='{.spec.version}' ")
 
+    def is_cnv_installed(self):
+        """
+        This method check if cnv operator is installed
+        :return:
+        """
+        verify_cmd = 'oc -n openshift-cnv wait deployment/virt-operator --for=condition=Available'
+        if 'met' in self.run(verify_cmd):
+            return True
+        return False
+
+    def is_ocs_installed(self):
+        """
+        This method check if ocs operator is installed
+        :return:
+        """
+        verify_cmd = 'oc -n openshift-storage wait deployment/ocs-operator --for=condition=Available'
+        if 'met' in self.run(verify_cmd):
+            return True
+        return False
+
+    def is_kata_installed(self):
+        """
+        This method check if kata operator is installed
+        :return:
+        """
+        verify_cmd = 'oc -n openshift-sandboxed-containers-operator wait deployment/controller-manager --for=condition=Available'
+        if 'met' in self.run(verify_cmd):
+            return True
+        return False
+
     def get_master_nodes(self):
         """
         This method return master nodes

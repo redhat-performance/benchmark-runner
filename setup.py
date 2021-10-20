@@ -48,7 +48,8 @@ setup(
         'azure==4.0.0',
         'paramiko==2.8.0',
         'tenacity==8.0.1',  # retry decorator
-        'PyGitHub==1.55'  # update secrets
+        'PyGitHub==1.55',  # update secrets
+        'myst-parser==0.15.2'  # readthedocs
         # add new package inside requirements.txt
     ],
 

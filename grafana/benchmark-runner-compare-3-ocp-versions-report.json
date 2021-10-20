@@ -21,8 +21,8 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 11,
-  "iteration": 1634734397297,
+  "id": 10,
+  "iteration": 1634734426289,
   "links": [],
   "panels": [
     {
@@ -278,7 +278,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "alias": "$ci_run_date1: VM 2 workers",
+          "alias": "$ocp_version1: VM 2 workers",
           "bucketAggs": [
             {
               "field": "timestamp",
@@ -301,12 +301,12 @@
               "type": "max"
             }
           ],
-          "query": "db_type:'mariadb' AND current_worker:2 AND kind:'vm' AND ci_run_date1=$ci_run_date1",
+          "query": "db_type:'mariadb' AND current_worker:2 AND kind:'vm' AND ocp_version1=$ocp_version1",
           "refId": "A",
           "timeField": "timestamp"
         },
         {
-          "alias": "$ci_run_date1: POD 2 workers",
+          "alias": "$ocp_version1: POD 2 workers",
           "bucketAggs": [
             {
               "field": "timestamp",
@@ -329,12 +329,12 @@
               "type": "max"
             }
           ],
-          "query": "db_type:'mariadb' AND current_worker:2 AND kind:'pod' AND ci_run_date=$ci_run_date1",
+          "query": "db_type:'mariadb' AND current_worker:2 AND kind:'pod' AND ocp_version=$ocp_version1",
           "refId": "B",
           "timeField": "timestamp"
         },
         {
-          "alias": "$ci_run_date2: VM 2 workers",
+          "alias": "$ocp_version2: VM 2 workers",
           "bucketAggs": [
             {
               "field": "timestamp",
@@ -357,12 +357,12 @@
               "type": "max"
             }
           ],
-          "query": "db_type:'mariadb' AND current_worker:2 AND kind:'vm' AND ci_run_date=$ci_run_date2",
+          "query": "db_type:'mariadb' AND current_worker:2 AND kind:'vm' AND ocp_version=$ocp_version2",
           "refId": "C",
           "timeField": "timestamp"
         },
         {
-          "alias": "$ci_run_date2: POD 2 workers",
+          "alias": "$ocp_version2: POD 2 workers",
           "bucketAggs": [
             {
               "field": "timestamp",
@@ -385,12 +385,12 @@
               "type": "max"
             }
           ],
-          "query": "db_type:'mariadb' AND current_worker:2 AND kind:'pod' AND ci_run_date=$ci_run_date2",
+          "query": "db_type:'mariadb' AND current_worker:2 AND kind:'pod' AND ocp_version=$ocp_version2",
           "refId": "D",
           "timeField": "timestamp"
         },
         {
-          "alias": "$ci_run_date3: VM 2 workers",
+          "alias": "$ocp_version3: VM 2 workers",
           "bucketAggs": [
             {
               "field": "timestamp",
@@ -413,12 +413,12 @@
               "type": "max"
             }
           ],
-          "query": "db_type:'mariadb' AND current_worker:2 AND kind:'vm' AND ci_run_date=$ci_run_date3",
+          "query": "db_type:'mariadb' AND current_worker:2 AND kind:'vm' AND ocp_version=$ocp_version3",
           "refId": "E",
           "timeField": "timestamp"
         },
         {
-          "alias": "$ci_run_date3: POD 2 workers",
+          "alias": "$ocp_version3: POD 2 workers",
           "bucketAggs": [
             {
               "field": "timestamp",
@@ -441,7 +441,7 @@
               "type": "max"
             }
           ],
-          "query": "db_type:'mariadb' AND current_worker:2 AND kind:'pod' AND ci_run_date=$ci_run_date3",
+          "query": "db_type:'mariadb' AND current_worker:2 AND kind:'pod' AND ocp_version=$ocp_version3",
           "refId": "F",
           "timeField": "timestamp"
         }
@@ -608,7 +608,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "alias": "$ci_run_date1: VM: 2 Workers",
+          "alias": "$ocp_version1: VM: 2 Workers",
           "bucketAggs": [
             {
               "field": "timestamp",
@@ -630,12 +630,12 @@
               "type": "max"
             }
           ],
-          "query": "db_type:'pg' AND current_worker:2 AND kind:'vm' AND ci_run_date=$ci_run_date1",
+          "query": "db_type:'pg' AND current_worker:2 AND kind:'vm' AND ocp_version=$ocp_version1",
           "refId": "A",
           "timeField": "timestamp"
         },
         {
-          "alias": "$ci_run_date1: POD: 2 Workers",
+          "alias": "$ocp_version1: POD: 2 Workers",
           "bucketAggs": [
             {
               "field": "timestamp",
@@ -657,12 +657,12 @@
               "type": "max"
             }
           ],
-          "query": "db_type:'pg' AND current_worker:2 AND kind:'pod' AND ci_run_date=$ci_run_date1",
+          "query": "db_type:'pg' AND current_worker:2 AND kind:'pod' AND ocp_version=$ocp_version1",
           "refId": "B",
           "timeField": "timestamp"
         },
         {
-          "alias": "$ci_run_date2: VM: 2 Workers",
+          "alias": "$ocp_version2: VM: 2 Workers",
           "bucketAggs": [
             {
               "field": "timestamp",
@@ -685,12 +685,12 @@
               "type": "max"
             }
           ],
-          "query": "db_type:'pg' AND current_worker:2 AND kind:'vm' AND ci_run_date=$ci_run_date2",
+          "query": "db_type:'pg' AND current_worker:2 AND kind:'vm' AND ocp_version=$ocp_version2",
           "refId": "C",
           "timeField": "timestamp"
         },
         {
-          "alias": "$ci_run_date2: POD: 2 Workers",
+          "alias": "$ocp_version2: POD: 2 Workers",
           "bucketAggs": [
             {
               "field": "timestamp",
@@ -713,12 +713,12 @@
               "type": "max"
             }
           ],
-          "query": "db_type:'pg' AND current_worker:2 AND kind:'pod' AND ci_run_date=$ci_run_date2",
+          "query": "db_type:'pg' AND current_worker:2 AND kind:'pod' AND ocp_version=$ocp_version2",
           "refId": "D",
           "timeField": "timestamp"
         },
         {
-          "alias": "$ci_run_date3: VM: 2 Workers",
+          "alias": "$ocp_version3: VM: 2 Workers",
           "bucketAggs": [
             {
               "field": "timestamp",
@@ -741,12 +741,12 @@
               "type": "max"
             }
           ],
-          "query": "db_type:'pg' AND current_worker:2 AND kind:'vm' AND ci_run_date=$ci_run_date3",
+          "query": "db_type:'pg' AND current_worker:2 AND kind:'vm' AND ocp_version=$ocp_version3",
           "refId": "E",
           "timeField": "timestamp"
         },
         {
-          "alias": "$ci_run_date3: POD: 2 Workers",
+          "alias": "$ocp_version3: POD: 2 Workers",
           "bucketAggs": [
             {
               "field": "timestamp",
@@ -769,7 +769,7 @@
               "type": "max"
             }
           ],
-          "query": "db_type:'pg' AND current_worker:2 AND kind:'pod' AND ci_run_date=$ci_run_date3",
+          "query": "db_type:'pg' AND current_worker:2 AND kind:'pod' AND ocp_version=$ocp_version3",
           "refId": "F",
           "timeField": "timestamp"
         }
@@ -935,7 +935,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "alias": "$ci_run_date1: VM: 2 workers",
+          "alias": "$ocp_version1: VM: 2 workers",
           "bucketAggs": [
             {
               "field": "timestamp",
@@ -957,12 +957,12 @@
               "type": "max"
             }
           ],
-          "query": "db_type:'mssql' AND current_worker:2 AND kind:’vm’ AND ci_run_date=$ci_run_date1",
+          "query": "db_type:'mssql' AND current_worker:2 AND kind:’vm’ AND ocp_version=$ocp_version1",
           "refId": "A",
           "timeField": "timestamp"
         },
         {
-          "alias": "$ci_run_date1: Pod: 2 workers",
+          "alias": "$ocp_version1: Pod: 2 workers",
           "bucketAggs": [
             {
               "field": "timestamp",
@@ -984,12 +984,12 @@
               "type": "max"
             }
           ],
-          "query": "db_type:'mssql' AND current_worker:2 AND kind:’pod’ AND ci_run_date=$ci_run_date1",
+          "query": "db_type:'mssql' AND current_worker:2 AND kind:’pod’ AND ocp_version=$ocp_version1",
           "refId": "B",
           "timeField": "timestamp"
         },
         {
-          "alias": "$ci_run_date2: VM: 2 workers",
+          "alias": "$ocp_version2: VM: 2 workers",
           "bucketAggs": [
             {
               "field": "timestamp",
@@ -1012,12 +1012,12 @@
               "type": "max"
             }
           ],
-          "query": "db_type:'mssql' AND current_worker:2 AND kind:’vm’ AND ci_run_date=$ci_run_date2",
+          "query": "db_type:'mssql' AND current_worker:2 AND kind:’vm’ AND ocp_version=$ocp_version2",
           "refId": "C",
           "timeField": "timestamp"
         },
         {
-          "alias": "$ci_run_date2: Pod: 2 workers",
+          "alias": "$ocp_version2: Pod: 2 workers",
           "bucketAggs": [
             {
               "field": "timestamp",
@@ -1040,12 +1040,12 @@
               "type": "max"
             }
           ],
-          "query": "db_type:'mssql' AND current_worker:2 AND kind:’pod’ AND ci_run_date=$ci_run_date2",
+          "query": "db_type:'mssql' AND current_worker:2 AND kind:’pod’ AND ocp_version=$ocp_version2",
           "refId": "D",
           "timeField": "timestamp"
         },
         {
-          "alias": "$ci_run_date3: VM: 2 workers",
+          "alias": "$ocp_version3: VM: 2 workers",
           "bucketAggs": [
             {
               "field": "timestamp",
@@ -1068,12 +1068,12 @@
               "type": "max"
             }
           ],
-          "query": "db_type:'mssql' AND current_worker:2 AND kind:’vm’ AND ci_run_date=$ci_run_date3",
+          "query": "db_type:'mssql' AND current_worker:2 AND kind:’vm’ AND ocp_version=$ocp_version3",
           "refId": "E",
           "timeField": "timestamp"
         },
         {
-          "alias": "$ci_run_date3 Pod: 2 workers",
+          "alias": "$ocp_version3 Pod: 2 workers",
           "bucketAggs": [
             {
               "field": "timestamp",
@@ -1096,7 +1096,7 @@
               "type": "max"
             }
           ],
-          "query": "db_type:'mssql' AND current_worker:2 AND kind:’pod’ AND ci_run_date=$ci_run_date3",
+          "query": "db_type:'mssql' AND current_worker:2 AND kind:’pod’ AND ocp_version=$ocp_version3",
           "refId": "F",
           "timeField": "timestamp"
         }
@@ -1284,7 +1284,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "alias": "$ci_run_date1:  VM 16384",
+          "alias": "$ocp_version1:  VM 16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -1307,12 +1307,12 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:1 AND ci_run_date=$ci_run_date1",
+          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:1 AND ocp_version=$ocp_version1",
           "refId": "A",
           "timeField": "uperf_ts"
         },
         {
-          "alias": "$ci_run_date1:  POD 16384",
+          "alias": "$ocp_version1:  POD 16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -1335,12 +1335,12 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:1 AND ci_run_date=$ci_run_date1",
+          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:1 AND ocp_version=$ocp_version1",
           "refId": "B",
           "timeField": "uperf_ts"
         },
         {
-          "alias": "$ci_run_date2:  VM 16384",
+          "alias": "$ocp_version2:  VM 16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -1363,12 +1363,12 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:1 AND ci_run_date=$ci_run_date2",
+          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:1 AND ocp_version=$ocp_version2",
           "refId": "C",
           "timeField": "uperf_ts"
         },
         {
-          "alias": "$ci_run_date2:  POD 16384",
+          "alias": "$ocp_version2:  POD 16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -1391,12 +1391,12 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:1 AND ci_run_date=$ci_run_date2",
+          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:1 AND ocp_version=$ocp_version2",
           "refId": "D",
           "timeField": "uperf_ts"
         },
         {
-          "alias": "$ci_run_date3:  VM 16384",
+          "alias": "$ocp_version3:  VM 16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -1419,12 +1419,12 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:1 AND ci_run_date=$ci_run_date3",
+          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:1 AND ocp_version=$ocp_version3",
           "refId": "E",
           "timeField": "uperf_ts"
         },
         {
-          "alias": "$ci_run_date3:  POD 16384",
+          "alias": "$ocp_version3:  POD 16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -1447,7 +1447,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:1 AND ci_run_date=$ci_run_date3",
+          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:1 AND ocp_version=$ocp_version3",
           "refId": "F",
           "timeField": "uperf_ts"
         }
@@ -1543,7 +1543,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "alias": "$ci_run_date1: VM  16384",
+          "alias": "$ocp_version1: VM  16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -1566,12 +1566,12 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:2 AND ci_run_date=$ci_run_date1",
+          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:2 AND ocp_version=$ocp_version1",
           "refId": "A",
           "timeField": "uperf_ts"
         },
         {
-          "alias": "$ci_run_date1: Pod  16384",
+          "alias": "$ocp_version1: Pod  16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -1594,12 +1594,12 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:2 AND ci_run_date=$ci_run_date1",
+          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:2 AND ocp_version=$ocp_version1",
           "refId": "B",
           "timeField": "uperf_ts"
         },
         {
-          "alias": "$ci_run_date2: VM  16384",
+          "alias": "$ocp_version2: VM  16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -1622,12 +1622,12 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:2 AND ci_run_date=$ci_run_date2",
+          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:2 AND ocp_version=$ocp_version2",
           "refId": "C",
           "timeField": "uperf_ts"
         },
         {
-          "alias": "$ci_run_date2: POD  16384",
+          "alias": "$ocp_version2: POD  16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -1650,12 +1650,12 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:2 AND ci_run_date=$ci_run_date2",
+          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:2 AND ocp_version=$ocp_version2",
           "refId": "D",
           "timeField": "uperf_ts"
         },
         {
-          "alias": "$ci_run_date3: POD  16384",
+          "alias": "$ocp_version3: POD  16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -1678,12 +1678,12 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:2 AND ci_run_date=$ci_run_date3",
+          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:2 AND ocp_version=$ocp_version3",
           "refId": "E",
           "timeField": "uperf_ts"
         },
         {
-          "alias": "$ci_run_date3: POD  16384",
+          "alias": "$ocp_version3: POD  16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -1706,7 +1706,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:2 AND ci_run_date=$ci_run_date3",
+          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:2 AND ocp_version=$ocp_version3",
           "refId": "F",
           "timeField": "uperf_ts"
         }
@@ -1798,7 +1798,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "alias": "$ci_run_date1: VM 16384",
+          "alias": "$ocp_version1: VM 16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -1821,12 +1821,12 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:1 AND ci_run_date=$ci_run_date1",
+          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:1 AND ocp_version=$ocp_version1",
           "refId": "A",
           "timeField": "uperf_ts"
         },
         {
-          "alias": "$ci_run_date1: POD 16384",
+          "alias": "$ocp_version1: POD 16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -1849,12 +1849,12 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:1 AND ci_run_date=$ci_run_date1",
+          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:1 AND ocp_version=$ocp_version1",
           "refId": "B",
           "timeField": "uperf_ts"
         },
         {
-          "alias": "$ci_run_date2: VM 16384",
+          "alias": "$ocp_version2: VM 16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -1877,12 +1877,12 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:1 AND ci_run_date=$ci_run_date2",
+          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:1 AND ocp_version=$ocp_version2",
           "refId": "C",
           "timeField": "uperf_ts"
         },
         {
-          "alias": "$ci_run_date2: POD 16384",
+          "alias": "$ocp_version2: POD 16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -1905,12 +1905,12 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:1 AND ci_run_date=$ci_run_date2",
+          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:1 AND ocp_version=$ocp_version2",
           "refId": "D",
           "timeField": "uperf_ts"
         },
         {
-          "alias": "$ci_run_date3: VM 16384",
+          "alias": "$ocp_version3: VM 16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -1933,12 +1933,12 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:1 AND ci_run_date=$ci_run_date3",
+          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:1 AND ocp_version=$ocp_version3",
           "refId": "E",
           "timeField": "uperf_ts"
         },
         {
-          "alias": "$ci_run_date3: POD 16384",
+          "alias": "$ocp_version3: POD 16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -1961,7 +1961,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:1 AND ci_run_date=$ci_run_date3",
+          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:1 AND ocp_version=$ocp_version3",
           "refId": "F",
           "timeField": "uperf_ts"
         }
@@ -2053,7 +2053,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "alias": "$ci_run_date1: VM 16384",
+          "alias": "$ocp_version1: VM 16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -2075,12 +2075,12 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:2 AND ci_run_date=$ci_run_date1",
+          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:2 AND ocp_version=$ocp_version1",
           "refId": "I",
           "timeField": "uperf_ts"
         },
         {
-          "alias": "$ci_run_date1: POD 16384",
+          "alias": "$ocp_version1: POD 16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -2103,12 +2103,12 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:2 AND ci_run_date=$ci_run_date1",
+          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:2 AND ocp_version=$ocp_version1",
           "refId": "F",
           "timeField": "uperf_ts"
         },
         {
-          "alias": "$ci_run_date2: VM 16384",
+          "alias": "$ocp_version2: VM 16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -2131,12 +2131,12 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:2 AND ci_run_date=$ci_run_date2",
+          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:2 AND ocp_version=$ocp_version2",
           "refId": "A",
           "timeField": "uperf_ts"
         },
         {
-          "alias": "$ci_run_date2: POD 16384",
+          "alias": "$ocp_version2: POD 16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -2159,12 +2159,12 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:2 AND ci_run_date=$ci_run_date2",
+          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:2 AND ocp_version=$ocp_version2",
           "refId": "B",
           "timeField": "uperf_ts"
         },
         {
-          "alias": "$ci_run_date3: VM 16384",
+          "alias": "$ocp_version3: VM 16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -2187,12 +2187,12 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:2 AND ci_run_date=$ci_run_date3",
+          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:2 AND ocp_version=$ocp_version3",
           "refId": "C",
           "timeField": "uperf_ts"
         },
         {
-          "alias": "$ci_run_date3: POD 16384",
+          "alias": "$ocp_version3: POD 16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -2215,7 +2215,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:2 AND ci_run_date=$ci_run_date3",
+          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:2 AND ocp_version=$ocp_version3",
           "refId": "D",
           "timeField": "uperf_ts"
         }
@@ -2311,7 +2311,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "alias": "$ci_run_date1: VM 16384",
+          "alias": "$ocp_version1: VM 16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -2333,12 +2333,12 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:1 AND ci_run_date=$ci_run_date1",
+          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:1 AND ocp_version=$ocp_version1",
           "refId": "B",
           "timeField": "uperf_ts"
         },
         {
-          "alias": "$ci_run_date1: POD 16384",
+          "alias": "$ocp_version1: POD 16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -2361,12 +2361,12 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:1 AND ci_run_date=$ci_run_date1",
+          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:1 AND ocp_version=$ocp_version1",
           "refId": "C",
           "timeField": "uperf_ts"
         },
         {
-          "alias": "$ci_run_date2: VM 16384",
+          "alias": "$ocp_version2: VM 16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -2388,12 +2388,12 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:1 AND ci_run_date=$ci_run_date2",
+          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:1 AND ocp_version=$ocp_version2",
           "refId": "E",
           "timeField": "uperf_ts"
         },
         {
-          "alias": "$ci_run_date2: POD 16384",
+          "alias": "$ocp_version2: POD 16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -2416,12 +2416,12 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:1 AND ci_run_date=$ci_run_date2",
+          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:1 AND ocp_version=$ocp_version2",
           "refId": "D",
           "timeField": "uperf_ts"
         },
         {
-          "alias": "$ci_run_date3: VM 16384",
+          "alias": "$ocp_version3: VM 16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -2444,12 +2444,12 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:1 AND ci_run_date=$ci_run_date3",
+          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:1 AND ocp_version=$ocp_version3",
           "refId": "A",
           "timeField": "uperf_ts"
         },
         {
-          "alias": "$ci_run_date3: POD 16384",
+          "alias": "$ocp_version3: POD 16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -2472,7 +2472,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:1 AND ci_run_date=$ci_run_date3",
+          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:1 AND ocp_version=$ocp_version3",
           "refId": "F",
           "timeField": "uperf_ts"
         }
@@ -2568,7 +2568,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "alias": "$ci_run_date1: VM 16384",
+          "alias": "$ocp_version1: VM 16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -2586,12 +2586,12 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:2 AND ci_run_date=$ci_run_date1",
+          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:2 AND ocp_version=$ocp_version1",
           "refId": "A",
           "timeField": "uperf_ts"
         },
         {
-          "alias": "$ci_run_date1: POD 16384",
+          "alias": "$ocp_version1: POD 16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -2610,12 +2610,12 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:2 AND ci_run_date=$ci_run_date1",
+          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:2 AND ocp_version=$ocp_version1",
           "refId": "B",
           "timeField": "uperf_ts"
         },
         {
-          "alias": "$ci_run_date2: VM 16384",
+          "alias": "$ocp_version2: VM 16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -2634,12 +2634,12 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:2 AND ci_run_date=$ci_run_date2",
+          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:2 AND ocp_version=$ocp_version2",
           "refId": "C",
           "timeField": "uperf_ts"
         },
         {
-          "alias": "$ci_run_date2: POD 16384",
+          "alias": "$ocp_version2: POD 16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -2658,12 +2658,12 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:2 AND ci_run_date=$ci_run_date2",
+          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:2 AND ocp_version=$ocp_version2",
           "refId": "D",
           "timeField": "uperf_ts"
         },
         {
-          "alias": "$ci_run_date3: VM 16384",
+          "alias": "$ocp_version3: VM 16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -2682,12 +2682,12 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:2 AND ci_run_date=$ci_run_date3",
+          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:2 AND ocp_version=$ocp_version3",
           "refId": "E",
           "timeField": "uperf_ts"
         },
         {
-          "alias": "$ci_run_date3: POD 16384",
+          "alias": "$ocp_version3: POD 16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -2706,7 +2706,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:2 AND ci_run_date=$ci_run_date3",
+          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:2 AND ocp_version=$ocp_version3",
           "refId": "F",
           "timeField": "uperf_ts"
         }
@@ -2802,7 +2802,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "alias": "$ci_run_date1: VM 16384",
+          "alias": "$ocp_version1: VM 16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -2825,12 +2825,12 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:1 AND ci_run_date=$ci_run_date1",
+          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:1 AND ocp_version=$ocp_version1",
           "refId": "A",
           "timeField": "uperf_ts"
         },
         {
-          "alias": "$ci_run_date1: POD 16384",
+          "alias": "$ocp_version1: POD 16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -2853,12 +2853,12 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:1 AND ci_run_date=$ci_run_date1",
+          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:1 AND ocp_version=$ocp_version1",
           "refId": "B",
           "timeField": "uperf_ts"
         },
         {
-          "alias": "$ci_run_date2: VM 16384",
+          "alias": "$ocp_version2: VM 16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -2881,12 +2881,12 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:1 AND ci_run_date=$ci_run_date2",
+          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:1 AND ocp_version=$ocp_version2",
           "refId": "C",
           "timeField": "uperf_ts"
         },
         {
-          "alias": "$ci_run_date2: POD 16384",
+          "alias": "$ocp_version2: POD 16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -2909,12 +2909,12 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:1 AND ci_run_date=$ci_run_date2",
+          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:1 AND ocp_version=$ocp_version2",
           "refId": "D",
           "timeField": "uperf_ts"
         },
         {
-          "alias": "$ci_run_date3: VM 16384",
+          "alias": "$ocp_version3: VM 16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -2937,12 +2937,12 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:1 AND ci_run_date=$ci_run_date3",
+          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:1 AND ocp_version=$ocp_version3",
           "refId": "E",
           "timeField": "uperf_ts"
         },
         {
-          "alias": "$ci_run_date3: POD 16384",
+          "alias": "$ocp_version3: POD 16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -2965,7 +2965,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:1 AND ci_run_date=$ci_run_date3",
+          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:1 AND ocp_version=$ocp_version3",
           "refId": "F",
           "timeField": "uperf_ts"
         }
@@ -3061,7 +3061,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "alias": "$ci_run_date1: VM 16384",
+          "alias": "$ocp_version1: VM 16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -3083,12 +3083,12 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:2 AND ci_run_date=$ci_run_date1",
+          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:2 AND ocp_version=$ocp_version1",
           "refId": "B",
           "timeField": "uperf_ts"
         },
         {
-          "alias": "$ci_run_date1: POD 16384",
+          "alias": "$ocp_version1: POD 16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -3111,12 +3111,12 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:2 AND ci_run_date=$ci_run_date1",
+          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:2 AND ocp_version=$ocp_version1",
           "refId": "C",
           "timeField": "uperf_ts"
         },
         {
-          "alias": "$ci_run_date2: VM 16384",
+          "alias": "$ocp_version2: VM 16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -3139,12 +3139,12 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:2 AND ci_run_date=$ci_run_date2",
+          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:2 AND ocp_version=$ocp_version2",
           "refId": "E",
           "timeField": "uperf_ts"
         },
         {
-          "alias": "$ci_run_date2: POD 16384",
+          "alias": "$ocp_version2: POD 16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -3167,12 +3167,12 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:2 AND ci_run_date=$ci_run_date2",
+          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:2 AND ocp_version=$ocp_version2",
           "refId": "D",
           "timeField": "uperf_ts"
         },
         {
-          "alias": "$ci_run_date3: VM 16384",
+          "alias": "$ocp_version3: VM 16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -3195,12 +3195,12 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:2 AND ci_run_date=$ci_run_date3",
+          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:2 AND ocp_version=$ocp_version3",
           "refId": "G",
           "timeField": "uperf_ts"
         },
         {
-          "alias": "$ci_run_date3: POD 16384",
+          "alias": "$ocp_version3: POD 16384",
           "bucketAggs": [
             {
               "field": "uperf_ts",
@@ -3223,7 +3223,7 @@
               "type": "max"
             }
           ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:2 AND ci_run_date=$ci_run_date3",
+          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:2 AND ocp_version=$ocp_version3",
           "refId": "F",
           "timeField": "uperf_ts"
         }
@@ -3409,7 +3409,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "alias": "$ci_run_date1: VM CPU ",
+          "alias": "$ocp_version1: VM CPU ",
           "bucketAggs": [
             {
               "field": "timestamp",
@@ -3431,12 +3431,12 @@
               "type": "max"
             }
           ],
-          "query": "kind:'vm' AND ci_run_date=$ci_run_date1",
+          "query": "kind:'vm' AND ocp_version=$ocp_version1",
           "refId": "A",
           "timeField": "timestamp"
         },
         {
-          "alias": "$ci_run_date1: POD CPU",
+          "alias": "$ocp_version1: POD CPU",
           "bucketAggs": [
             {
               "field": "timestamp",
@@ -3459,12 +3459,12 @@
               "type": "max"
             }
           ],
-          "query": "kind:'pod' AND ci_run_date=$ci_run_date1",
+          "query": "kind:'pod' AND ocp_version=$ocp_version1",
           "refId": "B",
           "timeField": "timestamp"
         },
         {
-          "alias": "$ci_run_date2: VM CPU",
+          "alias": "$ocp_version2: VM CPU",
           "bucketAggs": [
             {
               "field": "timestamp",
@@ -3487,12 +3487,12 @@
               "type": "max"
             }
           ],
-          "query": "kind:'vm' AND ci_run_date=$ci_run_date2",
+          "query": "kind:'vm' AND ocp_version=$ocp_version2",
           "refId": "C",
           "timeField": "timestamp"
         },
         {
-          "alias": "$ci_run_date2: POD CPU",
+          "alias": "$ocp_version2: POD CPU",
           "bucketAggs": [
             {
               "field": "timestamp",
@@ -3515,12 +3515,12 @@
               "type": "max"
             }
           ],
-          "query": "kind:'pod' AND ci_run_date=$ci_run_date2",
+          "query": "kind:'pod' AND ocp_version=$ocp_version2",
           "refId": "D",
           "timeField": "timestamp"
         },
         {
-          "alias": "$ci_run_date3: VM CPU",
+          "alias": "$ocp_version3: VM CPU",
           "bucketAggs": [
             {
               "field": "timestamp",
@@ -3543,12 +3543,12 @@
               "type": "max"
             }
           ],
-          "query": "kind:'vm' AND ci_run_date=$ci_run_date3",
+          "query": "kind:'vm' AND ocp_version=$ocp_version3",
           "refId": "E",
           "timeField": "timestamp"
         },
         {
-          "alias": "$ci_run_date3: POD CPU",
+          "alias": "$ocp_version3: POD CPU",
           "bucketAggs": [
             {
               "field": "timestamp",
@@ -3571,7 +3571,7 @@
               "type": "max"
             }
           ],
-          "query": "kind:'pod' AND ci_run_date=$ci_run_date3",
+          "query": "kind:'pod' AND ocp_version=$ocp_version3",
           "refId": "F",
           "timeField": "timestamp"
         }
@@ -3663,7 +3663,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "alias": "$ci_run_date1: VM Memcpy ",
+          "alias": "$ocp_version1: VM Memcpy ",
           "bucketAggs": [
             {
               "field": "timestamp",
@@ -3685,12 +3685,12 @@
               "type": "max"
             }
           ],
-          "query": "kind:'vm' AND ci_run_date=$ci_run_date1",
+          "query": "kind:'vm' AND ocp_version=$ocp_version1",
           "refId": "A",
           "timeField": "timestamp"
         },
         {
-          "alias": "$ci_run_date1: POD Memcpy",
+          "alias": "$ocp_version1: POD Memcpy",
           "bucketAggs": [
             {
               "field": "timestamp",
@@ -3713,12 +3713,12 @@
               "type": "max"
             }
           ],
-          "query": "kind:'pod' AND ci_run_date=$ci_run_date1",
+          "query": "kind:'pod' AND ocp_version=$ocp_version1",
           "refId": "B",
           "timeField": "timestamp"
         },
         {
-          "alias": "$ci_run_date2: VM Memcpy",
+          "alias": "$ocp_version2: VM Memcpy",
           "bucketAggs": [
             {
               "field": "timestamp",
@@ -3741,12 +3741,12 @@
               "type": "max"
             }
           ],
-          "query": "kind:'vm' AND ci_run_date=$ci_run_date2",
+          "query": "kind:'vm' AND ocp_version=$ocp_version2",
           "refId": "C",
           "timeField": "timestamp"
         },
         {
-          "alias": "$ci_run_date2: POD Memcpy",
+          "alias": "$ocp_version2: POD Memcpy",
           "bucketAggs": [
             {
               "field": "timestamp",
@@ -3769,12 +3769,12 @@
               "type": "max"
             }
           ],
-          "query": "kind:'pod' AND ci_run_date=$ci_run_date2",
+          "query": "kind:'pod' AND ocp_version=$ocp_version2",
           "refId": "D",
           "timeField": "timestamp"
         },
         {
-          "alias": "$ci_run_date3: VM Memcpy",
+          "alias": "$ocp_version3: VM Memcpy",
           "bucketAggs": [
             {
               "field": "timestamp",
@@ -3797,12 +3797,12 @@
               "type": "max"
             }
           ],
-          "query": "kind:'vm' AND ci_run_date=$ci_run_date3",
+          "query": "kind:'vm' AND ocp_version=$ocp_version3",
           "refId": "E",
           "timeField": "timestamp"
         },
         {
-          "alias": "$ci_run_date3: POD Memcpy",
+          "alias": "$ocp_version3: POD Memcpy",
           "bucketAggs": [
             {
               "field": "timestamp",
@@ -3825,7 +3825,7 @@
               "type": "max"
             }
           ],
-          "query": "kind:'pod' AND ci_run_date=$ci_run_date3",
+          "query": "kind:'pod' AND ocp_version=$ocp_version3",
           "refId": "F",
           "timeField": "timestamp"
         }
@@ -3917,7 +3917,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "alias": "$ci_run_date1: VM VM ",
+          "alias": "$ocp_version1: VM VM ",
           "bucketAggs": [
             {
               "field": "timestamp",
@@ -3939,12 +3939,12 @@
               "type": "max"
             }
           ],
-          "query": "kind:'vm' AND ci_run_date=$ci_run_date1",
+          "query": "kind:'vm' AND ocp_version=$ocp_version1",
           "refId": "A",
           "timeField": "timestamp"
         },
         {
-          "alias": "$ci_run_date1: POD VM",
+          "alias": "$ocp_version1: POD VM",
           "bucketAggs": [
             {
               "field": "timestamp",
@@ -3967,12 +3967,12 @@
               "type": "max"
             }
           ],
-          "query": "kind:'pod' AND ci_run_date=$ci_run_date1",
+          "query": "kind:'pod' AND ocp_version=$ocp_version1",
           "refId": "B",
           "timeField": "timestamp"
         },
         {
-          "alias": "$ci_run_date2: VM VM",
+          "alias": "$ocp_version2: VM VM",
           "bucketAggs": [
             {
               "field": "timestamp",
@@ -3995,12 +3995,12 @@
               "type": "max"
             }
           ],
-          "query": "kind:'vm' AND ci_run_date=$ci_run_date2",
+          "query": "kind:'vm' AND ocp_version=$ocp_version2",
           "refId": "C",
           "timeField": "timestamp"
         },
         {
-          "alias": "$ci_run_date2: POD VM",
+          "alias": "$ocp_version2: POD VM",
           "bucketAggs": [
             {
               "field": "timestamp",
@@ -4023,12 +4023,12 @@
               "type": "max"
             }
           ],
-          "query": "kind:'pod' AND ci_run_date=$ci_run_date2",
+          "query": "kind:'pod' AND ocp_version=$ocp_version2",
           "refId": "D",
           "timeField": "timestamp"
         },
         {
-          "alias": "$ci_run_date3: VM VM",
+          "alias": "$ocp_version3: VM VM",
           "bucketAggs": [
             {
               "field": "timestamp",
@@ -4051,12 +4051,12 @@
               "type": "max"
             }
           ],
-          "query": "kind:'vm' AND ci_run_date=$ci_run_date3",
+          "query": "kind:'vm' AND ocp_version=$ocp_version3",
           "refId": "E",
           "timeField": "timestamp"
         },
         {
-          "alias": "$ci_run_date3: POD VM",
+          "alias": "$ocp_version3: POD VM",
           "bucketAggs": [
             {
               "field": "timestamp",
@@ -4079,7 +4079,7 @@
               "type": "max"
             }
           ],
-          "query": "kind:'pod' AND ci_run_date=$ci_run_date3",
+          "query": "kind:'pod' AND ocp_version=$ocp_version3",
           "refId": "F",
           "timeField": "timestamp"
         }
@@ -4159,33 +4159,6 @@
         "allValue": null,
         "current": {
           "selected": false,
-          "text": "2021_10_15",
-          "value": "2021_10_15"
-        },
-        "datasource": "Elasticsearch-hammerdb-results",
-        "definition": "{\"find\":\"terms\",\"field\":\"ci_date.keyword\"}",
-        "description": null,
-        "error": null,
-        "hide": 0,
-        "includeAll": false,
-        "label": "ci_run_date1",
-        "multi": false,
-        "name": "ci_run_date1",
-        "options": [],
-        "query": "{\"find\":\"terms\",\"field\":\"ci_date.keyword\"}",
-        "refresh": 2,
-        "regex": "",
-        "skipUrlSync": false,
-        "sort": 0,
-        "tagValuesQuery": "",
-        "tagsQuery": "",
-        "type": "query",
-        "useTags": false
-      },
-      {
-        "allValue": null,
-        "current": {
-          "selected": false,
           "text": "2021_10_17",
           "value": "2021_10_17"
         },
@@ -4195,9 +4168,9 @@
         "error": null,
         "hide": 0,
         "includeAll": false,
-        "label": "ci_run_date2",
+        "label": "ocp_version1",
         "multi": false,
-        "name": "ci_run_date2",
+        "name": "ocp_version1",
         "options": [],
         "query": "{\"find\":\"terms\",\"field\":\"ci_date.keyword\"}",
         "refresh": 2,
@@ -4213,8 +4186,8 @@
         "allValue": null,
         "current": {
           "selected": false,
-          "text": "2021_10_20",
-          "value": "2021_10_20"
+          "text": "2021_10_18",
+          "value": "2021_10_18"
         },
         "datasource": "Elasticsearch-hammerdb-results",
         "definition": "{\"find\":\"terms\",\"field\":\"ci_date.keyword\"}",
@@ -4222,9 +4195,36 @@
         "error": null,
         "hide": 0,
         "includeAll": false,
-        "label": "ci_run_date3",
+        "label": "ocp_version2",
         "multi": false,
-        "name": "ci_run_date3",
+        "name": "ocp_version2",
+        "options": [],
+        "query": "{\"find\":\"terms\",\"field\":\"ci_date.keyword\"}",
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "tagValuesQuery": "",
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "allValue": null,
+        "current": {
+          "selected": false,
+          "text": "2021_10_19",
+          "value": "2021_10_19"
+        },
+        "datasource": "Elasticsearch-hammerdb-results",
+        "definition": "{\"find\":\"terms\",\"field\":\"ci_date.keyword\"}",
+        "description": null,
+        "error": null,
+        "hide": 0,
+        "includeAll": false,
+        "label": "ocp_version3",
+        "multi": false,
+        "name": "ocp_version3",
         "options": [],
         "query": "{\"find\":\"terms\",\"field\":\"ci_date.keyword\"}",
         "refresh": 2,
@@ -4244,7 +4244,7 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "benchmark-runner-compare-3-ci-dates-report",
-  "uid": "Cf4r_2O7a",
+  "title": "benchmark-runner-report-compare-3-ocp-versions",
+  "uid": "Cf4r_2O7z",
   "version": 1
 }

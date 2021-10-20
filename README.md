@@ -86,7 +86,9 @@ There are 3 grafana dashboards templates:
 ![](media/benchmark-runner-report.png)
 3. [benchmark-runner-compare-3-ci-dates-report.json](grafana/benchmark-runner-compare-3-ci-dates-report.json)
 ![](media/benchmark-runner-compare-3-ci-dates-report.png)
-4. [system-metrics-report.json](grafana/system-metrics-report.json)
+4. [benchmark-runner-compare-3-ocp-versions-report.json](grafana/benchmark-runner-compare-3-ocp-versions-report.json)
+![](media/benchmark-runner-compare-3-ocp-versions-report.png)
+5. [system-metrics-report.json](grafana/system-metrics-report.json)
 ![](media/system-metrics-report.png)
 
 ** After importing json in grafana, need to configure elasticsearch data source. (for more details: see [HOW_TO.md](HOW_TO.md))
