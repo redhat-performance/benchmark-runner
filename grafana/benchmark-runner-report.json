@@ -21,8 +21,8 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 7,
-  "iteration": 1634640762315,
+  "id": 9,
+  "iteration": 1634752969612,
   "links": [],
   "panels": [
     {
@@ -2868,7 +2868,7 @@
           "label": "",
           "logBase": 1,
           "max": null,
-          "min": null,
+          "min": "0",
           "show": true
         },
         {
@@ -3234,7 +3234,7 @@
           "label": "",
           "logBase": 1,
           "max": null,
-          "min": null,
+          "min": "0",
           "show": true
         },
         {
@@ -4370,8 +4370,8 @@
         "allValue": null,
         "current": {
           "selected": false,
-          "text": "2021_10_19",
-          "value": "2021_10_19"
+          "text": "2021_10_20",
+          "value": "2021_10_20"
         },
         "datasource": "Elasticsearch-hammerdb-results",
         "definition": "{\"find\":\"terms\",\"field\":\"ci_date.keyword\"}",
@@ -4397,8 +4397,8 @@
         "allValue": null,
         "current": {
           "selected": false,
-          "text": "1a9a3d88-c91a-5610-8bd7-3fead8fe6f05",
-          "value": "1a9a3d88-c91a-5610-8bd7-3fead8fe6f05"
+          "text": "0e1e946f-4173-5e52-87bf-6de1d8688d4d",
+          "value": "0e1e946f-4173-5e52-87bf-6de1d8688d4d"
         },
         "datasource": "Elasticsearch-hammerdb-results",
         "definition": "{\"find\":\"terms\",\"field\":\"uuid.keyword\"}",
