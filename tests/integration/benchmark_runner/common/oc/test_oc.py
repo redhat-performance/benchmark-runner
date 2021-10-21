@@ -90,6 +90,7 @@ def test_oc_get_pod_name_and_is_pod_exist():
     This method test get_pod_name and is_pod_exist
     :return:
     """
+    dsd
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
     assert oc._get_pod_name(pod_name='benchmark-controller-manager', namespace=test_environment_variable['namespace'])
