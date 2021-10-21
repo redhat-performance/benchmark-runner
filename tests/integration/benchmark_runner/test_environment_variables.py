@@ -7,15 +7,10 @@ def __get_test_environment_variable():
     This method generate environment variable for test
     """
     test_environment_variable = {}
-    # hard coded parameters
-    test_environment_variable['namespace'] = os.environ.get('NAMESPACE', 'benchmark-operator')
-    # run Hammerdb workload with ocs pvc
-    test_environment_variable['ocs_pvc'] = os.environ.get('OCS_PVC', 'True')
-    test_environment_variable['system_metrics'] = os.environ.get('SYSTEM_METRICS', 'True')
 
-    test_environment_variable['runner_path'] = os.environ.get('RUNNER_PATH', '/')
     ##################################################################################################
     # dynamic parameters - configure for local run
+    test_environment_variable['runner_path'] = os.environ.get('RUNNER_PATH', '/')
     test_environment_variable['kubeadmin_password'] = os.environ.get('KUBEADMIN_PASSWORD', '')
     # Node Selector
     test_environment_variable['pin_node1'] = os.environ.get('PIN_NODE1', '')
@@ -23,6 +18,16 @@ def __get_test_environment_variable():
     test_environment_variable['elasticsearch'] = os.environ.get('ELASTICSEARCH', '')
     test_environment_variable['elasticsearch_port'] = os.environ.get('ELASTICSEARCH_PORT', '')
 
+    # end dynamic parameters - configure for local run
+    ##################################################################################################
+
+    # ** DO NOT CHANGE THE PARAMETERS BELOW **
+    # Constant parameters
+
+    test_environment_variable['namespace'] = os.environ.get('NAMESPACE', 'benchmark-operator')
+    # run Hammerdb workload with ocs pvc
+    test_environment_variable['ocs_pvc'] = os.environ.get('OCS_PVC', 'True')
+    test_environment_variable['system_metrics'] = os.environ.get('SYSTEM_METRICS', 'True')
     # Azure details
     test_environment_variable['azure_cluster_stop'] = os.environ.get('AZURE_CLUSTER_STOP', '')
     test_environment_variable['azure_cluster_start'] = os.environ.get('AZURE_CLUSTER_START', '')
@@ -32,9 +37,6 @@ def __get_test_environment_variable():
     test_environment_variable['azure_subscriptionid'] = os.environ.get('AZURE_SUBSCRIPTIONID', '')
     test_environment_variable['azure_resource_group_name'] = os.environ.get('AZURE_RESOURCE_GROUP_NAME', '')
     test_environment_variable['azure_vm_name'] = os.environ.get('AZURE_VM_NAME', '')
-
-    # end dynamic parameters - configure for local run
-    ##################################################################################################
 
     # update node_selector
     if test_environment_variable['pin_node1']:
