@@ -10,7 +10,6 @@ class EnvironmentVariables:
 
         self._environment_variables_dict = {}
 
-        # Constant parameters
         ##################################################################################################
         # dynamic parameters - configure for local run
         # parameters for running workload
@@ -52,6 +51,7 @@ class EnvironmentVariables:
         ##################################################################################################
 
         # ** DO NOT CHANGE THE PARAMETERS BELOW **
+        # Constant parameters
 
         # Parameters below related to 'azure_cluster_start_stop()'
         # Azure details
