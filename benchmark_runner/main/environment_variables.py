@@ -86,7 +86,7 @@ class EnvironmentVariables:
 
         # Parameters below related to 'install_ocp()' and 'install_resource()'
         # Mandatory: OCP environment flavor PERF or FUNC
-        self._environment_variables_dict['ocp_env_flavor'] = os.environ.get('OCP_ENV_FLAVOR', '')
+        self._environment_variables_dict['ocp_env_flavor'] = os.environ.get('OCP_ENV_FLAVOR', 'FUNC')
         # IBM details
         self._environment_variables_dict['ibm_api_key'] = os.environ.get('IBM_API_KEY', '')
         # github token
