@@ -9,6 +9,7 @@ from benchmark_runner.common.elasticsearch.elasticsearch_exceptions import Elast
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 from benchmark_runner.main.environment_variables import environment_variables
 
+
 class ESOperations:
     """
     This class contains elastic search operations
