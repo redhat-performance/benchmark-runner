@@ -31,7 +31,7 @@ class ESOperations:
             self.__es = Elasticsearch([{'host': self.__es_host}])
         self._hits = 0
         self.__environment_variables_dict = environment_variables.environment_variables_dict
-        self.__timeout = environment_variables.environment_variables_dict['timeout']
+        self.__timeout = int(environment_variables.environment_variables_dict['timeout'])
 
     @property
     def hits(self):
