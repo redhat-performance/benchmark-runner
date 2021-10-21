@@ -2,6 +2,7 @@ shared_data:
   namespace: {{ namespace }}
   db_num_workers: 24
   db_warehouses: 100
+  storage: 100
   pin: {{ pin }}
   pin_node: {{ pin_node1 }}
   transactions: 100000
