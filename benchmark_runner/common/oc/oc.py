@@ -235,8 +235,7 @@ class OC(SSH):
     @typechecked
     @logger_time_stamp
     def wait_for_pod_create(self, pod_name: str,
-                            namespace: str = environment_variables.environment_variables_dict['namespace'],
-                            timeout: int = self.__timeout, sleep_time: int = SLEEP_TIME):
+                            namespace: str = environment_variables.environment_variables_dict['namespace'], sleep_time: int = SLEEP_TIME):
         """
         This method is wait till pod name is creating or throw exception after timeout
         :param namespace:
@@ -246,7 +245,7 @@ class OC(SSH):
         :return: True if getting pod name or raise PodNameError
         """
         current_wait_time = 0
-        while current_wait_time <= timeout:
+        while current_wait_time <= self.__timeout:
             if self._is_pod_exist(pod_name=pod_name, namespace=namespace):
                 return True
             # sleep for x seconds
@@ -257,8 +256,7 @@ class OC(SSH):
     @typechecked
     @logger_time_stamp
     def wait_for_vm_create(self, vm_name: str,
-                           namespace: str = environment_variables.environment_variables_dict['namespace'],
-                           timeout: int = self.__timeout, sleep_time: int = SLEEP_TIME):
+                           namespace: str = environment_variables.environment_variables_dict['namespace'], sleep_time: int = SLEEP_TIME):
         """
         This method is wait till vm name is creating or throw exception after timeout
         :param vm_name:
@@ -268,7 +266,7 @@ class OC(SSH):
         :return: True if getting pod name or raise PodNameError
         """
         current_wait_time = 0
-        while current_wait_time <= timeout:
+        while current_wait_time <= self.__timeout:
             if self._is_vmi_exist(vm_name=vm_name, namespace=namespace):
                 return True
             # sleep for x seconds
@@ -279,8 +277,7 @@ class OC(SSH):
     @typechecked
     @logger_time_stamp
     def wait_for_pod_terminate(self, pod_name: str,
-                               namespace: str = environment_variables.environment_variables_dict['namespace'],
-                               timeout: int = self.__timeout, sleep_time: int = SLEEP_TIME):
+                               namespace: str = environment_variables.environment_variables_dict['namespace'], sleep_time: int = SLEEP_TIME):
         """
         This method is wait till pod name is terminating or throw exception after timeout
         :param namespace:
@@ -290,7 +287,7 @@ class OC(SSH):
         :return: True if pod name terminated or raise
         """
         current_wait_time = 0
-        while current_wait_time <= timeout:
+        while current_wait_time <= self.__timeout:
             if not self._is_pod_exist(pod_name=pod_name, namespace=namespace):
                 return True
             # sleep for x seconds
@@ -301,8 +298,7 @@ class OC(SSH):
     @typechecked
     @logger_time_stamp
     def wait_for_vm_terminate(self, vm_name: str,
-                              namespace: str = environment_variables.environment_variables_dict['namespace'],
-                              timeout: int = self.__timeout, sleep_time: int = SLEEP_TIME):
+                              namespace: str = environment_variables.environment_variables_dict['namespace'], sleep_time: int = SLEEP_TIME):
         """
         This method is wait till vm name is terminating or throw exception after timeout
         :param vm_name:
@@ -312,7 +308,7 @@ class OC(SSH):
         :return: True if pod name terminated or raise
         """
         current_wait_time = 0
-        while current_wait_time <= timeout:
+        while current_wait_time <= self.__timeout:
             if not self._is_vmi_exist(vm_name=vm_name, namespace=namespace):
                 return True
             # sleep for x seconds
@@ -323,8 +319,7 @@ class OC(SSH):
     @typechecked
     @logger_time_stamp
     def create_pod_sync(self, yaml: str, pod_name: str,
-                        namespace: str = environment_variables.environment_variables_dict['namespace'],
-                        timeout: int = self.__timeout):
+                        namespace: str = environment_variables.environment_variables_dict['namespace']):
         """
         This method create pod yaml in async
         :param namespace:
@@ -334,11 +329,11 @@ class OC(SSH):
         :return:
         """
         self._create_async(yaml)
-        return self.wait_for_pod_create(pod_name=pod_name, namespace=namespace, timeout=timeout)
+        return self.wait_for_pod_create(pod_name=pod_name, namespace=namespace, timeout=self.__timeout)
 
     @typechecked
     @logger_time_stamp
-    def create_vm_sync(self, yaml: str, vm_name: str, timeout: int = self.__timeout):
+    def create_vm_sync(self, yaml: str, vm_name: str):
         """
         This method create vm yaml in async
         :param timeout:
@@ -347,13 +342,12 @@ class OC(SSH):
         :return:
         """
         self._create_async(yaml)
-        return self.wait_for_vm_create(vm_name=vm_name, timeout=timeout)
+        return self.wait_for_vm_create(vm_name=vm_name, timeout=self.__timeout)
 
     @typechecked
     @logger_time_stamp
     def delete_pod_sync(self, yaml: str, pod_name: str,
-                        namespace: str = environment_variables.environment_variables_dict['namespace'],
-                        timeout: int = self.__timeout):
+                        namespace: str = environment_variables.environment_variables_dict['namespace']):
         """
         This method delete pod yaml in async, only if exist and return false if not exist
         :param namespace:
@@ -364,15 +358,14 @@ class OC(SSH):
         """
         if self._is_pod_exist(pod_name, namespace):
             self._delete_async(yaml)
-            return self.wait_for_pod_terminate(pod_name=pod_name, namespace=namespace, timeout=timeout)
+            return self.wait_for_pod_terminate(pod_name=pod_name, namespace=namespace, timeout=self.__timeout)
         else:
             return False
 
     @typechecked
     @logger_time_stamp
     def delete_vm_sync(self, yaml: str, vm_name: str,
-                       namespace: str = environment_variables.environment_variables_dict['namespace'],
-                       timeout: int = self.__timeout):
+                       namespace: str = environment_variables.environment_variables_dict['namespace']):
         """
         This method delete vm yaml in async, only if exist and return false if not exist
         :param namespace:
@@ -383,7 +376,7 @@ class OC(SSH):
         """
         if self._is_vmi_exist(vm_name=vm_name, namespace=namespace):
             self._delete_async(yaml)
-            return self.wait_for_vm_terminate(vm_name=vm_name, namespace=namespace, timeout=timeout)
+            return self.wait_for_vm_terminate(vm_name=vm_name, namespace=namespace, timeout=self.__timeout)
         else:
             return False
 
@@ -454,8 +447,7 @@ class OC(SSH):
     @typechecked
     @logger_time_stamp
     def wait_for_pod_completed(self, label: str, workload: str = '',
-                               namespace: str = environment_variables.environment_variables_dict['namespace'],
-                               timeout: int = self.__timeout):
+                               namespace: str = environment_variables.environment_variables_dict['namespace']):
         """
         This method wait to pod to be completed
         :param workload:
@@ -466,7 +458,7 @@ class OC(SSH):
         """
         try:
             result = self.run(
-                f"oc --namespace {namespace} wait --for=condition=complete -l {label}-{self.__get_short_uuid(workload=workload)} jobs --timeout={timeout}s")
+                f"oc --namespace {namespace} wait --for=condition=complete -l {label}-{self.__get_short_uuid(workload=workload)} jobs --timeout={self.__timeout}s")
             if 'met' in result:
                 return True
         except Exception as err:
@@ -474,8 +466,7 @@ class OC(SSH):
 
     @logger_time_stamp
     def wait_for_vm_completed(self, workload: str = '',
-                              namespace: str = environment_variables.environment_variables_dict['namespace'],
-                              timeout: int = self.__timeout, sleep_time: int = SLEEP_TIME):
+                              namespace: str = environment_variables.environment_variables_dict['namespace'], sleep_time: int = SLEEP_TIME):
         """
         This method wait to pod to be completed
         :param workload:
@@ -483,7 +474,7 @@ class OC(SSH):
         :return:
         """
         current_wait_time = 0
-        while current_wait_time <= timeout:
+        while current_wait_time <= self.__timeout:
             if self.run(
                     f"oc --namespace {namespace} get benchmark {workload} -o jsonpath={{.status.complete}}") == 'true':
                 return True
@@ -506,8 +497,7 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def wait_for_ocp_resource_create(self, resource: str, verify_cmd: str, status: str = '', count_local_storage: bool = False, count_openshift_storage: bool = False, kata_worker_machine_count: bool = False, timeout: int = self.__timeout,
-                                     sleep_time: int = SLEEP_TIME):
+    def wait_for_ocp_resource_create(self, resource: str, verify_cmd: str, status: str = '', count_local_storage: bool = False, count_openshift_storage: bool = False, kata_worker_machine_count: bool = False, sleep_time: int = SLEEP_TIME):
         """
         This method is wait till operator is created or throw exception after timeout
         :param resource: The resource cnv, local storage, ocs, kata
@@ -519,7 +509,7 @@ class OC(SSH):
         :return: True if met the result
         """
         current_wait_time = 0
-        while current_wait_time <= timeout:
+        while current_wait_time <= self.__timeout:
             # Count openshift-storage/ pv
             if count_openshift_storage:
                 if int(self.run(verify_cmd)) == self.__get_num_active_nodes() * int(environment_variables.environment_variables_dict['num_ocs_disk']):
