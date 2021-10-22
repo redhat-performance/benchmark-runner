@@ -46,8 +46,8 @@ spec:
               cpu: 10m
               memory: 10Mi
             limits:
-              cpu: 4
-              memory: 16Gi
+              cpu: {{ limits_cpu }}
+              memory: {{ limits_memory_GB }}Gi
           env:
             - name: POSTGRESQL_USER
               value: "test"

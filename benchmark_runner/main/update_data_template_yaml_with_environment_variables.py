@@ -18,6 +18,7 @@ def update_environment_variable(dir_path: str, yaml_file: str, environment_varia
     oc = OC(kubeadmin_password=environment_variable_dict.get('kubeadmin_password', ''))
     # set prom token
     environment_variable_dict['prom_token'] = oc.get_prom_token()
+    # Jinja render yaml file
     with open(os.path.join(dir_path, yaml_file)) as f:
         template_str = f.read()
     tm = Template(template_str)
