@@ -29,6 +29,7 @@ jobs:
         pip install bumpversion
         git config --global user.email ${{ secrets.EMAIL }}
         git config --global user.name  ${{ secrets.USER_NAME }}
+        git config pull.rebase false
         bumpversion patch
         echo "bumpversion patch"
         # GITHUB_REPOSITORY already taken => GIT_REPOSITORY
