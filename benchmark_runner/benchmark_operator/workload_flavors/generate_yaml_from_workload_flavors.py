@@ -44,12 +44,6 @@ class TemplateOperations:
         """
         # replace environment variables and generate hammerdb_data.yaml
         update_environment_variable(dir_path=self.__hammerdb_dir_path, yaml_file='hammerdb_data_template.yaml')
-        # handle database pod yaml
-        if 'pod' in workload:
-            # replace environment variables
-            update_environment_variable(dir_path=self.__hammerdb__internal_dir_path, yaml_file=f'{database}_{self.__storage_type}_template.yaml')
-            shutil.move(os.path.join(self.__hammerdb__internal_dir_path, f'{database}_{self.__storage_type}.yaml'), os.path.join(self.__current_run_path, f'{database}.yaml'))
-            delete_generate_file(full_path_yaml=os.path.join(self.__hammerdb__internal_dir_path, f'{database}.yaml'))
         # Get hammerdb data
         with open(os.path.join(self.__hammerdb_dir_path, 'hammerdb_data.yaml'), 'r') as file:
             hammerdb_data = yaml.load(file, Loader=yaml.FullLoader)
@@ -58,6 +52,7 @@ class TemplateOperations:
         shared_data_vm = hammerdb_data['vm']
         database_data = hammerdb_data[database]
 
+        # Jinja render hammerdb yaml
         hammerdb_template = self.__get_yaml_template_by_workload(workload=workload)
         with open(os.path.join(self.__hammerdb_dir_path, 'internal_data', f'{hammerdb_template}.yaml')) as f:
             template_str = f.read()
@@ -74,6 +69,18 @@ class TemplateOperations:
         hammerdb_name = hammerdb_template.replace('template', '')
         with open(os.path.join(f'{self.__current_run_path}', f'{hammerdb_name}{database}.yaml'), 'w') as f:
             f.write(data)
+
+        # Jinja render database pod yaml
+        if 'pod' in workload:
+            # replace parameter from hammerdb_data
+            database_name = f'{database}_{self.__storage_type}_template.yaml'
+            with open(os.path.join(self.__hammerdb__internal_dir_path, database_name)) as f:
+                database_template_str = f.read()
+            database_tm = Template(database_template_str)
+            database_data = database_tm.render(render_data)
+            with open(os.path.join(f'{self.__current_run_path}', f'{database}.yaml'), 'w') as f:
+                f.write(database_data)
+
         # delete the generate data file with environment variable
         delete_generate_file(os.path.join(self.__hammerdb_dir_path, 'hammerdb_data.yaml'))
         # removing current_run yaml folder is occurred at the end of run: BenchmarkOperatorWorkloads__remove_run_workload_yaml_file

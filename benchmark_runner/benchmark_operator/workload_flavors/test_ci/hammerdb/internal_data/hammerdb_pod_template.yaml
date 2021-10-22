@@ -20,7 +20,7 @@ spec:
     name: hammerdb
     args:
       pin: {{ pin }} # enable for nodeSelector
-      pin_node: "{{ pin_node }}"
+      pin_node: "{{ pin_node1 }}"
       resources: {{ resources }} # enable for resources requests/limits
       requests_cpu: 10m
       requests_memory: 10Mi

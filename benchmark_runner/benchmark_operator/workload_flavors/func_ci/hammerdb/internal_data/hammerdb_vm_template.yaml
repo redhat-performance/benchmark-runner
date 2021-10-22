@@ -20,7 +20,7 @@ spec:
     name: hammerdb
     args:
       pin: {{ pin }} # enable for nodeSelector
-      pin_node: "{{ pin_node }}"
+      pin_node: "{{ pin_node1 }}"
       db_type: "{{ db_type }}"
       timed_test: true
       test_type: "tpc-c"
@@ -97,8 +97,8 @@ spec:
         pvc_pvcaccessmode: ReadWriteMany
         # Can be one of Filesystem,Block Default: Filesystem
         pvc_pvcvolumemode: Block
-        pvc_storagesize: 10Gi
+        pvc_storagesize: {{ storage }}Gi
         # HostPath - Configuring SELinux on cluster workers
         hostpath: false # enable for hostpath
         hostpath_path: /var/tmp/disk.img
-        hostpath_storagesize: 10Gi
+        hostpath_storagesize: {{ storage }}Gi

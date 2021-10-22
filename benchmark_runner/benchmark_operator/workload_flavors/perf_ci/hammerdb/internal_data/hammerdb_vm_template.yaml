@@ -20,7 +20,7 @@ spec:
     name: hammerdb
     args:
       pin: {{ pin }} # enable for nodeSelector
-      pin_node: "{{ pin_node }}"
+      pin_node: "{{ pin_node1 }}"
       db_type: "{{ db_type }}"
       timed_test: true
       test_type: "tpc-c"
