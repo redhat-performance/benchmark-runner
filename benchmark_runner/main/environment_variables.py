@@ -108,9 +108,9 @@ class EnvironmentVariables:
         self._environment_variables_dict['provision_installer_path'] = os.environ.get(f'{self.__ocp_env_flavor}_PROVISION_INSTALLER_PATH', '')
         self._environment_variables_dict['provision_installer_cmd'] = os.environ.get(f'{self.__ocp_env_flavor}_PROVISION_INSTALLER_CMD', '')
         # remote ssh timeout - 3 hours for installation time
-        self._environment_variables_dict['provision_timeout'] = os.environ.get(f'{self.__ocp_env_flavor}_PROVISION_TIMEOUT', '')
-        # General timeout - wait for pod/vm/upload data to elasticsearch
-        self._environment_variables_dict['timeout'] = os.environ.get(f'{self.__ocp_env_flavor}_TIMEOUT', '5000')
+        self._environment_variables_dict['provision_timeout'] = os.environ.get(f'{self.__ocp_env_flavor}_PROVISION_TIMEOUT', '10800')
+        # General timeout - 1.5 hours wait for pod/vm/upload data to elasticsearch
+        self._environment_variables_dict['timeout'] = os.environ.get(f'{self.__ocp_env_flavor}_TIMEOUT', '5400')
 
         # Parameters below related to 'update_ci_status()'
         # CI run time

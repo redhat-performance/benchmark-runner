@@ -1,7 +1,7 @@
 shared_data:
   namespace: {{ namespace }}
-  db_num_workers: 24
-  db_warehouses: 100
+  db_num_workers: 32
+  db_warehouses: 128
   storage: 100
   pin: {{ pin }}
   pin_node1: {{ pin_node1 }}
