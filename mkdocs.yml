@@ -1,0 +1,21 @@
+docs_dir: docs/
+repo_url: https://github.com/redhat-performance/benchmark-runner
+nav:
+- Home: index.md
+- From scratch:
+  - CLI: cli.md
+  - HOWTO: HOW_TO.md
+- Development:
+  - Contributing: contributing.md
+  - Authors: authors.md
+site_name: /benchmark-runner
+markdown_extensions:
+- toc:
+    permalink: "#"
+theme:
+  name: readthedocs
+  highlightjs: true
+  navigation_depth: 4
+  hljs_languages:
+  - yaml
+  - python
