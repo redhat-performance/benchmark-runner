@@ -302,7 +302,6 @@ class BenchmarkOperatorWorkloads:
 #***********************************************************************************************
 
     @logger_time_stamp
-    @retry(stop=stop_after_attempt(3))
     def stressng_pod(self):
         """
         This method run stressng workload
@@ -341,7 +340,6 @@ class BenchmarkOperatorWorkloads:
             raise err
 
     @logger_time_stamp
-    @retry(stop=stop_after_attempt(3))
     def stressng_vm(self):
         """
         This method run stressng vm workload
@@ -380,7 +378,6 @@ class BenchmarkOperatorWorkloads:
             raise err
 
     @logger_time_stamp
-    @retry(stop=stop_after_attempt(3))
     def uperf_pod(self):
         """
         This method run uperf workload
@@ -433,7 +430,6 @@ class BenchmarkOperatorWorkloads:
             raise err
 
     @logger_time_stamp
-    @retry(stop=stop_after_attempt(3))
     def uperf_vm(self):
         """
         This method run uperf vm workload
@@ -476,7 +472,6 @@ class BenchmarkOperatorWorkloads:
 
     @typechecked
     @logger_time_stamp
-    @retry(stop=stop_after_attempt(3))
     def hammerdb_pod(self, database: str):
         """
         This method run hammerdb pod workload
@@ -541,7 +536,6 @@ class BenchmarkOperatorWorkloads:
 
     @typechecked
     @logger_time_stamp
-    @retry(stop=stop_after_attempt(3))
     def hammerdb_vm(self, database: str):
         """
         This method run hammerdb vm workload
@@ -612,6 +606,7 @@ class BenchmarkOperatorWorkloads:
         self.__remove_run_workload_yaml_file(workload_full_name=workload_full_name)
 
     @logger_time_stamp
+    @retry(stop=stop_after_attempt(3))
     def run_workload(self, workload: str):
         """
         This method run the input workload
