@@ -66,7 +66,8 @@ def main():
         ibm_operations = IBMOperations(user=environment_variables_dict.get('provision_user', ''))
         ibm_operations.ibm_connect()
         ibm_operations.update_ocp_version()
-        if ibm_operations.run_ibm_ocp_ipi_installer():
+        result = ibm_operations.run_ibm_ocp_ipi_installer()
+        if result:
             logger.info(f'Installed OCP latest-{install_ocp_version} successfully')
             logger.info(f'Update GitHub OCP credentials')
             ibm_operations.update_ocp_github_credentials()
