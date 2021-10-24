@@ -23,7 +23,7 @@ Reference:
 * The benchmark-runner container image is located in [Quay.io](https://quay.io/repository/ebattat/benchmark-runner)
 
 ## Documentation
-Documentation is available at [benchmark-runner.readthedocs.io](benchmark-runner.readthedocs.io)
+Documentation is available at [benchmark-runner.readthedocs.io](https://benchmark-runner.readthedocs.io/en/latest/)
 
 ![](media/docker1.png)
 
