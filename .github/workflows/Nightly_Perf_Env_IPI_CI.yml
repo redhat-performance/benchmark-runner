@@ -67,7 +67,7 @@ jobs:
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End OCP IPI Install   >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
 
           end=$(printf '%(%s)T' -1)
-          echo "OCP_INSTALL_MINUTES_TIME=$(($((end-start))/60))" >> "$GITHUB_ENV"
+          echo "OCP_INSTALL_MINUTES_TIME=$(( (( end - start )) / 60))" >> "$GITHUB_ENV"
       - id: ocp_install_time
         run: echo "::set-output name=install_time::$OCP_INSTALL_MINUTES_TIME"
       - name: ⚙ Set Kubeconfig after OCP installation
@@ -101,7 +101,7 @@ jobs:
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End OCP Resource Install   >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
 
           end=$(printf '%(%s)T' -1)
-          echo "INSTALL_OCP_RESOURCE_MINUTES_TIME=$(($((end-start))/60))" >> "$GITHUB_ENV"
+          echo "INSTALL_OCP_RESOURCE_MINUTES_TIME=$(( (( end - start )) / 60))" >> "$GITHUB_ENV"
       - id: ocp_install_resource_time
         run: echo "::set-output name=install_resource_time::$INSTALL_OCP_RESOURCE_MINUTES_TIME"
 
