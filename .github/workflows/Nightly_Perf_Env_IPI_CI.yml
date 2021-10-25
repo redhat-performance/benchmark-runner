@@ -4,7 +4,7 @@
 name: Deploy IPI Perf Env Nightly CI
 on:
   push:
-    branches: [ main ]   
+    branches: [ main ]    
 #on:
 #  schedule:
 #    - cron: '0 4 * * 0' # run on Sunday at 4 AM UTC/ 0 AM EST
