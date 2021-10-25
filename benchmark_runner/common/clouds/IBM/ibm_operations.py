@@ -1,5 +1,6 @@
 
-from datetime import time, datetime
+import time
+from datetime import datetime
 from typeguard import typechecked
 from tenacity import retry, stop_after_attempt
 import ast  # change string list to list

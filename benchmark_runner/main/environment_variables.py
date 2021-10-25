@@ -69,6 +69,8 @@ class EnvironmentVariables:
         self._environment_variables_dict['install_ocp_version'] = os.environ.get('INSTALL_OCP_VERSION', '')
         # dev or ga (/ocp-dev-preview/ or /ocp/ )
         self._environment_variables_dict['ocp_version_build'] = os.environ.get('OCP_VERSION_BUILD', '')
+        # github repository
+        self._environment_variables_dict['github_repository_short'] = os.environ.get('GITHUB_REPOSITORY_SHORT', '')
 
         # Parameters below related to 'install_resource()'
         # MANDATORY for OCP resource install: 'True' for install resources
@@ -79,8 +81,6 @@ class EnvironmentVariables:
         self._environment_variables_dict['ocs_version'] = os.environ.get('OCS_VERSION', '')
         # number of ocs disk
         self._environment_variables_dict['num_ocs_disk'] = os.environ.get('NUM_OCS_DISK', 1)
-        # github repository
-        self._environment_variables_dict['github_repository_short'] = os.environ.get('GITHUB_REPOSITORY_SHORT', '')
         # install resources list
         self._environment_variables_dict['install_resources_list'] = os.environ.get('INSTALL_RESOURCES_LIST', '')
 
