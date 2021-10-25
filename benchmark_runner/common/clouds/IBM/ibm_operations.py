@@ -4,6 +4,7 @@ from typeguard import typechecked
 from tenacity import retry, stop_after_attempt
 import ast  # change string list to list
 from enum import Enum
+import pathlib
 
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger, datetime_format
 from benchmark_runner.main.environment_variables import environment_variables
@@ -41,6 +42,7 @@ class IBMOperations:
         self.__provision_kubeadmin_password_path = self.__environment_variables_dict.get('provision_kubeadmin_password_path', '')
         self.__provision_kubeconfig_path = self.__environment_variables_dict.get('provision_kubeconfig_path', '')
         self.__provision_installer_path = self.__environment_variables_dict.get('provision_installer_path', '')
+        self.__installer_path = pathlib.Path(self.__provision_installer_path).parent.resolve()
         self.__provision_installer_cmd = self.__environment_variables_dict.get('provision_installer_cmd', '')
         self.__install_ocp_version = self.__environment_variables_dict.get('install_ocp_version', '')
         self.__ocp_version_build = self.__environment_variables_dict.get('ocp_version_build', '')
@@ -177,9 +179,11 @@ class IBMOperations:
         This method run ocp ipi installer with retry mechanism
         :return: True if installation success and raise exception if installation failed
         """
+        logger.info(f'IBM Login, Start time: {datetime.now().strftime(datetime_format)}')
+        result = self.__remote_ssh.run_command(self.__ibm_login_cmd())
         logger.info(f'Starting OCP IPI installer, Start time: {datetime.now().strftime(datetime_format)}')
-        result = self.__remote_ssh.run_command(
-           f'{self.__ibm_login_cmd()};{self.__ibm_ipi_install_ocp_cmd()};{self.__ibm_logout_cmd()}')
+        result = self.__remote_ssh.run_command(self.__ibm_ipi_install_ocp_cmd())
+        logger.info(f'Ending OCP IPI installer, Start time: {datetime.now().strftime(datetime_format)}')
         if 'failed=1' in result:
             # Workers issue: workaround for solving IBM workers stuck on BIOS page after reboot
             logger.info('Installation failed, checking worker nodes status')

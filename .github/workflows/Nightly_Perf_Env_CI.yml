@@ -49,8 +49,8 @@ jobs:
         declare -a repositories=('benchmark-operator' 'benchmark-wrapper')
         for repository in "${repositories[@]}"
         do
-            git clone https://github.com/cloud-bulldozer/$repository $RUNNER_PATH/$repository
-            cd $RUNNER_PATH/$repository
+            git clone "https://github.com/cloud-bulldozer/$repository" "$RUNNER_PATH/$repository"
+            pushd "$RUNNER_PATH/$repository"
             if [[ $repository == 'benchmark-operator' ]]
             then
                 echo "BENCHMARK_OPERATOR_ID=$(git rev-parse @)" >> "$GITHUB_ENV"
@@ -59,7 +59,7 @@ jobs:
                 echo "BENCHMARK_WRAPPER_ID=$(git rev-parse @)" >> "$GITHUB_ENV"
                 BENCHMARK_WRAPPER_ID=$(git rev-parse @)
             fi
-            cd -
+            popd
         done
         build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
         build_version="$(cut -d'=' -f2 <<<"$build")"

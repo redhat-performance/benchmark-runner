@@ -4,7 +4,7 @@
 name: Deploy IPI Perf Env Nightly CI
 on:
   push:
-    branches: [ main ]  
+    branches: [ main ]      
 #on:
 #  schedule:
 #    - cron: '0 4 * * 0' # run on Sunday at 4 AM UTC/ 0 AM EST
@@ -63,7 +63,7 @@ jobs:
           start=$(printf '%(%s)T' -1)
 
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start OCP IPI Install >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
-          podman run --rm -e OCP_ENV_FLAVOR="PERF" -e IBM_API_KEY="$IBM_API_KEY" -e GITHUB_TOKEN="$GITHUB_TOKEN" -e INSTALL_OCP_VERSION="latest-4.8" -e OCP_VERSION_BUILD="ga" -e PERF_WORKER_IDS="$PERF_WORKER_IDS" -e PERF_PROVISION_IP="$PERF_PROVISION_IP" -e PERF_CONTAINER_PRIVATE_KEY_PATH="$PERF_CONTAINER_PRIVATE_KEY_PATH" -e CONTAINER_PRIVATE_KEY_PATH=$CONTAINER_PRIVATE_KEY_PATH -e PERF_PROVISION_USER="$PERF_PROVISION_USER" -e PERF_PROVISION_OC_USER="$PERF_PROVISION_OC_USER" -e PERF_PROVISION_PORT="$PERF_PROVISION_PORT" -e PERF_PROVISION_KUBEADMIN_PASSWORD_PATH="$PERF_PROVISION_KUBEADMIN_PASSWORD_PATH" -e PERF_PROVISION_KUBECONFIG_PATH="$PERF_PROVISION_KUBECONFIG_PATH" -e PERF_PROVISION_INSTALLER_PATH="$PERF_PROVISION_INSTALLER_PATH" -e PERF_PROVISION_INSTALLER_CMD="$PERF_PROVISION_INSTALLER_CMD" -e GITHUB_REPOSITORY_SHORT=$GITHUB_REPOSITORY_SHORT -e PERF_PROVISION_TIMEOUT="10800" -e log_level="INFO" -v "$PERF_PROVISION_PRIVATE_KEY_PATH":"$CONTAINER_PRIVATE_KEY_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+          podman run --rm -e OCP_ENV_FLAVOR="PERF" -e IBM_API_KEY="$IBM_API_KEY" -e GITHUB_TOKEN="$GITHUB_TOKEN" -e INSTALL_OCP_VERSION="latest-4.8" -e OCP_VERSION_BUILD="ga" -e PERF_WORKER_IDS="$PERF_WORKER_IDS" -e PERF_PROVISION_IP="$PERF_PROVISION_IP" -e PERF_CONTAINER_PRIVATE_KEY_PATH="$PERF_CONTAINER_PRIVATE_KEY_PATH" -e CONTAINER_PRIVATE_KEY_PATH=$CONTAINER_PRIVATE_KEY_PATH -e PERF_PROVISION_USER="$PERF_PROVISION_USER" -e PERF_PROVISION_OC_USER="$PERF_PROVISION_OC_USER" -e PERF_PROVISION_PORT="$PERF_PROVISION_PORT" -e PERF_PROVISION_KUBEADMIN_PASSWORD_PATH="$PERF_PROVISION_KUBEADMIN_PASSWORD_PATH" -e PERF_PROVISION_KUBECONFIG_PATH="$PERF_PROVISION_KUBECONFIG_PATH" -e PERF_PROVISION_INSTALLER_PATH="$PERF_PROVISION_INSTALLER_PATH" -e PERF_PROVISION_INSTALLER_CMD="$PERF_PROVISION_INSTALLER_CMD" -e GITHUB_REPOSITORY_SHORT=$GITHUB_REPOSITORY_SHORT -e PERF_PROVISION_TIMEOUT="5400" -e log_level="INFO" -v "$PERF_PROVISION_PRIVATE_KEY_PATH":"$CONTAINER_PRIVATE_KEY_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End OCP IPI Install   >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
 
           end=$(printf '%(%s)T' -1)
@@ -97,7 +97,7 @@ jobs:
           start=$(printf '%(%s)T' -1)
 
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start OCP Resource Install >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
-          podman run --rm -e OCP_ENV_FLAVOR="PERF" -e IBM_API_KEY="$IBM_API_KEY" -e GITHUB_TOKEN="$GITHUB_TOKEN" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e INSTALL_OCP_RESOURCES="True" -e CNV_VERSION="4.8.2" -e OCS_VERSION="4.8" -e NUM_OCS_DISK="4" -e INSTALL_RESOURCES_LIST="['cnv', 'local_storage', 'ocs', 'kata']" -e PERF_WORKER_IDS="$PERF_WORKER_IDS" -e PERF_PROVISION_IP="$PERF_PROVISION_IP" -e CONTAINER_PRIVATE_KEY_PATH="$CONTAINER_PRIVATE_KEY_PATH" -e PERF_PROVISION_USER="$PERF_PROVISION_USER" -e PERF_PROVISION_OC_USER="$PERF_PROVISION_OC_USER" -e PERF_PROVISION_PORT="$PERF_PROVISION_PORT" -e GITHUB_REPOSITORY_SHORT=$GITHUB_REPOSITORY_SHORT -e PERF_PROVISION_TIMEOUT="10800" -e log_level="INFO" -v "$PERF_PROVISION_PRIVATE_KEY_PATH":"$CONTAINER_PRIVATE_KEY_PATH" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+          podman run --rm -e OCP_ENV_FLAVOR="PERF" -e IBM_API_KEY="$IBM_API_KEY" -e GITHUB_TOKEN="$GITHUB_TOKEN" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e INSTALL_OCP_RESOURCES="True" -e CNV_VERSION="4.8.2" -e OCS_VERSION="4.8" -e NUM_OCS_DISK="4" -e INSTALL_RESOURCES_LIST="['cnv', 'local_storage', 'ocs', 'kata']" -e PERF_WORKER_IDS="$PERF_WORKER_IDS" -e PERF_PROVISION_IP="$PERF_PROVISION_IP" -e CONTAINER_PRIVATE_KEY_PATH="$CONTAINER_PRIVATE_KEY_PATH" -e PERF_PROVISION_USER="$PERF_PROVISION_USER" -e PERF_PROVISION_OC_USER="$PERF_PROVISION_OC_USER" -e PERF_PROVISION_PORT="$PERF_PROVISION_PORT" -e GITHUB_REPOSITORY_SHORT=$GITHUB_REPOSITORY_SHORT -e PERF_PROVISION_TIMEOUT="5400" -e log_level="INFO" -v "$PERF_PROVISION_PRIVATE_KEY_PATH":"$CONTAINER_PRIVATE_KEY_PATH" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End OCP Resource Install   >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
 
           end=$(printf '%(%s)T' -1)
@@ -144,9 +144,9 @@ jobs:
         # get repository last id
         declare -a repositories=('benchmark-operator' 'benchmark-wrapper')
         for repository in "${repositories[@]}"
-        do
+        do  
             git clone "https://github.com/cloud-bulldozer/$repository" "$RUNNER_PATH/$repository"
-            pushd "$RUNNER_PATH/repository"
+            pushd "$RUNNER_PATH/$repository"
             if [[ $repository == 'benchmark-operator' ]]
             then
                 echo "BENCHMARK_OPERATOR_ID=$(git rev-parse @)" >> "$GITHUB_ENV"
