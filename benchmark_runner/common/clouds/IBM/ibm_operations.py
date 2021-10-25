@@ -42,6 +42,7 @@ class IBMOperations:
         self.__provision_kubeconfig_path = self.__environment_variables_dict.get('provision_kubeconfig_path', '')
         self.__provision_installer_path = self.__environment_variables_dict.get('provision_installer_path', '')
         self.__provision_installer_cmd = self.__environment_variables_dict.get('provision_installer_cmd', '')
+        self.__provision_installer_log = self.__environment_variables_dict.get('provision_installer_log', '')
         self.__install_ocp_version = self.__environment_variables_dict.get('install_ocp_version', '')
         self.__ocp_version_build = self.__environment_variables_dict.get('ocp_version_build', '')
         self.__num_ocs_disks = int(self.__environment_variables_dict.get('num_ocs_disk', 1))
@@ -120,12 +121,16 @@ class IBMOperations:
         :param sleep_time:
         :return:
         """
-        current_wait_time = 0
+        current_wait_time = sleep_time
+        # precondition wait till installer start to generate logs, till delete previous run logs
+        time.sleep(sleep_time)
         while current_wait_time <= self.__provision_timeout:
-            output = self.__remote_ssh.run_command('tail -10 /home/kni/clusterconfigs/.openshift_install.log')
+            output = self.__remote_ssh.run_command(self.__provision_installer_log)
             if 'Install complete!' in output:
                 return True
-            logger.info(f'Waiting till OCP install complete, {current_wait_time} seconds')
+            elif 'level=error' in output:
+                return False
+            logger.info(f'Waiting till OCP install complete, waiting {int(current_wait_time/60)} minutes')
             # sleep for x seconds
             time.sleep(sleep_time)
             current_wait_time += sleep_time
@@ -197,8 +202,8 @@ class IBMOperations:
         logger.info(f'Starting OCP IPI installer, Start time: {datetime.now().strftime(datetime_format)}')
         self.__remote_ssh.run_command(f'{self.__ibm_login_cmd()};{self.__ibm_ipi_install_ocp_cmd()}')
         logger.info(f'Waiting till IPI installer complete, Start time: {datetime.now().strftime(datetime_format)}')
-        result = self.__wait_for_install_complete()
-        if 'failed=1' in result:
+        complete = self.__wait_for_install_complete()
+        if not complete:
             # Workers issue: workaround for solving IBM workers stuck on BIOS page after reboot
             logger.info('Installation failed, checking worker nodes status')
             # Check if first worker is down
