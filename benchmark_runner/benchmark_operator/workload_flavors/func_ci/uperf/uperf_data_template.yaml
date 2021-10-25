@@ -36,7 +36,7 @@ pod:
   server_limits_memory_GB: 16
 vm:
   es_kind: vm
-  server_cores: 4
+  server_sockets: 4
   server_limits_memory_GB: 16
-  client_cores: 4
+  client_sockets: 4
   client_limits_memory_GB: 16

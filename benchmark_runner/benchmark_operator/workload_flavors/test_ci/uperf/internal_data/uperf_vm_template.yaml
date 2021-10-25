@@ -47,8 +47,8 @@ spec:
      kind: vm
      server_vm:
        dedicatedcpuplacement: false
-       sockets: 1
-       cores: {{ server_cores }}
+       sockets: {{ server_sockets }}
+       cores: 1
        threads: 1
        image: kubevirt/fedora-cloud-container-disk-demo:latest # your image must've ethtool installed if enabling multiqueue
        limits:
@@ -65,8 +65,8 @@ spec:
          #- hostpassthrough
      client_vm:
        dedicatedcpuplacement: false
-       sockets: 1
-       cores: {{ client_cores }}
+       sockets: {{ client_sockets }}
+       cores: 1
        threads: 1
        image: kubevirt/fedora-cloud-container-disk-demo:latest
        limits:
