@@ -30,3 +30,12 @@ class MissingWorkerNodes(IBMError):
     def __init__(self):
         self.message = 'There are no worker nodes'
         super(MissingWorkerNodes, self).__init__(self.message)
+
+
+class IBMOCPInstallationFailed(IBMError):
+    """
+    This class exception is notice that ibm ocp installation failed
+    """
+    def __init__(self):
+        self.message = f'IBM OCP installation failed'
+        super(IBMOCPInstallationFailed, self).__init__(self.message)
