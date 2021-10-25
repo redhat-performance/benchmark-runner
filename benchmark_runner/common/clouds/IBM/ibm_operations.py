@@ -4,7 +4,6 @@ from typeguard import typechecked
 from tenacity import retry, stop_after_attempt
 import ast  # change string list to list
 from enum import Enum
-import pathlib
 
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger, datetime_format
 from benchmark_runner.main.environment_variables import environment_variables
@@ -12,7 +11,7 @@ from benchmark_runner.common.remote_ssh.remote_ssh import ConnectionData, Remote
 from benchmark_runner.common.ocp_resources.create_ocp_resource import CreateOcpResource
 from benchmark_runner.common.oc.oc import OC
 from benchmark_runner.common.github.github_operations import GitHubOperations
-from benchmark_runner.common.clouds.IBM.ibm_exceptions import IBMMachineNotLoad, MissingMasterNodes, MissingWorkerNodes
+from benchmark_runner.common.clouds.IBM.ibm_exceptions import IBMMachineNotLoad, MissingMasterNodes, MissingWorkerNodes, IBMOCPInstallationFailed
 
 
 class Actions(Enum):
@@ -42,17 +41,16 @@ class IBMOperations:
         self.__provision_kubeadmin_password_path = self.__environment_variables_dict.get('provision_kubeadmin_password_path', '')
         self.__provision_kubeconfig_path = self.__environment_variables_dict.get('provision_kubeconfig_path', '')
         self.__provision_installer_path = self.__environment_variables_dict.get('provision_installer_path', '')
-        self.__installer_path = pathlib.Path(self.__provision_installer_path).parent.resolve()
         self.__provision_installer_cmd = self.__environment_variables_dict.get('provision_installer_cmd', '')
         self.__install_ocp_version = self.__environment_variables_dict.get('install_ocp_version', '')
         self.__ocp_version_build = self.__environment_variables_dict.get('ocp_version_build', '')
         self.__num_ocs_disks = int(self.__environment_variables_dict.get('num_ocs_disk', 1))
-        self.__ssh_key= self.__environment_variables_dict.get('container_private_key_path', '')
+        self.__ssh_key = self.__environment_variables_dict.get('container_private_key_path', '')
+        self.__provision_timeout = int(self.__environment_variables_dict.get('provision_timeout', ''))
         self.__connection_data = ConnectionData(host_name=self.__environment_variables_dict.get('provision_ip', ''),
                                                 user_name=user,
                                                 port=int(self.__environment_variables_dict.get('provision_port', '')),
-                                                timeout=int(
-                                                    self.__environment_variables_dict.get('provision_timeout', '')),
+                                                timeout=self.__provision_timeout,
                                                 ssh_key=self.__environment_variables_dict.get('container_private_key_path', ''))
         self.__remote_ssh = RemoteSsh(self.__connection_data)
         self.__github_operations = GitHubOperations()
@@ -115,6 +113,23 @@ class IBMOperations:
             time.sleep(sleep_time)
             current_wait_time += sleep_time
         raise IBMMachineNotLoad()
+
+    def __wait_for_install_complete(self, sleep_time: int = 600):
+        """
+        This method wait till ocp install complete
+        :param sleep_time:
+        :return:
+        """
+        current_wait_time = 0
+        while current_wait_time <= self.__provision_timeout:
+            output = self.__remote_ssh.run_command('tail -10 /home/kni/clusterconfigs/.openshift_install.log')
+            if 'Install complete!' in output:
+                return True
+            logger.info(f'Waiting till OCP install complete, {current_wait_time} seconds')
+            # sleep for x seconds
+            time.sleep(sleep_time)
+            current_wait_time += sleep_time
+        raise IBMOCPInstallationFailed()
 
     @staticmethod
     def __ibm_logout_cmd():
@@ -179,11 +194,10 @@ class IBMOperations:
         This method run ocp ipi installer with retry mechanism
         :return: True if installation success and raise exception if installation failed
         """
-        logger.info(f'IBM Login, Start time: {datetime.now().strftime(datetime_format)}')
-        result = self.__remote_ssh.run_command(self.__ibm_login_cmd())
         logger.info(f'Starting OCP IPI installer, Start time: {datetime.now().strftime(datetime_format)}')
-        result = self.__remote_ssh.run_command(self.__ibm_ipi_install_ocp_cmd())
-        logger.info(f'Ending OCP IPI installer, Start time: {datetime.now().strftime(datetime_format)}')
+        self.__remote_ssh.run_command(f'{self.__ibm_login_cmd()};{self.__ibm_ipi_install_ocp_cmd()}')
+        logger.info(f'Waiting till IPI installer complete, Start time: {datetime.now().strftime(datetime_format)}')
+        result = self.__wait_for_install_complete()
         if 'failed=1' in result:
             # Workers issue: workaround for solving IBM workers stuck on BIOS page after reboot
             logger.info('Installation failed, checking worker nodes status')
@@ -204,8 +218,7 @@ class IBMOperations:
                 logger.info('Installation failed, retry again')
                 raise Exception(f'Installation failed after 3 retries')
 
-        else:
-            return True
+        return True
 
     @logger_time_stamp
     def oc_login(self):
