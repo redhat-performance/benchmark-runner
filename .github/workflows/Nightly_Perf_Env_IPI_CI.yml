@@ -144,9 +144,9 @@ jobs:
         # get repository last id
         declare -a repositories=('benchmark-operator' 'benchmark-wrapper')
         for repository in "${repositories[@]}"
-        do
+        do  
             git clone "https://github.com/cloud-bulldozer/$repository" "$RUNNER_PATH/$repository"
-            pushd "$RUNNER_PATH/repository"
+            pushd "$RUNNER_PATH/$repository"
             if [[ $repository == 'benchmark-operator' ]]
             then
                 echo "BENCHMARK_OPERATOR_ID=$(git rev-parse @)" >> "$GITHUB_ENV"
