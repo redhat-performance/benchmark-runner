@@ -18,6 +18,7 @@ jobs:
   ocp_ipi_installation:
     name: OCP IBM IPI Installation
     runs-on: ubuntu-latest
+    timeout-minutes: 120
     outputs:
       output1: ${{ steps.ocp_install_time.outputs.install_time }}
       output2: ${{ steps.ocp_install_resource_time.outputs.install_resource_time }}
