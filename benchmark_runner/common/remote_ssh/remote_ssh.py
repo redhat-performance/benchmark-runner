@@ -70,6 +70,20 @@ class RemoteSsh:
         except Exception as err:
             raise RunCommandError(err)
 
+    def run_background_command(self, command: str):
+        """
+        This method run command in background '> /dev/null 2>&1 &'
+        :param command:
+        :return: command response or Exception
+        """
+        try:
+            transport = self.__p_client.get_transport()
+            channel = transport.open_session()
+            pre_command = '. ~/.bash_profile;'
+            channel.exec_command(f'{pre_command}\n {command}')
+        except Exception as err:
+            raise RunCommandError(err)
+
     def mkdir(self, remote_path):
         """
         This method mkdir on remote path
