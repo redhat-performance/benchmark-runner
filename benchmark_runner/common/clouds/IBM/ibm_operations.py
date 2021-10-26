@@ -195,7 +195,6 @@ class IBMOperations:
                                             parameter='build=',
                                             value=f'"{self.__ocp_version_build}"')
     
-    #@retry(stop=stop_after_attempt(3))
     @logger_time_stamp
     def run_ibm_ocp_ipi_installer(self):
         """
@@ -203,7 +202,7 @@ class IBMOperations:
         :return: True if installation success and raise exception if installation failed
         """
         logger.info(f'Starting OCP IPI installer, Start time: {datetime.now().strftime(datetime_format)}')
-        #self.__remote_ssh.run_background_command(command=f'{self.__ibm_login_cmd()};{self.__ibm_ipi_install_ocp_cmd()}')
+        self.__remote_ssh.run_command(command=f'{self.__ibm_login_cmd()};{self.__ibm_ipi_install_ocp_cmd()}')
 
     @logger_time_stamp
     def wait_for_installer_complete(self):
