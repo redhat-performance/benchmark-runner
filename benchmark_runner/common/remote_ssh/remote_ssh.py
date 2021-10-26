@@ -77,10 +77,10 @@ class RemoteSsh:
         :return: command response or Exception
         """
         try:
-            transport = self.__p_client.get_transport()
-            channel = transport.open_session()
+            channel = self.__p_client.invoke_shell()
+            out = channel.recv(9999)
             pre_command = '. ~/.bash_profile;'
-            channel.exec_command(f'{pre_command}\n {command}')
+            channel.send(f'{pre_command}\n {command}')
         except Exception as err:
             raise RunCommandError(err)
 
