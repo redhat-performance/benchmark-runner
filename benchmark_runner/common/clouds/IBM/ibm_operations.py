@@ -203,9 +203,9 @@ class IBMOperations:
         :return: True if installation success and raise exception if installation failed
         """
         logger.info(f'Starting OCP IPI installer, Start time: {datetime.now().strftime(datetime_format)}')
-        result = self.__remote_ssh.run_command(
-           f'{self.__ibm_login_cmd()};{self.__ibm_ipi_install_ocp_cmd()};{self.__ibm_logout_cmd()}')
-        if 'failed=1' in result:
+        self.__remote_ssh.run_command(command=f'{self.__ibm_login_cmd()};{self.__ibm_ipi_install_ocp_cmd()}')
+        complete = self.__wait_for_install_complete()
+        if not complete:
             # Workers issue: workaround for solving IBM workers stuck on BIOS page after reboot
             logger.info('Installation failed, checking worker nodes status')
             # Check if first worker is down
