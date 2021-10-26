@@ -13,6 +13,7 @@ from benchmark_runner.common.ocp_resources.create_ocp_resource import CreateOcpR
 from benchmark_runner.common.oc.oc import OC
 from benchmark_runner.common.github.github_operations import GitHubOperations
 from benchmark_runner.common.clouds.IBM.ibm_exceptions import IBMMachineNotLoad, MissingMasterNodes, MissingWorkerNodes, IBMOCPInstallationFailed
+from benchmark_runner.common.ssh.ssh import SSH
 
 
 class Actions(Enum):
@@ -33,6 +34,7 @@ class IBMOperations:
     def __init__(self, user: str):
         self.__environment_variables_dict = environment_variables.environment_variables_dict
         self.__ibm_api_key = self.__environment_variables_dict.get('ibm_api_key', '')
+        self.__user = user
         self.__ibm_oc_user = self.__environment_variables_dict.get('provision_oc_user', '')
         self.__ibm_worker_ids = self.__environment_variables_dict.get('worker_ids', '')
         self.__ocp_env_flavor = self.__environment_variables_dict.get('ocp_env_flavor', '')
@@ -47,15 +49,18 @@ class IBMOperations:
         self.__install_ocp_version = self.__environment_variables_dict.get('install_ocp_version', '')
         self.__ocp_version_build = self.__environment_variables_dict.get('ocp_version_build', '')
         self.__num_ocs_disks = int(self.__environment_variables_dict.get('num_ocs_disk', 1))
-        self.__ssh_key = self.__environment_variables_dict.get('container_private_key_path', '')
+        self.__provision_ip = self.__environment_variables_dict.get('provision_ip', '')
+        self.__provision_port = int(self.__environment_variables_dict.get('provision_port', ''))
         self.__provision_timeout = int(self.__environment_variables_dict.get('provision_timeout', ''))
-        self.__connection_data = ConnectionData(host_name=self.__environment_variables_dict.get('provision_ip', ''),
-                                                user_name=user,
-                                                port=int(self.__environment_variables_dict.get('provision_port', '')),
+        self.__container_private_key_path = self.__environment_variables_dict.get('container_private_key_path', '')
+        self.__connection_data = ConnectionData(host_name=self.__provision_ip,
+                                                user_name=self.__user,
+                                                port=self.__provision_port,
                                                 timeout=self.__provision_timeout,
-                                                ssh_key=self.__environment_variables_dict.get('container_private_key_path', ''))
+                                                ssh_key=self.__container_private_key_path)
         self.__remote_ssh = RemoteSsh(self.__connection_data)
         self.__github_operations = GitHubOperations()
+        self.__ssh = SSH()
 
     def __get_kubeadmin_password(self):
         """
@@ -203,7 +208,7 @@ class IBMOperations:
         :return: True if installation success and raise exception if installation failed
         """
         logger.info(f'Starting OCP IPI installer, Start time: {datetime.now().strftime(datetime_format)}')
-        self.__remote_ssh.run_command(command=f'{self.__ibm_login_cmd()};{self.__ibm_ipi_install_ocp_cmd()}')
+        self.__ssh.run(cmd=f"ssh -i {self.__container_private_key_path} {self.__user}@{self.__provision_ip} '{self.__ibm_login_cmd()};{self.__ibm_ipi_install_ocp_cmd()} > /dev/null 2>&1 &'")
         complete = self.__wait_for_install_complete()
         if not complete:
             # Workers issue: workaround for solving IBM workers stuck on BIOS page after reboot
