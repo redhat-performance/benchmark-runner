@@ -116,7 +116,8 @@ class IBMOperations:
             current_wait_time += sleep_time
         raise IBMMachineNotLoad()
 
-    def __wait_for_install_complete(self, sleep_time: int = 600):
+    @logger_time_stamp
+    def wait_for_install_complete(self, sleep_time: int = 600):
         """
         This method wait till ocp install complete
         :param sleep_time:
@@ -124,7 +125,9 @@ class IBMOperations:
         """
         current_wait_time = sleep_time
         # precondition wait till installer start to generate logs, till delete previous run logs
+        logger.info(f'Waiting till OCP install complete, waiting {int(current_wait_time / 60)} minutes')
         time.sleep(sleep_time)
+        current_wait_time += sleep_time
         while current_wait_time <= self.__provision_timeout:
             output = self.__remote_ssh.run_command(self.__provision_installer_log)
             if 'Install complete!' in output:
@@ -201,9 +204,8 @@ class IBMOperations:
         :return: True if installation success and raise exception if installation failed
         """
         logger.info(f'Starting OCP IPI installer, Start time: {datetime.now().strftime(datetime_format)}')
-        self.__remote_ssh.run_command(f'{self.__ibm_login_cmd()};{self.__ibm_ipi_install_ocp_cmd()}')
-        logger.info(f'Waiting till IPI installer complete, Start time: {datetime.now().strftime(datetime_format)}')
-        complete = self.__wait_for_install_complete()
+        self.__remote_ssh.run_background_command(command=f'{self.__ibm_login_cmd()};{self.__ibm_ipi_install_ocp_cmd()}')
+        complete = self.wait_for_install_complete()
         if not complete:
             # Workers issue: workaround for solving IBM workers stuck on BIOS page after reboot
             logger.info('Installation failed, checking worker nodes status')
