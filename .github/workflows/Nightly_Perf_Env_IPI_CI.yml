@@ -63,7 +63,8 @@ jobs:
           build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
           build_version="$(cut -d'=' -f2 <<<"$build")"
           start=$(printf '%(%s)T' -1)
-
+          echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Run OCP IPI Install >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
+          ssh -i $PERF_PROVISION_PRIVATE_KEY_PATH $PERF_PROVISION_USER@$PERF_PROVISION_IP "ibmcloud login --apikey $IBM_API_KEY; $PERF_PROVISION_INSTALLER_CMD"
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start OCP IPI Install >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
           podman run --rm -e OCP_ENV_FLAVOR="PERF" -e IBM_API_KEY="$IBM_API_KEY" -e GITHUB_TOKEN="$GITHUB_TOKEN" -e INSTALL_OCP_VERSION="latest-4.8" -e OCP_VERSION_BUILD="ga" -e PERF_WORKER_IDS="$PERF_WORKER_IDS" -e PERF_PROVISION_IP="$PERF_PROVISION_IP" -e PERF_CONTAINER_PRIVATE_KEY_PATH="$PERF_CONTAINER_PRIVATE_KEY_PATH" -e CONTAINER_PRIVATE_KEY_PATH=$CONTAINER_PRIVATE_KEY_PATH -e PERF_PROVISION_USER="$PERF_PROVISION_USER" -e PERF_PROVISION_OC_USER="$PERF_PROVISION_OC_USER" -e PERF_PROVISION_PORT="$PERF_PROVISION_PORT" -e PERF_PROVISION_KUBEADMIN_PASSWORD_PATH="$PERF_PROVISION_KUBEADMIN_PASSWORD_PATH" -e PERF_PROVISION_KUBECONFIG_PATH="$PERF_PROVISION_KUBECONFIG_PATH" -e PERF_PROVISION_INSTALLER_PATH="$PERF_PROVISION_INSTALLER_PATH" -e PERF_PROVISION_INSTALLER_CMD="$PERF_PROVISION_INSTALLER_CMD" -e PERF_PROVISION_INSTALLER_LOG="$PERF_PROVISION_INSTALLER_LOG" -e GITHUB_REPOSITORY_SHORT=$GITHUB_REPOSITORY_SHORT -e PERF_PROVISION_TIMEOUT="5400" -e log_level="INFO" -v "$PERF_PROVISION_PRIVATE_KEY_PATH":"$CONTAINER_PRIVATE_KEY_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End OCP IPI Install   >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
