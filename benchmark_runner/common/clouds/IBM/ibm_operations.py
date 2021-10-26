@@ -196,22 +196,16 @@ class IBMOperations:
                                             value=f'"{self.__ocp_version_build}"')
     
     @logger_time_stamp
+    @retry(stop=stop_after_attempt(3))
     def run_ibm_ocp_ipi_installer(self):
         """
         This method run ocp ipi installer with retry mechanism
         :return: True if installation success and raise exception if installation failed
         """
         logger.info(f'Starting OCP IPI installer, Start time: {datetime.now().strftime(datetime_format)}')
-        self.__remote_ssh.run_command(command=f'{self.__ibm_login_cmd()};{self.__ibm_ipi_install_ocp_cmd()}')
-
-    @logger_time_stamp
-    def wait_for_installer_complete(self):
-        """
-        This method wait for installer complete
-        :return: True if installation success and raise exception if installation failed
-        """
-        complete = self.__wait_for_install_complete()
-        if not complete:
+        result = self.__remote_ssh.run_command(
+           f'{self.__ibm_login_cmd()};{self.__ibm_ipi_install_ocp_cmd()};{self.__ibm_logout_cmd()}')
+        if 'failed=1' in result:
             # Workers issue: workaround for solving IBM workers stuck on BIOS page after reboot
             logger.info('Installation failed, checking worker nodes status')
             # Check if first worker is down
@@ -231,7 +225,8 @@ class IBMOperations:
                 logger.info('Installation failed, retry again')
                 raise Exception(f'Installation failed after 3 retries')
 
-        return True
+        else:
+            return True
 
     @logger_time_stamp
     def oc_login(self):
