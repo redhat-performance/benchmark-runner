@@ -205,6 +205,8 @@ class IBMOperations:
         """
         logger.info(f'Starting OCP IPI installer, Start time: {datetime.now().strftime(datetime_format)}')
         self.__remote_ssh.run_background_command(command=f'{self.__ibm_login_cmd()};{self.__ibm_ipi_install_ocp_cmd()}')
+        self.ibm_disconnect()
+        self.ibm_connect()
         complete = self.wait_for_install_complete()
         if not complete:
             # Workers issue: workaround for solving IBM workers stuck on BIOS page after reboot
