@@ -30,6 +30,10 @@ class TemplateOperations:
         This method return yaml names in benchmark_operator folder
         :return:
         """
+        # Kata reuses the pod templates
+        if '_kata' in workload:
+            workload = f'{workload[:-len("_kata")]}_pod'
+
         for file in os.listdir(os.path.join(self.__dir_path, workload.split('_')[0], 'internal_data')):
             if file.endswith(extension):
                 if workload and workload in file and skip not in file:
@@ -43,7 +47,17 @@ class TemplateOperations:
         :return:
         """
         # replace environment variables and generate hammerdb_data.yaml
+        if 'kata' in workload:
+            environment_variables.environment_variables_dict['kind'] = 'kata'
+        else:
+            environment_variables.environment_variables_dict['kind'] = 'pod'
         update_environment_variable(dir_path=self.__hammerdb_dir_path, yaml_file='hammerdb_data_template.yaml')
+        # handle database pod yaml
+        if 'pod' in workload or 'kata' in workload:
+            # replace environment variables
+            update_environment_variable(dir_path=self.__hammerdb__internal_dir_path, yaml_file=f'{database}_{self.__storage_type}_template.yaml')
+            shutil.move(os.path.join(self.__hammerdb__internal_dir_path, f'{database}_{self.__storage_type}.yaml'), os.path.join(self.__current_run_path, f'{database}.yaml'))
+            delete_generate_file(full_path_yaml=os.path.join(self.__hammerdb__internal_dir_path, f'{database}.yaml'))
         # Get hammerdb data
         with open(os.path.join(self.__hammerdb_dir_path, 'hammerdb_data.yaml'), 'r') as file:
             hammerdb_data = yaml.load(file, Loader=yaml.FullLoader)
@@ -61,9 +75,14 @@ class TemplateOperations:
         if 'vm' in hammerdb_template:
             shared_data = {**shared_data, **shared_data_vm}
             render_data = {**shared_data, **database_data}
+            render_data['kind'] = 'vm'
         elif 'pod' in hammerdb_template:
             shared_data = {**shared_data, **shared_data_pod}
             render_data = {**shared_data, **database_data}
+            if 'kata' in workload:
+                render_data['kind'] = 'kata'
+            else:
+                render_data['kind'] = 'pod'
 
         data = tm.render(render_data)
         hammerdb_name = hammerdb_template.replace('template', '')
@@ -71,7 +90,7 @@ class TemplateOperations:
             f.write(data)
 
         # Jinja render database pod yaml
-        if 'pod' in workload:
+        if 'pod' in workload or 'kata' in workload:
             # replace parameter from hammerdb_data
             database_name = f'{database}_{self.__storage_type}_template.yaml'
             with open(os.path.join(self.__hammerdb__internal_dir_path, database_name)) as f:
@@ -93,6 +112,10 @@ class TemplateOperations:
         """
 
         # Get workload data
+        if 'kata' in workload:
+            environment_variables.environment_variables_dict['kind'] = 'kata'
+        else:
+            environment_variables.environment_variables_dict['kind'] = 'pod'
         workload_name = workload.split('_')[0]
         workload_dir_path = os.path.join(self.__dir_path, workload_name)
         update_environment_variable(dir_path=workload_dir_path, yaml_file=f'{workload_name}_data_template.yaml')
@@ -111,8 +134,13 @@ class TemplateOperations:
         # merge 3 dictionaries
         if 'vm' in workload_template:
             render_data = {**shared_data, **shared_data_vm}
+            render_data['kind'] = 'vm'
         elif 'pod' in workload_template:
             render_data = {**shared_data, **shared_data_pod}
+            if 'kata' in workload:
+                render_data['kind'] = 'kata'
+            else:
+                render_data['kind'] = 'pod'
 
         data = tm.render(render_data)
         workload_file_name = workload_template.replace('_template', '')

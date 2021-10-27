@@ -1,7 +1,7 @@
 apiVersion: ripsaw.cloudbulldozer.io/v1alpha1
 kind: Benchmark
 metadata:
-  name: uperf-pod
+  name: uperf-{{ kind }}
   namespace: {{ namespace }}
 spec:
   system_metrics:
@@ -58,5 +58,8 @@ spec:
         - {{ nthr1 }}
         - {{ nthr2 }}
       runtime: {{ runtime }}
-      #runtime_class: class_name
+      {% if kind == 'kata' -%}
+      runtime_class: kata
+      {% else %}
+      {%- endif -%}
       kind: pod

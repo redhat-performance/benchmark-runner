@@ -15,6 +15,16 @@ def test_oc_get_ocp_server_version():
     assert oc.get_ocp_server_version()
 
 
+def test_oc_get_kata_version():
+    """
+    This method gets the sandboxed containers (kata) version
+    :return:
+    """
+    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
+    oc.login()
+    assert oc.get_kata_version()
+
+
 def test_oc_get_cnv_version():
     """
     This method get cnv version
@@ -90,6 +100,16 @@ def test_is_cnv_installed():
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
     assert oc.is_cnv_installed()
+
+
+def test_is_kata_installed():
+    """
+    This method checks if the sandboxed containers (kata) operator is installed
+    :return:
+    """
+    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
+    oc.login()
+    assert oc.is_kata_installed()
 
 
 def test_is_ocs_installed():

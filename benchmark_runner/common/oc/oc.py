@@ -54,6 +54,13 @@ class OC(SSH):
         """
         return self.run("oc get csv -n openshift-storage $(oc get csv -n openshift-storage --no-headers | awk '{ print $1; }') -ojsonpath='{.spec.version}' ")
 
+    def get_kata_version(self):
+        """
+        This method returns kata version
+        :return:
+        """
+        return self.run("oc get csv -n openshift-sandboxed-containers-operator $(oc get csv -n openshift-sandboxed-containers-operator --no-headers | awk '{ print $1; }') -ojsonpath='{.spec.version}' ")
+
     def is_cnv_installed(self):
         """
         This method check if cnv operator is installed

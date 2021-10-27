@@ -65,7 +65,7 @@ class BenchmarkOperatorWorkloads:
         yaml_file = os.path.join(self.__current_run_path, f'{workload_full_name}.yaml')
         if os.path.isfile(yaml_file):
             os.remove(os.path.join(self.__current_run_path, f'{workload_full_name}.yaml'))
-            if 'hammerdb_pod' in workload_full_name:
+            if 'hammerdb_pod' in workload_full_name or 'hammerdb_kata' in workload_full_name:
                 names = workload_full_name.split('_')
                 os.remove(os.path.join(self.__current_run_path, f'{names[-1]}.yaml'))
         else:
@@ -257,20 +257,20 @@ class BenchmarkOperatorWorkloads:
     def get_metadata(self, kind: str = None, database: str = None):
         """
         This method return metadata kind and database argument are optional
-        @param kind: optional: pod or vm
+        @param kind: optional: pod, vm, or kata
         @param database: optional:mssql, postgres or mariadb
         :return:
         """
         date_format = '%Y_%m_%d'
         metadata = {'ocp_version': self.__oc.get_ocp_server_version(),
                     'cnv_version': self.__oc.get_cnv_version(),
+                    'kata_version': self.__oc.get_kata_version(),
                     'ocs_version': self.__oc.get_ocs_version(),
                     'runner_version': self.__runner_version,
                     'version': int(self.__runner_version.split('.')[-1]),
                     'ci_date': datetime.datetime.now().strftime(date_format)}
         if kind:
-            metadata.update({'kata_version': '',
-                             'kind': kind,
+            metadata.update({'kind': kind,
                              'vm_os_version': 'centos8'})
         # for hammerdb
         if database == 'mssql':
@@ -301,14 +301,22 @@ class BenchmarkOperatorWorkloads:
 ######################################## Workloads #############################################
 #***********************************************************************************************
 
+    @typechecked
     @logger_time_stamp
-    def stressng_pod(self):
+    def stressng_pod(self, name: str=''):
         """
         This method run stressng workload
         :return:
         """
         try:
-            workload = self.stressng_pod.__name__.replace('_', '-')
+            
+            if name == '':
+                name = self.stressng_pod.__name__
+            workload = name.replace('_', '-')
+            kind = 'pod'
+            if '_kata' in name:
+                kind = 'kata'
+            environment_variables.environment_variables_dict['kind'] = kind
             self.__oc.create_pod_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.stressng_pod.__name__}.yaml'), pod_name=f'{workload}-workload')
             self.__oc.wait_for_initialized(label='app=stressng_workload', workload=workload)
             self.__oc.wait_for_ready(label='app=stressng_workload', workload=workload)
@@ -326,7 +334,7 @@ class BenchmarkOperatorWorkloads:
                 ids = self.__es_operations.verify_es_data_uploaded(index=es_index, uuid=self.__oc.get_long_uuid(workload=workload))
                 # update metadata
                 for id in ids:
-                    self.__es_operations.update_es_index(index=es_index, id=id, metadata=self.get_metadata(kind='pod'))
+                    self.__es_operations.update_es_index(index=es_index, id=id, metadata=self.get_metadata(kind=kind))
             self.__oc.delete_pod_sync(
                 yaml=os.path.join(f'{self.__current_run_path}', f'{self.stressng_pod.__name__}.yaml'),
                 pod_name=f'{workload}-workload')
@@ -339,6 +347,11 @@ class BenchmarkOperatorWorkloads:
                                            pod_name=f'{workload}-workload')
             raise err
 
+    # The Kata workloads should not be decorated with
+    @logger_time_stamp
+    def stressng_kata(self):
+        self.stressng_pod(self.stressng_kata.__name__)
+
     @logger_time_stamp
     def stressng_vm(self):
         """
@@ -347,6 +360,7 @@ class BenchmarkOperatorWorkloads:
         """
         try:
             workload = self.stressng_vm.__name__.replace('_', '-')
+            environment_variables.environment_variables_dict['kind'] = 'vm'
             self.__oc.create_vm_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.stressng_vm.__name__}.yaml'), vm_name=f'{workload}-workload')
             self.__oc.wait_for_initialized(label='app=stressng_workload', workload=workload)
             self.__oc.wait_for_ready(label='app=stressng_workload', workload=workload)
@@ -377,14 +391,21 @@ class BenchmarkOperatorWorkloads:
                                           vm_name=f'{workload}-workload')
             raise err
 
+    @typechecked
     @logger_time_stamp
-    def uperf_pod(self):
+    def uperf_pod(self, name: str=''):
         """
         This method run uperf workload
         :return:
         """
         try:
-            workload = self.uperf_pod.__name__.replace('_', '-')
+            if name == '':
+                name = self.uperf_pod.__name__
+            workload = name.replace('_', '-')
+            kind = 'pod'
+            if '_kata' in name:
+                kind = 'kata'
+            environment_variables.environment_variables_dict['kind'] = kind
             self.__oc.create_pod_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.uperf_pod.__name__}.yaml'), pod_name=f'uperf-server')
             # uperf server
             server_name = self.__environment_variables_dict.get('pin_node1', '')
@@ -415,10 +436,10 @@ class BenchmarkOperatorWorkloads:
                 else:
                     es_index = 'uperf-results'
                 # verify that data upload to elastic search
-                ids = self.__es_operations.verify_es_data_uploaded(index=es_index, uuid=self.__oc.get_long_uuid(workload=workload), workload=self.uperf_pod.__name__)
+                ids = self.__es_operations.verify_es_data_uploaded(index=es_index, uuid=self.__oc.get_long_uuid(workload=workload), workload=name)
                 # update metadata
                 for id in ids:
-                    self.__es_operations.update_es_index(index=es_index, id=id, metadata=self.get_metadata(kind='pod'))
+                    self.__es_operations.update_es_index(index=es_index, id=id, metadata=self.get_metadata(kind=kind))
             self.__oc.delete_pod_sync(
                 yaml=os.path.join(f'{self.__current_run_path}', f'{self.uperf_pod.__name__}.yaml'),
                 pod_name=f'uperf-client')
@@ -430,6 +451,11 @@ class BenchmarkOperatorWorkloads:
             raise err
 
     @logger_time_stamp
+    def uperf_kata(self):
+        self.uperf_pod(self.uperf_kata.__name__)
+
+    @logger_time_stamp
+    @retry(stop=stop_after_attempt(3))
     def uperf_vm(self):
         """
         This method run uperf vm workload
@@ -437,6 +463,7 @@ class BenchmarkOperatorWorkloads:
         """
         try:
             workload = self.uperf_vm.__name__.replace('_', '-')
+            environment_variables.environment_variables_dict['kind'] = 'vm'
             self.__oc.create_vm_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.uperf_vm.__name__}.yaml'), vm_name='uperf-server')
             # uperf server
             self.__oc.wait_for_vm_create(vm_name='uperf-server')
@@ -472,13 +499,19 @@ class BenchmarkOperatorWorkloads:
 
     @typechecked
     @logger_time_stamp
-    def hammerdb_pod(self, database: str):
+    def hammerdb_pod(self, database: str, name: str=''):
         """
         This method run hammerdb pod workload
         :return:
         """
         try:
-            workload = self.hammerdb_pod.__name__.replace('_', '-')
+            if name == '':
+                name = self.hammerdb_pod.__name__
+            workload = name.replace('_', '-')
+            kind = 'pod'
+            if '_kata' in name:
+                kind = 'kata'
+            environment_variables.environment_variables_dict['kind'] = kind
             # database
             self.__oc.create_pod_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{database}.yaml'), pod_name=database, namespace=f'{database}-db')
             self.__oc.wait_for_initialized(label=f'app={database}', workload=database, namespace=f'{database}-db', label_uuid=False)
@@ -508,7 +541,7 @@ class BenchmarkOperatorWorkloads:
                 ids = self.__es_operations.verify_es_data_uploaded(index=es_index, uuid=self.__oc.get_long_uuid(workload=workload))
                 # update metadata
                 for id in ids:
-                    self.__es_operations.update_es_index(index=es_index, id=id, metadata=self.get_metadata(kind='pod', database=database))
+                    self.__es_operations.update_es_index(index=es_index, id=id, metadata=self.get_metadata(kind=kind, database=database))
             # delete hammerdb
             self.__oc.delete_pod_sync(
                 yaml=os.path.join(f'{self.__current_run_path}', f'{self.hammerdb_pod.__name__}_{database}.yaml'),
@@ -536,6 +569,12 @@ class BenchmarkOperatorWorkloads:
 
     @typechecked
     @logger_time_stamp
+    def hammerdb_kata(self, database: str):
+        self.hammerdb_pod(database, self.hammerdb_kata.__name__)
+
+    @typechecked
+    @logger_time_stamp
+    @retry(stop=stop_after_attempt(3))
     def hammerdb_vm(self, database: str):
         """
         This method run hammerdb vm workload
@@ -543,6 +582,7 @@ class BenchmarkOperatorWorkloads:
         """
         try:
             workload = self.hammerdb_vm.__name__.replace('_', '-')
+            environment_variables.environment_variables_dict['kind'] = 'vm'
             self.__oc.create_vm_sync(yaml=os.path.join(f'{self.__current_run_path}', f'{self.hammerdb_vm.__name__}_{database}.yaml'), vm_name=f'{workload}-workload')
             # hammerdb workload and database
             self.__oc.wait_for_vm_create(vm_name=f'{workload}-workload')
@@ -590,6 +630,7 @@ class BenchmarkOperatorWorkloads:
         # remove running workloads if exist
         self.remove_if_exist_run_yaml()
         workload_name = workload_full_name.split('_')
+
         if 'hammerdb' in workload_full_name:
             # check if ocs is installed
             if self.__environment_variables_dict.get('ocs_pvc', '') == 'True':

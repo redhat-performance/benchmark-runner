@@ -23,7 +23,7 @@ shared_data:
   metrics_profile: node-metrics.yml
   #metrics_profile: https://raw.githubusercontent.com/cloud-bulldozer/benchmark-operator/master/roles/kube-burner/files/metrics.yaml
 pod:
-  es_kind: pod
+  es_kind: {{ kind }}
   resources: true
   limits_cpu: 4
   limits_memory_GB: 16
