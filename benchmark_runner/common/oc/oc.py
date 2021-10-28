@@ -670,20 +670,9 @@ class OC(SSH):
                 self.wait_for_ocp_resource_create(resource='kata',
                                                   verify_cmd='oc -n openshift-sandboxed-containers-operator wait deployment/controller-manager --for=condition=Available',
                                                   status='deployment.apps/controller-manager condition met')
-            # for second script wait for refresh status
+            # for second script wait for kataconfig installation to no longer be in progress
             else:
-                # verify if there are workers nodes
-                if self.wait_for_ocp_resource_create(resource='ocs',
-                                                  verify_cmd="oc get mcp -n openshift-sandboxed-containers-operator $( oc get mcp -n openshift-sandboxed-containers-operator --no-headers | awk '{ print $1; }' | awk NR==2) -ojsonpath='{.status.machineCount}'",
-                                                  kata_worker_machine_count=True):
-                    # Wait till workers UPDATED==True
-                    self.wait_for_ocp_resource_create(resource='kata',
-                                                      verify_cmd="oc get mcp -n openshift-sandboxed-containers-operator $( oc get mcp -n openshift-sandboxed-containers-operator --no-headers | awk '{ print $1; }' | awk NR==2) -ojsonpath='{.status.conditions[3].status}'",
-                                                      status='True')
-                # There are only master nodes
-                else:
-                    # Wait till masters UPDATED==True
-                    self.wait_for_ocp_resource_create(resource='kata',
-                                                      verify_cmd="oc get mcp -n openshift-sandboxed-containers-operator $( oc get mcp -n openshift-sandboxed-containers-operator --no-headers | awk '{ print $1; }' | awk NR==1) -ojsonpath='{.status.conditions[3].status}'",
-                                                      status='True')
+                self.wait_for_ocp_resource_create(resource='kata',
+                                                  verify_cmd="oc get kataconfig -ojsonpath='{.items[0].status.installationStatus.IsInProgress}'",
+                                                  status='false')
         return True
