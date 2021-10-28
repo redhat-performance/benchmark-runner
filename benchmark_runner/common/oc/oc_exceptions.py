@@ -108,3 +108,10 @@ class OCPResourceNotCreateTimeout(OCError):
     def __init__(self, resource):
         self.message = f'The {resource} resource does not created'
         super(OCPResourceNotCreateTimeout, self).__init__(self.message)
+
+
+class KataInstallationFailed(OCError):
+    """This exception returns failure to install sandboxed containers"""
+    def __init__(self, reason):
+        self.message = f'Installation of sandboxed containers failed: {reason}'
+        super(KataInstallationFailed, self).__init__(self.message)
