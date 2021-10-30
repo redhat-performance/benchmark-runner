@@ -17,7 +17,7 @@ jobs:
     name: Deploy Perf Nightly - Stressng
     runs-on: ubuntu-latest
     outputs:
-      output_start: ${{ steps.ocp_install_time.outputs.install_time }}
+      output_start: ${{ steps.stressng_workload_start_step.outputs.stressng_workload_start }}
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.9
