@@ -177,7 +177,7 @@ jobs:
   nightly-hammerdb:
     name: Deploy Perf Nightly - hammerdb
     runs-on: ubuntu-latest
-    needs: nightly_stressng
+    needs: [nightly_uperf, nightly_stressng]
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.9
