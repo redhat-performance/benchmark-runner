@@ -1,12 +1,12 @@
 # Nightly CI https://github.com/marketplace/actions/deploy-nightly
 # This is a nightly CI Pipeline against Performance environment
 name: Deploy Perf Env Nightly CI
-on:
-  schedule:
-    - cron: '0 4 * * 1-6' # run Monday through Saturday at 4 AM UTC/ 0 AM EST
 #on:
-#  push:
-#    branches: [ main ]
+#  schedule:
+#    - cron: '0 4 * * 1-6' # run Monday through Saturday at 4 AM UTC/ 0 AM EST
+on:
+  push:
+    branches: [ main ]
 
 # Ensures that only one deploy task per branch/environment will run at a time.
 concurrency:
@@ -23,8 +23,8 @@ jobs:
     - id: nightly_start_step
       run: echo "::set-output name=nightly_start::$(printf '%(%s)T' -1)"
       
-  nightly_stressng:
-    name: Deploy Perf Nightly - Stressng
+  stressng_workload:
+    name: Stressng workload
     runs-on: ubuntu-latest
     needs: nightly_start
     steps:
@@ -104,10 +104,10 @@ jobs:
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Update CI status failed >>>>>>>>>>>>>>>>>>>>>>>>>>'
         podman run --rm -e OCP_ENV_FLAVOR="PERF" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e BUILD_VERSION="$build_version" -e CI_STATUS="failed" -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e OCP_INSTALL_MINUTES_TIME="${{needs.ocp_ipi_installation.outputs.output1}}" -e PERF_TIMEOUT="5400" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
   
-  nightly_uperf:
-    name: Deploy Perf Nightly - Uperf
+  uperf_workload:
+    name: Uperf workload
     runs-on: ubuntu-latest
-    needs: [nightly_start, nightly_stressng]
+    needs: [nightly_start, stressng_workload]
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.9
@@ -183,10 +183,10 @@ jobs:
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Update CI status failed >>>>>>>>>>>>>>>>>>>>>>>>>>'
         podman run --rm -e OCP_ENV_FLAVOR="PERF" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e BUILD_VERSION="$build_version" -e CI_STATUS="failed" -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e OCP_INSTALL_MINUTES_TIME="${{needs.ocp_ipi_installation.outputs.output1}}" -e PERF_TIMEOUT="5400" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
 
-  nightly_hammerdb:
-    name: Deploy Perf Nightly - hammerdb
+  hammerdb_workload:
+    name: Hammerdb workload
     runs-on: ubuntu-latest
-    needs: [nightly_start, nightly_stressng, nightly_uperf]
+    needs: [nightly_start, stressng_workload, uperf_workload]
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.9
@@ -265,7 +265,7 @@ jobs:
   nightly_end:
     name: Deploy Perf Nightly - End
     runs-on: ubuntu-latest
-    needs: [nightly_start, nightly_stressng, nightly_uperf, nightly_hammerdb]
+    needs: [nightly_start, stressng_workload, uperf_workload, hammerdb_workload]
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.9
