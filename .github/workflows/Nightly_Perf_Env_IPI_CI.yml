@@ -342,7 +342,7 @@ jobs:
         done
         build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
         build_version="$(cut -d'=' -f2 <<<"$build")"
-        declare -a workloads=('hammerdb_pod_mariadb' 'hammerdb_kata_mariadb' 'hammerdb_vm_mariadb' 'hammerdb_pod_postgres' 'hammerdb_kata_postgres' 'hammerdb_vm_postgres' 'hammerdb_pod_mssql' 'hammerdb_kata_mssql' 'hammerdb_vm_mssql')
+        declare -a workloads=('hammerdb_pod_mariadb' 'hammerdb_kata_mariadb' 'hammerdb_vm_mariadb')
         for workload in "${workloads[@]}"
         do
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>'
@@ -421,7 +421,7 @@ jobs:
         done
         build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
         build_version="$(cut -d'=' -f2 <<<"$build")"
-        declare -a workloads=('hammerdb_pod_mariadb' 'hammerdb_kata_mariadb' 'hammerdb_vm_mariadb' 'hammerdb_pod_postgres' 'hammerdb_kata_postgres' 'hammerdb_vm_postgres' 'hammerdb_pod_mssql' 'hammerdb_kata_mssql' 'hammerdb_vm_mssql')
+        declare -a workloads=('hammerdb_pod_postgres' 'hammerdb_kata_postgres' 'hammerdb_vm_postgres')
         for workload in "${workloads[@]}"
         do
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>'
@@ -500,7 +500,7 @@ jobs:
         done
         build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
         build_version="$(cut -d'=' -f2 <<<"$build")"
-        declare -a workloads=('hammerdb_pod_mariadb' 'hammerdb_kata_mariadb' 'hammerdb_vm_mariadb' 'hammerdb_pod_postgres' 'hammerdb_kata_postgres' 'hammerdb_vm_postgres' 'hammerdb_pod_mssql' 'hammerdb_kata_mssql' 'hammerdb_vm_mssql')
+        declare -a workloads=('hammerdb_pod_mssql' 'hammerdb_kata_mssql' 'hammerdb_vm_mssql')
         for workload in "${workloads[@]}"
         do
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>'
