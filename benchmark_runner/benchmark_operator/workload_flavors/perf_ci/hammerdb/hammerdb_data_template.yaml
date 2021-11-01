@@ -18,6 +18,8 @@ shared_data:
   metrics_profile: node-metrics.yml
   #metrics_profile: https://raw.githubusercontent.com/cloud-bulldozer/benchmark-operator/master/roles/kube-burner/files/metrics.yaml
 mariadb:
+  mariadb_limits_cpu: 16
+  mariadb_limits_memory_GB: 16
   db_image: centos8-mariadb103-container-disk:latest
   db_pass: mysql
   db_port: 3306
@@ -25,6 +27,8 @@ mariadb:
   db_user: root
   db_server_pod: mariadb-deployment.mariadb-db
 mssql:
+  mssql_limits_cpu: 32
+  mssql_limits_memory_GB: 16
   db_image: centos8-mssql2019-container-disk:latest
   db_pass: s3curePasswordString
   db_port: 1433
@@ -32,6 +36,8 @@ mssql:
   db_user: SA
   db_server_pod: mssql-deployment.mssql-db
 postgres:
+  postgres_limits_cpu: 16
+  postgres_limits_memory_GB: 16
   db_image: centos8-postgres10-container-disk:latest
   db_pass: postgres
   db_port: 5432

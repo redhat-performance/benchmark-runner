@@ -350,6 +350,10 @@ class BenchmarkOperatorWorkloads:
     # The Kata workloads should not be decorated with
     @logger_time_stamp
     def stressng_kata(self):
+        """
+        This method run stressng kata workload
+        :return:
+        """
         self.stressng_pod(self.stressng_kata.__name__)
 
     @logger_time_stamp
@@ -452,10 +456,13 @@ class BenchmarkOperatorWorkloads:
 
     @logger_time_stamp
     def uperf_kata(self):
+        """
+        This method run uperf kata workload
+        :return:
+        """
         self.uperf_pod(self.uperf_kata.__name__)
 
     @logger_time_stamp
-    @retry(stop=stop_after_attempt(3))
     def uperf_vm(self):
         """
         This method run uperf vm workload
@@ -570,11 +577,14 @@ class BenchmarkOperatorWorkloads:
     @typechecked
     @logger_time_stamp
     def hammerdb_kata(self, database: str):
+        """
+        This method run hammerdb kata workload
+        :return:
+        """
         self.hammerdb_pod(database, self.hammerdb_kata.__name__)
 
     @typechecked
     @logger_time_stamp
-    @retry(stop=stop_after_attempt(3))
     def hammerdb_vm(self, database: str):
         """
         This method run hammerdb vm workload
