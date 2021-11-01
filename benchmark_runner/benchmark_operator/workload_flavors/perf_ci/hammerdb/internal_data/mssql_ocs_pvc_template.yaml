@@ -37,8 +37,8 @@ spec:
             cpu: 10m
             memory: 10Mi
           limits:
-            cpu: {{ limits_cpu }}
-            memory: {{ limits_memory_GB }}Gi
+            cpu: {{ mssql_limits_cpu }}
+            memory: {{ mssql_limits_memory_GB }}Gi
         env:
           - name: MSSQL_PID
             value: "Enterprise"

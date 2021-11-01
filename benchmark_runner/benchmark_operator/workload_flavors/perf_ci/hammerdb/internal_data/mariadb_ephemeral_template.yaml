@@ -58,8 +58,8 @@ spec:
             cpu: 10m
             memory: 10Mi
           limits:
-            cpu: {{ limits_cpu }}
-            memory: {{ limits_memory_GB }}Gi
+            cpu: {{ mariadb_limits_cpu }}
+            memory: {{ mariadb_limits_memory_GB }}Gi
         env:
            - name: MYSQL_USER
              value: "test"
