@@ -30,9 +30,6 @@ class EnvironmentVariables:
         self._environment_variables_dict['elasticsearch'] = os.environ.get('ELASTICSEARCH', '')
         self._environment_variables_dict['elasticsearch_port'] = os.environ.get('ELASTICSEARCH_PORT', '')
 
-        # This parameter 'True'/'False' for debug workload, when its set to 'True' it will stop the workload when finishing
-        self._environment_variables_dict['stop_when_workload_finish'] = os.environ.get('STOP_WHEN_WORKLOAD_FINISH', '')
-
         # default parameter - change only if needed
         # Parameters below related to 'run_workload()'
         self._environment_variables_dict['workloads'] = ['stressng_pod', 'stressng_vm', 'stressng_kata',

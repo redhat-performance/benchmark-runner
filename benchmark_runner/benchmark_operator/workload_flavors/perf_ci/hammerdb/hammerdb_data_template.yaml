@@ -1,7 +1,7 @@
 shared_data:
   namespace: {{ namespace }}
   db_num_workers: 32
-  db_warehouses: 128
+  db_warehouses: 96
   storage: 100
   pin: {{ pin }}
   pin_node1: {{ pin_node1 }}
@@ -18,8 +18,10 @@ shared_data:
   metrics_profile: node-metrics.yml
   #metrics_profile: https://raw.githubusercontent.com/cloud-bulldozer/benchmark-operator/master/roles/kube-burner/files/metrics.yaml
 mariadb:
-  mariadb_limits_cpu: 16
-  mariadb_limits_memory_GB: 16
+  mariadb_limits_cpu: 32
+  mariadb_limits_memory_GB: 64
+  mariadb_requests_cpu: 32
+  mariadb_requests_memory_GB: 64
   db_image: centos8-mariadb103-container-disk:latest
   db_pass: mysql
   db_port: 3306
@@ -28,7 +30,9 @@ mariadb:
   db_server_pod: mariadb-deployment.mariadb-db
 mssql:
   mssql_limits_cpu: 32
-  mssql_limits_memory_GB: 16
+  mssql_limits_memory_GB: 64
+  mssql_requests_cpu: 32
+  mssql_requests_memory: 64
   db_image: centos8-mssql2019-container-disk:latest
   db_pass: s3curePasswordString
   db_port: 1433
@@ -36,8 +40,10 @@ mssql:
   db_user: SA
   db_server_pod: mssql-deployment.mssql-db
 postgres:
-  postgres_limits_cpu: 16
-  postgres_limits_memory_GB: 16
+  postgres_limits_cpu: 32
+  postgres_limits_memory_GB: 64
+  postgres_requests_cpu: 32
+  postgres_requests_memory_GB: 64
   db_image: centos8-postgres10-container-disk:latest
   db_pass: postgres
   db_port: 5432
@@ -46,8 +52,12 @@ postgres:
   db_server_pod: postgres-deployment.postgres-db
 pod:
   resources: true
-  limits_cpu: 16
-  limits_memory_GB: 16
+  pod_limits_cpu: 16
+  pod_limits_memory_GB: 16
+  pod_requests_cpu: 10m
+  pod_requests_memory: 10Mi
 vm:
-  cores: 16
-  limits_memory_GB: 16
+  vm_cores: 1
+  vm_sockets: 32
+  vm_limits_memory_GB: 64
+  vm_requests_memory_GB: 64

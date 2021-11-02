@@ -55,8 +55,8 @@ spec:
         - containerPort: 3306
         resources:
           requests:
-            cpu: 10m
-            memory: 10Mi
+            cpu: {{ mariadb_requests_cpu }}
+            memory: {{ mariadb_requests_memory_GB }}Gi
           limits:
             cpu: {{ mariadb_limits_cpu }}
             memory: {{ mariadb_limits_memory_GB }}Gi
