@@ -34,8 +34,8 @@ spec:
         - containerPort: 1433
         resources:
           requests:
-            cpu: 10m
-            memory: 10Mi
+            cpu: {{ mssql_requests_cpu }}
+            memory: {{ mssql_limits_memory_GB }}Gi
           limits:
             cpu: {{ mssql_limits_cpu }}
             memory: {{ mssql_limits_memory_GB }}Gi

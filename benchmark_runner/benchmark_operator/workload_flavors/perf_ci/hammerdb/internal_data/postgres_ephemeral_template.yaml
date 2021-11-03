@@ -47,8 +47,8 @@ spec:
             - containerPort: 5432
           resources:
             requests:
-              cpu: 10m
-              memory: 10Mi
+              cpu: {{ postgres_requests_cpu }}
+              memory: {{ postgres_requests_memory_GB }}Gi
             limits:
               cpu: {{ postgres_limits_cpu }}
               memory: {{ postgres_limits_memory_GB }}Gi

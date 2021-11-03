@@ -26,10 +26,10 @@ spec:
       pin: {{ pin }} # enable for nodeSelector
       pin_node: "{{ pin_node1 }}"
       resources: {{ resources }} # enable for resources requests/limits
-      requests_cpu: 10m
-      requests_memory: 10Mi
-      limits_cpu: {{ limits_cpu }}
-      limits_memory: {{ limits_memory_GB }}Gi
+      requests_cpu: {{ pod_requests_cpu }}
+      requests_memory: {{ pod_requests_memory }}
+      limits_cpu: {{ pod_limits_cpu }}
+      limits_memory: {{ pod_limits_memory_GB }}Gi
       db_type: "{{ db_type }}"
       timed_test: true
       test_type: "tpc-c"

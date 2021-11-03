@@ -27,7 +27,6 @@ class BenchmarkOperatorWorkloads:
         self.__environment_variables_dict = environment_variables.environment_variables_dict
         self.__runner_version = self.__environment_variables_dict.get('build_version', '')
         self.__run_type = self.__environment_variables_dict.get('run_type', '')
-        self.__stop_when_workload_finish = self.__environment_variables_dict.get('stop_when_workload_finish', '')
         self.__system_metrics = self.__environment_variables_dict.get('system_metrics', '')
         self.__elasticsearch = self.__environment_variables_dict.get('elasticsearch', '')
         self.__ssh = SSH()
@@ -71,21 +70,11 @@ class BenchmarkOperatorWorkloads:
         else:
             logger.info('yaml file {} does not exist')
 
-    def __exist_for_debug(self):
-        """
-        This method check for workload exist when complete running
-        :return:
-        """
-        # Stop for debugging workload pod
-        if self.__stop_when_workload_finish == 'True':
-            return sys.exit(0)
-
     def __check_elasticsearch_exist_for_system_metrics(self):
         """
         This method check if elasticsearch exist for system metrics
         :return:
         """
-        # Stop for debugging workload pod
         if self.__system_metrics == 'True':
             if not self.__elasticsearch:
                 raise SystemMetricsRequiredElasticSearch()
@@ -321,7 +310,6 @@ class BenchmarkOperatorWorkloads:
             self.__oc.wait_for_initialized(label='app=stressng_workload', workload=workload)
             self.__oc.wait_for_ready(label='app=stressng_workload', workload=workload)
             self.__oc.wait_for_pod_completed(label='app=stressng_workload', workload=workload)
-            self.__exist_for_debug()
             # system metrics
             if environment_variables.environment_variables_dict['system_metrics'] == 'True':
                 self.system_metrics_collector(workload=workload)
@@ -369,7 +357,6 @@ class BenchmarkOperatorWorkloads:
             self.__oc.wait_for_initialized(label='app=stressng_workload', workload=workload)
             self.__oc.wait_for_ready(label='app=stressng_workload', workload=workload)
             self.__oc.wait_for_vm_completed(workload=workload)
-            self.__exist_for_debug()
             # system metrics
             if environment_variables.environment_variables_dict['system_metrics'] == 'True':
                self.system_metrics_collector(workload=workload)
@@ -430,7 +417,6 @@ class BenchmarkOperatorWorkloads:
             self.__oc.wait_for_initialized(label='app=uperf-bench-client', workload=workload)
             self.__oc.wait_for_ready(label='app=uperf-bench-client', workload=workload)
             self.__oc.wait_for_pod_completed(label='app=uperf-bench-client', workload=workload)
-            self.__exist_for_debug()
             # system metrics
             if environment_variables.environment_variables_dict['system_metrics'] == 'True':
                 self.system_metrics_collector(workload=workload)
@@ -481,7 +467,6 @@ class BenchmarkOperatorWorkloads:
             self.__oc.wait_for_initialized(label='app=uperf-bench-client', workload=workload)
             self.__oc.wait_for_ready(label='app=uperf-bench-client', workload=workload)
             self.__oc.wait_for_vm_completed(workload=workload)
-            self.__exist_for_debug()
             # system metrics
             if environment_variables.environment_variables_dict['system_metrics'] == 'True':
                 self.system_metrics_collector(workload=workload)
@@ -535,7 +520,6 @@ class BenchmarkOperatorWorkloads:
             self.__oc.wait_for_initialized(label='app=hammerdb_workload', workload=workload)
             self.__oc.wait_for_ready(label='app=hammerdb_workload', workload=workload)
             self.__oc.wait_for_pod_completed(label='app=hammerdb_workload', workload=workload)
-            self.__exist_for_debug()
             # system metrics
             if environment_variables.environment_variables_dict['system_metrics'] == 'True':
                 self.system_metrics_collector(workload=workload)
@@ -599,7 +583,6 @@ class BenchmarkOperatorWorkloads:
             self.__oc.wait_for_initialized(label='app=hammerdb_workload', workload=workload)
             self.__oc.wait_for_ready(label='app=hammerdb_workload', workload=workload)
             self.__oc.wait_for_vm_completed(workload=workload)
-            self.__exist_for_debug()
             # system metrics
             if environment_variables.environment_variables_dict['system_metrics'] == 'True':
                 self.system_metrics_collector(workload=workload)
