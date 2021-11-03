@@ -30,7 +30,7 @@ def update_environment_variable(dir_path: str, yaml_file: str, environment_varia
 
 def delete_generate_file(full_path_yaml: str):
     """
-    This method update environment variable inside yaml file
+    This method cleans up a generated file name
     :param full_path_yaml:
     :return:
     """
