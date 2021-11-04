@@ -22,15 +22,15 @@ spec:
     args:
       client_resources:
         requests:
-          cpu: 10m
-          memory: 10Mi
+          cpu: {{ client_limits_cpu }}
+          memory: {{ client_limits_memory_GB }}Gi
         limits:
           cpu: {{ client_limits_cpu }}
           memory: {{ client_limits_memory_GB }}Gi
       server_resources:
         requests:
-          cpu: 10m
-          memory: 10Mi
+          cpu: {{ server_limits_cpu }}
+          memory: {{ server_limits_memory_GB }}Gi
         limits:
           cpu: {{ server_limits_cpu }}
           memory: {{ server_limits_memory_GB }}Gi
@@ -45,15 +45,14 @@ spec:
       samples: {{ samples }}
       pair: {{ pair }}
       test_types:
-        - {{ test_type }}
+        - {{ test_type1 }}
+        - {{ test_type2 }}
       protos:
         - {{ proto }}
       sizes:
         - {{ size1 }}
         - {{ size2 }}
         - {{ size3 }}
-        - {{ size4 }}
-        - {{ size5 }}
       nthrs:
         - {{ nthr1 }}
         - {{ nthr2 }}
