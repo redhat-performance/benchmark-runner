@@ -11,16 +11,15 @@ shared_data:
   multus: false
   samples: 1
   pair: 1
-  test_type: stream
+  test_type1: stream
+  test_type2: rr
   proto: tcp
   size1: 64
-  size2: 256
-  size3: 1024
-  size4: 4096
-  size5: 16384
+  size2: 1024
+  size3: 8192
   nthr1: 1
-  nthr2: 2
-  runtime: 30
+  nthr2: 8
+  runtime: 60
   # enable/disable system metrics
   system_metrics: {{ system_metrics }}
   prom_url: https://prometheus-k8s.openshift-monitoring.svc.cluster.local:9091
@@ -30,13 +29,13 @@ shared_data:
   #metrics_profile: https://raw.githubusercontent.com/cloud-bulldozer/benchmark-operator/master/roles/kube-burner/files/metrics.yaml
 pod:
   es_kind: {{ kind }}
-  client_limits_cpu: 4
-  client_limits_memory_GB: 16
-  server_limits_cpu: 4
-  server_limits_memory_GB: 16
+  client_limits_cpu: 8
+  client_limits_memory_GB: 8
+  server_limits_cpu: 8
+  server_limits_memory_GB: 8
 vm:
   es_kind: vm
-  server_cores: 4
-  server_limits_memory_GB: 16
-  client_cores: 4
-  client_limits_memory_GB: 16
+  server_sockets: 8
+  server_memory_GB: 8
+  client_sockets: 8
+  client_memory_GB: 8
