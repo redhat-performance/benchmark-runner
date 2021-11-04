@@ -51,6 +51,8 @@ tests/results.xml
 */tests/results.xml
 results.xml
 
+#Runtime
+**/current_run/
 
 # Translations
 *.mo
