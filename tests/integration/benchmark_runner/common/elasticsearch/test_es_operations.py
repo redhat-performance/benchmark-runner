@@ -16,10 +16,10 @@ def __generate_pod_yamls():
     This method create pod yaml from template and inject environment variable inside
     :return:
     """
-    yaml_file = 'stressng_pod_template.yaml'
-    data = render_yaml_file(dir_path=templates_path, yaml_file=yaml_file, environment_variable_dict=test_environment_variable)
-    yaml_file = yaml_file.replace('_template', '')
-    with open(os.path.join(dir_path, yaml_file), 'w') as f:
+    yaml_template = 'stressng_pod_template.yaml'
+    data = render_yaml_file(dir_path=templates_path, yaml_file=yaml_template, environment_variable_dict=test_environment_variable)
+    yaml_file = yaml_template.replace('_template', '')
+    with open(os.path.join(templates_path, yaml_file), 'w') as f:
         f.write(data)
 
 
@@ -77,7 +77,7 @@ def test_verify_es_data_uploaded_stressng_pod():
     oc.login()
     try:
         workload = 'stressng-pod'
-        oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_pod.yaml'), pod_name=f'{workload}-workload')
+        oc.create_pod_sync(yaml=os.path.join(templates_path, 'stressng_pod.yaml'), pod_name=f'{workload}-workload')
         oc.wait_for_initialized(label='app=stressng_workload', workload=workload)
         oc.wait_for_ready(label='app=stressng_workload', workload=workload)
         oc.wait_for_pod_completed(label='app=stressng_workload', workload=workload)

@@ -16,9 +16,9 @@ def __generate_yamls(workload: str, kind: str):
     :return:
     """
     yaml_template = f'{workload}_{kind}_template.yaml'
+    yaml_file = f'{workload}_{kind}.yaml'
     data = render_yaml_file(dir_path=templates_path, yaml_file=yaml_template, environment_variable_dict=test_environment_variable)
-    yaml_file = yaml_template.replace('_template', '')
-    with open(os.path.join(dir_path, yaml_file), 'w') as f:
+    with open(os.path.join(templates_path, yaml_file), 'w') as f:
         f.write(data)
 
 
@@ -31,7 +31,7 @@ def __delete_test_objects(workload: str, kind: str):
     workload_name=f'{workload}-{kind}-workload'
     workload_yaml=f'{workload}_{kind}.yaml'
     if oc._is_pod_exist(pod_name=workload_name, namespace=test_environment_variable['namespace']):
-        oc.delete_pod_sync(yaml=os.path.join(f'{templates_path}', workload_yaml), pod_name=workload_name)
+        oc.delete_pod_sync(yaml=os.path.join(templates_path, workload_yaml), pod_name=workload_name)
     if os.path.isfile(workload_yaml):
         os.remove(workload_yaml)
 
