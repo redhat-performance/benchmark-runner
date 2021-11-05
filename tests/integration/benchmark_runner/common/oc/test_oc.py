@@ -5,69 +5,35 @@ import pytest
 from benchmark_runner.common.oc.oc import OC
 from benchmark_runner.common.oc.oc_exceptions import LoginFailed, PodNotCreateTimeout, PodTerminateTimeout, VMNotCreateTimeout, YAMLNotExist
 from benchmark_runner.common.elasticsearch.es_operations import ESOperations
-from benchmark_runner.main.update_data_template_yaml_with_environment_variables import delete_generate_file, update_environment_variable
+from benchmark_runner.main.update_data_template_yaml_with_environment_variables import render_yaml_file
 from benchmark_runner.benchmark_operator.benchmark_operator_workloads import BenchmarkOperatorWorkloads
 from tests.integration.benchmark_runner.test_environment_variables import *
 
 
-def __generate_pod_yamls():
+def __generate_yamls(workload: str, kind: str):
     """
-    This method create pod yaml from template and inject environment variable inside
+    This method creates YAML files from templates, substituting environment variables.
     :return:
     """
-    update_environment_variable(dir_path=templates_path, yaml_file='stressng_pod_template.yaml', environment_variable_dict=test_environment_variable)
+    yaml_template = f'{workload}_{kind}_template.yaml'
+    data = render_yaml_file(dir_path=templates_path, yaml_file=yaml_template, environment_variable_dict=test_environment_variable)
+    yaml_file = yaml_template.replace('_template', '')
+    with open(os.path.join(dir_path, yaml_file), 'w') as f:
+        f.write(data)
 
 
-def __generate_kata_yamls():
+def __delete_test_objects(workload: str, kind: str):
     """
-    This method create kata yaml from template and inject environment variable inside
-    :return:
-    """
-    update_environment_variable(dir_path=templates_path, yaml_file='stressng_kata_template.yaml', environment_variable_dict=test_environment_variable)
-
-
-def __generate_vm_yamls():
-    """
-    This method create vm yaml from template and inject environment variable inside
-    :return:
-    """
-    update_environment_variable(dir_path=templates_path, yaml_file='stressng_vm_template.yaml', environment_variable_dict=test_environment_variable)
-
-
-def __delete_pod_yamls():
-    """
-    This method delete pod yamls if exist
-    :return:
+    Delete objects and YAML files if they exist
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
-    if oc._is_pod_exist(pod_name='stressng-pod-workload', namespace=test_environment_variable['namespace']):
-        oc.delete_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_pod.yaml'), pod_name='stressng-pod-workload')
-    delete_generate_file(full_path_yaml=os.path.join(f'{templates_path}', 'stressng_pod.yaml'))
-
-
-def __delete_kata_yamls():
-    """
-    This method delete kata yamls if exist
-    :return:
-    """
-    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
-    if oc._is_pod_exist(pod_name='stressng-kata-workload', namespace=test_environment_variable['namespace']):
-        oc.delete_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_kata.yaml'), pod_name='stressng-kata-workload')
-    delete_generate_file(full_path_yaml=os.path.join(f'{templates_path}', 'stressng_kata.yaml'))
-
-
-def __delete_vm_yamls():
-    """
-    This method delete vm yamls if exist
-    :return:
-    """
-    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
-    if oc._is_vmi_exist(vm_name='stressng-vm-workload', namespace=test_environment_variable['namespace']):
-        oc.delete_vm_sync(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'), vm_name='stressng-vm-workload')
-    delete_generate_file(full_path_yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'))
+    workload_name=f'{workload}-{kind}-workload'
+    workload_yaml=f'{workload}_{kind}.yaml'
+    if oc._is_pod_exist(pod_name=workload_name, namespace=test_environment_variable['namespace']):
+        oc.delete_pod_sync(yaml=os.path.join(f'{templates_path}', workload_yaml), pod_name=workload_name)
+    if os.path.isfile(workload_yaml):
+        os.remove(workload_yaml)
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -90,18 +56,17 @@ def before_after_all_tests_fixture():
 @pytest.fixture(autouse=True)
 def before_after_each_test_fixture():
     """
-    This method is clearing yaml before and after EACH test
+    This method creates and deletes YAML files and test objects before and after each test
     :return:
     """
     # before all test: setup
-    __generate_pod_yamls()
-    __generate_kata_yamls()
-    __generate_vm_yamls()
+    kinds = ('pod', 'kata', 'vm')
+    for kind in kinds:
+        __generate_yamls(workload='stressng', kind=kind)
     yield
     # After all tests
-    __delete_pod_yamls()
-    __delete_kata_yamls()
-    __delete_vm_yamls()
+    for kind in kinds:
+        __delete_test_objects(workload='stressng', kind=kind)
     print('Test End')
 
 ###################################################### POD Tests ##################################################

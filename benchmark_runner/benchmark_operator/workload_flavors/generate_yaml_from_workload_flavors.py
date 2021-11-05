@@ -3,16 +3,13 @@ import os
 import shutil
 import yaml
 from jinja2 import Template
-from benchmark_runner.main.update_data_template_yaml_with_environment_variables import render_yaml_file_with_environment
+from benchmark_runner.main.update_data_template_yaml_with_environment_variables import render_yaml_file
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp
 from benchmark_runner.main.environment_variables import environment_variables
 
 
 class TemplateOperations:
-    """
-    This class is responsible for template operations
-    
-    """
+    """This class is responsible for template operations"""
 
     def __init__(self):
         self.initialize_environment(environment_variables.environment_variables_dict)
@@ -87,7 +84,7 @@ class TemplateOperations:
         """
         # Get hammerdb data
         hammerdb_template = self.__get_yaml_template_by_workload(workload=workload)
-        hammerdb_data = yaml.load(render_yaml_file_with_environment(self.__hammerdb_dir_path, 'hammerdb_data_template.yaml', self.__environment_variables_dict), Loader=yaml.FullLoader)
+        hammerdb_data = yaml.load(render_yaml_file(self.__hammerdb_dir_path, 'hammerdb_data_template.yaml', self.__environment_variables_dict), Loader=yaml.FullLoader)
         database_data = hammerdb_data[database]
         render_data = hammerdb_data['shared_data']
 
@@ -132,7 +129,7 @@ class TemplateOperations:
         workload_template = self.__get_yaml_template_by_workload(workload=workload)
         workload_name = workload.split('_')[0]
         workload_dir_path = os.path.join(self.__dir_path, workload_name)
-        workload_data = yaml.load(render_yaml_file_with_environment(workload_dir_path, f'{workload_name}_data_template.yaml', self.__environment_variables_dict), Loader=yaml.FullLoader)
+        workload_data = yaml.load(render_yaml_file(workload_dir_path, f'{workload_name}_data_template.yaml', self.__environment_variables_dict), Loader=yaml.FullLoader)
         render_data = workload_data['shared_data']
 
         # merge 3 dictionaries

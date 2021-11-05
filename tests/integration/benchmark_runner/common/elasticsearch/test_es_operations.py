@@ -1,12 +1,12 @@
 
 import pytest
+import os
 from uuid import uuid4
 
 from benchmark_runner.common.oc.oc import OC
 from benchmark_runner.common.elasticsearch.es_operations import ESOperations
 from benchmark_runner.common.elasticsearch.elasticsearch_exceptions import ElasticSearchDataNotUploaded
-from benchmark_runner.main.update_data_template_yaml_with_environment_variables import delete_generate_file, \
-    update_environment_variable
+from benchmark_runner.main.update_data_template_yaml_with_environment_variables import render_yaml_file
 from benchmark_runner.benchmark_operator.benchmark_operator_workloads import BenchmarkOperatorWorkloads
 from tests.integration.benchmark_runner.test_environment_variables import *
 
@@ -16,7 +16,11 @@ def __generate_pod_yamls():
     This method create pod yaml from template and inject environment variable inside
     :return:
     """
-    update_environment_variable(dir_path=templates_path, yaml_file='stressng_pod_template.yaml', environment_variable_dict=test_environment_variable)
+    yaml_file = 'stressng_pod_template.yaml'
+    data = render_yaml_file(dir_path=templates_path, yaml_file=yaml_file, environment_variable_dict=test_environment_variable)
+    yaml_file = yaml_file.replace('_template', '')
+    with open(os.path.join(dir_path, yaml_file), 'w') as f:
+        f.write(data)
 
 
 def __delete_pod_yamls():
@@ -28,7 +32,8 @@ def __delete_pod_yamls():
     oc.login()
     if oc._is_pod_exist(pod_name='stressng-pod-workload', namespace=test_environment_variable['namespace']):
         oc.delete_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_pod.yaml'), pod_name='stressng-pod-workload')
-    delete_generate_file(full_path_yaml=os.path.join(f'{templates_path}', 'stressng_pod.yaml'))
+    if os.path.isfile(os.path.join(f'{templates_path}', 'stressng_pod.yaml')):
+        os.remove(os.path.join(f'{templates_path}', 'stressng_pod.yaml'))
 
 
 @pytest.fixture(scope="session", autouse=True)
