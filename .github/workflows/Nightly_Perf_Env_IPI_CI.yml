@@ -81,7 +81,6 @@ jobs:
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End OCP IPI Install   >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
           end=$(printf '%(%s)T' -1)
           echo "OCP_INSTALL_MINUTES_TIME=$(( (( end - start )) / 60))" >> "$GITHUB_ENV"
-          continue-on-error: true
       - id: ocp_install_time
         run: echo "::set-output name=install_time::$OCP_INSTALL_MINUTES_TIME"
       - name: ⚙ Set Kubeconfig after OCP installation
