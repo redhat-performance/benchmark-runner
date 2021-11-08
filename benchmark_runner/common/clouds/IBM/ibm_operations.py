@@ -208,7 +208,8 @@ class IBMOperations:
         :return: True if installation success and raise exception if installation failed
         """
         logger.info(f'Starting OCP IPI installer, Start time: {datetime.now().strftime(datetime_format)}')
-        self.__ssh.run(cmd=f"ssh -t -i {self.__container_private_key_path} {self.__user}@{self.__provision_ip} \"{self.__ibm_login_cmd()};{self.__ibm_ipi_install_ocp_cmd()}\" ")
+        # Must add -t and -o parameters otherwise remote ssh of ansible will not end 
+        self.__ssh.run(cmd=f"ssh -o ServerAliveInterval=30 -o ServerAliveCountMax=5 -o StrictHostKeyChecking=no -t -i {self.__container_private_key_path} {self.__user}@{self.__provision_ip} \"{self.__ibm_login_cmd()};{self.__ibm_ipi_install_ocp_cmd()}\" ")
         complete = self.__wait_for_install_complete()
         if not complete:
             # Workers issue: workaround for solving IBM workers stuck on BIOS page after reboot
