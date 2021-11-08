@@ -83,7 +83,7 @@ class IBMOperations:
         This method return ibm login command
         :return:
         """
-        return f'ibmcloud login --apikey {self.__ibm_api_key}'
+        return f'ibmcloud login --apikey {self.__ibm_api_key} 1>/dev/null 2>&1'
 
     # private method: machine id
     def __get_ibm_machine_status(self, machine_id: str):
@@ -209,8 +209,18 @@ class IBMOperations:
         :return: True if installation success and raise exception if installation failed
         """
         logger.info(f'Starting OCP IPI installer, Start time: {datetime.now().strftime(datetime_format)}')
-        # Must add -t and -o parameters otherwise remote ssh of ansible will not end
-        self.__ssh.run(cmd=f"ssh -o ServerAliveInterval=30 -o ServerAliveCountMax=5 -o StrictHostKeyChecking=no -t -i {self.__container_private_key_path} {self.__user}@{self.__provision_ip} \"{self.__ibm_login_cmd()};{self.__ibm_ipi_install_ocp_cmd()}\" ")
+        # update ssh config
+        self.__ssh.run(f"echo Host provision >> /{self.__user}/.ssh/config")
+        self.__ssh.run(f"echo -e '\t'HostName {self.__provision_ip} >> /{self.__user}/.ssh/config")
+        self.__ssh.run(f"echo -e '\t'User {self.__user} >> /{self.__user}/.ssh/config")
+        self.__ssh.run(f"echo -e '\t'IdentityFile {self.__container_private_key_path} >> /{self.__user}/.ssh/config")
+        self.__ssh.run(f"echo -e '\t'StrictHostKeyChecking no >> /{self.__user}/.ssh/config")
+        self.__ssh.run(f"echo -e '\t'ServerAliveInterval 30 >> /{self.__user}/.ssh/config")
+        self.__ssh.run(f"echo -e '\t'ServerAliveCountMax 5 >> /{self.__user}/.ssh/config")
+        self.__ssh.run(f"chmod 600 /{self.__user}/.ssh/config")
+        # Must add -t otherwise remote ssh of ansible will not end
+        self.__ssh.run(cmd=f"ssh -t provision \"{self.__ibm_login_cmd()};{self.__ibm_ipi_install_ocp_cmd()}\" ")
+        logger.info(f'End OCP IPI installer, End time: {datetime.now().strftime(datetime_format)}')
 
     @logger_time_stamp
     def verify_install_complete(self):
@@ -295,3 +305,6 @@ class IBMOperations:
         self.__github_operations.create_secret(secret_name=f'{self.__ocp_env_flavor}_KUBECONFIG', unencrypted_value=self.__get_kubeconfig())
         self.__github_operations.create_secret(secret_name=f'{self.__ocp_env_flavor}_KUBEADMIN_PASSWORD',
                                                 unencrypted_value=self.__get_kubeadmin_password())
+        # wait 5 minutes till credentials will be updated
+        logger.info(f'Wait 5 minutes till credentials will be updated {datetime.now().strftime(datetime_format)}')
+        time.sleep(300)

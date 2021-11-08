@@ -3,7 +3,7 @@
 name: Deploy Perf Env Nightly CI
 on:
   schedule:
-    - cron: '0 4 * * 1-6' # run Monday through Saturday at 4 AM UTC/ 0 AM EST
+    - cron: '0 4 * * 1-6' # run Monday through Saturday at 4 AM UTC/ 0 AM EDT
 #on:
 #  push:
 #    branches: [ main ]
