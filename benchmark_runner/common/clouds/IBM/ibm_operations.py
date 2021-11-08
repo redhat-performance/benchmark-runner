@@ -127,11 +127,12 @@ class IBMOperations:
         :param sleep_time:
         :return:
         """
-        current_wait_time = sleep_time
-        # precondition wait till installer start to generate logs, till delete previous run logs
-        logger.info(f'Waiting till OCP install complete, waiting {int(current_wait_time / 60)} minutes')
-        time.sleep(sleep_time)
-        current_wait_time += sleep_time
+        current_wait_time = 0
+        # current_wait_time = sleep_time
+        # # Important: must wait 10 min till installer start to generate logs
+        # logger.info(f'Waiting till OCP install complete, waiting {int(current_wait_time / 60)} minutes')
+        # time.sleep(sleep_time)
+        # current_wait_time += sleep_time
         while current_wait_time <= self.__provision_timeout:
             output = self.__remote_ssh.run_command(self.__provision_installer_log)
             if 'Install complete!' in output:
@@ -199,7 +200,7 @@ class IBMOperations:
                                             file_name='hosts',
                                             parameter='build=',
                                             value=f'"{self.__ocp_version_build}"')
-    
+
     @logger_time_stamp
     @retry(stop=stop_after_attempt(3))
     def run_ibm_ocp_ipi_installer(self):
@@ -208,7 +209,14 @@ class IBMOperations:
         :return: True if installation success and raise exception if installation failed
         """
         logger.info(f'Starting OCP IPI installer, Start time: {datetime.now().strftime(datetime_format)}')
-        self.__ssh.run(cmd=f"ssh -i {self.__container_private_key_path} {self.__user}@{self.__provision_ip} \"{self.__ibm_login_cmd()};{self.__ibm_ipi_install_ocp_cmd()}\" ")
+        self.__ssh.run(cmd=f"ssh -t -i {self.__container_private_key_path} {self.__user}@{self.__provision_ip} \"{self.__ibm_login_cmd()};{self.__ibm_ipi_install_ocp_cmd()}\" ")
+
+    @logger_time_stamp
+    def verify_install_complete(self):
+        """
+        This method wait for install complete
+        :return: True if installation success and raise exception if installation failed
+        """
         complete = self.__wait_for_install_complete()
         if not complete:
             # Workers issue: workaround for solving IBM workers stuck on BIOS page after reboot
