@@ -39,13 +39,13 @@ spec:
         sockets: 1
         cores: 2
         threads: 1
-        image: kubevirt/fedora-cloud-container-disk-demo:latest
+        image: quay.io/kubevirt/fedora-container-disk-images:34
         limits:
           memory: 16Gi
         requests:
           memory: 10Mi
         network:
-          front_end: bridge # or masquerade
+          front_end: masquerade
           multiqueue:
             enabled: false # if set to true, highly recommend to set selinux to permissive on the nodes where the vms would be scheduled
             queues: 0 # must be given if enabled is set to true and ideally should be set to vcpus ideally so sockets*threads*cores, your image must've ethtool installed

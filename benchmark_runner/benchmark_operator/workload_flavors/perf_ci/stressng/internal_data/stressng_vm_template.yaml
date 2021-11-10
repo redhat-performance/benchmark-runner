@@ -39,7 +39,7 @@ spec:
         sockets: 1
         cores: {{ cores }}
         threads: 1
-        image: kubevirt/fedora-cloud-container-disk-demo:latest
+        image: quay.io/kubevirt/fedora-container-disk-images:34
         limits:
           memory: {{ limits_memory_GB }}Gi
         requests:
