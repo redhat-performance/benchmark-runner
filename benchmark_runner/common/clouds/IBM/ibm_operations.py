@@ -128,11 +128,6 @@ class IBMOperations:
         :return:
         """
         current_wait_time = 0
-        # current_wait_time = sleep_time
-        # # Important: must wait 10 min till installer start to generate logs
-        # logger.info(f'Waiting till OCP install complete, waiting {int(current_wait_time / 60)} minutes')
-        # time.sleep(sleep_time)
-        # current_wait_time += sleep_time
         while current_wait_time <= self.__provision_timeout:
             output = self.__remote_ssh.run_command(self.__provision_installer_log)
             if 'Install complete!' in output:
