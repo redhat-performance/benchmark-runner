@@ -259,8 +259,12 @@ class BenchmarkOperatorWorkloads:
                     'version': int(self.__runner_version.split('.')[-1]),
                     'ci_date': datetime.datetime.now().strftime(date_format)}
         if kind:
-            metadata.update({'kind': kind,
-                             'vm_os_version': 'centos8'})
+            metadata.update({'kind': kind})
+        if database:
+            metadata.update({'vm_os_version': 'centos8'})
+        else:
+            metadata.update({'vm_os_version': 'fedora34'})
+
         # for hammerdb
         if database == 'mssql':
             metadata.update({'db_version': 2019})
