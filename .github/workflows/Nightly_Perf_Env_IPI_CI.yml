@@ -20,7 +20,6 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       output1: ${{ steps.ocp_install_time.outputs.install_time }}
-      output2: ${{ steps.ocp_install_resource_time.outputs.install_resource_time }}
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python 3.9
@@ -86,20 +85,28 @@ jobs:
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>> verify install complete >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
           #podman run --rm -e OCP_ENV_FLAVOR="PERF" -e IBM_API_KEY="$IBM_API_KEY" -e GITHUB_TOKEN="$GITHUB_TOKEN" -e INSTALL_OCP_VERSION="latest-4.8" -e INSTALL_STEP="verify_install_complete" -e OCP_VERSION_BUILD="ga" -e PERF_WORKER_IDS="$PERF_WORKER_IDS" -e PERF_PROVISION_IP="$PERF_PROVISION_IP" -e PERF_CONTAINER_PRIVATE_KEY_PATH="$PERF_CONTAINER_PRIVATE_KEY_PATH" -e CONTAINER_PRIVATE_KEY_PATH="$CONTAINER_PRIVATE_KEY_PATH" -e PERF_PROVISION_USER="$PERF_PROVISION_USER" -e PERF_PROVISION_OC_USER="$PERF_PROVISION_OC_USER" -e PERF_PROVISION_PORT="$PERF_PROVISION_PORT" -e PERF_PROVISION_KUBEADMIN_PASSWORD_PATH="$PERF_PROVISION_KUBEADMIN_PASSWORD_PATH" -e PERF_PROVISION_KUBECONFIG_PATH="$PERF_PROVISION_KUBECONFIG_PATH" -e PERF_PROVISION_INSTALLER_PATH="$PERF_PROVISION_INSTALLER_PATH" -e PERF_PROVISION_INSTALLER_CMD="$PERF_PROVISION_INSTALLER_CMD" -e PERF_PROVISION_INSTALLER_LOG="$PERF_PROVISION_INSTALLER_LOG" -e GITHUB_REPOSITORY_SHORT="$GITHUB_REPOSITORY_SHORT" -e PERF_PROVISION_TIMEOUT="3600" -e log_level="INFO" -v "$PERF_PROVISION_PRIVATE_KEY_PATH":"$CONTAINER_PRIVATE_KEY_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End verify install complete >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
-          echo 'wait 5 minutes till secrets will be update'
-          sleep 300
           end=$(printf '%(%s)T' -1)
           echo "OCP_INSTALL_MINUTES_TIME=$(( (( end - start )) / 60))" >> "$GITHUB_ENV"
       - id: ocp_install_time
         run: echo "::set-output name=install_time::$OCP_INSTALL_MINUTES_TIME"
-      - name: ⚙ Set Kubeconfig after OCP installation
-        env:
-          KUBECONFIG: ${{ secrets.PERF_KUBECONFIG }}
-          RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+
+  
+  ocp_operator_installation:
+    name: OCP Operator Installation
+    needs: ocp_ipi_installation
+    runs-on: ubuntu-latest
+    outputs:
+      output1: ${{ steps.ocp_install_resource_time.outputs.install_resource_time }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Install latest benchmark-runner
         run: |
-          mkdir -p "$RUNNER_PATH/.kube/"
-          echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
-          echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
+          python -m pip install --upgrade pip
+          pip install benchmark-runner
       - name:  🔩 OCP Operator Reources install
         env:
           IBM_API_KEY: ${{ secrets.IBM_API_KEY }}
@@ -128,7 +135,7 @@ jobs:
   nightly_start:
     name: Deploy Perf Nightly - Start
     runs-on: ubuntu-latest
-    needs: ocp_ipi_installation
+    needs: [ocp_ipi_installation, ocp_operator_installation]
     outputs:
       output_start: ${{ steps.nightly_start_step.outputs.nightly_start }}
     steps:
@@ -139,7 +146,7 @@ jobs:
   stressng_workload:
     name: Stressng workload
     runs-on: ubuntu-latest
-    needs: [ocp_ipi_installation, nightly_start]
+    needs: [ocp_ipi_installation, ocp_operator_installation, nightly_start]
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.9
@@ -220,7 +227,7 @@ jobs:
   uperf_workload:
     name: Deploy Perf Nightly - Uperf
     runs-on: ubuntu-latest
-    needs: [ocp_ipi_installation, nightly_start, stressng_workload]
+    needs: [ocp_ipi_installation, ocp_operator_installation, nightly_start, stressng_workload]
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.9
@@ -294,11 +301,12 @@ jobs:
         end=$(printf '%(%s)T' -1)
         ci_minutes_time=$(( (end - START_CI) / 60))
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Update CI status failed >>>>>>>>>>>>>>>>>>>>>>>>>>'
-        podman run --rm -e OCP_ENV_FLAVOR="PERF" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e BUILD_VERSION="$build_version" -e CI_STATUS="failed" -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e OCP_INSTALL_MINUTES_TIME="${{needs.ocp_ipi_installation.outputs.output1}}" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+        podman run --rm -e OCP_ENV_FLAVOR="PERF" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e BUILD_VERSION="$build_version" -e CI_STATUS="failed" -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e OCP_INSTALL_MINUTES_TIME="${{needs.ocp_ipi_installation.outputs.output1}}" -e OCP_RESOURCE_INSTALL_MINUTES_TIME="${{needs.install_resource_time.outputs.output1}}" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+  
   hammerdb_mariadb_workload:
     name: Hammerdb MariaDB workload
     runs-on: ubuntu-latest
-    needs: [nightly_start, stressng_workload, uperf_workload]
+    needs: [ocp_ipi_installation, ocp_operator_installation, nightly_start, stressng_workload, uperf_workload]
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.9
@@ -372,12 +380,12 @@ jobs:
         end=$(printf '%(%s)T' -1)
         ci_minutes_time=$(( (end - START_CI) / 60))
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Update CI status failed >>>>>>>>>>>>>>>>>>>>>>>>>>'
-        podman run --rm -e OCP_ENV_FLAVOR="PERF" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e BUILD_VERSION="$build_version" -e CI_STATUS="failed" -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e OCP_INSTALL_MINUTES_TIME="${{needs.ocp_ipi_installation.outputs.output1}}" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+        podman run --rm -e OCP_ENV_FLAVOR="PERF" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e BUILD_VERSION="$build_version" -e CI_STATUS="failed" -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e OCP_INSTALL_MINUTES_TIME="${{needs.ocp_ipi_installation.outputs.output1}}" -e OCP_RESOURCE_INSTALL_MINUTES_TIME="${{needs.install_resource_time.outputs.output1}}" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
  
   hammerdb_postgresql_workload:
     name: Hammerdb PostgreSQL workload
     runs-on: ubuntu-latest
-    needs: [nightly_start, stressng_workload, uperf_workload, hammerdb_mariadb_workload]
+    needs: [ocp_ipi_installation, ocp_operator_installation, nightly_start, stressng_workload, uperf_workload, hammerdb_mariadb_workload]
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.9
@@ -451,12 +459,12 @@ jobs:
         end=$(printf '%(%s)T' -1)
         ci_minutes_time=$(( (end - START_CI) / 60))
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Update CI status failed >>>>>>>>>>>>>>>>>>>>>>>>>>'
-        podman run --rm -e OCP_ENV_FLAVOR="PERF" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e BUILD_VERSION="$build_version" -e CI_STATUS="failed" -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e OCP_INSTALL_MINUTES_TIME="${{needs.ocp_ipi_installation.outputs.output1}}" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+        podman run --rm -e OCP_ENV_FLAVOR="PERF" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e BUILD_VERSION="$build_version" -e CI_STATUS="failed" -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e OCP_INSTALL_MINUTES_TIME="${{needs.ocp_ipi_installation.outputs.output1}}" -e OCP_RESOURCE_INSTALL_MINUTES_TIME="${{needs.install_resource_time.outputs.output1}}" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
   
   hammerdb_mssql_workload:
     name: Hammerdb MSSQL workload
     runs-on: ubuntu-latest
-    needs: [nightly_start, stressng_workload, uperf_workload, hammerdb_mariadb_workload, hammerdb_postgresql_workload]
+    needs: [ocp_ipi_installation, ocp_operator_installation, nightly_start, stressng_workload, uperf_workload, hammerdb_mariadb_workload, hammerdb_postgresql_workload]
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.9
@@ -530,12 +538,12 @@ jobs:
         end=$(printf '%(%s)T' -1)
         ci_minutes_time=$(( (end - START_CI) / 60))
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Update CI status failed >>>>>>>>>>>>>>>>>>>>>>>>>>'
-        podman run --rm -e OCP_ENV_FLAVOR="PERF" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e BUILD_VERSION="$build_version" -e CI_STATUS="failed" -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e OCP_INSTALL_MINUTES_TIME="${{needs.ocp_ipi_installation.outputs.output1}}" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+        podman run --rm -e OCP_ENV_FLAVOR="PERF" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e BUILD_VERSION="$build_version" -e CI_STATUS="failed" -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e OCP_INSTALL_MINUTES_TIME="${{needs.ocp_ipi_installation.outputs.output1}}" -e OCP_RESOURCE_INSTALL_MINUTES_TIME="${{needs.install_resource_time.outputs.output1}}" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
   
   nightly_end:
     name: Deploy Perf Nightly - End
     runs-on: ubuntu-latest
-    needs: [nightly_start, stressng_workload, uperf_workload, hammerdb_mariadb_workload, hammerdb_postgresql_workload, hammerdb_mssql_workload]
+    needs: [ocp_ipi_installation, ocp_operator_installation, nightly_start, stressng_workload, uperf_workload, hammerdb_mariadb_workload, hammerdb_postgresql_workload, hammerdb_mssql_workload]
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.9
@@ -588,7 +596,7 @@ jobs:
         end=$(printf '%(%s)T' -1)
         ci_minutes_time=$(( (end - START_CI) / 60))
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Update CI status pass >>>>>>>>>>>>>>>>>>>>>>>>>>'
-        podman run --rm -e OCP_ENV_FLAVOR="PERF" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e BUILD_VERSION="$build_version" -e CI_STATUS="pass" -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e OCP_INSTALL_MINUTES_TIME="${{needs.ocp_ipi_installation.outputs.output1}}" -e OCP_RESOURCE_INSTALL_MINUTES_TIME="${{needs.install_resource_time.outputs.output2}}" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+        podman run --rm -e OCP_ENV_FLAVOR="PERF" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e BUILD_VERSION="$build_version" -e CI_STATUS="pass" -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e OCP_INSTALL_MINUTES_TIME="${{needs.ocp_ipi_installation.outputs.output1}}" -e OCP_RESOURCE_INSTALL_MINUTES_TIME="${{needs.install_resource_time.outputs.output1}}" -e OCP_RESOURCE_INSTALL_MINUTES_TIME="${{needs.install_resource_time.outputs.output1}}" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
     - name: ❎ CI status failed
       env:
         KUBEADMIN_PASSWORD: ${{ secrets.PERF_KUBEADMIN_PASSWORD }}
@@ -606,6 +614,6 @@ jobs:
         end=$(printf '%(%s)T' -1)
         ci_minutes_time=$(( (end - START_CI) / 60))
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Update CI status failed >>>>>>>>>>>>>>>>>>>>>>>>>>'
-        podman run --rm -e OCP_ENV_FLAVOR="PERF" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e BUILD_VERSION="$build_version" -e CI_STATUS="failed" -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e OCP_INSTALL_MINUTES_TIME="${{needs.ocp_ipi_installation.outputs.output1}}" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+        podman run --rm -e OCP_ENV_FLAVOR="PERF" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e BUILD_VERSION="$build_version" -e CI_STATUS="failed" -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e OCP_INSTALL_MINUTES_TIME="${{needs.ocp_ipi_installation.outputs.output1}}" -e OCP_RESOURCE_INSTALL_MINUTES_TIME="${{needs.install_resource_time.outputs.output1}}" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
 
 
