@@ -107,6 +107,14 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install benchmark-runner
+      - name: ⚙ Set Kubeconfig after OCP installation
+        env:
+          KUBECONFIG: ${{ secrets.PERF_KUBECONFIG }}
+          RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+        run: |
+          mkdir -p "$RUNNER_PATH/.kube/"
+          echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
+          echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
       - name:  🔩 OCP Operator Reources install
         env:
           IBM_API_KEY: ${{ secrets.IBM_API_KEY }}
