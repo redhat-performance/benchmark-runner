@@ -129,10 +129,10 @@ class IBMOperations:
         """
         current_wait_time = 0
         while current_wait_time <= self.__provision_timeout:
-            output = self.__remote_ssh.run_command(self.__provision_installer_log)
-            if 'Install complete!' in output:
+            install_log = self.__remote_ssh.run_command(self.__provision_installer_log)
+            if 'Install complete!' in install_log:
                 return True
-            elif 'level=error' in output:
+            elif 'level=error' in install_log:
                 return False
             logger.info(f'Waiting till OCP install complete, waiting {int(current_wait_time/60)} minutes')
             # sleep for x seconds
@@ -300,6 +300,6 @@ class IBMOperations:
         self.__github_operations.create_secret(secret_name=f'{self.__ocp_env_flavor}_KUBECONFIG', unencrypted_value=self.__get_kubeconfig())
         self.__github_operations.create_secret(secret_name=f'{self.__ocp_env_flavor}_KUBEADMIN_PASSWORD',
                                                 unencrypted_value=self.__get_kubeadmin_password())
-        # wait 5 minutes till credentials will be updated
-        logger.info(f'Wait 5 minutes till credentials will be updated {datetime.now().strftime(datetime_format)}')
-        time.sleep(300)
+        install_log = self.__remote_ssh.run_command(self.__provision_installer_log)
+        self.__github_operations.create_secret(secret_name='OCP_INSTALL_MINUTES_TIME', unencrypted_value=install_log.split()[-1].strip('"'))
+
