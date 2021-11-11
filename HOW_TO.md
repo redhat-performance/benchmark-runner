@@ -10,6 +10,9 @@ _**Table of Contents**_
 <!-- /TOC -->
 
 ## Add new benchmark operator workload to benchmark runner
+This section also applies to modifying an existing workload, including
+any template .yaml files.
+
 1. git clone https://github.com/redhat-performance/benchmark-runner
 2. cd benchmark-runner
 3. Install prerequisites (these commands assume RHEL/CentOS/Fedora):
@@ -25,11 +28,18 @@ _**Table of Contents**_
       2. Add workload Pod and VM CRD template inside [internal_data](benchmark_runner/benchmark_operator/workload_flavors/func_ci/stressng/internal_data)
 8. Add workload folder path in [MANIFEST.in](MANIFEST.in), for each flavor 'func_ci', 'perf_ci', 'test_ci' add 2 paths: the workload path to 'workload_data_template.yaml' and path to 'internal_data' Pod and VM template yaml files
 9. Add tests for all new methods you write under `tests/integration`.
-10. For test and debug workload, need to configure [environment_variables.py](benchmark_runner/main/environment_variables.py)
+10. Update the golden unit test files:
+```
+PYTHONPATH=. python3
+tests/unittest/benchmark_runner/regression/generate_golden_files.py
+git add tests/unittest/benchmark_runner/regression/golden_files
+git commit -m"Add new golden files for $workload"
+```
+11. For test and debug workload, need to configure [environment_variables.py](benchmark_runner/main/environment_variables.py)
    1. Fill parameters: workload, kubeadmin_password, pin_node_benchmark_operator, pin_node1, pin_node2, elasticsearch, elasticsearch_port 
    2. Run [main.py](/benchmark_runner/main/main.py)  and verify that the workload run correctly
    3. The workload can be monitored and checked through 'current run' folder inside the run workload flavor (default flavor: 'test_ci')
-11. Open Kibana url and verify workload index populate with data:
+12. Open Kibana url and verify workload index populate with data:
    1. Create the workload index: Kibana -> Hamburger tab -> Stack Management -> Index patterns -> Create index pattern -> workload-results -> timestamp -> Done
    2. Verify workload-results index is populated: Kibana -> Hamburger tab -> Discover -> workload-results (index) -> verify that there is a new data
 
