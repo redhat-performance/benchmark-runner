@@ -269,11 +269,12 @@ class IBMOperations:
             logger.info('master nodes are up and running')
             if self.__ocp_env_flavor == 'PERF':
                 worker_nodes = oc.get_worker_nodes()
-                # In perf we have more than 1 worker
-                if len(worker_nodes.split()) >= 1:
-                    logger.info('worker nodes are up and running')
-                else:
-                    raise MissingWorkerNodes()
+                # if there are worker nodes, they must be 3
+                if len(worker_nodes.split()) > 1:
+                    if len(worker_nodes.split()) == 3:
+                        logger.info('worker nodes are up and running')
+                    else:
+                        raise MissingWorkerNodes()
         else:
             raise MissingMasterNodes()
 
