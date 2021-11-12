@@ -78,7 +78,7 @@ class GoldenFiles:
         os.mkdir(dest)
         for ocs_pvc in 'True', 'False':
             environment_variables.environment_variables_dict['ocs_pvc'] = ocs_pvc
-            for run_type in 'test_ci', 'func_ci', 'perf_ci':
+            for run_type in environment_variables.run_types_list:
                 environment_variables.environment_variables_dict['run_type'] = run_type
                 for workload in environment_variables.workloads_list:
                     workload_components = workload.split('_')

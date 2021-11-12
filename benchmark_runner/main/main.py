@@ -119,6 +119,12 @@ def main():
             logger.info(f'Enter valid workload name {environment_variables.workloads_list}')
             raise Exception(f'Not valid workload name: {workload} \n, choose one from the list: {environment_variables.workloads_list}')
 
+        run_type = environment_variables_dict.get('run_type', '')
+        # run type validation
+        if run_type not in environment_variables.run_types_list:
+            logger.info(f'Enter valid run type {environment_variables.run_types_list}')
+            raise Exception(f'Invalid run type: {run_type} \n, choose one from the list: {environment_variables.run_types_list}')
+
         # benchmark-operator node selector
         if environment_variables_dict.get('pin_node_benchmark_operator'):
             benchmark_operator_workload.update_node_selector(runner_path=environment_variables_dict.get('runner_path', ''),
