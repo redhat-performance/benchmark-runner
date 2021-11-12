@@ -6,6 +6,11 @@ name: Func Env Build CI
 #on:
 #  push:
 #    branches: [ main ]
+on:
+  workflow_run:
+    workflows: ["Test"]
+    types:
+      - completed
 
 # Ensures that only one deploy task per branch/environment will run at a time.
 concurrency:
