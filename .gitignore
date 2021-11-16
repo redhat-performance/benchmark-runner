@@ -202,5 +202,6 @@ fabric.properties
 
 # custom file configuration
 empty_environment_variables.py
-filled_environment_variables.py
+filled_func_environment_variables.py
+filled_perf_environment_variables.py
 key.txt
