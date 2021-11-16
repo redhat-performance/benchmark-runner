@@ -65,6 +65,7 @@ jobs:
           PERF_PROVISION_INSTALLER_LOG: ${{ secrets.PERF_PROVISION_INSTALLER_LOG }}
           GITHUB_REPOSITORY_SHORT: ${{ secrets.GIT_REPOSITORY_SHORT }}
           CONTAINER_PRIVATE_KEY_PATH: ${{ secrets.CONTAINER_PRIVATE_KEY_PATH }}
+          RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
         run: |
           build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
           build_version="$(cut -d'=' -f2 <<<"$build")"
