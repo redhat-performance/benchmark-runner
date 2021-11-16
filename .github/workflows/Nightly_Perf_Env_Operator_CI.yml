@@ -8,12 +8,6 @@ on:
     workflows: ["Deploy IPI Perf Env Nightly CI"]
     types:
       - completed
-#on:
-#  schedule:
-#    - cron: '0 4 * * 0' # run on Sunday at 4 AM UTC/ 0 AM EDT
-#on:
-#  push:
-#    branches: [ main ]
 
 # Ensures that only one deploy task per branch/environment will run at a time.
 concurrency:
@@ -21,8 +15,19 @@ concurrency:
   cancel-in-progress: false
   
 jobs:
-    
-  ocp_operator_installation:
+   on-success:
+     runs-on: ubuntu-latest
+     if: ${{ github.event.workflow_run.conclusion == 'success' }}
+     steps:
+       - run: echo "Deploy IPI Perf Env Nightly CI workflow was a success"
+
+   on-failure:
+     runs-on: ubuntu-latest
+     if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+     steps:
+       - run: echo "Deploy IPI Perf Env Nightly CI workflow was a failure"  
+  
+   ocp_operator_installation:
     name: OCP Operator Installation
     runs-on: ubuntu-latest
     outputs:
