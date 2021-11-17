@@ -42,6 +42,9 @@ class TemplateOperations:
         self.__environment_variables_dict.pop(variable, '')
         self.__initialize_dependent_variables__()
 
+    def get_current_run_path(self):
+        return self.__current_run_path
+
     @logger_time_stamp
     def __get_yaml_template_by_workload(self, workload: str, extension='.yaml', skip: str = 'data'):
         """

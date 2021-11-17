@@ -516,6 +516,7 @@ class OC(SSH):
                                      sleep_time: int = SLEEP_TIME):
         """
         This method is wait till operator is created or throw exception after timeout
+        :param sleep_time: sleep time between check
         :param resource: The resource cnv, local storage, ocs, kata
         :param verify_cmd: Verify command that resource was created successfully
         :param status: The final success status

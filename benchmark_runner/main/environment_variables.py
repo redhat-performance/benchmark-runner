@@ -46,6 +46,8 @@ class EnvironmentVariables:
         self._environment_variables_dict['system_metrics'] = os.environ.get('SYSTEM_METRICS', 'True')
         # CI status update once at the end of CI Pass/Failed
         self._environment_variables_dict['ci_status'] = os.environ.get('CI_STATUS', '')
+        # Valid run types
+        self._environment_variables_dict['run_types'] = ['test_ci', 'func_ci', 'perf_ci']
         # Run type test_ci/func_ci/perf_ci, default test_ci same environment as func_ci
         self._environment_variables_dict['run_type'] = os.environ.get('RUN_TYPE', 'test_ci')
         # end dynamic parameters - configure for local run
@@ -68,6 +70,8 @@ class EnvironmentVariables:
         # Parameters below related to 'install_ocp()'
         # MANDATORY for OCP install: install ocp version - insert version to install i.e. 'latest-4.8'
         self._environment_variables_dict['install_ocp_version'] = os.environ.get('INSTALL_OCP_VERSION', '')
+        # There are 3 steps update_ocp_version/run_ibm_ocp_ipi_installer/verify_install_complete
+        self._environment_variables_dict['install_step'] = os.environ.get('INSTALL_STEP', '')
         # dev or ga (/ocp-dev-preview/ or /ocp/ )
         self._environment_variables_dict['ocp_version_build'] = os.environ.get('OCP_VERSION_BUILD', '')
         # github repository
@@ -154,6 +158,13 @@ class EnvironmentVariables:
         This method is getter
         """
         return self._environment_variables_dict
+
+    @property
+    def run_types_list(self):
+        """
+        This method is getter
+        """
+        return self._environment_variables_dict['run_types']
 
     @environment_variables_dict.setter
     def environment_variables_dict(self, value: dict):

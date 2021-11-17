@@ -57,24 +57,26 @@ def main():
             logger.info(azure_operation.stop_vm(vm_name=azure_vm_name))
 
     @logger_time_stamp
-    def install_ocp():
+    def install_ocp(step: str):
         """
         This method install ocp version
         :return:
         """
-        logger.info(f'Start IBM OCP {install_ocp_version} installation')
         ibm_operations = IBMOperations(user=environment_variables_dict.get('provision_user', ''))
         ibm_operations.ibm_connect()
-        ibm_operations.update_ocp_version()
-        result = ibm_operations.run_ibm_ocp_ipi_installer()
-        if result:
-            logger.info(f'Installed OCP {install_ocp_version} successfully')
-            logger.info(f'Update GitHub OCP credentials')
-            ibm_operations.update_ocp_github_credentials()
-        else:
-            logger.info(f'Failed to install OCP latest-{install_ocp_version} after 3 retries')
+        if step == 'update_ocp_version':
+            ibm_operations.update_ocp_version()
+        elif step == 'run_ibm_ocp_ipi_installer':
+            ibm_operations.run_ibm_ocp_ipi_installer()
+        elif step == 'verify_install_complete':
+            complete = ibm_operations.verify_install_complete()
+            if complete:
+                logger.info(f'Installed OCP {install_ocp_version} successfully')
+                logger.info(f'Update GitHub OCP credentials')
+                ibm_operations.update_ocp_github_credentials()
+            else:
+                logger.info(f'Failed to install OCP {install_ocp_version}')
         ibm_operations.ibm_disconnect()
-        logger.info(f'End IBM OCP latest-{install_ocp_version} installation')
 
     @logger_time_stamp
     def install_resources():
@@ -117,6 +119,12 @@ def main():
             logger.info(f'Enter valid workload name {environment_variables.workloads_list}')
             raise Exception(f'Not valid workload name: {workload} \n, choose one from the list: {environment_variables.workloads_list}')
 
+        run_type = environment_variables_dict.get('run_type', '')
+        # run type validation
+        if run_type not in environment_variables.run_types_list:
+            logger.info(f'Enter valid run type {environment_variables.run_types_list}')
+            raise Exception(f'Invalid run type: {run_type} \n, choose one from the list: {environment_variables.run_types_list}')
+
         # benchmark-operator node selector
         if environment_variables_dict.get('pin_node_benchmark_operator'):
             benchmark_operator_workload.update_node_selector(runner_path=environment_variables_dict.get('runner_path', ''),
@@ -129,7 +137,8 @@ def main():
         azure_cluster_start_stop()
     # install_ocp_version
     elif install_ocp_version:
-        install_ocp()
+        install_step = environment_variables_dict.get('install_step', '')
+        install_ocp(step=install_step)
     # install_ocp_resource
     elif install_ocp_resources == 'True':
         install_resources()

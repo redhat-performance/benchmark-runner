@@ -83,7 +83,7 @@ class IBMOperations:
         This method return ibm login command
         :return:
         """
-        return f'ibmcloud login --apikey {self.__ibm_api_key}'
+        return f'ibmcloud login --apikey {self.__ibm_api_key} 1>/dev/null 2>&1'
 
     # private method: machine id
     def __get_ibm_machine_status(self, machine_id: str):
@@ -127,16 +127,12 @@ class IBMOperations:
         :param sleep_time:
         :return:
         """
-        current_wait_time = sleep_time
-        # precondition wait till installer start to generate logs, till delete previous run logs
-        logger.info(f'Waiting till OCP install complete, waiting {int(current_wait_time / 60)} minutes')
-        time.sleep(sleep_time)
-        current_wait_time += sleep_time
+        current_wait_time = 0
         while current_wait_time <= self.__provision_timeout:
-            output = self.__remote_ssh.run_command(self.__provision_installer_log)
-            if 'Install complete!' in output:
+            install_log = self.__remote_ssh.run_command(self.__provision_installer_log)
+            if 'Install complete!' in install_log:
                 return True
-            elif 'level=error' in output:
+            elif 'level=error' in install_log:
                 return False
             logger.info(f'Waiting till OCP install complete, waiting {int(current_wait_time/60)} minutes')
             # sleep for x seconds
@@ -199,7 +195,7 @@ class IBMOperations:
                                             file_name='hosts',
                                             parameter='build=',
                                             value=f'"{self.__ocp_version_build}"')
-    
+
     @logger_time_stamp
     @retry(stop=stop_after_attempt(3))
     def run_ibm_ocp_ipi_installer(self):
@@ -208,7 +204,25 @@ class IBMOperations:
         :return: True if installation success and raise exception if installation failed
         """
         logger.info(f'Starting OCP IPI installer, Start time: {datetime.now().strftime(datetime_format)}')
-        self.__ssh.run(cmd=f"ssh -i {self.__container_private_key_path} {self.__user}@{self.__provision_ip} \"{self.__ibm_login_cmd()};{self.__ibm_ipi_install_ocp_cmd()}\" ")
+        # update ssh config
+        #self.__ssh.run(f"echo Host provision >> /{self.__user}/.ssh/config")
+        #self.__ssh.run(f"echo -e '\t'HostName {self.__provision_ip} >> /{self.__user}/.ssh/config")
+        #self.__ssh.run(f"echo -e '\t'User {self.__user} >> /{self.__user}/.ssh/config")
+        #self.__ssh.run(f"echo -e '\t'IdentityFile {self.__container_private_key_path} >> /{self.__user}/.ssh/config")
+        #self.__ssh.run(f"echo -e '\t'StrictHostKeyChecking no >> /{self.__user}/.ssh/config")
+        #self.__ssh.run(f"echo -e '\t'ServerAliveInterval 30 >> /{self.__user}/.ssh/config")
+        #self.__ssh.run(f"echo -e '\t'ServerAliveCountMax 5 >> /{self.__user}/.ssh/config")
+        self.__ssh.run(f"chmod 600 /{self.__user}/.ssh/config")
+        # Must add -t otherwise remote ssh of ansible will not end
+        self.__ssh.run(cmd=f"ssh -t provision \"{self.__ibm_login_cmd()};{self.__ibm_ipi_install_ocp_cmd()}\" ")
+        logger.info(f'End OCP IPI installer, End time: {datetime.now().strftime(datetime_format)}')
+
+    @logger_time_stamp
+    def verify_install_complete(self):
+        """
+        This verify that install complete
+        :return: True if installation success and raise exception if installation failed
+        """
         complete = self.__wait_for_install_complete()
         if not complete:
             # Workers issue: workaround for solving IBM workers stuck on BIOS page after reboot
@@ -255,11 +269,12 @@ class IBMOperations:
             logger.info('master nodes are up and running')
             if self.__ocp_env_flavor == 'PERF':
                 worker_nodes = oc.get_worker_nodes()
-                # In perf we have more than 1 worker
-                if len(worker_nodes.split()) >= 1:
-                    logger.info('worker nodes are up and running')
-                else:
-                    raise MissingWorkerNodes()
+                # if there are worker nodes, they must be 3
+                if len(worker_nodes.split()) > 1:
+                    if len(worker_nodes.split()) == 3:
+                        logger.info('worker nodes are up and running')
+                    else:
+                        raise MissingWorkerNodes()
         else:
             raise MissingMasterNodes()
 
@@ -286,3 +301,6 @@ class IBMOperations:
         self.__github_operations.create_secret(secret_name=f'{self.__ocp_env_flavor}_KUBECONFIG', unencrypted_value=self.__get_kubeconfig())
         self.__github_operations.create_secret(secret_name=f'{self.__ocp_env_flavor}_KUBEADMIN_PASSWORD',
                                                 unencrypted_value=self.__get_kubeadmin_password())
+        install_log = self.__remote_ssh.run_command(self.__provision_installer_log)
+        self.__github_operations.create_secret(secret_name='OCP_INSTALL_MINUTES_TIME', unencrypted_value=install_log.split()[-1].strip('"'))
+

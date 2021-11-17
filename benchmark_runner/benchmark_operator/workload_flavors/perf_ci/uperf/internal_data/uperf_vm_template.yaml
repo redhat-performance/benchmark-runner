@@ -49,7 +49,7 @@ spec:
        sockets: {{ server_sockets }}
        cores: 1
        threads: 1
-       image: quay.io/kubevirt/fedora-cloud-container-disk-demo:latest # your image must've ethtool installed if enabling multiqueue
+       image: quay.io/kubevirt/fedora-container-disk-images:34
        limits:
          memory: {{ server_memory_GB }}Gi
        requests:
@@ -67,7 +67,7 @@ spec:
        sockets: {{ client_sockets }}
        cores: 1
        threads: 1
-       image: quay.io/kubevirt/fedora-cloud-container-disk-demo:latest
+       image: quay.io/kubevirt/fedora-container-disk-images:34
        limits:
          memory: {{ client_memory_GB }}Gi
        requests:
