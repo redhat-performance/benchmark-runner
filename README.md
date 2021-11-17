@@ -33,7 +33,7 @@ _**Table of Contents**_
 - [Run workload using Podman or Docker](#run-workload-using-podman-or-docker)
 - [Run workload in Pod using Kubernetes or OpenShift](#run-workload-in-pod-using-kubernetes-or-openshift)
 - [Grafana dashboards](#grafana-dashboards)
-- [How to add new workload](#how-to-add-new-workload)
+- [How to develop in benchmark-runner](#how-to-develop-in-benchmark-runner)
 
 <!-- /TOC -->
 
@@ -93,6 +93,6 @@ There are 3 grafana dashboards templates:
 
 ** After importing json in grafana, need to configure elasticsearch data source. (for more details: see [HOW_TO.md](HOW_TO.md))
 
-## How to add new workload
+## How to develop in benchmark-runner
 
 see [HOW_TO.md](HOW_TO.md)

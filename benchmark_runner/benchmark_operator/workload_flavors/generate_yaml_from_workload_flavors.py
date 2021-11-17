@@ -25,6 +25,9 @@ class TemplateOperations:
         else:
             self.__storage_type = 'ephemeral'
 
+    def get_current_run_path(self):
+        return self.__current_run_path
+
     def __get_yaml_template_by_workload(self, workload: str, extension='.yaml', skip: str = 'data'):
         """
         This method return yaml names in benchmark_operator folder

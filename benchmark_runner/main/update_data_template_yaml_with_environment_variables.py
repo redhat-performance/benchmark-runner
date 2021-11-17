@@ -15,9 +15,13 @@ def update_environment_variable(dir_path: str, yaml_file: str, environment_varia
     """
     if not environment_variable_dict:
         environment_variable_dict = environment_variables.environment_variables_dict
-    oc = OC(kubeadmin_password=environment_variable_dict.get('kubeadmin_password', ''))
-    # set prom token
-    environment_variable_dict['prom_token'] = oc.get_prom_token()
+    # Allow faking the Prometheus token so that we can generate deterministic test files
+    if 'prom_token_override' in environment_variable_dict:
+        environment_variable_dict['prom_token'] = environment_variable_dict.get('prom_token_override', '')
+    else:
+        oc = OC(kubeadmin_password=environment_variable_dict.get('kubeadmin_password', ''))
+        # set prom token
+        environment_variable_dict['prom_token'] = oc.get_prom_token()
     # Jinja render yaml file
     with open(os.path.join(dir_path, yaml_file)) as f:
         template_str = f.read()

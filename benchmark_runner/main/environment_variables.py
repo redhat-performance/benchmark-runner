@@ -46,6 +46,8 @@ class EnvironmentVariables:
         self._environment_variables_dict['system_metrics'] = os.environ.get('SYSTEM_METRICS', 'True')
         # CI status update once at the end of CI Pass/Failed
         self._environment_variables_dict['ci_status'] = os.environ.get('CI_STATUS', '')
+        # Valid run types
+        self._environment_variables_dict['run_types'] = ['test_ci', 'func_ci', 'perf_ci']
         # Run type test_ci/func_ci/perf_ci, default test_ci same environment as func_ci
         self._environment_variables_dict['run_type'] = os.environ.get('RUN_TYPE', 'test_ci')
         # end dynamic parameters - configure for local run
@@ -156,6 +158,13 @@ class EnvironmentVariables:
         This method is getter
         """
         return self._environment_variables_dict
+
+    @property
+    def run_types_list(self):
+        """
+        This method is getter
+        """
+        return self._environment_variables_dict['run_types']
 
     @environment_variables_dict.setter
     def environment_variables_dict(self, value: dict):
