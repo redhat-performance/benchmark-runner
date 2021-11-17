@@ -10,6 +10,7 @@ _**Table of Contents**_
     - [Add new benchmark operator workload to benchmark runner](#add-new-benchmark-operator-workload-to-benchmark-runner)
     - [Add workload to grafana dashboard](#add-workload-to-grafana-dashboard)
     - [Monitor and debug workload](#monitor-and-debug-workload)
+    - [Determine the version of benchmark-runner in the current container image](#determine-the-version-of-benchmark-runner-in-the-current-container-image)
 
 <!-- /TOC -->
 
@@ -178,3 +179,39 @@ any template .yaml files.
    1. Set `STOP_WHEN_WORKLOAD_FINISH=True` in the environment when
       running the workload.  This is case sensitive.
    2. Use a different, private ElasticSearch instance.
+
+## Determine the version of benchmark-runner in the current container image
+
+The version of [benchmark-runner on
+PyPi](https://pypi.org/project/benchmark-runner/) should match the
+version in `setup.py`, and the [container
+image version](https://quay.io/repository/ebattat/benchmark-runner?tab=tags)
+should also match that version.  However, if the version on PyPi is
+not updated quickly enough, the container image may remain stale.
+This may result in unexpected errors.
+
+To check the version of benchmark-runner in the container image, it's
+necessary to exec into the latest container image and check the
+version with pip:
+
+```
+# # If the command below results in an error, you may need to
+# # podman ps -a |grep benchmark-runner
+# # podman rm $(podman ps -a |grep benchmark-runner |awk '{print $1}')
+# # and repeat the command
+# podman rmi quay.io/ebattat/benchmark-runner
+# podman rmi quay.io/ebattat/benchmark-runner
+Untagged: quay.io/ebattat/benchmark-runner:latest
+# podman run --rm -it quay.io/ebattat/benchmark-runner:latest /bin/bash
+Trying to pull quay.io/ebattat/benchmark-runner:latest...
+Getting image source signatures
+...
+[root@ede12c01460d /]# pip show benchmark-runner
+Name: benchmark-runner
+Version: 1.0.195
+Summary: Benchmark Runner Tool
+...
+[root@ede12c01460d /]# cd /usr/local/lib/python3.9/site-packages/benchmark_runner
+```
+
+_* If the version reported via pip does not match the expected version, the image build did not happen correctly.  Please contact the development team for assistance. *_
