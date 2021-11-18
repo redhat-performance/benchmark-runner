@@ -676,11 +676,11 @@ class OC(SSH):
                 self.wait_for_ocp_resource_create(resource='kata',
                                                   verify_cmd="oc get kataconfig -ojsonpath='{.items[0].status.installationStatus.IsInProgress}'",
                                                   status='false')
-                totalNodesCount = self.run(cmd="oc get kataconfig -ojsonpath='{.items[0].status.totalNodesCount}'")
-                completedNodesCount = self.run(cmd="oc get kataconfig -ojsonpath='{.items[0].status.installationStatus.completed.completedNodesCount}'")
-                if totalNodesCount != completedNodesCount:
-                    raise KataInstallationFailed(f'not all nodes installed successfully total {totalNodesCount} != completed {completedNodesCount}')
-            # 
+                total_nodes_count = self.run(cmd="oc get kataconfig -ojsonpath='{.items[0].status.total_nodes_count}'")
+                completed_nodes_count = self.run(cmd="oc get kataconfig -ojsonpath='{.items[0].status.installationStatus.completed.completed_nodes_count}'")
+                if total_nodes_count != completed_nodes_count:
+                    raise KataInstallationFailed(f'not all nodes installed successfully total {total_nodes_count} != completed {completed_nodes_count}')
+            #
             elif '03_ocp48_patch.sh' == resource:
                 self.run(cmd=f'chmod +x {os.path.join(path, resource)}; {path}/./{resource}')
         return True
