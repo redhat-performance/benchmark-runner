@@ -666,13 +666,13 @@ class OC(SSH):
             logger.info(f'run {resource}')
             self._create_async(yaml=os.path.join(path, resource))
             # for first script wait for virt-operator
-            if '01_operator.yaml' in resource:
+            if '01_operator.yaml' == resource:
                 # Wait that cnv operator will be created
                 self.wait_for_ocp_resource_create(resource='kata',
                                                   verify_cmd='oc -n openshift-sandboxed-containers-operator wait deployment/controller-manager --for=condition=Available',
                                                   status='deployment.apps/controller-manager condition met')
             # for second script wait for kataconfig installation to no longer be in progress
-            else:
+            elif '02_config.yaml' == resource:
                 self.wait_for_ocp_resource_create(resource='kata',
                                                   verify_cmd="oc get kataconfig -ojsonpath='{.items[0].status.installationStatus.IsInProgress}'",
                                                   status='false')
@@ -680,4 +680,7 @@ class OC(SSH):
                 completedNodesCount = self.run(cmd="oc get kataconfig -ojsonpath='{.items[0].status.installationStatus.completed.completedNodesCount}'")
                 if totalNodesCount != completedNodesCount:
                     raise KataInstallationFailed(f'not all nodes installed successfully total {totalNodesCount} != completed {completedNodesCount}')
+            # 
+            elif '03_ocp48_patch.sh' == resource:
+                self.run(cmd=f'chmod +x {os.path.join(path, resource)}; {path}/./{resource}')
         return True
