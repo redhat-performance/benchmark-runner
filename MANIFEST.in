@@ -25,6 +25,7 @@ include benchmark_runner/benchmark_operator/workload_flavors/perf_ci/uperf/inter
 
 # ocp resource
 include benchmark_runner/common/ocp_resources/cnv/template/*.yaml
+include benchmark_runner/common/ocp_resources/kata/template/*.sh
 include benchmark_runner/common/ocp_resources/kata/template/*.yaml
 include benchmark_runner/common/ocp_resources/local_storage/template/*.yaml
 include benchmark_runner/common/ocp_resources/ocs/template/*.sh
