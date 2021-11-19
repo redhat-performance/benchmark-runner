@@ -204,14 +204,14 @@ class IBMOperations:
         :return: True if installation success and raise exception if installation failed
         """
         logger.info(f'Starting OCP IPI installer, Start time: {datetime.now().strftime(datetime_format)}')
-        # update ssh config
-        #self.__ssh.run(f"echo Host provision >> /{self.__user}/.ssh/config")
-        #self.__ssh.run(f"echo -e '\t'HostName {self.__provision_ip} >> /{self.__user}/.ssh/config")
-        #self.__ssh.run(f"echo -e '\t'User {self.__user} >> /{self.__user}/.ssh/config")
-        #self.__ssh.run(f"echo -e '\t'IdentityFile {self.__container_private_key_path} >> /{self.__user}/.ssh/config")
-        #self.__ssh.run(f"echo -e '\t'StrictHostKeyChecking no >> /{self.__user}/.ssh/config")
-        #self.__ssh.run(f"echo -e '\t'ServerAliveInterval 30 >> /{self.__user}/.ssh/config")
-        #self.__ssh.run(f"echo -e '\t'ServerAliveCountMax 5 >> /{self.__user}/.ssh/config")
+        # update ssh config - must add it and also mount it
+        self.__ssh.run(f"echo Host provision >> /{self.__user}/.ssh/config")
+        self.__ssh.run(f"echo -e '\t'HostName {self.__provision_ip} >> /{self.__user}/.ssh/config")
+        self.__ssh.run(f"echo -e '\t'User {self.__user} >> /{self.__user}/.ssh/config")
+        self.__ssh.run(f"echo -e '\t'IdentityFile {self.__container_private_key_path} >> /{self.__user}/.ssh/config")
+        self.__ssh.run(f"echo -e '\t'StrictHostKeyChecking no >> /{self.__user}/.ssh/config")
+        self.__ssh.run(f"echo -e '\t'ServerAliveInterval 30 >> /{self.__user}/.ssh/config")
+        self.__ssh.run(f"echo -e '\t'ServerAliveCountMax 5 >> /{self.__user}/.ssh/config")
         self.__ssh.run(f"chmod 600 /{self.__user}/.ssh/config")
         # Must add -t otherwise remote ssh of ansible will not end
         self.__ssh.run(cmd=f"ssh -t provision \"{self.__ibm_login_cmd()};{self.__ibm_ipi_install_ocp_cmd()}\" ")
