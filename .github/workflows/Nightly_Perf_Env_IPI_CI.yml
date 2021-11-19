@@ -49,7 +49,7 @@ jobs:
             ServerAliveInterval 30
             ServerAliveCountMax 5
           END
-      - name: ▶ OCP IPI install
+      - name: ▶  OCP IPI install
         env:
           INSTALL_OCP_VERSION: "4.8.14"
           IBM_API_KEY: ${{ secrets.IBM_API_KEY }}
