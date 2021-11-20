@@ -49,7 +49,7 @@ jobs:
           mkdir -p "$RUNNER_PATH/.kube/"
           echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
           echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
-    - name: ✔️ E2E tests using latest quay.io
+    - name: ✔️ E2E tests using stable quay.io
       env:
         KUBEADMIN_PASSWORD: ${{ secrets.PERF_KUBEADMIN_PASSWORD }}
         PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.PERF_PIN_NODE_BENCHMARK_OPERATOR }}
