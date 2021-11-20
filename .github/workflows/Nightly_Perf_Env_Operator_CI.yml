@@ -50,7 +50,7 @@ jobs:
           sudo chmod 600 $RUNNER_PATH/private_key.txt
           #echo "$PERF_PROVISION_KNOWN_HOSTS" > "$RUNNER_PATH/.ssh/known_hosts"
           echo "PERF_PROVISION_PRIVATE_KEY_PATH=$RUNNER_PATH/private_key.txt" >> "$GITHUB_ENV"
-      - name: ⚙ Set Kubeconfig after OCP installation
+      - name: ☉ Set Kubeconfig after OCP installation
         env:
           KUBECONFIG: ${{ secrets.PERF_KUBECONFIG }}
           RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
@@ -177,7 +177,7 @@ jobs:
         podman run --rm -e OCP_ENV_FLAVOR="PERF" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e BUILD_VERSION="$build_version" -e CI_STATUS="failed" -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e OCP_INSTALL_MINUTES_TIME="$OCP_INSTALL_MINUTES_TIME" -e OCP_RESOURCE_INSTALL_MINUTES_TIME="${{needs.install_resource_time.outputs.output1}}" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
   
   uperf_workload:
-    name: Deploy Perf Nightly - Uperf
+    name: Uperf workload
     runs-on: ubuntu-latest
     needs: [ocp_operator_installation, nightly_start, stressng_workload]
     steps:
