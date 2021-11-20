@@ -197,7 +197,6 @@ class IBMOperations:
                                             value=f'"{self.__ocp_version_build}"')
 
     @logger_time_stamp
-    @retry(stop=stop_after_attempt(3))
     def run_ibm_ocp_ipi_installer(self):
         """
         This method run ocp ipi installer with retry mechanism
