@@ -78,12 +78,12 @@ jobs:
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start OCP Resource Install >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
           #podman run --rm -e OCP_ENV_FLAVOR="PERF" -e IBM_API_KEY="$IBM_API_KEY" -e GITHUB_TOKEN="$GITHUB_TOKEN" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e INSTALL_OCP_RESOURCES="True" -e CNV_VERSION="4.8.2" -e OCS_VERSION="4.8" -e NUM_OCS_DISK="4" -e INSTALL_RESOURCES_LIST="['cnv', 'local_storage', 'ocs', 'kata']" -e PERF_WORKER_IDS="$PERF_WORKER_IDS" -e PERF_PROVISION_IP="$PERF_PROVISION_IP" -e CONTAINER_PRIVATE_KEY_PATH="$CONTAINER_PRIVATE_KEY_PATH" -e PERF_PROVISION_USER="$PERF_PROVISION_USER" -e PERF_PROVISION_OC_USER="$PERF_PROVISION_OC_USER" -e PERF_PROVISION_PORT="$PERF_PROVISION_PORT" -e GITHUB_REPOSITORY_SHORT="$GITHUB_REPOSITORY_SHORT" -e PERF_PROVISION_TIMEOUT="3600" -e log_level="INFO" -v "$PERF_PROVISION_PRIVATE_KEY_PATH":"$CONTAINER_PRIVATE_KEY_PATH" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End OCP Resource Install   >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
-          sleep 10
+          sleep 120
           end=$(printf '%(%s)T' -1)
           ci_minutes_time=$(( (end - start) / 60))
           echo ci_minutes_time
           echo $ci_minutes_time
-          echo "CI_RUN_TIME=$ci_minutes_time" >> "$GITHUB_ENV"
+          echo "CI_RUN_TIME=$(ci_minutes_time)" >> "$GITHUB_ENV"
           echo CI_RUN_TIME
           echo $CI_RUN_TIME 
 
@@ -177,4 +177,5 @@ jobs:
         ci_minutes_time=$(( (end - START_CI) / 60))
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Update CI status failed >>>>>>>>>>>>>>>>>>>>>>>>>>'
         podman run --rm -e OCP_ENV_FLAVOR="PERF" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e BUILD_VERSION="$build_version" -e CI_STATUS="failed" -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e OCP_RESOURCE_INSTALL_MINUTES_TIME="${{ needs.ocp_operator_installation.outputs.install_resource_time }}" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+
 
