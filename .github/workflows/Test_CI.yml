@@ -11,13 +11,18 @@ jobs:
       output1: ${{ steps.step1.outputs.test }}
       output2: ${{ steps.step2.outputs.test }}
     steps:
-      - id: step1
+      - name: step0
         run: |
           start=$(printf '%(%s)T' -1)
           sleep 120
           end=$(printf '%(%s)T' -1)
           ci_minutes_time=$(( (end - start) / 60))
-          echo "::set-output name=test::$ci_minutes_time"
+          echo "action_state=$ci_minutes_time" >> $GITHUB_ENV
+      - id: step1
+        run: |
+          echo action_state
+          echo $action_state
+          echo "::set-output name=test::$action_state"
       - id: step2
         run: echo "::set-output name=test::world"
   job2:
