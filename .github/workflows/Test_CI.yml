@@ -81,11 +81,10 @@ jobs:
           sleep 120
           end=$(printf '%(%s)T' -1)
           ci_minutes_time=$(( (end - start) / 60))
-          #echo "INSTALL_OCP_RESOURCE_MINUTES_TIME=$(( (( end - start )) / 60))" >> "$GITHUB_ENV"
-          echo "INSTALL_OCP_RESOURCE_MINUTES_TIME=$ci_minutes_time" >> "$GITHUB_ENV"
-          echo $INSTALL_OCP_RESOURCE_MINUTES_TIME
+          echo ci_minutes_time
+          echo $ci_minutes_time
       - id: ocp_install_resource_time
-        run: echo "::set-output name=install_resource_time::$INSTALL_OCP_RESOURCE_MINUTES_TIME"
+        run: echo "::set-output name=install_resource_time::$ci_minutes_time"
 
   nightly_start:
     name: Deploy Perf Nightly - Start
