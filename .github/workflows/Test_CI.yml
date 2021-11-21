@@ -1,32 +1,186 @@
-name: Demonstration
+# Nightly CI https://github.com/marketplace/actions/deploy-nightly
+# https://crontab.guru/
+# This is a nightly CI Pipeline against Performance environment using IPI installer - run on Sunday
+name: Deploy Operator Perf Env Nightly CI
+# Only trigger, when the build workflow succeeded
+#on:
+#  workflow_run:
+#    workflows: ["Deploy IPI Perf Env Nightly CI"]
+#    types:
+#      - completed
+#on:
+#  schedule:
+#    - cron: '0 4 * * 0' # run on Sunday at 4 AM UTC/ 0 AM EDT
 on:
   push:
     branches: [ main ]
 
+# Ensures that only one deploy task per branch/environment will run at a time.
+concurrency:
+  group: performance-environment
+  cancel-in-progress: false
+  
 jobs:
-  job1:
+    
+  ocp_operator_installation:
+    name: OCP Operator Installation
     runs-on: ubuntu-latest
-    # Map a step output to a job output
     outputs:
-      output1: ${{ steps.step1.outputs.test }}
-      output2: ${{ steps.step2.outputs.test }}
+      install_resource_time_output: ${{ steps.ocp_install_resource_time_id.outputs.install_resource_time }}
+      output1: ${{ steps.install_resource_time_step.outputs.install_resource_time }}
     steps:
-      - name: step0
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Install latest benchmark-runner
         run: |
+          python -m pip install --upgrade pip
+          pip install benchmark-runner
+      - name: ⚙️ SET SSH key
+        env:
+          PERF_PROVISION_PRIVATE_KEY: ${{ secrets.PERF_PROVISION_PRIVATE_KEY }}
+          PERF_PROVISION_KNOWN_HOSTS: ${{ secrets.PERF_PROVISION_KNOWN_HOSTS }}
+          RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+          PERF_PROVISION_IP: ${{ secrets.PERF_PROVISION_IP }}
+          PERF_PROVISION_USER: ${{ secrets.PERF_PROVISION_USER }}
+        run: |
+          mkdir -p "$RUNNER_PATH/.ssh/"
+          echo "$PERF_PROVISION_PRIVATE_KEY" > $RUNNER_PATH/private_key.txt
+          sudo chmod 600 $RUNNER_PATH/private_key.txt
+          #echo "$PERF_PROVISION_KNOWN_HOSTS" > "$RUNNER_PATH/.ssh/known_hosts"
+          echo "PERF_PROVISION_PRIVATE_KEY_PATH=$RUNNER_PATH/private_key.txt" >> "$GITHUB_ENV"
+      - name: ⚙️ Set Kubeconfig after OCP installation
+        env:
+          KUBECONFIG: ${{ secrets.PERF_KUBECONFIG }}
+          RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+        run: |
+          mkdir -p "$RUNNER_PATH/.kube/"
+          echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
+          echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
+      - name: ☉ OCP Operator Reources install
+        env:
+          IBM_API_KEY: ${{ secrets.IBM_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+          PERF_WORKER_IDS: ${{ secrets.PERF_WORKER_IDS }}
+          PERF_PROVISION_IP: ${{ secrets.PERF_PROVISION_IP }}
+          PERF_PROVISION_USER: ${{ secrets.PERF_PROVISION_USER }}
+          PERF_PROVISION_OC_USER: ${{ secrets.PERF_PROVISION_OC_USER }}
+          PERF_PROVISION_PORT: ${{ secrets.PERF_PROVISION_PORT }}
+          GITHUB_REPOSITORY_SHORT: ${{ secrets.GIT_REPOSITORY_SHORT }}
+          CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
+          CONTAINER_PRIVATE_KEY_PATH: ${{ secrets.CONTAINER_PRIVATE_KEY_PATH }}
+          KUBEADMIN_PASSWORD: ${{ secrets.PERF_KUBEADMIN_PASSWORD }}
+        run: |
+          build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
+          build_version="$(cut -d'=' -f2 <<<"$build")"
           start=$(printf '%(%s)T' -1)
+          echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start OCP Resource Install >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
+          #podman run --rm -e OCP_ENV_FLAVOR="PERF" -e IBM_API_KEY="$IBM_API_KEY" -e GITHUB_TOKEN="$GITHUB_TOKEN" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e INSTALL_OCP_RESOURCES="True" -e CNV_VERSION="4.8.2" -e OCS_VERSION="4.8" -e NUM_OCS_DISK="4" -e INSTALL_RESOURCES_LIST="['cnv', 'local_storage', 'ocs', 'kata']" -e PERF_WORKER_IDS="$PERF_WORKER_IDS" -e PERF_PROVISION_IP="$PERF_PROVISION_IP" -e CONTAINER_PRIVATE_KEY_PATH="$CONTAINER_PRIVATE_KEY_PATH" -e PERF_PROVISION_USER="$PERF_PROVISION_USER" -e PERF_PROVISION_OC_USER="$PERF_PROVISION_OC_USER" -e PERF_PROVISION_PORT="$PERF_PROVISION_PORT" -e GITHUB_REPOSITORY_SHORT="$GITHUB_REPOSITORY_SHORT" -e PERF_PROVISION_TIMEOUT="3600" -e log_level="INFO" -v "$PERF_PROVISION_PRIVATE_KEY_PATH":"$CONTAINER_PRIVATE_KEY_PATH" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+          echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End OCP Resource Install   >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
           sleep 60
           end=$(printf '%(%s)T' -1)
           ci_minutes_time=$(( (end - start) / 60))
-          echo "ACTION=$ci_minutes_time" >> "$GITHUB_ENV"
-      - id: step1
-        run: |
-          echo ACTION
-          echo $ACTION
-          echo "::set-output name=test::$ACTION"
-      - id: step2
-        run: echo "::set-output name=test::world"
-  job2:
+          echo ci_minutes_time
+          echo $ci_minutes_time
+          echo "CI_MIN_TIME=$ci_minutes_time" >> "$GITHUB_ENV"
+
+      - id: ocp_install_resource_time_id
+        run: echo "::set-output name=install_resource_time::$ci_run_time"
+      - id: install_resource_time_step
+        run: echo "::set-output name=install_resource_time::$CI_MIN_TIME"
+
+  nightly_start:
+    name: Deploy Perf Nightly - Start
     runs-on: ubuntu-latest
-    needs: job1
+    needs: [ocp_operator_installation]
+    outputs:
+      nightly_start_time_output: ${{ steps.nightly_start_step_id.outputs.nightly_start_time }}
     steps:
-      - run: echo ${{needs.job1.outputs.output1}} ${{needs.job1.outputs.output2}}
+    - uses: actions/checkout@v2
+    - id: nightly_start_step_id
+      run: echo "::set-output name=nightly_start_time::$(printf '%(%s)T' -1)"
+
+  nightly_end:
+    name: Deploy Perf Nightly - End
+    runs-on: ubuntu-latest
+    needs: [ocp_operator_installation, nightly_start]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: ⚙ Set START CI TIME
+      run: echo "START_CI=${{ needs.nightly_start.outputs.nightly_start_time_output }}" >> "$GITHUB_ENV"
+    - name: Install latest benchmark-runner
+      run: |
+        python -m pip install --upgrade pip
+        pip install benchmark-runner
+        echo 
+        echo ${{needs.ocp_operator_installation.outputs.output1}}
+    - name: ⚙ Set Kubeconfig
+      env:
+        KUBECONFIG: ${{ secrets.PERF_KUBECONFIG }}
+        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+      run: |
+          mkdir -p "$RUNNER_PATH/.kube/"
+          echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
+          echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
+    - name: ✔️ E2E tests using latest quay.io
+      env:
+        KUBEADMIN_PASSWORD: ${{ secrets.PERF_KUBEADMIN_PASSWORD }}
+        PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.PERF_PIN_NODE_BENCHMARK_OPERATOR }}
+        PIN_NODE1: ${{ secrets.PERF_PIN_NODE1 }}
+        PIN_NODE2: ${{ secrets.PERF_PIN_NODE2 }}
+        ELASTICSEARCH: ${{ secrets.PERF_ELASTICSEARCH }}
+        ELASTICSEARCH_PORT: ${{ secrets.PERF_ELASTICSEARCH_PORT }}
+        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+        CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
+      run: |
+        # get repository last id
+        declare -a repositories=('benchmark-operator' 'benchmark-wrapper')
+        for repository in "${repositories[@]}"
+        do  
+            git clone "https://github.com/cloud-bulldozer/$repository" "$RUNNER_PATH/$repository"
+            pushd "$RUNNER_PATH/$repository"
+            if [[ $repository == 'benchmark-operator' ]]
+            then
+                echo "BENCHMARK_OPERATOR_ID=$(git rev-parse @)" >> "$GITHUB_ENV"
+                BENCHMARK_OPERATOR_ID=$(git rev-parse @)
+            else
+                echo "BENCHMARK_WRAPPER_ID=$(git rev-parse @)" >> "$GITHUB_ENV"
+                BENCHMARK_WRAPPER_ID=$(git rev-parse @)
+            fi
+            popd
+        done
+        build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
+        build_version="$(cut -d'=' -f2 <<<"$build")"
+        end=$(printf '%(%s)T' -1)
+        ci_minutes_time=$(( (end - START_CI) / 60))
+        echo output1
+        echo ${{needs.ocp_operator_installation.outputs.output1}}
+        echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Update CI status pass >>>>>>>>>>>>>>>>>>>>>>>>>>'
+        #podman run --rm -e OCP_ENV_FLAVOR="PERF" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e BUILD_VERSION="$build_version" -e CI_STATUS="pass" -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e OCP_RESOURCE_INSTALL_MINUTES_TIME="${{ needs.ocp_operator_installation.outputs.install_resource_time_output }}" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+    - name: ❎ CI status failed
+      env:
+        KUBEADMIN_PASSWORD: ${{ secrets.PERF_KUBEADMIN_PASSWORD }}
+        PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.PERF_PIN_NODE_BENCHMARK_OPERATOR }}
+        PIN_NODE1: ${{ secrets.PERF_PIN_NODE1 }}
+        PIN_NODE2: ${{ secrets.PERF_PIN_NODE2 }}
+        ELASTICSEARCH: ${{ secrets.PERF_ELASTICSEARCH }}
+        ELASTICSEARCH_PORT: ${{ secrets.PERF_ELASTICSEARCH_PORT }}
+        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+        CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
+        OCP_INSTALL_TIME: ${{ secrets.OCP_INSTALL_TIME }}
+      if: ${{ failure() }}
+      run: |
+        build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
+        build_version="$(cut -d'=' -f2 <<<"$build")"
+        end=$(printf '%(%s)T' -1)
+        ci_minutes_time=$(( (end - START_CI) / 60))
+        echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Update CI status failed >>>>>>>>>>>>>>>>>>>>>>>>>>'
+        podman run --rm -e OCP_ENV_FLAVOR="PERF" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e BUILD_VERSION="$build_version" -e CI_STATUS="failed" -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e OCP_RESOURCE_INSTALL_MINUTES_TIME="${{ needs.ocp_operator_installation.outputs.install_resource_time }}" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+
+
