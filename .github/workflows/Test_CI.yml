@@ -26,8 +26,8 @@ jobs:
     name: OCP Operator Installation
     runs-on: ubuntu-latest
     outputs:
-      install_resource_time_output: ${{ steps.ocp_install_resource_time_id.outputs.install_resource_time }}
-      output1: ${{ steps.install_resource_time_step.outputs.install_resource_time }}
+      #install_resource_time_output: ${{ steps.ocp_install_resource_time_id.outputs.install_resource_time }}
+      install_resource_time_output: ${{ steps.install_resource_time_step.outputs.install_resource_time }}
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python 3.9
@@ -159,8 +159,8 @@ jobs:
         build_version="$(cut -d'=' -f2 <<<"$build")"
         end=$(printf '%(%s)T' -1)
         ci_minutes_time=$(( (end - START_CI) / 60))
-        echo output1
-        echo ${{needs.ocp_operator_installation.outputs.output1}}
+        echo install_resource_time_output
+        echo ${{needs.ocp_operator_installation.outputs.install_resource_time_output}}
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Update CI status pass >>>>>>>>>>>>>>>>>>>>>>>>>>'
         #podman run --rm -e OCP_ENV_FLAVOR="PERF" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e BUILD_VERSION="$build_version" -e CI_STATUS="pass" -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e OCP_RESOURCE_INSTALL_MINUTES_TIME="${{ needs.ocp_operator_installation.outputs.install_resource_time_output }}" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
     - name: ❎ CI status failed
