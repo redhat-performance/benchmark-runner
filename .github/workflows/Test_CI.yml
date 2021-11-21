@@ -14,14 +14,14 @@ jobs:
       - name: step0
         run: |
           start=$(printf '%(%s)T' -1)
-          sleep 120
+          sleep 60
           end=$(printf '%(%s)T' -1)
           ci_minutes_time=$(( (end - start) / 60))
-          echo "action_state=$ci_minutes_time" >> $GITHUB_ENV
+          echo "ACTION=$ci_minutes_time" >> "$GITHUB_ENV"
       - id: step1
         run: |
-          echo action_state
-          echo $action_state
+          echo ACTION
+          echo $ACTION
           echo "::set-output name=test::$action_state"
       - id: step2
         run: echo "::set-output name=test::world"
