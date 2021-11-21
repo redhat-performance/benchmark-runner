@@ -3,7 +3,7 @@
 # This is a nightly CI Pipeline against Performance environment using IPI installer - run on Sunday
 name: Deploy Operator Perf Env Nightly CI
 # Only trigger, when the build workflow succeeded
-on:
+#on:
 #  workflow_run:
 #    workflows: ["Deploy IPI Perf Env Nightly CI"]
 #    types:
