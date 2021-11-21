@@ -81,6 +81,8 @@ jobs:
           sleep 120
           end=$(printf '%(%s)T' -1)
           echo "INSTALL_OCP_RESOURCE_MINUTES_TIME=$(( (( end - start )) / 60))" >> "$GITHUB_ENV"
+          echo "operator time"
+          echo $INSTALL_OCP_RESOURCE_MINUTES_TIME
       - id: ocp_install_resource_time
         run: echo "::set-output name=install_resource_time::$INSTALL_OCP_RESOURCE_MINUTES_TIME"
 
