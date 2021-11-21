@@ -91,7 +91,7 @@ jobs:
       - id: ocp_install_resource_time_id
         run: echo "::set-output name=install_resource_time::$CI_RUN_TIME"
       - id: step2
-        run: echo "::set-output name=test::$CI_RUN_TIME"
+        run: echo "::set-output name=test::world"
 
   nightly_start:
     name: Deploy Perf Nightly - Start
