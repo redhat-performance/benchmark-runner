@@ -84,6 +84,10 @@ jobs:
           ci_minutes_time=$(( (end - start) / 60))
           echo ci_minutes_time
           echo $ci_minutes_time
+          echo "action_state1=yellow" >> $GITHUB_ENV
+          echo $action_state1
+          echo "action_state=$ci_minutes_time" >> $GITHUB_ENV
+          echo $action_state
           echo "CI_RUN_TIME=$(ci_minutes_time)" >> "$GITHUB_ENV"
           echo CI_RUN_TIME
           echo $CI_RUN_TIME 
