@@ -22,7 +22,7 @@ jobs:
         run: |
           echo ACTION
           echo $ACTION
-          echo "::set-output name=test::$action_state"
+          echo "::set-output name=test::$ACTION"
       - id: step2
         run: echo "::set-output name=test::world"
   job2:
