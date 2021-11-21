@@ -81,9 +81,14 @@ jobs:
           sleep 10
           end=$(printf '%(%s)T' -1)
           ci_minutes_time=$(( (end - start) / 60))
+          echo ci_minutes_time
+          echo $ci_minutes_time
+          echo "CI_RUN_TIME=$ci_minutes_time" >> "$GITHUB_ENV"
+          echo CI_RUN_TIME
+          echo $CI_RUN_TIME 
 
       - id: ocp_install_resource_time_id
-        run: echo "::set-output name=install_resource_time::$ci_minutes_time"
+        run: echo "::set-output name=install_resource_time::$CI_RUN_TIME"
 
   nightly_start:
     name: Deploy Perf Nightly - Start
@@ -172,5 +177,4 @@ jobs:
         ci_minutes_time=$(( (end - START_CI) / 60))
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Update CI status failed >>>>>>>>>>>>>>>>>>>>>>>>>>'
         podman run --rm -e OCP_ENV_FLAVOR="PERF" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e BUILD_VERSION="$build_version" -e CI_STATUS="failed" -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e OCP_RESOURCE_INSTALL_MINUTES_TIME="${{ needs.ocp_operator_installation.outputs.install_resource_time }}" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
-
 
