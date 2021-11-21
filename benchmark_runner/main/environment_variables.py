@@ -121,8 +121,6 @@ class EnvironmentVariables:
         # Parameters below related to 'update_ci_status()'
         # CI run time
         self._environment_variables_dict['ci_minutes_time'] = os.environ.get('CI_MINUTES_TIME', 0)
-        # Get this parameter from install process
-        self._environment_variables_dict['ocp_install_minutes_time'] = os.environ.get('OCP_INSTALL_MINUTES_TIME', 0)
         # Get this parameter from install resource process
         self._environment_variables_dict['ocp_resource_install_minutes_time'] = os.environ.get('OCP_RESOURCE_INSTALL_MINUTES_TIME', 0)
         # benchmark-operator last commit id

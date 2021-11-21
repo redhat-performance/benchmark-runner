@@ -300,6 +300,13 @@ class IBMOperations:
         self.__github_operations.create_secret(secret_name=f'{self.__ocp_env_flavor}_KUBECONFIG', unencrypted_value=self.__get_kubeconfig())
         self.__github_operations.create_secret(secret_name=f'{self.__ocp_env_flavor}_KUBEADMIN_PASSWORD',
                                                 unencrypted_value=self.__get_kubeadmin_password())
+
+    def get_ocp_install_time(self):
+        """
+        This method return install time
+        :param self:
+        :return:
+        """
         install_log = self.__remote_ssh.run_command(self.__provision_installer_log)
-        self.__github_operations.create_secret(secret_name='OCP_INSTALL_MINUTES_TIME', unencrypted_value=install_log.split()[-1].strip('"'))
+        return install_log.split()[-1].strip('"')
 

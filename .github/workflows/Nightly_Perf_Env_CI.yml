@@ -17,11 +17,11 @@ jobs:
     name: Deploy Perf Nightly - Start
     runs-on: ubuntu-latest
     outputs:
-      output_start: ${{ steps.nightly_start_step.outputs.nightly_start }}
+      start_time_output: ${{ steps.nightly_start_step.outputs.start_time }}
     steps:
     - uses: actions/checkout@v2
     - id: nightly_start_step
-      run: echo "::set-output name=nightly_start::$(printf '%(%s)T' -1)"
+      run: echo "::set-output name=start_time::$(printf '%(%s)T' -1)"
 
   stressng_workload:
     name: Stressng workload
@@ -36,7 +36,7 @@ jobs:
     - id: stressng_workload_start_step
       run: echo "::set-output name=stressng_workload_start::$(printf '%(%s)T' -1)"
     - name: ⚙ Set START CI TIME
-      run: echo "START_CI=${{needs.nightly_start.outputs.output_start}}" >> "$GITHUB_ENV"
+      run: echo "START_CI=${{ needs.nightly_start.outputs.start_time_output }}" >> "$GITHUB_ENV"
     - name: Install latest benchmark-runner
       run: |
         python -m pip install --upgrade pip
@@ -115,7 +115,7 @@ jobs:
       with:
         python-version: 3.9
     - name: ⚙ Set START CI TIME
-      run: echo "START_CI=${{needs.nightly_start.outputs.output_start}}" >> "$GITHUB_ENV"
+      run: echo "START_CI=${{ needs.nightly_start.outputs.start_time_output }}" >> "$GITHUB_ENV"
     - name: Install latest benchmark-runner
       run: |
         python -m pip install --upgrade pip
@@ -194,7 +194,7 @@ jobs:
       with:
         python-version: 3.9
     - name: ⚙ Set START CI TIME
-      run: echo "START_CI=${{needs.nightly_start.outputs.output_start}}" >> "$GITHUB_ENV"
+      run: echo "START_CI=${{ needs.nightly_start.outputs.start_time_output }}" >> "$GITHUB_ENV"
     - name: Install latest benchmark-runner
       run: |
         python -m pip install --upgrade pip
@@ -273,7 +273,7 @@ jobs:
       with:
         python-version: 3.9
     - name: ⚙ Set START CI TIME
-      run: echo "START_CI=${{needs.nightly_start.outputs.output_start}}" >> "$GITHUB_ENV"
+      run: echo "START_CI=${{ needs.nightly_start.outputs.start_time_output }}" >> "$GITHUB_ENV"
     - name: Install latest benchmark-runner
       run: |
         python -m pip install --upgrade pip
@@ -352,7 +352,7 @@ jobs:
       with:
         python-version: 3.9
     - name: ⚙ Set START CI TIME
-      run: echo "START_CI=${{needs.nightly_start.outputs.output_start}}" >> "$GITHUB_ENV"
+      run: echo "START_CI=${{ needs.nightly_start.outputs.start_time_output }}" >> "$GITHUB_ENV"
     - name: Install latest benchmark-runner
       run: |
         python -m pip install --upgrade pip
@@ -431,7 +431,7 @@ jobs:
       with:
         python-version: 3.9
     - name: ⚙ Set START CI TIME
-      run: echo "START_CI=${{needs.nightly_start.outputs.output_start}}" >> "$GITHUB_ENV"
+      run: echo "START_CI=${{ needs.nightly_start.outputs.start_time_output }}" >> "$GITHUB_ENV"
     - name: Install latest benchmark-runner
       run: |
         python -m pip install --upgrade pip
