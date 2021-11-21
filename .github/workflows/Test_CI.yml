@@ -88,12 +88,12 @@ jobs:
           echo $action_state1
           echo "action_state=$ci_minutes_time" >> $GITHUB_ENV
           echo $action_state
-          echo "CI_RUN_TIME=$ci_minutes_time" >> $GITHUB_ENV
-          echo CI_RUN_TIME
-          echo $CI_RUN_TIME 
+          echo "ci_run_time=$ci_minutes_time" >> $GITHUB_ENV
+          echo ci_run_time
+          echo $ci_run_time 
 
       - id: ocp_install_resource_time_id
-        run: echo "::set-output name=install_resource_time::$CI_RUN_TIME"
+        run: echo "::set-output name=install_resource_time::$ci_run_time"
       - id: step1
         run: echo "::set-output name=test::hello"
 
