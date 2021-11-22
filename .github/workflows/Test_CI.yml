@@ -16,9 +16,9 @@ on:
     branches: [ main ]
 
 # Ensures that only one deploy task per branch/environment will run at a time.
-concurrency:
-  group: performance-environment
-  cancel-in-progress: false
+#concurrency:
+#  group: performance-environment
+#  cancel-in-progress: false
   
 jobs:
     
