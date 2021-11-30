@@ -64,9 +64,8 @@ def main():
         """
         ibm_operations = IBMOperations(user=environment_variables_dict.get('provision_user', ''))
         ibm_operations.ibm_connect()
-        if step == 'update_ocp_version':
+        if step == 'run_ibm_ocp_ipi_installer':
             ibm_operations.update_ocp_version()
-        elif step == 'run_ibm_ocp_ipi_installer':
             ibm_operations.run_ibm_ocp_ipi_installer()
         elif step == 'verify_install_complete':
             complete = ibm_operations.verify_install_complete()

@@ -63,7 +63,7 @@ class RemoteSsh:
         """
         try:
             pre_command = '. ~/.bash_profile;'
-            stdin, stdout, stderr = self.__p_client.exec_command(f'{pre_command}\n {command}', timeout=self.__cmd_timeout)
+            stdin, stdout, stderr = self.__p_client.exec_command(f'{pre_command}\n {command}')
             opt = stdout.readlines()
             message = "".join(opt)
             return message

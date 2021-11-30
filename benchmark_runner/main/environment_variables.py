@@ -70,7 +70,7 @@ class EnvironmentVariables:
         # Parameters below related to 'install_ocp()'
         # MANDATORY for OCP install: install ocp version - insert version to install i.e. 'latest-4.8'
         self._environment_variables_dict['install_ocp_version'] = os.environ.get('INSTALL_OCP_VERSION', '')
-        # There are 3 steps update_ocp_version/run_ibm_ocp_ipi_installer/verify_install_complete
+        # There are 2 steps run_ibm_ocp_ipi_installer/verify_install_complete
         self._environment_variables_dict['install_step'] = os.environ.get('INSTALL_STEP', '')
         # dev or ga (/ocp-dev-preview/ or /ocp/ )
         self._environment_variables_dict['ocp_version_build'] = os.environ.get('OCP_VERSION_BUILD', '')
@@ -121,8 +121,6 @@ class EnvironmentVariables:
         # Parameters below related to 'update_ci_status()'
         # CI run time
         self._environment_variables_dict['ci_minutes_time'] = os.environ.get('CI_MINUTES_TIME', 0)
-        # Get this parameter from install process
-        self._environment_variables_dict['ocp_install_minutes_time'] = os.environ.get('OCP_INSTALL_MINUTES_TIME', 0)
         # Get this parameter from install resource process
         self._environment_variables_dict['ocp_resource_install_minutes_time'] = os.environ.get('OCP_RESOURCE_INSTALL_MINUTES_TIME', 0)
         # benchmark-operator last commit id

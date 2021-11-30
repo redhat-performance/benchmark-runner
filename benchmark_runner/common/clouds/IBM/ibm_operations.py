@@ -197,21 +197,20 @@ class IBMOperations:
                                             value=f'"{self.__ocp_version_build}"')
 
     @logger_time_stamp
-    @retry(stop=stop_after_attempt(3))
     def run_ibm_ocp_ipi_installer(self):
         """
         This method run ocp ipi installer with retry mechanism
         :return: True if installation success and raise exception if installation failed
         """
         logger.info(f'Starting OCP IPI installer, Start time: {datetime.now().strftime(datetime_format)}')
-        # update ssh config
-        #self.__ssh.run(f"echo Host provision >> /{self.__user}/.ssh/config")
-        #self.__ssh.run(f"echo -e '\t'HostName {self.__provision_ip} >> /{self.__user}/.ssh/config")
-        #self.__ssh.run(f"echo -e '\t'User {self.__user} >> /{self.__user}/.ssh/config")
-        #self.__ssh.run(f"echo -e '\t'IdentityFile {self.__container_private_key_path} >> /{self.__user}/.ssh/config")
-        #self.__ssh.run(f"echo -e '\t'StrictHostKeyChecking no >> /{self.__user}/.ssh/config")
-        #self.__ssh.run(f"echo -e '\t'ServerAliveInterval 30 >> /{self.__user}/.ssh/config")
-        #self.__ssh.run(f"echo -e '\t'ServerAliveCountMax 5 >> /{self.__user}/.ssh/config")
+        # update ssh config - must add it and also mount it
+        self.__ssh.run(f"echo Host provision >> /{self.__user}/.ssh/config")
+        self.__ssh.run(f"echo -e '\t'HostName {self.__provision_ip} >> /{self.__user}/.ssh/config")
+        self.__ssh.run(f"echo -e '\t'User {self.__user} >> /{self.__user}/.ssh/config")
+        self.__ssh.run(f"echo -e '\t'IdentityFile {self.__container_private_key_path} >> /{self.__user}/.ssh/config")
+        self.__ssh.run(f"echo -e '\t'StrictHostKeyChecking no >> /{self.__user}/.ssh/config")
+        self.__ssh.run(f"echo -e '\t'ServerAliveInterval 30 >> /{self.__user}/.ssh/config")
+        self.__ssh.run(f"echo -e '\t'ServerAliveCountMax 5 >> /{self.__user}/.ssh/config")
         self.__ssh.run(f"chmod 600 /{self.__user}/.ssh/config")
         # Must add -t otherwise remote ssh of ansible will not end
         self.__ssh.run(cmd=f"ssh -t provision \"{self.__ibm_login_cmd()};{self.__ibm_ipi_install_ocp_cmd()}\" ")
@@ -301,6 +300,13 @@ class IBMOperations:
         self.__github_operations.create_secret(secret_name=f'{self.__ocp_env_flavor}_KUBECONFIG', unencrypted_value=self.__get_kubeconfig())
         self.__github_operations.create_secret(secret_name=f'{self.__ocp_env_flavor}_KUBEADMIN_PASSWORD',
                                                 unencrypted_value=self.__get_kubeadmin_password())
+
+    def get_ocp_install_time(self):
+        """
+        This method return install time
+        :param self:
+        :return:
+        """
         install_log = self.__remote_ssh.run_command(self.__provision_installer_log)
-        self.__github_operations.create_secret(secret_name='OCP_INSTALL_MINUTES_TIME', unencrypted_value=install_log.split()[-1].strip('"'))
+        return install_log.split()[-1].strip('"')
 

@@ -15,6 +15,7 @@ from benchmark_runner.common.elasticsearch.es_operations import ESOperations
 from benchmark_runner.common.ssh.ssh import SSH
 from benchmark_runner.benchmark_operator.benchmark_operator_exceptions import OCSNonInstalled, SystemMetricsRequiredElasticSearch
 from benchmark_runner.main.environment_variables import environment_variables
+from benchmark_runner.common.clouds.IBM.ibm_operations import IBMOperations
 
 
 class BenchmarkOperatorWorkloads:
@@ -286,6 +287,11 @@ class BenchmarkOperatorWorkloads:
         """
         status_dict = {'failed': 0, 'pass': 1}
         metadata = self.get_metadata()
+        if ocp_resource_install_minutes_time != 0:
+            ibm_operations = IBMOperations(user=self.__environment_variables_dict.get('provision_user', ''))
+            ibm_operations.ibm_connect()
+            ocp_install_minutes_time = ibm_operations.get_ocp_install_time()
+            ibm_operations.ibm_disconnect()
         metadata.update({'status': status, 'status#': status_dict[status], 'ci_minutes_time': ci_minutes_time, 'benchmark_operator_id': benchmark_operator_id, 'benchmark_wrapper_id': benchmark_wrapper_id, 'ocp_install_minutes_time': ocp_install_minutes_time, 'ocp_resource_install_minutes_time': ocp_resource_install_minutes_time})
         self.__es_operations.upload_to_es(index='ci-status', data=metadata)
 

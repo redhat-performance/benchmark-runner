@@ -664,20 +664,24 @@ class OC(SSH):
         """
         for resource in resource_list:
             logger.info(f'run {resource}')
-            self._create_async(yaml=os.path.join(path, resource))
-            # for first script wait for virt-operator
-            if '01_operator.yaml' in resource:
-                # Wait that cnv operator will be created
-                self.wait_for_ocp_resource_create(resource='kata',
-                                                  verify_cmd='oc -n openshift-sandboxed-containers-operator wait deployment/controller-manager --for=condition=Available',
-                                                  status='deployment.apps/controller-manager condition met')
-            # for second script wait for kataconfig installation to no longer be in progress
+            if resource.endswith('.yaml'):
+                self._create_async(yaml=os.path.join(path, resource))
+                # for first script wait for virt-operator
+                if '01_operator.yaml' == resource:
+                    # Wait that cnv operator will be created
+                    self.wait_for_ocp_resource_create(resource='kata',
+                                                      verify_cmd='oc -n openshift-sandboxed-containers-operator wait deployment/controller-manager --for=condition=Available',
+                                                      status='deployment.apps/controller-manager condition met')
+                # for second script wait for kataconfig installation to no longer be in progress
+                elif '02_config.yaml' == resource:
+                    self.wait_for_ocp_resource_create(resource='kata',
+                                                      verify_cmd="oc get kataconfig -ojsonpath='{.items[0].status.installationStatus.IsInProgress}'",
+                                                      status='false')
+                    total_nodes_count = self.run(cmd="oc get kataconfig -ojsonpath='{.items[0].status.total_nodes_count}'")
+                    completed_nodes_count = self.run(cmd="oc get kataconfig -ojsonpath='{.items[0].status.installationStatus.completed.completed_nodes_count}'")
+                    if total_nodes_count != completed_nodes_count:
+                        raise KataInstallationFailed(f'not all nodes installed successfully total {total_nodes_count} != completed {completed_nodes_count}')
             else:
-                self.wait_for_ocp_resource_create(resource='kata',
-                                                  verify_cmd="oc get kataconfig -ojsonpath='{.items[0].status.installationStatus.IsInProgress}'",
-                                                  status='false')
-                totalNodesCount = self.run(cmd="oc get kataconfig -ojsonpath='{.items[0].status.totalNodesCount}'")
-                completedNodesCount = self.run(cmd="oc get kataconfig -ojsonpath='{.items[0].status.installationStatus.completed.completedNodesCount}'")
-                if totalNodesCount != completedNodesCount:
-                    raise KataInstallationFailed(f'not all nodes installed successfully total {totalNodesCount} != completed {completedNodesCount}')
+                if '03_ocp48_patch.sh' == resource:
+                    self.run(cmd=f'chmod +x {os.path.join(path, resource)}; {path}/./{resource}')
         return True
