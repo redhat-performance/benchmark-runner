@@ -13,6 +13,12 @@ class CreateOcpResource:
     def __init__(self):
         self.__dir_path = f'{os.path.dirname(os.path.realpath(__file__))}'
         self.__environment_variable_dict = environment_variables.environment_variables_dict
+        # In order to load the openshift-sandboxed-containers-operator,
+        # we need to get information from the package manifest to render
+        # the template.  As the template files are rendered here rather
+        # than in oc.py, we need to have that environmental knowledge.
+        oc = OC(kubeadmin_password=self.__environment_variable_dict.get('kubeadmin_password', ''))
+        oc.populate_additional_template_variables(self.__environment_variable_dict)
 
     @staticmethod
     def __get_yaml_files(path: str, extensions: list = ['.yaml', '.sh']):

@@ -61,6 +61,40 @@ class OC(SSH):
         """
         return self.run("oc get csv -n openshift-sandboxed-containers-operator $(oc get csv -n openshift-sandboxed-containers-operator --no-headers | awk '{ print $1; }') -ojsonpath='{.spec.version}' ")
 
+    def _get_kata_csv(self):
+        """
+        Retrieve the CSV of the sandboxed containers operator for installation"
+        """
+        return self.run("oc get packagemanifest -n openshift-marketplace sandboxed-containers-operator -ojsonpath='{.status.channels[0].currentCSV}'")
+
+    def _get_kata_catalog_source(self):
+        """
+        Retrieve the catalog source of the sandboxed containers operator for installation"
+        """
+        return self.run("oc get packagemanifest -n openshift-marketplace sandboxed-containers-operator -ojsonpath='{.status.catalogSource}'")
+
+    def _get_kata_channel(self):
+        """
+        Retrieve the channel of the sandboxed containers operator for installation"
+        """
+        return self.run("oc get packagemanifest -n openshift-marketplace sandboxed-containers-operator -ojsonpath='{.status.channels[0].name}'")
+
+    def _get_kata_namespace(self):
+        """
+        Retrieve the namespace of the sandboxed containers operator for installation"
+        """
+        return self.run("oc get packagemanifest -n openshift-marketplace sandboxed-containers-operator -ojsonpath='{.status.channels[0].currentCSVDesc.annotations.operatorframework\.io/suggested-namespace}'")
+
+    @typechecked
+    def populate_additional_template_variables(self, env: dict):
+        """
+        Populate any additional variables needed for setup templates
+        """
+        env['kata_csv'] = self._get_kata_csv()
+        env['kata_catalog_source'] = self._get_kata_catalog_source()
+        env['kata_channel'] = self._get_kata_channel()
+        env['kata_namespace'] = self._get_kata_namespace()
+
     def is_cnv_installed(self):
         """
         This method check if cnv operator is installed
@@ -670,8 +704,8 @@ class OC(SSH):
                 if '01_operator.yaml' == resource:
                     # Wait that cnv operator will be created
                     self.wait_for_ocp_resource_create(resource='kata',
-                                                      verify_cmd='oc -n openshift-sandboxed-containers-operator wait deployment/controller-manager --for=condition=Available',
-                                                      status='deployment.apps/controller-manager condition met')
+                                                      verify_cmd='oc -n openshift-sandboxed-containers-operator wait deployment/sandboxed-containers-operator-controller-manager --for=condition=Available',
+                                                      status='deployment.apps/sandboxed-containers-operator-controller-manager condition met')
                 # for second script wait for kataconfig installation to no longer be in progress
                 elif '02_config.yaml' == resource:
                     self.wait_for_ocp_resource_create(resource='kata',
