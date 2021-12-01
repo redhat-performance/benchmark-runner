@@ -83,7 +83,7 @@ class OC(SSH):
         """
         Retrieve the namespace of the sandboxed containers operator for installation"
         """
-        return self.run("oc get packagemanifest -n openshift-marketplace sandboxed-containers-operator -ojsonpath='{.status.channels[0].currentCSVDesc.annotations.operatorframework\.io/suggested-namespace}'")
+        return self.run(r"oc get packagemanifest -n openshift-marketplace sandboxed-containers-operator -ojsonpath='{.status.channels[0].currentCSVDesc.annotations.operatorframework\.io/suggested-namespace}'")
 
     @typechecked
     def populate_additional_template_variables(self, env: dict):
