@@ -16,10 +16,14 @@ class TemplateOperations:
 
     def __initialize_dependent_variables__(self):
         self.__run_type = self.__environment_variables_dict.get('run_type', '')
-        self.__dir_path = f'{os.path.dirname(os.path.realpath(__file__))}/{self.__run_type}'
-        self.__current_run_path = f'{self.__dir_path}/current_run'
+        self.__dir_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'templates')
+        self.__current_run_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'current_run')
         self.__hammerdb_dir_path = os.path.join(self.__dir_path, f'hammerdb')
         self.__hammerdb__internal_dir_path = os.path.join(self.__dir_path, f'hammerdb', 'internal_data')
+        if self.__run_type == 'test_ci':
+            self.__environment_variables_dict['es_suffix'] = '-test-ci'
+        else:
+            self.__environment_variables_dict['es_suffix'] = ''
         # hammerdb storage
         if self.__environment_variables_dict.get('ocs_pvc', '') == 'True':
             self.__storage_type = 'ocs_pvc'
@@ -106,7 +110,7 @@ class TemplateOperations:
         # Jinja render database pod yaml
         if 'pod' in workload or 'kata' in workload:
             # replace parameter from hammerdb_data
-            database_name = f'{database}_{self.__storage_type}_template.yaml'
+            database_name = f'{database}_template.yaml'
             with open(os.path.join(self.__hammerdb__internal_dir_path, database_name)) as f:
                 database_template = Template(f.read())
             answer[f'{database}.yaml'] = database_template.render(render_data)

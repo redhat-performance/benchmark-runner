@@ -65,6 +65,7 @@ class GoldenFiles:
                     else:
                         t.generate_workload_yamls(base_workload)
                     self.__copy_yaml_files_to_dir(src=srcdir, dest=destdir)
+                    self.__clear_directory_yaml(srcdir)
 
     # From https://stackoverflow.com/questions/4187564/recursively-compare-two-directories-to-ensure-they-have-the-same-files-and-subdi
     def __compare_tree__(self, root1, root2, subdir: str):
