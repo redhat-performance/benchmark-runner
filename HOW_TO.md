@@ -147,7 +147,7 @@ kind_data:
 	    <other_kind_data_for_other_run_types>
 ```
 
-The `shared_data` section is mandatory.  All other sections are optional.  Generally, the `run_type` data for `func_ci` and `test_ci` is identical, so only `perf_ci` data need be specified, and the otherwise shared data under `default`.  Similarly, the `kata` and `pod` kinds use identical data, and only vm data need be specified separately.
+The `shared_data` section is mandatory, but all other sections are optional.  Generally, the `run_type` data for `func_ci` and `test_ci` is identical, so only `perf_ci` data need be specified, and the otherwise shared data under `default`.  Similarly, the `kata` and `pod` kinds use identical data, and only vm data need be specified separately.
 
 Boilerplate data that is independent of workload has been moved to `common.yaml` at top level in the `templates` directory.
 
