@@ -100,7 +100,10 @@ class TemplateOperations:
         """
         # Get hammerdb data
         hammerdb_template = self.__get_yaml_template_by_workload(workload=workload)
-        hammerdb_data = yaml.load(render_yaml_file(self.__hammerdb_dir_path, 'hammerdb_data_template.yaml', self.__environment_variables_dict), Loader=yaml.FullLoader)
+        self.__environment_variables_dict['workload_name'] = 'hammerdb'
+        common_data = yaml.load(render_yaml_file(self.__dir_path, 'common.yaml', self.__environment_variables_dict), Loader=yaml.FullLoader)['common_data']
+        common_data = {**self.__environment_variables_dict, **common_data}
+        hammerdb_data = yaml.load(render_yaml_file(self.__hammerdb_dir_path, 'hammerdb_data_template.yaml', common_data), Loader=yaml.FullLoader)
         render_data = hammerdb_data['shared_data']
 
         kind = self.__get_workload_keys(workload)
@@ -113,8 +116,7 @@ class TemplateOperations:
         database_runtype_data = self.__get_subdict(database_data, 'run_type_data', self.__run_type)
 
         kind_runtype_data = self.__get_subdict(kind_data, 'run_type_data', self.__run_type)
-        render_data = {**render_data, **kind_runtype_data}
-        render_data = {**self.__environment_variables_dict, **render_data,
+        render_data = {**common_data, **render_data,
                        **kind_data, **database_data, **run_type_data,
                        **database_kind_data, **database_runtype_data,
                        **kind_runtype_data}
@@ -155,16 +157,20 @@ class TemplateOperations:
         workload_template = self.__get_yaml_template_by_workload(workload=workload)
         workload_name = workload.split('_')[0]
         workload_dir_path = os.path.join(self.__dir_path, workload_name)
-        workload_data = yaml.load(render_yaml_file(workload_dir_path, f'{workload_name}_data_template.yaml', self.__environment_variables_dict), Loader=yaml.FullLoader)
+        self.__environment_variables_dict['workload_name'] = workload_name
+        common_data = yaml.load(render_yaml_file(self.__dir_path, 'common.yaml', self.__environment_variables_dict), Loader=yaml.FullLoader)['common_data']
+        common_data = {**self.__environment_variables_dict, **common_data}
+        workload_data = yaml.load(render_yaml_file(workload_dir_path, f'{workload_name}_data_template.yaml', common_data), Loader=yaml.FullLoader)
         render_data = workload_data['shared_data']
 
         kind = self.__get_workload_keys(workload)
         render_data['kind'] = kind
+        render_data['workload_name'] = workload_name
         kind_data = self.__get_subdict(workload_data, 'kind_data', kind)
         run_type_data = self.__get_subdict(workload_data, 'run_type_data', self.__run_type)
 
         kind_runtype_data = self.__get_subdict(kind_data, 'run_type_data', self.__run_type)
-        render_data = {**self.__environment_variables_dict, **render_data,
+        render_data = {**common_data, **render_data,
                        **kind_data, **run_type_data, **kind_runtype_data}
 
         with open(os.path.join(f'{workload_dir_path}', 'internal_data', f'{workload_template}.yaml')) as f:

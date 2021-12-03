@@ -1,8 +1,4 @@
 shared_data:
-  namespace: {{ namespace }}
-  es_url: {{ elasticsearch_url }}
-  es_index_name: uperf{{ es_suffix }}
-  pin: {{ pin }}
   pin_server: {{ pin_node1 }}
   pin_client: {{ pin_node2 }}
   serviceip: false
@@ -11,14 +7,6 @@ shared_data:
   multus: false
   samples: 1
   pair: 1
-  proto: tcp
-  # enable/disable system metrics
-  system_metrics: {{ system_metrics }}
-  prom_url: https://prometheus-k8s.openshift-monitoring.svc.cluster.local:9091
-  prom_token: {{ prom_token }}
-  sm_index_name: system-metrics{{ es_suffix }}
-  metrics_profile: node-metrics.yml
-  #metrics_profile: https://raw.githubusercontent.com/cloud-bulldozer/benchmark-operator/master/roles/kube-burner/files/metrics.yaml
   protos:
     - tcp
 run_type_data:
@@ -48,21 +36,7 @@ run_type_data:
       - 2
     runtime: 30
 kind_data:
-  default:
-    es_kind: {{ kind }}
-    run_type_data:
-      perf_ci:
-        limits_cpu: 8
-        limits_memory: 8Gi
-        requests_cpu: 8
-        requests_memory: 8Gi
-      default:
-        limits_cpu: 4
-        limits_memory: 16Gi
-        requests_cpu: 10m
-        requests_memory: 10Mi
   vm:
-    es_kind: vm
     run_type_data:
       perf_ci:
         sockets: 8
@@ -73,4 +47,16 @@ kind_data:
         sockets: 1
         cores: 4
         limits_memory: 16Gi
+        requests_memory: 10Mi
+  default:
+    run_type_data:
+      perf_ci:
+        limits_cpu: 8
+        limits_memory: 8Gi
+        requests_cpu: 8
+        requests_memory: 8Gi
+      default:
+        limits_cpu: 4
+        limits_memory: 16Gi
+        requests_cpu: 10m
         requests_memory: 10Mi
