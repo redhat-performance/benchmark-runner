@@ -1,3 +1,11 @@
+# templates
+include benchmark_runner/benchmark_operator/workload_flavors/templates/current_run/*
+include benchmark_runner/benchmark_operator/workload_flavors/templates/hammerdb/*.yaml
+include benchmark_runner/benchmark_operator/workload_flavors/templates/hammerdb/internal_data/*.yaml
+include benchmark_runner/benchmark_operator/workload_flavors/templates/stressng/*.yaml
+include benchmark_runner/benchmark_operator/workload_flavors/templates/stressng/internal_data/*.yaml
+include benchmark_runner/benchmark_operator/workload_flavors/templates/uperf/*.yaml
+include benchmark_runner/benchmark_operator/workload_flavors/templates/uperf/internal_data/*.yaml
 # test_ci
 include benchmark_runner/benchmark_operator/workload_flavors/test_ci/current_run/*
 include benchmark_runner/benchmark_operator/workload_flavors/test_ci/hammerdb/*.yaml
