@@ -16,53 +16,61 @@ shared_data:
   system_metrics: {{ system_metrics }}
   prom_url: https://prometheus-k8s.openshift-monitoring.svc.cluster.local:9091
   prom_token: {{ prom_token }}
-  xtype: {{ run_type }}
   sm_index_name: system-metrics{{ es_suffix }}
   metrics_profile: node-metrics.yml
   #metrics_profile: https://raw.githubusercontent.com/cloud-bulldozer/benchmark-operator/master/roles/kube-burner/files/metrics.yaml
-  {% if run_type == 'perf_ci' -%}
-  test_type1: stream
-  test_type2: rr
-  size1: 64
-  size2: 1024
-  size3: 8192
-  nthr1: 1
-  nthr2: 8
-  runtime: 60
-  {% else %}
-  test_type: stream
-  size1: 64
-  size2: 256
-  size3: 1024
-  size4: 4096
-  size5: 16384
-  nthr1: 1
-  nthr2: 2
-  runtime: 30
-  {% endif %}
-pod:
-  es_kind: {{ kind }}
-  {% if run_type == 'perf_ci' %}
-  limits_cpu: 8
-  limits_memory: 8Gi
-  requests_cpu: 8
-  requests_memory: 8Gi
-  {% else %}
-  limits_cpu: 4
-  limits_memory: 16Gi
-  requests_cpu: 10m
-  requests_memory: 10Mi
-  {% endif %}
-vm:
-  es_kind: vm
-  {% if run_type == 'perf_ci' %}
-  sockets: 8
-  cores: 1
-  limits_memory: 8Gi
-  requests_memory: 8Gi
-  {% else %}
-  sockets: 1
-  cores: 4
-  limits_memory: 16Gi
-  requests_memory: 10Mi
-  {% endif %}
+  protos:
+    - tcp
+run_type_data:
+  perf_ci:
+    test_types:
+      - stream
+      - rr
+    sizes:
+      - 64
+      - 1024
+      - 8192
+    nthrs:
+      - 1
+      - 8
+    runtime: 60
+  default:
+    test_types:
+      - stream
+    sizes:
+      - 64
+      - 256
+      - 1024
+      - 4096
+      - 16384
+    nthrs:
+      - 1
+      - 2
+    runtime: 30
+kind_data:
+  default:
+    es_kind: {{ kind }}
+    run_type_data:
+      perf_ci:
+        limits_cpu: 8
+        limits_memory: 8Gi
+        requests_cpu: 8
+        requests_memory: 8Gi
+      default:
+        limits_cpu: 4
+        limits_memory: 16Gi
+        requests_cpu: 10m
+        requests_memory: 10Mi
+  vm:
+    es_kind: vm
+    run_type_data:
+      perf_ci:
+        sockets: 8
+        cores: 1
+        limits_memory: 8Gi
+        requests_memory: 8Gi
+      default:
+        sockets: 1
+        cores: 4
+        limits_memory: 16Gi
+        requests_memory: 10Mi

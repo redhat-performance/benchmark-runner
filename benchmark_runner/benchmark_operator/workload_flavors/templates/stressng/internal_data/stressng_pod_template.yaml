@@ -19,10 +19,9 @@ spec:
   workload:
     name: stressng
     args:
-      {% if kind == 'kata' -%}
+      {%- if kind == 'kata' %}
       runtime_class: kata
-      {% else %}
-      {%- endif -%}
+      {%- endif %}
       pin: {{ pin }} # enable for nodeSelector
       pin_node: "{{ pin_node }}"
       resources: {{ resources }} # enable for resources requests/limits

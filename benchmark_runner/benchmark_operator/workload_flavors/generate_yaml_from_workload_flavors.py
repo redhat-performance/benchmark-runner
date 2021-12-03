@@ -75,13 +75,22 @@ class TemplateOperations:
         Compute kind and data key from workload name
         """
         if '_pod' in workload:
-            return 'pod', 'pod'
+            return 'pod'
         elif '_kata' in workload:
-            return 'kata', 'pod'
+            return 'kata'
         elif '_vm' in workload:
-            return 'vm', 'vm'
+            return 'vm'
         else:
-            return None, None
+            return None
+
+    def __get_subdict(self, dictionary: dict, key: str, value: str):
+        if key in dictionary:
+            subdict = dictionary[key]
+            if value in subdict:
+                return subdict[value]
+            elif 'default' in subdict:
+                return subdict['default']
+        return dict()
 
     @logger_time_stamp
     def generate_hammerdb_yamls_internal(self, workload: str, database: str):
@@ -92,13 +101,23 @@ class TemplateOperations:
         # Get hammerdb data
         hammerdb_template = self.__get_yaml_template_by_workload(workload=workload)
         hammerdb_data = yaml.load(render_yaml_file(self.__hammerdb_dir_path, 'hammerdb_data_template.yaml', self.__environment_variables_dict), Loader=yaml.FullLoader)
-        database_data = hammerdb_data[database]
         render_data = hammerdb_data['shared_data']
 
-        # merge 3 dictionaries
-        kind, template_kind = self.__get_workload_keys(workload)
+        kind = self.__get_workload_keys(workload)
         render_data['kind'] = kind
-        render_data = {**self.__environment_variables_dict, **render_data, **database_data, **hammerdb_data[template_kind]}
+        database_data = self.__get_subdict(hammerdb_data, 'database_data', database)
+        kind_data = self.__get_subdict(hammerdb_data, 'kind_data', kind)
+        run_type_data = self.__get_subdict(hammerdb_data, 'run_type_data', self.__run_type)
+
+        database_kind_data = self.__get_subdict(database_data, 'kind_data', kind)
+        database_runtype_data = self.__get_subdict(database_data, 'run_type_data', self.__run_type)
+
+        kind_runtype_data = self.__get_subdict(kind_data, 'run_type_data', self.__run_type)
+        render_data = {**render_data, **kind_runtype_data}
+        render_data = {**self.__environment_variables_dict, **render_data,
+                       **kind_data, **database_data, **run_type_data,
+                       **database_kind_data, **database_runtype_data,
+                       **kind_runtype_data}
 
         # Jinja render hammerdb yaml
         with open(os.path.join(self.__hammerdb_dir_path, 'internal_data', f'{hammerdb_template}.yaml')) as f:
@@ -139,10 +158,14 @@ class TemplateOperations:
         workload_data = yaml.load(render_yaml_file(workload_dir_path, f'{workload_name}_data_template.yaml', self.__environment_variables_dict), Loader=yaml.FullLoader)
         render_data = workload_data['shared_data']
 
-        # merge 3 dictionaries
-        kind, template_kind = self.__get_workload_keys(workload)
+        kind = self.__get_workload_keys(workload)
         render_data['kind'] = kind
-        render_data = {**self.__environment_variables_dict, **render_data, **workload_data[template_kind]}
+        kind_data = self.__get_subdict(workload_data, 'kind_data', kind)
+        run_type_data = self.__get_subdict(workload_data, 'run_type_data', self.__run_type)
+
+        kind_runtype_data = self.__get_subdict(kind_data, 'run_type_data', self.__run_type)
+        render_data = {**self.__environment_variables_dict, **render_data,
+                       **kind_data, **run_type_data, **kind_runtype_data}
 
         with open(os.path.join(f'{workload_dir_path}', 'internal_data', f'{workload_template}.yaml')) as f:
             tm = Template(f.read())

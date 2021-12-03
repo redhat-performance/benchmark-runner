@@ -27,8 +27,9 @@ shared_data:
   limits_memory: 16Gi
   requests_cpu: 10m
   requests_memory: 10Mi
-pod:
-  es_kind: {{ kind }}
-vm:
-  es_kind: vm
-  cores: 4
+kind_data:
+  default:
+    es_kind: {{ kind }}
+  vm:
+    es_kind: vm
+    cores: 4
