@@ -1,0 +1,12 @@
+common_data:
+  namespace: {{ namespace }}
+  es_url: {{ elasticsearch_url }}
+  es_index_name: {{ workload_name }}{{ es_suffix }}
+  # enable/disable system metrics
+  system_metrics: {{ system_metrics }}
+  prom_url: https://prometheus-k8s.openshift-monitoring.svc.cluster.local:9091
+  prom_token: {{ prom_token }}
+  sm_index_name: system-metrics{{ es_suffix }}
+  metrics_profile: node-metrics.yml
+  #metrics_profile: https://raw.githubusercontent.com/cloud-bulldozer/benchmark-operator/master/roles/kube-burner/files/metrics.yaml
+  pin: {{ pin }}

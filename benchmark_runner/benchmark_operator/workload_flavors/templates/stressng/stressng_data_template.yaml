@@ -1,0 +1,21 @@
+shared_data:
+  pin_node: {{ pin_node1 }}
+  runtype: parallel
+  timeout: 30
+  instances: 1
+  # cpu stressor options
+  cpu_stressors: 1
+  cpu_percentage: 100
+  # vm stressor option
+  vm_stressors: 1
+  vm_bytes: 128M
+  # mem stressor options
+  mem_stressors: 1
+  resources: true
+  limits_cpu: 4
+  limits_memory: 16Gi
+  requests_cpu: 10m
+  requests_memory: 10Mi
+kind_data:
+  vm:
+    cores: 4
