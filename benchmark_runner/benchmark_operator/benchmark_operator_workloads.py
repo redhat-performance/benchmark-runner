@@ -633,16 +633,15 @@ class BenchmarkOperatorWorkloads:
         self.remove_if_exist_run_yaml()
         workload_name = workload_full_name.split('_')
 
+        self.__template.generate_yamls(workload=workload_full_name)
         if 'hammerdb' in workload_full_name:
             # check if ocs is installed
             if self.__environment_variables_dict.get('ocs_pvc', '') == 'True':
                 if not self.__oc.is_ocs_installed():
                     raise OCSNonInstalled()
-            self.__template.generate_hammerdb_yamls(workload=f'{workload_name[0]}_{workload_name[1]}', database=workload_name[2])
             class_method = getattr(BenchmarkOperatorWorkloads, f'{workload_name[0]}_{workload_name[1]}')
             class_method(self, workload_name[2])
         else:
-            self.__template.generate_workload_yamls(workload=workload_full_name)
             class_method = getattr(BenchmarkOperatorWorkloads, workload_full_name)
             class_method(self)
         # remove workload yaml at the end of run

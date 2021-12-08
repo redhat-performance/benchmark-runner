@@ -54,16 +54,11 @@ class GoldenFiles:
             for run_type in environment_variables.run_types_list:
                 environment_variables.environment_variables_dict['run_type'] = run_type
                 for workload in environment_variables.workloads_list:
-                    workload_components = workload.split('_')
-                    base_workload = f'{workload_components[0]}_{workload_components[1]}'
                     t = TemplateOperations()
                     srcdir = t.get_current_run_path()
                     self.__clear_directory_yaml(srcdir)
                     destdir = self.__generate_yaml_dir_name(run_type=run_type, workload=workload, ocs_pvc=ocs_pvc, dest=dest)
-                    if workload_components[0] == 'hammerdb':
-                        t.generate_hammerdb_yamls(base_workload, workload_components[2])
-                    else:
-                        t.generate_workload_yamls(base_workload)
+                    t.generate_yamls(workload)
                     self.__copy_yaml_files_to_dir(src=srcdir, dest=destdir)
                     self.__clear_directory_yaml(srcdir)
 
