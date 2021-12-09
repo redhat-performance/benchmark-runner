@@ -636,7 +636,7 @@ class BenchmarkOperatorWorkloads:
         self.__template.generate_yamls(workload=workload_full_name)
         if 'hammerdb' in workload_full_name:
             # check if ocs is installed
-            if self.__environment_variables_dict.get('ocs_pvc', '') == 'True':
+            if self.__environment_variables_dict.get('ocs_pvc', '').lower() == 'True':
                 if not self.__oc.is_ocs_installed():
                     raise OCSNonInstalled()
             class_method = getattr(BenchmarkOperatorWorkloads, f'{workload_name[0]}_{workload_name[1]}')
