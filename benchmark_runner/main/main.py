@@ -1,6 +1,10 @@
 
 import ast  # change string list to list
 
+import argparse
+from jinja2 import Template
+import yaml
+from benchmark_runner.main.update_data_template_yaml_with_environment_variables import render_yaml_file
 from benchmark_runner.main.environment_variables import *
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 from benchmark_runner.benchmark_operator.benchmark_operator_workloads import BenchmarkOperatorWorkloads
@@ -18,11 +22,57 @@ logger.setLevel(level=log_level)
 # . venv/bin/activate
 
 
+def __parse_args():
+    """
+    Parse command line arguments
+    """
+    parser = argparse.ArgumentParser(description='Run benchmarks using benchmark_runner')
+    parser.add_argument('-D', '--define', type=str, help='Define a variable', metavar='var=value', action='append')
+    parser.add_argument('-U', '--undefine', type=str, help='Undefine a variable from the environment', metavar='var', action='append')
+    parser.add_argument('-F', '--filename', type=str, help='YAML file containing settings', metavar='file')
+    parser.add_argument('--install_ocp_version', type=str, help='OCP version to install', metavar='version')
+    parser.add_argument('--azure_cluster_start', action='store_true', help='Start Azure cluster')
+    parser.add_argument('--azure_cluster_stop', action='store_true', help='Stop Azure cluster')
+    parser.add_argument('--install_ocp_resources', action='store_true', help='Install OCP resources')
+    parser.add_argument('--ci-status', type=str, help='Update CI status to pass or failed', metavar='ci status')
+    parser.add_argument('-w', '--workload', type=str, help='Run workload',  metavar='workload')
+    args = parser.parse_args()
+
+    if args.install_ocp_version:
+        environment_variables.environment_variables_dict['install_ocp_version'] = args.install_ocp_version
+    if args.install_ocp_resources:
+        environment_variables.environment_variables_dict['install_ocp_resources'] = 'True'
+    if args.azure_cluster_start:
+        environment_variables.environment_variables_dict['azure_cluster_start'] = 'True'
+    if args.azure_cluster_stop:
+        environment_variables.environment_variables_dict['azure_cluster_stop'] = 'True'
+    if args.ci_status:
+        environment_variables.environment_variables_dict['ci_status'] = args.ci_status
+    if args.workload:
+        environment_variables.environment_variables_dict['workload'] = args.workload
+    if args.undefine:
+        for var in args.undefine:
+            environment_variables.environment_variables_dict.pop(var, None)
+    if args.define:
+        for var in args.define:
+            if '=' not in var or var.startswith('='):
+                raise Exception(f'Invalid variable definition "{var}"')
+            elif var.endswith('='):
+                environment_variables.environment_variables_dict[var] = ''
+            else:
+                var, value = var.split('=')
+                environment_variables.environment_variables_dict[var] = value
+    if args.filename:
+        render_data = yaml.load(render_yaml_file(args.filename, environment_variables.environment_variables_dict), Loader=yaml.FullLoader)
+        environment_variables.environment_variables_dict = {**environment_variables.environment_variables_dict, **render_data}
+
+
 @logger_time_stamp
 def main():
     """
     The main of benchmark-runner handle Azure operations or Workload runs
     """
+    __parse_args()
     environment_variables_dict = environment_variables.environment_variables_dict
     # environment variables data
     workload = environment_variables_dict.get('workload', '')

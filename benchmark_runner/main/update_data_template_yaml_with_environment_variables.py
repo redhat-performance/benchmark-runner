@@ -1,5 +1,6 @@
 
 import os
+import sys
 from jinja2 import Template
 from benchmark_runner.main.environment_variables import environment_variables
 from benchmark_runner.common.oc.oc import OC
@@ -34,5 +35,10 @@ def render_yaml_file(dir_path: str, yaml_file: str, environment_variable_dict: d
     :return yaml text:
     """
     # Jinja render yaml file
-    with open(os.path.join(dir_path, yaml_file)) as f:
-        return render_yaml_string(f.read(), environment_variable_dict)
+    yaml = ''
+    if yaml_file == '-':
+        yaml = sys.stdin.read()
+    else:
+        with open(os.path.join(dir_path, yaml_file)) as f:
+            yaml = f.read()
+    return render_yaml_string(yaml, environment_variable_dict)
