@@ -325,7 +325,6 @@ class BenchmarkOperatorWorkloads:
             # system metrics
             if self.__system_metrics:
                 self.system_metrics_collector(workload=workload)
-            if self.__es_host:
                 if self.__run_type == 'test_ci':
                     es_index = 'stressng-test-ci-results'
                 else:
@@ -372,8 +371,7 @@ class BenchmarkOperatorWorkloads:
             # system metrics
             if self.__system_metrics:
                 self.system_metrics_collector(workload=workload)
-            # verify that data upload to elastic search
-            if self.__es_host:
+                # verify that data upload to elastic search
                 if self.__run_type == 'test_ci':
                     es_index = 'stressng-test-ci-results'
                 else:
@@ -432,7 +430,6 @@ class BenchmarkOperatorWorkloads:
             # system metrics
             if self.__system_metrics:
                 self.system_metrics_collector(workload=workload)
-            if self.__es_host:
                 if self.__run_type == 'test_ci':
                     es_index = 'uperf-test-ci-results'
                 else:
@@ -482,8 +479,7 @@ class BenchmarkOperatorWorkloads:
             # system metrics
             if self.__system_metrics:
                 self.system_metrics_collector(workload=workload)
-            # verify that data upload to elastic search
-            if self.__es_host:
+                # verify that data upload to elastic search
                 if self.__run_type == 'test_ci':
                     es_index = 'uperf-test-ci-results'
                 else:
@@ -535,7 +531,6 @@ class BenchmarkOperatorWorkloads:
             # system metrics
             if self.__system_metrics:
                 self.system_metrics_collector(workload=workload)
-            if self.__es_host:
                 if self.__run_type == 'test_ci':
                     es_index = 'hammerdb-test-ci-results'
                 else:
@@ -598,8 +593,7 @@ class BenchmarkOperatorWorkloads:
             # system metrics
             if self.__system_metrics:
                 self.system_metrics_collector(workload=workload)
-            # verify that data upload to elastic search
-            if self.__es_host:
+                # verify that data upload to elastic search
                 if self.__run_type == 'test_ci':
                     es_index = 'hammerdb-test-ci-results'
                 else:
