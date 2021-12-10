@@ -224,7 +224,7 @@ def test_vm_create_initialized_ready_completed_system_metrics_deleted():
     assert oc.wait_for_ready(label='app=stressng_workload', workload=workload)
     assert oc.wait_for_vm_completed(workload=workload)
     # system-metrics
-    if test_environment_variable['system_metrics'] == 'True':
+    if test_environment_variable['system_metrics'].lower() == 'true':
         es = ESOperations(es_host=test_environment_variable['elasticsearch'],
                           es_port=test_environment_variable['elasticsearch_port'])
         assert oc.wait_for_pod_create(pod_name='system-metrics-collector')

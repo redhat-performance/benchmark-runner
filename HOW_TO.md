@@ -173,29 +173,49 @@ Boilerplate data that is independent of workload has been moved to `common.yaml`
 ```
 4. There are 2 options to run workload:
    1. Run workload through [main.py](/benchmark_runner/main/main.py)
-      1. Need to configure all mandatory parameters in [environment_variables.py](benchmark_runner/main/environment_variables.py)
-         1. `workloads` = e.g. stressng_pod
-         2. `runner_path` = path to local cloned benchmark-operator (e.g. /home/user/)
-            1. git clone https://github.com/cloud-bulldozer/benchmark-operator  (inside 'runner_path')
-         3. `kubeadmin_password`
-         4. `pin_node_benchmark_operator` - benchmark-operator node selector
-         5. `pin_node1` - workload first node selector
-         6. `pin_node2` - workload second node selector (for workload with client server e.g. uperf)
-         7. `elasticsearch` - elasticsearch url without http prefix
-         8. `elasticsearch_port` - elasticsearch port
-      2. Run [main.py](/benchmark_runner/main/main.py)
-      3. Verify that benchmark-runner run the workload
+	  1. Configure mandatory parameters.  You may do so by use of
+         command line arguments (by means of `-Dvariable=value`) or environment variables.  The
+         following parameters must be configured.
+		 1. `workload` = name of the workload (`-Dworkload` on the commandline,
+            or `$WORKLOAD` in the environment)
+         2. `runner_path` = path to parent of local cloned
+            benchmark-operator (e.g. `/home/user` if the actual clone
+            is `/home/user/benchmark-operator`).  (`-Drunner_path` or `$RUNNER_PATH`)
+            1. `cd $RUNNER_PATH && git clone https://github.com/cloud-bulldozer/benchmark-operator`  (inside 'runner_path')
+         3. `elasticsearch` - elasticsearch url without http prefix or
+            port (`-Delasticsearch` or `$ELASTICSEARCH`).  This is
+            required unless you choose not to use metrics (see
+            `system_metrics` below).
+         4. `elasticsearch_port` - elasticsearch port
+            (`-Delasticsearch_port` or `$ELASTICSEARCH_PORT`).  Needed
+            unless you choose not to use system metrics.
+         5. `kubeadmin_password` = password (if required) to access
+            your cluster.  This is required in most cases; if your
+            cluster was installed via the UPI installer, it may not
+            be (`-Dkubeadmin_password` or `$KUBEADMIN_PASSWORD`)
+	  2. Configure any optional parameters
+         1. `pin_node_benchmark_operator` - benchmark-operator node
+            selector (`-Dpin_node_benchmark_operator` or `$PIN_NODE_BENCHMARK_OPERATOR`)
+         2. `pin_node1` - workload first node selector (`-Dpin_node1`
+            or `$PIN_NODE1`)
+         3. `pin_node2` - workload second node selector, for
+            client-server workloads such as uperf (`-Dpin_node1`
+            or `$PIN_NODE1`)
+		 4. `ocs_pvc` - Boolean, whether to use OCS or
+            ephemeral storage, for workloads using storage
+            (e. g. hammerdb).  Must be either `true` or `false`
+            (`-Docs_pvc` or `$OCS_PVC`).  Default `true` (use OCS).
+		 5. `system_metrics` - Boolean, whether to store system
+            metrics in Elasticsearch (`-Dsystem_metrics`,
+            `$SYSTEM_METRICS`).  Default `true`.
+      3. Run [main.py](/benchmark_runner/main/main.py)
+      4. Verify that benchmark-runner run the workload
    2. Run workload through integration/unittest tests [using pytest]
-      1. Need to configure all mandatory parameters [test_environment_variables.py](tests/integration/benchmark_runner/test_environment_variables.py)
-         1. `runner_path` = path to local cloned benchmark-operator (e.g. /home/user/)
-            1. git clone https://github.com/cloud-bulldozer/benchmark-operator (inside 'runner_path')
-         2. `kubeadmin_password`
-         3. `pin_node1` - workload first node selector
-         4. `elasticsearch` - elasticsearch url without http prefix
-         5. `elasticsearch_port` - elasticsearch port
+      1. Configure all parameters
       2. Run the selected test using pytest [test_oc.py](/tests/integration/benchmark_runner/common/oc/test_oc.py)
          1. Enable pytest in Pycharm: Configure pytest in Pycharm -> File -> settings -> tools -> Python integrated tools -> Testing -> pytest -> ok), and run the selected test
-         2. Run pytest through terminal: python -m pytest -v tests/ (pip install pytest)
+         2. Run pytest through terminal: `python3 -m pytest -v tests/`
+            (`pip3 install pytest` if not already installed)
 5. There are three separate flavors of test: `test-ci`, `func-ci`, and
    `perf-ci`.  These are intended for testing, automated functional
    testing of benchmark-runner itself, and the performance measurement
@@ -203,15 +223,14 @@ Boilerplate data that is independent of workload has been moved to `common.yaml`
    particular test environments; as noted above under
    [#Add-new-benchmark-operator-workload-to-benchmark-runner](adding
    new workloads), they also use different template files.  The flavor
-   can be selected via the environment variable `RUN_TYPE`.
+   can be selected via `-Drun_type` on the command line or the environment variable `$RUN_TYPE`.
 
    *When using a shared ElasticSearch instance (not documented here),
    it's important not to use the `perf-ci` run type*.  This will
    contaminate the index of the shared ElasticSearch database.  There
    are two ways to use the `perf-ci` flavor safely:
 
-   1. Set `STOP_WHEN_WORKLOAD_FINISH=True` in the environment when
-      running the workload.  This is case sensitive.
+   1. Set `system_metrics` to `false` when running the workload.
    2. Use a different, private ElasticSearch instance.
 
 ## Determine the version of benchmark-runner in the current container image

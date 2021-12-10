@@ -27,7 +27,10 @@ class BenchmarkOperatorWorkloads:
         self.__environment_variables_dict = environment_variables.environment_variables_dict
         self.__runner_version = self.__environment_variables_dict.get('build_version', '')
         self.__run_type = self.__environment_variables_dict.get('run_type', '')
-        self.__system_metrics = self.__environment_variables_dict.get('system_metrics', '')
+        if self.__environment_variables_dict.get('system_metrics', '').lower() == 'false':
+            self.__system_metrics = False
+        else:
+            self.__system_metrics = True
         self.__elasticsearch = self.__environment_variables_dict.get('elasticsearch', '')
         self.__ssh = SSH()
         self.__kubeadmin_password = kubeadmin_password
@@ -75,7 +78,7 @@ class BenchmarkOperatorWorkloads:
         This method check if elasticsearch exist for system metrics
         :return:
         """
-        if self.__system_metrics == 'True':
+        if self.__system_metrics:
             if not self.__elasticsearch:
                 raise SystemMetricsRequiredElasticSearch()
 
@@ -320,7 +323,7 @@ class BenchmarkOperatorWorkloads:
             self.__oc.wait_for_ready(label='app=stressng_workload', workload=workload)
             self.__oc.wait_for_pod_completed(label='app=stressng_workload', workload=workload)
             # system metrics
-            if environment_variables.environment_variables_dict['system_metrics'] == 'True':
+            if self.__system_metrics:
                 self.system_metrics_collector(workload=workload)
             if self.__es_host:
                 if self.__run_type == 'test_ci':
@@ -367,8 +370,8 @@ class BenchmarkOperatorWorkloads:
             self.__oc.wait_for_ready(label='app=stressng_workload', workload=workload)
             self.__oc.wait_for_vm_completed(workload=workload)
             # system metrics
-            if environment_variables.environment_variables_dict['system_metrics'] == 'True':
-               self.system_metrics_collector(workload=workload)
+            if self.__system_metrics:
+                self.system_metrics_collector(workload=workload)
             # verify that data upload to elastic search
             if self.__es_host:
                 if self.__run_type == 'test_ci':
@@ -427,7 +430,7 @@ class BenchmarkOperatorWorkloads:
             self.__oc.wait_for_ready(label='app=uperf-bench-client', workload=workload)
             self.__oc.wait_for_pod_completed(label='app=uperf-bench-client', workload=workload)
             # system metrics
-            if environment_variables.environment_variables_dict['system_metrics'] == 'True':
+            if self.__system_metrics:
                 self.system_metrics_collector(workload=workload)
             if self.__es_host:
                 if self.__run_type == 'test_ci':
@@ -477,7 +480,7 @@ class BenchmarkOperatorWorkloads:
             self.__oc.wait_for_ready(label='app=uperf-bench-client', workload=workload)
             self.__oc.wait_for_vm_completed(workload=workload)
             # system metrics
-            if environment_variables.environment_variables_dict['system_metrics'] == 'True':
+            if self.__system_metrics:
                 self.system_metrics_collector(workload=workload)
             # verify that data upload to elastic search
             if self.__es_host:
@@ -530,7 +533,7 @@ class BenchmarkOperatorWorkloads:
             self.__oc.wait_for_ready(label='app=hammerdb_workload', workload=workload)
             self.__oc.wait_for_pod_completed(label='app=hammerdb_workload', workload=workload)
             # system metrics
-            if environment_variables.environment_variables_dict['system_metrics'] == 'True':
+            if self.__system_metrics:
                 self.system_metrics_collector(workload=workload)
             if self.__es_host:
                 if self.__run_type == 'test_ci':
@@ -593,7 +596,7 @@ class BenchmarkOperatorWorkloads:
             self.__oc.wait_for_ready(label='app=hammerdb_workload', workload=workload)
             self.__oc.wait_for_vm_completed(workload=workload)
             # system metrics
-            if environment_variables.environment_variables_dict['system_metrics'] == 'True':
+            if self.__system_metrics:
                 self.system_metrics_collector(workload=workload)
             # verify that data upload to elastic search
             if self.__es_host:
