@@ -15,7 +15,7 @@ class GoldenFiles:
         self.__file_path = os.path.join(f'{os.path.dirname(os.path.realpath(__file__))}', 'golden_files')
         environment_variables.environment_variables_dict['elasticsearch'] = 'elasticsearch.example.com'
         environment_variables.environment_variables_dict['elasticsearch_port'] = '9999'
-        environment_variables.environment_variables_dict['elasticsearch_url'] = 'http://elasticsearch.example.com:gol9999'
+        environment_variables.environment_variables_dict['elasticsearch_url_override'] = 'http://elasticsearch.example.com:gol9999'
         environment_variables.environment_variables_dict['pin'] = 'True'
         environment_variables.environment_variables_dict['pin_node1'] = 'pin-node-1'
         environment_variables.environment_variables_dict['pin_node2'] = 'pin-node-2'

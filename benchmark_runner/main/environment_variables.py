@@ -143,7 +143,9 @@ class EnvironmentVariables:
             self._environment_variables_dict['pin_node2'] = self._environment_variables_dict['pin_node1']
 
         # ElasticSearch functionality
-        if self._environment_variables_dict['elasticsearch'] and self._environment_variables_dict['elasticsearch_port']:
+        if self._environment_variables_dict.get('elasticsearch_url_override', False):
+            self._environment_variables_dict['elasticsearch_url'] = self._environment_variables_dict.get('elasticsearch_url_override', False)
+        elif self._environment_variables_dict['elasticsearch'] and self._environment_variables_dict['elasticsearch_port']:
             self._environment_variables_dict['elasticsearch_url'] = f"http://{self._environment_variables_dict['elasticsearch']}:{self._environment_variables_dict['elasticsearch_port']}"
         else:
             self._environment_variables_dict['elasticsearch_url'] = ''
