@@ -76,6 +76,7 @@ def main():
         kubeadmin_password = environment_variables_dict.get('kubeadmin_password', '')
         benchmark_operator_workload = BenchmarkOperatorWorkloads(kubeadmin_password=kubeadmin_password, es_host=es_host,
                                                                  es_port=es_port)
+    environment_variables.update_derived_environment_variables()
 
     @logger_time_stamp
     def azure_cluster_start_stop():

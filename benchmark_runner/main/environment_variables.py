@@ -128,6 +128,11 @@ class EnvironmentVariables:
         # benchmark-wrapper last commit id
         self._environment_variables_dict['benchmark_wrapper_id'] = os.environ.get('BENCHMARK_WRAPPER_ID', '')
 
+    def update_derived_environment_variables(self):
+        """
+        Update any derived variables.  Should be called after environment
+        variables are modified
+        """
         # Node Selector functionality
         if self._environment_variables_dict['pin_node1']:
             self._environment_variables_dict['pin'] = 'true'
@@ -148,6 +153,7 @@ class EnvironmentVariables:
         """
         This method is getter
         """
+        self.update_derived_environment_variables()
         return self._environment_variables_dict['workloads']
 
     @property
@@ -155,6 +161,7 @@ class EnvironmentVariables:
         """
         This method is getter
         """
+        self.update_derived_environment_variables()
         return self._environment_variables_dict
 
     @property
@@ -162,6 +169,7 @@ class EnvironmentVariables:
         """
         This method is getter
         """
+        self.update_derived_environment_variables()
         return self._environment_variables_dict['run_types']
 
     @environment_variables_dict.setter
@@ -170,6 +178,8 @@ class EnvironmentVariables:
         This method is setter
         """
         self._environment_variables_dict = value
+        self.update_derived_environment_variables()
 
 
 environment_variables = EnvironmentVariables()
+environment_variables.update_derived_environment_variables()
