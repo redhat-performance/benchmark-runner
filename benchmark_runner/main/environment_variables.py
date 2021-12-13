@@ -1,6 +1,8 @@
 
 import os
-import datetime, time
+import time
+import datetime
+
 
 class EnvironmentVariables:
     """

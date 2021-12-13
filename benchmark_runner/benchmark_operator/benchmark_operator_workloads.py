@@ -32,6 +32,7 @@ class BenchmarkOperatorWorkloads:
         self.__run_type = self.__environment_variables_dict.get('run_type', '')
         self.__system_metrics = self.__environment_variables_dict.get('system_metrics', '')
         self.__elasticsearch = self.__environment_variables_dict.get('elasticsearch', '')
+        self.__run_artifacts = self.__environment_variables_dict.get('run_artifacts_path', '')
         self.__ssh = SSH()
         self.__kubeadmin_password = kubeadmin_password
         self.__oc = OC(kubeadmin_password=self.__kubeadmin_password)
@@ -369,7 +370,7 @@ class BenchmarkOperatorWorkloads:
         This method tar.gz log path and return the tar.gz path
         :return:
         """
-        run_artifacts_path = self.__environment_variables_dict.get('run_artifacts_path', '')
+        run_artifacts_path = self.__run_artifacts
         tar_run_artifacts_path = f"{run_artifacts_path}-{self.__time_stamp_format}.tar.gz"
         with tarfile.open(tar_run_artifacts_path, mode='w:gz') as archive:
             archive.add(run_artifacts_path, arcname=f'{workload}-{self.__time_stamp_format}', recursive=True)
@@ -393,11 +394,10 @@ class BenchmarkOperatorWorkloads:
                                  key=run_artifacts_hierarchy,
                                  upload_file=upload_file)
         # remove local run artifacts workload folder
-        path = self.__environment_variables_dict.get('run_artifacts_path', '')
         # verify that its not empty path
-        if len(path) > 3 and path != '/' and path and tar_run_artifacts_path and os.path.isfile(tar_run_artifacts_path):
+        if len(self.__run_artifacts) > 3 and self.__run_artifacts != '/' and self.__run_artifacts and tar_run_artifacts_path and os.path.isfile(tar_run_artifacts_path):
             # remove run_artifacts_path
-            shutil.rmtree(path=self.__environment_variables_dict.get('run_artifacts_path', ''))
+            shutil.rmtree(path=self.__run_artifacts)
             # remove tar.gz file
             os.remove(path=tar_run_artifacts_path)
 
