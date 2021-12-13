@@ -65,7 +65,7 @@ def __delete_vm_yamls():
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
-    if oc._is_vmi_exist(vm_name='stressng-vm-workload', namespace=test_environment_variable['namespace']):
+    if oc._is_vm_exist(vm_name='stressng-vm-workload', namespace=test_environment_variable['namespace']):
         oc.delete_vm_sync(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'), vm_name='stressng-vm-workload')
     delete_generate_file(full_path_yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'))
 
@@ -76,14 +76,14 @@ def before_after_all_tests_fixture():
     This method is create benchmark operator pod once for ALL tests
     :return:
     """
-    print('Install benchmark-operator pod')
+    print('Deploy benchmark-operator pod')
     benchmark_operator = BenchmarkOperatorWorkloads(kubeadmin_password=test_environment_variable['kubeadmin_password'],
                                                     es_host=test_environment_variable['elasticsearch'],
                                                     es_port=test_environment_variable['elasticsearch_port'])
     benchmark_operator.make_undeploy_benchmark_controller_manager_if_exist(runner_path=test_environment_variable['runner_path'])
     benchmark_operator.make_deploy_benchmark_controller_manager(runner_path=test_environment_variable['runner_path'])
     yield
-    print('Delete benchmark-operator pod')
+    print('UnDeploy benchmark-operator pod')
     benchmark_operator.make_undeploy_benchmark_controller_manager(runner_path=test_environment_variable['runner_path'])
 
 
@@ -218,9 +218,9 @@ def test_create_sync_vm_timeout_error():
 
 
 @pytest.mark.skip(reason="Already verified in: test_vm_create_initialized_ready_completed_system_metrics_deleted ")
-def test_oc_get_vmi_name_and_is_vmi_exist():
+def test_oc_get_vm_name_and_is_vm_exist():
     """
-    This method test get_vmi_name and is_vmi_exist
+    This method test get_vm_name and is_vm_exist
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
@@ -228,8 +228,8 @@ def test_oc_get_vmi_name_and_is_vmi_exist():
     oc._create_async(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'))
     # wait 60 sec till vm will be created
     time.sleep(60)
-    assert oc._get_vmi_name(vm_name='stressng-vm-workload', namespace=test_environment_variable['namespace'])
-    assert oc._is_vmi_exist(vm_name='stressng-vm-workload', namespace=test_environment_variable['namespace'])
+    assert oc._get_vm_name(vm_name='stressng-vm-workload', namespace=test_environment_variable['namespace'])
+    assert oc._is_vm_exist(vm_name='stressng-vm-workload', namespace=test_environment_variable['namespace'])
 
 
 @pytest.mark.skip(reason="Already verified in: test_vm_create_initialized_ready_completed_system_metrics_deleted ")
@@ -246,7 +246,7 @@ def test_wait_for_vm_created():
 
 def test_vm_create_initialized_ready_completed_system_metrics_deleted():
     """
-    This method test create, get_vmi, initialize, ready, completed, system-metrics, deleted
+    This method test create, get_vm, initialize, ready, completed, system-metrics, deleted
     Must have running ElasticSearch server
     :return:
     """
@@ -254,7 +254,7 @@ def test_vm_create_initialized_ready_completed_system_metrics_deleted():
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
     assert oc.create_vm_sync(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'), vm_name='stressng-vm-workload')
-    assert oc.get_vmi()
+    assert oc.get_vm()
     assert oc.wait_for_initialized(label='app=stressng_workload', workload=workload)
     assert oc.wait_for_ready(label='app=stressng_workload', workload=workload)
     assert oc.wait_for_vm_completed(workload=workload)

@@ -53,7 +53,7 @@ Choose one from the following list:
 
 **auto:** SYSTEM_METRICS=True [ True=collect metric, False=not collect metrics, default True ]
 
-**auto:** RUNNER_PATH=/ [ The default work space is / ]
+**auto:** RUNNER_PATH=/tmp [ The default work space is /tmp ]
 
 **optional:** KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD
 

@@ -2,7 +2,6 @@
 import os
 import time
 from typeguard import typechecked
-from tenacity import retry, stop_after_attempt
 
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 from benchmark_runner.common.oc.oc_exceptions import PodNotCreateTimeout, PodNotInitializedTimeout, PodNotReadyTimeout, \
@@ -27,6 +26,7 @@ class OC(SSH):
         super().__init__()
         self.__kubeadmin_password = kubeadmin_password
         self.__environment_variables_dict = environment_variables.environment_variables_dict
+        self.__run_artifacts = self.__environment_variables_dict.get('run_artifacts_path', '')
 
     def get_ocp_server_version(self):
         """
@@ -168,7 +168,7 @@ class OC(SSH):
             return False
 
     @typechecked
-    def _get_vmi_name(self, vm_name: str, namespace: str):
+    def _get_vm_name(self, vm_name: str, namespace: str):
         """
         This method return pod name if exist or raise error
         :return:
@@ -179,7 +179,7 @@ class OC(SSH):
             raise VMNameNotExist(vm_name=vm_name)
 
     @typechecked
-    def _is_vmi_exist(self, vm_name: str, namespace: str):
+    def _is_vm_exist(self, vm_name: str, namespace: str):
         """
         This method return pod name if exist or empty string
         :return:
@@ -222,6 +222,70 @@ class OC(SSH):
             raise LoginFailed
         return True
 
+    @typechecked
+    @logger_time_stamp
+    def get_pod(self, label: str, database: str = ''):
+        """
+        This method get pods according to label
+        :param label:
+        :param database:
+        :return:
+        """
+        if database:
+            return self.run(
+                f"oc get pods -n '{database}-db'" + " --no-headers | awk '{ print $1; }' | grep " + database,
+                is_check=True).rstrip().decode('ascii')
+        else:
+            return self.run(
+                "oc get pods -n " + environment_variables.environment_variables_dict['namespace'] + " --no-headers | awk '{ print $1; }' | grep " + label,
+                is_check=True).rstrip().decode('ascii')
+
+    @typechecked
+    @logger_time_stamp
+    def get_vm(self, label: str = ''):
+        """
+        This method get vm according to label
+        :param label:
+        :return:
+        """
+        if label:
+            return self.run(
+                cmd="oc get vmi -n " + environment_variables.environment_variables_dict['namespace'] + " --no-headers | awk '{ print $1; }' | grep " + label,
+                is_check=True).rstrip().decode('ascii')
+        else:
+            return self.run('oc get vmi', is_check=True)
+
+    @typechecked
+    @logger_time_stamp
+    def save_pod_log(self, pod_name: str, database: str = ''):
+        """
+        This method save pod log in log_path
+        :param pod_name: pod name with uuid
+        :param database: database
+        :return:
+        """
+        output_filename = os.path.join(self.__run_artifacts, pod_name)
+        if database:
+            self.run(f"oc logs -n '{database}-db' {pod_name} > {output_filename} ")
+        # manager logs of benchmark-controller-manager
+        elif 'benchmark-controller-manager' in pod_name:
+            self.run(f"oc logs -n {environment_variables.environment_variables_dict['namespace']} {pod_name} manager > {output_filename} ")
+        else:
+            self.run(f"oc logs -n {environment_variables.environment_variables_dict['namespace']} {pod_name} > {output_filename} ")
+
+    @typechecked
+    @logger_time_stamp
+    def save_vm_log(self, vm_name: str):
+        """
+        This method save vm log in log_path
+        :param vm_name: vm name with uuid
+        :return:
+        """
+        output_filename = f"{self.__run_artifacts}/{vm_name}"
+        self.run(
+            cmd=f"/home/ebattat/kubevirt/cmd/virtctl/virtctl console -n {environment_variables.environment_variables_dict['namespace']} {vm_name} | tee -a {output_filename}",
+            background=True)
+
     @logger_time_stamp
     def get_pods(self):
         """
@@ -230,24 +294,15 @@ class OC(SSH):
         """
         return self.run('oc get pods', is_check=True)
 
-    @logger_time_stamp
-    def get_vmi(self):
-        """
-        This method get vmi
-        :return:
-        """
-        return self.run('oc get vmi', is_check=True)
-
     @typechecked
     @logger_time_stamp
     def wait_for_pod_create(self, pod_name: str,
                             namespace: str = environment_variables.environment_variables_dict['namespace'],
-                            timeout: int = int(environment_variables.environment_variables_dict['timeout']), sleep_time: int = SLEEP_TIME):
+                            timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
         """
         This method is wait till pod name is creating or throw exception after timeout
         :param namespace:
         :param pod_name:
-        :param sleep_time:
         :param timeout:
         :return: True if getting pod name or raise PodNameError
         """
@@ -256,42 +311,40 @@ class OC(SSH):
             if self._is_pod_exist(pod_name=pod_name, namespace=namespace):
                 return True
             # sleep for x seconds
-            time.sleep(sleep_time)
-            current_wait_time += sleep_time
+            time.sleep(OC.SLEEP_TIME)
+            current_wait_time += OC.SLEEP_TIME
         raise PodNotCreateTimeout(pod_name)
 
     @typechecked
     @logger_time_stamp
     def wait_for_vm_create(self, vm_name: str,
                            namespace: str = environment_variables.environment_variables_dict['namespace'],
-                           timeout: int = int(environment_variables.environment_variables_dict['timeout']), sleep_time: int = SLEEP_TIME):
+                           timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
         """
         This method is wait till vm name is creating or throw exception after timeout
         :param vm_name:
         :param namespace:
-        :param sleep_time:
         :param timeout:
         :return: True if getting pod name or raise PodNameError
         """
         current_wait_time = 0
         while current_wait_time <= timeout:
-            if self._is_vmi_exist(vm_name=vm_name, namespace=namespace):
+            if self._is_vm_exist(vm_name=vm_name, namespace=namespace):
                 return True
             # sleep for x seconds
-            time.sleep(sleep_time)
-            current_wait_time += sleep_time
+            time.sleep(OC.SLEEP_TIME)
+            current_wait_time += OC.SLEEP_TIME
         raise VMNotCreateTimeout(vm_name)
 
     @typechecked
     @logger_time_stamp
     def wait_for_pod_terminate(self, pod_name: str,
                                namespace: str = environment_variables.environment_variables_dict['namespace'],
-                               timeout: int = int(environment_variables.environment_variables_dict['timeout']), sleep_time: int = SLEEP_TIME):
+                               timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
         """
         This method is wait till pod name is terminating or throw exception after timeout
         :param namespace:
         :param pod_name:
-        :param sleep_time:
         :param timeout:
         :return: True if pod name terminated or raise
         """
@@ -300,30 +353,29 @@ class OC(SSH):
             if not self._is_pod_exist(pod_name=pod_name, namespace=namespace):
                 return True
             # sleep for x seconds
-            time.sleep(sleep_time)
-            current_wait_time += sleep_time
+            time.sleep(OC.SLEEP_TIME)
+            current_wait_time += OC.SLEEP_TIME
         raise PodTerminateTimeout(pod_name)
 
     @typechecked
     @logger_time_stamp
     def wait_for_vm_terminate(self, vm_name: str,
                               namespace: str = environment_variables.environment_variables_dict['namespace'],
-                              timeout: int = int(environment_variables.environment_variables_dict['timeout']), sleep_time: int = SLEEP_TIME):
+                              timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
         """
         This method is wait till vm name is terminating or throw exception after timeout
         :param vm_name:
         :param namespace:
-        :param sleep_time:
         :param timeout:
         :return: True if pod name terminated or raise
         """
         current_wait_time = 0
         while current_wait_time <= timeout:
-            if not self._is_vmi_exist(vm_name=vm_name, namespace=namespace):
+            if not self._is_vm_exist(vm_name=vm_name, namespace=namespace):
                 return True
             # sleep for x seconds
-            time.sleep(sleep_time)
-            current_wait_time += sleep_time
+            time.sleep(OC.SLEEP_TIME)
+            current_wait_time += OC.SLEEP_TIME
         raise VMTerminateTimeout(vm_name)
 
     @typechecked
@@ -387,7 +439,7 @@ class OC(SSH):
         :param yaml:
         :return:
         """
-        if self._is_vmi_exist(vm_name=vm_name, namespace=namespace):
+        if self._is_vm_exist(vm_name=vm_name, namespace=namespace):
             self._delete_async(yaml)
             return self.wait_for_vm_terminate(vm_name=vm_name, namespace=namespace, timeout=timeout)
         else:
@@ -459,29 +511,36 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def wait_for_pod_completed(self, label: str, workload: str = '',
-                               namespace: str = environment_variables.environment_variables_dict['namespace'],
-                               timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
+    def wait_for_pod_completed(self, label: str, workload: str = '', namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
         """
         This method wait to pod to be completed
         :param workload:
-        :param namespace:
         :param label:
         :param timeout:
+        :param namespace:
         :return:
         """
         try:
-            result = self.run(
-                f"oc --namespace {namespace} wait --for=condition=complete -l {label}-{self.__get_short_uuid(workload=workload)} jobs --timeout={timeout}s")
-            if 'met' in result:
-                return True
+            current_wait_time = 0
+            while current_wait_time <= timeout:
+                result = self.run(
+                    f"oc --namespace {namespace} wait --for=condition=complete -l {label}-{self.__get_short_uuid(workload=workload)} jobs --timeout={OC.SHORT_WAIT_TIME}s")
+                if 'met' in result:
+                    return True
+                result = self.run(
+                    f"oc --namespace {namespace} wait --for=condition=failed -l {label}-{self.__get_short_uuid(workload=workload)} jobs --timeout={OC.SLEEP_TIME}s")
+                if 'met' in result:
+                    return False
+            # sleep for x seconds
+            time.sleep(OC.SLEEP_TIME)
+            current_wait_time += OC.SLEEP_TIME
         except Exception as err:
             raise PodNotCompletedTimeout(workload=workload)
 
     @logger_time_stamp
     def wait_for_vm_completed(self, workload: str = '',
                               namespace: str = environment_variables.environment_variables_dict['namespace'],
-                              timeout: int = int(environment_variables.environment_variables_dict['timeout']), sleep_time: int = SLEEP_TIME):
+                              timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
         """
         This method wait to pod to be completed
         :param workload:
@@ -494,8 +553,8 @@ class OC(SSH):
                     f"oc --namespace {namespace} get benchmark {workload} -o jsonpath={{.status.complete}}") == 'true':
                 return True
             # sleep for x seconds
-            time.sleep(sleep_time)
-            current_wait_time += sleep_time
+            time.sleep(OC.SLEEP_TIME)
+            current_wait_time += OC.SLEEP_TIME
         raise VMNotCompletedTimeout(workload=workload)
 
     def __get_num_active_nodes(self):
@@ -512,11 +571,9 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def wait_for_ocp_resource_create(self, resource: str, verify_cmd: str, status: str = '', count_local_storage: bool = False, count_openshift_storage: bool = False, kata_worker_machine_count: bool = False, timeout: int = int(environment_variables.environment_variables_dict['timeout']),
-                                     sleep_time: int = SLEEP_TIME):
+    def wait_for_ocp_resource_create(self, resource: str, verify_cmd: str, status: str = '', count_local_storage: bool = False, count_openshift_storage: bool = False, kata_worker_machine_count: bool = False, timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
         """
         This method is wait till operator is created or throw exception after timeout
-        :param sleep_time: sleep time between check
         :param resource: The resource cnv, local storage, ocs, kata
         :param verify_cmd: Verify command that resource was created successfully
         :param status: The final success status
@@ -549,13 +606,12 @@ class OC(SSH):
                 if self.run(verify_cmd) != '':
                     return True
             # sleep for x seconds
-            time.sleep(sleep_time)
-            current_wait_time += sleep_time
+            time.sleep(OC.SLEEP_TIME)
+            current_wait_time += OC.SLEEP_TIME
         raise OCPResourceNotCreateTimeout(resource)
 
     @typechecked
     @logger_time_stamp
-    @retry(stop=stop_after_attempt(3))
     def create_cnv(self, path: str, resource_list: list):
         """
         This method create cnv resource
@@ -583,7 +639,6 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    @retry(stop=stop_after_attempt(3))
     def create_local_storage(self, path: str, resource_list: list):
         """
         This method create local storage
@@ -602,7 +657,6 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    @retry(stop=stop_after_attempt(3))
     def create_ocs(self, path: str, resource_list: list, ibm_blk_disk_name: list):
         """
         This method create ocs
@@ -654,7 +708,6 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    @retry(stop=stop_after_attempt(3))
     def create_kata(self, path: str, resource_list: list):
         """
         This method create kata resource

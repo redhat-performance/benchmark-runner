@@ -37,7 +37,7 @@ def before_after_all_tests_fixture():
     This method is create benchmark operator pod once for ALL tests
     :return:
     """
-    print('Install benchmark-operator pod')
+    print('Deploy benchmark-operator pod')
 
     # delete benchmark-operator pod if exist
     benchmark_operator = BenchmarkOperatorWorkloads(kubeadmin_password=test_environment_variable['kubeadmin_password'], es_host=test_environment_variable['elasticsearch'],
@@ -45,7 +45,7 @@ def before_after_all_tests_fixture():
     benchmark_operator.make_undeploy_benchmark_controller_manager_if_exist(runner_path=test_environment_variable['runner_path'])
     benchmark_operator.make_deploy_benchmark_controller_manager(runner_path=test_environment_variable['runner_path'])
     yield
-    print('Delete benchmark-operator pod')
+    print('Undeploy benchmark-operator pod')
     benchmark_operator.make_undeploy_benchmark_controller_manager(runner_path=test_environment_variable['runner_path'])
 
 
