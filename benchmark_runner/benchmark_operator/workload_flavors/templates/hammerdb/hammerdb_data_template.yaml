@@ -1,0 +1,66 @@
+shared_data:
+  pin_node1: {{ pin_node1 }}
+  pin_node2: {{ pin_node2 }}
+  transactions: 100000
+  ocs_pvc: {{ ocs_pvc }}
+  resources: true
+run_type_data:
+  perf_ci:
+    db_num_workers: 32
+    db_warehouses: 96
+    storage: 100
+    database_limits_cpu: 32
+    database_limits_memory: 32Gi
+    database_requests_cpu: 32
+    database_requests_memory: 32Gi
+    limits_cpu: 16
+    limits_memory: 16Gi
+    requests_cpu: 10m
+    requests_memory: 10Mi
+  default:
+    db_num_workers: 2
+    db_warehouses: 2
+    storage: 10
+    database_limits_cpu: 4
+    database_limits_memory: 16Gi
+    database_requests_cpu: 10m
+    database_requests_memory: 10Mi
+    limits_cpu: 4
+    limits_memory: 16Gi
+    requests_cpu: 10m
+    requests_memory: 10Mi
+database_data:
+  mariadb:
+    db_image: centos8-mariadb103-container-disk:latest
+    db_pass: mysql
+    db_port: 3306
+    db_type: mariadb
+    db_user: root
+    db_server_pod: mariadb-deployment.mariadb-db
+  mssql:
+    db_image: centos8-mssql2019-container-disk:latest
+    db_pass: s3curePasswordString
+    db_port: 1433
+    db_type: mssql
+    db_user: SA
+    db_server_pod: mssql-deployment.mssql-db
+  postgres:
+    db_image: centos8-postgres10-container-disk:latest
+    db_pass: postgres
+    db_port: 5432
+    db_type: pg
+    db_user: postgres
+    db_server_pod: postgres-deployment.postgres-db
+kind_data:
+  vm:
+    run_type_data:
+      perf_ci:
+        sockets: 32
+        cores: 1
+        vm_limits_memory: 32Gi
+        vm_requests_memory: 32Gi
+      default:
+        sockets: 1
+        cores: 4
+        vm_limits_memory: 16Gi
+        vm_requests_memory: 10Mi

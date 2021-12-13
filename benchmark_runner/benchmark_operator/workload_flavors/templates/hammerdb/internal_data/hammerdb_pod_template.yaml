@@ -1,0 +1,80 @@
+apiVersion: ripsaw.cloudbulldozer.io/v1alpha1
+kind: Benchmark
+metadata:
+  name: hammerdb-{{ kind }}
+  namespace: {{ namespace }}
+spec:
+  system_metrics:
+    collection: {{ system_metrics }}
+    prom_url: "{{ prom_url }}"
+    es_url: "{{ es_url }}"
+    prom_token: "{{ prom_token }}"
+    metrics_profile: "{{ metrics_profile }}"
+    index_name: {{ sm_index_name }}
+  elasticsearch:
+    url: "{{ es_url }}"
+    index_name: {{ es_index_name }}
+  metadata:
+    collection: false
+  workload:
+    name: hammerdb
+    args:
+      {%- if kind == 'kata' %}
+      runtime_class: kata
+      {%- endif %}
+      pin: {{ pin }} # enable for nodeSelector
+      pin_node: "{{ pin_node1 }}"
+      resources: {{ resources }} # enable for resources requests/limits
+      requests_cpu: {{ requests_cpu }}
+      requests_memory: {{ requests_memory }}
+      limits_cpu: {{ limits_cpu }}
+      limits_memory: {{ limits_memory }}
+      db_type: "{{ db_type }}"
+      timed_test: true
+      test_type: "tpc-c"
+      db_init: true
+      db_benchmark: true
+      db_server: {{ db_server_pod }}
+      db_port: "{{ db_port }}"
+      db_warehouses: {{ db_warehouses }}
+      db_num_workers: {{ db_num_workers }}
+      db_user: "{{ db_user }}"
+      db_pass: "{{ db_pass }}"
+      db_name: "tpcc"
+      transactions: {{ transactions }}
+      raiseerror: "false"
+      keyandthink: "false"
+      driver: "timed"
+      rampup: 1
+      runtime: 1
+      allwarehouse: false
+      timeprofile: false
+      async_scale: false
+      async_client: 10
+      async_verbose: false
+      async_delay: 1000
+      samples: 1
+      # database specific variables
+      # mssql:
+      db_mssql_tcp: "true"
+      db_mssql_azure: "false"
+      db_mssql_authentication: "windows"
+      db_mssql_linux_authent: "sql"
+      db_mssql_odbc_driver: "ODBC Driver 13 for SQL Server"
+      db_mssql_linux_odbc: "ODBC Driver 17 for SQL Server"
+      db_mssql_imdb: "false"
+      db_mssql_bucket: 1
+      db_mssql_durability: "SCHEMA_AND_DATA"
+      db_mssql_checkpoint: "false"
+      # mysql:
+      db_mysql_storage_engine: "innodb"
+      db_mysql_partition: "false"
+      db_mysql_socket: "/var/lib/mysql/mysql.sock"
+      # postgresql
+      db_postgresql_superuser: "postgres"
+      db_postgresql_superuser_pass: "postgres"
+      db_postgresql_defaultdbase: "tpcc"
+      db_postgresql_vacuum: "false"
+      db_postgresql_dritasnap: "false"
+      db_postgresql_oracompat: "false"
+      db_postgresql_storedprocs: "false"

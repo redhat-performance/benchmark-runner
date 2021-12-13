@@ -9,6 +9,7 @@ _**Table of Contents**_
     - [Add new workload, modify parameters to workload, or change parameters for any CI job](#add-new-workload-modify-parameters-to-workload-or-change-parameters-for-any-ci-job)
     - [Add new benchmark operator workload to benchmark runner](#add-new-benchmark-operator-workload-to-benchmark-runner)
     - [Add workload to grafana dashboard](#add-workload-to-grafana-dashboard)
+        - [Data template](#data-template)
     - [Monitor and debug workload](#monitor-and-debug-workload)
     - [Determine the version of benchmark-runner in the current container image](#determine-the-version-of-benchmark-runner-in-the-current-container-image)
 
@@ -71,7 +72,7 @@ add` the appropriate files as discussed above (usually you can just
 `git add` the golden_files directory).  If you have remove .yaml
 files, you must manually `git rm` them.
 
-You should never need to modify the golden files manually.
+You should /never/ modify the golden files manually.
 
 ## Add new benchmark operator workload to benchmark runner
 This section also applies to modifying an existing workload, including
@@ -86,11 +87,10 @@ any template .yaml files.
 5. Create new `workload method` for Pod and VM under `Workloads` section in [benchmark_operator_workloads.py](benchmark_runner/benchmark_operator/benchmark_operator_workloads.py).
    It can be duplicated from existing workload method: `def stressng_pod` or `def stressng_vm` and customized workload run steps accordingly
 6. Add workload method name (workload_pod/workload_vm) to environment_variables_dict['workloads'] in [environment_variables.py](benchmark_runner/main/environment_variables.py)
-7. Create workload folder in each workload flavor [func_ci](benchmark_runner/benchmark_operator/workload_flavors/func_ci), [perf_ci](benchmark_runner/benchmark_operator/workload_flavors/perf_ci), [test_ci](benchmark_runner/benchmark_operator/workload_flavors/test_ci)
-   1. For each workload folder:
-      1. Add 'workload_data_template' for configured parameters and configure workload index name 'es_index_name' e.g. [stressng_data_template.yaml](benchmark_runner/benchmark_operator/workload_flavors/func_ci/stressng/stressng_data_template.yaml)
-      2. Add workload Pod and VM CRD template inside [internal_data](benchmark_runner/benchmark_operator/workload_flavors/func_ci/stressng/internal_data)
-8. Add workload folder path in [MANIFEST.in](MANIFEST.in), for each flavor 'func_ci', 'perf_ci', 'test_ci' add 2 paths: the workload path to 'workload_data_template.yaml' and path to 'internal_data' Pod and VM template yaml files
+7. Create workload folder in the [templates](benchmark_runner/benchmark_operator/workload_flavors/templates) directory.  Create the following files in that directory:
+   1. workload_data_template for configuration parameters, e. g. [stressng_data_template.yaml](benchmark_runner/benchmark_operator/workload_flavors/templates/stressng/stressng_data_template.yaml).  The data template is structured as discussed [below](#data-template).
+   2. workload pod and VM custom resource template inside [internal_data](benchmark_runner/benchmark_operator/workload_flavors/templates/stressng/internal_data)
+8. Add workload folder path in [MANIFEST.in](MANIFEST.in), add 2 paths: the workload path to 'workload_data_template.yaml' and path to 'internal_data' Pod and VM template yaml files
 9. Add tests for all new methods you write under `tests/integration`.
 10. Update the golden unit test files as described [above](#add-new-workload-modify-parameters-to-workload-or-change-parameters-for-any-ci-job)
 11. For test and debug workload, need to configure [environment_variables.py](benchmark_runner/main/environment_variables.py)
@@ -116,6 +116,40 @@ any template .yaml files.
    3. Create panel from scratch or duplicate existing on (stressng/uperf)
    4. Configure the workload related metrics
    5. Save dashboard -> share -> Export -> view json -> Copy to clipboard -> override existing one [benchmark-runner-report.json](grafana/benchmark-runner-report.json)
+   
+### Data template 
+
+The data template is a structured YAML file, organized as follows:
+```
+shared_data:
+  <shared_data>
+run_type_data:
+  perf_ci:
+    <perf_ci_data>
+  func_ci:
+    <func_ci_data>
+  default:
+    <data for other run types>
+kind_data:
+  vm:
+    <vm_data>
+	run_type_data:
+	  perf_ci:
+	    <vm_data_for_perf_ci>
+	  default:
+	    <vm_data_for_other_run_types>
+  default:
+    <data_for_other_kinds>
+	run_type_data:
+	  perf_ci:
+	    <other_kind_data_for_perf_ci>
+	  default:
+	    <other_kind_data_for_other_run_types>
+```
+
+The `shared_data` section is mandatory, but all other sections are optional.  Generally, the `run_type` data for `func_ci` and `test_ci` is identical, so only `perf_ci` data need be specified, and the otherwise shared data under `default`.  Similarly, the `kata` and `pod` kinds use identical data, and only vm data need be specified separately.
+
+Boilerplate data that is independent of workload has been moved to `common.yaml` at top level in the `templates` directory.
 
 ## Monitor and debug workload
 1. git clone https://github.com/redhat-performance/benchmark-runner

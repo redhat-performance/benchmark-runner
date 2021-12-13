@@ -33,7 +33,10 @@ spec:
         type: postgres-database-server
     spec:
       nodeSelector:
-        kubernetes.io/hostname: "pin-node-2"
+        kubernetes.io/hostname: "{{ pin_node2 }}"
+      {%- if kind == 'kata' %}
+      runtimeClassName: kata
+      {%- endif %}
       terminationGracePeriodSeconds: 10
       containers:
         - name: postgres
@@ -43,11 +46,11 @@ spec:
             - containerPort: 5432
           resources:
             requests:
-              cpu: 32
-              memory: 32Gi
+              cpu: {{ database_requests_cpu }}
+              memory: {{ database_requests_memory }}
             limits:
-              cpu: 32
-              memory: 32Gi
+              cpu: {{ database_limits_cpu }}
+              memory: {{ database_limits_memory }}
           env:
             - name: POSTGRESQL_USER
               value: "test"
@@ -61,10 +64,33 @@ spec:
             - name: postgres-custom-config
               mountPath: /var/lib/pgsql/data/pg_hba.conf
               subPath: custom.pg_hba.conf #should be the name used in the ConfigMap
+          {%- if ocs_pvc == True %}
+            - name: postgres-persistent-storage
+              mountPath: /var/lib/pgsql/data
+              readOnly: false
+      {%- endif %}
       volumes:
         - name: postgres-custom-config
           configMap:
             name: postgres-custom-config
+        {%- if ocs_pvc == True %}
+        - name: postgres-persistent-storage
+          persistentVolumeClaim:
+            claimName: postgres-persistent-storage
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+    name: postgres-persistent-storage
+    namespace: postgres-db
+spec:
+    storageClassName: ocs-storagecluster-ceph-rbd
+    accessModes: [ "ReadWriteOnce" ]
+    volumeMode: Filesystem
+    resources:
+      requests:
+        storage: {{ storage }}Gi
+{%- endif %}
 ---
 apiVersion: v1
 kind: Service
