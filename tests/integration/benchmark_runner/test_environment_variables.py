@@ -10,7 +10,7 @@ def __get_test_environment_variable():
 
     ##################################################################################################
     # dynamic parameters - configure for local run
-    test_environment_variable['runner_path'] = os.environ.get('RUNNER_PATH', '/')
+    test_environment_variable['runner_path'] = os.environ.get('RUNNER_PATH', '/tmp')
     test_environment_variable['kubeadmin_password'] = os.environ.get('KUBEADMIN_PASSWORD', '')
     # Node Selector
     test_environment_variable['pin_node1'] = os.environ.get('PIN_NODE1', '')

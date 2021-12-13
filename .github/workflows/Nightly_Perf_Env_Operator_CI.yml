@@ -106,6 +106,7 @@ jobs:
           end=$(printf '%(%s)T' -1)
           echo "INSTALL_OCP_RESOURCE_MINUTES_TIME=$(( (( end - start )) / 60))" >> "$GITHUB_ENV"
 
+
   nightly_start:
     name: Deploy Perf Nightly - Start
     runs-on: ubuntu-latest

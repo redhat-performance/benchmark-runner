@@ -50,7 +50,9 @@ setup(
         'tenacity==8.0.1',  # retry decorator
         'PyGitHub==1.55',  # update secrets
         'myst-parser==0.15.2'  # readthedocs
-        # add new package inside requirements.txt
+        'boto3==1.20.23',  # s3
+        'botocore==1.23.23'  # s3
+        # must add new package inside requirements.txt
     ],
 
     setup_requires=['pytest', 'pytest-runner', 'wheel', 'coverage'],
