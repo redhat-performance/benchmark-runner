@@ -242,35 +242,6 @@ class OC(SSH):
         long_uuid = self.run(f"oc -n openshift-monitoring sa get-token prometheus-k8s")
         return long_uuid
 
-    @typechecked
-    def exec(self, command: str, pod_name: str, namespace: str=''):
-        """
-        oc exec a command and return the answer
-        :return:
-        """
-        try:
-            if namespace != '':
-                namespace = f'-n {namespace}'
-            return self.run(f'oc exec {namespace} {pod_name} -- {command}')
-        except Exception as err:
-            raise ExecFailed(command, pod_name, err)
-
-    @typechecked
-    def terminate_pod_sync(self, pod_name: str,
-                           namespace: str = environment_variables.environment_variables_dict['namespace'],
-                           timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
-
-        """
-        Delete a pod with no associated YAML file
-        """
-        if self._is_pod_exist(pod_name, namespace):
-            try:
-                if namespace != '':
-                    namespace = f'-n {namespace}'
-                self.run(f'oc delete pod {namespace} {pod_name} timeout={timeout}')
-            except Exception as err:
-                raise PodTerminateTimeout(pod_name)
-
     @logger_time_stamp
     def login(self):
         """
@@ -529,10 +500,8 @@ class OC(SSH):
                     f"oc --namespace {namespace} wait --for=condition={status} pod -l {label}-{self.__get_short_uuid(workload=workload)} --timeout={timeout}s",
                     is_check=True)
             else:
-                if label != '':
-                    label = f'-l {label}'
                 return self.run(
-                    f"oc --namespace {namespace} wait --for=condition={status} pod {label} --timeout={timeout}s",
+                    f"oc --namespace {namespace} wait --for=condition={status} pod -l {label} --timeout={timeout}s",
                     is_check=True)
             if 'met' in result.decode("utf-8"):
                 return True
@@ -563,10 +532,8 @@ class OC(SSH):
                     f"oc --namespace {namespace} wait --for=condition={status} pod -l {label}-{self.__get_short_uuid(workload=workload)} --timeout={timeout}s",
                     is_check=True)
             else:
-                if label != '':
-                    label = f'-l {label}'
                 result = self.run(
-                    f"oc --namespace {namespace} wait --for=condition={status} pod {label} --timeout={timeout}s",
+                    f"oc --namespace {namespace} wait --for=condition={status} pod -l {label} --timeout={timeout}s",
                     is_check=True)
             if 'met' in result.decode("utf-8"):
                 return True
@@ -623,6 +590,61 @@ class OC(SSH):
             time.sleep(OC.SLEEP_TIME)
             current_wait_time += OC.SLEEP_TIME
         raise VMNotCompletedTimeout(workload=workload)
+
+    @typechecked
+    def exec(self, command: str, pod_name: str, namespace: str=''):
+        """
+        oc exec a command and return the answer
+        :return:
+        """
+        try:
+            if namespace != '':
+                namespace = f'-n {namespace}'
+            return self.run(f'oc exec {namespace} {pod_name} -- {command}')
+        except Exception as err:
+            raise ExecFailed(command, pod_name, err)
+
+    @typechecked
+    def terminate_pod_sync(self, pod_name: str,
+                           namespace: str = environment_variables.environment_variables_dict['namespace'],
+                           timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
+
+        """
+        Delete a pod with no associated YAML file
+        """
+        if self._is_pod_exist(pod_name, namespace):
+            try:
+                if namespace != '':
+                    namespace = f'-n {namespace}'
+                self.run(f'oc delete pod {namespace} {pod_name} timeout={timeout}')
+            except Exception as err:
+                raise PodTerminateTimeout(pod_name)
+
+    @typechecked
+    @logger_time_stamp
+    def wait_for_pod_ready(self, pod_name: str,
+                           namespace: str = environment_variables.environment_variables_dict['namespace'],
+                           timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
+        """
+        Wait for a pod to be ready and running
+        :param namespace:
+        :param pod_name:
+        :param timeout:
+        :return: True if getting pod name or raise PodNameError
+        """
+        self.wait_for_pod_create(pod_name=pod_name, namespace=namespace, timeout=timeout)
+        current_wait_time = 0
+        if namespace != '':
+            namespace=f'-n {namespace}'
+        while current_wait_time <= timeout:
+            answer = self.run(f'oc get pod {namespace} {pod_name} --no-headers -ocustom-columns=Status:status.phase 2>/dev/null')
+            if answer == 'Running':
+                return
+            elif answer == 'Error':
+                raise PodFailed(pod_name)
+            time.sleep(OC.SLEEP_TIME)
+            current_wait_time += OC.SLEEP_TIME
+        raise PodNotReadyTimeout(pod_name)
 
     def __get_num_active_nodes(self):
         """

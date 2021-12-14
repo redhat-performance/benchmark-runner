@@ -5,6 +5,7 @@ from benchmark_runner.common.oc.oc import OC
 from tests.integration.benchmark_runner.test_environment_variables import *
 import tempfile
 import tarfile
+import time
 
 
 def test_oc_get_ocp_server_version():
@@ -151,11 +152,10 @@ def test_bounce_prometheus():
     Test that the Prometheus pod can be bounced
     :return:
     """
-
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
-    oc.terminate_pod_sync(pod_name="prometheus=k8s-0", namespace="openshift-monitoring")
-    oc.wait_for_pod_ready(pod_name="prometheus=k8s-0", namespace="openshift-monitoring")
+    oc.terminate_pod_sync(pod_name="prometheus-k8s-0", namespace="openshift-monitoring")
+    oc.wait_for_pod_ready(pod_name="prometheus-k8s-0", namespace="openshift-monitoring")
     assert True
 
 
@@ -168,8 +168,8 @@ def test_collect_prometheus():
     oc.login()
     with tempfile.NamedTemporaryFile(suffix='.tar') as tf:
         filename = tf.name
-        self.__oc.terminate_pod_sync(pod_name='prometheus-k8s-0', namespace='openshift-monitoring')
-        self.__oc.wait_for_ready(pod_name='prometheus-k8s-0', namespace='openshift-monitoring', label_uuid=False, label='')
+        oc.terminate_pod_sync(pod_name="prometheus-k8s-0", namespace="openshift-monitoring")
+        oc.wait_for_pod_ready(pod_name="prometheus-k8s-0", namespace="openshift-monitoring")
         time.sleep(60)
         oc.exec(pod_name='prometheus-k8s-0', namespace='openshift-monitoring', command=f'/bin/sh -c "tar -C /prometheus -cf - .; true" > "{filename}"')
         assert tarfile.is_tarfile(filename)
