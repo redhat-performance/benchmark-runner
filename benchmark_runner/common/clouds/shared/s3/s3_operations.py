@@ -7,7 +7,7 @@ from botocore.exceptions import ClientError
 from os import listdir
 from os.path import isfile, join
 
-from benchmark_runner.common.clouds.shared.s3.s3_operations_exceptions import S3FileNotUploaded, S3FileNotDownloaded, S3FileNotDeleted, S3KeyNotCreated
+from benchmark_runner.common.clouds.shared.s3.s3_operations_exceptions import S3FileNotUploaded, S3FileNotDownloaded, S3FileNotDeleted, S3KeyNotCreated, S3FileNotExist, S3FailedCreatePresingedURL
 from benchmark_runner.main.environment_variables import environment_variables
 
 
@@ -149,7 +149,7 @@ class S3Operations:
         except ClientError:
             raise
         except Exception:
-            raise
+            raise S3FileNotExist
 
     @typeguard.typechecked
     def upload_objects(self, local_source: str, s3_target: str):
@@ -230,4 +230,4 @@ class S3Operations:
         except ClientError:
             raise
         except Exception:
-            raise
+            raise S3FailedCreatePresingedURL
