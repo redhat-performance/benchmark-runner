@@ -811,17 +811,17 @@ class BenchmarkOperatorWorkloads:
             self.__oc.terminate_pod_sync(pod_name='prometheus-k8s-0', namespace='openshift-monitoring')
             logger.info('Waiting for prometheus-k8s-0 pod to reappear')
             self.__oc.wait_for_pod_ready(pod_name='prometheus-k8s-0', namespace='openshift-monitoring')
-            start_timestamp = self.__oc.exec(pod_name='prometheus-k8s-0', namespace='openshift-monitoring', command=f"date '+%Y_%m_%dT%H_%M_%S%z'")
+            start_timestamp = self.__oc.exec(pod_name='prometheus-k8s-0', namespace='openshift-monitoring', container='prometheus', command=f"date '+%Y_%m_%dT%H_%M_%S%z'")
             logger.info('Waiting 60 seconds for prometheus to stabilize')
             time.sleep(60)
             self.run_workload_func_internal(workload_full_name)
             logger.info('Waiting 120 seconds for metrics collection to complete')
             time.sleep(120)
-            end_timestamp = self.__oc.exec(pod_name='prometheus-k8s-0', namespace='openshift-monitoring', command=f"date '+%Y_%m_%dT%H_%M_%S%z'")
+            end_timestamp = self.__oc.exec(pod_name='prometheus-k8s-0', namespace='openshift-monitoring', container='prometheus', command=f"date '+%Y_%m_%dT%H_%M_%S%z'")
             promdb = os.path.join(log_path, f'promdb-{start_timestamp}-{end_timestamp}')
             xformcmd = f"--transform 's,^\.,./{promdb},'"
             logger.info(f'Saving prometheus DB to {promdb}')
-            self.__oc.exec(pod_name='prometheus-k8s-0', namespace='openshift-monitoring', command=f'/bin/sh -c "tar -C /prometheus {xformcmd} -cf - .; true" > "{promdb}.tar"')
+            self.__oc.exec(pod_name='prometheus-k8s-0', namespace='openshift-monitoring', container='prometheus', command=f'/bin/sh -c "tar -C /prometheus {xformcmd} -cf - .; true" > "{promdb}.tar"')
         else:
             self.run_workload_func_internal(workload_full_name)
 

@@ -143,7 +143,7 @@ def test_oc_exec():
     test_message = "I am here"
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
-    answer = oc.exec(pod_name="prometheus-k8s-0", namespace="openshift-monitoring", command=f'echo "{test_message}"')
+    answer = oc.exec(pod_name="prometheus-k8s-0", namespace="openshift-monitoring", container='prometheus', command=f'echo "{test_message}"')
     assert answer == test_message
 
 
@@ -171,5 +171,5 @@ def test_collect_prometheus():
         oc.terminate_pod_sync(pod_name="prometheus-k8s-0", namespace="openshift-monitoring")
         oc.wait_for_pod_ready(pod_name="prometheus-k8s-0", namespace="openshift-monitoring")
         time.sleep(60)
-        oc.exec(pod_name='prometheus-k8s-0', namespace='openshift-monitoring', command=f'/bin/sh -c "tar -C /prometheus -cf - .; true" > "{filename}"')
+        oc.exec(pod_name='prometheus-k8s-0', namespace='openshift-monitoring', container='prometheus', command=f'/bin/sh -c "tar -C /prometheus -cf - .; true" > "{filename}"')
         assert tarfile.is_tarfile(filename)

@@ -592,7 +592,7 @@ class OC(SSH):
         raise VMNotCompletedTimeout(workload=workload)
 
     @typechecked
-    def exec(self, command: str, pod_name: str, namespace: str=''):
+    def exec(self, command: str, pod_name: str, namespace: str='', container: str=''):
         """
         oc exec a command and return the answer
         :return:
@@ -600,7 +600,9 @@ class OC(SSH):
         try:
             if namespace != '':
                 namespace = f'-n {namespace}'
-            return self.run(f'oc exec {namespace} {pod_name} -- {command}')
+            if container != '':
+                container = f'-c {container}'
+            return self.run(f'oc exec {namespace} {pod_name} {container} -- {command}')
         except Exception as err:
             raise ExecFailed(command, pod_name, err)
 
