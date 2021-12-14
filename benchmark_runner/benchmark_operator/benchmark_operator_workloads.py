@@ -809,7 +809,8 @@ class BenchmarkOperatorWorkloads:
             # TODO: this won't work for Kubernetes
             self.__oc.terminate_pod_sync(pod_name='prometheus-k8s-0', namespace='openshift-monitoring')
             logger.info('Waiting for prometheus-k8s-0 pod to reappear')
-            self.__oc.wait_for_pod_ready(pod_name='prometheus-k8s-0', namespace='openshift-monitoring')
+            self.__oc.wait_for_pod_create(pod_name='prometheus-k8s-0', namespace='openshift-monitoring'
+            self.__oc.wait_for_ready(pod_name='prometheus-k8s-0', namespace='openshift-monitoring', label_uuid=False, label='')
             start_timestamp = self.__oc.exec(pod_name='prometheus-k8s-0', namespace='openshift-monitoring', command=f"date '+%Y_%m_%dT%H_%M_%S%z'")
             logger.info('Waiting 60 seconds for prometheus to stabilize')
             time.sleep(60)
