@@ -52,8 +52,8 @@ RUN mkdir -p ~/.kube
 # Create folder for provision private key file (ssh)
 RUN mkdir -p ~/.ssh/
 
-# download benchmark-operator
-RUN git clone https://github.com/cloud-bulldozer/benchmark-operator
+# download benchmark-operator to /tmp default path
+RUN git clone https://github.com/cloud-bulldozer/benchmark-operator /tmp
 
 # Add main
 COPY benchmark_runner/main/main.py /benchmark_runner/main/main.py
