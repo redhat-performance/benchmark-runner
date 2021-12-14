@@ -15,12 +15,13 @@ class ESOperations:
     This class contains elastic search operations
     """
 
-    # sleep time between checks is 30 sec
+    # sleep time between checks is 10 sec
     SLEEP_TIME = 10
     # ElasticSearch fetch data of last 15 minutes
     ES_FETCH_MIN_TIME = 15
     # max search results
     MAX_SEARCH_RESULTS = 1000
+    MIN_SEARCH_RESULTS = 100
 
     def __init__(self, es_host: str, es_port: str, es_fetch_last_x_minutes: int = ES_FETCH_MIN_TIME):
         self.__es_fetch_last_x_minutes = es_fetch_last_x_minutes  # MUST BE 15 MIN AT LEAST
@@ -72,7 +73,7 @@ class ESOperations:
                 'gte': f'now-{self.__es_fetch_last_x_minutes}m', 'lt': 'now'})
         # reduce the search result
         if fast_check:
-            search = search[0:10]
+            search = search[0:self.MIN_SEARCH_RESULTS]
         else:
             search = search[0:self.MAX_SEARCH_RESULTS]
         search_response = search.execute()
@@ -165,7 +166,6 @@ class ESOperations:
         This method update existing index
         :param index: index name
         :param id: The specific index id
-        :param doc_type:
         :param metadata: The metadata for enrich that existing index according to id
         :return:
         """
