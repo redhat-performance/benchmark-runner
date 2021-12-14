@@ -6,8 +6,8 @@ from tests.integration.benchmark_runner.test_environment_variables import *
 import tempfile
 import tarfile
 import time
-from benchmark_runner.common.prometheus_snapshot import PrometheusSnapshot
-import benchmark_runner.common.prometheus_snapshot_exceptions
+from benchmark_runner.common.prometheus_snapshot.prometheus_snapshot import PrometheusSnapshot
+from benchmark_runner.common.prometheus_snapshot.prometheus_snapshot_exceptions import PrometheusSnapshotError, PrometheusSnapshotAlreadyStarted, PrometheusSnapshotNotStarted, PrometheusSnapshotAlreadyRetrieved
 
 
 def test_oc_get_ocp_server_version():
@@ -156,10 +156,9 @@ def test_collect_prometheus():
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
-    with tempfile.TemporaryDirectory() as td:
-        dirname = td.name
+    with tempfile.TemporaryDirectory() as dirname:
         snapshot = PrometheusSnapshot(oc=oc, log_path=dirname, verbose=True)
-        snapshot.prepare_for_snapshot()
-        time.sleep(30)
-        tarball = snapshot.retrieve_snapshot(post_wait_time=30)
+        snapshot.prepare_for_snapshot(pre_wait_time=1)
+        time.sleep(10)
+        tarball = snapshot.retrieve_snapshot(post_wait_time=1)
         assert tarfile.is_tarfile(tarball)

@@ -18,8 +18,8 @@ from benchmark_runner.benchmark_operator.benchmark_operator_exceptions import OC
 from benchmark_runner.main.environment_variables import environment_variables
 from benchmark_runner.common.clouds.IBM.ibm_operations import IBMOperations
 from benchmark_runner.common.clouds.shared.s3.s3_operations import S3Operations
-from benchmark_runner.common.prometheus_snapshot import PrometheusSnapshot
-import benchmark_runner.common.prometheus_snapshot_exceptions
+from benchmark_runner.common.prometheus_snapshot.prometheus_snapshot import PrometheusSnapshot
+from benchmark_runner.common.prometheus_snapshot.prometheus_snapshot_exceptions import PrometheusSnapshotError, PrometheusSnapshotAlreadyStarted, PrometheusSnapshotNotStarted, PrometheusSnapshotAlreadyRetrieved
 
 
 class BenchmarkOperatorWorkloads:
