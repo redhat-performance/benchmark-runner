@@ -3,6 +3,8 @@
 
 from benchmark_runner.common.oc.oc import OC
 from tests.integration.benchmark_runner.test_environment_variables import *
+import tempfile
+import tarfile
 
 
 def test_oc_get_ocp_server_version():
@@ -130,3 +132,44 @@ def test_is_kata_installed():
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
     assert oc.is_kata_installed()
+
+
+def test_oc_exec():
+    """
+    Test that oc exec works
+    :return:
+    """
+    test_message = "I am here"
+    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
+    oc.login()
+    answer = oc.exec(pod_name="prometheus_k8s-0", namespace="openshift-monitoring", command=f'echo "{test_message}"')
+    assert answer == test_message
+
+
+def test_bounce_prometheus():
+    """
+    Test that the Prometheus pod can be bounced
+    :return:
+    """
+
+    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
+    oc.login()
+    oc.terminate_pod_sync(pod_name="prometheus=k8s-0", namespace="openshift-monitoring")
+    oc.wait_for_pod_ready(pod_name="prometheus=k8s-0", namespace="openshift-monitoring")
+    assert True
+
+
+def test_collect_prometheus():
+    """
+    Test that Prometheus data can be collected.  TBD test that data is valid.
+    :return:
+    """
+    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
+    oc.login()
+    tf = tempfile.NamedTemporaryFile(suffix='.tar')
+    filename = tf.name()
+    self.__oc.terminate_pod_sync(pod_name='prometheus-k8s-0', namespace='openshift-monitoring')
+    self.__oc.wait_for_pod_ready(pod_name='prometheus-k8s-0', namespace='openshift-monitoring')
+    time.sleep(60)
+    oc.exec(pod_name='prometheus-k8s-0', namespace='openshift-monitoring', command=f'/bin/sh -c "tar -C /prometheus -cf - .; true" > "{filename}"')
+    assert tarfile.is_tarfile(filename)
