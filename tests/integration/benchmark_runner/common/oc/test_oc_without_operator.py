@@ -166,10 +166,10 @@ def test_collect_prometheus():
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
-    tf = tempfile.NamedTemporaryFile(suffix='.tar')
-    filename = tf.name
-    self.__oc.terminate_pod_sync(pod_name='prometheus-k8s-0', namespace='openshift-monitoring')
-    self.__oc.wait_for_ready(pod_name='prometheus-k8s-0', namespace='openshift-monitoring', label_uuid=False, label='')
-    time.sleep(60)
-    oc.exec(pod_name='prometheus-k8s-0', namespace='openshift-monitoring', command=f'/bin/sh -c "tar -C /prometheus -cf - .; true" > "{filename}"')
-    assert tarfile.is_tarfile(filename)
+    with tempfile.NamedTemporaryFile(suffix='.tar') as tf:
+        filename = tf.name
+        self.__oc.terminate_pod_sync(pod_name='prometheus-k8s-0', namespace='openshift-monitoring')
+        self.__oc.wait_for_ready(pod_name='prometheus-k8s-0', namespace='openshift-monitoring', label_uuid=False, label='')
+        time.sleep(60)
+        oc.exec(pod_name='prometheus-k8s-0', namespace='openshift-monitoring', command=f'/bin/sh -c "tar -C /prometheus -cf - .; true" > "{filename}"')
+        assert tarfile.is_tarfile(filename)
