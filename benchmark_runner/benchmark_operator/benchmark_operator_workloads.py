@@ -18,6 +18,8 @@ from benchmark_runner.benchmark_operator.benchmark_operator_exceptions import OC
 from benchmark_runner.main.environment_variables import environment_variables
 from benchmark_runner.common.clouds.IBM.ibm_operations import IBMOperations
 from benchmark_runner.common.clouds.shared.s3.s3_operations import S3Operations
+from benchmark_runner.common.prometheus_snapshot import PrometheusSnapshot
+import benchmark_runner.common.prometheus_snapshot_exceptions
 
 
 class BenchmarkOperatorWorkloads:
@@ -774,7 +776,7 @@ class BenchmarkOperatorWorkloads:
 
     @typechecked
     @logger_time_stamp
-    def run_workload_func_internal(self, workload_full_name: str):
+    def run_workload_func(self, workload_full_name: str):
         """
         The method run specific workload function according to the workload string
         :param workload_full_name:
@@ -798,34 +800,6 @@ class BenchmarkOperatorWorkloads:
         # remove workload yaml at the end of run
         self.__remove_run_workload_yaml_file(workload_full_name=workload_full_name)
 
-    @typechecked
-    @logger_time_stamp
-    def run_workload_func(self, workload_full_name: str):
-        extract_prometheus_snapshot = self.__environment_variables_dict.get('extract_prometheus_snapshot', 'True')
-        if extract_prometheus_snapshot.lower() == 'true':
-            log_path = self.__environment_variables_dict.get('run_artifacts_path', '')
-            if not os.path.isdir(log_path):
-                os.mkdir(log_path)
-            logger.info('Deleting prometheus-k8s-0 pod')
-            # TODO: this won't work for Kubernetes
-            self.__oc.terminate_pod_sync(pod_name='prometheus-k8s-0', namespace='openshift-monitoring')
-            logger.info('Waiting for prometheus-k8s-0 pod to reappear')
-            self.__oc.wait_for_pod_ready(pod_name='prometheus-k8s-0', namespace='openshift-monitoring')
-            start_timestamp = self.__oc.exec(pod_name='prometheus-k8s-0', namespace='openshift-monitoring', container='prometheus', command=f"date '+%Y_%m_%dT%H_%M_%S%z'")
-            logger.info('Waiting 60 seconds for prometheus to stabilize')
-            time.sleep(60)
-            self.run_workload_func_internal(workload_full_name)
-            logger.info('Waiting 120 seconds for metrics collection to complete')
-            time.sleep(120)
-            end_timestamp = self.__oc.exec(pod_name='prometheus-k8s-0', namespace='openshift-monitoring', container='prometheus', command=f"date '+%Y_%m_%dT%H_%M_%S%z'")
-            promdb = os.path.join(log_path, f'promdb-{start_timestamp}-{end_timestamp}')
-            xformcmd = f"--transform 's,^\.,./{promdb},'"
-            logger.info(f'Saving prometheus DB to {promdb}')
-            self.__oc.exec(pod_name='prometheus-k8s-0', namespace='openshift-monitoring', container='prometheus', command=f'/bin/sh -c "tar -C /prometheus {xformcmd} -cf - .; true" > "{promdb}.tar"')
-        else:
-            self.run_workload_func_internal(workload_full_name)
-
-
     @logger_time_stamp
     def run_workload(self, workload: str):
         """
@@ -842,12 +816,24 @@ class BenchmarkOperatorWorkloads:
         # make deploy benchmark controller manager
         self.make_deploy_benchmark_controller_manager(runner_path=environment_variables.environment_variables_dict['runner_path'])
 
+        # Start collection of Prometheus snapshot
+        extract_prometheus_snapshot = self.__environment_variables_dict.get('extract_prometheus_snapshot', 'True')
+        if extract_prometheus_snapshot.lower() == 'true':
+            log_path = self.__environment_variables_dict.get('run_artifacts_path', '')
+            if not os.path.isdir(log_path):
+                os.mkdir(log_path)
+            snapshot = PrometheusSnapshot(oc=self.__oc, log_path=log_path, verbose=True)
+            snapshot.prepare_for_snapshot()
+
         # run workload
         self.run_workload_func(workload_full_name=workload)
+
+        # Retrieve the Prometheus snapshot
+        if extract_prometheus_snapshot.lower() == 'true':
+            snapshot.retrieve_snapshot()
 
         # upload logs to s3
         self.upload_run_artifacts_to_s3(workload=workload)
 
         # make undeploy benchmark controller manager
         self.make_undeploy_benchmark_controller_manager(runner_path=environment_variables.environment_variables_dict['runner_path'])
-

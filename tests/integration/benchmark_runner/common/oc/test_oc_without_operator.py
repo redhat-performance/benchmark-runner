@@ -6,6 +6,8 @@ from tests.integration.benchmark_runner.test_environment_variables import *
 import tempfile
 import tarfile
 import time
+from benchmark_runner.common.prometheus_snapshot import PrometheusSnapshot
+import benchmark_runner.common.prometheus_snapshot_exceptions
 
 
 def test_oc_get_ocp_server_version():
@@ -147,18 +149,6 @@ def test_oc_exec():
     assert answer == test_message
 
 
-def test_bounce_prometheus():
-    """
-    Test that the Prometheus pod can be bounced
-    :return:
-    """
-    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
-    oc.terminate_pod_sync(pod_name="prometheus-k8s-0", namespace="openshift-monitoring")
-    oc.wait_for_pod_ready(pod_name="prometheus-k8s-0", namespace="openshift-monitoring")
-    assert True
-
-
 def test_collect_prometheus():
     """
     Test that Prometheus data can be collected.  TBD test that data is valid.
@@ -166,10 +156,10 @@ def test_collect_prometheus():
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
-    with tempfile.NamedTemporaryFile(suffix='.tar') as tf:
-        filename = tf.name
-        oc.terminate_pod_sync(pod_name="prometheus-k8s-0", namespace="openshift-monitoring")
-        oc.wait_for_pod_ready(pod_name="prometheus-k8s-0", namespace="openshift-monitoring")
-        time.sleep(60)
-        oc.exec(pod_name='prometheus-k8s-0', namespace='openshift-monitoring', container='prometheus', command=f'/bin/sh -c "tar -C /prometheus -cf - .; true" > "{filename}"')
-        assert tarfile.is_tarfile(filename)
+    with tempfile.TemporaryDirectory() as td:
+        dirname = td.name
+        snapshot = PrometheusSnapshot(oc=oc, log_path=dirname, verbose=True)
+        snapshot.prepare_for_snapshot()
+        time.sleep(30)
+        tarball = snapshot.retrieve_snapshot(post_wait_time=30)
+        assert tarfile.is_tarfile(tarball)
