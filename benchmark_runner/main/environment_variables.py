@@ -52,8 +52,10 @@ class EnvironmentVariables:
         self._environment_variables_dict['run_types'] = ['test_ci', 'func_ci', 'perf_ci']
         # Run type test_ci/func_ci/perf_ci, default test_ci same environment as func_ci
         self._environment_variables_dict['run_type'] = os.environ.get('RUN_TYPE', 'test_ci')
-        # Benchmark runner local run artifacts path with time stamp format
+        # Benchmark runner IBM Cloud Object Storage run artifacts hierarchy, not part of a POSIX path ('/' a key seperator, '-' file name convenstion )
+        self._environment_variables_dict['date_key'] = datetime.datetime.now().strftime("%Y/%m/%d")
         self._environment_variables_dict['time_stamp_format'] = os.path.join(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d-%H-%M-%S'))
+        # Benchmark runner local run artifacts path with time stamp format
         self._environment_variables_dict['run_artifacts_path'] = os.path.join(self._environment_variables_dict['runner_path'], f"{self._environment_variables_dict['workload'].replace('_', '-')}-{self._environment_variables_dict['time_stamp_format']}")
         self._environment_variables_dict['extract_prometheus_snapshot'] = os.environ.get('EXTRACT_PROMETHEUS_SNAPSHOT', 'True')
         # end dynamic parameters - configure for local run

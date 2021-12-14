@@ -39,3 +39,21 @@ class S3KeyNotCreated(S3OperationsError):
     def __init__(self):
         self.message = "S3 File is not deleted"
         super(S3KeyNotCreated, self).__init__(self.message)
+
+
+class S3FileNotExist(S3OperationsError):
+    """
+    This class is error that s3 file is not exist
+    """
+    def __init__(self):
+        self.message = "S3 File is not exist"
+        super(S3FileNotExist, self).__init__(self.message)
+
+
+class S3FailedCreatePresingedURL(S3OperationsError):
+    """
+    This class is error that failed to create presigned url
+    """
+    def __init__(self):
+        self.message = "failed to create presigned url"
+        super(S3FailedCreatePresingedURL, self).__init__(self.message)

@@ -33,6 +33,8 @@ class BenchmarkOperatorWorkloads:
         self.__system_metrics = self.__environment_variables_dict.get('system_metrics', '')
         self.__elasticsearch = self.__environment_variables_dict.get('elasticsearch', '')
         self.__run_artifacts = self.__environment_variables_dict.get('run_artifacts_path', '')
+        self.__date_key = self.__environment_variables_dict.get('date_key', '')
+        self.__key = self.__environment_variables_dict.get('key', '')
         self.__ssh = SSH()
         self.__kubeadmin_password = kubeadmin_password
         self.__oc = OC(kubeadmin_password=self.__kubeadmin_password)
@@ -334,9 +336,9 @@ class BenchmarkOperatorWorkloads:
         :param workload_name: workload name
         :return:
         """
-        date_key = datetime.datetime.now().strftime("%Y/%m/%d")
-        run_type = self.__environment_variables_dict.get('run_type', '').replace('_', '-')
-        key = self.__environment_variables_dict.get('key', '').replace('_', '-')
+        key = self.__key
+        run_type = self.__run_type.replace('_', '-')
+        date_key = self.__date_key
         if workload_name:
             return os.path.join(key, run_type, date_key, workload_name)
         return os.path.join(key, run_type, date_key)
@@ -370,10 +372,9 @@ class BenchmarkOperatorWorkloads:
         This method tar.gz log path and return the tar.gz path
         :return:
         """
-        run_artifacts_path = self.__run_artifacts
-        tar_run_artifacts_path = f"{run_artifacts_path}-{self.__time_stamp_format}.tar.gz"
+        tar_run_artifacts_path = f"{self.__run_artifacts}.tar.gz"
         with tarfile.open(tar_run_artifacts_path, mode='w:gz') as archive:
-            archive.add(run_artifacts_path, arcname=f'{workload}-{self.__time_stamp_format}', recursive=True)
+            archive.add(self.__run_artifacts, arcname=f'{workload}-{self.__time_stamp_format}', recursive=True)
         return tar_run_artifacts_path
 
     @logger_time_stamp
