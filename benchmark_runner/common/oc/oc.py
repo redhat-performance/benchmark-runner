@@ -592,9 +592,13 @@ class OC(SSH):
         raise VMNotCompletedTimeout(workload=workload)
 
     @typechecked
-    def exec(self, command: str, pod_name: str, namespace: str='', container: str=''):
+    def exec(self, command: str, pod_name: str, namespace: str = '', container: str = ''):
         """
         oc exec a command and return the answer
+        :param command:
+        :param pod_name:
+        :param namespace:
+        :param container:
         :return:
         """
         try:
@@ -610,9 +614,12 @@ class OC(SSH):
     def terminate_pod_sync(self, pod_name: str,
                            namespace: str = environment_variables.environment_variables_dict['namespace'],
                            timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
-
         """
-        Delete a pod with no associated YAML file
+        Delete a pod based on name and namespace only
+        :param pod_name:
+        :param namespace:
+        :param timeout:
+        :return:
         """
         if self._is_pod_exist(pod_name, namespace):
             try:
@@ -629,8 +636,8 @@ class OC(SSH):
                            timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
         """
         Wait for a pod to be ready and running
-        :param namespace:
         :param pod_name:
+        :param namespace:
         :param timeout:
         :return: True if getting pod name or raise PodNameError
         """
