@@ -3,6 +3,11 @@
 
 from benchmark_runner.common.oc.oc import OC
 from tests.integration.benchmark_runner.test_environment_variables import *
+import tempfile
+import tarfile
+import time
+from benchmark_runner.common.prometheus.prometheus_snapshot import PrometheusSnapshot
+from benchmark_runner.common.prometheus.prometheus_snapshot_exceptions import PrometheusSnapshotError, PrometheusSnapshotAlreadyStarted, PrometheusSnapshotNotStarted, PrometheusSnapshotAlreadyRetrieved
 
 
 def test_oc_get_ocp_server_version():
@@ -130,3 +135,30 @@ def test_is_kata_installed():
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
     assert oc.is_kata_installed()
+
+
+def test_oc_exec():
+    """
+    Test that oc exec works
+    :return:
+    """
+    test_message = "I am here"
+    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
+    oc.login()
+    answer = oc.exec(pod_name="prometheus-k8s-0", namespace="openshift-monitoring", container='prometheus', command=f'echo "{test_message}"')
+    assert answer == test_message
+
+
+def test_collect_prometheus():
+    """
+    Test that Prometheus data can be collected.  TBD test that data is valid.
+    :return:
+    """
+    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
+    oc.login()
+    with tempfile.TemporaryDirectory() as dirname:
+        snapshot = PrometheusSnapshot(oc=oc, artifacts_path=dirname, verbose=True)
+        snapshot.prepare_for_snapshot(pre_wait_time=1)
+        time.sleep(10)
+        tarball = snapshot.retrieve_snapshot(post_wait_time=1)
+        assert tarfile.is_tarfile(tarball)
