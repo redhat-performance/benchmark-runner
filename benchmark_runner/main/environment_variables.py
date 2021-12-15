@@ -57,6 +57,8 @@ class EnvironmentVariables:
         self._environment_variables_dict['time_stamp_format'] = os.path.join(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d-%H-%M-%S'))
         # Benchmark runner local run artifacts path with time stamp format
         self._environment_variables_dict['run_artifacts_path'] = os.path.join(self._environment_variables_dict['runner_path'], f"{self._environment_variables_dict['workload'].replace('_', '-')}-{self._environment_variables_dict['time_stamp_format']}")
+        # None/'True' to keep local(/tmp) artifacts files
+        self._environment_variables_dict['keep_artifacts_local'] = os.environ.get('KEEP_ARTIFACTS_LOCAL', None)
         # end dynamic parameters - configure for local run
         ##################################################################################################
 
