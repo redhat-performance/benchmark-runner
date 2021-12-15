@@ -23,27 +23,27 @@ spec:
       pin_node: "pin-node-1"
       # general options
       runtype: "parallel"
-      timeout: "30"
+      timeout: "300"
       instances: 1
       # cpu stressor options
-      cpu_stressors: "1"
+      cpu_stressors: "60"
       cpu_percentage: "100"
       # vm stressor option
       vm_stressors: "1"
-      vm_bytes: "128M"
+      vm_bytes: "60G"
       # mem stressor options
       mem_stressors: "1"
       kind: vm
       client_vm:
         dedicatedcpuplacement: false
-        sockets: 1
-        cores: 4
+        sockets: 60
+        cores: 1
         threads: 1
         image: quay.io/kubevirt/fedora-container-disk-images:34
         limits:
-          memory: 16Gi
+          memory: 75Gi
         requests:
-          memory: 10Mi
+          memory: 75Gi
         network:
           front_end: masquerade
           multiqueue:

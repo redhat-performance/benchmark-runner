@@ -22,19 +22,19 @@ spec:
       pin: True # enable for nodeSelector
       pin_node: "pin-node-1"
       resources: True # enable for resources requests/limits
-      requests_cpu: 10m
-      requests_memory: 10Mi
-      limits_cpu: 4
-      limits_memory: 16Gi
+      requests_cpu: 60
+      requests_memory: 75Gi
+      limits_cpu: 60
+      limits_memory: 75Gi
       # general options
       runtype: "parallel"
-      timeout: "30"
+      timeout: "300"
       instances: 1
       # cpu stressor options
-      cpu_stressors: "1"
+      cpu_stressors: "60"
       cpu_percentage: "100"
       # vm stressor option
       vm_stressors: "1"
-      vm_bytes: "128M"
+      vm_bytes: "60G"
       # mem stressor options
       mem_stressors: "1"
