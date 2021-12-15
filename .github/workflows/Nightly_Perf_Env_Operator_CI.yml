@@ -8,9 +8,7 @@ on:
     workflows: ["Deploy IPI Perf Env Nightly CI"]
     types:
       - completed
-#on:
-#  schedule:
-#    - cron: '0 4 * * 0' # run on Sunday at 4 AM UTC/ 0 AM EDT
+
 #on:
 #  push:
 #    branches: [ main ]
@@ -154,6 +152,13 @@ jobs:
         ELASTICSEARCH_PORT: ${{ secrets.PERF_ELASTICSEARCH_PORT }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
         CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
+        IBM_REGION_NAME: ${{ secrets.IBM_REGION_NAME }}
+        IBM_ENDPOINT_URL: ${{ secrets.IBM_ENDPOINT_URL }}
+        IBM_ACCESS_KEY_ID: ${{ secrets.IBM_ACCESS_KEY_ID }}
+        IBM_SECRET_ACCESS_KEY: ${{ secrets.IBM_SECRET_ACCESS_KEY }}
+        IBM_BUCKET: ${{ secrets.IBM_BUCKET }}
+        IBM_KEY: ${{ secrets.IBM_KEY }}
+        PERF_RUN_ARTIFACTS_URL: ${{ secrets.PERF_RUN_ARTIFACTS_URL }}
       run: |
         # get repository last id
         declare -a repositories=('benchmark-operator' 'benchmark-wrapper')
@@ -177,7 +182,7 @@ jobs:
         for workload in "${workloads[@]}"
         do
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>'
-            podman run --rm -e OCP_ENV_FLAVOR="PERF" -e WORKLOAD="$workload" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e BUILD_VERSION="$build_version" -e RUN_TYPE="perf_ci" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+            podman run --rm -e OCP_ENV_FLAVOR="PERF" -e WORKLOAD="$workload" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e IBM_REGION_NAME="$IBM_REGION_NAME" -e IBM_ENDPOINT_URL="$IBM_ENDPOINT_URL" -e IBM_ACCESS_KEY_ID="$IBM_ACCESS_KEY_ID" -e IBM_SECRET_ACCESS_KEY="$IBM_SECRET_ACCESS_KEY" -e IBM_BUCKET="$IBM_BUCKET" -e IBM_KEY="$IBM_KEY" -e PERF_RUN_ARTIFACTS_URL="$PERF_RUN_ARTIFACTS_URL" -e BUILD_VERSION="$build_version" -e RUN_TYPE="perf_ci" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
         done
     - name: ❎ CI status failed
@@ -233,6 +238,13 @@ jobs:
         ELASTICSEARCH_PORT: ${{ secrets.PERF_ELASTICSEARCH_PORT }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
         CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
+        IBM_REGION_NAME: ${{ secrets.IBM_REGION_NAME }}
+        IBM_ENDPOINT_URL: ${{ secrets.IBM_ENDPOINT_URL }}
+        IBM_ACCESS_KEY_ID: ${{ secrets.IBM_ACCESS_KEY_ID }}
+        IBM_SECRET_ACCESS_KEY: ${{ secrets.IBM_SECRET_ACCESS_KEY }}
+        IBM_BUCKET: ${{ secrets.IBM_BUCKET }}
+        IBM_KEY: ${{ secrets.IBM_KEY }}
+        PERF_RUN_ARTIFACTS_URL: ${{ secrets.PERF_RUN_ARTIFACTS_URL }}
       run: |
         # get repository last id
         declare -a repositories=('benchmark-operator' 'benchmark-wrapper')
@@ -256,7 +268,7 @@ jobs:
         for workload in "${workloads[@]}"
         do
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>'
-            podman run --rm -e OCP_ENV_FLAVOR="PERF" -e WORKLOAD="$workload" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e BUILD_VERSION="$build_version" -e RUN_TYPE="perf_ci" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+            podman run --rm -e OCP_ENV_FLAVOR="PERF" -e WORKLOAD="$workload" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e IBM_REGION_NAME="$IBM_REGION_NAME" -e IBM_ENDPOINT_URL="$IBM_ENDPOINT_URL" -e IBM_ACCESS_KEY_ID="$IBM_ACCESS_KEY_ID" -e IBM_SECRET_ACCESS_KEY="$IBM_SECRET_ACCESS_KEY" -e IBM_BUCKET="$IBM_BUCKET" -e IBM_KEY="$IBM_KEY" -e PERF_RUN_ARTIFACTS_URL="$PERF_RUN_ARTIFACTS_URL" -e BUILD_VERSION="$build_version" -e RUN_TYPE="perf_ci" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
         done
     - name: ❎ CI status failed
@@ -312,6 +324,13 @@ jobs:
         ELASTICSEARCH_PORT: ${{ secrets.PERF_ELASTICSEARCH_PORT }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
         CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
+        IBM_REGION_NAME: ${{ secrets.IBM_REGION_NAME }}
+        IBM_ENDPOINT_URL: ${{ secrets.IBM_ENDPOINT_URL }}
+        IBM_ACCESS_KEY_ID: ${{ secrets.IBM_ACCESS_KEY_ID }}
+        IBM_SECRET_ACCESS_KEY: ${{ secrets.IBM_SECRET_ACCESS_KEY }}
+        IBM_BUCKET: ${{ secrets.IBM_BUCKET }}
+        IBM_KEY: ${{ secrets.IBM_KEY }}
+        PERF_RUN_ARTIFACTS_URL: ${{ secrets.PERF_RUN_ARTIFACTS_URL }}
       run: |
         # get repository last id
         declare -a repositories=('benchmark-operator' 'benchmark-wrapper')
@@ -335,7 +354,7 @@ jobs:
         for workload in "${workloads[@]}"
         do
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>'
-            podman run --rm -e OCP_ENV_FLAVOR="PERF" -e WORKLOAD="$workload" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e BUILD_VERSION="$build_version" -e RUN_TYPE="perf_ci" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+            podman run --rm -e OCP_ENV_FLAVOR="PERF" -e WORKLOAD="$workload" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e IBM_REGION_NAME="$IBM_REGION_NAME" -e IBM_ENDPOINT_URL="$IBM_ENDPOINT_URL" -e IBM_ACCESS_KEY_ID="$IBM_ACCESS_KEY_ID" -e IBM_SECRET_ACCESS_KEY="$IBM_SECRET_ACCESS_KEY" -e IBM_BUCKET="$IBM_BUCKET" -e IBM_KEY="$IBM_KEY" -e PERF_RUN_ARTIFACTS_URL="$PERF_RUN_ARTIFACTS_URL" -e BUILD_VERSION="$build_version" -e RUN_TYPE="perf_ci" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
         done
     - name: ❎ CI status failed
@@ -391,6 +410,13 @@ jobs:
         ELASTICSEARCH_PORT: ${{ secrets.PERF_ELASTICSEARCH_PORT }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
         CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
+        IBM_REGION_NAME: ${{ secrets.IBM_REGION_NAME }}
+        IBM_ENDPOINT_URL: ${{ secrets.IBM_ENDPOINT_URL }}
+        IBM_ACCESS_KEY_ID: ${{ secrets.IBM_ACCESS_KEY_ID }}
+        IBM_SECRET_ACCESS_KEY: ${{ secrets.IBM_SECRET_ACCESS_KEY }}
+        IBM_BUCKET: ${{ secrets.IBM_BUCKET }}
+        IBM_KEY: ${{ secrets.IBM_KEY }}
+        PERF_RUN_ARTIFACTS_URL: ${{ secrets.PERF_RUN_ARTIFACTS_URL }}
       run: |
         # get repository last id
         declare -a repositories=('benchmark-operator' 'benchmark-wrapper')
@@ -414,7 +440,7 @@ jobs:
         for workload in "${workloads[@]}"
         do
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>'
-            podman run --rm -e OCP_ENV_FLAVOR="PERF" -e WORKLOAD="$workload" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e BUILD_VERSION="$build_version" -e RUN_TYPE="perf_ci" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+            podman run --rm -e OCP_ENV_FLAVOR="PERF" -e WORKLOAD="$workload" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e IBM_REGION_NAME="$IBM_REGION_NAME" -e IBM_ENDPOINT_URL="$IBM_ENDPOINT_URL" -e IBM_ACCESS_KEY_ID="$IBM_ACCESS_KEY_ID" -e IBM_SECRET_ACCESS_KEY="$IBM_SECRET_ACCESS_KEY" -e IBM_BUCKET="$IBM_BUCKET" -e IBM_KEY="$IBM_KEY" -e PERF_RUN_ARTIFACTS_URL="$PERF_RUN_ARTIFACTS_URL" -e BUILD_VERSION="$build_version" -e RUN_TYPE="perf_ci" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
         done
     - name: ❎ CI status failed
@@ -470,6 +496,13 @@ jobs:
         ELASTICSEARCH_PORT: ${{ secrets.PERF_ELASTICSEARCH_PORT }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
         CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
+        IBM_REGION_NAME: ${{ secrets.IBM_REGION_NAME }}
+        IBM_ENDPOINT_URL: ${{ secrets.IBM_ENDPOINT_URL }}
+        IBM_ACCESS_KEY_ID: ${{ secrets.IBM_ACCESS_KEY_ID }}
+        IBM_SECRET_ACCESS_KEY: ${{ secrets.IBM_SECRET_ACCESS_KEY }}
+        IBM_BUCKET: ${{ secrets.IBM_BUCKET }}
+        IBM_KEY: ${{ secrets.IBM_KEY }}
+        PERF_RUN_ARTIFACTS_URL: ${{ secrets.PERF_RUN_ARTIFACTS_URL }}
       run: |
         # get repository last id
         declare -a repositories=('benchmark-operator' 'benchmark-wrapper')
@@ -493,7 +526,7 @@ jobs:
         for workload in "${workloads[@]}"
         do
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>'
-            podman run --rm -e OCP_ENV_FLAVOR="PERF" -e WORKLOAD="$workload" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e BUILD_VERSION="$build_version" -e RUN_TYPE="perf_ci" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+            podman run --rm -e OCP_ENV_FLAVOR="PERF" -e WORKLOAD="$workload" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e IBM_REGION_NAME="$IBM_REGION_NAME" -e IBM_ENDPOINT_URL="$IBM_ENDPOINT_URL" -e IBM_ACCESS_KEY_ID="$IBM_ACCESS_KEY_ID" -e IBM_SECRET_ACCESS_KEY="$IBM_SECRET_ACCESS_KEY" -e IBM_BUCKET="$IBM_BUCKET" -e IBM_KEY="$IBM_KEY" -e PERF_RUN_ARTIFACTS_URL="$PERF_RUN_ARTIFACTS_URL" -e BUILD_VERSION="$build_version" -e RUN_TYPE="perf_ci" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
         done
     - name: ❎ CI status failed
