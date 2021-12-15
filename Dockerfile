@@ -53,7 +53,7 @@ RUN mkdir -p ~/.kube
 RUN mkdir -p ~/.ssh/
 
 # download benchmark-operator to /tmp default path
-RUN git clone https://github.com/cloud-bulldozer/benchmark-operator /tmp
+RUN git clone https://github.com/cloud-bulldozer/benchmark-operator /tmp/benchmark-operator
 
 # Add main
 COPY benchmark_runner/main/main.py /benchmark_runner/main/main.py
