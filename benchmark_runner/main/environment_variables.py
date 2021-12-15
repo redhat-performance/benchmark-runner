@@ -57,6 +57,7 @@ class EnvironmentVariables:
         self._environment_variables_dict['time_stamp_format'] = os.path.join(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d-%H-%M-%S'))
         # Benchmark runner local run artifacts path with time stamp format
         self._environment_variables_dict['run_artifacts_path'] = os.path.join(self._environment_variables_dict['runner_path'], f"{self._environment_variables_dict['workload'].replace('_', '-')}-{self._environment_variables_dict['time_stamp_format']}")
+        self._environment_variables_dict['extract_prometheus_snapshot'] = os.environ.get('EXTRACT_PROMETHEUS_SNAPSHOT', 'True')
         # end dynamic parameters - configure for local run
         ##################################################################################################
 

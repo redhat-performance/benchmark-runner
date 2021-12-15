@@ -7,7 +7,7 @@ from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, 
 from benchmark_runner.common.oc.oc_exceptions import PodNotCreateTimeout, PodNotInitializedTimeout, PodNotReadyTimeout, \
     PodNotCompletedTimeout, PodTerminateTimeout, PodNameNotExist, LoginFailed, VMNotCreateTimeout, VMTerminateTimeout, \
     YAMLNotExist, VMNameNotExist, VMNotInitializedTimeout, VMNotReadyTimeout, VMNotCompletedTimeout, \
-    OCPResourceNotCreateTimeout, KataInstallationFailed
+    OCPResourceNotCreateTimeout, KataInstallationFailed, ExecFailed, PodFailed
 from benchmark_runner.common.ssh.ssh import SSH
 from benchmark_runner.main.environment_variables import environment_variables
 
@@ -590,6 +590,70 @@ class OC(SSH):
             time.sleep(OC.SLEEP_TIME)
             current_wait_time += OC.SLEEP_TIME
         raise VMNotCompletedTimeout(workload=workload)
+
+    @typechecked
+    def exec(self, command: str, pod_name: str, namespace: str = '', container: str = ''):
+        """
+        oc exec a command and return the answer
+        :param command:
+        :param pod_name:
+        :param namespace:
+        :param container:
+        :return:
+        """
+        try:
+            if namespace != '':
+                namespace = f'-n {namespace}'
+            if container != '':
+                container = f'-c {container}'
+            return self.run(f'oc exec {namespace} {pod_name} {container} -- {command}')
+        except Exception as err:
+            raise ExecFailed(command, pod_name, err)
+
+    @typechecked
+    def terminate_pod_sync(self, pod_name: str,
+                           namespace: str = environment_variables.environment_variables_dict['namespace'],
+                           timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
+        """
+        Delete a pod based on name and namespace only
+        :param pod_name:
+        :param namespace:
+        :param timeout:
+        :return:
+        """
+        if self._is_pod_exist(pod_name, namespace):
+            try:
+                if namespace != '':
+                    namespace = f'-n {namespace}'
+                self.run(f'oc delete pod {namespace} {pod_name} timeout={timeout}')
+            except Exception as err:
+                raise PodTerminateTimeout(pod_name)
+
+    @typechecked
+    @logger_time_stamp
+    def wait_for_pod_ready(self, pod_name: str,
+                           namespace: str = environment_variables.environment_variables_dict['namespace'],
+                           timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
+        """
+        Wait for a pod to be ready and running
+        :param pod_name:
+        :param namespace:
+        :param timeout:
+        :return: True if getting pod name or raise PodNameError
+        """
+        self.wait_for_pod_create(pod_name=pod_name, namespace=namespace, timeout=timeout)
+        current_wait_time = 0
+        if namespace != '':
+            namespace=f'-n {namespace}'
+        while current_wait_time <= timeout:
+            answer = self.run(f'oc get pod {namespace} {pod_name} --no-headers -ocustom-columns=Status:status.phase 2>/dev/null')
+            if answer == 'Running':
+                return
+            elif answer == 'Error':
+                raise PodFailed(pod_name)
+            time.sleep(OC.SLEEP_TIME)
+            current_wait_time += OC.SLEEP_TIME
+        raise PodNotReadyTimeout(pod_name)
 
     def __get_num_active_nodes(self):
         """
