@@ -18,8 +18,8 @@ from benchmark_runner.benchmark_operator.benchmark_operator_exceptions import OC
 from benchmark_runner.main.environment_variables import environment_variables
 from benchmark_runner.common.clouds.IBM.ibm_operations import IBMOperations
 from benchmark_runner.common.clouds.shared.s3.s3_operations import S3Operations
-from benchmark_runner.common.prometheus_snapshot.prometheus_snapshot import PrometheusSnapshot
-from benchmark_runner.common.prometheus_snapshot.prometheus_snapshot_exceptions import PrometheusSnapshotError, PrometheusSnapshotAlreadyStarted, PrometheusSnapshotNotStarted, PrometheusSnapshotAlreadyRetrieved
+from benchmark_runner.common.prometheus.prometheus_snapshot import PrometheusSnapshot
+from benchmark_runner.common.prometheus.prometheus_snapshot_exceptions import PrometheusSnapshotError, PrometheusSnapshotAlreadyStarted, PrometheusSnapshotNotStarted, PrometheusSnapshotAlreadyRetrieved
 
 
 class BenchmarkOperatorWorkloads:
@@ -819,10 +819,11 @@ class BenchmarkOperatorWorkloads:
         # Start collection of Prometheus snapshot
         extract_prometheus_snapshot = self.__environment_variables_dict.get('extract_prometheus_snapshot', 'True')
         if extract_prometheus_snapshot.lower() == 'true':
-            log_path = self.__environment_variables_dict.get('run_artifacts_path', '')
-            if not os.path.isdir(log_path):
-                os.mkdir(log_path)
-            snapshot = PrometheusSnapshot(oc=self.__oc, log_path=log_path, verbose=True)
+
+            artifacts_path = self.__environment_variables_dict.get('run_artifacts_path', '')
+            if not os.path.isdir(artifacts_path):
+                os.mkdir(artifacts_path)
+            snapshot = PrometheusSnapshot(oc=self.__oc, artifacts_path=artifacts_path, verbose=True)
             snapshot.prepare_for_snapshot()
 
         # run workload
