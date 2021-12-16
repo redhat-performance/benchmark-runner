@@ -43,7 +43,7 @@ jobs:
           mkdir -p "$RUNNER_PATH/.kube/"
           echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
           echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
-    - name: 📃 Test with pytest
+    - name: 📃 Unittest and Integration tests with pytest
       env:
         KUBEADMIN_PASSWORD: ${{ secrets.FUNC_KUBEADMIN_PASSWORD }}
         PIN_NODE1: ${{ secrets.FUNC_PIN_NODE1 }}
@@ -69,3 +69,16 @@ jobs:
 
         # run pytest
         python -m pytest
+    - name: 📃 E2E test
+      env:
+        WORKLOAD: "stressng_pod"
+        KUBEADMIN_PASSWORD: ${{ secrets.FUNC_KUBEADMIN_PASSWORD }}
+        PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.FUNC_PIN_NODE_BENCHMARK_OPERATOR }}
+        PIN_NODE1: ${{ secrets.FUNC_PIN_NODE1 }}
+        PIN_NODE2: ${{ secrets.FUNC_PIN_NODE2 }}
+        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+        ELASTICSEARCH: ${{ secrets.FUNC_ELASTICSEARCH }}
+        ELASTICSEARCH_PORT: ${{ secrets.FUNC_ELASTICSEARCH_PORT }}
+      run: |
+        # run main
+        PYTHONPATH=. python benchmark_runner/main/main.py

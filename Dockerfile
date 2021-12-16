@@ -29,7 +29,7 @@ RUN  curl -L https://github.com/openshift/okd/releases/download/${oc_version}/op
      && cp ~/kubectl /usr/local/bin/kubectl \
      && cp ~/oc /usr/local/bin/oc
 
-install virtctl for VNC
+# install virtctl for VNC
 ARG virtctl_version=0.48.1
 RUN curl -L https://github.com/kubevirt/kubevirt/releases/download/v${virtctl_version}/virtctl-v${virtctl_version}-linux-amd64 -o  ~/virtctl \
     && chmod +x ~/virtctl \
