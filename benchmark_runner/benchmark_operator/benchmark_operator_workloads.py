@@ -389,13 +389,13 @@ class BenchmarkOperatorWorkloads:
         :param workload:
         :return:
         """
+        workload = workload.replace('_', '-')
+        tar_run_artifacts_path = self.__make_run_artifacts_tarfile(workload)
+        run_artifacts_hierarchy = self.__get_run_artifacts_hierarchy()
         # Upload when endpoint_url is not None
         if self.__endpoint_url:
             s3operations = S3Operations()
             # change workload to key convention
-            workload = workload.replace('_', '-')
-            tar_run_artifacts_path = self.__make_run_artifacts_tarfile(workload)
-            run_artifacts_hierarchy = self.__get_run_artifacts_hierarchy()
             upload_file = f"{workload}-{self.__time_stamp_format}.tar.gz"
             s3operations.upload_file(file_name_path=tar_run_artifacts_path,
                                      bucket=self.__environment_variables_dict.get('bucket', ''),
