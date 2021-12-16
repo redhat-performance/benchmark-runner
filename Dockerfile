@@ -29,19 +29,11 @@ RUN  curl -L https://github.com/openshift/okd/releases/download/${oc_version}/op
      && cp ~/kubectl /usr/local/bin/kubectl \
      && cp ~/oc /usr/local/bin/oc
 
-# install virtctl for VNC
-# ARG virtctl_version=0.34.2
-# RUN curl -L https://github.com/kubevirt/kubevirt/releases/download/v${virtctl_version}/virtctl-v${virtctl_version}-linux-amd64 -o  ~/virtctl \
-#     && chmod +x ~/virtctl \
-#     && cp ~/virtctl /usr/local/bin/virtctl
-
-# Patch for capture vm: install GO & clone kubevirt & build virtctl
-RUN dnf install -y epel-release
-RUN dnf install -y go
-RUN git clone https://github.com/kubevirt/kubevirt ~/kubevirt \
-    && cd ~/kubevirt/cmd/virtctl \
-    && go build . \
-    && cp  ~/kubevirt/cmd/virtctl/virtctl /usr/local/bin/virtctl
+install virtctl for VNC
+ARG virtctl_version=0.48.1
+RUN curl -L https://github.com/kubevirt/kubevirt/releases/download/v${virtctl_version}/virtctl-v${virtctl_version}-linux-amd64 -o  ~/virtctl \
+    && chmod +x ~/virtctl \
+    && cp ~/virtctl /usr/local/bin/virtctl
 
 # Activate root alias
 RUN source ~/.bashrc

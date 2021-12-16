@@ -139,7 +139,7 @@ jobs:
         FUNC_RUN_ARTIFACTS_URL: ${{ secrets.FUNC_RUN_ARTIFACTS_URL }}
       run: |
         build_version=$(python3 setup.py --version)
-        declare -a workloads=('stressng_pod')
+        declare -a workloads=('stressng_pod' 'stressng_vm')
         for workload in "${workloads[@]}"
         do
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>'

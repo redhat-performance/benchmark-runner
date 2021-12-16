@@ -24,9 +24,7 @@ class SSH:
         try:
             if background:
                 # DEVNULL - hide stdout
-                output = subprocess.Popen(
-                    cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-                    shell=True)
+                output = subprocess.Popen(cmd, shell=True)
             elif is_check:
                 output = subprocess.check_output(
                     cmd,
