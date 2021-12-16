@@ -19,7 +19,7 @@ from benchmark_runner.main.environment_variables import environment_variables
 from benchmark_runner.common.clouds.IBM.ibm_operations import IBMOperations
 from benchmark_runner.common.clouds.shared.s3.s3_operations import S3Operations
 from benchmark_runner.common.prometheus.prometheus_snapshot import PrometheusSnapshot
-from benchmark_runner.common.prometheus.prometheus_snapshot_exceptions import PrometheusSnapshotError, PrometheusSnapshotAlreadyStarted, PrometheusSnapshotNotStarted, PrometheusSnapshotAlreadyRetrieved
+from benchmark_runner.common.prometheus.prometheus_snapshot_exceptions import PrometheusSnapshotError
 
 
 class BenchmarkOperatorWorkloads:
@@ -50,6 +50,7 @@ class BenchmarkOperatorWorkloads:
             self.__es_operations = ESOperations(es_host=self.__es_host, es_port=self.__es_port)
         # Generate workload_flavors class
         self.__template = TemplateOperations()
+        self.__enable_prometheus_snapshot = self.__environment_variables_dict.get('enable_prometheus_snapshot', True)
 
         # Login when kubeadmin_password
         if self.__environment_variables_dict.get('kubeadmin_password', ''):
@@ -388,13 +389,13 @@ class BenchmarkOperatorWorkloads:
         :param workload:
         :return:
         """
+        workload = workload.replace('_', '-')
+        tar_run_artifacts_path = self.__make_run_artifacts_tarfile(workload)
+        run_artifacts_hierarchy = self.__get_run_artifacts_hierarchy()
         # Upload when endpoint_url is not None
         if self.__endpoint_url:
             s3operations = S3Operations()
             # change workload to key convention
-            workload = workload.replace('_', '-')
-            tar_run_artifacts_path = self.__make_run_artifacts_tarfile(workload)
-            run_artifacts_hierarchy = self.__get_run_artifacts_hierarchy()
             upload_file = f"{workload}-{self.__time_stamp_format}.tar.gz"
             s3operations.upload_file(file_name_path=tar_run_artifacts_path,
                                      bucket=self.__environment_variables_dict.get('bucket', ''),
@@ -821,21 +822,29 @@ class BenchmarkOperatorWorkloads:
         self.make_deploy_benchmark_controller_manager(runner_path=environment_variables.environment_variables_dict['runner_path'])
 
         # Start collection of Prometheus snapshot
-        extract_prometheus_snapshot = self.__environment_variables_dict.get('extract_prometheus_snapshot', 'True')
-        if extract_prometheus_snapshot.lower() == 'true':
-
+        if self.__enable_prometheus_snapshot:
             artifacts_path = self.__environment_variables_dict.get('run_artifacts_path', '')
-            if not os.path.isdir(artifacts_path):
-                os.mkdir(artifacts_path)
-            snapshot = PrometheusSnapshot(oc=self.__oc, artifacts_path=artifacts_path, verbose=True)
-            snapshot.prepare_for_snapshot()
+            try:
+                if not os.path.isdir(artifacts_path):
+                    os.mkdir(artifacts_path)
+                snapshot = PrometheusSnapshot(oc=self.__oc, artifacts_path=artifacts_path, verbose=True)
+                snapshot.prepare_for_snapshot()
+            except PrometheusSnapshotError as err:
+                raise PrometheusSnapshotError(err)
+            except Exception as err:
+                raise err
 
         # run workload
         self.run_workload_func(workload_full_name=workload)
 
         # Retrieve the Prometheus snapshot
-        if extract_prometheus_snapshot.lower() == 'true':
-            snapshot.retrieve_snapshot()
+        if self.__enable_prometheus_snapshot:
+            try:
+                snapshot.retrieve_snapshot()
+            except PrometheusSnapshotError as err:
+                raise PrometheusSnapshotError(err)
+            except Exception as err:
+                raise err
 
         # upload logs to s3
         self.upload_run_artifacts_to_s3(workload=workload)
