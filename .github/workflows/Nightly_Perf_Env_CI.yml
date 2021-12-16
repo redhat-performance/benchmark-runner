@@ -3,7 +3,9 @@
 name: Deploy Perf Env Nightly CI
 on:
   schedule:
-    - cron: '0 4 * * 1-6' # run Monday through Saturday at 4 AM UTC/ 0 AM EDT
+    - cron: '0 4 * * *' # run at 4 AM UTC/ 0 AM EDT
+    # @todo patch disable sunday OCP installation
+    #- cron: '0 4 * * 1-6' # run Monday through Saturday at 4 AM UTC/ 0 AM EDT
 #on:
 #  push:
 #    branches: [ main ]

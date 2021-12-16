@@ -59,8 +59,8 @@ class EnvironmentVariables:
         self._environment_variables_dict['run_artifacts_path'] = os.path.join(self._environment_variables_dict['runner_path'], f"{self._environment_variables_dict['workload'].replace('_', '-')}-{self._environment_variables_dict['time_stamp_format']}")
         # None(Default)/ 'True' to save local(/tmp) artifacts files
         self._environment_variables_dict['save_artifacts_local'] = os.environ.get('SAVE_ARTIFACTS_LOCAL', None)
-        # Prometheus
-        self._environment_variables_dict['enable_prometheus_snapshot'] = os.environ.get('ENABLE_PROMETHEUS_SNAPSHOT', 'true').lower() == 'true'
+        # None/ True(Default) to enable prometheus snapshot
+        self._environment_variables_dict['enable_prometheus_snapshot'] = os.environ.get('ENABLE_PROMETHEUS_SNAPSHOT', 'True')
         # end dynamic parameters - configure for local run
         ##################################################################################################
 
