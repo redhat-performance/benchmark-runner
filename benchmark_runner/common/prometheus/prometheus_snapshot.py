@@ -1,8 +1,6 @@
 
-import datetime
 import time
-import string
-from benchmark_runner.common.prometheus.prometheus_snapshot_exceptions import PrometheusSnapshotError, PrometheusSnapshotAlreadyStarted, PrometheusSnapshotNotStarted, PrometheusSnapshotAlreadyRetrieved
+from benchmark_runner.common.prometheus.prometheus_snapshot_exceptions import PrometheusSnapshotAlreadyStarted, PrometheusSnapshotNotStarted, PrometheusSnapshotAlreadyRetrieved
 
 from typeguard import typechecked
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
@@ -102,12 +100,12 @@ class PrometheusSnapshot:
         if self.__start_timestamp or self.__end_timestamp:
             raise PrometheusSnapshotAlreadyStarted
         if clear_db:
-            self.__verbose_log(f'Deleting existing {self.__pod_name} pod')
+            self.__verbose_log(f'Deleting existing {self.__pod_name} (Prometheus snapshot) pod')
             self.__oc.terminate_pod_sync(pod_name=self.__pod_name, namespace=self.__namespace)
         self.__verbose_log(f'Waiting for {self.__pod_name} pod to reappear')
         self.__oc.wait_for_pod_ready(pod_name=self.__pod_name, namespace=self.__namespace)
         self.__start_timestamp = self.__prom_timestamp()
-        self.__verbose_log(f'Waiting {pre_wait_time} seconds for initial metrics collection to settle')
+        self.__verbose_log(f'Waiting {pre_wait_time} seconds for Prometheus snapshot to fully initialize')
         time.sleep(pre_wait_time)
 
     @typechecked
@@ -121,13 +119,13 @@ class PrometheusSnapshot:
             raise PrometheusSnapshotNotStarted
         if self.__end_timestamp:
             raise PrometheusSnapshotAlreadyRetrieved
-        self.__verbose_log(f'Waiting {post_wait_time} seconds for metrics collection to complete')
+        self.__verbose_log(f'Waiting {post_wait_time} seconds for Prometheus snapshot to complete')
         time.sleep(post_wait_time)
         self.__end_timestamp = self.__prom_timestamp()
         promdb_name = f'promdb_{self.__start_timestamp}_{self.__end_timestamp}'
         promdb_path = os.path.join(self.__artifacts_path, f'{promdb_name}.tar')
         xformcmd = f"--transform 's,^[.],./{promdb_name},'"
-        self.__verbose_log(f'Saving prometheus DB to {promdb_path}')
+        self.__verbose_log(f'Saving prometheus snapshot to {promdb_path}')
         cmd = f'/bin/sh -c "tar -C /prometheus {xformcmd} -cf - .; true" > "{promdb_path}"'
         self.__exec(cmd)
         return promdb_path

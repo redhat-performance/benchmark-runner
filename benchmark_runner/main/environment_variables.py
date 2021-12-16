@@ -60,7 +60,7 @@ class EnvironmentVariables:
         # None(Default)/ 'True' to save local(/tmp) artifacts files
         self._environment_variables_dict['save_artifacts_local'] = os.environ.get('SAVE_ARTIFACTS_LOCAL', None)
         # Prometheus
-        self._environment_variables_dict['extract_prometheus_snapshot'] = os.environ.get('EXTRACT_PROMETHEUS_SNAPSHOT', 'True')
+        self._environment_variables_dict['enable_prometheus_snapshot'] = os.environ.get('ENABLE_PROMETHEUS_SNAPSHOT', 'true').lower() == 'true'
         # end dynamic parameters - configure for local run
         ##################################################################################################
 
