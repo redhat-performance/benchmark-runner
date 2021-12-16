@@ -37,6 +37,8 @@ class BenchmarkOperatorWorkloads:
         self.__run_artifacts = self.__environment_variables_dict.get('run_artifacts_path', '')
         self.__date_key = self.__environment_variables_dict.get('date_key', '')
         self.__key = self.__environment_variables_dict.get('key', '')
+        self.__endpoint_url = self.__environment_variables_dict.get('endpoint_url', '')
+        self.__save_artifacts_local = self.__environment_variables_dict.get('save_artifacts_local', '')
         self.__ssh = SSH()
         self.__kubeadmin_password = kubeadmin_password
         self.__oc = OC(kubeadmin_password=self.__kubeadmin_password)
@@ -386,19 +388,21 @@ class BenchmarkOperatorWorkloads:
         :param workload:
         :return:
         """
-        s3operations = S3Operations()
-        # change workload to key convention
-        workload = workload.replace('_', '-')
-        tar_run_artifacts_path = self.__make_run_artifacts_tarfile(workload)
-        run_artifacts_hierarchy = self.__get_run_artifacts_hierarchy()
-        upload_file = f"{workload}-{self.__time_stamp_format}.tar.gz"
-        s3operations.upload_file(file_name_path=tar_run_artifacts_path,
-                                 bucket=self.__environment_variables_dict.get('bucket', ''),
-                                 key=run_artifacts_hierarchy,
-                                 upload_file=upload_file)
+        # Upload when endpoint_url is not None
+        if self.__endpoint_url:
+            s3operations = S3Operations()
+            # change workload to key convention
+            workload = workload.replace('_', '-')
+            tar_run_artifacts_path = self.__make_run_artifacts_tarfile(workload)
+            run_artifacts_hierarchy = self.__get_run_artifacts_hierarchy()
+            upload_file = f"{workload}-{self.__time_stamp_format}.tar.gz"
+            s3operations.upload_file(file_name_path=tar_run_artifacts_path,
+                                     bucket=self.__environment_variables_dict.get('bucket', ''),
+                                     key=run_artifacts_hierarchy,
+                                     upload_file=upload_file)
         # remove local run artifacts workload folder
         # verify that its not empty path
-        if len(self.__run_artifacts) > 3 and self.__run_artifacts != '/' and self.__run_artifacts and tar_run_artifacts_path and os.path.isfile(tar_run_artifacts_path):
+        if len(self.__run_artifacts) > 3 and self.__run_artifacts != '/' and self.__run_artifacts and tar_run_artifacts_path and os.path.isfile(tar_run_artifacts_path) and not self.__save_artifacts_local:
             # remove run_artifacts_path
             shutil.rmtree(path=self.__run_artifacts)
             # remove tar.gz file
