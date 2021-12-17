@@ -82,7 +82,7 @@ def test_verify_es_data_uploaded_stressng_pod():
         oc.wait_for_ready(label='app=stressng_workload', workload=workload)
         oc.wait_for_pod_completed(label='app=stressng_workload', workload=workload)
         # system-metrics
-        if test_environment_variable['system_metrics'].lower() == 'true':
+        if test_environment_variable['system_metrics']:
             es = ESOperations(es_host=test_environment_variable['elasticsearch'],
                               es_port=test_environment_variable['elasticsearch_port'])
             assert oc.wait_for_pod_create(pod_name='system-metrics-collector')

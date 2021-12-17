@@ -10,6 +10,12 @@ class EnvironmentVariables:
     """
     def __init__(self):
 
+        def env_to_bool(var:str, default: bool):
+            value = os.environ.get(var, '')
+            if not value:
+                return default
+            return value.lower() in ('yes', 'y', 'true', 't', '1')
+
         self._environment_variables_dict = {}
 
         ##################################################################################################
@@ -43,11 +49,11 @@ class EnvironmentVariables:
                                                          'hammerdb_pod_mssql', 'hammerdb_vm_mssql', 'hammerdb_kata_mssql']
         self._environment_variables_dict['namespace'] = os.environ.get('NAMESPACE', 'benchmark-operator')
         # run Hammerdb workload with ocs pvc True/False. True=OCS, False=Ephemeral
-        self._environment_variables_dict['ocs_pvc'] = os.environ.get('OCS_PVC', 'True')
+        self._environment_variables_dict['ocs_pvc'] = env_to_bool('OCS_PVC', True)
         # This parameter get from Test_CI.yml file
         self._environment_variables_dict['build_version'] = os.environ.get('BUILD_VERSION', '1.0.0')
         # collect system metrics True/False
-        self._environment_variables_dict['system_metrics'] = os.environ.get('SYSTEM_METRICS', 'True')
+        self._environment_variables_dict['system_metrics'] = env_to_bool('SYSTEM_METRICS', True)
         # CI status update once at the end of CI Pass/Failed
         self._environment_variables_dict['ci_status'] = os.environ.get('CI_STATUS', '')
         # Valid run types
@@ -60,9 +66,9 @@ class EnvironmentVariables:
         # Benchmark runner local run artifacts path with time stamp format
         self._environment_variables_dict['run_artifacts_path'] = os.path.join(self._environment_variables_dict['run_artifacts'], f"{self._environment_variables_dict['workload'].replace('_', '-')}-{self._environment_variables_dict['time_stamp_format']}")
         # None(Default)/ 'True' to save local(/tmp) artifacts files
-        self._environment_variables_dict['save_artifacts_local'] = os.environ.get('SAVE_ARTIFACTS_LOCAL', None)
+        self._environment_variables_dict['save_artifacts_local'] = env_to_bool('SAVE_ARTIFACTS_LOCAL', False)
         # None/ True(Default) to enable prometheus snapshot
-        self._environment_variables_dict['enable_prometheus_snapshot'] = os.environ.get('ENABLE_PROMETHEUS_SNAPSHOT', 'True')
+        self._environment_variables_dict['enable_prometheus_snapshot'] = env_to_bool('ENABLE_PROMETHEUS_SNAPSHOT', True)
         # end dynamic parameters - configure for local run
         ##################################################################################################
 
@@ -71,8 +77,8 @@ class EnvironmentVariables:
 
         # Parameters below related to 'azure_cluster_start_stop()'
         # Azure details
-        self._environment_variables_dict['azure_cluster_stop'] = os.environ.get('AZURE_CLUSTER_STOP', '')
-        self._environment_variables_dict['azure_cluster_start'] = os.environ.get('AZURE_CLUSTER_START', '')
+        self._environment_variables_dict['azure_cluster_stop'] = env_to_bool('AZURE_CLUSTER_STOP', False)
+        self._environment_variables_dict['azure_cluster_start'] = env_to_bool('AZURE_CLUSTER_START', False)
         self._environment_variables_dict['azure_clientid'] = os.environ.get('AZURE_CLIENTID', '')
         self._environment_variables_dict['azure_secret'] = os.environ.get('AZURE_SECRET', '')
         self._environment_variables_dict['azure_tenantid'] = os.environ.get('AZURE_TENANTID', '')
@@ -101,7 +107,7 @@ class EnvironmentVariables:
 
         # Parameters below related to 'install_resource()'
         # MANDATORY for OCP resource install: 'True' for install resources
-        self._environment_variables_dict['install_ocp_resources'] = os.environ.get('INSTALL_OCP_RESOURCES', '')
+        self._environment_variables_dict['install_ocp_resources'] = env_to_bool('INSTALL_OCP_RESOURCES', False)
         # cnv version
         self._environment_variables_dict['cnv_version'] = os.environ.get('CNV_VERSION', '')
         # ocs version
@@ -159,10 +165,7 @@ class EnvironmentVariables:
         variables are modified
         """
         # Node Selector functionality
-        if self._environment_variables_dict['pin_node1']:
-            self._environment_variables_dict['pin'] = 'true'
-        else:
-            self._environment_variables_dict['pin'] = 'false'
+        self._environment_variables_dict['pin'] = bool(self._environment_variables_dict['pin_node1'])
         # if pin_node2 not exist, get pin_node1 value
         if self._environment_variables_dict['pin_node1'] and not self._environment_variables_dict['pin_node2']:
             self._environment_variables_dict['pin_node2'] = self._environment_variables_dict['pin_node1']

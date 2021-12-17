@@ -32,17 +32,14 @@ class BenchmarkOperatorWorkloads:
         self.__time_stamp_format = self.__environment_variables_dict.get('time_stamp_format', '')
         self.__runner_version = self.__environment_variables_dict.get('build_version', '')
         self.__run_type = self.__environment_variables_dict.get('run_type', '')
-        if self.__environment_variables_dict.get('system_metrics', '').lower() == 'false':
-            self.__system_metrics = False
-        else:
-            self.__system_metrics = True
+        self.__system_metrics = self.__environment_variables_dict.get('system_metrics', True)
         self.__elasticsearch = self.__environment_variables_dict.get('elasticsearch', '')
         self.__run_artifacts = self.__environment_variables_dict.get('run_artifacts', '')
         self.__run_artifacts_path = self.__environment_variables_dict.get('run_artifacts_path', '')
         self.__date_key = self.__environment_variables_dict.get('date_key', '')
         self.__key = self.__environment_variables_dict.get('key', '')
         self.__endpoint_url = self.__environment_variables_dict.get('endpoint_url', '')
-        self.__save_artifacts_local = self.__environment_variables_dict.get('save_artifacts_local', '')
+        self.__save_artifacts_local = self.__environment_variables_dict.get('save_artifacts_local', False)
         self.__enable_prometheus_snapshot = self.__environment_variables_dict.get('enable_prometheus_snapshot', '')
         self.__ssh = SSH()
         self.__kubeadmin_password = kubeadmin_password
@@ -571,16 +568,9 @@ class BenchmarkOperatorWorkloads:
             # system metrics
             if self.__system_metrics:
                 self.system_metrics_collector(workload=workload)
-<<<<<<< HEAD
-                if self.__run_type == 'test_ci':
-                    es_index = 'uperf-test-ci-results'
-                else:
-                    es_index = 'uperf-results'
-=======
             # save run artifacts logs
             run_artifacts_url = self.__create_run_artifacts(workload=workload, labels=['uperf-client', 'uperf-server'])
             if self.__es_host:
->>>>>>> main
                 # verify that data upload to elastic search
                 ids = self.__es_operations.verify_es_data_uploaded(index=es_index, uuid=self.__oc.get_long_uuid(workload=workload), workload=name)
                 # update metadata
@@ -811,7 +801,7 @@ class BenchmarkOperatorWorkloads:
         self.__template.generate_yamls(workload=workload_full_name)
         if 'hammerdb' in workload_full_name:
             # check if ocs is installed
-            if self.__environment_variables_dict.get('ocs_pvc', '').lower() == 'True':
+            if self.__environment_variables_dict.get('ocs_pvc', True):
                 if not self.__oc.is_ocs_installed():
                     raise OCSNonInstalled()
             class_method = getattr(BenchmarkOperatorWorkloads, f'{workload_name[0]}_{workload_name[1]}')

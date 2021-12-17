@@ -27,10 +27,10 @@ class GoldenFiles:
                 if file.endswith('.yaml'):
                     os.remove(os.path.join(dir, file))
 
-    def __generate_yaml_dir_name(self, run_type: str, workload: str, ocs_pvc: str, dest: str=None):
+    def __generate_yaml_dir_name(self, run_type: str, workload: str, ocs_pvc: bool, dest: str=None):
         if dest is None:
             dest = self.__file_path
-        return os.path.join(dest, f'{run_type}_{workload}_OCS_PVC_{ocs_pvc}')
+        return os.path.join(dest, f'{run_type}_{workload}_OCS_PVC_{str(ocs_pvc)}')
 
     def __copy_yaml_files_to_dir(self, src: str, dest: str):
         if os.path.isdir(dest):
@@ -49,7 +49,7 @@ class GoldenFiles:
         if os.path.isdir(dest):
             shutil.rmtree(dest)
         os.mkdir(dest)
-        for ocs_pvc in 'True', 'False':
+        for ocs_pvc in True, False:
             environment_variables.environment_variables_dict['ocs_pvc'] = ocs_pvc
             for run_type in environment_variables.run_types_list:
                 environment_variables.environment_variables_dict['run_type'] = run_type

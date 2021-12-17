@@ -6,6 +6,11 @@ def __get_test_environment_variable():
     """
     This method generate environment variable for test
     """
+    def env_to_bool(var:str, default: bool):
+        value = os.environ.get(var, '')
+        if not value:
+            return default
+        return value.lower() in ('yes', 'y', 'true', 't', '1')
     test_environment_variable = {}
 
     ##################################################################################################
@@ -26,11 +31,11 @@ def __get_test_environment_variable():
 
     test_environment_variable['namespace'] = os.environ.get('NAMESPACE', 'benchmark-operator')
     # run Hammerdb workload with ocs pvc
-    test_environment_variable['ocs_pvc'] = os.environ.get('OCS_PVC', 'True')
-    test_environment_variable['system_metrics'] = os.environ.get('SYSTEM_METRICS', 'True')
+    test_environment_variable['ocs_pvc'] = env_to_bool('OCS_PVC', True)
+    test_environment_variable['system_metrics'] = env_to_bool('SYSTEM_METRICS', True)
     # Azure details
-    test_environment_variable['azure_cluster_stop'] = os.environ.get('AZURE_CLUSTER_STOP', '')
-    test_environment_variable['azure_cluster_start'] = os.environ.get('AZURE_CLUSTER_START', '')
+    test_environment_variable['azure_cluster_stop'] = env_to_bool('AZURE_CLUSTER_STOP', False)
+    test_environment_variable['azure_cluster_start'] = env_to_bool('AZURE_CLUSTER_START', False)
     test_environment_variable['azure_clientid'] = os.environ.get('AZURE_CLIENTID', '')
     test_environment_variable['azure_secret'] = os.environ.get('AZURE_SECRET', '')
     test_environment_variable['azure_tenantid'] = os.environ.get('AZURE_TENANTID', '')
@@ -39,10 +44,7 @@ def __get_test_environment_variable():
     test_environment_variable['azure_vm_name'] = os.environ.get('AZURE_VM_NAME', '')
 
     # update node_selector
-    if test_environment_variable['pin_node1']:
-        test_environment_variable['pin'] = 'true'
-    else:
-        test_environment_variable['pin'] = 'false'
+    test_environment_variable['pin'] = bool(test_environment_variable['pin_node1'])
 
     # ElasticSearch functionality
     if test_environment_variable['elasticsearch'] and test_environment_variable['elasticsearch_port']:
