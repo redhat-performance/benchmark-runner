@@ -138,6 +138,7 @@ jobs:
         IBM_KEY: ${{ secrets.IBM_KEY }}
         FUNC_RUN_ARTIFACTS_URL: ${{ secrets.FUNC_RUN_ARTIFACTS_URL }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+        RUN_ARTIFACTS: ${{ secrets.RUN_ARTIFACTS }}
       run: |
         build_version=$(python3 setup.py --version)
         declare -a workloads=('stressng_pod' 'stressng_vm')
