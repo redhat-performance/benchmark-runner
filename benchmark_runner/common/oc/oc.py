@@ -100,8 +100,8 @@ class OC(SSH):
         This method check if cnv operator is installed
         :return:
         """
-        verify_cmd = 'oc -n openshift-cnv wait deployment/virt-operator --for=condition=Available'
-        if 'met' in self.run(verify_cmd):
+        verify_cmd = "oc get csv -n openshift-cnv -ojsonpath='{.items[0].status.phase}'"
+        if 'Succeeded' in self.run(verify_cmd):
             return True
         return False
 
@@ -110,8 +110,8 @@ class OC(SSH):
         This method check if ocs operator is installed
         :return:
         """
-        verify_cmd = 'oc -n openshift-storage wait deployment/ocs-operator --for=condition=Available'
-        if 'met' in self.run(verify_cmd):
+        verify_cmd = "oc get csv -n openshift-storage -ojsonpath='{.items[0].status.phase}'"
+        if 'Succeeded' in self.run(verify_cmd):
             return True
         return False
 
@@ -120,8 +120,8 @@ class OC(SSH):
         This method check if kata operator is installed
         :return:
         """
-        verify_cmd = 'oc -n openshift-sandboxed-containers-operator wait deployment/controller-manager --for=condition=Available'
-        if 'met' in self.run(verify_cmd):
+        verify_cmd = "oc get csv -n openshift-sandboxed-containers-operator -ojsonpath='{.items[0].status.phase}'"
+        if 'Succeeded' in self.run(verify_cmd):
             return True
         return False
 
@@ -731,7 +731,7 @@ class OC(SSH):
                 time.sleep(10)
             # Wait that till succeeded
             self.wait_for_ocp_resource_create(resource='cnv',
-                                              verify_cmd="oc get csv -n openshift-cnv $(oc get csv -n openshift-cnv --no-headers | awk '{ print $1; }') -ojsonpath='{.status.phase}'",
+                                              verify_cmd="oc get csv -n openshift-cnv -ojsonpath='{.items[0].status.phase}'",
                                               status='Succeeded')
         return True
 
@@ -797,7 +797,7 @@ class OC(SSH):
                     self.wait_for_ocp_resource_create(resource='ocs',
                                                       verify_cmd=r"""oc get pod -n openshift-storage | grep osd | grep -v prepare""")
                     self.wait_for_ocp_resource_create(resource='ocs',
-                                                      verify_cmd="oc get csv -n openshift-storage $(oc get csv -n openshift-storage --no-headers | awk '{ print $1; }') -ojsonpath='{.status.phase}'",
+                                                      verify_cmd="oc get csv -n openshift-storage -ojsonpath='{.items[0].status.phase}'",
                                                       status='Succeeded')
                     self.wait_for_ocp_resource_create(resource='ocs',
                                                       verify_cmd='oc get pod -n openshift-storage | grep osd | grep -v prepare | wc -l',

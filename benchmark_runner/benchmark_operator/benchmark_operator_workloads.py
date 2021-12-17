@@ -404,9 +404,11 @@ class BenchmarkOperatorWorkloads:
                                      upload_file=upload_file)
         # remove local run artifacts workload folder
         # verify that its not empty path
-        if len(self.__run_artifacts_path) > 3 and self.__run_artifacts_path != '/' and self.__run_artifacts_path and not self.__save_artifacts_local:
+        if len(self.__run_artifacts_path) > 3 and self.__run_artifacts_path != '/' and self.__run_artifacts_path and tar_run_artifacts_path and os.path.isfile(tar_run_artifacts_path) and not self.__save_artifacts_local:
             # remove run_artifacts_path
-            shutil.rmtree(path=self.__run_artifacts)
+            shutil.rmtree(path=self.__run_artifacts_path)
+            # remove tar.gz file
+            os.remove(path=tar_run_artifacts_path)
 
 
 
