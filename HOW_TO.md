@@ -152,13 +152,21 @@ The `shared_data` section is mandatory, but all other sections are optional.  Ge
 Boilerplate data that is independent of workload has been moved to `common.yaml` at top level in the `templates` directory.
 
 ## Monitor and debug workload
+You will need a copy of `benchmark-operator`, and RUNNER_PATH set in
+the environment to point to the directory *above* the clone.
+
 1. git clone https://github.com/redhat-performance/benchmark-runner
-2. cd benchmark-runner
-3. *It is strongly recommended that you create a Python virtual
+2. export RUNNER_PATH=$HOME
+3. git clone https://github.com/cloud-bulldozer/benchmark-operator "$RUNNER_PATH/benchmark-operator"
+4. cd benchmark-runner
+5. *It is strongly recommended that you create a Python virtual
    environment for this work*:
 ```
    $ python3 -m venv venv
    $ . venv/bin/activate
+   $ # For development purposes, you will need to install additional packages
+   $ # This is not needed for production use and hence is not in requirements.txt
+   $ pip3 install setuptools_rust pytest moto mock flake8 pytest-cov
    $ pip3 install -r requirements.txt
 ```
    When you are finished working, you should deactivate your virtual
@@ -171,7 +179,7 @@ Boilerplate data that is independent of workload has been moved to `common.yaml`
 ```
    $ . venv/bin/activate
 ```
-4. There are 2 options to run workload:
+6. There are 2 options to run workload:
    1. Run workload through [main.py](/benchmark_runner/main/main.py)
 	  1. Configure mandatory parameters.  You may do so by use of
          command line arguments (by means of `-Dvariable=value`) or environment variables.  The
@@ -216,7 +224,7 @@ Boilerplate data that is independent of workload has been moved to `common.yaml`
          1. Enable pytest in Pycharm: Configure pytest in Pycharm -> File -> settings -> tools -> Python integrated tools -> Testing -> pytest -> ok), and run the selected test
          2. Run pytest through terminal: `python3 -m pytest -v tests/`
             (`pip3 install pytest` if not already installed)
-5. There are three separate flavors of test: `test-ci`, `func-ci`, and
+7. There are three separate flavors of test: `test-ci`, `func-ci`, and
    `perf-ci`.  These are intended for testing, automated functional
    testing of benchmark-runner itself, and the performance measurement
    itself.  The default is `test-ci`.  These are distinct from any
