@@ -44,6 +44,9 @@ RUN mkdir -p ~/.kube
 # Create folder for provision private key file (ssh)
 RUN mkdir -p ~/.ssh/
 
+# Create folder for run artifacts
+RUN mkdir -p /tmp/run_artifacts
+
 # download benchmark-operator to /tmp default path
 RUN git clone https://github.com/cloud-bulldozer/benchmark-operator /tmp/benchmark-operator
 
