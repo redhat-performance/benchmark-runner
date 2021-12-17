@@ -1,12 +1,11 @@
 
 import time
-from benchmark_runner.common.prometheus.prometheus_snapshot_exceptions import PrometheusSnapshotAlreadyStarted, PrometheusSnapshotNotStarted, PrometheusSnapshotAlreadyRetrieved
-
-from typeguard import typechecked
-from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
-from benchmark_runner.common.oc.oc import OC
 import os
 import re
+from typeguard import typechecked
+from benchmark_runner.common.prometheus.prometheus_snapshot_exceptions import PrometheusSnapshotAlreadyStarted, PrometheusSnapshotNotStarted, PrometheusSnapshotAlreadyRetrieved
+from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
+from benchmark_runner.common.oc.oc import OC
 
 
 class PrometheusSnapshot:

@@ -34,7 +34,8 @@ class BenchmarkOperatorWorkloads:
         self.__run_type = self.__environment_variables_dict.get('run_type', '')
         self.__system_metrics = self.__environment_variables_dict.get('system_metrics', '')
         self.__elasticsearch = self.__environment_variables_dict.get('elasticsearch', '')
-        self.__run_artifacts = self.__environment_variables_dict.get('run_artifacts_path', '')
+        self.__run_artifacts = self.__environment_variables_dict.get('run_artifacts', '')
+        self.__run_artifacts_path = self.__environment_variables_dict.get('run_artifacts_path', '')
         self.__date_key = self.__environment_variables_dict.get('date_key', '')
         self.__key = self.__environment_variables_dict.get('key', '')
         self.__endpoint_url = self.__environment_variables_dict.get('endpoint_url', '')
@@ -44,7 +45,7 @@ class BenchmarkOperatorWorkloads:
         self.__kubeadmin_password = kubeadmin_password
         self.__oc = OC(kubeadmin_password=self.__kubeadmin_password)
         self.__dir_path = f'{os.path.dirname(os.path.realpath(__file__))}'
-        self.__current_run_path = f'{self.__dir_path}/workload_flavors/current_run'
+        self.__current_run_path = os.path.join(f'{self.__dir_path}/workload_flavors/current_run')
         self.__es_host = es_host
         self.__es_port = es_port
         if es_host and es_port:
@@ -377,9 +378,9 @@ class BenchmarkOperatorWorkloads:
         This method tar.gz log path and return the tar.gz path
         :return:
         """
-        tar_run_artifacts_path = f"{self.__run_artifacts}.tar.gz"
+        tar_run_artifacts_path = f"{self.__run_artifacts_path}.tar.gz"
         with tarfile.open(tar_run_artifacts_path, mode='w:gz') as archive:
-            archive.add(self.__run_artifacts, arcname=f'{workload}-{self.__time_stamp_format}', recursive=True)
+            archive.add(self.__run_artifacts_path, arcname=f'{workload}-{self.__time_stamp_format}', recursive=True)
         return tar_run_artifacts_path
 
     @logger_time_stamp
@@ -403,11 +404,9 @@ class BenchmarkOperatorWorkloads:
                                      upload_file=upload_file)
         # remove local run artifacts workload folder
         # verify that its not empty path
-        if len(self.__run_artifacts) > 3 and self.__run_artifacts != '/' and self.__run_artifacts and tar_run_artifacts_path and os.path.isfile(tar_run_artifacts_path) and not self.__save_artifacts_local:
+        if len(self.__run_artifacts_path) > 3 and self.__run_artifacts_path != '/' and self.__run_artifacts_path and not self.__save_artifacts_local:
             # remove run_artifacts_path
             shutil.rmtree(path=self.__run_artifacts)
-            # remove tar.gz file
-            os.remove(path=tar_run_artifacts_path)
 
 
 
@@ -823,11 +822,10 @@ class BenchmarkOperatorWorkloads:
 
         # Start collection of Prometheus snapshot
         if self.__enable_prometheus_snapshot:
-            artifacts_path = self.__environment_variables_dict.get('run_artifacts_path', '')
             try:
-                if not os.path.isdir(artifacts_path):
-                    os.mkdir(artifacts_path)
-                snapshot = PrometheusSnapshot(oc=self.__oc, artifacts_path=artifacts_path, verbose=True)
+                if not os.path.isdir(self.__run_artifacts_path):
+                    os.mkdir(self.__run_artifacts_path)
+                snapshot = PrometheusSnapshot(oc=self.__oc, artifacts_path=self.__run_artifacts_path, verbose=True)
                 snapshot.prepare_for_snapshot()
             except PrometheusSnapshotError as err:
                 raise PrometheusSnapshotError(err)

@@ -18,6 +18,8 @@ class EnvironmentVariables:
 
         # This path is github actions runner path (benchmark-operator should be cloned here)
         self._environment_variables_dict['runner_path'] = os.environ.get('RUNNER_PATH', '/tmp')
+        # This path is for vm/pod run artifacts - solve vm capture issue
+        self._environment_variables_dict['run_artifacts'] = os.environ.get('RUN_ARTIFACTS', '/tmp/run_artifacts')
 
         # dynamic parameters - configure for local run
         self._environment_variables_dict['workload'] = os.environ.get('WORKLOAD', '')
@@ -56,7 +58,7 @@ class EnvironmentVariables:
         self._environment_variables_dict['date_key'] = datetime.datetime.now().strftime("%Y/%m/%d")
         self._environment_variables_dict['time_stamp_format'] = os.path.join(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d-%H-%M-%S'))
         # Benchmark runner local run artifacts path with time stamp format
-        self._environment_variables_dict['run_artifacts_path'] = os.path.join(self._environment_variables_dict['runner_path'], f"{self._environment_variables_dict['workload'].replace('_', '-')}-{self._environment_variables_dict['time_stamp_format']}")
+        self._environment_variables_dict['run_artifacts_path'] = os.path.join(self._environment_variables_dict['run_artifacts'], f"{self._environment_variables_dict['workload'].replace('_', '-')}-{self._environment_variables_dict['time_stamp_format']}")
         # None(Default)/ 'True' to save local(/tmp) artifacts files
         self._environment_variables_dict['save_artifacts_local'] = os.environ.get('SAVE_ARTIFACTS_LOCAL', None)
         # None/ True(Default) to enable prometheus snapshot
