@@ -2,9 +2,15 @@
 # https://crontab.guru/
 # This is a nightly CI Pipeline against Performance environment using IPI installer - run on Sunday
 name: Deploy IPI Perf Env Nightly CI
+# @todo patch disable sunday OCP installation
 on:
-  schedule:
-    - cron: '0 4 * * 0' # run on Sunday at 4 AM UTC/ 0 AM EDT
+  workflow_run:
+    workflows: ["Deploy Operator Perf Env Nightly CI"]
+    types:
+      - completed
+#on:
+#  schedule:
+#    - cron: '0 4 * * 0' # run on Sunday at 4 AM UTC/ 0 AM EDT
 #on:
 #  push:
 #    branches: [ main ]

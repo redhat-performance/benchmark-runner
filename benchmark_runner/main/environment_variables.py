@@ -1,5 +1,7 @@
 
 import os
+import time
+import datetime
 
 
 class EnvironmentVariables:
@@ -15,7 +17,9 @@ class EnvironmentVariables:
         # parameters for running workload
 
         # This path is github actions runner path (benchmark-operator should be cloned here)
-        self._environment_variables_dict['runner_path'] = os.environ.get('RUNNER_PATH', '/')
+        self._environment_variables_dict['runner_path'] = os.environ.get('RUNNER_PATH', '/tmp')
+        # This path is for vm/pod run artifacts - solve vm capture issue
+        self._environment_variables_dict['run_artifacts'] = os.environ.get('RUN_ARTIFACTS', '/tmp/run_artifacts')
 
         # dynamic parameters - configure for local run
         self._environment_variables_dict['workload'] = os.environ.get('WORKLOAD', '')
@@ -50,6 +54,15 @@ class EnvironmentVariables:
         self._environment_variables_dict['run_types'] = ['test_ci', 'func_ci', 'perf_ci']
         # Run type test_ci/func_ci/perf_ci, default test_ci same environment as func_ci
         self._environment_variables_dict['run_type'] = os.environ.get('RUN_TYPE', 'test_ci')
+        # Benchmark runner IBM Cloud Object Storage run artifacts hierarchy, not part of a POSIX path ('/' a key seperator, '-' file name convenstion )
+        self._environment_variables_dict['date_key'] = datetime.datetime.now().strftime("%Y/%m/%d")
+        self._environment_variables_dict['time_stamp_format'] = os.path.join(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d-%H-%M-%S'))
+        # Benchmark runner local run artifacts path with time stamp format
+        self._environment_variables_dict['run_artifacts_path'] = os.path.join(self._environment_variables_dict['run_artifacts'], f"{self._environment_variables_dict['workload'].replace('_', '-')}-{self._environment_variables_dict['time_stamp_format']}")
+        # None(Default)/ 'True' to save local(/tmp) artifacts files
+        self._environment_variables_dict['save_artifacts_local'] = os.environ.get('SAVE_ARTIFACTS_LOCAL', None)
+        # None/ True(Default) to enable prometheus snapshot
+        self._environment_variables_dict['enable_prometheus_snapshot'] = os.environ.get('ENABLE_PROMETHEUS_SNAPSHOT', 'True')
         # end dynamic parameters - configure for local run
         ##################################################################################################
 
@@ -66,6 +79,15 @@ class EnvironmentVariables:
         self._environment_variables_dict['azure_subscriptionid'] = os.environ.get('AZURE_SUBSCRIPTIONID', '')
         self._environment_variables_dict['azure_resource_group_name'] = os.environ.get('AZURE_RESOURCE_GROUP_NAME', '')
         self._environment_variables_dict['azure_vm_name'] = os.environ.get('AZURE_VM_NAME', '')
+
+        # IBM details
+        self._environment_variables_dict['region_name'] = os.environ.get('IBM_REGION_NAME', '')
+        # must be None for pytest
+        self._environment_variables_dict['endpoint_url'] = os.environ.get('IBM_ENDPOINT_URL', None)
+        self._environment_variables_dict['access_key_id'] = os.environ.get('IBM_ACCESS_KEY_ID', '')
+        self._environment_variables_dict['secret_access_key'] = os.environ.get('IBM_SECRET_ACCESS_KEY', '')
+        self._environment_variables_dict['bucket'] = os.environ.get('IBM_BUCKET', '')
+        self._environment_variables_dict['key'] = os.environ.get('IBM_KEY', 'run-artifacts')
 
         # Parameters below related to 'install_ocp()'
         # MANDATORY for OCP install: install ocp version - insert version to install i.e. 'latest-4.8'
@@ -117,6 +139,9 @@ class EnvironmentVariables:
         self._environment_variables_dict['provision_timeout'] = os.environ.get(f'{self.__ocp_env_flavor}_PROVISION_TIMEOUT', '10800')
         # General timeout - 1.5 hours wait for pod/vm/upload data to elasticsearch
         self._environment_variables_dict['timeout'] = os.environ.get(f'{self.__ocp_env_flavor}_TIMEOUT', '3600')
+
+        # Benchmark runner run artifacts url
+        self._environment_variables_dict['run_artifacts_url'] = os.environ.get(f'{self.__ocp_env_flavor}_RUN_ARTIFACTS_URL', '')
 
         # Parameters below related to 'update_ci_status()'
         # CI run time

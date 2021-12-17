@@ -36,8 +36,8 @@ spec:
       kind: vm
       client_vm:
         dedicatedcpuplacement: false
-        sockets: 1
-        cores: 4
+        sockets: 4
+        cores: 1
         threads: 1
         image: quay.io/kubevirt/fedora-container-disk-images:34
         limits:

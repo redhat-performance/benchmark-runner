@@ -1,9 +1,10 @@
 pytest
 typeguard
-elasticsearch==7.13.2
-elasticsearch_dsl==7.3.0
+elasticsearch==7.16.1
+elasticsearch_dsl==7.4.0
 pandas
-jinja2==3.0.1
-PyYAML==5.4.1
+jinja2==3.0.3
+PyYAML==6.0
 azure==4.0.0
 mock
+moto==2.2.16

@@ -30,7 +30,7 @@ RUN  curl -L https://github.com/openshift/okd/releases/download/${oc_version}/op
      && cp ~/oc /usr/local/bin/oc
 
 # install virtctl for VNC
-ARG virtctl_version=0.34.2
+ARG virtctl_version=0.48.1
 RUN curl -L https://github.com/kubevirt/kubevirt/releases/download/v${virtctl_version}/virtctl-v${virtctl_version}-linux-amd64 -o  ~/virtctl \
     && chmod +x ~/virtctl \
     && cp ~/virtctl /usr/local/bin/virtctl
@@ -44,8 +44,11 @@ RUN mkdir -p ~/.kube
 # Create folder for provision private key file (ssh)
 RUN mkdir -p ~/.ssh/
 
-# download benchmark-operator
-RUN git clone https://github.com/cloud-bulldozer/benchmark-operator
+# Create folder for run artifacts
+RUN mkdir -p /tmp/run_artifacts
+
+# download benchmark-operator to /tmp default path
+RUN git clone https://github.com/cloud-bulldozer/benchmark-operator /tmp/benchmark-operator
 
 # Add main
 COPY benchmark_runner/main/main.py /benchmark_runner/main/main.py
