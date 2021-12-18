@@ -61,8 +61,9 @@ jobs:
         RUN_ARTIFACTS: ${{ secrets.RUN_ARTIFACTS }}
       run: |
         cd /home/runner
-        ls
-        declare -a workloads=('stressng_pod' 'stressng_vm')
+        ls -a
+        sleep 10
+        declare -a workloads=('stressng_vm')
         for workload in "${workloads[@]}"
         do
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>'
