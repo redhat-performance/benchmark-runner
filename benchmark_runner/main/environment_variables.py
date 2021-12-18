@@ -18,7 +18,7 @@ class EnvironmentVariables:
 
         # This path is github actions runner path (benchmark-operator should be cloned here)
         self._environment_variables_dict['runner_path'] = os.environ.get('RUNNER_PATH', '/tmp')
-        # This path is for vm/pod run artifacts - solve vm capture issue
+        # This path is for vm/pod/prometheus run artifacts
         self._environment_variables_dict['run_artifacts'] = os.environ.get('RUN_ARTIFACTS', '/tmp/run_artifacts')
 
         # dynamic parameters - configure for local run
