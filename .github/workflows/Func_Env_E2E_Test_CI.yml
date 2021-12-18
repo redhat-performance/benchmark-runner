@@ -62,7 +62,10 @@ jobs:
       run: |
         cd /home/runner
         ls -a
-        sleep 10
+        # update hosts ci file
+        sudo echo "${{ secrets.FUNC_HOSTS_API }}" | sudo tee -a /etc/hosts
+        sudo echo "${{ secrets.FUNC_HOSTS_OAUTH }}" | sudo tee -a /etc/hosts
+        
         declare -a workloads=('stressng_vm')
         for workload in "${workloads[@]}"
         do
