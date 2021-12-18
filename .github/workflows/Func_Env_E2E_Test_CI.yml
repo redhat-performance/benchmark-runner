@@ -11,7 +11,7 @@ on:
 concurrency:
   group: functional-environment
   cancel-in-progress: false
-  
+   
 jobs:
   build:
     runs-on: ubuntu-latest
