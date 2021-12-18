@@ -66,7 +66,7 @@ jobs:
         # update hosts ci file
         sudo echo "${{ secrets.FUNC_HOSTS_API }}" | sudo tee -a /etc/hosts
         sudo echo "${{ secrets.FUNC_HOSTS_OAUTH }}" | sudo tee -a /etc/hosts
-        build_version=1.0.141
+        build_version=1.0.241
         declare -a workloads=('stressng_vm')
         for workload in "${workloads[@]}"
         do
