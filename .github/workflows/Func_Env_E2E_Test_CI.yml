@@ -65,7 +65,9 @@ jobs:
         # update hosts ci file
         sudo echo "${{ secrets.FUNC_HOSTS_API }}" | sudo tee -a /etc/hosts
         sudo echo "${{ secrets.FUNC_HOSTS_OAUTH }}" | sudo tee -a /etc/hosts
-        
+        pip install setuptools wheel twine
+        python setup.py sdist bdist_wheel
+        version=$(python3 setup.py --version)
         declare -a workloads=('stressng_vm')
         for workload in "${workloads[@]}"
         do
