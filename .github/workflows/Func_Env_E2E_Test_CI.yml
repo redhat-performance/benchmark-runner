@@ -78,7 +78,7 @@ jobs:
         ls -l
         cd /home/runner/run_artifacts/
         ls -l
-        cd /stressng-vm*
+        cd /home/runner/run_artifacts/stressng-vm*
         ls -l
 
 
