@@ -53,7 +53,7 @@ RUN git clone https://github.com/cloud-bulldozer/benchmark-operator /tmp/benchma
 # Add main
 COPY benchmark_runner/main/main.py /benchmark_runner/main/main.py
 
-CMD [ "python3.9", "-u", "/benchmark_runner/main/main.py"]
+CMD [ "python3.9", "/benchmark_runner/main/main.py"]
 
 # oc: https://www.ibm.com/docs/en/fci/6.5.1?topic=steps-setting-up-installation-server
 # sudo podman build -t quay.io/ebattat/benchmark-runner:latest . --no-cache

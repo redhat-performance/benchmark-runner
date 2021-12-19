@@ -52,7 +52,7 @@ jobs:
         ELASTICSEARCH: ${{ secrets.FUNC_ELASTICSEARCH }}
         ELASTICSEARCH_PORT: ${{ secrets.FUNC_ELASTICSEARCH_PORT }}
       run: |
-        # update hosts ci file
+        # Functional CI MUST update hosts ci file
         sudo echo "${{ secrets.FUNC_HOSTS_API }}" | sudo tee -a /etc/hosts
         sudo echo "${{ secrets.FUNC_HOSTS_OAUTH }}" | sudo tee -a /etc/hosts
         # Install Dockerfile content for pytest
