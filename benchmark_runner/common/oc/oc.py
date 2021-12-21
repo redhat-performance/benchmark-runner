@@ -303,9 +303,9 @@ class OC(SSH):
             self.run(f"oc logs -n '{database}-db' {pod_name} > {output_filename} ")
         # manager logs of benchmark-controller-manager
         elif 'benchmark-controller-manager' in pod_name:
-            self.run(f"oc logs -n {environment_variables.environment_variables_dict['namespace']} {pod_name} manager > {output_filename} ")
+            self.run(f"oc logs -n {environment_variables.environment_variables_dict['namespace']} {pod_name} manager > {output_filename}; ")
         else:
-            self.run(f"oc logs -n {environment_variables.environment_variables_dict['namespace']} {pod_name} > {output_filename} ")
+            self.run(f"oc logs -n {environment_variables.environment_variables_dict['namespace']} {pod_name} > {output_filename}; ")
 
     @typechecked
     @logger_time_stamp
@@ -317,7 +317,7 @@ class OC(SSH):
         """
         output_filename = f"{self.__run_artifacts}/{vm_name}"
         self.run(
-            cmd=f"virtctl console -n {environment_variables.environment_variables_dict['namespace']} {vm_name} | tee -a {output_filename} > {output_filename} ",
+            cmd=f"virtctl console -n {environment_variables.environment_variables_dict['namespace']} {vm_name} | tee -a {output_filename} > {output_filename}; ",
             background=True)
 
     @logger_time_stamp
