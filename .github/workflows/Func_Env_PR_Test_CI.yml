@@ -51,6 +51,15 @@ jobs:
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
         ELASTICSEARCH: ${{ secrets.FUNC_ELASTICSEARCH }}
         ELASTICSEARCH_PORT: ${{ secrets.FUNC_ELASTICSEARCH_PORT }}
+        ELASTICSEARCH_USER: ${{ secrets.FUNC_ELASTICSEARCH_USER }}
+        ELASTICSEARCH_PASSWORD: ${{ secrets.FUNC_ELASTICSEARCH_PASSWORD }}
+        IBM_REGION_NAME: ${{ secrets.IBM_REGION_NAME }}
+        IBM_ENDPOINT_URL: ${{ secrets.IBM_ENDPOINT_URL }}
+        IBM_ACCESS_KEY_ID: ${{ secrets.IBM_ACCESS_KEY_ID }}
+        IBM_SECRET_ACCESS_KEY: ${{ secrets.IBM_SECRET_ACCESS_KEY }}
+        IBM_BUCKET: ${{ secrets.IBM_BUCKET }}
+        IBM_KEY: ${{ secrets.IBM_KEY }}
+        FUNC_RUN_ARTIFACTS_URL: ${{ secrets.FUNC_RUN_ARTIFACTS_URL }}
       run: |
         # Functional CI MUST update hosts ci file
         sudo echo "${{ secrets.FUNC_HOSTS_API }}" | sudo tee -a /etc/hosts
@@ -79,6 +88,8 @@ jobs:
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
         ELASTICSEARCH: ${{ secrets.FUNC_ELASTICSEARCH }}
         ELASTICSEARCH_PORT: ${{ secrets.FUNC_ELASTICSEARCH_PORT }}
+        ELASTICSEARCH_USER: ${{ secrets.FUNC_ELASTICSEARCH_USER }}
+        ELASTICSEARCH_PASSWORD: ${{ secrets.FUNC_ELASTICSEARCH_PASSWORD }}
       run: |
         # run main
         PYTHONPATH=. python benchmark_runner/main/main.py
