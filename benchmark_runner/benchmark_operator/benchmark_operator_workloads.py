@@ -26,7 +26,7 @@ class BenchmarkOperatorWorkloads:
     """
     This class contains all the custom_workloads
     """
-    def __init__(self, kubeadmin_password: str = '', es_host: str = '', es_port: str = ''):
+    def __init__(self, kubeadmin_password: str = '', es_host: str = '', es_port: str = '', es_user: str = '', es_password: str = '', timeout: int = 300):
         # environment variables
         self.__environment_variables_dict = environment_variables.environment_variables_dict
         self.__time_stamp_format = self.__environment_variables_dict.get('time_stamp_format', '')
@@ -48,8 +48,15 @@ class BenchmarkOperatorWorkloads:
         self.__current_run_path = os.path.join(f'{self.__dir_path}/workload_flavors/current_run')
         self.__es_host = es_host
         self.__es_port = es_port
+        self.__es_user = es_user
+        self.__es_password = es_password
+        self.__timeout = timeout
         if es_host and es_port:
-            self.__es_operations = ESOperations(es_host=self.__es_host, es_port=self.__es_port)
+            self.__es_operations = ESOperations(es_host=self.__es_host,
+                                                es_port=self.__es_port,
+                                                es_user=self.__es_user,
+                                                es_password=self.__es_password,
+                                                timeout=self.__timeout)
         # Generate workload_flavors class
         self.__template = TemplateOperations()
 
@@ -336,17 +343,22 @@ class BenchmarkOperatorWorkloads:
         else:
             self.__oc.save_pod_log(pod_name=pod_name)
 
-    def __get_run_artifacts_hierarchy(self, workload_name: str = ''):
+    def __get_run_artifacts_hierarchy(self, workload_name: str = '', is_file: bool = False):
         """
         This method return log hierarchy
         :param workload_name: workload name
+        :param is_file: is file name
         :return:
         """
         key = self.__key
         run_type = self.__run_type.replace('_', '-')
         date_key = self.__date_key
         if workload_name:
-            return os.path.join(key, run_type, date_key, workload_name)
+            workload_key = workload_name.split('-')[0]
+            if is_file:
+                return os.path.join(key, run_type, date_key, workload_key, workload_name)
+            else:
+                return os.path.join(key, run_type, date_key, workload_key)
         return os.path.join(key, run_type, date_key)
 
     def __create_run_artifacts(self, workload: str = '', database: str = '', labels: list = [], pod: bool = True):
@@ -371,7 +383,7 @@ class BenchmarkOperatorWorkloads:
             if database:
                 self.__create_pod_log(database=database)
         workload_name = self.__environment_variables_dict.get('workload', '').replace('_', '-')
-        return os.path.join(self.__environment_variables_dict.get('run_artifacts_url', ''), f'{self.__get_run_artifacts_hierarchy(workload_name=workload_name)}-{self.__time_stamp_format}.tar.gz')
+        return os.path.join(self.__environment_variables_dict.get('run_artifacts_url', ''), f'{self.__get_run_artifacts_hierarchy(workload_name=workload_name, is_file=True)}-{self.__time_stamp_format}.tar.gz')
 
     def __make_run_artifacts_tarfile(self, workload: str):
         """
@@ -392,7 +404,7 @@ class BenchmarkOperatorWorkloads:
         """
         workload = workload.replace('_', '-')
         tar_run_artifacts_path = self.__make_run_artifacts_tarfile(workload)
-        run_artifacts_hierarchy = self.__get_run_artifacts_hierarchy()
+        run_artifacts_hierarchy = self.__get_run_artifacts_hierarchy(workload_name=workload)
         # Upload when endpoint_url is not None
         if self.__endpoint_url:
             s3operations = S3Operations()
