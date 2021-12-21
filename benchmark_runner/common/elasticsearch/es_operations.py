@@ -22,7 +22,7 @@ class ESOperations:
     MAX_SEARCH_RESULTS = 1000
     MIN_SEARCH_RESULTS = 100
 
-    def __init__(self, es_host: str, es_port: str, es_user: str = '', es_password: str = '', timeout: int = 300):
+    def __init__(self, es_host: str, es_port: str, es_user: str = '', es_password: str = '', timeout: int = 2000):
         self.__es_host = es_host
         self.__es_port = es_port
         self.__es_user = es_user
