@@ -33,6 +33,8 @@ class EnvironmentVariables:
         # ElasticSearch
         self._environment_variables_dict['elasticsearch'] = os.environ.get('ELASTICSEARCH', '')
         self._environment_variables_dict['elasticsearch_port'] = os.environ.get('ELASTICSEARCH_PORT', '')
+        self._environment_variables_dict['elasticsearch_user'] = os.environ.get('ELASTICSEARCH_USER', '')
+        self._environment_variables_dict['elasticsearch_password'] = os.environ.get('ELASTICSEARCH_PASSWORD', '')
 
         # default parameter - change only if needed
         # Parameters below related to 'run_workload()'
@@ -162,11 +164,14 @@ class EnvironmentVariables:
         if self._environment_variables_dict['pin_node1'] and not self._environment_variables_dict['pin_node2']:
             self._environment_variables_dict['pin_node2'] = self._environment_variables_dict['pin_node1']
 
-        # ElasticSearch functionality
-        if self._environment_variables_dict['elasticsearch'] and self._environment_variables_dict['elasticsearch_port']:
-            self._environment_variables_dict['elasticsearch_url'] = f"http://{self._environment_variables_dict['elasticsearch']}:{self._environment_variables_dict['elasticsearch_port']}"
+        # ElasticSearch url
+        if self._environment_variables_dict.get('elasticsearch_password', ''):
+            self._environment_variables_dict['elasticsearch_url'] = f"http://{self._environment_variables_dict.get('elasticsearch_user', '')}:{self._environment_variables_dict.get('elasticsearch_password', '')}@{self._environment_variables_dict.get('elasticsearch', '')}:{self._environment_variables_dict.get('elasticsearch_port', '')}"
         else:
-            self._environment_variables_dict['elasticsearch_url'] = ''
+            if self._environment_variables_dict['elasticsearch'] and self._environment_variables_dict.get('elasticsearch_port', ''):
+                self._environment_variables_dict['elasticsearch_url'] = f"http://{self._environment_variables_dict.get('elasticsearch', '')}:{self._environment_variables_dict.get('elasticsearch_port', '')}"
+            else:
+                self._environment_variables_dict['elasticsearch_url'] = ''
 
     @property
     def workloads_list(self):

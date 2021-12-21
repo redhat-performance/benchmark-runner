@@ -14,7 +14,7 @@ def test_get_upload_update_es():
     if test_environment_variable['elasticsearch']:
         uuid = str(uuid4())
         # verify that data upload to elastic search
-        es = ESOperations(es_host=test_environment_variable['elasticsearch'], es_port=test_environment_variable['elasticsearch_port'])
+        es = ESOperations(es_host=test_environment_variable.get('elasticsearch', ''), es_port=test_environment_variable.get('elasticsearch_port', ''), es_user=test_environment_variable.get('elasticsearch_user', ''), es_password=test_environment_variable.get('elasticsearch_password', ''))
         data = {'tool': 'benchmark-runner', 'uuid': uuid}
         es.upload_to_es(index='benchmark-runner-test', data=data)
         assert es.verify_es_data_uploaded(index='benchmark-runner-test', uuid=uuid)

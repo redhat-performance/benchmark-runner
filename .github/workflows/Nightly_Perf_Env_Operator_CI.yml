@@ -150,6 +150,8 @@ jobs:
         PIN_NODE2: ${{ secrets.PERF_PIN_NODE2 }}
         ELASTICSEARCH: ${{ secrets.PERF_ELASTICSEARCH }}
         ELASTICSEARCH_PORT: ${{ secrets.PERF_ELASTICSEARCH_PORT }}
+        ELASTICSEARCH_USER: ${{ secrets.PERF_ELASTICSEARCH_USER }}
+        ELASTICSEARCH_PASSWORD: ${{ secrets.PERF_ELASTICSEARCH_PASSWORD }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
         CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
         IBM_REGION_NAME: ${{ secrets.IBM_REGION_NAME }}
@@ -182,7 +184,7 @@ jobs:
         for workload in "${workloads[@]}"
         do
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>'
-            podman run --rm -it -e OCP_ENV_FLAVOR="PERF" -e WORKLOAD="$workload" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e IBM_REGION_NAME="$IBM_REGION_NAME" -e IBM_ENDPOINT_URL="$IBM_ENDPOINT_URL" -e IBM_ACCESS_KEY_ID="$IBM_ACCESS_KEY_ID" -e IBM_SECRET_ACCESS_KEY="$IBM_SECRET_ACCESS_KEY" -e IBM_BUCKET="$IBM_BUCKET" -e IBM_KEY="$IBM_KEY" -e PERF_RUN_ARTIFACTS_URL="$PERF_RUN_ARTIFACTS_URL" -e BUILD_VERSION="$build_version" -e RUN_TYPE="perf_ci" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+            podman run --rm -it -e OCP_ENV_FLAVOR="PERF" -e WORKLOAD="$workload" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e ELASTICSEARCH_USER="$ELASTICSEARCH_USER" -e ELASTICSEARCH_PASSWORD="$ELASTICSEARCH_PASSWORD" -e IBM_REGION_NAME="$IBM_REGION_NAME" -e IBM_ENDPOINT_URL="$IBM_ENDPOINT_URL" -e IBM_ACCESS_KEY_ID="$IBM_ACCESS_KEY_ID" -e IBM_SECRET_ACCESS_KEY="$IBM_SECRET_ACCESS_KEY" -e IBM_BUCKET="$IBM_BUCKET" -e IBM_KEY="$IBM_KEY" -e PERF_RUN_ARTIFACTS_URL="$PERF_RUN_ARTIFACTS_URL" -e BUILD_VERSION="$build_version" -e RUN_TYPE="perf_ci" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
         done
     - name: ❎ CI status failed
@@ -193,6 +195,8 @@ jobs:
         PIN_NODE2: ${{ secrets.PERF_PIN_NODE2 }}
         ELASTICSEARCH: ${{ secrets.PERF_ELASTICSEARCH }}
         ELASTICSEARCH_PORT: ${{ secrets.PERF_ELASTICSEARCH_PORT }}
+        ELASTICSEARCH_USER: ${{ secrets.PERF_ELASTICSEARCH_USER }}
+        ELASTICSEARCH_PASSWORD: ${{ secrets.PERF_ELASTICSEARCH_PASSWORD }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
         CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
       if: ${{ failure() }}
@@ -202,7 +206,7 @@ jobs:
         end=$(printf '%(%s)T' -1)
         ci_minutes_time=$(( (end - START_CI) / 60))
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Update CI status failed >>>>>>>>>>>>>>>>>>>>>>>>>>'
-        podman run --rm -e OCP_ENV_FLAVOR="PERF" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e BUILD_VERSION="$build_version" -e CI_STATUS="failed" -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e OCP_RESOURCE_INSTALL_MINUTES_TIME="${{ needs.ocp_operator_installation.outputs.install_resource_time_output }}" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+        podman run --rm -e OCP_ENV_FLAVOR="PERF" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e ELASTICSEARCH_USER="$ELASTICSEARCH_USER" -e ELASTICSEARCH_PASSWORD="$ELASTICSEARCH_PASSWORD" -e BUILD_VERSION="$build_version" -e CI_STATUS="failed" -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e OCP_RESOURCE_INSTALL_MINUTES_TIME="${{ needs.ocp_operator_installation.outputs.install_resource_time_output }}" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
 
   uperf_workload:
     name: Uperf workload
@@ -236,6 +240,8 @@ jobs:
         PIN_NODE2: ${{ secrets.PERF_PIN_NODE2 }}
         ELASTICSEARCH: ${{ secrets.PERF_ELASTICSEARCH }}
         ELASTICSEARCH_PORT: ${{ secrets.PERF_ELASTICSEARCH_PORT }}
+        ELASTICSEARCH_USER: ${{ secrets.PERF_ELASTICSEARCH_USER }}
+        ELASTICSEARCH_PASSWORD: ${{ secrets.PERF_ELASTICSEARCH_PASSWORD }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
         CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
         IBM_REGION_NAME: ${{ secrets.IBM_REGION_NAME }}
@@ -268,7 +274,7 @@ jobs:
         for workload in "${workloads[@]}"
         do
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>'
-            podman run --rm -it -e OCP_ENV_FLAVOR="PERF" -e WORKLOAD="$workload" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e IBM_REGION_NAME="$IBM_REGION_NAME" -e IBM_ENDPOINT_URL="$IBM_ENDPOINT_URL" -e IBM_ACCESS_KEY_ID="$IBM_ACCESS_KEY_ID" -e IBM_SECRET_ACCESS_KEY="$IBM_SECRET_ACCESS_KEY" -e IBM_BUCKET="$IBM_BUCKET" -e IBM_KEY="$IBM_KEY" -e PERF_RUN_ARTIFACTS_URL="$PERF_RUN_ARTIFACTS_URL" -e BUILD_VERSION="$build_version" -e RUN_TYPE="perf_ci" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+            podman run --rm -it -e OCP_ENV_FLAVOR="PERF" -e WORKLOAD="$workload" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e ELASTICSEARCH_USER="$ELASTICSEARCH_USER" -e ELASTICSEARCH_PASSWORD="$ELASTICSEARCH_PASSWORD" -e IBM_REGION_NAME="$IBM_REGION_NAME" -e IBM_ENDPOINT_URL="$IBM_ENDPOINT_URL" -e IBM_ACCESS_KEY_ID="$IBM_ACCESS_KEY_ID" -e IBM_SECRET_ACCESS_KEY="$IBM_SECRET_ACCESS_KEY" -e IBM_BUCKET="$IBM_BUCKET" -e IBM_KEY="$IBM_KEY" -e PERF_RUN_ARTIFACTS_URL="$PERF_RUN_ARTIFACTS_URL" -e BUILD_VERSION="$build_version" -e RUN_TYPE="perf_ci" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
         done
     - name: ❎ CI status failed
@@ -279,6 +285,8 @@ jobs:
         PIN_NODE2: ${{ secrets.PERF_PIN_NODE2 }}
         ELASTICSEARCH: ${{ secrets.PERF_ELASTICSEARCH }}
         ELASTICSEARCH_PORT: ${{ secrets.PERF_ELASTICSEARCH_PORT }}
+        ELASTICSEARCH_USER: ${{ secrets.PERF_ELASTICSEARCH_USER }}
+        ELASTICSEARCH_PASSWORD: ${{ secrets.PERF_ELASTICSEARCH_PASSWORD }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
         CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
       if: ${{ failure() }}
@@ -288,7 +296,7 @@ jobs:
         end=$(printf '%(%s)T' -1)
         ci_minutes_time=$(( (end - START_CI) / 60))
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Update CI status failed >>>>>>>>>>>>>>>>>>>>>>>>>>'
-        podman run --rm -e OCP_ENV_FLAVOR="PERF" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e BUILD_VERSION="$build_version" -e CI_STATUS="failed" -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e OCP_RESOURCE_INSTALL_MINUTES_TIME="${{ needs.ocp_operator_installation.outputs.install_resource_time_output }}" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+        podman run --rm -e OCP_ENV_FLAVOR="PERF" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e ELASTICSEARCH_USER="$ELASTICSEARCH_USER" -e ELASTICSEARCH_PASSWORD="$ELASTICSEARCH_PASSWORD" -e BUILD_VERSION="$build_version" -e CI_STATUS="failed" -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e OCP_RESOURCE_INSTALL_MINUTES_TIME="${{ needs.ocp_operator_installation.outputs.install_resource_time_output }}" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
   
   hammerdb_mariadb_workload:
     name: Hammerdb MariaDB workload
@@ -322,6 +330,8 @@ jobs:
         PIN_NODE2: ${{ secrets.PERF_PIN_NODE2 }}
         ELASTICSEARCH: ${{ secrets.PERF_ELASTICSEARCH }}
         ELASTICSEARCH_PORT: ${{ secrets.PERF_ELASTICSEARCH_PORT }}
+        ELASTICSEARCH_USER: ${{ secrets.PERF_ELASTICSEARCH_USER }}
+        ELASTICSEARCH_PASSWORD: ${{ secrets.PERF_ELASTICSEARCH_PASSWORD }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
         CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
         IBM_REGION_NAME: ${{ secrets.IBM_REGION_NAME }}
@@ -354,7 +364,7 @@ jobs:
         for workload in "${workloads[@]}"
         do
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>'
-            podman run --rm -it -e OCP_ENV_FLAVOR="PERF" -e WORKLOAD="$workload" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e IBM_REGION_NAME="$IBM_REGION_NAME" -e IBM_ENDPOINT_URL="$IBM_ENDPOINT_URL" -e IBM_ACCESS_KEY_ID="$IBM_ACCESS_KEY_ID" -e IBM_SECRET_ACCESS_KEY="$IBM_SECRET_ACCESS_KEY" -e IBM_BUCKET="$IBM_BUCKET" -e IBM_KEY="$IBM_KEY" -e PERF_RUN_ARTIFACTS_URL="$PERF_RUN_ARTIFACTS_URL" -e BUILD_VERSION="$build_version" -e RUN_TYPE="perf_ci" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+            podman run --rm -it -e OCP_ENV_FLAVOR="PERF" -e WORKLOAD="$workload" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e ELASTICSEARCH_USER="$ELASTICSEARCH_USER" -e ELASTICSEARCH_PASSWORD="$ELASTICSEARCH_PASSWORD" -e IBM_REGION_NAME="$IBM_REGION_NAME" -e IBM_ENDPOINT_URL="$IBM_ENDPOINT_URL" -e IBM_ACCESS_KEY_ID="$IBM_ACCESS_KEY_ID" -e IBM_SECRET_ACCESS_KEY="$IBM_SECRET_ACCESS_KEY" -e IBM_BUCKET="$IBM_BUCKET" -e IBM_KEY="$IBM_KEY" -e PERF_RUN_ARTIFACTS_URL="$PERF_RUN_ARTIFACTS_URL" -e BUILD_VERSION="$build_version" -e RUN_TYPE="perf_ci" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
         done
     - name: ❎ CI status failed
@@ -365,6 +375,8 @@ jobs:
         PIN_NODE2: ${{ secrets.PERF_PIN_NODE2 }}
         ELASTICSEARCH: ${{ secrets.PERF_ELASTICSEARCH }}
         ELASTICSEARCH_PORT: ${{ secrets.PERF_ELASTICSEARCH_PORT }}
+        ELASTICSEARCH_USER: ${{ secrets.PERF_ELASTICSEARCH_USER }}
+        ELASTICSEARCH_PASSWORD: ${{ secrets.PERF_ELASTICSEARCH_PASSWORD }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
         CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
       if: ${{ failure() }}
@@ -374,7 +386,7 @@ jobs:
         end=$(printf '%(%s)T' -1)
         ci_minutes_time=$(( (end - START_CI) / 60))
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Update CI status failed >>>>>>>>>>>>>>>>>>>>>>>>>>'
-        podman run --rm -e OCP_ENV_FLAVOR="PERF" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e BUILD_VERSION="$build_version" -e CI_STATUS="failed" -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e OCP_RESOURCE_INSTALL_MINUTES_TIME="${{ needs.ocp_operator_installation.outputs.install_resource_time_output }}" -e OCP_RESOURCE_INSTALL_MINUTES_TIME="${{ needs.ocp_operator_installation.outputs.install_resource_time_output }}" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+        podman run --rm -e OCP_ENV_FLAVOR="PERF" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e ELASTICSEARCH_USER="$ELASTICSEARCH_USER" -e ELASTICSEARCH_PASSWORD="$ELASTICSEARCH_PASSWORD" -e BUILD_VERSION="$build_version" -e CI_STATUS="failed" -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e OCP_RESOURCE_INSTALL_MINUTES_TIME="${{ needs.ocp_operator_installation.outputs.install_resource_time_output }}" -e OCP_RESOURCE_INSTALL_MINUTES_TIME="${{ needs.ocp_operator_installation.outputs.install_resource_time_output }}" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
  
   hammerdb_postgresql_workload:
     name: Hammerdb PostgreSQL workload
@@ -408,6 +420,8 @@ jobs:
         PIN_NODE2: ${{ secrets.PERF_PIN_NODE2 }}
         ELASTICSEARCH: ${{ secrets.PERF_ELASTICSEARCH }}
         ELASTICSEARCH_PORT: ${{ secrets.PERF_ELASTICSEARCH_PORT }}
+        ELASTICSEARCH_USER: ${{ secrets.PERF_ELASTICSEARCH_USER }}
+        ELASTICSEARCH_PASSWORD: ${{ secrets.PERF_ELASTICSEARCH_PASSWORD }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
         CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
         IBM_REGION_NAME: ${{ secrets.IBM_REGION_NAME }}
@@ -440,7 +454,7 @@ jobs:
         for workload in "${workloads[@]}"
         do
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>'
-            podman run --rm -it -e OCP_ENV_FLAVOR="PERF" -e WORKLOAD="$workload" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e IBM_REGION_NAME="$IBM_REGION_NAME" -e IBM_ENDPOINT_URL="$IBM_ENDPOINT_URL" -e IBM_ACCESS_KEY_ID="$IBM_ACCESS_KEY_ID" -e IBM_SECRET_ACCESS_KEY="$IBM_SECRET_ACCESS_KEY" -e IBM_BUCKET="$IBM_BUCKET" -e IBM_KEY="$IBM_KEY" -e PERF_RUN_ARTIFACTS_URL="$PERF_RUN_ARTIFACTS_URL" -e BUILD_VERSION="$build_version" -e RUN_TYPE="perf_ci" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+            podman run --rm -it -e OCP_ENV_FLAVOR="PERF" -e WORKLOAD="$workload" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e ELASTICSEARCH_USER="$ELASTICSEARCH_USER" -e ELASTICSEARCH_PASSWORD="$ELASTICSEARCH_PASSWORD" -e IBM_REGION_NAME="$IBM_REGION_NAME" -e IBM_ENDPOINT_URL="$IBM_ENDPOINT_URL" -e IBM_ACCESS_KEY_ID="$IBM_ACCESS_KEY_ID" -e IBM_SECRET_ACCESS_KEY="$IBM_SECRET_ACCESS_KEY" -e IBM_BUCKET="$IBM_BUCKET" -e IBM_KEY="$IBM_KEY" -e PERF_RUN_ARTIFACTS_URL="$PERF_RUN_ARTIFACTS_URL" -e BUILD_VERSION="$build_version" -e RUN_TYPE="perf_ci" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
         done
     - name: ❎ CI status failed
@@ -451,6 +465,8 @@ jobs:
         PIN_NODE2: ${{ secrets.PERF_PIN_NODE2 }}
         ELASTICSEARCH: ${{ secrets.PERF_ELASTICSEARCH }}
         ELASTICSEARCH_PORT: ${{ secrets.PERF_ELASTICSEARCH_PORT }}
+        ELASTICSEARCH_USER: ${{ secrets.PERF_ELASTICSEARCH_USER }}
+        ELASTICSEARCH_PASSWORD: ${{ secrets.PERF_ELASTICSEARCH_PASSWORD }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
         CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
       if: ${{ failure() }}
@@ -460,7 +476,7 @@ jobs:
         end=$(printf '%(%s)T' -1)
         ci_minutes_time=$(( (end - START_CI) / 60))
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Update CI status failed >>>>>>>>>>>>>>>>>>>>>>>>>>'
-        podman run --rm -e OCP_ENV_FLAVOR="PERF" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e BUILD_VERSION="$build_version" -e CI_STATUS="failed" -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e OCP_RESOURCE_INSTALL_MINUTES_TIME="${{ needs.ocp_operator_installation.outputs.install_resource_time_output }}" -e OCP_RESOURCE_INSTALL_MINUTES_TIME="${{ needs.ocp_operator_installation.outputs.install_resource_time_output }}" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+        podman run --rm -e OCP_ENV_FLAVOR="PERF" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e ELASTICSEARCH_USER="$ELASTICSEARCH_USER" -e ELASTICSEARCH_PASSWORD="$ELASTICSEARCH_PASSWORD" -e BUILD_VERSION="$build_version" -e CI_STATUS="failed" -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e OCP_RESOURCE_INSTALL_MINUTES_TIME="${{ needs.ocp_operator_installation.outputs.install_resource_time_output }}" -e OCP_RESOURCE_INSTALL_MINUTES_TIME="${{ needs.ocp_operator_installation.outputs.install_resource_time_output }}" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
   
   hammerdb_mssql_workload:
     name: Hammerdb MSSQL workload
@@ -494,6 +510,8 @@ jobs:
         PIN_NODE2: ${{ secrets.PERF_PIN_NODE2 }}
         ELASTICSEARCH: ${{ secrets.PERF_ELASTICSEARCH }}
         ELASTICSEARCH_PORT: ${{ secrets.PERF_ELASTICSEARCH_PORT }}
+        ELASTICSEARCH_USER: ${{ secrets.PERF_ELASTICSEARCH_USER }}
+        ELASTICSEARCH_PASSWORD: ${{ secrets.PERF_ELASTICSEARCH_PASSWORD }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
         CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
         IBM_REGION_NAME: ${{ secrets.IBM_REGION_NAME }}
@@ -526,7 +544,7 @@ jobs:
         for workload in "${workloads[@]}"
         do
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>'
-            podman run --rm -it -e OCP_ENV_FLAVOR="PERF" -e WORKLOAD="$workload" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e IBM_REGION_NAME="$IBM_REGION_NAME" -e IBM_ENDPOINT_URL="$IBM_ENDPOINT_URL" -e IBM_ACCESS_KEY_ID="$IBM_ACCESS_KEY_ID" -e IBM_SECRET_ACCESS_KEY="$IBM_SECRET_ACCESS_KEY" -e IBM_BUCKET="$IBM_BUCKET" -e IBM_KEY="$IBM_KEY" -e PERF_RUN_ARTIFACTS_URL="$PERF_RUN_ARTIFACTS_URL" -e BUILD_VERSION="$build_version" -e RUN_TYPE="perf_ci" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+            podman run --rm -it -e OCP_ENV_FLAVOR="PERF" -e WORKLOAD="$workload" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e ELASTICSEARCH_USER="$ELASTICSEARCH_USER" -e ELASTICSEARCH_PASSWORD="$ELASTICSEARCH_PASSWORD" -e IBM_REGION_NAME="$IBM_REGION_NAME" -e IBM_ENDPOINT_URL="$IBM_ENDPOINT_URL" -e IBM_ACCESS_KEY_ID="$IBM_ACCESS_KEY_ID" -e IBM_SECRET_ACCESS_KEY="$IBM_SECRET_ACCESS_KEY" -e IBM_BUCKET="$IBM_BUCKET" -e IBM_KEY="$IBM_KEY" -e PERF_RUN_ARTIFACTS_URL="$PERF_RUN_ARTIFACTS_URL" -e BUILD_VERSION="$build_version" -e RUN_TYPE="perf_ci" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
         done
     - name: ❎ CI status failed
@@ -537,6 +555,8 @@ jobs:
         PIN_NODE2: ${{ secrets.PERF_PIN_NODE2 }}
         ELASTICSEARCH: ${{ secrets.PERF_ELASTICSEARCH }}
         ELASTICSEARCH_PORT: ${{ secrets.PERF_ELASTICSEARCH_PORT }}
+        ELASTICSEARCH_USER: ${{ secrets.PERF_ELASTICSEARCH_USER }}
+        ELASTICSEARCH_PASSWORD: ${{ secrets.PERF_ELASTICSEARCH_PASSWORD }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
         CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
       if: ${{ failure() }}
@@ -546,7 +566,7 @@ jobs:
         end=$(printf '%(%s)T' -1)
         ci_minutes_time=$(( (end - START_CI) / 60))
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Update CI status failed >>>>>>>>>>>>>>>>>>>>>>>>>>'
-        podman run --rm -e OCP_ENV_FLAVOR="PERF" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e BUILD_VERSION="$build_version" -e CI_STATUS="failed" -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e OCP_RESOURCE_INSTALL_MINUTES_TIME="${{ needs.ocp_operator_installation.outputs.install_resource_time_output }}" -e OCP_RESOURCE_INSTALL_MINUTES_TIME="${{ needs.ocp_operator_installation.outputs.install_resource_time_output }}" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+        podman run --rm -e OCP_ENV_FLAVOR="PERF" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e ELASTICSEARCH_USER="$ELASTICSEARCH_USER" -e ELASTICSEARCH_PASSWORD="$ELASTICSEARCH_PASSWORD" -e BUILD_VERSION="$build_version" -e CI_STATUS="failed" -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e OCP_RESOURCE_INSTALL_MINUTES_TIME="${{ needs.ocp_operator_installation.outputs.install_resource_time_output }}" -e OCP_RESOURCE_INSTALL_MINUTES_TIME="${{ needs.ocp_operator_installation.outputs.install_resource_time_output }}" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
   
   nightly_end:
     name: Deploy Perf Nightly - End
@@ -580,6 +600,8 @@ jobs:
         PIN_NODE2: ${{ secrets.PERF_PIN_NODE2 }}
         ELASTICSEARCH: ${{ secrets.PERF_ELASTICSEARCH }}
         ELASTICSEARCH_PORT: ${{ secrets.PERF_ELASTICSEARCH_PORT }}
+        ELASTICSEARCH_USER: ${{ secrets.PERF_ELASTICSEARCH_USER }}
+        ELASTICSEARCH_PASSWORD: ${{ secrets.PERF_ELASTICSEARCH_PASSWORD }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
         CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
       run: |
@@ -604,7 +626,7 @@ jobs:
         end=$(printf '%(%s)T' -1)
         ci_minutes_time=$(( (end - START_CI) / 60))
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Update CI status pass >>>>>>>>>>>>>>>>>>>>>>>>>>'
-        podman run --rm -e OCP_ENV_FLAVOR="PERF" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e BUILD_VERSION="$build_version" -e CI_STATUS="pass" -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e OCP_RESOURCE_INSTALL_MINUTES_TIME="${{ needs.ocp_operator_installation.outputs.install_resource_time_output }}" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+        podman run --rm -e OCP_ENV_FLAVOR="PERF" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e ELASTICSEARCH_USER="$ELASTICSEARCH_USER" -e ELASTICSEARCH_PASSWORD="$ELASTICSEARCH_PASSWORD" -e BUILD_VERSION="$build_version" -e CI_STATUS="pass" -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e OCP_RESOURCE_INSTALL_MINUTES_TIME="${{ needs.ocp_operator_installation.outputs.install_resource_time_output }}" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
     - name: ❎ CI status failed
       env:
         KUBEADMIN_PASSWORD: ${{ secrets.PERF_KUBEADMIN_PASSWORD }}
@@ -613,6 +635,8 @@ jobs:
         PIN_NODE2: ${{ secrets.PERF_PIN_NODE2 }}
         ELASTICSEARCH: ${{ secrets.PERF_ELASTICSEARCH }}
         ELASTICSEARCH_PORT: ${{ secrets.PERF_ELASTICSEARCH_PORT }}
+        ELASTICSEARCH_USER: ${{ secrets.PERF_ELASTICSEARCH_USER }}
+        ELASTICSEARCH_PASSWORD: ${{ secrets.PERF_ELASTICSEARCH_PASSWORD }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
         CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
         OCP_INSTALL_TIME: ${{ secrets.OCP_INSTALL_TIME }}
@@ -623,6 +647,6 @@ jobs:
         end=$(printf '%(%s)T' -1)
         ci_minutes_time=$(( (end - START_CI) / 60))
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Update CI status failed >>>>>>>>>>>>>>>>>>>>>>>>>>'
-        podman run --rm -e OCP_ENV_FLAVOR="PERF" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e BUILD_VERSION="$build_version" -e CI_STATUS="failed" -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e OCP_RESOURCE_INSTALL_MINUTES_TIME="${{ needs.ocp_operator_installation.outputs.install_resource_time_output }}" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+        podman run --rm -e OCP_ENV_FLAVOR="PERF" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e ELASTICSEARCH_USER="$ELASTICSEARCH_USER" -e ELASTICSEARCH_PASSWORD="$ELASTICSEARCH_PASSWORD" -e BUILD_VERSION="$build_version" -e CI_STATUS="failed" -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e OCP_RESOURCE_INSTALL_MINUTES_TIME="${{ needs.ocp_operator_installation.outputs.install_resource_time_output }}" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
 
 

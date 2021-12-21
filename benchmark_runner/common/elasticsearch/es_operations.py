@@ -7,7 +7,6 @@ from datetime import datetime
 
 from benchmark_runner.common.elasticsearch.elasticsearch_exceptions import ElasticSearchDataNotUploaded
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
-from benchmark_runner.main.environment_variables import environment_variables
 
 
 class ESOperations:
@@ -23,17 +22,22 @@ class ESOperations:
     MAX_SEARCH_RESULTS = 1000
     MIN_SEARCH_RESULTS = 100
 
-    def __init__(self, es_host: str, es_port: str, es_fetch_last_x_minutes: int = ES_FETCH_MIN_TIME):
-        self.__es_fetch_last_x_minutes = es_fetch_last_x_minutes  # MUST BE 15 MIN AT LEAST
+    def __init__(self, es_host: str, es_port: str, es_user: str = '', es_password: str = '', timeout: int = 300):
         self.__es_host = es_host
         self.__es_port = es_port
-        if self.__es_port:
-            self.__es = Elasticsearch([{'host': self.__es_host, 'port': self.__es_port}])
+        self.__es_user = es_user
+        self.__es_password = es_password
+        self.__timeout = timeout
+
+        if self.__es_password:
+            self.__es_url = f"http://{self.__es_user}:{self.__es_password}@{self.__es_host}:{self.__es_port}"
+            self.__es = Elasticsearch([self.__es_url])
         else:
-            self.__es = Elasticsearch([{'host': self.__es_host}])
+            if self.__es_port:
+                self.__es = Elasticsearch([{'host': self.__es_host, 'port': self.__es_port}])
+            else:
+                self.__es = Elasticsearch([{'host': self.__es_host}])
         self._hits = 0
-        self.__environment_variables_dict = environment_variables.environment_variables_dict
-        self.__timeout = int(environment_variables.environment_variables_dict['timeout'])
 
     @property
     def hits(self):
@@ -67,10 +71,10 @@ class ESOperations:
         # timestamp name in Elasticsearch is different
         if 'uperf' in workload:
             search = Search(using=self.__es, index=index).filter('range', uperf_ts={
-                'gte': f'now-{self.__es_fetch_last_x_minutes}m', 'lt': 'now'})
+                'gte': f'now-{self.ES_FETCH_MIN_TIME}m', 'lt': 'now'})
         else:
             search = Search(using=self.__es, index=index).filter('range', timestamp={
-                'gte': f'now-{self.__es_fetch_last_x_minutes}m', 'lt': 'now'})
+                'gte': f'now-{self.ES_FETCH_MIN_TIME}m', 'lt': 'now'})
         # reduce the search result
         if fast_check:
             search = search[0:self.MIN_SEARCH_RESULTS]
@@ -178,8 +182,6 @@ class ESOperations:
         This method return elastic search index data by id
         :param index: index name
         :param id: The specific index id
-        :param doc_type:
-        :param metadata: The metadata for enrich that existing index according to id
         :return:
         """
         return self.__es.get(index=index, id=id)
