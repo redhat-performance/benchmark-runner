@@ -7,7 +7,6 @@ import tempfile
 import tarfile
 import time
 from benchmark_runner.common.prometheus.prometheus_snapshot import PrometheusSnapshot
-from benchmark_runner.common.prometheus.prometheus_snapshot_exceptions import PrometheusSnapshotError, PrometheusSnapshotAlreadyStarted, PrometheusSnapshotNotStarted, PrometheusSnapshotAlreadyRetrieved
 
 
 def test_oc_get_ocp_server_version():

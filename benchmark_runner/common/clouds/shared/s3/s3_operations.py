@@ -14,18 +14,21 @@ from benchmark_runner.main.environment_variables import environment_variables
 class S3Operations:
     """ This class is responsible for S3 operations """
 
-    def __init__(self, region_name: str = ''):
+    def __init__(self, region_name: str = '', endpoint_url: str = None, aws_access_key_id: str = None, aws_secret_access_key: str = None):
         # environment variables
         self.__environment_variables_dict = environment_variables.environment_variables_dict
         # must add region for pytest
         if region_name:
             self.__region = region_name
+            self.__endpoint_url = endpoint_url
+            self.__aws_access_key_id = aws_access_key_id
+            self.__aws_secret_access_key = aws_secret_access_key
         else:
             self.__region = self.__environment_variables_dict.get('region_name', '')
-        # must be None for pytest
-        self.__endpoint_url = self.__environment_variables_dict.get('endpoint_url', None)
-        self.__aws_access_key_id = self.__environment_variables_dict.get('access_key_id', '')
-        self.__aws_secret_access_key = self.__environment_variables_dict.get('secret_access_key', '')
+            # must be None for pytest
+            self.__endpoint_url = self.__environment_variables_dict.get('endpoint_url', None)
+            self.__aws_access_key_id = self.__environment_variables_dict.get('access_key_id', '')
+            self.__aws_secret_access_key = self.__environment_variables_dict.get('secret_access_key', '')
         self.__s3_client = boto3.client(service_name='s3',
                                         region_name=self.__region,
                                         endpoint_url=self.__endpoint_url,
@@ -37,7 +40,7 @@ class S3Operations:
         """
         This method upload file to s3
         :param file_name_path:'/home/user/test.txt'
-        :param bucket:'devops-ais'
+        :param bucket:'benchmark'
         :param key:'test-data'
         :param upload_file:'test.txt'
         :return:
@@ -57,7 +60,7 @@ class S3Operations:
     def download_file(self, bucket: str, key: str, download_file: str, file_name_path: str):
         """
         This method download file from s3
-        :param bucket:'devops-ais'
+        :param bucket:'benchmark'
         :param key:'logs/ec2-idle/2021/01/19/18'
         :param download_file: 'test.txt'
         :param file_name_path:'D:\\Performance\\Projects\\py-image-service\\data\\rt_results\\test.txt'
@@ -77,11 +80,10 @@ class S3Operations:
     @typeguard.typechecked
     def delete_file(self, bucket: str, key: str, file_name: str):
         """
-        This method download file from s3
-        :param bucket:'devops-ais'
+        This method delete file from s3
+        :param bucket:'benchmark'
         :param key:'test-data'
-        :param delete_file: 'test.txt'
-        :param file_name_path:'/home/user/result/test.txt'
+        :param file_name: 'test.txt'
         :return:
         """
         try:
@@ -95,8 +97,8 @@ class S3Operations:
     @typeguard.typechecked
     def delete_folder(self, bucket: str, key: str):
         """
-        This method download file from s3
-        :param bucket:'devops-ais'
+        This method delete folder from s3
+        :param bucket:'benchmark'
         :param key:'framework/test'
         :return:
         """
@@ -116,7 +118,7 @@ class S3Operations:
     def create_folder(self, bucket: str, key: str):
         """
         This method download file from s3
-        :param bucket:'devops-ais'
+        :param bucket:'benchmark'
         :param key:'framework/test'
         :return:
         """
@@ -132,7 +134,7 @@ class S3Operations:
     def file_exist(self, bucket: str, key: str, file_name: str):
         """
         This method check if file exist
-        :param bucket:'devops-ais'
+        :param bucket:'benchmark'
         :param key:'framework/test'
         :param file_name:'file.txt'
         :return:
@@ -217,7 +219,7 @@ class S3Operations:
     def generate_presigned_url(self, bucket: str, key: str, file_name: str):
         """
         This method generate presigned url for specific uploaded object, default 7 days
-        :param bucket:'devops-ais'
+        :param bucket:'benchmark'
         :param key:'logs/test-data'
         :param file_name:'file.txt'
         :return:

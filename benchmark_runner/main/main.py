@@ -35,9 +35,16 @@ def main():
     if workload or ci_status:
         es_host = environment_variables_dict.get('elasticsearch', '')
         es_port = environment_variables_dict.get('elasticsearch_port', '')
+        es_user = environment_variables_dict.get('elasticsearch_user', '')
+        es_password = environment_variables_dict.get('elasticsearch_password', '')
+        timeout = int(environment_variables_dict.get('timeout', ''))
         kubeadmin_password = environment_variables_dict.get('kubeadmin_password', '')
-        benchmark_operator_workload = BenchmarkOperatorWorkloads(kubeadmin_password=kubeadmin_password, es_host=es_host,
-                                                                 es_port=es_port)
+        benchmark_operator_workload = BenchmarkOperatorWorkloads(kubeadmin_password=kubeadmin_password,
+                                                                 es_host=es_host,
+                                                                 es_port=es_port,
+                                                                 es_user=es_user,
+                                                                 es_password=es_password,
+                                                                 timeout=timeout)
 
     @logger_time_stamp
     def azure_cluster_start_stop():
