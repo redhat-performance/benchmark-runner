@@ -235,3 +235,4 @@ def test_vm_create_initialized_ready_completed_system_metrics_deleted():
         assert es.verify_es_data_uploaded(index='stressng-vm-test-results', uuid=oc.get_long_uuid(workload=workload))
     assert oc.delete_vm_sync(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'),
                              vm_name='stressng-vm-workload')
+
