@@ -27,6 +27,7 @@ class OC(SSH):
         self.__kubeadmin_password = kubeadmin_password
         self.__environment_variables_dict = environment_variables.environment_variables_dict
         self.__run_artifacts = self.__environment_variables_dict.get('run_artifacts_path', '')
+        self.__elasticsearch_url = self.__environment_variables_dict.get('elasticsearch_url', '')
 
     def get_ocp_server_version(self):
         """
@@ -317,7 +318,7 @@ class OC(SSH):
         """
         output_filename = f"{self.__run_artifacts}/{vm_name}"
         self.run(
-            cmd=f"virtctl console -n {environment_variables.environment_variables_dict['namespace']} {vm_name} | tee {output_filename} > {output_filename}",
+            cmd=f"virtctl console -n {environment_variables.environment_variables_dict['namespace']} {vm_name} | sed 's/{self.__elasticsearch_url[7:]}/****/g' | tee -a {output_filename}",
             background=True)
 
     @logger_time_stamp
