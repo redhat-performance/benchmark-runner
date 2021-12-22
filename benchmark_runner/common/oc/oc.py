@@ -318,7 +318,7 @@ class OC(SSH):
         """
         output_filename = f"{self.__run_artifacts}/{vm_name}"
         self.run(
-            cmd=f"virtctl console -n {environment_variables.environment_variables_dict['namespace']} {vm_name} | sed 's/{self.__elasticsearch_url[7:]}/****/g' | tee -a {output_filename}",
+            cmd=f"virtctl console -n {environment_variables.environment_variables_dict['namespace']} {vm_name} | tee -a {output_filename} > {output_filename} ",
             background=True)
 
     @logger_time_stamp
