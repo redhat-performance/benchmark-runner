@@ -760,7 +760,7 @@ class BenchmarkOperatorWorkloads:
             self.__oc.wait_for_initialized(label='app=hammerdb_workload', workload=workload)
             self.__oc.wait_for_ready(label='app=hammerdb_workload', workload=workload)
             # Create vm log should be direct after vm is ready
-            self.__create_vm_log(labels=[workload])
+            vm_name = self.__create_vm_log(labels=[workload])
             status = self.__oc.wait_for_vm_completed(workload=workload, vm_name=vm_name)
             status = 'complete' if status else 'failed'
             # system metrics
