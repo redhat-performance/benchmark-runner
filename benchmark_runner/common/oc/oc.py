@@ -322,24 +322,6 @@ class OC(SSH):
             background=True)
 
     @logger_time_stamp
-    def __verify_vm_log_finish(self, vm_name: str, timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
-        """
-        This method verify that vm log is finish writing
-        :param vm_name: vm name with uuid
-        :return:
-        """
-        output_filename = f"{self.__run_artifacts}/{vm_name}"
-        current_wait_time = 0
-        while current_wait_time <= timeout:
-            with open(output_filename) as file:
-                if '-----END SSH HOST KEY KEYS-----' in file.read():
-                    return True
-            # sleep for x seconds
-            time.sleep(OC.SLEEP_TIME)
-            current_wait_time += OC.SLEEP_TIME
-        raise VMNotCompletedTimeout(vm_name)
-
-    @logger_time_stamp
     def get_pods(self):
         """
         This method get pods
@@ -591,7 +573,7 @@ class OC(SSH):
             raise PodNotCompletedTimeout(workload=workload)
 
     @logger_time_stamp
-    def wait_for_vm_completed(self, workload: str = '', vm_name: str = '',
+    def wait_for_vm_completed(self, workload: str = '',
                               namespace: str = environment_variables.environment_variables_dict['namespace'],
                               timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
         """
@@ -605,9 +587,6 @@ class OC(SSH):
         while current_wait_time <= timeout:
             if self.run(
                     f"oc --namespace {namespace} get benchmark {workload} -o jsonpath={{.status.complete}}") == 'true':
-                # verify log only when pass vm_name
-                if vm_name:
-                    self.__verify_vm_log_finish(vm_name=vm_name)
                 return True
             # sleep for x seconds
             time.sleep(OC.SLEEP_TIME)
