@@ -44,6 +44,8 @@ jobs:
             ServerAliveCountMax 5
             ClientAliveInterval 120
             ClientAliveCountMax 720
+            User root
+            port 22
           END
       - name: Install latest benchmark-runner
         run: |
