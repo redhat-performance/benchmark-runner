@@ -1,4 +1,4 @@
-import time
+
 import subprocess
 from benchmark_runner.common.logger.logger_time_stamp import logger
 from benchmark_runner.common.ssh.ssh_exceptions import SSHSubprocessError
@@ -24,7 +24,6 @@ class SSH:
         try:
             if background:
                 output = subprocess.Popen(cmd, shell=True)
-                time.sleep(120)
             elif is_check:
                 output = subprocess.check_output(
                     cmd,
