@@ -605,9 +605,6 @@ class OC(SSH):
         while current_wait_time <= timeout:
             if self.run(
                     f"oc --namespace {namespace} get benchmark {workload} -o jsonpath={{.status.complete}}") == 'true':
-                # verify log only when pass vm_name
-                if vm_name:
-                    self.__verify_vm_log_finish(vm_name=vm_name)
                 return True
             # sleep for x seconds
             time.sleep(OC.SLEEP_TIME)
