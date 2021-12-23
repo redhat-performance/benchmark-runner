@@ -38,10 +38,7 @@ jobs:
           sudo chmod 600 $RUNNER_PATH/private_key.txt
           echo "PERF_PROVISION_PRIVATE_KEY_PATH=$RUNNER_PATH/private_key.txt" >> "$GITHUB_ENV"
           cat >> "$RUNNER_PATH/.ssh/config" <<END
-          Host provision
-            HostName $PERF_PROVISION_IP
-            User $PERF_PROVISION_USER
-            IdentityFile $RUNNER_PATH/private_key.txt
+          Host *
             StrictHostKeyChecking no
             ServerAliveInterval 30
             ServerAliveCountMax 5
