@@ -40,12 +40,15 @@ jobs:
           cat >> "$RUNNER_PATH/.ssh/config" <<END
           Host *
             StrictHostKeyChecking no
-            ServerAliveInterval 30
-            ServerAliveCountMax 5
+            ServerAliveInterval 60
+            ServerAliveCountMax 30
             ClientAliveInterval 120
             ClientAliveCountMax 720
             User root
-            port 22
+            Port 22
+            X11Forwarding yes
+            ForwardAgent yes
+            ForwardX11Trusted yes
           END
       - name: Install latest benchmark-runner
         run: |
