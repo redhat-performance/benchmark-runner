@@ -320,15 +320,16 @@ class BenchmarkOperatorWorkloads:
         metadata.update({'status': status, 'status#': status_dict[status], 'ci_minutes_time': ci_minutes_time, 'benchmark_operator_id': benchmark_operator_id, 'benchmark_wrapper_id': benchmark_wrapper_id, 'ocp_install_minutes_time': ocp_install_minutes_time, 'ocp_resource_install_minutes_time': ocp_resource_install_minutes_time})
         self.__es_operations.upload_to_es(index='ci-status', data=metadata)
 
-    def __create_vm_log(self, labels: list):
+    def __create_vm_log(self, labels: list) -> str:
         """
         This method set vm log per workload
         :param labels: list of labels
-        :return:
+        :return: vm_name
         """
         for label in labels:
             vm_name = self.__oc.get_vm(label=label)
             self.__oc.save_vm_log(vm_name=vm_name)
+        return vm_name
 
     def __create_pod_log(self, label: str = '', database: str = '') -> str:
         """
@@ -505,8 +506,8 @@ class BenchmarkOperatorWorkloads:
             self.__oc.wait_for_initialized(label='app=stressng_workload', workload=workload)
             self.__oc.wait_for_ready(label='app=stressng_workload', workload=workload)
             # Create vm log should be direct after vm is ready
-            self.__create_vm_log(labels=[workload])
-            status = self.__oc.wait_for_vm_completed(workload=workload)
+            vm_name = self.__create_vm_log(labels=[workload])
+            status = self.__oc.wait_for_vm_completed(workload=workload, vm_name=vm_name)
             status = 'complete' if status else 'failed'
             # system metrics
             if environment_variables.environment_variables_dict['system_metrics'] == 'True':
@@ -629,8 +630,8 @@ class BenchmarkOperatorWorkloads:
             self.__oc.wait_for_initialized(label='app=uperf-bench-client', workload=workload)
             self.__oc.wait_for_ready(label='app=uperf-bench-client', workload=workload)
             # Create vm log should be direct after vm is ready
-            self.__create_vm_log(labels=['uperf-server', 'uperf-client'])
-            status = self.__oc.wait_for_vm_completed(workload=workload)
+            vm_name = self.__create_vm_log(labels=['uperf-server', 'uperf-client'])
+            status = self.__oc.wait_for_vm_completed(workload=workload, vm_name=vm_name)
             status = 'complete' if status else 'failed'
             # system metrics
             if environment_variables.environment_variables_dict['system_metrics'] == 'True':
@@ -759,8 +760,8 @@ class BenchmarkOperatorWorkloads:
             self.__oc.wait_for_initialized(label='app=hammerdb_workload', workload=workload)
             self.__oc.wait_for_ready(label='app=hammerdb_workload', workload=workload)
             # Create vm log should be direct after vm is ready
-            self.__create_vm_log(labels=[workload])
-            status = self.__oc.wait_for_vm_completed(workload=workload)
+            vm_name = self.__create_vm_log(labels=[workload])
+            status = self.__oc.wait_for_vm_completed(workload=workload, vm_name=vm_name)
             status = 'complete' if status else 'failed'
             # system metrics
             if environment_variables.environment_variables_dict['system_metrics'] == 'True':
