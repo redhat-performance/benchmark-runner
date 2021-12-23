@@ -50,7 +50,7 @@ jobs:
             ForwardAgent yes
             ForwardX11Trusted yes
           END
-          cat >> "/etc/default/grub" <<END
+          sudo cat >> "/etc/default/grub" <<END
           GRUB_TERMINAL=serial
           GRUB_CMDLINE_LINUX_DEFAULT="console=ttyS0"
           END
