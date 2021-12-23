@@ -87,6 +87,5 @@ jobs:
           done
           echo "cd /tmp/run_artifacts"
           cd /tmp/run_artifacts
-          ls
-          cd /tmp/run_artifacts/stressng*
+          ls -l
           cat stressng-*
