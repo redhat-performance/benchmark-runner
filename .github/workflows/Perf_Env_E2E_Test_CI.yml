@@ -51,8 +51,8 @@ jobs:
             ForwardX11Trusted yes
           END
           sudo mkdir -p /etc/default
-          sudo echo "GRUB_TERMINAL=serial" >> /etc/default/grub
-          sudo echo "GRUB_CMDLINE_LINUX_DEFAULT="console=ttyS0"" >> /etc/default/grub
+          echo "GRUB_TERMINAL=serial" | sudo tee -a /etc/default/grub
+          echo "GRUB_CMDLINE_LINUX_DEFAULT="console=ttyS0"" | sudo tee -a /etc/default/grub
       - name: Install latest benchmark-runner
         run: |
           python -m pip install --upgrade pip
