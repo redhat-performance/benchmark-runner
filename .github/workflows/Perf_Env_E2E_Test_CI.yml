@@ -50,10 +50,9 @@ jobs:
             ForwardAgent yes
             ForwardX11Trusted yes
           END
-          sudo cat >> "/etc/default/grub" <<END
-          GRUB_TERMINAL=serial
-          GRUB_CMDLINE_LINUX_DEFAULT="console=ttyS0"
-          END
+          sudo mkdir -p /etc/default
+          sudo echo GRUB_TERMINAL=serial >> /tmp/test1/grub
+          sudo echo GRUB_CMDLINE_LINUX_DEFAULT="console=ttyS0" >> /tmp/test1/grub
       - name: Install latest benchmark-runner
         run: |
           python -m pip install --upgrade pip
