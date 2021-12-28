@@ -53,6 +53,12 @@ jobs:
           sudo mkdir -p /etc/default
           echo "GRUB_TERMINAL=serial" | sudo tee -a /etc/default/grub
           echo "GRUB_CMDLINE_LINUX_DEFAULT="console=ttyS0"" | sudo tee -a /etc/default/grub
+          echo "GRUB_TIMEOUT=5" | sudo tee -a /etc/default/grub
+          echo "GRUB_DEFAULT=saved" | sudo tee -a /etc/default/grub
+          echo "GRUB_DISABLE_SUBMENU=true" | sudo tee -a /etc/default/grub
+          echo "GRUB_TERMINAL_OUTPUT="console"" | sudo tee -a /etc/default/grub
+          echo "GRUB_DISABLE_RECOVERY="true"" | sudo tee -a /etc/default/grub
+          echo "GRUB_ENABLE_BLSCFG=true" | sudo tee -a /etc/default/grub
       - name: Install latest benchmark-runner
         run: |
           python -m pip install --upgrade pip
