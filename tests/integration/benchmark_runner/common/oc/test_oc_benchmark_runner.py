@@ -14,7 +14,6 @@ def __generate_yamls(workload: str, kind: str):
     """
     yaml_template = f'{workload}_{kind}_template.yaml'
     yaml_file = f'{workload}_{kind}.yaml'
-    test_environment_variable['namespace'] = 'benchmark-runner'
     data = render_yaml_file(dir_path=templates_path, yaml_file=yaml_template, environment_variable_dict=test_environment_variable)
     with open(os.path.join(templates_path, yaml_file), 'w') as f:
         f.write(data)
@@ -27,7 +26,6 @@ def __delete_test_objects(workload: str, kind: str):
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
     # revert bach to default namespace
-    test_environment_variable['namespace'] = 'benchmark-operator'
     workload_name = f'{workload}-{kind}'
     workload_yaml = f'{workload}_{kind}.yaml'
     if oc._is_pod_exist(pod_name=workload_name, namespace=test_environment_variable['namespace']):
@@ -43,6 +41,7 @@ def before_after_each_test_fixture():
     :return:
     """
     # before all test: setup
+    test_environment_variable['namespace'] = 'benchmark-runner'
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
     assert oc.delete_all_pods(namespace=test_environment_variable['namespace'])
@@ -55,6 +54,7 @@ def before_after_each_test_fixture():
     for kind in kinds:
         __delete_test_objects(workload='vdbench', kind=kind)
     assert oc.delete_all_pods(namespace=test_environment_variable['namespace'])
+    test_environment_variable['namespace'] = 'benchmark-operator'
     print('Test End')
 
 
