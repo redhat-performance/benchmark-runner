@@ -23,7 +23,7 @@ class SSH:
         """
         try:
             if background:
-                output = subprocess.Popen(cmd, shell=True)
+                output = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             elif is_check:
                 output = subprocess.check_output(
                     cmd,
