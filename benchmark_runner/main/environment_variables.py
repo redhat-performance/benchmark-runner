@@ -2,6 +2,7 @@
 import os
 import time
 import datetime
+from uuid import uuid4
 
 
 class EnvironmentVariables:
@@ -19,7 +20,7 @@ class EnvironmentVariables:
         # This path is github actions runner path (benchmark-operator should be cloned here)
         self._environment_variables_dict['runner_path'] = os.environ.get('RUNNER_PATH', '/tmp')
         # This path is for vm/pod/prometheus run artifacts
-        self._environment_variables_dict['run_artifacts'] = os.environ.get('RUN_ARTIFACTS', '/tmp/run_artifacts')
+        self._environment_variables_dict['run_artifacts'] = os.environ.get('RUN_ARTIFACTS', '/tmp/benchmark-runner-run-artifacts')
 
         # dynamic parameters - configure for local run
         self._environment_variables_dict['workload'] = os.environ.get('WORKLOAD', '')
@@ -42,10 +43,19 @@ class EnvironmentVariables:
                                                          'uperf_pod', 'uperf_vm', 'uperf_kata',
                                                          'hammerdb_pod_mariadb', 'hammerdb_vm_mariadb', 'hammerdb_kata_mariadb',
                                                          'hammerdb_pod_postgres', 'hammerdb_vm_postgres', 'hammerdb_kata_postgres',
-                                                         'hammerdb_pod_mssql', 'hammerdb_vm_mssql', 'hammerdb_kata_mssql']
-        self._environment_variables_dict['namespace'] = os.environ.get('NAMESPACE', 'benchmark-operator')
-        # run Hammerdb workload with ocs pvc True/False. True=OCS, False=Ephemeral
+                                                         'hammerdb_pod_mssql', 'hammerdb_vm_mssql', 'hammerdb_kata_mssql',
+                                                         'vdbench_pod', 'vdbench_kata']
+        # benchmark-operator workloads
+        self._environment_variables_dict['benchmark_operator_workloads'] = ['stressng', 'uperf', 'hammerdb']
+        # benchmark-runner workloads - customs
+        self._environment_variables_dict['benchmark_runner_workloads'] = ['vdbench']
+        # Choose default namespace
+        default_namespace = 'benchmark-runner' if self._environment_variables_dict['workload'].split('_')[0] in list(self._environment_variables_dict['benchmark_runner_workloads']) else 'benchmark-operator'
+        self._environment_variables_dict['namespace'] = os.environ.get('NAMESPACE', default_namespace)
+        # run workload with ocs pvc True/False. True=OCS, False=Ephemeral
         self._environment_variables_dict['ocs_pvc'] = os.environ.get('OCS_PVC', 'True')
+        # Workloads that required OCS
+        self._environment_variables_dict['workloads_ocs_pvc'] = ['vdbench', 'hammerdb']
         # This parameter get from Test_CI.yml file
         self._environment_variables_dict['build_version'] = os.environ.get('BUILD_VERSION', '1.0.0')
         # collect system metrics True/False
@@ -56,6 +66,9 @@ class EnvironmentVariables:
         self._environment_variables_dict['run_types'] = ['test_ci', 'func_ci', 'perf_ci']
         # Run type test_ci/func_ci/perf_ci, default test_ci same environment as func_ci
         self._environment_variables_dict['run_type'] = os.environ.get('RUN_TYPE', 'test_ci')
+        # Run uuid
+        self._environment_variables_dict['uuid'] = str(uuid4())
+        self._environment_variables_dict['trunc_uuid'] = self._environment_variables_dict['uuid'].split('-')[0]
         # Benchmark runner IBM Cloud Object Storage run artifacts hierarchy, not part of a POSIX path ('/' a key seperator, '-' file name convenstion )
         self._environment_variables_dict['date_key'] = datetime.datetime.now().strftime("%Y/%m/%d")
         self._environment_variables_dict['time_stamp_format'] = os.path.join(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d-%H-%M-%S'))
@@ -84,12 +97,12 @@ class EnvironmentVariables:
 
         # IBM details
         self._environment_variables_dict['region_name'] = os.environ.get('IBM_REGION_NAME', '')
-        # must be None for pytest
+        # None(default) - must for unittest
         self._environment_variables_dict['endpoint_url'] = os.environ.get('IBM_ENDPOINT_URL', None)
         self._environment_variables_dict['access_key_id'] = os.environ.get('IBM_ACCESS_KEY_ID', '')
         self._environment_variables_dict['secret_access_key'] = os.environ.get('IBM_SECRET_ACCESS_KEY', '')
         self._environment_variables_dict['bucket'] = os.environ.get('IBM_BUCKET', '')
-        self._environment_variables_dict['key'] = os.environ.get('IBM_KEY', 'run-artifacts')
+        self._environment_variables_dict['key'] = os.environ.get('IBM_KEY', '')
 
         # Parameters below related to 'install_ocp()'
         # MANDATORY for OCP install: install ocp version - insert version to install i.e. 'latest-4.8'

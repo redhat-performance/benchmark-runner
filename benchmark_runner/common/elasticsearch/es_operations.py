@@ -28,7 +28,6 @@ class ESOperations:
         self.__es_user = es_user
         self.__es_password = es_password
         self.__timeout = timeout
-
         if self.__es_password:
             self.__es_url = f"http://{self.__es_user}:{self.__es_password}@{self.__es_host}:{self.__es_port}"
             self.__es = Elasticsearch([self.__es_url])
@@ -131,7 +130,6 @@ class ESOperations:
         raise ElasticSearchDataNotUploaded
 
     @typechecked()
-    @logger_time_stamp
     def upload_to_es(self, index: str, data: dict, doc_type: str = '_doc', es_add_items: dict = None):
         """
         This method is upload json data into elasticsearch
@@ -164,7 +162,6 @@ class ESOperations:
             raise err
 
     @typechecked()
-    @logger_time_stamp
     def update_es_index(self, index: str, id: str, metadata: dict = ''):
         """
         This method update existing index
