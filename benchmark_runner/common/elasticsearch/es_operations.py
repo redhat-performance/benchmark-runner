@@ -153,10 +153,10 @@ class ESOperations:
         # Upload data to elastic search server
         try:
             if isinstance(data, dict):  # JSON Object
-                self.__es.index(index=index, doc_type=doc_type, body=data)
+                self.__es.index(index=index, doc_type=doc_type, document=data)
             else:  # JSON Array
                 for record in data:
-                    self.__es.index(index=index, doc_type=doc_type, body=record)
+                    self.__es.index(index=index, doc_type=doc_type, document=record)
             return True
         except Exception as err:
             raise err

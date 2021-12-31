@@ -500,13 +500,15 @@ class OC(SSH):
             return False
 
     @typechecked
-    def delete_all_pods(self, namespace: str = environment_variables.environment_variables_dict['namespace']):
+    def delete_all_resources(self, resources: list = ('pods', 'pvc'), namespace: str = environment_variables.environment_variables_dict['namespace']):
         """
         This method delete all pods in namespace
+        :param resources: default list = ('pods', 'pvc')
         :param namespace:
         :return:
         """
-        return self.run(f'oc delete all --all -n {namespace}')
+        for resource in resources:
+            return self.run(f'oc delete -n {namespace} {resource} --all ')
 
     @typechecked
     @logger_time_stamp
