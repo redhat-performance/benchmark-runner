@@ -22,7 +22,7 @@ def __get_test_environment_variable():
     test_environment_variable['elasticsearch_password'] = os.environ.get('ELASTICSEARCH_PASSWORD', '')
 
     # end dynamic parameters - configure for local run
-    ##################################################################################################
+    ###################################################################################################
 
     # ** DO NOT CHANGE THE PARAMETERS BELOW **
     # Constant parameters
