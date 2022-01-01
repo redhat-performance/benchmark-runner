@@ -1,0 +1,55 @@
+shared_data:
+  pin_node: {{ pin_node1 }}
+  uuid: {{ uuid }}
+run_type_data:
+  perf_ci:
+    BLOCK_SIZES: 64,oltp1
+    IO_OPERATION: write,oltp1
+    IO_THREADS: 1,3
+    FILES_IO: random,oltp1
+    IO_RATE: max,max
+    MIX_PRECENTAGE:
+    DURATION: 20
+    PAUSE: 0
+    WARMUP: 0
+    FILES_SELECTION: random
+    COMPRESSION_RATIO: 2
+    RUN_FILLUP: "yes"
+    DIRECTORIES: 300
+    FILES_PER_DIRECTORY: 3
+    SIZE_PER_FILE: 10
+    limits_cpu: 20m
+    limits_memory: 2Gi
+    requests_cpu: 10m
+    requests_memory: 10Mi
+    storage: 10Gi
+  default:
+    BLOCK_SIZES: 64,oltp1
+    IO_OPERATION: write,oltp1
+    IO_THREADS: 1,3
+    FILES_IO: random,oltp1
+    IO_RATE: max,max
+    MIX_PRECENTAGE:
+    DURATION: 20
+    PAUSE: 0
+    WARMUP: 0
+    # sequential/random
+    FILES_SELECTION: random
+    COMPRESSION_RATIO: 2
+    # yes/no
+    RUN_FILLUP: "no"
+    DIRECTORIES: 300
+    FILES_PER_DIRECTORY: 3
+    SIZE_PER_FILE: 10
+    limits_cpu: 20m
+    limits_memory: 2Gi
+    requests_cpu: 10m
+    requests_memory: 10Mi
+    storage: 10Gi
+kind_data:
+  vm:
+    run_type_data:
+      perf_ci:
+        sockets: 60
+      default:
+        sockets: 4

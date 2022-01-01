@@ -297,7 +297,7 @@ class OC(SSH):
         This method save pod log in log_path
         :param pod_name: pod name with uuid
         :param database: database
-        :return:
+        :return: output_filename
         """
         output_filename = os.path.join(self.__run_artifacts, pod_name)
         if database:
@@ -307,6 +307,7 @@ class OC(SSH):
             self.run(f"oc logs -n {environment_variables.environment_variables_dict['namespace']} {pod_name} manager > {output_filename} ")
         else:
             self.run(f"oc logs -n {environment_variables.environment_variables_dict['namespace']} {pod_name} > {output_filename} ")
+        return output_filename
 
     @typechecked
     @logger_time_stamp
@@ -499,6 +500,17 @@ class OC(SSH):
             return False
 
     @typechecked
+    def delete_all_resources(self, resources: list = ('pods', 'pvc'), namespace: str = environment_variables.environment_variables_dict['namespace']):
+        """
+        This method delete all pods in namespace
+        :param resources: default list = ('pods', 'pvc')
+        :param namespace:
+        :return:
+        """
+        for resource in resources:
+            return self.run(f'oc delete -n {namespace} {resource} --all ')
+
+    @typechecked
     @logger_time_stamp
     def wait_for_initialized(self, label: str, workload: str = '', status: str = 'Initialized', label_uuid: bool = True,
                              namespace: str = environment_variables.environment_variables_dict['namespace'],
@@ -508,7 +520,7 @@ class OC(SSH):
         :param namespace:
         :param label:
         :param status:
-        :param label_uuid: The label include uuid
+        :param label_uuid: need to get uuid from label (benchmark-operator)
         :param timeout:
         :param workload:
         :return:
@@ -541,7 +553,7 @@ class OC(SSH):
         :param namespace:
         :param label:
         :param status:
-        :param label_uuid:  The label include uuid
+        :param label_uuid: need to get uuid from label (benchmark-operator)
         :param timeout:
         :return:
         """
@@ -564,11 +576,13 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def wait_for_pod_completed(self, label: str, workload: str = '', namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
+    def wait_for_pod_completed(self, label: str, workload: str = '', label_uuid: bool = True, job: bool = True, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
         """
         This method wait to pod to be completed
         :param workload:
         :param label:
+        :param label_uuid: need to get uuid from label (benchmark-operator)
+        :param job: kind is job instead of pod
         :param timeout:
         :param namespace:
         :return:
@@ -576,14 +590,19 @@ class OC(SSH):
         try:
             current_wait_time = 0
             while current_wait_time <= timeout:
-                result = self.run(
-                    f"oc --namespace {namespace} wait --for=condition=complete -l {label}-{self.__get_short_uuid(workload=workload)} jobs --timeout={OC.SHORT_WAIT_TIME}s")
-                if 'met' in result:
-                    return True
-                result = self.run(
-                    f"oc --namespace {namespace} wait --for=condition=failed -l {label}-{self.__get_short_uuid(workload=workload)} jobs --timeout={OC.SLEEP_TIME}s")
-                if 'met' in result:
-                    return False
+                if label_uuid and job:
+                    result = self.run(
+                        f"oc --namespace {namespace} wait --for=condition=complete -l {label}-{self.__get_short_uuid(workload=workload)} jobs --timeout={OC.SHORT_WAIT_TIME}s")
+                    if 'met' in result:
+                        return True
+                    result = self.run(
+                        f"oc --namespace {namespace} wait --for=condition=failed -l {label}-{self.__get_short_uuid(workload=workload)} jobs --timeout={OC.SLEEP_TIME}s")
+                    if 'met' in result:
+                        return False
+                if not job:
+                    result = self.run(f"oc get pod -l {label}" + " -n benchmark-runner --no-headers | awk '{ print $3; }'")
+                    if 'Completed' in result:
+                        return True
             # sleep for x seconds
             time.sleep(OC.SLEEP_TIME)
             current_wait_time += OC.SLEEP_TIME

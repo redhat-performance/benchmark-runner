@@ -4,6 +4,7 @@ import ast  # change string list to list
 from benchmark_runner.main.environment_variables import *
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 from benchmark_runner.benchmark_operator.benchmark_operator_workloads import BenchmarkOperatorWorkloads
+from benchmark_runner.workloads.workloads import Workloads
 from benchmark_runner.main.environment_variables import environment_variables
 from benchmark_runner.common.clouds.Azure.azure_operations import AzureOperations
 from benchmark_runner.common.clouds.IBM.ibm_operations import IBMOperations
@@ -31,20 +32,33 @@ def main():
     ci_status = environment_variables_dict.get('ci_status', '')
     install_ocp_version = environment_variables_dict.get('install_ocp_version', '')
     install_ocp_resources = environment_variables_dict.get('install_ocp_resources', '')
-
     if workload or ci_status:
+        benchmark_runner_workloads = list(environment_variables_dict.get('benchmark_runner_workloads', ''))
+        benchmark_operator_workloads = list(environment_variables_dict.get('benchmark_operator_workloads', ''))
         es_host = environment_variables_dict.get('elasticsearch', '')
         es_port = environment_variables_dict.get('elasticsearch_port', '')
         es_user = environment_variables_dict.get('elasticsearch_user', '')
         es_password = environment_variables_dict.get('elasticsearch_password', '')
         timeout = int(environment_variables_dict.get('timeout', ''))
         kubeadmin_password = environment_variables_dict.get('kubeadmin_password', '')
-        benchmark_operator_workload = BenchmarkOperatorWorkloads(kubeadmin_password=kubeadmin_password,
-                                                                 es_host=es_host,
-                                                                 es_port=es_port,
-                                                                 es_user=es_user,
-                                                                 es_password=es_password,
-                                                                 timeout=timeout)
+        run_type = environment_variables_dict.get('run_type', '')
+        # workload name validation
+        if workload not in environment_variables.workloads_list:
+            logger.info(f'Enter valid workload name {environment_variables.workloads_list}')
+            raise Exception(f'Not valid workload name: {workload} \n, choose one from the list: {environment_variables.workloads_list}')
+        # run type validation
+        if run_type not in environment_variables.run_types_list:
+            logger.info(f'Enter valid run type {environment_variables.run_types_list}')
+            raise Exception(f'Invalid run type: {run_type} \n, choose one from the list: {environment_variables.run_types_list}')
+        if workload.split('_')[0] in benchmark_operator_workloads:
+            benchmark_operator_workload = BenchmarkOperatorWorkloads(kubeadmin_password=kubeadmin_password,
+                                                                     es_host=es_host,
+                                                                     es_port=es_port,
+                                                                     es_user=es_user,
+                                                                     es_password=es_password,
+                                                                     timeout=timeout)
+        elif workload.split('_')[0] in benchmark_runner_workloads:
+            benchmark_runner_workload = Workloads()
 
     @logger_time_stamp
     def azure_cluster_start_stop():
@@ -114,28 +128,25 @@ def main():
         benchmark_operator_workload.update_ci_status(status=ci_status, ci_minutes_time=int(ci_minutes_time), benchmark_operator_id=benchmark_operator_id, benchmark_wrapper_id=benchmark_wrapper_id)
 
     @logger_time_stamp
-    def run_workload():
+    def run_benchmark_operator_workload():
         """
-        This method run workload
+        This method run benchmark-operator workload
         :return:
         """
-        workload = environment_variables_dict.get('workload', '')
-        # workload name validation
-        if workload not in environment_variables.workloads_list:
-            logger.info(f'Enter valid workload name {environment_variables.workloads_list}')
-            raise Exception(f'Not valid workload name: {workload} \n, choose one from the list: {environment_variables.workloads_list}')
-
-        run_type = environment_variables_dict.get('run_type', '')
-        # run type validation
-        if run_type not in environment_variables.run_types_list:
-            logger.info(f'Enter valid run type {environment_variables.run_types_list}')
-            raise Exception(f'Invalid run type: {run_type} \n, choose one from the list: {environment_variables.run_types_list}')
-
         # benchmark-operator node selector
         if environment_variables_dict.get('pin_node_benchmark_operator'):
             benchmark_operator_workload.update_node_selector(runner_path=environment_variables_dict.get('runner_path', ''),
                                                              yaml_path='benchmark-operator/config/manager/manager.yaml',
                                                              pin_node='pin_node_benchmark_operator')
+        benchmark_operator_workload.run_workload(workload=workload)
+
+    @logger_time_stamp
+    def run_benchmark_runner_workload():
+        """
+        This method run benchmark-runner workload
+        :return:
+        """
+        # benchmark-operator node selector
         benchmark_operator_workload.run_workload(workload=workload)
 
     # azure_cluster_start_stop
@@ -150,8 +161,10 @@ def main():
         install_resources()
     elif ci_status == 'pass' or ci_status == 'failed':
         update_ci_status()
-    else:
-        run_workload()
+    elif workload.split('_')[0] in benchmark_operator_workloads:
+        run_benchmark_operator_workload()
+    elif workload.split('_')[0] in benchmark_runner_workloads:
+        benchmark_runner_workload.run()
 
 
 main()

@@ -2,7 +2,7 @@ apiVersion: ripsaw.cloudbulldozer.io/v1alpha1
 kind: Benchmark
 metadata:
   name: stressng-vm
-  namespace: benchmark-operator
+  namespace: {{ namespace }}
 spec:
   system_metrics:
     collection: {{ system_metrics }}
