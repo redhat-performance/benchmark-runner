@@ -1,4 +1,6 @@
-# templates
+# Add yamls files to benchmark-runner package
+
+# benchmark operator templates
 include benchmark_runner/benchmark_operator/workload_flavors/templates/common.yaml
 include benchmark_runner/benchmark_operator/workload_flavors/templates/current_run/*
 include benchmark_runner/benchmark_operator/workload_flavors/templates/hammerdb/*.yaml
@@ -7,6 +9,11 @@ include benchmark_runner/benchmark_operator/workload_flavors/templates/stressng/
 include benchmark_runner/benchmark_operator/workload_flavors/templates/stressng/internal_data/*.yaml
 include benchmark_runner/benchmark_operator/workload_flavors/templates/uperf/*.yaml
 include benchmark_runner/benchmark_operator/workload_flavors/templates/uperf/internal_data/*.yaml
+
+# benchmark runner templates (custom workloads)
+include benchmark_runner/workloads/workload_flavors/templates/common.yaml
+include benchmark_runner/workloads/workload_flavors/templates/vdbench/*.yaml
+include benchmark_runner/workloads/workload_flavors/templates/vdbench/internal_data/*.yaml
 
 # ocp resource
 include benchmark_runner/common/ocp_resources/cnv/template/*.yaml
