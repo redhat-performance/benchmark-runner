@@ -77,10 +77,8 @@ jobs:
         # clone benchmark-operator
         git clone https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
 
-        # run pytest unittest
-        python -m pytest -v tests/unittest
-        # run pytest integration
-        python -m pytest -v tests/integration
+        # run pytest
+        python -m pytest
     - name: 📃 E2E test
       env:
         WORKLOAD: "stressng_pod"
