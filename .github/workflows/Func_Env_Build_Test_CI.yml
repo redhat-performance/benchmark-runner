@@ -198,3 +198,4 @@ jobs:
         git pull https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} main
         git push https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} main
         git push https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} --tag
+
