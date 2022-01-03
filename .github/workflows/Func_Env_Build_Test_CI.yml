@@ -149,6 +149,7 @@ jobs:
         IBM_BUCKET: ${{ secrets.IBM_BUCKET }}
         IBM_KEY: ${{ secrets.IBM_KEY }}
         FUNC_RUN_ARTIFACTS_URL: ${{ secrets.FUNC_RUN_ARTIFACTS_URL }}
+        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
       run: |
         # Functional CI MUST update hosts ci file
         sudo echo "${{ secrets.FUNC_HOSTS_API }}" | sudo tee -a /etc/hosts
