@@ -1,6 +1,5 @@
 
 import os
-import shutil
 import yaml
 from jinja2 import Template
 from benchmark_runner.main.update_data_template_yaml_with_environment_variables import render_yaml_file
@@ -8,7 +7,7 @@ from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp
 from benchmark_runner.main.environment_variables import environment_variables
 
 
-class TemplateOperations:
+class BenchmarkOperatorTemplateOperations:
     """This class is responsible for template operations"""
 
     def __init__(self):
@@ -17,7 +16,7 @@ class TemplateOperations:
     def __initialize_dependent_variables__(self):
         self.__run_type = self.__environment_variables_dict.get('run_type', '')
         self.__dir_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'templates')
-        self.__current_run_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'current_run')
+        self.__run_artifacts_path = self.__environment_variables_dict.get('run_artifacts_path', '')
         if self.__run_type == 'test_ci':
             self.__environment_variables_dict['es_suffix'] = '-test-ci'
         else:
@@ -130,7 +129,7 @@ class TemplateOperations:
     @logger_time_stamp
     def generate_files(self, data_files: dict):
         for filename, data in data_files.items():
-            with open(os.path.join(self.__current_run_path, filename), 'w') as f:
+            with open(os.path.join(self.__run_artifacts_path, filename), 'w') as f:
                 f.write(data)
 
     @logger_time_stamp
@@ -161,4 +160,4 @@ class TemplateOperations:
         self.__initialize_dependent_variables__()
 
     def get_current_run_path(self):
-        return self.__current_run_path
+        return self.__run_artifacts_path

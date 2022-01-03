@@ -24,6 +24,8 @@ def main():
     """
     The main of benchmark-runner handle Azure operations or Workload runs
     """
+    benchmark_operator_workload = None
+    benchmark_runner_workload = None
     environment_variables_dict = environment_variables.environment_variables_dict
     # environment variables data
     workload = environment_variables_dict.get('workload', '')
@@ -32,17 +34,11 @@ def main():
     ci_status = environment_variables_dict.get('ci_status', '')
     install_ocp_version = environment_variables_dict.get('install_ocp_version', '')
     install_ocp_resources = environment_variables_dict.get('install_ocp_resources', '')
-    if workload or ci_status:
-        benchmark_runner_workloads = list(environment_variables_dict.get('benchmark_runner_workloads', ''))
-        benchmark_operator_workloads = list(environment_variables_dict.get('benchmark_operator_workloads', ''))
-        es_host = environment_variables_dict.get('elasticsearch', '')
-        es_port = environment_variables_dict.get('elasticsearch_port', '')
-        es_user = environment_variables_dict.get('elasticsearch_user', '')
-        es_password = environment_variables_dict.get('elasticsearch_password', '')
-        timeout = int(environment_variables_dict.get('timeout', ''))
-        kubeadmin_password = environment_variables_dict.get('kubeadmin_password', '')
-        run_type = environment_variables_dict.get('run_type', '')
-        # workload name validation
+    benchmark_runner_workloads = list(environment_variables_dict.get('benchmark_runner_workloads', ''))
+    benchmark_operator_workloads = list(environment_variables_dict.get('benchmark_operator_workloads', ''))
+    run_type = environment_variables_dict.get('run_type', '')
+    # workload name validation
+    if workload and not ci_status:
         if workload not in environment_variables.workloads_list:
             logger.info(f'Enter valid workload name {environment_variables.workloads_list}')
             raise Exception(f'Not valid workload name: {workload} \n, choose one from the list: {environment_variables.workloads_list}')
@@ -51,12 +47,7 @@ def main():
             logger.info(f'Enter valid run type {environment_variables.run_types_list}')
             raise Exception(f'Invalid run type: {run_type} \n, choose one from the list: {environment_variables.run_types_list}')
         if workload.split('_')[0] in benchmark_operator_workloads:
-            benchmark_operator_workload = BenchmarkOperatorWorkloads(kubeadmin_password=kubeadmin_password,
-                                                                     es_host=es_host,
-                                                                     es_port=es_port,
-                                                                     es_user=es_user,
-                                                                     es_password=es_password,
-                                                                     timeout=timeout)
+            benchmark_operator_workload = BenchmarkOperatorWorkloads()
         elif workload.split('_')[0] in benchmark_runner_workloads:
             benchmark_runner_workload = Workloads()
 
@@ -125,7 +116,8 @@ def main():
         ci_minutes_time = environment_variables_dict.get('ci_minutes_time', '')
         benchmark_operator_id = environment_variables_dict.get('benchmark_operator_id', '')
         benchmark_wrapper_id = environment_variables_dict.get('benchmark_wrapper_id', '')
-        benchmark_operator_workload.update_ci_status(status=ci_status, ci_minutes_time=int(ci_minutes_time), benchmark_operator_id=benchmark_operator_id, benchmark_wrapper_id=benchmark_wrapper_id)
+        benchmark_runner = Workloads()
+        benchmark_runner.update_ci_status(status=ci_status, ci_minutes_time=int(ci_minutes_time), benchmark_operator_id=benchmark_operator_id, benchmark_wrapper_id=benchmark_wrapper_id)
 
     @logger_time_stamp
     def run_benchmark_operator_workload():
@@ -138,7 +130,7 @@ def main():
             benchmark_operator_workload.update_node_selector(runner_path=environment_variables_dict.get('runner_path', ''),
                                                              yaml_path='benchmark-operator/config/manager/manager.yaml',
                                                              pin_node='pin_node_benchmark_operator')
-        benchmark_operator_workload.run_workload(workload=workload)
+        benchmark_operator_workload.run()
 
     @logger_time_stamp
     def run_benchmark_runner_workload():
@@ -147,7 +139,7 @@ def main():
         :return:
         """
         # benchmark-operator node selector
-        benchmark_operator_workload.run_workload(workload=workload)
+        benchmark_runner_workload.run()
 
     # azure_cluster_start_stop
     if azure_cluster_stop or azure_cluster_start:
@@ -164,7 +156,7 @@ def main():
     elif workload.split('_')[0] in benchmark_operator_workloads:
         run_benchmark_operator_workload()
     elif workload.split('_')[0] in benchmark_runner_workloads:
-        benchmark_runner_workload.run()
+        run_benchmark_runner_workload()
 
 
 main()

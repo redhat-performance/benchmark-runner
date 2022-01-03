@@ -2,7 +2,6 @@
 
 # benchmark operator templates
 include benchmark_runner/benchmark_operator/workload_flavors/templates/common.yaml
-include benchmark_runner/benchmark_operator/workload_flavors/templates/current_run/*
 include benchmark_runner/benchmark_operator/workload_flavors/templates/hammerdb/*.yaml
 include benchmark_runner/benchmark_operator/workload_flavors/templates/hammerdb/internal_data/*.yaml
 include benchmark_runner/benchmark_operator/workload_flavors/templates/stressng/*.yaml

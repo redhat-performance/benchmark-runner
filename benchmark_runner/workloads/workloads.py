@@ -16,6 +16,11 @@ class Workloads(WorkloadsOperations):
         All inherit from WorkloadsOperations
         """
         super().__init__()
+        self.__workload = ''
+        self.__es_index = ''
+        self.__kind = ''
+        self.__status = ''
+        self.__pod_name = ''
 
     @typechecked
     @logger_time_stamp
@@ -24,50 +29,45 @@ class Workloads(WorkloadsOperations):
     This method run vdbench pog workload
     :return:
     """
-        pod_name = ''
-        kind = ''
-        status = ''
         try:
             if name == '':
                 name = self.vdbench_pod.__name__
-            workload = name.replace('_', '-')
-            pod_name = f'{workload}-{self._trunc_uuid}'
-            kind = 'pod'
+            self.__workload = name.replace('_', '-')
+            self.__pod_name = f'{self.__workload}-{self._trunc_uuid}'
+            self.__kind = 'pod'
             if '_kata' in name:
-                kind = 'kata'
+                self.__kind = 'kata'
             if self._run_type == 'test_ci':
-                es_index = 'vdbench-test-ci-results'
+                self.__es_index = 'vdbench-test-ci-results'
             else:
-                es_index = 'vdbench-results'
-            self._environment_variables_dict['kind'] = kind
-            self._oc.create_pod_sync(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.vdbench_pod.__name__}.yaml'), pod_name=pod_name)
+                self.__es_index = 'vdbench-results'
+            self._environment_variables_dict['kind'] = self.__kind
+            self._oc.create_pod_sync(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.vdbench_pod.__name__}.yaml'), pod_name=self.__pod_name)
             self._oc.wait_for_initialized(label=f'app=vdbench-{self._trunc_uuid}', label_uuid=False)
             self._oc.wait_for_ready(label=f'app=vdbench-{self._trunc_uuid}', label_uuid=False)
-            status = self._oc.wait_for_pod_completed(label=f'app=vdbench-{self._trunc_uuid}', label_uuid=False, job=False)
-            status = 'complete' if status else 'failed'
+            self.__status = self._oc.wait_for_pod_completed(label=f'app=vdbench-{self._trunc_uuid}', label_uuid=False, job=False)
+            self.__status = 'complete' if self.__status else 'failed'
             # save run artifacts logs
-            result = self._create_run_artifacts(pod_name=pod_name)
-            metadata = self._get_metadata(kind=kind, status=status, result=result)
+            result = self._create_run_artifacts(pod_name=self.__pod_name)
             if self._es_host:
-                self.es_operations.upload_to_es(index=es_index, data=metadata)
+                self._upload_to_es(index=self.__es_index, kind=self.__kind, status=self.__status, result=result)
                 # verify that data upload to elastic search according to unique uuid
-                self.es_operations.verify_es_data_uploaded(index=es_index, uuid=self._uuid)
+                self._verify_es_data_uploaded(index=self.__es_index, uuid=self._uuid)
             self._oc.delete_pod_sync(
                 yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.vdbench_pod.__name__}.yaml'),
-                pod_name=pod_name)
+                pod_name=self.__pod_name)
         except ElasticSearchDataNotUploaded as err:
             self._oc.delete_pod_sync(
                 yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.vdbench_pod.__name__}.yaml'),
-                pod_name=pod_name)
+                pod_name=self.__pod_name)
             raise err
         except Exception as err:
             # save run artifacts logs
-            result = self._create_run_artifacts(pod_name=pod_name)
-            metadata = self._get_metadata(kind=kind, status=status, result=result)
-            self.es_operations.upload_to_es(index=es_index, data=metadata)
+            result = self._create_run_artifacts(pod_name=self.__pod_name)
+            self._upload_to_es(kind=self.__kind, status='failed', result=result)
             self._oc.delete_pod_sync(
                 yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.vdbench_pod.__name__}.yaml'),
-                pod_name=pod_name)
+                pod_name=self.__pod_name)
             raise err
 
     # The Kata workloads should not be decorated with
@@ -90,7 +90,6 @@ class Workloads(WorkloadsOperations):
         class_method = getattr(workloads, self._workload)
         class_method()
         self.finalize_workload()
-
 
 
 
