@@ -57,7 +57,7 @@ class BenchmarkOperatorWorkloadsOperations:
                                                 es_password=self._es_password,
                                                 timeout=self._timeout)
         # Generate workload_flavors class
-        self._template = TemplateOperations()
+        self._template = TemplateOperations(workload=self._workload)
         # set oc login
         self._oc = self.set_login(kubeadmin_password=self._kubeadmin_password)
         # PrometheusSnapshot
@@ -70,9 +70,8 @@ class BenchmarkOperatorWorkloadsOperations:
         :param kubeadmin_password:
         :return:
         """
-        if kubeadmin_password:
-            self._oc = OC(kubeadmin_password=kubeadmin_password)
-            self._oc.login()
+        self._oc = OC(kubeadmin_password=kubeadmin_password)
+        self._oc.login()
         return self._oc
 
     def __check_elasticsearch_exist_for_system_metrics(self):
