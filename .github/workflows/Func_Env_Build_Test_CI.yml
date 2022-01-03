@@ -141,6 +141,7 @@ jobs:
         ELASTICSEARCH_PORT: ${{ secrets.FUNC_ELASTICSEARCH_PORT }}
         ELASTICSEARCH_USER: ${{ secrets.FUNC_ELASTICSEARCH_USER }}
         ELASTICSEARCH_PASSWORD: ${{ secrets.FUNC_ELASTICSEARCH_PASSWORD }}
+        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
         CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
         IBM_REGION_NAME: ${{ secrets.IBM_REGION_NAME }}
         IBM_ENDPOINT_URL: ${{ secrets.IBM_ENDPOINT_URL }}
@@ -149,13 +150,12 @@ jobs:
         IBM_BUCKET: ${{ secrets.IBM_BUCKET }}
         IBM_KEY: ${{ secrets.IBM_KEY }}
         FUNC_RUN_ARTIFACTS_URL: ${{ secrets.FUNC_RUN_ARTIFACTS_URL }}
-        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
       run: |
         # Functional CI MUST update hosts ci file
         sudo echo "${{ secrets.FUNC_HOSTS_API }}" | sudo tee -a /etc/hosts
         sudo echo "${{ secrets.FUNC_HOSTS_OAUTH }}" | sudo tee -a /etc/hosts
-        # get repository last id
-        declare -a repositories=('benchmark-operator' 'benchmark-wrapper')
+        # get repository last id 'benchmark-operator' already cloned in pyest
+        declare -a repositories=('benchmark-wrapper')
         for repository in "${repositories[@]}"
         do
             git clone "https://github.com/cloud-bulldozer/$repository" "$RUNNER_PATH/$repository"
@@ -172,7 +172,7 @@ jobs:
         done
         build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
         build_version="$(cut -d'=' -f2 <<<"$build")"
-        declare -a workloads=('stressng_pod' 'dbench_pod')
+        declare -a workloads=('stressng_pod' 'vdbench_pod')
         for workload in "${workloads[@]}"
         do
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>'
@@ -181,7 +181,7 @@ jobs:
         done
         end=$(printf '%(%s)T' -1)
         ci_minutes_time=$(( (end - START_CI) / 60))
-        echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Test Update CI status pass >>>>>>>>>>>>>>>>>>>>>>>>>>'
+        echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Test update CI status pass >>>>>>>>>>>>>>>>>>>>>>>>>>'
         podman run --rm -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e ELASTICSEARCH_USER="$ELASTICSEARCH_USER" -e ELASTICSEARCH_PASSWORD="$ELASTICSEARCH_PASSWORD" -e BUILD_VERSION="$build_version" -e CI_STATUS="pass" -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e RUN_TYPE="test_ci" -e FUNC_TIMEOUT="2000" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
     - name: 🎁 Bump Version
       run: |
