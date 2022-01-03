@@ -45,6 +45,19 @@ class EnvironmentVariables:
                                                          'hammerdb_pod_postgres', 'hammerdb_vm_postgres', 'hammerdb_kata_postgres',
                                                          'hammerdb_pod_mssql', 'hammerdb_vm_mssql', 'hammerdb_kata_mssql',
                                                          'vdbench_pod', 'vdbench_kata']
+        # benchmark-operator workload types
+        self._environment_variables_dict['workload_types'] = {
+            'stressng': 'benchmark_operator',
+            'hammerdb': 'benchmark_operator',
+            'uperf': 'benchmark_operator',
+            'vdbench': 'benchmark_runner',
+            }
+        # benchmark-operator workload paths
+        self._environment_variables_dict['workload_type_paths'] = {
+            'benchmark_operator': os.path.join('benchmark_runner', 'benchmark_operator', 'workload_flavors'),
+            'benchmark_runner':  os.path.join('benchmark_runner', 'workloads', 'workload_flavors'),
+            }
+        
         # benchmark-operator workloads
         self._environment_variables_dict['benchmark_operator_workloads'] = ['stressng', 'uperf', 'hammerdb']
         # benchmark-runner workloads - customs
@@ -66,6 +79,7 @@ class EnvironmentVariables:
         self._environment_variables_dict['run_types'] = ['test_ci', 'func_ci', 'perf_ci']
         # Run type test_ci/func_ci/perf_ci, default test_ci same environment as func_ci
         self._environment_variables_dict['run_type'] = os.environ.get('RUN_TYPE', 'test_ci')
+        
         # Run uuid
         self._environment_variables_dict['uuid'] = str(uuid4())
         self._environment_variables_dict['trunc_uuid'] = self._environment_variables_dict['uuid'].split('-')[0]
@@ -213,6 +227,25 @@ class EnvironmentVariables:
         This method is setter
         """
         self._environment_variables_dict = value
+
+    def workload_type(self, workload: str):
+        """
+        Return the workload type for a given workload
+        """
+        if workload in self._environment_variables_dict['workloads'] and workload.split('_')[0] in self._environment_variables_dict['workload_types']:
+            return self._environment_variables_dict['workload_types'][workload.split('_')[0]]
+        else:
+            return None
+
+    def workload_path(self, workload:str):
+        """
+        Return the workload type for a given workload
+        """
+        workload_type = self.workload_type(workload)
+        if workload_type and workload_type in self._environment_variables_dict['workload_type_paths']:
+            return self._environment_variables_dict['workload_type_paths'][workload_type]
+        else:
+            return None
 
 
 environment_variables = EnvironmentVariables()

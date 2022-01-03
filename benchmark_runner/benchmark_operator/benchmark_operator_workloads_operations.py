@@ -8,7 +8,7 @@ from typeguard import typechecked
 
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 from benchmark_runner.common.oc.oc import OC
-from benchmark_runner.benchmark_operator.workload_flavors.benchmark_operator_template_operations import BenchmarkOperatorTemplateOperations
+from benchmark_runner.common.workload_flavors.template_operations import TemplateOperations
 from benchmark_runner.common.elasticsearch.es_operations import ESOperations
 from benchmark_runner.common.ssh.ssh import SSH
 from benchmark_runner.benchmark_operator.benchmark_operator_exceptions import OCSNonInstalled, SystemMetricsRequiredElasticSearch
@@ -437,7 +437,7 @@ class BenchmarkOperatorWorkloadsOperations:
         # make deploy benchmark controller manager
         self.make_deploy_benchmark_controller_manager(runner_path=environment_variables.environment_variables_dict['runner_path'])
         self.ocs_pvc_verification()
-        self._template.generate_yamls(workload=self._workload)
+        self._template.generate_yamls()
         self.start_prometheus()
 
     def finalize_workload(self):

@@ -19,16 +19,16 @@ _**Table of Contents**_
 
 The unit tests include a check to ensure that the generated .yaml
 files do not inadvertently change.  This check, located in
-`tests/unittest/benchmark_runner/regression/test_golden_files.py`,
+`tests/unittest/benchmark_runner/common/workload_flavors/test_golden_files.py`,
 compares these files against expected files found in
-`tests/unittest/benchmark_runner/regression/golden_files` and fails if
+`tests/unittest/benchmark_runner/common/workloads_flavors/golden_files` and fails if
 any golden files have been added, modified, or removed.
 
 _*If you add or modify any YAML files, you must run the following commands:*_
 
 ```
-PYTHONPATH=. python3 tests/unittest/benchmark_runner/regression/generate_golden_files.py
-git add tests/unittest/benchmark_runner/regression/golden_files
+PYTHONPATH=. python3 tests/unittest/benchmark_runner/common/workload_flavors/generate_golden_files.py
+git add tests/unittest/benchmark_runner/common/workload_flavors/golden_files
 git commit -m"Update golden files"
 ```
 
@@ -41,7 +41,7 @@ only a few seconds to run.
 
 ```
 $ PYTHONPATH=. python3 -m pytest -v
-tests/unittest/benchmark_runner/regression/
+tests/unittest/benchmark_runner/common/workload_flavors/
 ============================== test session starts ===============================
 platform linux -- Python 3.9.5, pytest-6.2.2, py-1.10.0, pluggy-0.13.1 -- /usr/bin/python3
 cachedir: .pytest_cache
@@ -49,7 +49,7 @@ rootdir: /home/rkrawitz/sandbox/benchmark-runner
 plugins: typeguard-2.10.0, venv-0.2
 collected 1 item
 
-tests/unittest/benchmark_runner/regression/test_golden_files.py::test_golden_files PASSED [100%]
+tests/unittest/benchmark_runner/common/workload_flavors/test_golden_files.py::test_golden_files PASSED [100%]
 
 =============================== 1 passed in 1.85s ================================
 ```
