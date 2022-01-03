@@ -162,6 +162,7 @@ jobs:
             pushd "$RUNNER_PATH/$repository"
             if [[ $repository == 'benchmark-operator' ]]
             then
+                # 'benchmark-operator' already cloned in pyest
                 echo "BENCHMARK_OPERATOR_ID=$(git rev-parse @)" >> "$GITHUB_ENV"
                 BENCHMARK_OPERATOR_ID=$(git rev-parse @)
             else
