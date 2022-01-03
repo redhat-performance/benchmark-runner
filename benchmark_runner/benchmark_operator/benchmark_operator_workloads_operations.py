@@ -196,7 +196,8 @@ class BenchmarkOperatorWorkloadsOperations:
         self._oc.wait_for_pod_completed(label='app=system-metrics-collector', workload=workload)
         # verify that data upload to elastic search
         if self._es_host:
-            self._verify_es_data_uploaded(index=es_index, uuid=self._oc.get_long_uuid(workload=workload), fast_check = True)
+            # workload: system metrics, in case of uperf take timestamp and not uperf_ts
+            self._verify_es_data_uploaded(index=es_index, uuid=self._oc.get_long_uuid(workload=workload), workload='system-metrics', fast_check = True)
 
     def __get_metadata(self, kind: str = None, database: str = None, status: str = None, run_artifacts_url: str = None) -> dict:
         """
@@ -261,15 +262,19 @@ class BenchmarkOperatorWorkloadsOperations:
         """
         self.__es_operations.upload_to_es(index=index, data=self.__get_metadata(kind=kind, database=database, status=status, run_artifacts_url=run_artifacts_url))
 
-    def _verify_es_data_uploaded(self, index: str, uuid: str, fast_check: bool = False):
+    def _verify_es_data_uploaded(self, index: str, uuid: str, workload: str = '', fast_check: bool = False):
         """
         This method verify that elasticsearch data uploaded
         :param index:
         :param uuid:
+        :param workload:
         :param fast_check:
         :return: ids
         """
-        return self.__es_operations.verify_es_data_uploaded(index=index, uuid=uuid, workload=self._workload_name, fast_check=fast_check)
+        if workload:
+            return self.__es_operations.verify_es_data_uploaded(index=index, uuid=uuid, workload=workload, fast_check=fast_check)
+        else:
+            return self.__es_operations.verify_es_data_uploaded(index=index, uuid=uuid, workload=self._workload_name, fast_check=fast_check)
 
     def _create_vm_log(self, labels: list) -> str:
         """
