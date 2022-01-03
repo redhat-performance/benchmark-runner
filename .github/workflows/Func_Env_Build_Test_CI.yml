@@ -154,17 +154,18 @@ jobs:
         # Functional CI MUST update hosts ci file
         sudo echo "${{ secrets.FUNC_HOSTS_API }}" | sudo tee -a /etc/hosts
         sudo echo "${{ secrets.FUNC_HOSTS_OAUTH }}" | sudo tee -a /etc/hosts
-        # get repository last id 'benchmark-operator' already cloned in pyest
-        declare -a repositories=('benchmark-wrapper')
+        # get repository last id
+        declare -a repositories=('benchmark-operator' 'benchmark-wrapper')
         for repository in "${repositories[@]}"
-        do
-            git clone "https://github.com/cloud-bulldozer/$repository" "$RUNNER_PATH/$repository"
+        do 
             pushd "$RUNNER_PATH/$repository"
             if [[ $repository == 'benchmark-operator' ]]
             then
+                # 'benchmark-operator' already cloned in pyest
                 echo "BENCHMARK_OPERATOR_ID=$(git rev-parse @)" >> "$GITHUB_ENV"
                 BENCHMARK_OPERATOR_ID=$(git rev-parse @)
             else
+                git clone "https://github.com/cloud-bulldozer/$repository" "$RUNNER_PATH/$repository"
                 echo "BENCHMARK_WRAPPER_ID=$(git rev-parse @)" >> "$GITHUB_ENV"
                 BENCHMARK_WRAPPER_ID=$(git rev-parse @)
             fi
@@ -197,4 +198,3 @@ jobs:
         git pull https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} main
         git push https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} main
         git push https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} --tag
-
