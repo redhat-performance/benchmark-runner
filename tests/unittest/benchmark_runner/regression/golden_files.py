@@ -5,8 +5,9 @@ import os
 import shutil
 import tempfile
 from benchmark_runner.main.environment_variables import environment_variables
-from benchmark_runner.benchmark_operator.workload_flavors.generate_yaml_from_workload_flavors import TemplateOperations
+from benchmark_runner.benchmark_operator.workload_flavors.benchmark_operator_template_operations import BenchmarkOperatorTemplateOperations
 from tests.unittest.benchmark_runner.regression.golden_files_exceptions import GoldenFileCheckFailed
+
 
 class GoldenFiles:
     """Generate golden files for regression testing"""
@@ -59,7 +60,7 @@ class GoldenFiles:
             for run_type in environment_variables.run_types_list:
                 environment_variables.environment_variables_dict['run_type'] = run_type
                 for workload in environment_variables.workloads_list:
-                    t = TemplateOperations()
+                    t = BenchmarkOperatorTemplateOperations()
                     srcdir = t.get_current_run_path()
                     self.__clear_directory_yaml(srcdir)
                     destdir = self.__generate_yaml_dir_name(run_type=run_type, workload=workload, ocs_pvc=ocs_pvc, dest=dest)
@@ -89,11 +90,6 @@ class GoldenFiles:
         right_only = canon_list(subdir, dirs_cmp.right_only)
         diff_files = []
         funny_files = []
-#        diff_files = canon_list(subdir, dirs_cmp.diff_files)
-#        funny_files = canon_list(subdir, dirs_cmp.funny_files)
-#        right_only = dirs_cmp.right_only
-#        diff_files = dirs_cmp.diff_files
-#        funny_files = dirs_cmp.funny_files
 
         (_, mismatch, errors) =  filecmp.cmpfiles(dir1, dir2, dirs_cmp.common_files, shallow=False)
         diff_files.extend(canon_list(subdir, mismatch))

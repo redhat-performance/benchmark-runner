@@ -5,7 +5,7 @@ import tarfile
 import shutil
 from csv import DictReader
 
-from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
+from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp
 from benchmark_runner.workloads.workloads_exceptions import OCSNonInstalled
 from benchmark_runner.common.oc.oc import OC
 from benchmark_runner.common.elasticsearch.es_operations import ESOperations
@@ -13,7 +13,8 @@ from benchmark_runner.main.environment_variables import environment_variables
 from benchmark_runner.common.clouds.shared.s3.s3_operations import S3Operations
 from benchmark_runner.common.prometheus.prometheus_snapshot import PrometheusSnapshot
 from benchmark_runner.common.prometheus.prometheus_snapshot_exceptions import PrometheusSnapshotError
-from benchmark_runner.workloads.workload_flavors.templates.template_operations import TemplateOperations
+from benchmark_runner.workloads.workload_flavors.template_operations import TemplateOperations
+from benchmark_runner.common.clouds.IBM.ibm_operations import IBMOperations
 
 
 class WorkloadsOperations:
@@ -43,7 +44,7 @@ class WorkloadsOperations:
         self._save_artifacts_local = self._environment_variables_dict.get('save_artifacts_local', '')
         self._timeout = int(self._environment_variables_dict.get('timeout', ''))
         if self._es_host and self._es_port:
-            self.es_operations = ESOperations(es_host=self._es_host,
+            self.__es_operations = ESOperations(es_host=self._es_host,
                                               es_port=self._es_port,
                                               es_user=self._es_user,
                                               es_password=self._es_password,
@@ -211,7 +212,7 @@ class WorkloadsOperations:
             # remove tar.gz file
             os.remove(path=tar_run_artifacts_path)
 
-    def _get_metadata(self, kind: str = None, status: str = None, result: dict = None) -> dict:
+    def __get_metadata(self, kind: str = None, status: str = None, result: dict = None) -> dict:
         """
         This method return metadata kind and database argument are optional
         @param kind: optional: pod, vm, or kata
@@ -237,7 +238,53 @@ class WorkloadsOperations:
             metadata.update(result)
 
         return metadata
-    
+
+    def _upload_to_es(self, index: str, kind: str, status: str, result: dict = None):
+        """
+        This method upload to elasticsearch
+        :param index:
+        :param kind:
+        :param status:
+        :param result:
+        :return:
+        """
+        self.__es_operations.upload_to_es(index=index, data=self.__get_metadata(kind=kind, status=status, result=result))
+
+    def _verify_es_data_uploaded(self, index: str, uuid: str):
+        """
+        This method verify that elasticsearch data uploaded
+        :param index:
+        :param uuid:
+        :return:
+        """
+        self.__es_operations.verify_es_data_uploaded(index=index, uuid=uuid)
+
+    @logger_time_stamp
+    def update_ci_status(self, status: str, ci_minutes_time: int, benchmark_operator_id: str, benchmark_wrapper_id: str, ocp_install_minutes_time: int = 0, ocp_resource_install_minutes_time: int = 0):
+        """
+        This method update ci status Pass/Failed
+        :param status: Pass/Failed
+        :param ci_minutes_time: ci time in minutes
+        :param benchmark_wrapper_id: benchmark_wrapper last repository commit id
+        :param benchmark_operator_id: benchmark_operator last repository commit id
+        :param ocp_install_minutes_time: ocp install minutes time, default 0 because ocp install run once a week
+        :param ocp_resource_install_minutes_time: ocp install minutes time, default 0 because ocp install run once a week
+        :return:
+        """
+        if self._run_type == 'test_ci':
+            es_index = 'ci-status-test'
+        else:
+            es_index = 'ci-status'
+        status_dict = {'failed': 0, 'pass': 1}
+        metadata = self.__get_metadata()
+        if ocp_resource_install_minutes_time != 0:
+            ibm_operations = IBMOperations(user=self._environment_variables_dict.get('provision_user', ''))
+            ibm_operations.ibm_connect()
+            ocp_install_minutes_time = ibm_operations.get_ocp_install_time()
+            ibm_operations.ibm_disconnect()
+        metadata.update({'status': status, 'status#': status_dict[status], 'ci_minutes_time': ci_minutes_time, 'benchmark_operator_id': benchmark_operator_id, 'benchmark_wrapper_id': benchmark_wrapper_id, 'ocp_install_minutes_time': ocp_install_minutes_time, 'ocp_resource_install_minutes_time': ocp_resource_install_minutes_time})
+        self.__es_operations.upload_to_es(index=es_index, data=metadata)
+
     def initialize_workload(self):
         """
         This method includes all the initialization of workload 

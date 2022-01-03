@@ -1,13 +1,11 @@
 
 import pytest
-import os
-from uuid import uuid4
 
 from benchmark_runner.common.oc.oc import OC
 from benchmark_runner.common.elasticsearch.es_operations import ESOperations
 from benchmark_runner.common.elasticsearch.elasticsearch_exceptions import ElasticSearchDataNotUploaded
 from benchmark_runner.main.update_data_template_yaml_with_environment_variables import render_yaml_file
-from benchmark_runner.benchmark_operator.benchmark_operator_workloads import BenchmarkOperatorWorkloads
+from benchmark_runner.benchmark_operator.benchmark_operator_workloads_operations import BenchmarkOperatorWorkloadsOperations
 from tests.integration.benchmark_runner.test_environment_variables import *
 
 
@@ -45,8 +43,8 @@ def before_after_all_tests_fixture():
     print('Deploy benchmark-operator pod')
 
     # delete benchmark-operator pod if exist
-    benchmark_operator = BenchmarkOperatorWorkloads(kubeadmin_password=test_environment_variable.get('kubeadmin_password', ''), es_host=test_environment_variable.get('elasticsearch', ''),
-                                                    es_port=test_environment_variable.get('elasticsearch_port', ''))
+    benchmark_operator = BenchmarkOperatorWorkloadsOperations()
+    benchmark_operator.set_login(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     benchmark_operator.make_undeploy_benchmark_controller_manager_if_exist(runner_path=test_environment_variable.get('runner_path', ''))
     benchmark_operator.make_deploy_benchmark_controller_manager(runner_path=test_environment_variable.get('runner_path', ''))
     yield

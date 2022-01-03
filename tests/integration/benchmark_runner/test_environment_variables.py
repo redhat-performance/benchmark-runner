@@ -20,6 +20,7 @@ def __get_test_environment_variable():
     test_environment_variable['elasticsearch_port'] = os.environ.get('ELASTICSEARCH_PORT', '')
     test_environment_variable['elasticsearch_user'] = os.environ.get('ELASTICSEARCH_USER', '')
     test_environment_variable['elasticsearch_password'] = os.environ.get('ELASTICSEARCH_PASSWORD', '')
+    test_environment_variable['timeout'] = int(os.environ.get('TIMEOUT', '2000'))
 
     # end dynamic parameters - configure for local run
     ###################################################################################################
