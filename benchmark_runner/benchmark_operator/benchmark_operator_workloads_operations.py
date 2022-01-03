@@ -328,7 +328,8 @@ class BenchmarkOperatorWorkloadsOperations:
         :return: run artifacts url
         """
         self.__create_pod_log(label='benchmark-controller-manager')
-        self.__create_pod_log(label='system-metrics')
+        if environment_variables.environment_variables_dict['system_metrics'] == 'True':
+            self.__create_pod_log(label='system-metrics')
         # for vm call to create_vm_log
         if pod:
             # workload that contains 2 pods
