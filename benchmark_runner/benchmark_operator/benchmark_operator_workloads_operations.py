@@ -57,7 +57,7 @@ class BenchmarkOperatorWorkloadsOperations:
                                                 es_password=self._es_password,
                                                 timeout=self._timeout)
         # Generate workload_flavors class
-        self._template = BenchmarkOperatorTemplateOperations()
+        self._template = TemplateOperations()
         # set oc login
         self._oc = self.set_login(kubeadmin_password=self._kubeadmin_password)
         # PrometheusSnapshot
