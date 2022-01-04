@@ -56,28 +56,6 @@ jobs:
             ServerAliveInterval 30
             ServerAliveCountMax 5
           END
-          #Host *
-          #  StrictHostKeyChecking no
-          #  ServerAliveInterval 60
-          #  ServerAliveCountMax 30
-          # ClientAliveInterval 120
-          #  ClientAliveCountMax 720
-          #  User root
-          #  Port 22
-          #  X11Forwarding yes
-          #  ForwardAgent yes
-          #  ForwardX11Trusted yes
-          #END
-          #sudo mkdir -p /etc/default
-          #echo "GRUB_TERMINAL=serial" | sudo tee -a /etc/default/grub
-          #echo "GRUB_CMDLINE_LINUX_DEFAULT="console=ttyS0"" | sudo tee -a /etc/default/grub
-          #echo "GRUB_TIMEOUT=5" | sudo tee -a /etc/default/grub
-          #echo "GRUB_DEFAULT=saved" | sudo tee -a /etc/default/grub
-          #echo "GRUB_DISABLE_SUBMENU=true" | sudo tee -a /etc/default/grub
-          #echo "GRUB_TERMINAL_OUTPUT="console"" | sudo tee -a /etc/default/grub
-          #echo "GRUB_DISABLE_RECOVERY="true"" | sudo tee -a /etc/default/grub
-          #echo "GRUB_ENABLE_BLSCFG=true" | sudo tee -a /etc/default/grub
-          #sudo update-grub
       - name: Install latest benchmark-runner
         run: |
           python -m pip install --upgrade pip
