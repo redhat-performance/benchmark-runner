@@ -110,24 +110,6 @@ jobs:
           IBM_KEY: ${{ secrets.IBM_KEY }}
           PERF_RUN_ARTIFACTS_URL: ${{ secrets.PERF_RUN_ARTIFACTS_URL }}
         run: |
-          # get repository last id
-          echo  mkdir /tmp/run_artifacts
-          mkdir /tmp/run_artifacts
-          declare -a repositories=('benchmark-operator' 'benchmark-wrapper')
-          for repository in "${repositories[@]}"
-          do
-              git clone "https://github.com/cloud-bulldozer/$repository" "$RUNNER_PATH/$repository"
-              pushd "$RUNNER_PATH/$repository"
-              if [[ $repository == 'benchmark-operator' ]]
-              then
-                  echo "BENCHMARK_OPERATOR_ID=$(git rev-parse @)" >> "$GITHUB_ENV"
-                  BENCHMARK_OPERATOR_ID=$(git rev-parse @)
-              else
-                  echo "BENCHMARK_WRAPPER_ID=$(git rev-parse @)" >> "$GITHUB_ENV"
-                  BENCHMARK_WRAPPER_ID=$(git rev-parse @)
-              fi
-              popd
-          done
           build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
           build_version="$(cut -d'=' -f2 <<<"$build")"
           #build_version=1.0.253
