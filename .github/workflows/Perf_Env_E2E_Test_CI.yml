@@ -1,26 +1,22 @@
-# This workflow will install Python dependencies, run tests and lint with a single version of Python
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
-# This is Test PR CI Pipeline against Functional environment when pushing a PR
- 
-name: Perf Env E2E Test CI
-
+# Nightly CI https://github.com/marketplace/actions/deploy-nightly
+# https://crontab.guru/
+# This is a nightly CI Pipeline against Performance environment using IPI installer - run on Sunday
+name: Deploy IPI Perf Env Nightly CI
 #on:
-#  workflow_run:
-#    workflows: ["Test1"]
-#    types:
-#      - completed
+#  schedule:
+#    - cron: '0 4 * * 0' # run on Sunday at 4 AM UTC/ 0 AM EDT
 on:
   push:
     branches: [ main ]
 
-# Ensures that only one deploy task per branch/environment will run at a time. 
+# Ensures that only one deploy task per branch/environment will run at a time.
 concurrency:
   group: performance-environment
   cancel-in-progress: false
   
 jobs:
-  stressng_workload:
-    name: Stressng workload
+  ocp_ipi_installation:
+    name: OCP IBM IPI Installation
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -28,8 +24,10 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
-      - name: ⚙ Set START CI TIME
-        run: echo "START_CI=${{ needs.nightly_start.outputs.start_time_output }}" >> "$GITHUB_ENV"
+      - name: Install latest benchmark-runner
+        run: |
+          python -m pip install --upgrade pip
+          pip install benchmark-runner
       - name: ⚙️ SET SSH key
         env:
           PERF_PROVISION_PRIVATE_KEY: ${{ secrets.PERF_PROVISION_PRIVATE_KEY }}
@@ -43,11 +41,6 @@ jobs:
           sudo chmod 600 $RUNNER_PATH/private_key.txt
           echo "PERF_PROVISION_PRIVATE_KEY_PATH=$RUNNER_PATH/private_key.txt" >> "$GITHUB_ENV"
           cat >> "$RUNNER_PATH/.ssh/config" <<END
-                    mkdir -p "$RUNNER_PATH/.ssh/"
-          echo "$PERF_PROVISION_PRIVATE_KEY" > $RUNNER_PATH/private_key.txt
-          sudo chmod 600 $RUNNER_PATH/private_key.txt
-          echo "PERF_PROVISION_PRIVATE_KEY_PATH=$RUNNER_PATH/private_key.txt" >> "$GITHUB_ENV"
-          cat >> "$RUNNER_PATH/.ssh/config" <<END
           Host provision
             HostName $PERF_PROVISION_IP
             User $PERF_PROVISION_USER
@@ -56,19 +49,7 @@ jobs:
             ServerAliveInterval 30
             ServerAliveCountMax 5
           END
-      - name: Install latest benchmark-runner
-        run: |
-          python -m pip install --upgrade pip
-          pip install benchmark-runner
-      - name: ⚙ Set Kubeconfig
-        env:
-          KUBECONFIG: ${{ secrets.PERF_KUBECONFIG }}
-          RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-        run: |
-          mkdir -p "$RUNNER_PATH/.kube/"
-          echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
-          echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
-      - name: ✔️ E2E tests using stable quay.io
+      - name: 🔧️ OCP IPI install
         env:
           KUBEADMIN_PASSWORD: ${{ secrets.PERF_KUBEADMIN_PASSWORD }}
           PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.PERF_PIN_NODE_BENCHMARK_OPERATOR }}
@@ -88,15 +69,6 @@ jobs:
           IBM_KEY: ${{ secrets.IBM_KEY }}
           PERF_RUN_ARTIFACTS_URL: ${{ secrets.PERF_RUN_ARTIFACTS_URL }}
         run: |
-          ssh -t provision "ls"
           build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
           build_version="$(cut -d'=' -f2 <<<"$build")"
-          #build_version=1.0.253
-          declare -a workloads=('stressng_vm')
-          for workload in "${workloads[@]}"
-          do
-              echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>'
-              #ssh -t provision "podman run --rm -t -a stdout -a stdin -a stderr -e OCP_ENV_FLAVOR="PERF" -e WORKLOAD="$workload" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e ELASTICSEARCH_USER="$ELASTICSEARCH_USER" -e ELASTICSEARCH_PASSWORD="$ELASTICSEARCH_PASSWORD" -e IBM_REGION_NAME="$IBM_REGION_NAME" -e IBM_ENDPOINT_URL="$IBM_ENDPOINT_URL" -e IBM_ACCESS_KEY_ID="$IBM_ACCESS_KEY_ID" -e IBM_SECRET_ACCESS_KEY="$IBM_SECRET_ACCESS_KEY" -e IBM_BUCKET="$IBM_BUCKET" -e IBM_KEY="$IBM_KEY" -e PERF_RUN_ARTIFACTS_URL="$PERF_RUN_ARTIFACTS_URL" -e BUILD_VERSION="$build_version" -e RUN_TYPE="perf_ci" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" -e SAVE_ARTIFACTS_LOCAL="True" -v /tmp/run_artifacts:/tmp/run_artifacts -v "/$RUNNER_PATH/.ssh/config":"/$PERF_PROVISION_USER/.ssh/config" -v /etc/default/grub:/etc/default/grub --privileged quay.io/ebattat/benchmark-runner:v$build_version "
-              echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
-          done
-
+          ssh -t provision "ls"
