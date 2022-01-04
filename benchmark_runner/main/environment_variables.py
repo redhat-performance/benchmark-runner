@@ -225,7 +225,7 @@ class EnvironmentVariables:
         """
         self._environment_variables_dict = value
 
-    def workload_namespace(self, workload: str):
+    def get_workload_namespace(self, workload: str):
         """
         Return the workload namespace for a given workload
         """

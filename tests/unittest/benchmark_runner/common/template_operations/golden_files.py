@@ -22,7 +22,7 @@ class GoldenFiles:
         environment_variables.environment_variables_dict['pin_node2'] = 'pin-node-2'
         environment_variables.environment_variables_dict['prom_token_override'] = 'fake_prom_token'
         environment_variables.environment_variables_dict['uuid'] = 'deadbeef-0123-3210-cdef-01234567890abcdef'
-        environment_variables.environment_variables_dict['trunc_uuid'] = 'deadbeef'
+        environment_variables.environment_variables_dict['trunc_uuid'] = environment_variables.environment_variables_dict['uuid'].split('-')[0]
 
     def __clear_directory_yaml(self, dir):
         if os.path.isdir(dir):
@@ -57,12 +57,12 @@ class GoldenFiles:
             for run_type in environment_variables.run_types_list:
                 environment_variables.environment_variables_dict['run_type'] = run_type
                 for workload in environment_variables.workloads_list:
-                    environment_variables.environment_variables_dict['namespace'] = environment_variables.workload_namespace(workload)
-                    t = TemplateOperations(workload)
-                    srcdir = t.get_current_run_path()
+                    environment_variables.environment_variables_dict['namespace'] = environment_variables.get_workload_namespace(workload)
+                    template = TemplateOperations(workload)
+                    srcdir = template.get_current_run_path()
                     self.__clear_directory_yaml(srcdir)
                     destdir = self.__generate_yaml_dir_name(run_type=run_type, workload=workload, ocs_pvc=ocs_pvc, dest=dest)
-                    t.generate_yamls()
+                    template.generate_yamls()
                     self.__copy_yaml_files_to_dir(src=srcdir, dest=destdir)
                     self.__clear_directory_yaml(srcdir)
 

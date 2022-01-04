@@ -10,7 +10,7 @@ def test_golden_files():
     previously generated files
     """
     with TemporaryEnvironmentVariables():
-        g = GoldenFiles()
-        assert(g.compare_golden_files())
+        golden_files = GoldenFiles()
+        assert(golden_files.compare_golden_files())
 
 test_golden_files()

@@ -44,9 +44,9 @@ def main():
         if run_type not in environment_variables.run_types_list:
             logger.info(f'Enter valid run type {environment_variables.run_types_list}')
             raise Exception(f'Invalid run type: {run_type} \n, choose one from the list: {environment_variables.run_types_list}')
-        if environment_variables.workload_namespace(workload) == 'benchmark-operator':
+        if environment_variables.get_workload_namespace(workload) == 'benchmark-operator':
             benchmark_operator_workload = BenchmarkOperatorWorkloads()
-        elif environment_variables.workload_namespace(workload) == 'benchmark-runner':
+        elif environment_variables.get_workload_namespace(workload) == 'benchmark-runner':
             benchmark_runner_workload = Workloads()
 
     @logger_time_stamp
@@ -151,9 +151,9 @@ def main():
         install_resources()
     elif ci_status == 'pass' or ci_status == 'failed':
         update_ci_status()
-    elif environment_variables.workload_namespace(workload) == 'benchmark-operator':
+    elif environment_variables.get_workload_namespace(workload) == 'benchmark-operator':
         run_benchmark_operator_workload()
-    elif environment_variables.workload_namespace(workload) == 'benchmark-runner':
+    elif environment_variables.get_workload_namespace(workload) == 'benchmark-runner':
         run_benchmark_runner_workload()
 
 
