@@ -57,7 +57,7 @@ class GoldenFiles:
             for run_type in environment_variables.run_types_list:
                 environment_variables.environment_variables_dict['run_type'] = run_type
                 for workload in environment_variables.workloads_list:
-                    environment_variables.environment_variables_dict['namespace'] = environment_variables.workload_type(workload).replace('_', '-')
+                    environment_variables.environment_variables_dict['namespace'] = environment_variables.workload_namespace(workload)
                     t = TemplateOperations(workload)
                     srcdir = t.get_current_run_path()
                     self.__clear_directory_yaml(srcdir)

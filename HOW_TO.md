@@ -3,9 +3,8 @@
 _**Table of Contents**_
 
 <!-- TOC -->
-**Table of Contents**
-
 - [Benchmark-runner: How to?](#benchmark-runner-how-to)
+    - [Add any new Python code](#add-any-new-python-code)
     - [Add new workload, modify parameters to workload, or change parameters for any CI job](#add-new-workload-modify-parameters-to-workload-or-change-parameters-for-any-ci-job)
     - [Add new benchmark operator workload to benchmark runner](#add-new-benchmark-operator-workload-to-benchmark-runner)
     - [Add workload to grafana dashboard](#add-workload-to-grafana-dashboard)
@@ -14,6 +13,27 @@ _**Table of Contents**_
     - [Determine the version of benchmark-runner in the current container image](#determine-the-version-of-benchmark-runner-in-the-current-container-image)
 
 <!-- /TOC -->
+
+## Add any new Python code
+
+If you need to add any new Python code in any directory, you *must*
+create an `__init__.py` file in that directory if it does not already
+exist.  If you don't, that code will not be propagated into the
+release package.
+
+To check this, run the following command:
+
+```
+$ ls -l $(git ls-files |grep '\.py$' |grep -v '/__init__\.py$' | xargs dirname | sort -n |uniq | sed 's,$,/__init__.py,') 2>&1 >/dev/null
+```
+
+If there is any output, e. g.
+
+```
+ls: cannot access 'tests/unittest/benchmark_runner/common/template_operations/__init__.py': No such file or directory
+```
+
+you need to create an empty file by that name and `git add` it.
 
 ## Add new workload, modify parameters to workload, or change parameters for any CI job
 

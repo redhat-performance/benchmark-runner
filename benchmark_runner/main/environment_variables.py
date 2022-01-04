@@ -46,17 +46,17 @@ class EnvironmentVariables:
                                                          'hammerdb_pod_mssql', 'hammerdb_vm_mssql', 'hammerdb_kata_mssql',
                                                          'vdbench_pod', 'vdbench_kata']
         # benchmark-operator workload types
-        self._environment_variables_dict['workload_types'] = {
-            'stressng': 'benchmark_operator',
-            'hammerdb': 'benchmark_operator',
-            'uperf': 'benchmark_operator',
-            'vdbench': 'benchmark_runner',
+        self._environment_variables_dict['workload_namespaces'] = {
+            'stressng': 'benchmark-operator',
+            'hammerdb': 'benchmark-operator',
+            'uperf': 'benchmark-operator',
+            'vdbench': 'benchmark-runner',
             }
         
         # Choose default namespace
         base_workload = self._environment_variables_dict['workload'].split('_')[0]
-        if base_workload in self._environment_variables_dict['workload_types']:
-            default_namespace = self._environment_variables_dict['workload_types'][base_workload].replace('_', '-')
+        if base_workload in self._environment_variables_dict['workload_namespaces']:
+            default_namespace = self._environment_variables_dict['workload_namespaces'][base_workload]
             self._environment_variables_dict['namespace'] = os.environ.get('NAMESPACE', default_namespace)
         else:
             # TBD if this is not set
@@ -225,12 +225,12 @@ class EnvironmentVariables:
         """
         self._environment_variables_dict = value
 
-    def workload_type(self, workload: str):
+    def workload_namespace(self, workload: str):
         """
-        Return the workload type for a given workload
+        Return the workload namespace for a given workload
         """
-        if workload in self._environment_variables_dict['workloads'] and workload.split('_')[0] in self._environment_variables_dict['workload_types']:
-            return self._environment_variables_dict['workload_types'][workload.split('_')[0]]
+        if workload in self._environment_variables_dict['workloads'] and workload.split('_')[0] in self._environment_variables_dict['workload_namespaces']:
+            return self._environment_variables_dict['workload_namespaces'][workload.split('_')[0]]
         else:
             return None
 
