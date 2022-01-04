@@ -52,19 +52,16 @@ class EnvironmentVariables:
             'uperf': 'benchmark_operator',
             'vdbench': 'benchmark_runner',
             }
-        # benchmark-operator workload paths
-        self._environment_variables_dict['workload_type_paths'] = {
-            'benchmark_operator': os.path.join('benchmark_runner', 'benchmark_operator', 'workload_flavors'),
-            'benchmark_runner':  os.path.join('benchmark_runner', 'workloads', 'workload_flavors'),
-            }
         
-        # benchmark-operator workloads
-        self._environment_variables_dict['benchmark_operator_workloads'] = ['stressng', 'uperf', 'hammerdb']
-        # benchmark-runner workloads - customs
-        self._environment_variables_dict['benchmark_runner_workloads'] = ['vdbench']
         # Choose default namespace
-        default_namespace = 'benchmark-runner' if self._environment_variables_dict['workload'].split('_')[0] in list(self._environment_variables_dict['benchmark_runner_workloads']) else 'benchmark-operator'
-        self._environment_variables_dict['namespace'] = os.environ.get('NAMESPACE', default_namespace)
+        base_workload = self._environment_variables_dict['workload'].split('_')[0]
+        if base_workload in self._environment_variables_dict['workload_types']:
+            default_namespace = self._environment_variables_dict['workload_types'][base_workload].replace('_', '-')
+            self._environment_variables_dict['namespace'] = os.environ.get('NAMESPACE', default_namespace)
+        else:
+            # TBD if this is not set
+            self._environment_variables_dict['namespace'] = 'benchmark-operator'
+
         # run workload with ocs pvc True/False. True=OCS, False=Ephemeral
         self._environment_variables_dict['ocs_pvc'] = os.environ.get('OCS_PVC', 'True')
         # Workloads that required OCS
@@ -234,16 +231,6 @@ class EnvironmentVariables:
         """
         if workload in self._environment_variables_dict['workloads'] and workload.split('_')[0] in self._environment_variables_dict['workload_types']:
             return self._environment_variables_dict['workload_types'][workload.split('_')[0]]
-        else:
-            return None
-
-    def workload_path(self, workload:str):
-        """
-        Return the workload type for a given workload
-        """
-        workload_type = self.workload_type(workload)
-        if workload_type and workload_type in self._environment_variables_dict['workload_type_paths']:
-            return self._environment_variables_dict['workload_type_paths'][workload_type]
         else:
             return None
 

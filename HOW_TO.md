@@ -19,7 +19,7 @@ _**Table of Contents**_
 
 The unit tests include a check to ensure that the generated .yaml
 files do not inadvertently change.  This check, located in
-`tests/unittest/benchmark_runner/common/workload_flavors/test_golden_files.py`,
+`tests/unittest/benchmark_runner/common/templates/test_golden_files.py`,
 compares these files against expected files found in
 `tests/unittest/benchmark_runner/common/workloads_flavors/golden_files` and fails if
 any golden files have been added, modified, or removed.
@@ -27,8 +27,8 @@ any golden files have been added, modified, or removed.
 _*If you add or modify any YAML files, you must run the following commands:*_
 
 ```
-PYTHONPATH=. python3 tests/unittest/benchmark_runner/common/workload_flavors/generate_golden_files.py
-git add tests/unittest/benchmark_runner/common/workload_flavors/golden_files
+PYTHONPATH=. python3 tests/unittest/benchmark_runner/common/templates/generate_golden_files.py
+git add tests/unittest/benchmark_runner/common/templates/golden_files
 git commit -m"Update golden files"
 ```
 
@@ -41,7 +41,7 @@ only a few seconds to run.
 
 ```
 $ PYTHONPATH=. python3 -m pytest -v
-tests/unittest/benchmark_runner/common/workload_flavors/
+tests/unittest/benchmark_runner/common/templates/
 ============================== test session starts ===============================
 platform linux -- Python 3.9.5, pytest-6.2.2, py-1.10.0, pluggy-0.13.1 -- /usr/bin/python3
 cachedir: .pytest_cache
@@ -49,7 +49,7 @@ rootdir: /home/rkrawitz/sandbox/benchmark-runner
 plugins: typeguard-2.10.0, venv-0.2
 collected 1 item
 
-tests/unittest/benchmark_runner/common/workload_flavors/test_golden_files.py::test_golden_files PASSED [100%]
+tests/unittest/benchmark_runner/common/templates/test_golden_files.py::test_golden_files PASSED [100%]
 
 =============================== 1 passed in 1.85s ================================
 ```
@@ -87,9 +87,9 @@ any template .yaml files.
 5. Create new `workload method` for Pod and VM under `Workloads` section in [benchmark_operator_workloads.py](benchmark_runner/benchmark_operator/benchmark_operator_workloads.py).
    It can be duplicated from existing workload method: `def stressng_pod` or `def stressng_vm` and customized workload run steps accordingly
 6. Add workload method name (workload_pod/workload_vm) to environment_variables_dict['workloads'] in [environment_variables.py](benchmark_runner/main/environment_variables.py)
-7. Create workload folder in the [templates](benchmark_runner/benchmark_operator/workload_flavors/templates) directory.  Create the following files in that directory:
-   1. workload_data_template for configuration parameters, e. g. [stressng_data_template.yaml](benchmark_runner/benchmark_operator/workload_flavors/templates/stressng/stressng_data_template.yaml).  The data template is structured as discussed [below](#data-template).
-   2. workload pod and VM custom resource template inside [internal_data](benchmark_runner/benchmark_operator/workload_flavors/templates/stressng/internal_data)
+7. Create workload folder in the [templates](benchmark_runner/templates) directory.  Create the following files in that directory:
+   1. workload_data_template for configuration parameters, e. g. [stressng_data_template.yaml](benchmark_runner/templates/stressng/stressng_data_template.yaml).  The data template is structured as discussed [below](#data-template).
+   2. workload pod and VM custom resource template inside [internal_data](benchmark_runner/templates/stressng/internal_data)
 8. Add workload folder path in [MANIFEST.in](MANIFEST.in), add 2 paths: the workload path to 'workload_data_template.yaml' and path to 'internal_data' Pod and VM template yaml files
 9. Add tests for all new methods you write under `tests/integration`.
 10. Update the golden unit test files as described [above](#add-new-workload-modify-parameters-to-workload-or-change-parameters-for-any-ci-job)

@@ -8,7 +8,7 @@ from typeguard import typechecked
 
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 from benchmark_runner.common.oc.oc import OC
-from benchmark_runner.common.workload_flavors.template_operations import TemplateOperations
+from benchmark_runner.common.template_operations.template_operations import TemplateOperations
 from benchmark_runner.common.elasticsearch.es_operations import ESOperations
 from benchmark_runner.common.ssh.ssh import SSH
 from benchmark_runner.benchmark_operator.benchmark_operator_exceptions import OCSNonInstalled, SystemMetricsRequiredElasticSearch
@@ -56,7 +56,7 @@ class BenchmarkOperatorWorkloadsOperations:
                                                 es_user=self._es_user,
                                                 es_password=self._es_password,
                                                 timeout=self._timeout)
-        # Generate workload_flavors class
+        # Generate template class
         self._template = TemplateOperations(workload=self._workload)
         # set oc login
         self._oc = self.set_login(kubeadmin_password=self._kubeadmin_password)

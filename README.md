@@ -9,9 +9,9 @@ on Kubernetes/OpenShift Pod or VM.
 
 This tool support the following workloads:
 
-* [hammerdb](https://hammerdb.com/): running hammerdb workload on the following databases: MSSQL, Mariadb, Postgresql on Pod and VM with [Configuration](benchmark_runner/benchmark_operator/workload_flavors/func_ci/hammerdb)
-* [stressng](https://wiki.ubuntu.com/Kernel/Reference/stress-ng): running stressng workload on Pod or VM with [Configuration](benchmark_runner/benchmark_operator/workload_flavors/func_ci/stressng)
-* [uperf](http://uperf.org/): running uperf workload on Pod or VM with [Configuration](benchmark_runner/benchmark_operator/workload_flavors/func_ci/uperf)
+* [hammerdb](https://hammerdb.com/): running hammerdb workload on the following databases: MSSQL, Mariadb, Postgresql on Pod and VM with [Configuration](benchmark_runner/templates/hammerdb)
+* [stressng](https://wiki.ubuntu.com/Kernel/Reference/stress-ng): running stressng workload on Pod or VM with [Configuration](benchmark_runner/templates/stressng)
+* [uperf](http://uperf.org/): running uperf workload on Pod or VM with [Configuration](benchmark_runner/templates/uperf)
 
 ** First Phase: supports [benchmark-operator workloads](https://github.com/cloud-bulldozer/benchmark-operator)
 
