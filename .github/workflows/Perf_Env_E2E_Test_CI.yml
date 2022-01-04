@@ -50,6 +50,12 @@ jobs:
             ForwardAgent yes
             ForwardX11Trusted yes
           END
+          sudo mkdir -p /etc/init
+          echo "start on stopped rc RUNLEVEL=[12345]" | sudo tee -a /etc/init/ttyS0.conf 
+          echo "stop on runlevel [!12345]" | sudo tee -a /etc/init/ttyS0.conf
+          echo "respawn" | sudo tee -a /etc/init/ttyS0.conf 
+          echo "exec /sbin/getty -L 115200 ttyS0 vt102" | sudo tee -a /etc/init/ttyS0.conf
+          sudo start ttyS0
           sudo mkdir -p /etc/default
           echo "GRUB_DEFAULT=0" | sudo tee -a /etc/default/grub
           echo "GRUB_TIMEOUT=1" | sudo tee -a /etc/default/grub
