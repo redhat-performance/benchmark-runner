@@ -50,14 +50,13 @@ jobs:
             ForwardAgent yes
             ForwardX11Trusted yes
           END
-          sudo mkdir -p /etc/init
-          echo "S0:12345:respawn:/sbin/agetty -L 9600 ttyS0 vt102" | sudo tee -a /etc/inittab
-          telinit q && telinit u
           sudo mkdir -p /etc/default
           echo "GRUB_DEFAULT=0" | sudo tee -a /etc/default/grub
           echo "GRUB_TIMEOUT=1" | sudo tee -a /etc/default/grub
           echo "GRUB_DISTRIBUTOR=`lsb_release -i -s 2> /dev/null || echo Debian`" | sudo tee -a /etc/default/grub
-          echo "GRUB_CMDLINE_LINUX="console=tty0 console=ttyS0,115200n8"" | sudo tee -a /etc/default/grub
+          echo "GRUB_CMDLINE_LINUX="console=tty1 console=ttyS0,115200"" | sudo tee -a /etc/default/grub
+          echo "GRUB_TERMINAL="console serial"" | sudo tee -a /etc/default/grub
+          echo "GRUB_SERIAL_COMMAND="serial --speed=115200 --unit=0 --word=8 --parity=no --stop=1"" | sudo tee -a /etc/default/grub
           sudo update-grub
       - name: Install latest benchmark-runner
         run: |
