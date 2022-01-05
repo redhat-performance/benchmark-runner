@@ -8,7 +8,7 @@ from typeguard import typechecked
 
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 from benchmark_runner.common.oc.oc import OC
-from benchmark_runner.benchmark_operator.workload_flavors.benchmark_operator_template_operations import BenchmarkOperatorTemplateOperations
+from benchmark_runner.common.template_operations.template_operations import TemplateOperations
 from benchmark_runner.common.elasticsearch.es_operations import ESOperations
 from benchmark_runner.common.ssh.ssh import SSH
 from benchmark_runner.benchmark_operator.benchmark_operator_exceptions import OCSNonInstalled, SystemMetricsRequiredElasticSearch
@@ -56,8 +56,8 @@ class BenchmarkOperatorWorkloadsOperations:
                                                 es_user=self._es_user,
                                                 es_password=self._es_password,
                                                 timeout=self._timeout)
-        # Generate workload_flavors class
-        self._template = BenchmarkOperatorTemplateOperations()
+        # Generate template class
+        self._template = TemplateOperations(workload=self._workload)
         # set oc login
         self._oc = self.set_login(kubeadmin_password=self._kubeadmin_password)
         # PrometheusSnapshot
@@ -70,9 +70,8 @@ class BenchmarkOperatorWorkloadsOperations:
         :param kubeadmin_password:
         :return:
         """
-        if kubeadmin_password:
-            self._oc = OC(kubeadmin_password=kubeadmin_password)
-            self._oc.login()
+        self._oc = OC(kubeadmin_password=kubeadmin_password)
+        self._oc.login()
         return self._oc
 
     def __check_elasticsearch_exist_for_system_metrics(self):
@@ -329,7 +328,8 @@ class BenchmarkOperatorWorkloadsOperations:
         :return: run artifacts url
         """
         self.__create_pod_log(label='benchmark-controller-manager')
-        self.__create_pod_log(label='system-metrics')
+        if environment_variables.environment_variables_dict['system_metrics'] == 'True':
+            self.__create_pod_log(label='system-metrics')
         # for vm call to create_vm_log
         if pod:
             # workload that contains 2 pods
@@ -442,7 +442,7 @@ class BenchmarkOperatorWorkloadsOperations:
         # make deploy benchmark controller manager
         self.make_deploy_benchmark_controller_manager(runner_path=environment_variables.environment_variables_dict['runner_path'])
         self.ocs_pvc_verification()
-        self._template.generate_yamls(workload=self._workload)
+        self._template.generate_yamls()
         self.start_prometheus()
 
     def finalize_workload(self):

@@ -5,8 +5,8 @@ import os
 import shutil
 import tempfile
 from benchmark_runner.main.environment_variables import environment_variables
-from benchmark_runner.benchmark_operator.workload_flavors.benchmark_operator_template_operations import BenchmarkOperatorTemplateOperations
-from tests.unittest.benchmark_runner.regression.golden_files_exceptions import GoldenFileCheckFailed
+from benchmark_runner.common.template_operations.template_operations import TemplateOperations
+from tests.unittest.benchmark_runner.common.template_operations.golden_files_exceptions import GoldenFileCheckFailed
 
 
 class GoldenFiles:
@@ -21,11 +21,8 @@ class GoldenFiles:
         environment_variables.environment_variables_dict['pin_node1'] = 'pin-node-1'
         environment_variables.environment_variables_dict['pin_node2'] = 'pin-node-2'
         environment_variables.environment_variables_dict['prom_token_override'] = 'fake_prom_token'
-        environment_variables.environment_variables_dict['workloads'] = ['stressng_pod', 'stressng_vm', 'stressng_kata',
-                                                         'uperf_pod', 'uperf_vm', 'uperf_kata',
-                                                         'hammerdb_pod_mariadb', 'hammerdb_vm_mariadb', 'hammerdb_kata_mariadb',
-                                                         'hammerdb_pod_postgres', 'hammerdb_vm_postgres', 'hammerdb_kata_postgres',
-                                                         'hammerdb_pod_mssql', 'hammerdb_vm_mssql', 'hammerdb_kata_mssql']
+        environment_variables.environment_variables_dict['uuid'] = 'deadbeef-0123-3210-cdef-01234567890abcdef'
+        environment_variables.environment_variables_dict['trunc_uuid'] = environment_variables.environment_variables_dict['uuid'].split('-')[0]
 
     def __clear_directory_yaml(self, dir):
         if os.path.isdir(dir):
@@ -60,11 +57,12 @@ class GoldenFiles:
             for run_type in environment_variables.run_types_list:
                 environment_variables.environment_variables_dict['run_type'] = run_type
                 for workload in environment_variables.workloads_list:
-                    t = BenchmarkOperatorTemplateOperations()
-                    srcdir = t.get_current_run_path()
+                    environment_variables.environment_variables_dict['namespace'] = environment_variables.get_workload_namespace(workload)
+                    template = TemplateOperations(workload)
+                    srcdir = template.get_current_run_path()
                     self.__clear_directory_yaml(srcdir)
                     destdir = self.__generate_yaml_dir_name(run_type=run_type, workload=workload, ocs_pvc=ocs_pvc, dest=dest)
-                    t.generate_yamls(workload)
+                    template.generate_yamls()
                     self.__copy_yaml_files_to_dir(src=srcdir, dest=destdir)
                     self.__clear_directory_yaml(srcdir)
 

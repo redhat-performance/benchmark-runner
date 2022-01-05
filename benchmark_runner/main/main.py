@@ -34,8 +34,6 @@ def main():
     ci_status = environment_variables_dict.get('ci_status', '')
     install_ocp_version = environment_variables_dict.get('install_ocp_version', '')
     install_ocp_resources = environment_variables_dict.get('install_ocp_resources', '')
-    benchmark_runner_workloads = list(environment_variables_dict.get('benchmark_runner_workloads', ''))
-    benchmark_operator_workloads = list(environment_variables_dict.get('benchmark_operator_workloads', ''))
     run_type = environment_variables_dict.get('run_type', '')
     # workload name validation
     if workload and not ci_status:
@@ -46,9 +44,9 @@ def main():
         if run_type not in environment_variables.run_types_list:
             logger.info(f'Enter valid run type {environment_variables.run_types_list}')
             raise Exception(f'Invalid run type: {run_type} \n, choose one from the list: {environment_variables.run_types_list}')
-        if workload.split('_')[0] in benchmark_operator_workloads:
+        if environment_variables.get_workload_namespace(workload) == 'benchmark-operator':
             benchmark_operator_workload = BenchmarkOperatorWorkloads()
-        elif workload.split('_')[0] in benchmark_runner_workloads:
+        elif environment_variables.get_workload_namespace(workload) == 'benchmark-runner':
             benchmark_runner_workload = Workloads()
 
     @logger_time_stamp
@@ -153,9 +151,9 @@ def main():
         install_resources()
     elif ci_status == 'pass' or ci_status == 'failed':
         update_ci_status()
-    elif workload.split('_')[0] in benchmark_operator_workloads:
+    elif environment_variables.get_workload_namespace(workload) == 'benchmark-operator':
         run_benchmark_operator_workload()
-    elif workload.split('_')[0] in benchmark_runner_workloads:
+    elif environment_variables.get_workload_namespace(workload) == 'benchmark-runner':
         run_benchmark_runner_workload()
 
 

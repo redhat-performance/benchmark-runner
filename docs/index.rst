@@ -11,13 +11,13 @@ This tool support the following workloads:
 -  `hammerdb <https://hammerdb.com/>`__: running hammerdb workload on
    the following databases: MSSQL, Mariadb, Postgresql on Pod and VM
    with
-   `Configuration <benchmark_runner/benchmark_operator/workload_flavors/func_ci/hammerdb>`__
+   `Configuration <benchmark_runner/common/templates/hammerdb>`__
 -  `stressng <https://wiki.ubuntu.com/Kernel/Reference/stress-ng>`__:
    running stressng workload on Pod or VM with
-   `Configuration <benchmark_runner/benchmark_operator/workload_flavors/func_ci/stressng>`__
+   `Configuration <benchmark_runner/common/templates/stressng>`__
 -  `uperf <http://uperf.org/>`__: running uperf workload on Pod or VM
    with
-   `Configuration <benchmark_runner/benchmark_operator/workload_flavors/func_ci/uperf>`__
+   `Configuration <benchmark_runner/common/templates/uperf>`__
 
 \*\* First Phase: supports `benchmark-operator
 workloads <https://github.com/cloud-bulldozer/benchmark-operator>`__

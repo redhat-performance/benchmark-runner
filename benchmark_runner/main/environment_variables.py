@@ -45,13 +45,23 @@ class EnvironmentVariables:
                                                          'hammerdb_pod_postgres', 'hammerdb_vm_postgres', 'hammerdb_kata_postgres',
                                                          'hammerdb_pod_mssql', 'hammerdb_vm_mssql', 'hammerdb_kata_mssql',
                                                          'vdbench_pod', 'vdbench_kata']
-        # benchmark-operator workloads
-        self._environment_variables_dict['benchmark_operator_workloads'] = ['stressng', 'uperf', 'hammerdb']
-        # benchmark-runner workloads - customs
-        self._environment_variables_dict['benchmark_runner_workloads'] = ['vdbench']
+        # benchmark-operator workload types
+        self._environment_variables_dict['workload_namespaces'] = {
+            'stressng': 'benchmark-operator',
+            'hammerdb': 'benchmark-operator',
+            'uperf': 'benchmark-operator',
+            'vdbench': 'benchmark-runner',
+            }
+        
         # Choose default namespace
-        default_namespace = 'benchmark-runner' if self._environment_variables_dict['workload'].split('_')[0] in list(self._environment_variables_dict['benchmark_runner_workloads']) else 'benchmark-operator'
-        self._environment_variables_dict['namespace'] = os.environ.get('NAMESPACE', default_namespace)
+        base_workload = self._environment_variables_dict['workload'].split('_')[0]
+        if base_workload in self._environment_variables_dict['workload_namespaces']:
+            default_namespace = self._environment_variables_dict['workload_namespaces'][base_workload]
+            self._environment_variables_dict['namespace'] = os.environ.get('NAMESPACE', default_namespace)
+        else:
+            # TBD if this is not set
+            self._environment_variables_dict['namespace'] = 'benchmark-operator'
+
         # run workload with ocs pvc True/False. True=OCS, False=Ephemeral
         self._environment_variables_dict['ocs_pvc'] = os.environ.get('OCS_PVC', 'True')
         # Workloads that required OCS
@@ -66,6 +76,7 @@ class EnvironmentVariables:
         self._environment_variables_dict['run_types'] = ['test_ci', 'func_ci', 'perf_ci']
         # Run type test_ci/func_ci/perf_ci, default test_ci same environment as func_ci
         self._environment_variables_dict['run_type'] = os.environ.get('RUN_TYPE', 'test_ci')
+        
         # Run uuid
         self._environment_variables_dict['uuid'] = str(uuid4())
         self._environment_variables_dict['trunc_uuid'] = self._environment_variables_dict['uuid'].split('-')[0]
@@ -213,6 +224,15 @@ class EnvironmentVariables:
         This method is setter
         """
         self._environment_variables_dict = value
+
+    def get_workload_namespace(self, workload: str):
+        """
+        Return the workload namespace for a given workload
+        """
+        if workload in self._environment_variables_dict['workloads'] and workload.split('_')[0] in self._environment_variables_dict['workload_namespaces']:
+            return self._environment_variables_dict['workload_namespaces'][workload.split('_')[0]]
+        else:
+            return None
 
 
 environment_variables = EnvironmentVariables()

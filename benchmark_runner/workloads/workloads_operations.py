@@ -13,7 +13,7 @@ from benchmark_runner.main.environment_variables import environment_variables
 from benchmark_runner.common.clouds.shared.s3.s3_operations import S3Operations
 from benchmark_runner.common.prometheus.prometheus_snapshot import PrometheusSnapshot
 from benchmark_runner.common.prometheus.prometheus_snapshot_exceptions import PrometheusSnapshotError
-from benchmark_runner.workloads.workload_flavors.template_operations import TemplateOperations
+from benchmark_runner.common.template_operations.template_operations import TemplateOperations
 from benchmark_runner.common.clouds.IBM.ibm_operations import IBMOperations
 
 
@@ -52,7 +52,7 @@ class WorkloadsOperations:
         self._enable_prometheus_snapshot = self._environment_variables_dict.get('enable_prometheus_snapshot', '')
         if self._enable_prometheus_snapshot:
             self._snapshot = PrometheusSnapshot(oc=self._oc, artifacts_path=self._run_artifacts_path, verbose=True)
-        # Generate workload_flavors class
+        # Generate templates class
         self._template = TemplateOperations(workload=self._workload)
 
     @logger_time_stamp
@@ -292,7 +292,7 @@ class WorkloadsOperations:
         """
         self.delete_all()
         self.ocs_pvc_verification()
-        self._template.generate_yaml()
+        self._template.generate_yamls()
         self.start_prometheus()
         
     def finalize_workload(self):
