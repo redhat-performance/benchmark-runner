@@ -5,6 +5,7 @@ from jinja2 import Template
 from benchmark_runner.main.update_data_template_yaml_with_environment_variables import render_yaml_file
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp
 from benchmark_runner.main.environment_variables import environment_variables
+from utils import get_project_root
 
 
 class TemplateOperations:
@@ -17,7 +18,7 @@ class TemplateOperations:
     def __initialize_dependent_variables__(self):
         self.__run_type = self.__environment_variables_dict.get('run_type', '')
         self.__run_artifacts_path = self.__environment_variables_dict.get('run_artifacts_path', '')
-        self.__dir_path = os.path.dirname(os.path.realpath(os.path.join('benchmark_runner', 'templates')))
+        self.__dir_path = os.path.abspath(os.path.join(get_project_root(), 'benchmark_runner', 'templates'))
         if self.__run_type == 'test_ci':
             self.__environment_variables_dict['es_suffix'] = '-test-ci'
         else:
@@ -60,7 +61,7 @@ class TemplateOperations:
         full_workload = f'{base_workload}_{kind}'
         if not full_workload:
             return None
-        for filename in os.listdir(os.path.join(self.__dir_path, 'templates', base_workload, 'internal_data')):
+        for filename in os.listdir(os.path.join(self.__dir_path, base_workload, 'internal_data')):
             if filename.endswith(extension):
                 if filename.startswith(full_workload) and skip not in filename:
                     return os.path.splitext(filename)[0]
@@ -83,9 +84,9 @@ class TemplateOperations:
         """
         workload_template = self.__get_yaml_template_by_workload()
         workload_name = self.__get_workload_name()
-        workload_dir_path = os.path.join(self.__dir_path, 'templates', workload_name)
+        workload_dir_path = os.path.join(self.__dir_path, workload_name)
         self.__environment_variables_dict['workload_name'] = workload_name
-        common_data = yaml.load(render_yaml_file(self.__dir_path, os.path.join('templates', 'common.yaml'), self.__environment_variables_dict), Loader=yaml.FullLoader)['common_data']
+        common_data = yaml.load(render_yaml_file(self.__dir_path, 'common.yaml', self.__environment_variables_dict), Loader=yaml.FullLoader)['common_data']
         common_data = {**self.__environment_variables_dict, **common_data}
         workload_data = yaml.load(render_yaml_file(workload_dir_path, f'{workload_name}_data_template.yaml', common_data), Loader=yaml.FullLoader)
         render_data = workload_data['shared_data']
