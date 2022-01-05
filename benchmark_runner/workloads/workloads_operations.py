@@ -28,6 +28,7 @@ class WorkloadsOperations:
         self._build_version = self._environment_variables_dict.get('build_version', '')
         self._run_artifacts_path = self._environment_variables_dict.get('run_artifacts_path', '')
         self._workloads_ocs_pvc = list(self._environment_variables_dict.get('workloads_ocs_pvc', ''))
+        self._ocs_pvc = self._environment_variables_dict.get('ocs_pvc', '')
         self._kubeadmin_password = self._environment_variables_dict.get('kubeadmin_password', '')
         self._oc = OC(kubeadmin_password=self._kubeadmin_password)
         self._run_type = self._environment_variables_dict.get('run_type', '')
@@ -98,7 +99,7 @@ class WorkloadsOperations:
         :return:
         """
         workload_name = self._workload.split('_')
-        if workload_name[0] in self._workloads_ocs_pvc:
+        if self._ocs_pvc == 'True' and workload_name[0] in self._workloads_ocs_pvc:
             if not self._oc.is_ocs_installed():
                 raise OCSNonInstalled()
 

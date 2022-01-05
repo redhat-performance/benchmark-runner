@@ -1,5 +1,6 @@
 shared_data:
   pin_node: {{ pin_node1 }}
+  ocs_pvc: {{ ocs_pvc }}
   uuid: {{ uuid }}
 run_type_data:
   perf_ci:
