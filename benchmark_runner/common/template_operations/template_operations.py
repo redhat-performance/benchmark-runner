@@ -5,7 +5,6 @@ from jinja2 import Template
 from benchmark_runner.main.update_data_template_yaml_with_environment_variables import render_yaml_file
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp
 from benchmark_runner.main.environment_variables import environment_variables
-from utils import get_project_root
 
 
 class TemplateOperations:
@@ -18,7 +17,7 @@ class TemplateOperations:
     def __initialize_dependent_variables__(self):
         self.__run_type = self.__environment_variables_dict.get('run_type', '')
         self.__run_artifacts_path = self.__environment_variables_dict.get('run_artifacts_path', '')
-        self.__dir_path = os.path.abspath(os.path.join(get_project_root(), 'benchmark_runner', 'templates'))
+        self.__dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'templates'))
         if self.__run_type == 'test_ci':
             self.__environment_variables_dict['es_suffix'] = '-test-ci'
         else:

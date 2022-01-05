@@ -16,7 +16,7 @@ _**Table of Contents**_
 
 ## Add any new Python code
 
-If you need to add any new Python code in any directory, you *must*
+If you need to add any new Python  code in any directory, you *must*
 create an `__init__.py` file in that directory if it does not already
 exist.  If you don't, that code will not be propagated into the
 release package.
@@ -107,9 +107,9 @@ any template .yaml files.
 5. Create new `workload method` for Pod and VM under `Workloads` section in [benchmark_operator_workloads.py](benchmark_runner/benchmark_operator/benchmark_operator_workloads.py).
    It can be duplicated from existing workload method: `def stressng_pod` or `def stressng_vm` and customized workload run steps accordingly
 6. Add workload method name (workload_pod/workload_vm) to environment_variables_dict['workloads'] in [environment_variables.py](benchmark_runner/main/environment_variables.py)
-7. Create workload folder in the [templates](benchmark_runner/templates) directory.  Create the following files in that directory:
-   1. workload_data_template for configuration parameters, e. g. [stressng_data_template.yaml](benchmark_runner/templates/stressng/stressng_data_template.yaml).  The data template is structured as discussed [below](#data-template).
-   2. workload pod and VM custom resource template inside [internal_data](benchmark_runner/templates/stressng/internal_data)
+7. Create workload folder in the [templates](benchmark_runner/common/template_operations/templates) directory.  Create the following files in that directory:
+   1. workload_data_template for configuration parameters, e. g. [stressng_data_template.yaml](benchmark_runner/common/template_operations/templates/stressng/stressng_data_template.yaml).  The data template is structured as discussed [below](#data-template).
+   2. workload pod and VM custom resource template inside [internal_data](benchmark_runner/common/template_operations/templates/stressng/internal_data)
 8. Add workload folder path in [MANIFEST.in](MANIFEST.in), add 2 paths: the workload path to 'workload_data_template.yaml' and path to 'internal_data' Pod and VM template yaml files
 9. Add tests for all new methods you write under `tests/integration`.
 10. Update the golden unit test files as described [above](#add-new-workload-modify-parameters-to-workload-or-change-parameters-for-any-ci-job)
