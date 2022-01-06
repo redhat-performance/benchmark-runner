@@ -31,6 +31,7 @@ class BenchmarkOperatorWorkloadsOperations:
         self._runner_version = self._environment_variables_dict.get('build_version', '')
         self._run_type = self._environment_variables_dict.get('run_type', '')
         self._workloads_ocs_pvc = list(self._environment_variables_dict.get('workloads_ocs_pvc', ''))
+        self._ocs_pvc = self._environment_variables_dict.get('ocs_pvc', '')
         self._system_metrics = self._environment_variables_dict.get('system_metrics', '')
         self._elasticsearch = self._environment_variables_dict.get('elasticsearch', '')
         self._run_artifacts = self._environment_variables_dict.get('run_artifacts', '')
@@ -415,7 +416,7 @@ class BenchmarkOperatorWorkloadsOperations:
         :return:
         """
         workload_name = self._workload.split('_')
-        if workload_name[0] in self._workloads_ocs_pvc:
+        if self._ocs_pvc == 'True' and workload_name[0] in self._workloads_ocs_pvc:
             if not self._oc.is_ocs_installed():
                 raise OCSNonInstalled()
 

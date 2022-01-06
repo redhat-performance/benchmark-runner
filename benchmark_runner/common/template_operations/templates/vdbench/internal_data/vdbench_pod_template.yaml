@@ -2,6 +2,7 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: {{ namespace }}
+{%- if ocs_pvc == True %}
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1
@@ -15,6 +16,7 @@ spec:
   resources:
     requests:
       storage: {{ storage }}
+{%- endif %}
 ---
 kind: Pod
 apiVersion: v1
@@ -30,8 +32,10 @@ spec:
   selector:
     matchLabels:
       app: vdbench
+  {%- if pin_node != '' %}
   nodeSelector:
     kubernetes.io/hostname: {{ pin_node1 }}
+  {%- endif %}
   {%- if kind == 'kata' %}
   runtimeClassName: kata
   {%- endif %}
@@ -40,9 +44,11 @@ spec:
       namespace: {{ namespace }}
       image: quay.io/bbenshab/vdpod
       imagePullPolicy: "IfNotPresent"
+      {%- if ocs_pvc == True %}
       volumeMounts:
         - name: vdbench-pvc
           mountPath: "/workload"
+      {%- endif %}
       env:
         - name: BLOCK_SIZES
           value: "{{ BLOCK_SIZES }}"
@@ -90,11 +96,13 @@ spec:
       storageClassName: ocs-storagecluster-ceph-rbd
     source:
       blank: {}
+  {%- if ocs_pvc == True %}
   volumes:
     - name: vdbench-pvc
       namespace: {{ namespace }}
       persistentVolumeClaim:
         claimName: vdbench-pvc
+  {%- endif %}
   resources:
     requests:
       cpu: {{ requests_cpu }}

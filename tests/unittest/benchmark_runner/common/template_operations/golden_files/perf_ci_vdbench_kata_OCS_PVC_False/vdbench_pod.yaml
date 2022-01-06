@@ -3,19 +3,6 @@ kind: Namespace
 metadata:
   name: benchmark-runner
 ---
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-  name: vdbench-pvc
-  namespace: benchmark-runner
-spec:
-  accessModes:
-    - ReadWriteOnce
-  storageClassName: ocs-storagecluster-ceph-rbd
-  resources:
-    requests:
-      storage: 10Gi
----
 kind: Pod
 apiVersion: v1
 metadata:
@@ -38,9 +25,6 @@ spec:
       namespace: benchmark-runner
       image: quay.io/bbenshab/vdpod
       imagePullPolicy: "IfNotPresent"
-      volumeMounts:
-        - name: vdbench-pvc
-          mountPath: "/workload"
       env:
         - name: BLOCK_SIZES
           value: "64,oltp1"
@@ -88,11 +72,6 @@ spec:
       storageClassName: ocs-storagecluster-ceph-rbd
     source:
       blank: {}
-  volumes:
-    - name: vdbench-pvc
-      namespace: benchmark-runner
-      persistentVolumeClaim:
-        claimName: vdbench-pvc
   resources:
     requests:
       cpu: 10m
