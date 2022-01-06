@@ -1,17 +1,16 @@
 # Add yamls files to benchmark-runner package
 
 # common templates
-include benchmark_runner/common/template_operation/templates/common.yaml
+include benchmark_runner/common/template_operations/templates/common.yaml
 
 # benchmark operator templates
-include benchmark_runner/common/template_operation/templates
-include benchmark_runner/common/template_operation/templates/hammerdb/*.yaml
-include benchmark_runner/common/template_operation/templates/hammerdb/internal_data/*.yaml
-include benchmark_runner/common/template_operation/templates/stressng/*.yaml
-include benchmark_runner/common/template_operation/templates/stressng/internal_data/*.yaml
-include benchmark_runner/common/template_operation/templates/uperf/*.yaml
-include benchmark_runner/common/template_operation/templates/uperf/internal_data/*.yaml
-
+include benchmark_runner/common/template_operations/templates
+include benchmark_runner/common/template_operations/templates/hammerdb/*.yaml
+include benchmark_runner/common/template_operations/templates/hammerdb/internal_data/*.yaml
+include benchmark_runner/common/template_operations/templates/stressng/*.yaml
+include benchmark_runner/common/template_operations/templates/stressng/internal_data/*.yaml
+include benchmark_runner/common/template_operations/templates/uperf/*.yaml
+include benchmark_runner/common/template_operations/templates/uperf/internal_data/*.yaml
 
 # benchmark runner templates (custom workloads)
 include ibenchmark_runner/common/template_operation/templates/vdbench/*.yaml
