@@ -83,40 +83,43 @@ class TemplateOperations:
         """
         workload_template = self.__get_yaml_template_by_workload()
         workload_name = self.__get_workload_name()
+        workload_extra_name = self.__get_workload_extra()
         workload_dir_path = os.path.join(self.__dir_path, workload_name)
+        kind = self.__get_workload_kind()
         self.__environment_variables_dict['workload_name'] = workload_name
+        self.__environment_variables_dict['workload_extra_name'] = workload_extra_name
+        self.__environment_variables_dict['kind'] = kind
         common_data = yaml.load(render_yaml_file(self.__dir_path, 'common.yaml', self.__environment_variables_dict), Loader=yaml.FullLoader)['common_data']
         common_data = {**self.__environment_variables_dict, **common_data}
         workload_data = yaml.load(render_yaml_file(workload_dir_path, f'{workload_name}_data_template.yaml', common_data), Loader=yaml.FullLoader)
-        render_data = workload_data['shared_data']
-        kind = self.__get_workload_kind()
+        extra_files = workload_data.get('extra_files')
+        template_data = workload_data.get('template_data')
+        render_data = template_data.get('shared')
         render_data['kind'] = kind
         render_data['workload_name'] = workload_name
-        kind_data = self.__get_sub_dict(workload_data, 'kind_data', kind)
-        run_type_data = self.__get_sub_dict(workload_data, 'run_type_data', self.__run_type)
-        kind_runtype_data = self.__get_sub_dict(kind_data, 'run_type_data', self.__run_type)
+        render_data['workload_extra_name'] = workload_extra_name
+        kind_data = self.__get_sub_dict(template_data, 'kind', kind)
+        run_type_data = self.__get_sub_dict(template_data, 'run_type', self.__run_type)
+        kind_runtype_data = self.__get_sub_dict(kind_data, 'run_type', self.__run_type)
+        extra_data = self.__get_sub_dict(template_data, 'extra', workload_extra_name)
+        extra_kind_data = self.__get_sub_dict(extra_data, 'kind', kind)
+        extra_runtype_data = self.__get_sub_dict(extra_data, 'run_type', self.__run_type)
+        extra_kind_runtype_data = self.__get_sub_dict(extra_kind_data, 'run_type', self.__run_type)
 
         render_data = {**common_data, **render_data,
-                       **kind_data, **run_type_data, **kind_runtype_data}
-        workload_file_suffix = ''
+                       **kind_data, **run_type_data, **kind_runtype_data,
+                       **extra_data, **extra_kind_data, **extra_runtype_data, **extra_kind_runtype_data}
+        if workload_extra_name:
+            workload_file_suffix = f'_{workload_extra_name}'
+        else:
+            workload_file_suffix = ''
 
         answer = {}
-        if workload_name == 'hammerdb':
-            database = self.__get_workload_extra()
-            database_data = self.__get_sub_dict(workload_data, 'database_data', database)
-
-            database_kind_data = self.__get_sub_dict(database_data, 'kind_data', kind)
-            database_runtype_data = self.__get_sub_dict(database_data, 'run_type_data', self.__run_type)
-            render_data = {**render_data, **database_data, **database_kind_data, **database_runtype_data}
-            workload_file_suffix = f'_{database}'
-
-            # Jinja render database pod yaml
-            if kind == 'pod' or kind == 'kata':
-                # Override any more generic data
-                database_name = f'{database}_template.yaml'
-                with open(os.path.join(workload_dir_path, 'internal_data', database_name)) as f:
-                    database_template = Template(f.read())
-                answer[f'{database}.yaml'] = database_template.render(render_data)
+        if extra_files:
+            for extra_file in extra_files:
+                with open(os.path.join(workload_dir_path, 'internal_data', extra_file)) as f:
+                    template = Template(f.read())
+                answer[f'{extra_file.replace("_template", "")}'] = template.render(render_data)
 
         # Jinja render workload yaml
         with open(os.path.join(workload_dir_path, 'internal_data', f'{workload_template}.yaml')) as f:
