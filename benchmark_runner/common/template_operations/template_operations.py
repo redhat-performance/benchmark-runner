@@ -2,7 +2,7 @@
 import os
 import yaml
 from jinja2 import Template
-from benchmark_runner.main.update_data_template_yaml_with_environment_variables import render_yaml_file
+from benchmark_runner.common.template_operations.update_data_template_yaml_with_environment_variables import render_yaml_file
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp
 from benchmark_runner.main.environment_variables import environment_variables
 
