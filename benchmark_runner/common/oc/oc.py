@@ -508,7 +508,7 @@ class OC(SSH):
         :return:
         """
         for resource in resources:
-            return self.run(f'oc delete -n {namespace} {resource} --all ')
+            return self.run(f'oc delete -n {namespace} {resource} --all')
 
     @typechecked
     @logger_time_stamp
