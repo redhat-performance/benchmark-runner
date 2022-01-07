@@ -426,9 +426,10 @@ class BenchmarkOperatorWorkloadsOperations:
         This method delete all pod in namespace
         :return:
         """
-        self._oc.delete_all_resources()
+        # make undeploy benchmark controller manager if exist
+        self.make_undeploy_benchmark_controller_manager_if_exist(runner_path=environment_variables.environment_variables_dict['runner_path'])
         if 'hammerdb' in self._workload:
-            self._oc.delete_all_resources(namespace=f"{self._workload.split('_')[2]}-db")
+            self._oc.delete_all_resources(resources=['deployments'], namespace=f"{self._workload.split('_')[2]}-db")
 
     def initialize_workload(self):
         """
@@ -438,8 +439,6 @@ class BenchmarkOperatorWorkloadsOperations:
         self.delete_all()
         # check that there is elasticsearch when system metric is True
         self.__check_elasticsearch_exist_for_system_metrics()
-        # make undeploy benchmark controller manager if exist
-        self.make_undeploy_benchmark_controller_manager_if_exist(runner_path=environment_variables.environment_variables_dict['runner_path'])
         # make deploy benchmark controller manager
         self.make_deploy_benchmark_controller_manager(runner_path=environment_variables.environment_variables_dict['runner_path'])
         self.ocs_pvc_verification()
@@ -453,6 +452,4 @@ class BenchmarkOperatorWorkloadsOperations:
         """
         self.end_prometheus()
         self.upload_run_artifacts_to_s3()
-        # make undeploy benchmark controller manager
-        self.make_undeploy_benchmark_controller_manager(runner_path=environment_variables.environment_variables_dict['runner_path'])
         self.delete_all()
