@@ -59,10 +59,10 @@ class WorkloadsOperations:
     @logger_time_stamp
     def delete_all(self):
         """
-        This method delete all pod in namespace
+        This method delete all resources in namespace
         :return:
         """
-        self._oc.delete_all_resources()
+        self._oc.delete_all_resources(resources=['pods', 'pvc'])
     
     @logger_time_stamp
     def start_prometheus(self):
