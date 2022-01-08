@@ -4,14 +4,15 @@
  
 name: Perf Env E2E Test CI
 
-on:
-  workflow_run:
-    workflows: ["Test1"]
-    types:
-      - completed
 #on:
-#  push:
-#    branches: [ main ]
+#  workflow_run:
+#    workflows: ["Test1"]
+#    types:
+#      - completed
+
+on:
+  push:
+    branches: [ main ]
 
 # Ensures that only one deploy task per branch/environment will run at a time. 
 concurrency:
@@ -96,6 +97,7 @@ jobs:
           for workload in "${workloads[@]}"
           do
               echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>'
-              ssh -t provision "podman run --rm -t -e OCP_ENV_FLAVOR="PERF" -e WORKLOAD="$workload" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e ELASTICSEARCH_USER="$ELASTICSEARCH_USER" -e ELASTICSEARCH_PASSWORD="$ELASTICSEARCH_PASSWORD" -e IBM_REGION_NAME="$IBM_REGION_NAME" -e IBM_ENDPOINT_URL="$IBM_ENDPOINT_URL" -e IBM_ACCESS_KEY_ID="$IBM_ACCESS_KEY_ID" -e IBM_SECRET_ACCESS_KEY="$IBM_SECRET_ACCESS_KEY" -e IBM_BUCKET="$IBM_BUCKET" -e IBM_KEY="$IBM_KEY" -e PERF_RUN_ARTIFACTS_URL="$PERF_RUN_ARTIFACTS_URL" -e BUILD_VERSION="$build_version" -e RUN_TYPE="perf_ci" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" -e SAVE_ARTIFACTS_LOCAL="True" -v /tmp/run_artifacts:/tmp/run_artifacts -v "/$RUNNER_PATH/.ssh/config":"/$PERF_PROVISION_USER/.ssh/config" -v /etc/default/grub:/etc/default/grub --privileged quay.io/ebattat/benchmark-runner:v$build_version "
+              ssh -tt provision"scp "$KUBECONFIG_PATH $CONTAINER_KUBECONFIG_PATH"
+              #ssh -t provision "podman run --rm -t -e OCP_ENV_FLAVOR="PERF" -e WORKLOAD="$workload" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e ELASTICSEARCH_USER="$ELASTICSEARCH_USER" -e ELASTICSEARCH_PASSWORD="$ELASTICSEARCH_PASSWORD" -e IBM_REGION_NAME="$IBM_REGION_NAME" -e IBM_ENDPOINT_URL="$IBM_ENDPOINT_URL" -e IBM_ACCESS_KEY_ID="$IBM_ACCESS_KEY_ID" -e IBM_SECRET_ACCESS_KEY="$IBM_SECRET_ACCESS_KEY" -e IBM_BUCKET="$IBM_BUCKET" -e IBM_KEY="$IBM_KEY" -e PERF_RUN_ARTIFACTS_URL="$PERF_RUN_ARTIFACTS_URL" -e BUILD_VERSION="$build_version" -e RUN_TYPE="perf_ci" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" -e SAVE_ARTIFACTS_LOCAL="True" -v /tmp/run_artifacts:/tmp/run_artifacts -v "/$RUNNER_PATH/.ssh/config":"/$PERF_PROVISION_USER/.ssh/config" -v /etc/default/grub:/etc/default/grub --privileged quay.io/ebattat/benchmark-runner:v$build_version "
               echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
           done
