@@ -38,6 +38,7 @@ jobs:
           PERF_PROVISION_IP: ${{ secrets.PERF_PROVISION_IP }}
           PERF_PROVISION_USER: ${{ secrets.PERF_PROVISION_USER }}
         run: |
+          umask 77
           mkdir -p "$RUNNER_PATH/.ssh/"
           echo "$PERF_PROVISION_PRIVATE_KEY" > $RUNNER_PATH/private_key.txt
           sudo chmod 600 $RUNNER_PATH/private_key.txt
@@ -83,7 +84,7 @@ jobs:
           IBM_KEY: ${{ secrets.IBM_KEY }}
           PERF_RUN_ARTIFACTS_URL: ${{ secrets.PERF_RUN_ARTIFACTS_URL }}
         run: |
-          ssh -t provision "ls"
+          ssh -tt provision "ls"
           build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
           build_version="$(cut -d'=' -f2 <<<"$build")"
           #build_version=1.0.253
