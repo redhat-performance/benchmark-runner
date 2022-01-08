@@ -144,6 +144,7 @@ jobs:
     - name: ⚙ Copy config to provision
       env:
         CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
+        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
       run: |
         scp -r "$RUNNER_PATH/.kube/config" provision:"$CONTAINER_KUBECONFIG_PATH"
 
