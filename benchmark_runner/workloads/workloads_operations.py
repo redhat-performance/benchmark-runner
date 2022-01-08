@@ -38,6 +38,8 @@ class WorkloadsOperations:
         self._key = self._environment_variables_dict.get('key', '')
         self._time_stamp_format = self._environment_variables_dict.get('time_stamp_format', '')
         self._endpoint_url = self._environment_variables_dict.get('endpoint_url', '')
+        self._pin_node1 = self._environment_variables_dict.get('pin_node1', '')
+        self._pin_node2 = self._environment_variables_dict.get('pin_node2', '')
         self._es_host = self._environment_variables_dict.get('elasticsearch', '')
         self._es_port = self._environment_variables_dict.get('elasticsearch_port', '')
         self._es_user = self._environment_variables_dict.get('elasticsearch_user', '')
@@ -230,7 +232,9 @@ class WorkloadsOperations:
                     'version': int(self._build_version.split('.')[-1]),
                     'vm_os_version': 'centos8',
                     'ci_date': datetime.datetime.now().strftime(date_format),
-                    'uuid': self._uuid}
+                    'uuid': self._uuid,
+                    'pin_node1': self._pin_node1,
+                    'pin_node2': self._pin_node2}
         if kind:
             metadata.update({'kind': kind})
         if status:

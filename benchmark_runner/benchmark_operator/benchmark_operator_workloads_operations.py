@@ -43,7 +43,9 @@ class BenchmarkOperatorWorkloadsOperations:
         self._enable_prometheus_snapshot = self._environment_variables_dict.get('enable_prometheus_snapshot', '')
         self._kubeadmin_password = self._environment_variables_dict.get('kubeadmin_password', '')
         self._dir_path = f'{os.path.dirname(os.path.realpath(__file__))}'
-        self._save_artifacts_local = self._environment_variables_dict.get('save_artifacts_local', '')
+        self._pin_node_benchmark_operator = self._environment_variables_dict.get('pin_node_benchmark_operator', '')
+        self._pin_node1 = self._environment_variables_dict.get('pin_node1', '')
+        self._pin_node2 = self._environment_variables_dict.get('pin_node2', '')
         self._es_host = self._environment_variables_dict.get('elasticsearch', '')
         self._es_port = self._environment_variables_dict.get('elasticsearch_port', '')
         self._es_user = self._environment_variables_dict.get('elasticsearch_user', '')
@@ -215,7 +217,10 @@ class BenchmarkOperatorWorkloadsOperations:
                     'ocs_version': self._oc.get_ocs_version(),
                     'runner_version': self._runner_version,
                     'version': int(self._runner_version.split('.')[-1]),
-                    'ci_date': datetime.datetime.now().strftime(date_format)}
+                    'ci_date': datetime.datetime.now().strftime(date_format),
+                    'pin_node_benchmark_operator': self._pin_node_benchmark_operator,
+                    'pin_node1': self._pin_node1,
+                    'pin_node2': self._pin_node2}
         if kind:
             metadata.update({'kind': kind})
         if status:
