@@ -63,7 +63,7 @@ jobs:
         build_version=$(cut -d'=' -f2 <<<"$build")
         sudo podman build --build-arg VERSION=$build_version --layers=false -t ${{ secrets.PACKAGE_NAME }}:v$build_version .
         sudo podman login quay.io -u ${{ secrets.QAUYIO_ROBOT_USER }} -p ${{ secrets.QAUYIO_ROBOT_TOKEN }}
-        sudo podman push localhost/${{ secrets.PACKAGE_NAME }}:v$build_version quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}
+        sudo podman push localhost/${{ secrets.PACKAGE_NAME }}:v$build_version quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:latest
         echo '⌛ Wait 30 sec till image will be updated in quay.io'
         sleep 30
     - name: ✔️ E2E tests using latest quay.io
@@ -112,7 +112,7 @@ jobs:
         do
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>'
             ssh -t provision "podman run --rm -t -e WORKLOAD='$workload' -e KUBEADMIN_PASSWORD='$KUBEADMIN_PASSWORD' -e PIN_NODE_BENCHMARK_OPERATOR='$PIN_NODE_BENCHMARK_OPERATOR' -e PIN_NODE1='$PIN_NODE1' -e PIN_NODE2='$PIN_NODE2' -e ELASTICSEARCH='$ELASTICSEARCH' -e ELASTICSEARCH_PORT='$ELASTICSEARCH_PORT' -e ELASTICSEARCH_USER='$ELASTICSEARCH_USER' -e ELASTICSEARCH_PASSWORD='$ELASTICSEARCH_PASSWORD' -e IBM_REGION_NAME='$IBM_REGION_NAME' -e IBM_ENDPOINT_URL='$IBM_ENDPOINT_URL' -e IBM_ACCESS_KEY_ID='$IBM_ACCESS_KEY_ID' -e IBM_SECRET_ACCESS_KEY='$IBM_SECRET_ACCESS_KEY' -e IBM_BUCKET='$IBM_BUCKET' -e IBM_KEY='$IBM_KEY' -e FUNC_RUN_ARTIFACTS_URL='$FUNC_RUN_ARTIFACTS_URL' -e BUILD_VERSION='$build_version' -e RUN_TYPE='func_ci' -e FUNC_TIMEOUT='2000' -e log_level='INFO' -v '$CONTAINER_KUBECONFIG_PATH':'$CONTAINER_KUBECONFIG_PATH' --privileged 'quay.io/ebattat/benchmark-runner:latest'"
-            ssh -t provision "podman rmi -f 'quay.io/ebattat/benchmark-runner:v$build_version'"
+            ssh -t provision "podman rmi -f 'quay.io/ebattat/benchmark-runner:latest'"
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
         done
         end=$(printf '%(%s)T' -1)
