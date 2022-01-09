@@ -1,14 +1,13 @@
 # Nightly CI https://github.com/marketplace/actions/deploy-nightly
 # This is a nightly CI Pipeline against Performance environment
 name: Deploy Perf Env Nightly CI
-#on:
-#  schedule:
-#    - cron: '0 4 * * *' # run at 4 AM UTC/ 0 AM EDT
-#    # @TODO patch disable sunday OCP installation
-#    #- cron: '0 4 * * 1-6' # run Monday through Saturday at 4 AM UTC/ 0 AM EDT
+
 on:
-  push:
-    branches: [ main ]
+  schedule:
+    - cron: '0 4 * * *' # run at 4 AM UTC/ 0 AM EDT
+    # @TODO patch disable sunday OCP installation
+    #- cron: '0 4 * * 1-6' # run Monday through Saturday at 4 AM UTC/ 0 AM EDT
+
 
 # Ensures that only one deploy task per branch/environment will run at a time.
 concurrency:
