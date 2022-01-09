@@ -2,13 +2,10 @@
 # This is a nightly CI Pipeline against Functional environment
 name: Deploy Func Env Nightly CI
 
-#on:  
-#  schedule:
-#    - cron: '0 4 * * *' # run at 4 AM UTC/ 0 AM EDT
+on:  
+  schedule:
+    - cron: '0 4 * * *' # run at 4 AM UTC/ 0 AM EDT
 
-on:
-  push:
-    branches: [ main ]
 
 # Ensures that only one deploy task per branch/environment will run at a time.
 concurrency:
