@@ -146,8 +146,6 @@ jobs:
         CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
       run: |
-        echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Delete image on provision - if exist >>>>>>>>>>>>>>>>>>>>>>>>>'
-        ssh -tt provision "podman rmi -f 'quay.io/ebattat/benchmark-runner:v$build_version'"
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Copy config to provision  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
         scp -r "$RUNNER_PATH/.kube/config" provision:"$CONTAINER_KUBECONFIG_PATH"
 
