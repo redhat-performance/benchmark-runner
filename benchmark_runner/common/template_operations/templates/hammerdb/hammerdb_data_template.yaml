@@ -2,7 +2,6 @@ metadata:
   name: hammerdb
 files:
   - name: "{{ standard_output_file }}"
-    template: "{{ standard_template_file }}"
 {%- if kind != 'vm' %}
   - name: "{{ workload_extra_name }}.yaml"
 {%- endif %}
