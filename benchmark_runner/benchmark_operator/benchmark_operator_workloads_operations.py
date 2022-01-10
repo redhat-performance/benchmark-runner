@@ -43,7 +43,9 @@ class BenchmarkOperatorWorkloadsOperations:
         self._enable_prometheus_snapshot = self._environment_variables_dict.get('enable_prometheus_snapshot', '')
         self._kubeadmin_password = self._environment_variables_dict.get('kubeadmin_password', '')
         self._dir_path = f'{os.path.dirname(os.path.realpath(__file__))}'
-        self._save_artifacts_local = self._environment_variables_dict.get('save_artifacts_local', '')
+        self._pin_node_benchmark_operator = self._environment_variables_dict.get('pin_node_benchmark_operator', '')
+        self._pin_node1 = self._environment_variables_dict.get('pin_node1', '')
+        self._pin_node2 = self._environment_variables_dict.get('pin_node2', '')
         self._es_host = self._environment_variables_dict.get('elasticsearch', '')
         self._es_port = self._environment_variables_dict.get('elasticsearch_port', '')
         self._es_user = self._environment_variables_dict.get('elasticsearch_user', '')
@@ -215,7 +217,10 @@ class BenchmarkOperatorWorkloadsOperations:
                     'ocs_version': self._oc.get_ocs_version(),
                     'runner_version': self._runner_version,
                     'version': int(self._runner_version.split('.')[-1]),
-                    'ci_date': datetime.datetime.now().strftime(date_format)}
+                    'ci_date': datetime.datetime.now().strftime(date_format),
+                    'pin_node_benchmark_operator': self._pin_node_benchmark_operator,
+                    'pin_node1': self._pin_node1,
+                    'pin_node2': self._pin_node2}
         if kind:
             metadata.update({'kind': kind})
         if status:
@@ -426,9 +431,10 @@ class BenchmarkOperatorWorkloadsOperations:
         This method delete all pod in namespace
         :return:
         """
-        self._oc.delete_all_resources()
+        # make undeploy benchmark controller manager if exist
+        self.make_undeploy_benchmark_controller_manager_if_exist(runner_path=environment_variables.environment_variables_dict['runner_path'])
         if 'hammerdb' in self._workload:
-            self._oc.delete_all_resources(namespace=f"{self._workload.split('_')[2]}-db")
+            self._oc.delete_all_resources(resources=['deployments', 'services', 'pvc'], namespace=f"{self._workload.split('_')[2]}-db")
 
     def initialize_workload(self):
         """
@@ -438,8 +444,6 @@ class BenchmarkOperatorWorkloadsOperations:
         self.delete_all()
         # check that there is elasticsearch when system metric is True
         self.__check_elasticsearch_exist_for_system_metrics()
-        # make undeploy benchmark controller manager if exist
-        self.make_undeploy_benchmark_controller_manager_if_exist(runner_path=environment_variables.environment_variables_dict['runner_path'])
         # make deploy benchmark controller manager
         self.make_deploy_benchmark_controller_manager(runner_path=environment_variables.environment_variables_dict['runner_path'])
         self.ocs_pvc_verification()
@@ -453,6 +457,4 @@ class BenchmarkOperatorWorkloadsOperations:
         """
         self.end_prometheus()
         self.upload_run_artifacts_to_s3()
-        # make undeploy benchmark controller manager
-        self.make_undeploy_benchmark_controller_manager(runner_path=environment_variables.environment_variables_dict['runner_path'])
         self.delete_all()

@@ -52,7 +52,7 @@ class EnvironmentVariables:
             'uperf': 'benchmark-operator',
             'vdbench': 'benchmark-runner',
             }
-        
+
         # Choose default namespace
         base_workload = self._environment_variables_dict['workload'].split('_')[0]
         if base_workload in self._environment_variables_dict['workload_namespaces']:
@@ -76,9 +76,9 @@ class EnvironmentVariables:
         self._environment_variables_dict['run_types'] = ['test_ci', 'func_ci', 'perf_ci']
         # Run type test_ci/func_ci/perf_ci, default test_ci same environment as func_ci
         self._environment_variables_dict['run_type'] = os.environ.get('RUN_TYPE', 'test_ci')
-        
+
         # Run uuid
-        self._environment_variables_dict['uuid'] = str(uuid4())
+        self._environment_variables_dict['uuid'] = os.environ.get('UUID', str(uuid4()))
         self._environment_variables_dict['trunc_uuid'] = self._environment_variables_dict['uuid'].split('-')[0]
         # Benchmark runner IBM Cloud Object Storage run artifacts hierarchy, not part of a POSIX path ('/' a key seperator, '-' file name convenstion )
         self._environment_variables_dict['date_key'] = datetime.datetime.now().strftime("%Y/%m/%d")

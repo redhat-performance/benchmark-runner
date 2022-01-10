@@ -1,15 +1,14 @@
 # Nightly CI https://github.com/marketplace/actions/deploy-nightly
 # This is a nightly CI Pipeline against Performance environment
 name: Deploy Perf Env Nightly CI
+
 on:
   schedule:
     - cron: '0 4 * * *' # run at 4 AM UTC/ 0 AM EDT
     # @TODO patch disable sunday OCP installation
     #- cron: '0 4 * * 1-6' # run Monday through Saturday at 4 AM UTC/ 0 AM EDT
-#on:
-#  push:
-#    branches: [ main ]
 
+    
 # Ensures that only one deploy task per branch/environment will run at a time.
 concurrency:
   group: performance-environment
@@ -24,6 +23,41 @@ jobs:
     - uses: actions/checkout@v2
     - id: nightly_start_step
       run: echo "::set-output name=start_time::$(printf '%(%s)T' -1)"
+    - name: ⚙️ Set SSH key
+      env:
+        PERF_PROVISION_PRIVATE_KEY: ${{ secrets.PERF_PROVISION_PRIVATE_KEY }}
+        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+        PERF_PROVISION_IP: ${{ secrets.PERF_PROVISION_IP }}
+        PERF_PROVISION_USER: ${{ secrets.PERF_PROVISION_USER }}
+      run: |
+        mkdir -p "$RUNNER_PATH/.ssh/"
+        echo "$PERF_PROVISION_PRIVATE_KEY" > $RUNNER_PATH/private_key.txt
+        sudo chmod 600 $RUNNER_PATH/private_key.txt
+        echo "PERF_PROVISION_PRIVATE_KEY_PATH=$RUNNER_PATH/private_key.txt" >> "$GITHUB_ENV"
+        cat >> "$RUNNER_PATH/.ssh/config" <<END
+        Host provision
+          HostName $PERF_PROVISION_IP
+          User $PERF_PROVISION_USER
+          IdentityFile $RUNNER_PATH/private_key.txt
+          StrictHostKeyChecking no
+          ServerAliveInterval 30
+          ServerAliveCountMax 5
+        END
+    - name: ⚙ Set Kubeconfig
+      env:
+        KUBECONFIG: ${{ secrets.PERF_KUBECONFIG }}
+        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+      run: |
+        mkdir -p "$RUNNER_PATH/.kube/"
+        echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
+        echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
+    - name: ⚙ Copy config to provision
+      env:
+        CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
+        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+      run: |
+        echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Copy config to provision  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
+        scp -r "$RUNNER_PATH/.kube/config" provision:"$CONTAINER_KUBECONFIG_PATH"
 
   stressng_workload:
     name: Stressng workload
@@ -43,6 +77,26 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install benchmark-runner
+    - name: ⚙️ Set SSH key
+      env:
+        PERF_PROVISION_PRIVATE_KEY: ${{ secrets.PERF_PROVISION_PRIVATE_KEY }}
+        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+        PERF_PROVISION_IP: ${{ secrets.PERF_PROVISION_IP }}
+        PERF_PROVISION_USER: ${{ secrets.PERF_PROVISION_USER }}
+      run: |
+        mkdir -p "$RUNNER_PATH/.ssh/"
+        echo "$PERF_PROVISION_PRIVATE_KEY" > $RUNNER_PATH/private_key.txt
+        sudo chmod 600 $RUNNER_PATH/private_key.txt
+        echo "PERF_PROVISION_PRIVATE_KEY_PATH=$RUNNER_PATH/private_key.txt" >> "$GITHUB_ENV"
+        cat >> "$RUNNER_PATH/.ssh/config" <<END
+        Host provision
+          HostName $PERF_PROVISION_IP
+          User $PERF_PROVISION_USER
+          IdentityFile $RUNNER_PATH/private_key.txt
+          StrictHostKeyChecking no
+          ServerAliveInterval 30
+          ServerAliveCountMax 5
+        END
     - name: ⚙ Set Kubeconfig
       env:
         KUBECONFIG: ${{ secrets.PERF_KUBECONFIG }}
@@ -93,7 +147,7 @@ jobs:
         for workload in "${workloads[@]}"
         do
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>'
-            podman run --rm -t -e OCP_ENV_FLAVOR="PERF" -e WORKLOAD="$workload" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e ELASTICSEARCH_USER="$ELASTICSEARCH_USER" -e ELASTICSEARCH_PASSWORD="$ELASTICSEARCH_PASSWORD" -e IBM_REGION_NAME="$IBM_REGION_NAME" -e IBM_ENDPOINT_URL="$IBM_ENDPOINT_URL" -e IBM_ACCESS_KEY_ID="$IBM_ACCESS_KEY_ID" -e IBM_SECRET_ACCESS_KEY="$IBM_SECRET_ACCESS_KEY" -e IBM_BUCKET="$IBM_BUCKET" -e IBM_KEY="$IBM_KEY" -e PERF_RUN_ARTIFACTS_URL="$PERF_RUN_ARTIFACTS_URL" -e BUILD_VERSION="$build_version" -e RUN_TYPE="perf_ci" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+            ssh -tt provision "podman run --rm -t -e OCP_ENV_FLAVOR='PERF' -e WORKLOAD='$workload' -e KUBEADMIN_PASSWORD='$KUBEADMIN_PASSWORD' -e PIN_NODE_BENCHMARK_OPERATOR='$PIN_NODE_BENCHMARK_OPERATOR' -e PIN_NODE1='$PIN_NODE1' -e PIN_NODE2='$PIN_NODE2' -e ELASTICSEARCH='$ELASTICSEARCH' -e ELASTICSEARCH_PORT='$ELASTICSEARCH_PORT' -e ELASTICSEARCH_USER='$ELASTICSEARCH_USER' -e ELASTICSEARCH_PASSWORD='$ELASTICSEARCH_PASSWORD' -e IBM_REGION_NAME='$IBM_REGION_NAME' -e IBM_ENDPOINT_URL='$IBM_ENDPOINT_URL' -e IBM_ACCESS_KEY_ID='$IBM_ACCESS_KEY_ID' -e IBM_SECRET_ACCESS_KEY='$IBM_SECRET_ACCESS_KEY' -e IBM_BUCKET='$IBM_BUCKET' -e IBM_KEY='$IBM_KEY' -e PERF_RUN_ARTIFACTS_URL='$PERF_RUN_ARTIFACTS_URL' -e BUILD_VERSION='$build_version' -e RUN_TYPE='perf_ci' -e PERF_TIMEOUT='3600' -e log_level='INFO' -v '$CONTAINER_KUBECONFIG_PATH':'$CONTAINER_KUBECONFIG_PATH' --privileged 'quay.io/ebattat/benchmark-runner:v$build_version'"
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
         done
     - name: ❎ CI status failed
@@ -133,6 +187,26 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install benchmark-runner
+    - name: ⚙️ Set SSH key
+      env:
+        PERF_PROVISION_PRIVATE_KEY: ${{ secrets.PERF_PROVISION_PRIVATE_KEY }}
+        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+        PERF_PROVISION_IP: ${{ secrets.PERF_PROVISION_IP }}
+        PERF_PROVISION_USER: ${{ secrets.PERF_PROVISION_USER }}
+      run: |
+        mkdir -p "$RUNNER_PATH/.ssh/"
+        echo "$PERF_PROVISION_PRIVATE_KEY" > $RUNNER_PATH/private_key.txt
+        sudo chmod 600 $RUNNER_PATH/private_key.txt
+        echo "PERF_PROVISION_PRIVATE_KEY_PATH=$RUNNER_PATH/private_key.txt" >> "$GITHUB_ENV"
+        cat >> "$RUNNER_PATH/.ssh/config" <<END
+        Host provision
+          HostName $PERF_PROVISION_IP
+          User $PERF_PROVISION_USER
+          IdentityFile $RUNNER_PATH/private_key.txt
+          StrictHostKeyChecking no
+          ServerAliveInterval 30
+          ServerAliveCountMax 5
+        END
     - name: ⚙ Set Kubeconfig
       env:
         KUBECONFIG: ${{ secrets.PERF_KUBECONFIG }}
@@ -183,7 +257,7 @@ jobs:
         for workload in "${workloads[@]}"
         do
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>'
-            podman run --rm -t -e OCP_ENV_FLAVOR="PERF" -e WORKLOAD="$workload" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e ELASTICSEARCH_USER="$ELASTICSEARCH_USER" -e ELASTICSEARCH_PASSWORD="$ELASTICSEARCH_PASSWORD" -e IBM_REGION_NAME="$IBM_REGION_NAME" -e IBM_ENDPOINT_URL="$IBM_ENDPOINT_URL" -e IBM_ACCESS_KEY_ID="$IBM_ACCESS_KEY_ID" -e IBM_SECRET_ACCESS_KEY="$IBM_SECRET_ACCESS_KEY" -e IBM_BUCKET="$IBM_BUCKET" -e IBM_KEY="$IBM_KEY" -e PERF_RUN_ARTIFACTS_URL="$PERF_RUN_ARTIFACTS_URL" -e BUILD_VERSION="$build_version" -e RUN_TYPE="perf_ci" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+            ssh -tt provision "podman run --rm -t -e OCP_ENV_FLAVOR='PERF' -e WORKLOAD='$workload' -e KUBEADMIN_PASSWORD='$KUBEADMIN_PASSWORD' -e PIN_NODE_BENCHMARK_OPERATOR='$PIN_NODE_BENCHMARK_OPERATOR' -e PIN_NODE1='$PIN_NODE1' -e PIN_NODE2='$PIN_NODE2' -e ELASTICSEARCH='$ELASTICSEARCH' -e ELASTICSEARCH_PORT='$ELASTICSEARCH_PORT' -e ELASTICSEARCH_USER='$ELASTICSEARCH_USER' -e ELASTICSEARCH_PASSWORD='$ELASTICSEARCH_PASSWORD' -e IBM_REGION_NAME='$IBM_REGION_NAME' -e IBM_ENDPOINT_URL='$IBM_ENDPOINT_URL' -e IBM_ACCESS_KEY_ID='$IBM_ACCESS_KEY_ID' -e IBM_SECRET_ACCESS_KEY='$IBM_SECRET_ACCESS_KEY' -e IBM_BUCKET='$IBM_BUCKET' -e IBM_KEY='$IBM_KEY' -e PERF_RUN_ARTIFACTS_URL='$PERF_RUN_ARTIFACTS_URL' -e BUILD_VERSION='$build_version' -e RUN_TYPE='perf_ci' -e PERF_TIMEOUT='3600' -e log_level='INFO' -v '$CONTAINER_KUBECONFIG_PATH':'$CONTAINER_KUBECONFIG_PATH' --privileged 'quay.io/ebattat/benchmark-runner:v$build_version'"
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
         done
     - name: ❎ CI status failed
@@ -223,6 +297,26 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install benchmark-runner
+    - name: ⚙️ Set SSH key
+      env:
+        PERF_PROVISION_PRIVATE_KEY: ${{ secrets.PERF_PROVISION_PRIVATE_KEY }}
+        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+        PERF_PROVISION_IP: ${{ secrets.PERF_PROVISION_IP }}
+        PERF_PROVISION_USER: ${{ secrets.PERF_PROVISION_USER }}
+      run: |
+        mkdir -p "$RUNNER_PATH/.ssh/"
+        echo "$PERF_PROVISION_PRIVATE_KEY" > $RUNNER_PATH/private_key.txt
+        sudo chmod 600 $RUNNER_PATH/private_key.txt
+        echo "PERF_PROVISION_PRIVATE_KEY_PATH=$RUNNER_PATH/private_key.txt" >> "$GITHUB_ENV"
+        cat >> "$RUNNER_PATH/.ssh/config" <<END
+        Host provision
+          HostName $PERF_PROVISION_IP
+          User $PERF_PROVISION_USER
+          IdentityFile $RUNNER_PATH/private_key.txt
+          StrictHostKeyChecking no
+          ServerAliveInterval 30
+          ServerAliveCountMax 5
+        END
     - name: ⚙ Set Kubeconfig
       env:
         KUBECONFIG: ${{ secrets.PERF_KUBECONFIG }}
@@ -273,7 +367,7 @@ jobs:
         for workload in "${workloads[@]}"
         do
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>'
-            podman run --rm -t -e OCP_ENV_FLAVOR="PERF" -e WORKLOAD="$workload" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e ELASTICSEARCH_USER="$ELASTICSEARCH_USER" -e ELASTICSEARCH_PASSWORD="$ELASTICSEARCH_PASSWORD" -e IBM_REGION_NAME="$IBM_REGION_NAME" -e IBM_ENDPOINT_URL="$IBM_ENDPOINT_URL" -e IBM_ACCESS_KEY_ID="$IBM_ACCESS_KEY_ID" -e IBM_SECRET_ACCESS_KEY="$IBM_SECRET_ACCESS_KEY" -e IBM_BUCKET="$IBM_BUCKET" -e IBM_KEY="$IBM_KEY" -e PERF_RUN_ARTIFACTS_URL="$PERF_RUN_ARTIFACTS_URL" -e BUILD_VERSION="$build_version" -e RUN_TYPE="perf_ci" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+            ssh -tt provision "podman run --rm -t -e OCP_ENV_FLAVOR='PERF' -e WORKLOAD='$workload' -e KUBEADMIN_PASSWORD='$KUBEADMIN_PASSWORD' -e PIN_NODE_BENCHMARK_OPERATOR='$PIN_NODE_BENCHMARK_OPERATOR' -e PIN_NODE1='$PIN_NODE1' -e PIN_NODE2='$PIN_NODE2' -e ELASTICSEARCH='$ELASTICSEARCH' -e ELASTICSEARCH_PORT='$ELASTICSEARCH_PORT' -e ELASTICSEARCH_USER='$ELASTICSEARCH_USER' -e ELASTICSEARCH_PASSWORD='$ELASTICSEARCH_PASSWORD' -e IBM_REGION_NAME='$IBM_REGION_NAME' -e IBM_ENDPOINT_URL='$IBM_ENDPOINT_URL' -e IBM_ACCESS_KEY_ID='$IBM_ACCESS_KEY_ID' -e IBM_SECRET_ACCESS_KEY='$IBM_SECRET_ACCESS_KEY' -e IBM_BUCKET='$IBM_BUCKET' -e IBM_KEY='$IBM_KEY' -e PERF_RUN_ARTIFACTS_URL='$PERF_RUN_ARTIFACTS_URL' -e BUILD_VERSION='$build_version' -e RUN_TYPE='perf_ci' -e PERF_TIMEOUT='3600' -e log_level='INFO' -v '$CONTAINER_KUBECONFIG_PATH':'$CONTAINER_KUBECONFIG_PATH' --privileged 'quay.io/ebattat/benchmark-runner:v$build_version'"
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
         done
     - name: ❎ CI status failed
@@ -313,6 +407,26 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install benchmark-runner
+    - name: ⚙️ Set SSH key
+      env:
+        PERF_PROVISION_PRIVATE_KEY: ${{ secrets.PERF_PROVISION_PRIVATE_KEY }}
+        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+        PERF_PROVISION_IP: ${{ secrets.PERF_PROVISION_IP }}
+        PERF_PROVISION_USER: ${{ secrets.PERF_PROVISION_USER }}
+      run: |
+        mkdir -p "$RUNNER_PATH/.ssh/"
+        echo "$PERF_PROVISION_PRIVATE_KEY" > $RUNNER_PATH/private_key.txt
+        sudo chmod 600 $RUNNER_PATH/private_key.txt
+        echo "PERF_PROVISION_PRIVATE_KEY_PATH=$RUNNER_PATH/private_key.txt" >> "$GITHUB_ENV"
+        cat >> "$RUNNER_PATH/.ssh/config" <<END
+        Host provision
+          HostName $PERF_PROVISION_IP
+          User $PERF_PROVISION_USER
+          IdentityFile $RUNNER_PATH/private_key.txt
+          StrictHostKeyChecking no
+          ServerAliveInterval 30
+          ServerAliveCountMax 5
+        END
     - name: ⚙ Set Kubeconfig
       env:
         KUBECONFIG: ${{ secrets.PERF_KUBECONFIG }}
@@ -363,7 +477,7 @@ jobs:
         for workload in "${workloads[@]}"
         do
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>'
-            podman run --rm -t -e OCP_ENV_FLAVOR="PERF" -e WORKLOAD="$workload" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e ELASTICSEARCH_USER="$ELASTICSEARCH_USER" -e ELASTICSEARCH_PASSWORD="$ELASTICSEARCH_PASSWORD" -e IBM_REGION_NAME="$IBM_REGION_NAME" -e IBM_ENDPOINT_URL="$IBM_ENDPOINT_URL" -e IBM_ACCESS_KEY_ID="$IBM_ACCESS_KEY_ID" -e IBM_SECRET_ACCESS_KEY="$IBM_SECRET_ACCESS_KEY" -e IBM_BUCKET="$IBM_BUCKET" -e IBM_KEY="$IBM_KEY" -e PERF_RUN_ARTIFACTS_URL="$PERF_RUN_ARTIFACTS_URL" -e BUILD_VERSION="$build_version" -e RUN_TYPE="perf_ci" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+            ssh -tt provision "podman run --rm -t -e OCP_ENV_FLAVOR='PERF' -e WORKLOAD='$workload' -e KUBEADMIN_PASSWORD='$KUBEADMIN_PASSWORD' -e PIN_NODE_BENCHMARK_OPERATOR='$PIN_NODE_BENCHMARK_OPERATOR' -e PIN_NODE1='$PIN_NODE1' -e PIN_NODE2='$PIN_NODE2' -e ELASTICSEARCH='$ELASTICSEARCH' -e ELASTICSEARCH_PORT='$ELASTICSEARCH_PORT' -e ELASTICSEARCH_USER='$ELASTICSEARCH_USER' -e ELASTICSEARCH_PASSWORD='$ELASTICSEARCH_PASSWORD' -e IBM_REGION_NAME='$IBM_REGION_NAME' -e IBM_ENDPOINT_URL='$IBM_ENDPOINT_URL' -e IBM_ACCESS_KEY_ID='$IBM_ACCESS_KEY_ID' -e IBM_SECRET_ACCESS_KEY='$IBM_SECRET_ACCESS_KEY' -e IBM_BUCKET='$IBM_BUCKET' -e IBM_KEY='$IBM_KEY' -e PERF_RUN_ARTIFACTS_URL='$PERF_RUN_ARTIFACTS_URL' -e BUILD_VERSION='$build_version' -e RUN_TYPE='perf_ci' -e PERF_TIMEOUT='3600' -e log_level='INFO' -v '$CONTAINER_KUBECONFIG_PATH':'$CONTAINER_KUBECONFIG_PATH' --privileged 'quay.io/ebattat/benchmark-runner:v$build_version'"
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
         done
     - name: ❎ CI status failed
@@ -403,6 +517,26 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install benchmark-runner
+    - name: ⚙️ Set SSH key
+      env:
+        PERF_PROVISION_PRIVATE_KEY: ${{ secrets.PERF_PROVISION_PRIVATE_KEY }}
+        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+        PERF_PROVISION_IP: ${{ secrets.PERF_PROVISION_IP }}
+        PERF_PROVISION_USER: ${{ secrets.PERF_PROVISION_USER }}
+      run: |
+        mkdir -p "$RUNNER_PATH/.ssh/"
+        echo "$PERF_PROVISION_PRIVATE_KEY" > $RUNNER_PATH/private_key.txt
+        sudo chmod 600 $RUNNER_PATH/private_key.txt
+        echo "PERF_PROVISION_PRIVATE_KEY_PATH=$RUNNER_PATH/private_key.txt" >> "$GITHUB_ENV"
+        cat >> "$RUNNER_PATH/.ssh/config" <<END
+        Host provision
+          HostName $PERF_PROVISION_IP
+          User $PERF_PROVISION_USER
+          IdentityFile $RUNNER_PATH/private_key.txt
+          StrictHostKeyChecking no
+          ServerAliveInterval 30
+          ServerAliveCountMax 5
+        END
     - name: ⚙ Set Kubeconfig
       env:
         KUBECONFIG: ${{ secrets.PERF_KUBECONFIG }}
@@ -453,7 +587,7 @@ jobs:
         for workload in "${workloads[@]}"
         do
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>'
-            podman run --rm -t -e OCP_ENV_FLAVOR="PERF" -e WORKLOAD="$workload" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e ELASTICSEARCH_USER="$ELASTICSEARCH_USER" -e ELASTICSEARCH_PASSWORD="$ELASTICSEARCH_PASSWORD" -e IBM_REGION_NAME="$IBM_REGION_NAME" -e IBM_ENDPOINT_URL="$IBM_ENDPOINT_URL" -e IBM_ACCESS_KEY_ID="$IBM_ACCESS_KEY_ID" -e IBM_SECRET_ACCESS_KEY="$IBM_SECRET_ACCESS_KEY" -e IBM_BUCKET="$IBM_BUCKET" -e IBM_KEY="$IBM_KEY" -e PERF_RUN_ARTIFACTS_URL="$PERF_RUN_ARTIFACTS_URL" -e BUILD_VERSION="$build_version" -e RUN_TYPE="perf_ci" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+            ssh -tt provision "podman run --rm -t -e OCP_ENV_FLAVOR='PERF' -e WORKLOAD='$workload' -e KUBEADMIN_PASSWORD='$KUBEADMIN_PASSWORD' -e PIN_NODE_BENCHMARK_OPERATOR='$PIN_NODE_BENCHMARK_OPERATOR' -e PIN_NODE1='$PIN_NODE1' -e PIN_NODE2='$PIN_NODE2' -e ELASTICSEARCH='$ELASTICSEARCH' -e ELASTICSEARCH_PORT='$ELASTICSEARCH_PORT' -e ELASTICSEARCH_USER='$ELASTICSEARCH_USER' -e ELASTICSEARCH_PASSWORD='$ELASTICSEARCH_PASSWORD' -e IBM_REGION_NAME='$IBM_REGION_NAME' -e IBM_ENDPOINT_URL='$IBM_ENDPOINT_URL' -e IBM_ACCESS_KEY_ID='$IBM_ACCESS_KEY_ID' -e IBM_SECRET_ACCESS_KEY='$IBM_SECRET_ACCESS_KEY' -e IBM_BUCKET='$IBM_BUCKET' -e IBM_KEY='$IBM_KEY' -e PERF_RUN_ARTIFACTS_URL='$PERF_RUN_ARTIFACTS_URL' -e BUILD_VERSION='$build_version' -e RUN_TYPE='perf_ci' -e PERF_TIMEOUT='3600' -e log_level='INFO' -v '$CONTAINER_KUBECONFIG_PATH':'$CONTAINER_KUBECONFIG_PATH' --privileged 'quay.io/ebattat/benchmark-runner:v$build_version'"
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
         done
     - name: ❎ CI status failed
@@ -493,6 +627,26 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install benchmark-runner
+    - name: ⚙️ Set SSH key
+      env:
+        PERF_PROVISION_PRIVATE_KEY: ${{ secrets.PERF_PROVISION_PRIVATE_KEY }}
+        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+        PERF_PROVISION_IP: ${{ secrets.PERF_PROVISION_IP }}
+        PERF_PROVISION_USER: ${{ secrets.PERF_PROVISION_USER }}
+      run: |
+        mkdir -p "$RUNNER_PATH/.ssh/"
+        echo "$PERF_PROVISION_PRIVATE_KEY" > $RUNNER_PATH/private_key.txt
+        sudo chmod 600 $RUNNER_PATH/private_key.txt
+        echo "PERF_PROVISION_PRIVATE_KEY_PATH=$RUNNER_PATH/private_key.txt" >> "$GITHUB_ENV"
+        cat >> "$RUNNER_PATH/.ssh/config" <<END
+        Host provision
+          HostName $PERF_PROVISION_IP
+          User $PERF_PROVISION_USER
+          IdentityFile $RUNNER_PATH/private_key.txt
+          StrictHostKeyChecking no
+          ServerAliveInterval 30
+          ServerAliveCountMax 5
+        END
     - name: ⚙ Set Kubeconfig
       env:
         KUBECONFIG: ${{ secrets.PERF_KUBECONFIG }}
@@ -536,6 +690,8 @@ jobs:
         ci_minutes_time=$(( (end - START_CI) / 60))
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Update CI status pass >>>>>>>>>>>>>>>>>>>>>>>>>>'
         podman run --rm -e OCP_ENV_FLAVOR="PERF" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e ELASTICSEARCH_USER="$ELASTICSEARCH_USER" -e ELASTICSEARCH_PASSWORD="$ELASTICSEARCH_PASSWORD" -e BUILD_VERSION="$build_version" -e CI_STATUS="pass" -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e RUN_TYPE="perf_ci" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+        echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Delete image on provision  >>>>>>>>>>>>>>>>>>>>>>>>>'
+        ssh -tt provision "podman rmi -f 'quay.io/ebattat/benchmark-runner:v$build_version'"
     - name: ❎ CI status failed
       env:
         KUBEADMIN_PASSWORD: ${{ secrets.PERF_KUBEADMIN_PASSWORD }}

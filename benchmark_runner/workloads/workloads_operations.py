@@ -26,11 +26,9 @@ class WorkloadsOperations:
         self._environment_variables_dict = environment_variables.environment_variables_dict
         self._workload = self._environment_variables_dict.get('workload', '')
         self._build_version = self._environment_variables_dict.get('build_version', '')
-        self._run_artifacts_path = self._environment_variables_dict.get('run_artifacts_path', '')
         self._workloads_ocs_pvc = list(self._environment_variables_dict.get('workloads_ocs_pvc', ''))
         self._ocs_pvc = self._environment_variables_dict.get('ocs_pvc', '')
         self._kubeadmin_password = self._environment_variables_dict.get('kubeadmin_password', '')
-        self._oc = OC(kubeadmin_password=self._kubeadmin_password)
         self._run_type = self._environment_variables_dict.get('run_type', '')
         self._trunc_uuid = self._environment_variables_dict.get('trunc_uuid', '')
         self._uuid = self._environment_variables_dict.get('uuid', '')
@@ -38,31 +36,49 @@ class WorkloadsOperations:
         self._key = self._environment_variables_dict.get('key', '')
         self._time_stamp_format = self._environment_variables_dict.get('time_stamp_format', '')
         self._endpoint_url = self._environment_variables_dict.get('endpoint_url', '')
+        self._run_artifacts_path = self._environment_variables_dict.get('run_artifacts_path', '')
+        self._save_artifacts_local = self._environment_variables_dict.get('save_artifacts_local', '')
+        self._enable_prometheus_snapshot = self._environment_variables_dict.get('enable_prometheus_snapshot', '')
+        self._pin_node1 = self._environment_variables_dict.get('pin_node1', '')
+        self._pin_node2 = self._environment_variables_dict.get('pin_node2', '')
         self._es_host = self._environment_variables_dict.get('elasticsearch', '')
         self._es_port = self._environment_variables_dict.get('elasticsearch_port', '')
         self._es_user = self._environment_variables_dict.get('elasticsearch_user', '')
         self._es_password = self._environment_variables_dict.get('elasticsearch_password', '')
-        self._save_artifacts_local = self._environment_variables_dict.get('save_artifacts_local', '')
         self._timeout = int(self._environment_variables_dict.get('timeout', ''))
+        # Elasticsearch connection
         if self._es_host and self._es_port:
             self.__es_operations = ESOperations(es_host=self._es_host,
-                                              es_port=self._es_port,
-                                              es_user=self._es_user,
-                                              es_password=self._es_password,
-                                              timeout=self._timeout)
-        self._enable_prometheus_snapshot = self._environment_variables_dict.get('enable_prometheus_snapshot', '')
-        if self._enable_prometheus_snapshot:
-            self._snapshot = PrometheusSnapshot(oc=self._oc, artifacts_path=self._run_artifacts_path, verbose=True)
+                                                es_port=self._es_port,
+                                                es_user=self._es_user,
+                                                es_password=self._es_password,
+                                                timeout=self._timeout)
         # Generate templates class
         self._template = TemplateOperations(workload=self._workload)
+        # set oc login
+        self._oc = self.set_login(kubeadmin_password=self._kubeadmin_password)
+        # PrometheusSnapshot
+        if self._enable_prometheus_snapshot:
+            self._snapshot = PrometheusSnapshot(oc=self._oc, artifacts_path=self._run_artifacts_path, verbose=True)
+
+    @logger_time_stamp
+    def set_login(self, kubeadmin_password: str = ''):
+        """
+        This method set oc login
+        :param kubeadmin_password:
+        :return: oc instance
+        """
+        self._oc = OC(kubeadmin_password=kubeadmin_password)
+        self._oc.login()
+        return self._oc
 
     @logger_time_stamp
     def delete_all(self):
         """
-        This method delete all pod in namespace
+        This method delete all resources in namespace
         :return:
         """
-        self._oc.delete_all_resources()
+        self._oc.delete_all_resources(resources=['pods', 'pvc'])
     
     @logger_time_stamp
     def start_prometheus(self):
@@ -230,7 +246,9 @@ class WorkloadsOperations:
                     'version': int(self._build_version.split('.')[-1]),
                     'vm_os_version': 'centos8',
                     'ci_date': datetime.datetime.now().strftime(date_format),
-                    'uuid': self._uuid}
+                    'uuid': self._uuid,
+                    'pin_node1': self._pin_node1,
+                    'pin_node2': self._pin_node2}
         if kind:
             metadata.update({'kind': kind})
         if status:
