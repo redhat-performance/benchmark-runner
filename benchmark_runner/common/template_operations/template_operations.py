@@ -15,6 +15,16 @@ class TemplateOperations:
         self.initialize_environment(environment_variables.environment_variables_dict)
 
     def __initialize_dependent_variables__(self):
+        self.__workload_name = self.__workload.split('_')[0]
+        self.__workload_kind = self.__workload.split('_')[1]
+        self.__workload_extra_name = '_'.join(self.__workload.split('_')[2:])
+        self.__workload_template_kind = self.__get_workload_template_kind()
+        if self.__workload_extra_name:
+            self.__standard_output_file = f"{'_'.join([self.__workload_name, self.__workload_template_kind, self.__workload_extra_name])}.yaml"
+        else:
+            self.__standard_output_file = f"{'_'.join([self.__workload_name, self.__workload_template_kind])}.yaml"
+        self.__standard_template_file = f"{'_'.join([self.__workload_name, self.__workload_template_kind])}_template.yaml"
+        
         self.__run_type = self.__environment_variables_dict.get('run_type', '')
         self.__run_artifacts_path = self.__environment_variables_dict.get('run_artifacts_path', '')
         self.__dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'templates'))
@@ -22,58 +32,17 @@ class TemplateOperations:
             self.__environment_variables_dict['es_suffix'] = '-test-ci'
         else:
             self.__environment_variables_dict['es_suffix'] = ''
-        # hammerdb storage
-        if self.__environment_variables_dict.get('ocs_pvc', '') == 'True':
-            self.__storage_type = 'ocs_pvc'
-        else:
-            self.__storage_type = 'ephemeral'
-
-    def __get_workload_name(self):
-        return self.__workload.split('_')[0]
-
-    def __get_workload_kind(self):
-        return self.__workload.split('_')[1]
-
-    def __get_workload_extra(self):
-        return '_'.join(self.__workload.split('_')[2:])
 
     def __get_workload_template_kind(self):
         """
         Kata shares templates with pod
         """
-        kind = self.__get_workload_kind()
-        if kind == 'kata' or kind == 'pod':
+        if self.__workload_kind == 'kata' or self.__workload_kind == 'pod':
             return 'pod'
-        elif kind == 'vm':
+        elif self.__workload_kind == 'vm':
             return 'vm'
         else:
             return None
-
-    def __get_yaml_template_by_workload(self, extension='.yaml', skip: str = 'data'):
-        """
-        This method return yaml names in benchmark_operator folder
-        :return:
-        """
-        # Kata reuses the pod templates
-        kind = self.__get_workload_template_kind()
-        base_workload = self.__get_workload_name()
-        full_workload = f'{base_workload}_{kind}'
-        if not full_workload:
-            return None
-        for filename in os.listdir(os.path.join(self.__dir_path, base_workload, 'internal_data')):
-            if filename.endswith(extension):
-                if filename.startswith(full_workload) and skip not in filename:
-                    return os.path.splitext(filename)[0]
-
-    @staticmethod
-    def __get_sub_dict(dictionary: dict, key: str, value: str):
-        if key in dictionary:
-            subdict = dictionary[key]
-            if value in subdict:
-                return subdict[value]
-            elif 'default' in subdict:
-                return subdict['default']
-        return dict()
 
     @logger_time_stamp
     def generate_yamls_internal(self):
@@ -81,51 +50,62 @@ class TemplateOperations:
         Generate required .yaml files as a dictionary of file names and contents
         :return: Dictionary <filename:contents>
         """
-        workload_template = self.__get_yaml_template_by_workload()
-        workload_name = self.__get_workload_name()
-        workload_extra_name = self.__get_workload_extra()
-        workload_dir_path = os.path.join(self.__dir_path, workload_name)
-        kind = self.__get_workload_kind()
-        self.__environment_variables_dict['workload_name'] = workload_name
-        self.__environment_variables_dict['workload_extra_name'] = workload_extra_name
-        self.__environment_variables_dict['kind'] = kind
-        common_data = yaml.load(render_yaml_file(self.__dir_path, 'common.yaml', self.__environment_variables_dict), Loader=yaml.FullLoader)['common_data']
-        common_data = {**self.__environment_variables_dict, **common_data}
-        workload_data = yaml.load(render_yaml_file(workload_dir_path, f'{workload_name}_data_template.yaml', common_data), Loader=yaml.FullLoader)
-        extra_files = workload_data.get('extra_files')
-        template_data = workload_data.get('template_data')
-        render_data = template_data.get('shared')
-        render_data['kind'] = kind
-        render_data['workload_name'] = workload_name
-        render_data['workload_extra_name'] = workload_extra_name
-        kind_data = self.__get_sub_dict(template_data, 'kind', kind)
-        run_type_data = self.__get_sub_dict(template_data, 'run_type', self.__run_type)
-        kind_runtype_data = self.__get_sub_dict(kind_data, 'run_type', self.__run_type)
-        extra_data = self.__get_sub_dict(template_data, 'extra', workload_extra_name)
-        extra_kind_data = self.__get_sub_dict(extra_data, 'kind', kind)
-        extra_runtype_data = self.__get_sub_dict(extra_data, 'run_type', self.__run_type)
-        extra_kind_runtype_data = self.__get_sub_dict(extra_kind_data, 'run_type', self.__run_type)
+        def build_template_data(previous_data: dict, template_root_data: dict):
+            """
+            Build data dictionary for rendering from template data.
+            """
+            def get_sub_dict(dictionary: dict, key: str, value: str):
+                if key in dictionary:
+                    subdict = dictionary[key]
+                    if value in subdict:
+                        return subdict[value]
+                    elif 'default' in subdict:
+                        return subdict['default']
+                return dict()
+            template_data = template_root_data.get('template_data')
+            shared_data = template_data.get('shared')
+            kind_data = get_sub_dict(template_data, 'kind', self.__workload_kind)
+            run_type_data = get_sub_dict(template_data, 'run_type', self.__run_type)
+            kind_runtype_data = get_sub_dict(kind_data, 'run_type', self.__run_type)
+            extra_data = get_sub_dict(template_data, 'extra', self.__workload_extra_name)
+            extra_kind_data = get_sub_dict(extra_data, 'kind', self.__workload_kind)
+            extra_runtype_data = get_sub_dict(extra_data, 'run_type', self.__run_type)
+            extra_kind_runtype_data = get_sub_dict(extra_kind_data, 'run_type', self.__run_type)
 
-        render_data = {**common_data, **render_data,
-                       **kind_data, **run_type_data, **kind_runtype_data,
-                       **extra_data, **extra_kind_data, **extra_runtype_data, **extra_kind_runtype_data}
-        if workload_extra_name:
-            workload_file_suffix = f'_{workload_extra_name}'
-        else:
-            workload_file_suffix = ''
+            return {**previous_data, **shared_data,
+                    **kind_data, **run_type_data, **kind_runtype_data,
+                    **extra_data, **extra_kind_data, **extra_runtype_data, **extra_kind_runtype_data}
+
+        workload_dir_path = os.path.join(self.__dir_path, self.__workload_name)
+
+        template_render_data = {
+            'kind': self.__workload_kind,
+            'workload_name': self.__workload_name,
+            'workload_template_kind': self.__workload_template_kind,
+            'workload_extra_name': self.__workload_extra_name,
+            'standard_output_file': self.__standard_output_file,
+            'standard_template_file': self.__standard_template_file,
+            }
+        self.__environment_variables_dict = {**self.__environment_variables_dict, **template_render_data}
+        common_data = yaml.load(render_yaml_file(self.__dir_path, 'common.yaml', self.__environment_variables_dict), Loader=yaml.FullLoader)['common_data']
+        template_render_data = {**self.__environment_variables_dict, **common_data}
+
+        workload_data = yaml.load(render_yaml_file(workload_dir_path, f'{self.__workload_name}_data_template.yaml', template_render_data), Loader=yaml.FullLoader)
+        render_data = build_template_data(template_render_data, workload_data)
 
         answer = {}
-        if extra_files:
-            for extra_file in extra_files:
-                with open(os.path.join(workload_dir_path, 'internal_data', extra_file)) as f:
-                    template = Template(f.read())
-                answer[f'{extra_file.replace("_template", "")}'] = template.render(render_data)
-
-        # Jinja render workload yaml
-        with open(os.path.join(workload_dir_path, 'internal_data', f'{workload_template}.yaml')) as f:
-            tm = Template(f.read())
-        workload_file_name = workload_template.replace('_template', '')
-        answer[f'{workload_file_name}{workload_file_suffix}.yaml'] = tm.render(render_data)
+        for out_file in workload_data.get('files'):
+            filename = out_file['name']
+            if 'template' in out_file:
+                template_file = out_file['template']
+            elif filename == self.__standard_output_file:
+                template_file = self.__standard_template_file
+            else:
+                file_components = os.path.splitext(filename)
+                template_file = f'{file_components[0]}_template{file_components[1]}'
+            with open(os.path.join(workload_dir_path, 'internal_data', template_file)) as f:
+                template = Template(f.read())
+            answer[filename] = template.render(render_data)
         return answer
 
     @logger_time_stamp

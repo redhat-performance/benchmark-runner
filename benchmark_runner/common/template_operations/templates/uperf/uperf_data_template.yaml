@@ -1,5 +1,7 @@
 metadata:
   name: uperf
+files:
+  - name: "{{ standard_output_file }}"
 template_data:
   shared:
     pin_server: {{ pin_node1 }}
