@@ -15,16 +15,6 @@ class TemplateOperations:
         self.initialize_environment(environment_variables.environment_variables_dict)
 
     def __initialize_dependent_variables__(self):
-        self.__workload_name = self.__workload.split('_')[0]
-        self.__workload_kind = self.__workload.split('_')[1]
-        self.__workload_extra_name = '_'.join(self.__workload.split('_')[2:])
-        self.__workload_template_kind = self.__get_workload_template_kind()
-        if self.__workload_extra_name:
-            self.__standard_output_file = f"{'_'.join([self.__workload_name, self.__workload_template_kind, self.__workload_extra_name])}.yaml"
-        else:
-            self.__standard_output_file = f"{'_'.join([self.__workload_name, self.__workload_template_kind])}.yaml"
-        self.__standard_template_file = f"{'_'.join([self.__workload_name, self.__workload_template_kind])}_template.yaml"
-        
         self.__run_type = self.__environment_variables_dict.get('run_type', '')
         self.__run_artifacts_path = self.__environment_variables_dict.get('run_artifacts_path', '')
         self.__dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'templates'))
@@ -76,6 +66,17 @@ class TemplateOperations:
                     **kind_data, **run_type_data, **kind_runtype_data,
                     **extra_data, **extra_kind_data, **extra_runtype_data, **extra_kind_runtype_data}
 
+        # This really belongs in __init__, but some of the tests rely on
+        # being able to create this without an actual workload.
+        self.__workload_name = self.__workload.split('_')[0]
+        self.__workload_kind = self.__workload.split('_')[1]
+        self.__workload_extra_name = '_'.join(self.__workload.split('_')[2:])
+        self.__workload_template_kind = self.__get_workload_template_kind()
+        if self.__workload_extra_name:
+            self.__standard_output_file = f"{'_'.join([self.__workload_name, self.__workload_template_kind, self.__workload_extra_name])}.yaml"
+        else:
+            self.__standard_output_file = f"{'_'.join([self.__workload_name, self.__workload_template_kind])}.yaml"
+        self.__standard_template_file = f"{'_'.join([self.__workload_name, self.__workload_template_kind])}_template.yaml"
         workload_dir_path = os.path.join(self.__dir_path, self.__workload_name)
 
         template_render_data = {
