@@ -95,12 +95,13 @@ class TemplateOperations:
         render_data = build_template_data(template_render_data, workload_data)
 
         answer = {}
-        for out_file in workload_data.get('files'):
+        out_files = [{'name': self.__standard_output_file, 'template': self.__standard_template_file}]
+        if 'files' in workload_data:
+            out_files.extend(workload_data['files'])
+        for out_file in out_files:
             filename = out_file['name']
             if 'template' in out_file:
                 template_file = out_file['template']
-            elif filename == self.__standard_output_file:
-                template_file = self.__standard_template_file
             else:
                 file_components = os.path.splitext(filename)
                 template_file = f'{file_components[0]}_template{file_components[1]}'

@@ -1,7 +1,5 @@
 metadata:
   name: vdbench
-files:
-  - name: "{{ standard_output_file }}"
 template_data:
   shared:
     pin_node: {{ pin_node1 }}
