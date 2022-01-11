@@ -2,7 +2,7 @@
 import os
 import yaml
 from jinja2 import Template
-from benchmark_runner.common.template_operations.update_data_template_yaml_with_environment_variables import render_yaml_file
+from benchmark_runner.common.template_operations.render_yaml_from_template import render_yaml_file
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp
 from benchmark_runner.main.environment_variables import environment_variables
 
@@ -45,6 +45,17 @@ class TemplateOperations:
             Build data dictionary for rendering from template data.
             """
             def get_sub_dict(dictionary: dict, key: str, value: str):
+                """
+                Return a sub-dictionary of input dictionary as specified below.
+                If dictionary[key][value] exists, return that.
+                If dictionary[key][value] does not exist, but dictionary[key]['default'] exists, return
+                   dictionary[key]['default']
+                Otherwise return an empty dictionary.
+                :param dictionary: dictionary to be searched
+                :param key: key to search for in dictionary
+                :param value: value to be searched for under key
+                :return: dictionary[key][value] if that exists, dictionary[key]['default'] if that exists, otherwise empty dictionary.
+                """
                 if key in dictionary:
                     subdict = dictionary[key]
                     if value in subdict:

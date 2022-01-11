@@ -5,7 +5,7 @@ import pytest
 from benchmark_runner.common.oc.oc import OC
 from benchmark_runner.common.oc.oc_exceptions import LoginFailed, PodNotCreateTimeout, PodTerminateTimeout, VMNotCreateTimeout, YAMLNotExist
 from benchmark_runner.common.elasticsearch.es_operations import ESOperations
-from benchmark_runner.common.template_operations.update_data_template_yaml_with_environment_variables import render_yaml_file
+from benchmark_runner.common.template_operations.render_yaml_from_template import render_yaml_file
 from benchmark_runner.benchmark_operator.benchmark_operator_workloads_operations import BenchmarkOperatorWorkloadsOperations
 from tests.integration.benchmark_runner.test_environment_variables import *
 
