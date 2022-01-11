@@ -3,7 +3,7 @@
 
 import pytest
 from benchmark_runner.common.oc.oc import OC
-from benchmark_runner.main.update_data_template_yaml_with_environment_variables import render_yaml_file
+from benchmark_runner.common.template_operations.render_yaml_from_template import render_yaml_file
 from tests.integration.benchmark_runner.test_environment_variables import *
 
 
