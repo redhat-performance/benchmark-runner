@@ -2,13 +2,10 @@
 # This is a nightly CI Pipeline against Functional environment
 name: Deploy Func Env Nightly CI
 
-#on:  
-#  schedule:
-#    - cron: '0 4 * * *' # run at 4 AM UTC/ 0 AM EDT
+on:  
+  schedule:
+    - cron: '0 4 * * *' # run at 4 AM UTC/ 0 AM EDT
 
-on:
-  push:
-    branches: [ main ]
 
 # Ensures that only one deploy task per branch/environment will run at a time.
 concurrency:
@@ -110,8 +107,7 @@ jobs:
         done
         build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
         build_version="$(cut -d'=' -f2 <<<"$build")"
-        #declare -a workloads=('stressng_pod' 'stressng_kata' 'stressng_vm' 'uperf_pod' 'uperf_kata' 'uperf_vm' 'hammerdb_pod_mariadb' 'hammerdb_kata_mariadb' 'hammerdb_vm_mariadb' 'hammerdb_pod_postgres' 'hammerdb_kata_postgres' 'hammerdb_vm_postgres' 'hammerdb_pod_mssql' 'hammerdb_kata_mssql' 'hammerdb_vm_mssql' 'vdbench_pod' 'vdbench_kata')
-        declare -a workloads=('hammerdb_vm_mssql' 'vdbench_pod' 'vdbench_kata')
+        declare -a workloads=('stressng_pod' 'stressng_kata' 'stressng_vm' 'uperf_pod' 'uperf_kata' 'uperf_vm' 'hammerdb_pod_mariadb' 'hammerdb_kata_mariadb' 'hammerdb_vm_mariadb' 'hammerdb_pod_postgres' 'hammerdb_kata_postgres' 'hammerdb_vm_postgres' 'hammerdb_pod_mssql' 'hammerdb_kata_mssql' 'hammerdb_vm_mssql' 'vdbench_pod' 'vdbench_kata')
         for workload in "${workloads[@]}"
         do
             echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start E2E workload:' $workload '>>>>>>>>>>>>>>>>>>>>>>>>>>'
