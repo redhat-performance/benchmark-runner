@@ -78,7 +78,7 @@ class WorkloadsOperations:
         This method delete all resources in namespace
         :return:
         """
-        self._oc.delete_all_resources(resources=['pods', 'pvc'])
+        self._oc.delete_all_resources(resources=['vm', 'pods', 'pvc'])
     
     @logger_time_stamp
     def start_prometheus(self):
