@@ -52,6 +52,14 @@ jobs:
             ServerAliveInterval 30
             ServerAliveCountMax 5
           END
+      - name: pull latest benchmark-runner
+        run: |
+          podman images
+          podman pull quay.io/ebattat/benchmark-runner:latest
+          if [[ "$(podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)" != "" ]]; then
+              podman rmi -f $(podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)
+          fi
+          podman images
       - name: Install latest benchmark-runner
         run: |
           python -m pip install --upgrade pip
