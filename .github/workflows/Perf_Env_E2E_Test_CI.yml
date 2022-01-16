@@ -71,7 +71,7 @@ jobs:
            echo sleep 10
            sleep 10
            #ssh provision "if [[ "$(podman images -q quay.io/ebattat/benchmark-runner)" != "" ]]; then  echo podman rmi -f $(podman images -q quay.io/ebattat/benchmark-runner); fi"
-           ssh -t provision "version=$(podman images -q quay.io/ebattat/benchmark-runner); echo $version"
+           ssh -tt provision "version=$(podman images -q quay.io/ebattat/benchmark-runner); echo $version; echo test;"
            ssh -t provision "podman images"
       - name: ✔️ E2E tests using stable quay.io
         env:
