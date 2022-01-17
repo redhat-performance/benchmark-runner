@@ -7,49 +7,47 @@ template_data:
     uuid: {{ uuid }}
   run_type:
     perf_ci:
-      BLOCK_SIZES: 64,oltp1
-      IO_OPERATION: write,oltp1
-      IO_THREADS: 1,3
-      FILES_IO: random,oltp1
-      IO_RATE: max,max
+      BLOCK_SIZES: oltp1,oltp2,oltphw,odss2,odss128,4_cache,64_cache,4,64,4_cache,64_cache,4,64
+      IO_OPERATION: oltp1,oltp2,oltphw,odss2,odss128,read,read,read,read,write,write,write,write
+      IO_THREADS: 1,1,1,1,1,4,4,2,2,4,4,2,2
+      FILES_IO: oltp1,oltp2,oltphw,odss2,odss128,random,random,random,random,random,random,random,random
+      IO_RATE: max,max,max,max,max,max,max,max,max,max,max,max,max
       MIX_PRECENTAGE:
-      DURATION: 20
-      PAUSE: 0
-      WARMUP: 0
+      DURATION: 600
+      PAUSE: 20
+      WARMUP: 20
       FILES_SELECTION: random
       COMPRESSION_RATIO: 2
       RUN_FILLUP: "yes"
-      DIRECTORIES: 300
-      FILES_PER_DIRECTORY: 3
+      DIRECTORIES: 600
+      FILES_PER_DIRECTORY: 10
       SIZE_PER_FILE: 10
       limits_cpu: 20m
       limits_memory: 2Gi
-      requests_cpu: 10m
-      requests_memory: 10Mi
-      storage: 10Gi
+      requests_cpu: 2
+      requests_memory: 2Gi 
+      storage: 64Gi
     default:
-      BLOCK_SIZES: 64,oltp1
-      IO_OPERATION: write,oltp1
-      IO_THREADS: 1,3
-      FILES_IO: random,oltp1
-      IO_RATE: max,max
+      BLOCK_SIZES: oltp1,oltp2,oltphw,odss2,odss128,4_cache,64_cache,4,64,4_cache,64_cache,4,64
+      IO_OPERATION: oltp1,oltp2,oltphw,odss2,odss128,read,read,read,read,write,write,write,write
+      IO_THREADS: 1,1,1,1,1,4,4,2,2,4,4,2,2
+      FILES_IO: oltp1,oltp2,oltphw,odss2,odss128,random,random,random,random,random,random,random,random
+      IO_RATE: max,max,max,max,max,max,max,max,max,max,max,max,max
       MIX_PRECENTAGE:
-      DURATION: 20
-      PAUSE: 0
-      WARMUP: 0
-      # sequential/random
+      DURATION: 600
+      PAUSE: 20
+      WARMUP: 20
       FILES_SELECTION: random
       COMPRESSION_RATIO: 2
-      # yes/no
-      RUN_FILLUP: "no"
-      DIRECTORIES: 300
-      FILES_PER_DIRECTORY: 3
+      RUN_FILLUP: "yes"
+      DIRECTORIES: 600
+      FILES_PER_DIRECTORY: 10
       SIZE_PER_FILE: 10
       limits_cpu: 20m
       limits_memory: 2Gi
-      requests_cpu: 10m
-      requests_memory: 10Mi
-      storage: 10Gi
+      requests_cpu: 2
+      requests_memory: 2Gi
+      storage: 64Gi
   kind:
     vm:
       run_type:
