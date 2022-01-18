@@ -44,14 +44,14 @@ class EnvironmentVariables:
                                                          'hammerdb_pod_mariadb', 'hammerdb_vm_mariadb', 'hammerdb_kata_mariadb',
                                                          'hammerdb_pod_postgres', 'hammerdb_vm_postgres', 'hammerdb_kata_postgres',
                                                          'hammerdb_pod_mssql', 'hammerdb_vm_mssql', 'hammerdb_kata_mssql',
-                                                         'vdbench_pod', 'vdbench_kata']
+                                                         'vdbench_pod', 'vdbench_kata', 'vdbench_vm']
         # benchmark-operator workload types
         self._environment_variables_dict['workload_namespaces'] = {
             'stressng': 'benchmark-operator',
             'hammerdb': 'benchmark-operator',
             'uperf': 'benchmark-operator',
             'vdbench': 'benchmark-runner',
-            }
+        }
 
         # Choose default namespace
         base_workload = self._environment_variables_dict['workload'].split('_')[0]
@@ -70,7 +70,7 @@ class EnvironmentVariables:
         self._environment_variables_dict['build_version'] = os.environ.get('BUILD_VERSION', '1.0.0')
         # collect system metrics True/False
         self._environment_variables_dict['system_metrics'] = os.environ.get('SYSTEM_METRICS', 'True')
-        # CI status update once at the end of CI Pass/Failed
+        # CI status update once at the end of CI pass/failed
         self._environment_variables_dict['ci_status'] = os.environ.get('CI_STATUS', '')
         # Valid run types
         self._environment_variables_dict['run_types'] = ['test_ci', 'func_ci', 'perf_ci']

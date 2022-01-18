@@ -277,7 +277,7 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def get_vm(self, label: str = ''):
+    def get_vm(self, label: str = '', namespace: str = environment_variables.environment_variables_dict['namespace']):
         """
         This method get vm according to label
         :param label:
@@ -285,7 +285,7 @@ class OC(SSH):
         """
         if label:
             return self.run(
-                cmd="oc get vmi -n " + environment_variables.environment_variables_dict['namespace'] + " --no-headers | awk '{ print $1; }' | grep " + label,
+                cmd="oc get vmi -n " + namespace + " --no-headers | awk '{ print $1; }' | grep " + label,
                 is_check=True).rstrip().decode('ascii')
         else:
             return self.run('oc get vmi', is_check=True)
@@ -311,16 +311,16 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def save_vm_log(self, vm_name: str):
+    def save_vm_log(self, vm_name: str, output_filename: str = '', namespace: str = environment_variables.environment_variables_dict['namespace']):
         """
         This method save vm log in log_path
         :param vm_name: vm name with uuid
+        :param output_filename:
         :return:
         """
-        output_filename = f"{self.__run_artifacts}/{vm_name}"
-        self.run(
-            cmd=f"virtctl console -n {environment_variables.environment_variables_dict['namespace']} {vm_name} > {output_filename} ",
-            background=True)
+        if not output_filename:
+            output_filename = os.path.join(self.__run_artifacts, vm_name)
+        self.run(cmd=f"virtctl console -n {namespace} {vm_name} > {output_filename}", background=True)
 
     @logger_time_stamp
     def __verify_vm_log_finish(self, vm_name: str, timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
@@ -450,7 +450,7 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def create_vm_sync(self, yaml: str, vm_name: str, timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
+    def create_vm_sync(self, yaml: str, vm_name: str, namespace: str = environment_variables.environment_variables_dict['namespace'], timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
         """
         This method create vm yaml in async
         :param timeout:
@@ -459,7 +459,7 @@ class OC(SSH):
         :return:
         """
         self._create_async(yaml)
-        return self.wait_for_vm_create(vm_name=vm_name, timeout=timeout)
+        return self.wait_for_vm_create(vm_name=vm_name, namespace=namespace, timeout=timeout)
 
     @typechecked
     @logger_time_stamp
@@ -544,14 +544,15 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def wait_for_ready(self, label: str, workload: str = '', status: str = 'ready', label_uuid: bool = True,
+    def wait_for_ready(self, label: str, run_type: str = 'pod', workload: str = '', status: str = 'ready', label_uuid: bool = True,
                        namespace: str = environment_variables.environment_variables_dict['namespace'],
                        timeout: int = SHORT_WAIT_TIME):
         """
         This method wait to pod to be ready
+        :param label:
+        :param run_type:pod or vm
         :param workload:
         :param namespace:
-        :param label:
         :param status:
         :param label_uuid: need to get uuid from label (benchmark-operator)
         :param timeout:
@@ -560,11 +561,11 @@ class OC(SSH):
         try:
             if label_uuid:
                 result = self.run(
-                    f"oc --namespace {namespace} wait --for=condition={status} pod -l {label}-{self.__get_short_uuid(workload=workload)} --timeout={timeout}s",
+                    f"oc --namespace {namespace} wait --for=condition={status} {run_type} -l {label}-{self.__get_short_uuid(workload=workload)} --timeout={timeout}s",
                     is_check=True)
             else:
                 result = self.run(
-                    f"oc --namespace {namespace} wait --for=condition={status} pod -l {label} --timeout={timeout}s",
+                    f"oc --namespace {namespace} wait --for=condition={status} {run_type} -l {label} --timeout={timeout}s",
                     is_check=True)
             if 'met' in result.decode("utf-8"):
                 return True
@@ -875,3 +876,57 @@ class OC(SSH):
                 if '03_ocp48_patch.sh' == resource:
                     self.run(cmd=f'chmod +x {os.path.join(path, resource)}; {path}/./{resource}')
         return True
+
+    @logger_time_stamp
+    def wait_for_vm_log_completed(self, vm_name: str = '', end_stamp: str = '', output_filename: str = '', timeout: int = int(environment_variables.environment_variables_dict['timeout']), sleep_time: int = 30):
+        """
+        This method wait to vm to be completed by end sign string
+        :param vm_name:
+        :param end_stamp: end of run stamp
+        :param output_filename:
+        :param timeout:
+        :param sleep_time:
+        :return:
+        """
+        if not output_filename:
+            output_filename = os.path.join(self.__run_artifacts, vm_name)
+        current_wait_time = 0
+        # wait initialize time till vm log create
+        time.sleep(sleep_time)
+        while current_wait_time <= timeout:
+            with open(output_filename, 'r') as file:
+                data = file.read()
+                if end_stamp in data:
+                    return True
+                else:
+                    # sleep for x seconds
+                    time.sleep(sleep_time)
+                    current_wait_time += sleep_time
+        raise VMNotCompletedTimeout(workload=vm_name)
+
+    @logger_time_stamp
+    def extract_vm_results(self, vm_name: str = '', start_stamp: str = '', end_stamp: str = '', output_filename: str = ''):
+        """
+        This method extract vm results from vm output log
+        :param vm_name:
+        :param start_stamp: start of run stamp
+        :param end_stamp: end of run stamp
+        :param output_filename:
+        :return:
+        """
+        if not output_filename:
+            output_filename = os.path.join(self.__run_artifacts, vm_name)
+        results_list = []
+        with open(output_filename) as infile:
+            copy = False
+            for line in infile:
+                if start_stamp in line:
+                    copy = True
+                    results_list.append(line.strip().split(':')[2:])
+                    continue
+                elif end_stamp in line:
+                    copy = False
+                    continue
+                elif copy:
+                    results_list.append(line.strip().split(':')[1:])
+        return results_list

@@ -39,6 +39,7 @@ class WorkloadsOperations:
         self._run_artifacts_path = self._environment_variables_dict.get('run_artifacts_path', '')
         self._save_artifacts_local = self._environment_variables_dict.get('save_artifacts_local', '')
         self._enable_prometheus_snapshot = self._environment_variables_dict.get('enable_prometheus_snapshot', '')
+        self._run_artifacts_url = self._environment_variables_dict.get('run_artifacts_url', '')
         self._pin_node1 = self._environment_variables_dict.get('pin_node1', '')
         self._pin_node2 = self._environment_variables_dict.get('pin_node2', '')
         self._es_host = self._environment_variables_dict.get('elasticsearch', '')
@@ -61,7 +62,6 @@ class WorkloadsOperations:
         if self._enable_prometheus_snapshot:
             self._snapshot = PrometheusSnapshot(oc=self._oc, artifacts_path=self._run_artifacts_path, verbose=True)
 
-    @logger_time_stamp
     def set_login(self, kubeadmin_password: str = ''):
         """
         This method set oc login
@@ -78,7 +78,7 @@ class WorkloadsOperations:
         This method delete all resources in namespace
         :return:
         """
-        self._oc.delete_all_resources(resources=['pods', 'pvc'])
+        self._oc.delete_all_resources(resources=['vm', 'pods', 'pvc'])
     
     @logger_time_stamp
     def start_prometheus(self):
@@ -119,7 +119,7 @@ class WorkloadsOperations:
             if not self._oc.is_ocs_installed():
                 raise OCSNonInstalled()
 
-    def __create_vm_log(self, labels: list) -> str:
+    def _create_vm_log(self, labels: list) -> str:
         """
         This method set vm log per workload
         :param labels: list of labels
@@ -171,26 +171,50 @@ class WorkloadsOperations:
         except ValueError:
             return False
 
-    def _create_run_artifacts(self, pod_name: str, is_pod: bool = True):
+    def _create_pod_run_artifacts(self, pod_name: str):
         """
-        This method create pod logs of benchmark-controller-manager, system-metrics and workload pod
-        :param pod_name: False in case of vm
-        :param is_pod: list of pod names - using it when it different from workload name
+        This method create pod run artifacts
+        :param pod_name: pod name
         :return: run results dict
         """
-        # for vm call to create_vm_log
         result_dict = {'pod': pod_name}
-        if is_pod:
-            pod_log_file = self.__create_pod_log(pod=pod_name)
-            workload_name = self._environment_variables_dict.get('workload', '').replace('_', '-')
-            the_reader = DictReader(open(pod_log_file, 'r'))
-            for line_dict in the_reader:
-                for key, value in line_dict.items():
-                    if self.__is_float(value):
-                        line_dict[key] = float(value)
-                result_dict[line_dict['Run']] = line_dict
-            result_dict['run_artifacts_url'] = os.path.join(self._environment_variables_dict.get('run_artifacts_url', ''), f'{self.__get_run_artifacts_hierarchy(workload_name=workload_name, is_file=True)}-{self._time_stamp_format}.tar.gz')
-            return result_dict
+        pod_log_file = self.__create_pod_log(pod=pod_name)
+        workload_name = self._environment_variables_dict.get('workload', '').replace('_', '-')
+        # csv to dictionary
+        the_reader = DictReader(open(pod_log_file, 'r'))
+        for line_dict in the_reader:
+            for key, value in line_dict.items():
+                if self.__is_float(value):
+                    line_dict[key] = float(value)
+            result_dict[line_dict['Run']] = line_dict
+        result_dict['run_artifacts_url'] = os.path.join(self._run_artifacts_url, f'{self.__get_run_artifacts_hierarchy(workload_name=workload_name, is_file=True)}-{self._time_stamp_format}.tar.gz')
+        return result_dict
+
+    def _create_vm_run_artifacts(self, vm_name: str, start_stamp: str, end_stamp: str):
+        """
+        This method create vm run artifacts
+        :param vm_name: vm name
+        :param start_stamp: start stamp
+        :param end_stamp: end stamp
+        :return: run results dict
+        """
+        result_dict = {'vm': vm_name}
+        results_list = self._oc.extract_vm_results(vm_name=vm_name, start_stamp=start_stamp, end_stamp=end_stamp)
+        workload_name = self._environment_variables_dict.get('workload', '').replace('_', '-')
+        # insert results to csv
+        csv_result_file = os.path.join(self._run_artifacts_path, 'vdbench_vm_result.csv')
+        with open(csv_result_file, 'w') as out:
+            for row in results_list:
+                out.write(f'{row[0].strip()}\n')
+        # csv to dictionary
+        the_reader = DictReader(open(csv_result_file, 'r'))
+        for line_dict in the_reader:
+            for key, value in line_dict.items():
+                if self.__is_float(value):
+                    line_dict[key] = float(value)
+            result_dict[line_dict['Run']] = line_dict
+        result_dict['run_artifacts_url'] = os.path.join(self._run_artifacts_url, f'{self.__get_run_artifacts_hierarchy(workload_name=workload_name, is_file=True)}-{self._time_stamp_format}.tar.gz')
+        return result_dict
 
     def __make_run_artifacts_tarfile(self, workload: str):
         """

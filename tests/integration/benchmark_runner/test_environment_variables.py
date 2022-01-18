@@ -23,7 +23,7 @@ def __get_test_environment_variable():
     test_environment_variable['timeout'] = int(os.environ.get('TIMEOUT', '2000'))
 
     # end dynamic parameters - configure for local run
-    ###################################################################################################
+    ##################################################################################################
 
     # ** DO NOT CHANGE THE PARAMETERS BELOW **
     # Constant parameters

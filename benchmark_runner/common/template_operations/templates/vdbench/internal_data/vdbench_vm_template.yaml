@@ -1,0 +1,105 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ namespace }}
+{%- if ocs_pvc == True %}
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: vdbench-pvc-claim
+  namespace: {{ namespace }}
+spec:
+  storageClassName: ocs-storagecluster-ceph-rbd
+  accessModes: [ "ReadWriteOnce" ]
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: {{ storage }}
+{%- endif %}
+---
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: vdbench-{{ kind }}-{{ trunc_uuid }}
+  namespace: {{ namespace }}
+  labels:
+    app: vdbench-{{ trunc_uuid }}
+    type: vdbench-{{ kind }}-{{ trunc_uuid }}
+    benchmark-uuid: {{ uuid }}
+    benchmark-runner-workload: vdbench
+spec:
+  running: true
+  template:
+    metadata:
+      labels:
+        kubevirt-vm: vdbench
+    spec:
+      {%- if pin_node != '' %}
+      nodeSelector:
+        kubernetes.io/hostname: {{ pin_node1 }}
+      {%- endif %}
+      domain:
+        cpu:
+          sockets: {{ sockets }}
+          cores: 1
+          threads: 1
+        devices:
+          disks:
+            - disk:
+                bus: virtio
+              name: containerdisk
+            - disk:
+                bus: virtio
+              name: cloudinitdisk
+            - disk:
+                bus: virtio
+              name: data-volume
+              serial: vdbenchdata
+        machine:
+          type: ""
+        resources:
+          requests:
+            cpu: {{ requests_cpu }}
+            memory: {{ requests_memory }}
+          limits:
+            cpu: {{ limits_cpu }}
+            memory: {{ limits_memory }}
+      terminationGracePeriodSeconds: 0
+      volumes:
+{%- if ocs_pvc == True %}
+        - name: data-volume
+          persistentVolumeClaim:
+            claimName: vdbench-pvc-claim
+{%- endif %}
+        - containerDisk:
+            image: quay.io/ebattat/centos-stream8-vdbench5.04.07-container-disk:latest
+          name: containerdisk
+        - cloudInitNoCloud:
+            userData: |-
+              #cloud-config
+              password: centos
+              chpasswd: { expire: False }
+              bootcmd:
+                - "mkdir -p /workload || true"
+                - "[ -e /dev/disk/by-id/*vdbenchdata ] && disk=$(shopt -s nullglob; basename /dev/disk/by-id/*vdbenchdata) && mkfs.ext4 /dev/disk/by-id/$disk && mount /dev/disk/by-id/$disk /workload"
+              runcmd:
+                - export BLOCK_SIZES={{ BLOCK_SIZES }}
+                - export IO_OPERATION={{ IO_OPERATION }}
+                - export IO_THREADS={{ IO_THREADS }}
+                - export FILES_IO={{ FILES_IO }}
+                - export IO_RATE={{ IO_RATE }}
+                - export MIX_PRECENTAGE # used for mixed workload 0-100
+                - export DURATION={{ DURATION }}
+                - export PAUSE={{ PAUSE }}
+                - export WARMUP={{ WARMUP }}
+                - export FILES_SELECTION={{ FILES_SELECTION }}
+                - export COMPRESSION_RATIO={{ COMPRESSION_RATIO }}
+                - export RUN_FILLUP={{ RUN_FILLUP }}
+                - export DIRECTORIES={{ DIRECTORIES }}
+                - export FILES_PER_DIRECTORY={{ FILES_PER_DIRECTORY }}
+                - export SIZE_PER_FILE={{ SIZE_PER_FILE }}
+                - echo @@~@@START-WORKLOAD@@~@@
+                - /vdbench/vdbench_runner.sh
+                - echo @@~@@END-WORKLOAD@@~@@
+          name: cloudinitdisk

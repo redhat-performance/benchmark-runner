@@ -22,8 +22,8 @@ template_data:
       DIRECTORIES: 300
       FILES_PER_DIRECTORY: 3
       SIZE_PER_FILE: 10
-      limits_cpu: 20m
-      limits_memory: 2Gi
+      limits_cpu: 4
+      limits_memory: 16Gi
       requests_cpu: 10m
       requests_memory: 10Mi
       storage: 10Gi
@@ -45,8 +45,8 @@ template_data:
       DIRECTORIES: 300
       FILES_PER_DIRECTORY: 3
       SIZE_PER_FILE: 10
-      limits_cpu: 20m
-      limits_memory: 2Gi
+      limits_cpu: 4
+      limits_memory: 16Gi
       requests_cpu: 10m
       requests_memory: 10Mi
       storage: 10Gi
