@@ -55,6 +55,13 @@ git commit -m"Update golden files"
 If you remove any YAML files, you must identify the changed files and
 `git rm` them before committing the result.
 
+*It is by design that these files are not updated automatically.*  This
+check is intended to catch inadvertent changes to the generated YAML
+files, and updating them automatically would defeat that purpose.
+If you make changes that are intended to modify the generated YAML
+files, it is your responsibility to update the golden reference files
+yourself, using the procedure above.
+
 The check is run automatically as part of the unit tests; if you want
 to run it manually, you can do so as follows.  The test should take
 only a few seconds to run.
