@@ -24,8 +24,8 @@ template_data:
       SIZE_PER_FILE: 10
       limits_cpu: 2
       limits_memory: 2Gi
-      requests_cpu: 500m
-      requests_memory: 512Mi
+      requests_cpu: 2
+      requests_memory: 2Gi
       storage: 64Gi
     default:
       BLOCK_SIZES: 64,oltp1
@@ -54,6 +54,6 @@ template_data:
     vm:
       run_type:
         perf_ci:
-          sockets: 60
+          sockets: 2
         default:
-          sockets: 4
+          sockets: 2
