@@ -3,8 +3,8 @@ kind: Namespace
 metadata:
   name: benchmark-runner
 ---
-kind: Pod
 apiVersion: v1
+kind: Pod
 metadata:
   name: vdbench-pod-deadbeef
   namespace: benchmark-runner
@@ -19,10 +19,17 @@ spec:
       app: vdbench
   nodeSelector:
     kubernetes.io/hostname: pin-node-1
+  resources:
+    requests:
+      cpu: 10m
+      memory: 10Mi
+    limits:
+      cpu: 2
+      memory: 2Gi
   containers:
     - name: vdbench-pod
       namespace: benchmark-runner
-      image: quay.io/bbenshab/vdpod
+      image: quay.io/ebattat/centos-stream8-vdbench5.04.07-pod
       imagePullPolicy: "IfNotPresent"
       env:
         - name: BLOCK_SIZES
@@ -71,10 +78,3 @@ spec:
       storageClassName: ocs-storagecluster-ceph-rbd
     source:
       blank: {}
-  resources:
-    requests:
-      cpu: 10m
-      memory: 10Mi
-    limits:
-      cpu: 20m
-      memory: 2Gi

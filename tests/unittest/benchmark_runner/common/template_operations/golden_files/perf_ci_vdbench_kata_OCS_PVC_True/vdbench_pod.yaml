@@ -3,21 +3,21 @@ kind: Namespace
 metadata:
   name: benchmark-runner
 ---
-kind: PersistentVolumeClaim
 apiVersion: v1
+kind: PersistentVolumeClaim
 metadata:
-  name: vdbench-pvc
+  name: vdbench-pod-pvc-claim
   namespace: benchmark-runner
 spec:
-  accessModes:
-    - ReadWriteOnce
   storageClassName: ocs-storagecluster-ceph-rbd
+  accessModes: [ "ReadWriteOnce" ]
+  volumeMode: Filesystem
   resources:
     requests:
-      storage: 10Gi
+      storage: 64Gi
 ---
-kind: Pod
 apiVersion: v1
+kind: Pod
 metadata:
   name: vdbench-kata-deadbeef
   namespace: benchmark-runner
@@ -33,34 +33,41 @@ spec:
   nodeSelector:
     kubernetes.io/hostname: pin-node-1
   runtimeClassName: kata
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: 2
+      memory: 2Gi
   containers:
     - name: vdbench-pod
       namespace: benchmark-runner
-      image: quay.io/bbenshab/vdpod
+      image: quay.io/ebattat/centos-stream8-vdbench5.04.07-pod
       imagePullPolicy: "IfNotPresent"
       volumeMounts:
-        - name: vdbench-pvc
+        - name: vdbench-pod-pvc-claim
           mountPath: "/workload"
       env:
         - name: BLOCK_SIZES
-          value: "64,oltp1"
+          value: "oltp1,oltp2,oltphw,odss2,odss128,4_cache,64_cache,4,64,4_cache,64_cache,4,64"
         - name: IO_OPERATION
-          value: "write,oltp1"
+          value: "oltp1,oltp2,oltphw,odss2,odss128,read,read,read,read,write,write,write,write"
         - name: IO_THREADS
-          value: "1,3"
+          value: "1,1,1,1,1,4,4,2,2,4,4,2,2"
         - name: FILES_IO #How file IO will be done
-          value: "random,oltp1"
+          value: "oltp1,oltp2,oltphw,odss2,odss128,random,random,random,random,random,random,random,random"
         - name: IO_RATE # an integer or "max"
-          value: "max,max"
+          value: "max,max,max,max,max,max,max,max,max,max,max,max,max"
         - name: MIX_PRECENTAGE # used for mixed workload 0-100
           value:
         #global settings
         - name: DURATION
-          value: "20"
+          value: "600"
         - name: PAUSE #pause after every test in sec
-          value: "0"
+          value: "20"
         - name: WARMUP # warmup before any test in sec
-          value: "0"
+          value: "20"
         - name: FILES_SELECTION #This parameter allows you to select directories and files for processing either sequential/random
           value: "random"
         - name: COMPRESSION_RATIO #ratio is 1:X e.g 2 = 50% compressible
@@ -69,9 +76,9 @@ spec:
           value: "yes"
         #data set settings
         - name: DIRECTORIES #how many directories to create
-          value: "300"
+          value: "600"
         - name: FILES_PER_DIRECTORY
-          value: "3"
+          value: "10"
         - name: SIZE_PER_FILE # size in MB
           value: "10"
       command: ["/bin/bash"]
@@ -83,20 +90,13 @@ spec:
         - ReadWriteOnce
       resources:
         requests:
-          storage: 10Gi
+          storage: 64Gi
           Reclaim Policy: Delete
       storageClassName: ocs-storagecluster-ceph-rbd
     source:
       blank: {}
   volumes:
-    - name: vdbench-pvc
+    - name: vdbench-pod-pvc-claim
       namespace: benchmark-runner
       persistentVolumeClaim:
-        claimName: vdbench-pvc
-  resources:
-    requests:
-      cpu: 10m
-      memory: 10Mi
-    limits:
-      cpu: 20m
-      memory: 2Gi
+        claimName: vdbench-pod-pvc-claim
