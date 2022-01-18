@@ -60,7 +60,7 @@ to run it manually, you can do so as follows.  The test should take
 only a few seconds to run.
 
 ```
-$ PYTHONPATH=. python3 -m pytest -v tests/unittest/benchmark_runner/common/templates/
+$ PYTHONPATH=. python3 -m pytest -v tests/unittest/benchmark_runner/common/template_operations/
 ============================== test session starts ===============================
 platform linux -- Python 3.9.5, pytest-6.2.2, py-1.10.0, pluggy-0.13.1 -- /usr/bin/python3
 cachedir: .pytest_cache
