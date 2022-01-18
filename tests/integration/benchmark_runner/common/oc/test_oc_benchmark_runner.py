@@ -101,11 +101,11 @@ def test_benchmark_runner_vm_create_initialized_ready_completed_deleted():
     vm_name = 'vdbench-vm'
     assert oc.create_vm_sync(yaml=os.path.join(f'{templates_path}', 'vdbench_vm.yaml'), vm_name=vm_name, namespace=test_environment_variable['namespace'], timeout=600)
     assert oc.wait_for_ready(label='app=vdbench', run_type='vm', label_uuid=False, namespace=test_environment_variable['namespace'],  timeout=600)
-    # Capture section
-    output_filename = os.path.join(f'{templates_path}', 'vdbench_vm.log')
-    vm_name = oc.get_vm(label='vdbench', namespace=test_environment_variable['namespace'])
-    oc.save_vm_log(vm_name=vm_name, output_filename=output_filename, namespace=test_environment_variable['namespace'])
-    assert oc.wait_for_vm_log_completed(vm_name=vm_name, end_stamp='@@~@@END-WORKLOAD@@~@@', output_filename=output_filename)
-    assert oc.extract_vm_results(vm_name=vm_name, start_stamp=vm_name, end_stamp='@@~@@END-WORKLOAD@@~@@', output_filename=output_filename)
     assert oc.delete_vm_sync(yaml=os.path.join(f'{templates_path}', 'vdbench_vm.yaml'), vm_name=vm_name, namespace=test_environment_variable['namespace'], timeout=600)
+    # Capture section
+    #output_filename = os.path.join(f'{templates_path}', 'vdbench_vm.log')
+    #vm_name = oc.get_vm(label='vdbench', namespace=test_environment_variable['namespace'])
+    #oc.save_vm_log(vm_name=vm_name, output_filename=output_filename, namespace=test_environment_variable['namespace'])
+    #assert oc.wait_for_vm_log_completed(vm_name=vm_name, end_stamp='@@~@@END-WORKLOAD@@~@@', output_filename=output_filename)
+    #assert oc.extract_vm_results(vm_name=vm_name, start_stamp=vm_name, end_stamp='@@~@@END-WORKLOAD@@~@@', output_filename=output_filename)
 

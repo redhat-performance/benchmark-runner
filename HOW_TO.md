@@ -60,8 +60,7 @@ to run it manually, you can do so as follows.  The test should take
 only a few seconds to run.
 
 ```
-$ PYTHONPATH=. python3 -m pytest -s -v
-tests/unittest/benchmark_runner/common/templates/
+$ PYTHONPATH=. python3 -m pytest -v tests/unittest/benchmark_runner/common/templates/
 ============================== test session starts ===============================
 platform linux -- Python 3.9.5, pytest-6.2.2, py-1.10.0, pluggy-0.13.1 -- /usr/bin/python3
 cachedir: .pytest_cache
@@ -215,7 +214,7 @@ Boilerplate data that is independent of workload has been moved to `common.yaml`
          5. `elasticsearch_port` - elasticsearch port
       2. Run the selected test using pytest [test_oc.py](/tests/integration/benchmark_runner/common/oc/test_oc.py)
          1. Enable pytest in Pycharm: Configure pytest in Pycharm -> File -> settings -> tools -> Python integrated tools -> Testing -> pytest -> ok), and run the selected test
-         2. Run pytest through terminal: python -m pytest -s -v tests/ (pip install pytest)
+         2. Run pytest through terminal: python -m pytest -v tests/ (pip install pytest)
 5. There are three separate flavors of test: `test-ci`, `func-ci`, and
    `perf-ci`.  These are intended for testing, automated functional
    testing of benchmark-runner itself, and the performance measurement

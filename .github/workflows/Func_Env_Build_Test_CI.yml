@@ -97,7 +97,7 @@ jobs:
         git clone https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
         # run pytest
         pytest --cov=benchmark_runner --cov-report=term-missing
-        coverage run -m pytest -s
+        coverage run -m pytest
         sleep 60
         coverage report -m
     - name: 🎥 Publish to coveralls.io
