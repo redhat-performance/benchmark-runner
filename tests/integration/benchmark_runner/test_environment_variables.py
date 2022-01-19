@@ -23,7 +23,7 @@ def __get_test_environment_variable():
     test_environment_variable['timeout'] = int(os.environ.get('TIMEOUT', '2000'))
 
     # end dynamic parameters - configure for local run
-    ###################################################################################################
+    ##################################################################################################
 
     # ** DO NOT CHANGE THE PARAMETERS BELOW **
     # Constant parameters
@@ -44,7 +44,7 @@ def __get_test_environment_variable():
 
     # IBM details
     test_environment_variable['region_name'] = os.environ.get('IBM_REGION_NAME', '')
-    test_environment_variable['endpoint_url'] = os.environ.get('IBM_ENDPOINT_URL', '')
+    test_environment_variable['endpoint_url'] = os.environ.get('IBM_ENDPOINT_URL', None)
     test_environment_variable['access_key_id'] = os.environ.get('IBM_ACCESS_KEY_ID', '')
     test_environment_variable['secret_access_key'] = os.environ.get('IBM_SECRET_ACCESS_KEY', '')
     test_environment_variable['bucket'] = os.environ.get('IBM_BUCKET', '')

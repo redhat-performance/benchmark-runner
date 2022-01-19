@@ -47,9 +47,9 @@ any golden files have been added, modified, or removed.
 _*If you add or modify any YAML files, you must run the following commands:*_
 
 ```
-PYTHONPATH=. python3 tests/unittest/benchmark_runner/common/templates/generate_golden_files.py
+PYTHONPATH=. python3 tests/unittest/benchmark_runner/common/template_operations/generate_golden_files.py
 git add tests/unittest/benchmark_runner/common/templates/golden_files
-git commit -m"Update golden files"
+git commit -m "Update golden files"
 ```
 
 If you remove any YAML files, you must identify the changed files and
@@ -60,8 +60,7 @@ to run it manually, you can do so as follows.  The test should take
 only a few seconds to run.
 
 ```
-$ PYTHONPATH=. python3 -m pytest -v
-tests/unittest/benchmark_runner/common/templates/
+$ PYTHONPATH=. python3 -m pytest -v tests/unittest/benchmark_runner/common/template_operations/
 ============================== test session starts ===============================
 platform linux -- Python 3.9.5, pytest-6.2.2, py-1.10.0, pluggy-0.13.1 -- /usr/bin/python3
 cachedir: .pytest_cache

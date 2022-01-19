@@ -19,18 +19,20 @@
     ]
   },
   "editable": true,
-  "gnetId": null,
+  "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
   "id": 3,
-  "iteration": 1634640829189,
+  "iteration": 1642582790275,
   "links": [],
+  "liveNow": false,
   "panels": [
     {
-      "datasource": "$Datasource",
+      "datasource": {
+        "uid": "$Datasource"
+      },
       "fieldConfig": {
         "defaults": {
           "custom": {
-            "align": null,
             "displayMode": "auto",
             "filterable": false
           },
@@ -72,10 +74,17 @@
       },
       "id": 327,
       "options": {
+        "footer": {
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
         "showHeader": true,
         "sortBy": []
       },
-      "pluginVersion": "8.1.5",
+      "pluginVersion": "8.4.0-pre",
       "targets": [
         {
           "bucketAggs": [],
@@ -96,8 +105,6 @@
           "timeField": "timestamp"
         }
       ],
-      "timeFrom": null,
-      "timeShift": null,
       "title": "Job Summary",
       "transformations": [
         {
@@ -180,7 +187,9 @@
       "type": "table"
     },
     {
-      "datasource": "$Datasource",
+      "datasource": {
+        "uid": "$Datasource"
+      },
       "fieldConfig": {
         "defaults": {
           "mappings": [],
@@ -222,7 +231,7 @@
         "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "8.1.5",
+      "pluginVersion": "8.4.0-pre",
       "targets": [
         {
           "alias": "",
@@ -257,7 +266,6 @@
               "$$hashKey": "object:31",
               "field": "coun",
               "id": "1",
-              "inlineScript": null,
               "meta": {},
               "settings": {},
               "type": "count"
@@ -268,13 +276,13 @@
           "timeField": "timestamp"
         }
       ],
-      "timeFrom": null,
-      "timeShift": null,
       "title": "Node count",
       "type": "stat"
     },
     {
-      "datasource": "$Datasource",
+      "datasource": {
+        "uid": "$Datasource"
+      },
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -317,7 +325,7 @@
         "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "8.1.5",
+      "pluginVersion": "8.4.0-pre",
       "targets": [
         {
           "alias": "",
@@ -352,7 +360,6 @@
               "$$hashKey": "object:31",
               "field": "value",
               "id": "1",
-              "inlineScript": null,
               "meta": {},
               "settings": {},
               "type": "avg"
@@ -363,13 +370,13 @@
           "timeField": "timestamp"
         }
       ],
-      "timeFrom": null,
-      "timeShift": null,
       "title": "Final pod status summary",
       "type": "stat"
     },
     {
-      "datasource": "$Datasource",
+      "datasource": {
+        "uid": "$Datasource"
+      },
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -408,7 +415,7 @@
         "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "8.1.5",
+      "pluginVersion": "8.4.0-pre",
       "targets": [
         {
           "alias": "Secrets",
@@ -430,7 +437,6 @@
               "$$hashKey": "object:31",
               "field": "value",
               "id": "1",
-              "inlineScript": null,
               "meta": {},
               "settings": {},
               "type": "avg"
@@ -460,7 +466,6 @@
               "$$hashKey": "object:31",
               "field": "value",
               "id": "1",
-              "inlineScript": null,
               "meta": {},
               "settings": {},
               "type": "avg"
@@ -471,12 +476,12 @@
           "timeField": "timestamp"
         }
       ],
-      "timeFrom": null,
-      "timeShift": null,
       "type": "stat"
     },
     {
-      "datasource": "$Datasource",
+      "datasource": {
+        "uid": "$Datasource"
+      },
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -515,7 +520,7 @@
         "text": {},
         "textMode": "value"
       },
-      "pluginVersion": "8.1.5",
+      "pluginVersion": "8.4.0-pre",
       "targets": [
         {
           "alias": "",
@@ -525,7 +530,6 @@
               "$$hashKey": "object:31",
               "field": "versi",
               "id": "1",
-              "inlineScript": null,
               "meta": {},
               "settings": {
                 "size": 500
@@ -538,13 +542,13 @@
           "timeField": "timestamp"
         }
       ],
-      "timeFrom": null,
-      "timeShift": null,
       "title": "OpenShift version",
       "type": "stat"
     },
     {
-      "datasource": "$Datasource",
+      "datasource": {
+        "uid": "$Datasource"
+      },
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -583,7 +587,7 @@
         "text": {},
         "textMode": "value"
       },
-      "pluginVersion": "8.1.5",
+      "pluginVersion": "8.4.0-pre",
       "targets": [
         {
           "alias": "",
@@ -593,7 +597,6 @@
               "$$hashKey": "object:31",
               "field": "versi",
               "id": "1",
-              "inlineScript": null,
               "meta": {},
               "settings": {
                 "size": 500
@@ -606,13 +609,13 @@
           "timeField": "timestamp"
         }
       ],
-      "timeFrom": null,
-      "timeShift": null,
       "title": "Etcd version",
       "type": "stat"
     },
     {
-      "datasource": "$Datasource",
+      "datasource": {
+        "uid": "$Datasource"
+      },
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -655,7 +658,7 @@
         "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "8.1.5",
+      "pluginVersion": "8.4.0-pre",
       "targets": [
         {
           "alias": "Namespaces",
@@ -677,7 +680,6 @@
               "$$hashKey": "object:31",
               "field": "value",
               "id": "1",
-              "inlineScript": null,
               "meta": {},
               "settings": {},
               "type": "avg"
@@ -707,7 +709,6 @@
               "$$hashKey": "object:31",
               "field": "value",
               "id": "1",
-              "inlineScript": null,
               "meta": {},
               "settings": {},
               "type": "avg"
@@ -737,7 +738,6 @@
               "$$hashKey": "object:31",
               "field": "value",
               "id": "1",
-              "inlineScript": null,
               "meta": {},
               "settings": {},
               "type": "avg"
@@ -748,13 +748,14 @@
           "timeField": "timestamp"
         }
       ],
-      "timeFrom": null,
-      "timeShift": null,
       "type": "stat"
     },
     {
       "collapsed": true,
-      "datasource": "Elasticsearch-system-metrics",
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "jQbzdZDnz"
+      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -768,7 +769,9 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "$Datasource",
+          "datasource": {
+            "uid": "$Datasource"
+          },
           "fieldConfig": {
             "defaults": {
               "custom": {}
@@ -795,7 +798,6 @@
             "min": false,
             "rightSide": false,
             "show": true,
-            "sideWidth": null,
             "sort": "max",
             "sortDesc": false,
             "total": false,
@@ -874,9 +876,7 @@
             }
           ],
           "thresholds": [],
-          "timeFrom": null,
           "timeRegions": [],
-          "timeShift": null,
           "title": "Prometheus CPU usage",
           "tooltip": {
             "shared": true,
@@ -885,9 +885,7 @@
           },
           "type": "graph",
           "xaxis": {
-            "buckets": null,
             "mode": "time",
-            "name": null,
             "show": true,
             "values": []
           },
@@ -895,25 +893,18 @@
             {
               "$$hashKey": "object:4320",
               "format": "percent",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": true
             },
             {
               "$$hashKey": "object:4321",
               "format": "short",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": true
             }
           ],
           "yaxis": {
-            "align": false,
-            "alignLevel": null
+            "align": false
           }
         },
         {
@@ -921,7 +912,9 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "$Datasource",
+          "datasource": {
+            "uid": "$Datasource"
+          },
           "fieldConfig": {
             "defaults": {
               "custom": {}
@@ -948,7 +941,6 @@
             "min": false,
             "rightSide": false,
             "show": true,
-            "sideWidth": null,
             "sort": "max",
             "sortDesc": false,
             "total": false,
@@ -1027,9 +1019,7 @@
             }
           ],
           "thresholds": [],
-          "timeFrom": null,
           "timeRegions": [],
-          "timeShift": null,
           "title": "Prometheus RSS Memory usage",
           "tooltip": {
             "shared": true,
@@ -1038,9 +1028,7 @@
           },
           "type": "graph",
           "xaxis": {
-            "buckets": null,
             "mode": "time",
-            "name": null,
             "show": true,
             "values": []
           },
@@ -1048,25 +1036,18 @@
             {
               "$$hashKey": "object:4320",
               "format": "bytes",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": true
             },
             {
               "$$hashKey": "object:4321",
               "format": "short",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": true
             }
           ],
           "yaxis": {
-            "align": false,
-            "alignLevel": null
+            "align": false
           }
         }
       ],
@@ -1075,7 +1056,10 @@
     },
     {
       "collapsed": true,
-      "datasource": "Elasticsearch-system-metrics",
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "jQbzdZDnz"
+      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -1089,7 +1073,9 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "$Datasource",
+          "datasource": {
+            "uid": "$Datasource"
+          },
           "fieldConfig": {
             "defaults": {
               "custom": {}
@@ -1164,7 +1150,6 @@
                   "$$hashKey": "object:31",
                   "field": "value",
                   "id": "1",
-                  "inlineScript": null,
                   "meta": {},
                   "settings": {},
                   "type": "avg"
@@ -1176,9 +1161,7 @@
             }
           ],
           "thresholds": [],
-          "timeFrom": null,
           "timeRegions": [],
-          "timeShift": null,
           "title": "etcd 99th disk WAL fsync latency",
           "tooltip": {
             "shared": true,
@@ -1187,9 +1170,7 @@
           },
           "type": "graph",
           "xaxis": {
-            "buckets": null,
             "mode": "time",
-            "name": null,
             "show": true,
             "values": []
           },
@@ -1197,25 +1178,18 @@
             {
               "$$hashKey": "object:65",
               "format": "s",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": true
             },
             {
               "$$hashKey": "object:66",
               "format": "short",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": true
             }
           ],
           "yaxis": {
-            "align": false,
-            "alignLevel": null
+            "align": false
           }
         },
         {
@@ -1223,7 +1197,9 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "$Datasource",
+          "datasource": {
+            "uid": "$Datasource"
+          },
           "fieldConfig": {
             "defaults": {
               "custom": {}
@@ -1298,7 +1274,6 @@
                   "$$hashKey": "object:31",
                   "field": "value",
                   "id": "1",
-                  "inlineScript": null,
                   "meta": {},
                   "settings": {},
                   "type": "avg"
@@ -1310,9 +1285,7 @@
             }
           ],
           "thresholds": [],
-          "timeFrom": null,
           "timeRegions": [],
-          "timeShift": null,
           "title": "etcd 99th disk backend commit latency",
           "tooltip": {
             "shared": true,
@@ -1321,9 +1294,7 @@
           },
           "type": "graph",
           "xaxis": {
-            "buckets": null,
             "mode": "time",
-            "name": null,
             "show": true,
             "values": []
           },
@@ -1331,25 +1302,18 @@
             {
               "$$hashKey": "object:65",
               "format": "s",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": true
             },
             {
               "$$hashKey": "object:66",
               "format": "short",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": true
             }
           ],
           "yaxis": {
-            "align": false,
-            "alignLevel": null
+            "align": false
           }
         },
         {
@@ -1357,7 +1321,9 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "$Datasource",
+          "datasource": {
+            "uid": "$Datasource"
+          },
           "fieldConfig": {
             "defaults": {
               "custom": {},
@@ -1366,8 +1332,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -1486,9 +1451,7 @@
             }
           ],
           "thresholds": [],
-          "timeFrom": null,
           "timeRegions": [],
-          "timeShift": null,
           "title": "Etcd leader",
           "tooltip": {
             "shared": true,
@@ -1497,9 +1460,7 @@
           },
           "type": "graph",
           "xaxis": {
-            "buckets": null,
             "mode": "time",
-            "name": null,
             "show": true,
             "values": []
           },
@@ -1507,26 +1468,18 @@
             {
               "$$hashKey": "object:301",
               "format": "none",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": true
             },
             {
               "$$hashKey": "object:302",
-              "decimals": null,
               "format": "none",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": false
             }
           ],
           "yaxis": {
-            "align": false,
-            "alignLevel": null
+            "align": false
           }
         },
         {
@@ -1534,7 +1487,9 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "$Datasource",
+          "datasource": {
+            "uid": "$Datasource"
+          },
           "fieldConfig": {
             "defaults": {
               "custom": {}
@@ -1626,9 +1581,7 @@
             }
           ],
           "thresholds": [],
-          "timeFrom": null,
           "timeRegions": [],
-          "timeShift": null,
           "title": "Etcd object count rate",
           "tooltip": {
             "shared": true,
@@ -1637,9 +1590,7 @@
           },
           "type": "graph",
           "xaxis": {
-            "buckets": null,
             "mode": "time",
-            "name": null,
             "show": true,
             "values": []
           },
@@ -1647,26 +1598,18 @@
             {
               "$$hashKey": "object:301",
               "format": "none",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": true
             },
             {
               "$$hashKey": "object:302",
-              "decimals": null,
               "format": "none",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": false
             }
           ],
           "yaxis": {
-            "align": false,
-            "alignLevel": null
+            "align": false
           }
         },
         {
@@ -1674,11 +1617,12 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "$Datasource",
+          "datasource": {
+            "uid": "$Datasource"
+          },
           "fieldConfig": {
             "defaults": {
               "custom": {
-                "align": null,
                 "filterable": false
               },
               "mappings": [],
@@ -1686,8 +1630,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -1829,9 +1772,7 @@
             }
           ],
           "thresholds": [],
-          "timeFrom": null,
           "timeRegions": [],
-          "timeShift": null,
           "title": "Etcd DB size",
           "tooltip": {
             "shared": true,
@@ -1840,9 +1781,7 @@
           },
           "type": "graph",
           "xaxis": {
-            "buckets": null,
             "mode": "time",
-            "name": null,
             "show": true,
             "values": []
           },
@@ -1850,26 +1789,18 @@
             {
               "$$hashKey": "object:301",
               "format": "decbytes",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": true
             },
             {
               "$$hashKey": "object:302",
-              "decimals": null,
               "format": "decbytes",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": true
             }
           ],
           "yaxis": {
-            "align": false,
-            "alignLevel": null
+            "align": false
           }
         },
         {
@@ -1877,11 +1808,12 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "$Datasource",
+          "datasource": {
+            "uid": "$Datasource"
+          },
           "fieldConfig": {
             "defaults": {
               "custom": {
-                "align": null,
                 "filterable": false
               },
               "mappings": [],
@@ -1889,8 +1821,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -2004,9 +1935,7 @@
             }
           ],
           "thresholds": [],
-          "timeFrom": null,
           "timeRegions": [],
-          "timeShift": null,
           "title": "Etcd 99th network peer roundtrip time",
           "tooltip": {
             "shared": true,
@@ -2015,9 +1944,7 @@
           },
           "type": "graph",
           "xaxis": {
-            "buckets": null,
             "mode": "time",
-            "name": null,
             "show": true,
             "values": []
           },
@@ -2025,26 +1952,18 @@
             {
               "$$hashKey": "object:301",
               "format": "s",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": true
             },
             {
               "$$hashKey": "object:302",
-              "decimals": null,
               "format": "decbytes",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": false
             }
           ],
           "yaxis": {
-            "align": false,
-            "alignLevel": null
+            "align": false
           }
         },
         {
@@ -2052,7 +1971,9 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "$Datasource",
+          "datasource": {
+            "uid": "$Datasource"
+          },
           "fieldConfig": {
             "defaults": {
               "custom": {}
@@ -2127,7 +2048,6 @@
                   "$$hashKey": "object:31",
                   "field": "value",
                   "id": "1",
-                  "inlineScript": null,
                   "meta": {},
                   "settings": {},
                   "type": "avg"
@@ -2139,9 +2059,7 @@
             }
           ],
           "thresholds": [],
-          "timeFrom": null,
           "timeRegions": [],
-          "timeShift": null,
           "title": "Node status summary",
           "tooltip": {
             "shared": true,
@@ -2150,9 +2068,7 @@
           },
           "type": "graph",
           "xaxis": {
-            "buckets": null,
             "mode": "time",
-            "name": null,
             "show": true,
             "values": []
           },
@@ -2160,25 +2076,18 @@
             {
               "$$hashKey": "object:430",
               "format": "short",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": true
             },
             {
               "$$hashKey": "object:431",
               "format": "short",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": true
             }
           ],
           "yaxis": {
-            "align": false,
-            "alignLevel": null
+            "align": false
           }
         },
         {
@@ -2186,7 +2095,9 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "$Datasource",
+          "datasource": {
+            "uid": "$Datasource"
+          },
           "fieldConfig": {
             "defaults": {
               "custom": {}
@@ -2261,7 +2172,6 @@
                   "$$hashKey": "object:31",
                   "field": "value",
                   "id": "1",
-                  "inlineScript": null,
                   "meta": {},
                   "settings": {},
                   "type": "avg"
@@ -2273,9 +2183,7 @@
             }
           ],
           "thresholds": [],
-          "timeFrom": null,
           "timeRegions": [],
-          "timeShift": null,
           "title": "Pod status summary",
           "tooltip": {
             "shared": true,
@@ -2284,9 +2192,7 @@
           },
           "type": "graph",
           "xaxis": {
-            "buckets": null,
             "mode": "time",
-            "name": null,
             "show": true,
             "values": []
           },
@@ -2294,25 +2200,18 @@
             {
               "$$hashKey": "object:65",
               "format": "none",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": true
             },
             {
               "$$hashKey": "object:66",
               "format": "short",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": true
             }
           ],
           "yaxis": {
-            "align": false,
-            "alignLevel": null
+            "align": false
           }
         },
         {
@@ -2320,7 +2219,9 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "$Datasource",
+          "datasource": {
+            "uid": "$Datasource"
+          },
           "fieldConfig": {
             "defaults": {
               "custom": {}
@@ -2347,7 +2248,6 @@
             "min": false,
             "rightSide": true,
             "show": true,
-            "sideWidth": null,
             "sort": "max",
             "sortDesc": true,
             "total": false,
@@ -2412,9 +2312,7 @@
             }
           ],
           "thresholds": [],
-          "timeFrom": null,
           "timeRegions": [],
-          "timeShift": null,
           "title": "API P99 latency",
           "tooltip": {
             "shared": true,
@@ -2423,9 +2321,7 @@
           },
           "type": "graph",
           "xaxis": {
-            "buckets": null,
             "mode": "time",
-            "name": null,
             "show": true,
             "values": []
           },
@@ -2433,25 +2329,18 @@
             {
               "$$hashKey": "object:4320",
               "format": "s",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": true
             },
             {
               "$$hashKey": "object:4321",
               "format": "short",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": true
             }
           ],
           "yaxis": {
-            "align": false,
-            "alignLevel": null
+            "align": false
           }
         }
       ],
@@ -2460,7 +2349,10 @@
     },
     {
       "collapsed": true,
-      "datasource": "Elasticsearch-system-metrics",
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "jQbzdZDnz"
+      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -2474,7 +2366,9 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "$Datasource",
+          "datasource": {
+            "uid": "$Datasource"
+          },
           "fieldConfig": {
             "defaults": {
               "custom": {}
@@ -2567,9 +2461,7 @@
             }
           ],
           "thresholds": [],
-          "timeFrom": null,
           "timeRegions": [],
-          "timeShift": null,
           "title": "Average pod latency",
           "tooltip": {
             "shared": true,
@@ -2578,9 +2470,7 @@
           },
           "type": "graph",
           "xaxis": {
-            "buckets": null,
             "mode": "time",
-            "name": null,
             "show": true,
             "values": []
           },
@@ -2588,29 +2478,24 @@
             {
               "$$hashKey": "object:101",
               "format": "ms",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": true
             },
             {
               "$$hashKey": "object:102",
               "format": "short",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": true
             }
           ],
           "yaxis": {
-            "align": false,
-            "alignLevel": null
+            "align": false
           }
         },
         {
-          "datasource": "$Datasource",
+          "datasource": {
+            "uid": "$Datasource"
+          },
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -2624,8 +2509,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -2703,8 +2587,6 @@
               "timeField": "timestamp"
             }
           ],
-          "timeFrom": null,
-          "timeShift": null,
           "title": "Pod latencies summary",
           "type": "stat"
         }
@@ -2714,7 +2596,10 @@
     },
     {
       "collapsed": true,
-      "datasource": "Elasticsearch-system-metrics",
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "jQbzdZDnz"
+      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -2728,7 +2613,9 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "$Datasource",
+          "datasource": {
+            "uid": "$Datasource"
+          },
           "fieldConfig": {
             "defaults": {
               "custom": {}
@@ -2817,9 +2704,7 @@
             }
           ],
           "thresholds": [],
-          "timeFrom": null,
           "timeRegions": [],
-          "timeShift": null,
           "title": "Top 5 Kubelet process CPU usage",
           "tooltip": {
             "shared": true,
@@ -2828,9 +2713,7 @@
           },
           "type": "graph",
           "xaxis": {
-            "buckets": null,
             "mode": "time",
-            "name": null,
             "show": true,
             "values": []
           },
@@ -2838,25 +2721,18 @@
             {
               "$$hashKey": "object:80",
               "format": "percent",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": true
             },
             {
               "$$hashKey": "object:81",
               "format": "short",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": true
             }
           ],
           "yaxis": {
-            "align": false,
-            "alignLevel": null
+            "align": false
           }
         },
         {
@@ -2864,7 +2740,9 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "$Datasource",
+          "datasource": {
+            "uid": "$Datasource"
+          },
           "fieldConfig": {
             "defaults": {
               "custom": {}
@@ -2953,9 +2831,7 @@
             }
           ],
           "thresholds": [],
-          "timeFrom": null,
           "timeRegions": [],
-          "timeShift": null,
           "title": "Top 5 Kubelet process RSS memory usage",
           "tooltip": {
             "shared": true,
@@ -2964,9 +2840,7 @@
           },
           "type": "graph",
           "xaxis": {
-            "buckets": null,
             "mode": "time",
-            "name": null,
             "show": true,
             "values": []
           },
@@ -2974,25 +2848,18 @@
             {
               "$$hashKey": "object:80",
               "format": "bytes",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": true
             },
             {
               "$$hashKey": "object:81",
               "format": "short",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": true
             }
           ],
           "yaxis": {
-            "align": false,
-            "alignLevel": null
+            "align": false
           }
         },
         {
@@ -3000,7 +2867,9 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "$Datasource",
+          "datasource": {
+            "uid": "$Datasource"
+          },
           "fieldConfig": {
             "defaults": {
               "custom": {}
@@ -3089,9 +2958,7 @@
             }
           ],
           "thresholds": [],
-          "timeFrom": null,
           "timeRegions": [],
-          "timeShift": null,
           "title": "Top 5 CRI-O process CPU usage",
           "tooltip": {
             "shared": true,
@@ -3100,9 +2967,7 @@
           },
           "type": "graph",
           "xaxis": {
-            "buckets": null,
             "mode": "time",
-            "name": null,
             "show": true,
             "values": []
           },
@@ -3110,25 +2975,18 @@
             {
               "$$hashKey": "object:80",
               "format": "percent",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": true
             },
             {
               "$$hashKey": "object:81",
               "format": "short",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": true
             }
           ],
           "yaxis": {
-            "align": false,
-            "alignLevel": null
+            "align": false
           }
         },
         {
@@ -3136,7 +2994,9 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "$Datasource",
+          "datasource": {
+            "uid": "$Datasource"
+          },
           "fieldConfig": {
             "defaults": {
               "custom": {}
@@ -3223,9 +3083,7 @@
             }
           ],
           "thresholds": [],
-          "timeFrom": null,
           "timeRegions": [],
-          "timeShift": null,
           "title": "Top 5 CRI-O process RSS memory usage",
           "tooltip": {
             "shared": true,
@@ -3234,9 +3092,7 @@
           },
           "type": "graph",
           "xaxis": {
-            "buckets": null,
             "mode": "time",
-            "name": null,
             "show": true,
             "values": []
           },
@@ -3244,25 +3100,18 @@
             {
               "$$hashKey": "object:80",
               "format": "bytes",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": true
             },
             {
               "$$hashKey": "object:81",
               "format": "short",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": true
             }
           ],
           "yaxis": {
-            "align": false,
-            "alignLevel": null
+            "align": false
           }
         }
       ],
@@ -3271,7 +3120,10 @@
     },
     {
       "collapsed": false,
-      "datasource": "Elasticsearch-system-metrics",
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "jQbzdZDnz"
+      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -3289,7 +3141,9 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "$Datasource",
+      "datasource": {
+        "uid": "$Datasource"
+      },
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
@@ -3318,7 +3172,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "8.1.5",
+      "pluginVersion": "8.4.0-pre",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -3360,7 +3214,6 @@
               "$$hashKey": "object:31",
               "field": "value",
               "id": "1",
-              "inlineScript": null,
               "meta": {},
               "settings": {},
               "type": "avg"
@@ -3372,9 +3225,7 @@
         }
       ],
       "thresholds": [],
-      "timeFrom": null,
       "timeRegions": [],
-      "timeShift": null,
       "title": "Top 5 CPU  usage $master",
       "tooltip": {
         "shared": true,
@@ -3383,9 +3234,7 @@
       },
       "type": "graph",
       "xaxis": {
-        "buckets": null,
         "mode": "time",
-        "name": null,
         "show": true,
         "values": []
       },
@@ -3393,25 +3242,18 @@
         {
           "$$hashKey": "object:65",
           "format": "percent",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         },
         {
           "$$hashKey": "object:66",
           "format": "short",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         }
       ],
       "yaxis": {
-        "align": false,
-        "alignLevel": null
+        "align": false
       }
     },
     {
@@ -3419,7 +3261,9 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "$Datasource",
+      "datasource": {
+        "uid": "$Datasource"
+      },
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
@@ -3448,7 +3292,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "8.1.5",
+      "pluginVersion": "8.4.0-pre",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -3490,7 +3334,6 @@
               "$$hashKey": "object:31",
               "field": "value",
               "id": "1",
-              "inlineScript": null,
               "meta": {},
               "settings": {},
               "type": "avg"
@@ -3502,9 +3345,7 @@
         }
       ],
       "thresholds": [],
-      "timeFrom": null,
       "timeRegions": [],
-      "timeShift": null,
       "title": "Top 5 memory RSS $master",
       "tooltip": {
         "shared": true,
@@ -3513,36 +3354,26 @@
       },
       "type": "graph",
       "xaxis": {
-        "buckets": null,
         "mode": "time",
-        "name": null,
         "show": true,
         "values": []
       },
       "yaxes": [
         {
           "$$hashKey": "object:65",
-          "decimals": null,
           "format": "bytes",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         },
         {
           "$$hashKey": "object:66",
           "format": "bytes",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": false
         }
       ],
       "yaxis": {
-        "align": false,
-        "alignLevel": null
+        "align": false
       }
     },
     {
@@ -3550,7 +3381,9 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "$Datasource",
+      "datasource": {
+        "uid": "$Datasource"
+      },
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
@@ -3577,7 +3410,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "8.1.5",
+      "pluginVersion": "8.4.0-pre",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -3643,9 +3476,7 @@
         }
       ],
       "thresholds": [],
-      "timeFrom": null,
       "timeRegions": [],
-      "timeShift": null,
       "title": "Container disk write rate: $master",
       "tooltip": {
         "shared": true,
@@ -3654,9 +3485,7 @@
       },
       "type": "graph",
       "xaxis": {
-        "buckets": null,
         "mode": "time",
-        "name": null,
         "show": true,
         "values": []
       },
@@ -3664,25 +3493,18 @@
         {
           "$$hashKey": "object:616",
           "format": "Bps",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         },
         {
           "$$hashKey": "object:617",
           "format": "short",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         }
       ],
       "yaxis": {
-        "align": false,
-        "alignLevel": null
+        "align": false
       }
     },
     {
@@ -3690,7 +3512,9 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "$Datasource",
+      "datasource": {
+        "uid": "$Datasource"
+      },
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
@@ -3719,7 +3543,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "8.1.5",
+      "pluginVersion": "8.4.0-pre",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -3748,7 +3572,6 @@
               "$$hashKey": "object:31",
               "field": "value",
               "id": "1",
-              "inlineScript": null,
               "meta": {},
               "settings": {},
               "type": "avg"
@@ -3778,7 +3601,6 @@
               "$$hashKey": "object:31",
               "field": "value",
               "id": "1",
-              "inlineScript": null,
               "meta": {},
               "settings": {},
               "type": "avg"
@@ -3808,7 +3630,6 @@
               "$$hashKey": "object:31",
               "field": "value",
               "id": "1",
-              "inlineScript": null,
               "meta": {},
               "settings": {},
               "type": "avg"
@@ -3820,9 +3641,7 @@
         }
       ],
       "thresholds": [],
-      "timeFrom": null,
       "timeRegions": [],
-      "timeShift": null,
       "title": "Memory $master",
       "tooltip": {
         "shared": true,
@@ -3831,9 +3650,7 @@
       },
       "type": "graph",
       "xaxis": {
-        "buckets": null,
         "mode": "time",
-        "name": null,
         "show": true,
         "values": []
       },
@@ -3841,25 +3658,18 @@
         {
           "$$hashKey": "object:65",
           "format": "bytes",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         },
         {
           "$$hashKey": "object:66",
           "format": "short",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         }
       ],
       "yaxis": {
-        "align": false,
-        "alignLevel": null
+        "align": false
       }
     },
     {
@@ -3867,7 +3677,9 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "$Datasource",
+      "datasource": {
+        "uid": "$Datasource"
+      },
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
@@ -3896,7 +3708,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "8.1.5",
+      "pluginVersion": "8.4.0-pre",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -3954,9 +3766,7 @@
         }
       ],
       "thresholds": [],
-      "timeFrom": null,
       "timeRegions": [],
-      "timeShift": null,
       "title": "CPU $master",
       "tooltip": {
         "shared": true,
@@ -3965,9 +3775,7 @@
       },
       "type": "graph",
       "xaxis": {
-        "buckets": null,
         "mode": "time",
-        "name": null,
         "show": true,
         "values": []
       },
@@ -3975,25 +3783,18 @@
         {
           "$$hashKey": "object:65",
           "format": "percent",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         },
         {
           "$$hashKey": "object:66",
           "format": "short",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         }
       ],
       "yaxis": {
-        "align": false,
-        "alignLevel": null
+        "align": false
       }
     },
     {
@@ -4001,7 +3802,9 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "$Datasource",
+      "datasource": {
+        "uid": "$Datasource"
+      },
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
@@ -4028,7 +3831,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "8.1.5",
+      "pluginVersion": "8.4.0-pre",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -4118,7 +3921,6 @@
               "$$hashKey": "object:1193",
               "field": "value",
               "id": "1",
-              "inlineScript": null,
               "meta": {},
               "settings": {},
               "type": "avg"
@@ -4130,9 +3932,7 @@
         }
       ],
       "thresholds": [],
-      "timeFrom": null,
       "timeRegions": [],
-      "timeShift": null,
       "title": "Disk $master",
       "tooltip": {
         "shared": true,
@@ -4141,9 +3941,7 @@
       },
       "type": "graph",
       "xaxis": {
-        "buckets": null,
         "mode": "time",
-        "name": null,
         "show": true,
         "values": []
       },
@@ -4151,25 +3949,18 @@
         {
           "$$hashKey": "object:1121",
           "format": "Bps",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         },
         {
           "$$hashKey": "object:1122",
           "format": "short",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         }
       ],
       "yaxis": {
-        "align": false,
-        "alignLevel": null
+        "align": false
       }
     },
     {
@@ -4177,7 +3968,9 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "$Datasource",
+      "datasource": {
+        "uid": "$Datasource"
+      },
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
@@ -4204,7 +3997,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "8.1.5",
+      "pluginVersion": "8.4.0-pre",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -4294,7 +4087,6 @@
               "$$hashKey": "object:1193",
               "field": "value",
               "id": "1",
-              "inlineScript": null,
               "meta": {},
               "settings": {},
               "type": "avg"
@@ -4306,9 +4098,7 @@
         }
       ],
       "thresholds": [],
-      "timeFrom": null,
       "timeRegions": [],
-      "timeShift": null,
       "title": "Network bytes $master",
       "tooltip": {
         "shared": true,
@@ -4317,9 +4107,7 @@
       },
       "type": "graph",
       "xaxis": {
-        "buckets": null,
         "mode": "time",
-        "name": null,
         "show": true,
         "values": []
       },
@@ -4327,25 +4115,18 @@
         {
           "$$hashKey": "object:1121",
           "format": "Bps",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         },
         {
           "$$hashKey": "object:1122",
           "format": "short",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         }
       ],
       "yaxis": {
-        "align": false,
-        "alignLevel": null
+        "align": false
       }
     },
     {
@@ -4353,7 +4134,9 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "$Datasource",
+      "datasource": {
+        "uid": "$Datasource"
+      },
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
@@ -4381,7 +4164,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "8.1.5",
+      "pluginVersion": "8.4.0-pre",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -4484,9 +4267,7 @@
         }
       ],
       "thresholds": [],
-      "timeFrom": null,
       "timeRegions": [],
-      "timeShift": null,
       "title": "Dropped packets $master",
       "tooltip": {
         "shared": true,
@@ -4495,9 +4276,7 @@
       },
       "type": "graph",
       "xaxis": {
-        "buckets": null,
         "mode": "time",
-        "name": null,
         "show": true,
         "values": []
       },
@@ -4505,30 +4284,26 @@
         {
           "$$hashKey": "object:1701",
           "format": "short",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         },
         {
           "$$hashKey": "object:1702",
           "format": "short",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         }
       ],
       "yaxis": {
-        "align": false,
-        "alignLevel": null
+        "align": false
       }
     },
     {
       "collapsed": false,
-      "datasource": "Elasticsearch-system-metrics",
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "jQbzdZDnz"
+      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -4546,7 +4321,9 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "$Datasource",
+      "datasource": {
+        "uid": "$Datasource"
+      },
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
@@ -4575,7 +4352,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "8.1.5",
+      "pluginVersion": "8.4.0-pre",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -4617,7 +4394,6 @@
               "$$hashKey": "object:31",
               "field": "value",
               "id": "1",
-              "inlineScript": null,
               "meta": {},
               "settings": {},
               "type": "avg"
@@ -4629,9 +4405,7 @@
         }
       ],
       "thresholds": [],
-      "timeFrom": null,
       "timeRegions": [],
-      "timeShift": null,
       "title": "Top 5 CPU usage $worker",
       "tooltip": {
         "shared": true,
@@ -4640,9 +4414,7 @@
       },
       "type": "graph",
       "xaxis": {
-        "buckets": null,
         "mode": "time",
-        "name": null,
         "show": true,
         "values": []
       },
@@ -4650,25 +4422,18 @@
         {
           "$$hashKey": "object:65",
           "format": "percent",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         },
         {
           "$$hashKey": "object:66",
           "format": "short",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         }
       ],
       "yaxis": {
-        "align": false,
-        "alignLevel": null
+        "align": false
       }
     },
     {
@@ -4676,7 +4441,9 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "$Datasource",
+      "datasource": {
+        "uid": "$Datasource"
+      },
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
@@ -4705,7 +4472,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "8.1.5",
+      "pluginVersion": "8.4.0-pre",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -4747,7 +4514,6 @@
               "$$hashKey": "object:31",
               "field": "value",
               "id": "1",
-              "inlineScript": null,
               "meta": {},
               "settings": {},
               "type": "avg"
@@ -4759,9 +4525,7 @@
         }
       ],
       "thresholds": [],
-      "timeFrom": null,
       "timeRegions": [],
-      "timeShift": null,
       "title": "Top 5 memory RSS $worker",
       "tooltip": {
         "shared": true,
@@ -4770,36 +4534,26 @@
       },
       "type": "graph",
       "xaxis": {
-        "buckets": null,
         "mode": "time",
-        "name": null,
         "show": true,
         "values": []
       },
       "yaxes": [
         {
           "$$hashKey": "object:65",
-          "decimals": null,
           "format": "bytes",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         },
         {
           "$$hashKey": "object:66",
           "format": "bytes",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         }
       ],
       "yaxis": {
-        "align": false,
-        "alignLevel": null
+        "align": false
       }
     },
     {
@@ -4807,7 +4561,9 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "$Datasource",
+      "datasource": {
+        "uid": "$Datasource"
+      },
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
@@ -4836,7 +4592,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "8.1.5",
+      "pluginVersion": "8.4.0-pre",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -4894,9 +4650,7 @@
         }
       ],
       "thresholds": [],
-      "timeFrom": null,
       "timeRegions": [],
-      "timeShift": null,
       "title": "CPU $worker",
       "tooltip": {
         "shared": true,
@@ -4905,9 +4659,7 @@
       },
       "type": "graph",
       "xaxis": {
-        "buckets": null,
         "mode": "time",
-        "name": null,
         "show": true,
         "values": []
       },
@@ -4915,25 +4667,18 @@
         {
           "$$hashKey": "object:65",
           "format": "percent",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         },
         {
           "$$hashKey": "object:66",
           "format": "short",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         }
       ],
       "yaxis": {
-        "align": false,
-        "alignLevel": null
+        "align": false
       }
     },
     {
@@ -4941,7 +4686,9 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "$Datasource",
+      "datasource": {
+        "uid": "$Datasource"
+      },
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
@@ -4970,7 +4717,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "8.1.5",
+      "pluginVersion": "8.4.0-pre",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -4999,7 +4746,6 @@
               "$$hashKey": "object:31",
               "field": "value",
               "id": "1",
-              "inlineScript": null,
               "meta": {},
               "settings": {},
               "type": "avg"
@@ -5029,7 +4775,6 @@
               "$$hashKey": "object:31",
               "field": "value",
               "id": "1",
-              "inlineScript": null,
               "meta": {},
               "settings": {},
               "type": "avg"
@@ -5059,7 +4804,6 @@
               "$$hashKey": "object:31",
               "field": "value",
               "id": "1",
-              "inlineScript": null,
               "meta": {},
               "settings": {},
               "type": "avg"
@@ -5071,9 +4815,7 @@
         }
       ],
       "thresholds": [],
-      "timeFrom": null,
       "timeRegions": [],
-      "timeShift": null,
       "title": "Memory $worker",
       "tooltip": {
         "shared": true,
@@ -5082,9 +4824,7 @@
       },
       "type": "graph",
       "xaxis": {
-        "buckets": null,
         "mode": "time",
-        "name": null,
         "show": true,
         "values": []
       },
@@ -5092,25 +4832,18 @@
         {
           "$$hashKey": "object:65",
           "format": "bytes",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         },
         {
           "$$hashKey": "object:66",
           "format": "short",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         }
       ],
       "yaxis": {
-        "align": false,
-        "alignLevel": null
+        "align": false
       }
     },
     {
@@ -5118,7 +4851,9 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "$Datasource",
+      "datasource": {
+        "uid": "$Datasource"
+      },
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
@@ -5145,7 +4880,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "8.1.5",
+      "pluginVersion": "8.4.0-pre",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -5235,7 +4970,6 @@
               "$$hashKey": "object:1193",
               "field": "value",
               "id": "1",
-              "inlineScript": null,
               "meta": {},
               "settings": {},
               "type": "avg"
@@ -5247,9 +4981,7 @@
         }
       ],
       "thresholds": [],
-      "timeFrom": null,
       "timeRegions": [],
-      "timeShift": null,
       "title": "Network bytes $worker",
       "tooltip": {
         "shared": true,
@@ -5258,9 +4990,7 @@
       },
       "type": "graph",
       "xaxis": {
-        "buckets": null,
         "mode": "time",
-        "name": null,
         "show": true,
         "values": []
       },
@@ -5268,25 +4998,18 @@
         {
           "$$hashKey": "object:1121",
           "format": "Bps",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         },
         {
           "$$hashKey": "object:1122",
           "format": "short",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         }
       ],
       "yaxis": {
-        "align": false,
-        "alignLevel": null
+        "align": false
       }
     },
     {
@@ -5294,7 +5017,9 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "$Datasource",
+      "datasource": {
+        "uid": "$Datasource"
+      },
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
@@ -5321,7 +5046,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "8.1.5",
+      "pluginVersion": "8.4.0-pre",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -5411,7 +5136,6 @@
               "$$hashKey": "object:1193",
               "field": "value",
               "id": "1",
-              "inlineScript": null,
               "meta": {},
               "settings": {},
               "type": "avg"
@@ -5423,9 +5147,7 @@
         }
       ],
       "thresholds": [],
-      "timeFrom": null,
       "timeRegions": [],
-      "timeShift": null,
       "title": "Disk $worker",
       "tooltip": {
         "shared": true,
@@ -5434,9 +5156,7 @@
       },
       "type": "graph",
       "xaxis": {
-        "buckets": null,
         "mode": "time",
-        "name": null,
         "show": true,
         "values": []
       },
@@ -5444,25 +5164,18 @@
         {
           "$$hashKey": "object:1121",
           "format": "Bps",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         },
         {
           "$$hashKey": "object:1122",
           "format": "short",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         }
       ],
       "yaxis": {
-        "align": false,
-        "alignLevel": null
+        "align": false
       }
     },
     {
@@ -5470,7 +5183,9 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "$Datasource",
+      "datasource": {
+        "uid": "$Datasource"
+      },
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
@@ -5501,7 +5216,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "8.1.5",
+      "pluginVersion": "8.4.0-pre",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -5604,9 +5319,7 @@
         }
       ],
       "thresholds": [],
-      "timeFrom": null,
       "timeRegions": [],
-      "timeShift": null,
       "title": "Dropped packets $worker",
       "tooltip": {
         "shared": true,
@@ -5615,9 +5328,7 @@
       },
       "type": "graph",
       "xaxis": {
-        "buckets": null,
         "mode": "time",
-        "name": null,
         "show": true,
         "values": []
       },
@@ -5625,30 +5336,26 @@
         {
           "$$hashKey": "object:1701",
           "format": "short",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         },
         {
           "$$hashKey": "object:1702",
           "format": "short",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         }
       ],
       "yaxis": {
-        "align": false,
-        "alignLevel": null
+        "align": false
       }
     },
     {
       "collapsed": true,
-      "datasource": "Elasticsearch-system-metrics",
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "jQbzdZDnz"
+      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -5662,7 +5369,9 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "$Datasource",
+          "datasource": {
+            "uid": "$Datasource"
+          },
           "fieldConfig": {
             "defaults": {
               "custom": {}
@@ -5739,7 +5448,6 @@
                   "$$hashKey": "object:31",
                   "field": "value",
                   "id": "1",
-                  "inlineScript": null,
                   "meta": {},
                   "settings": {},
                   "type": "avg"
@@ -5751,9 +5459,7 @@
             }
           ],
           "thresholds": [],
-          "timeFrom": null,
           "timeRegions": [],
-          "timeShift": null,
           "title": "Top 5 CPU usage $infra",
           "tooltip": {
             "shared": true,
@@ -5762,9 +5468,7 @@
           },
           "type": "graph",
           "xaxis": {
-            "buckets": null,
             "mode": "time",
-            "name": null,
             "show": true,
             "values": []
           },
@@ -5772,25 +5476,18 @@
             {
               "$$hashKey": "object:65",
               "format": "percent",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": true
             },
             {
               "$$hashKey": "object:66",
               "format": "short",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": true
             }
           ],
           "yaxis": {
-            "align": false,
-            "alignLevel": null
+            "align": false
           }
         },
         {
@@ -5798,7 +5495,9 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "$Datasource",
+          "datasource": {
+            "uid": "$Datasource"
+          },
           "fieldConfig": {
             "defaults": {
               "custom": {}
@@ -5875,7 +5574,6 @@
                   "$$hashKey": "object:31",
                   "field": "value",
                   "id": "1",
-                  "inlineScript": null,
                   "meta": {},
                   "settings": {},
                   "type": "avg"
@@ -5887,9 +5585,7 @@
             }
           ],
           "thresholds": [],
-          "timeFrom": null,
           "timeRegions": [],
-          "timeShift": null,
           "title": "Top 5 memory RSS $infra",
           "tooltip": {
             "shared": true,
@@ -5898,36 +5594,26 @@
           },
           "type": "graph",
           "xaxis": {
-            "buckets": null,
             "mode": "time",
-            "name": null,
             "show": true,
             "values": []
           },
           "yaxes": [
             {
               "$$hashKey": "object:65",
-              "decimals": null,
               "format": "bytes",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": true
             },
             {
               "$$hashKey": "object:66",
               "format": "bytes",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": true
             }
           ],
           "yaxis": {
-            "align": false,
-            "alignLevel": null
+            "align": false
           }
         },
         {
@@ -5935,7 +5621,9 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "$Datasource",
+          "datasource": {
+            "uid": "$Datasource"
+          },
           "fieldConfig": {
             "defaults": {
               "custom": {}
@@ -6028,9 +5716,7 @@
             }
           ],
           "thresholds": [],
-          "timeFrom": null,
           "timeRegions": [],
-          "timeShift": null,
           "title": "CPU $infra",
           "tooltip": {
             "shared": true,
@@ -6039,9 +5725,7 @@
           },
           "type": "graph",
           "xaxis": {
-            "buckets": null,
             "mode": "time",
-            "name": null,
             "show": true,
             "values": []
           },
@@ -6049,25 +5733,18 @@
             {
               "$$hashKey": "object:65",
               "format": "percent",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": true
             },
             {
               "$$hashKey": "object:66",
               "format": "short",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": true
             }
           ],
           "yaxis": {
-            "align": false,
-            "alignLevel": null
+            "align": false
           }
         },
         {
@@ -6075,7 +5752,9 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "$Datasource",
+          "datasource": {
+            "uid": "$Datasource"
+          },
           "fieldConfig": {
             "defaults": {
               "custom": {}
@@ -6139,7 +5818,6 @@
                   "$$hashKey": "object:31",
                   "field": "value",
                   "id": "1",
-                  "inlineScript": null,
                   "meta": {},
                   "settings": {},
                   "type": "avg"
@@ -6169,7 +5847,6 @@
                   "$$hashKey": "object:31",
                   "field": "value",
                   "id": "1",
-                  "inlineScript": null,
                   "meta": {},
                   "settings": {},
                   "type": "avg"
@@ -6199,7 +5876,6 @@
                   "$$hashKey": "object:31",
                   "field": "value",
                   "id": "1",
-                  "inlineScript": null,
                   "meta": {},
                   "settings": {},
                   "type": "avg"
@@ -6211,9 +5887,7 @@
             }
           ],
           "thresholds": [],
-          "timeFrom": null,
           "timeRegions": [],
-          "timeShift": null,
           "title": "Memory $infra",
           "tooltip": {
             "shared": true,
@@ -6222,9 +5896,7 @@
           },
           "type": "graph",
           "xaxis": {
-            "buckets": null,
             "mode": "time",
-            "name": null,
             "show": true,
             "values": []
           },
@@ -6232,25 +5904,18 @@
             {
               "$$hashKey": "object:65",
               "format": "bytes",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": true
             },
             {
               "$$hashKey": "object:66",
               "format": "short",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": true
             }
           ],
           "yaxis": {
-            "align": false,
-            "alignLevel": null
+            "align": false
           }
         },
         {
@@ -6258,7 +5923,9 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "$Datasource",
+          "datasource": {
+            "uid": "$Datasource"
+          },
           "fieldConfig": {
             "defaults": {
               "custom": {}
@@ -6381,7 +6048,6 @@
                   "$$hashKey": "object:1193",
                   "field": "value",
                   "id": "1",
-                  "inlineScript": null,
                   "meta": {},
                   "settings": {},
                   "type": "avg"
@@ -6393,9 +6059,7 @@
             }
           ],
           "thresholds": [],
-          "timeFrom": null,
           "timeRegions": [],
-          "timeShift": null,
           "title": "Network bytes $infra",
           "tooltip": {
             "shared": true,
@@ -6404,9 +6068,7 @@
           },
           "type": "graph",
           "xaxis": {
-            "buckets": null,
             "mode": "time",
-            "name": null,
             "show": true,
             "values": []
           },
@@ -6414,25 +6076,18 @@
             {
               "$$hashKey": "object:1121",
               "format": "Bps",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": true
             },
             {
               "$$hashKey": "object:1122",
               "format": "short",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": true
             }
           ],
           "yaxis": {
-            "align": false,
-            "alignLevel": null
+            "align": false
           }
         },
         {
@@ -6440,7 +6095,9 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "$Datasource",
+          "datasource": {
+            "uid": "$Datasource"
+          },
           "fieldConfig": {
             "defaults": {
               "custom": {}
@@ -6563,7 +6220,6 @@
                   "$$hashKey": "object:1193",
                   "field": "value",
                   "id": "1",
-                  "inlineScript": null,
                   "meta": {},
                   "settings": {},
                   "type": "avg"
@@ -6575,9 +6231,7 @@
             }
           ],
           "thresholds": [],
-          "timeFrom": null,
           "timeRegions": [],
-          "timeShift": null,
           "title": "Disk $infra",
           "tooltip": {
             "shared": true,
@@ -6586,9 +6240,7 @@
           },
           "type": "graph",
           "xaxis": {
-            "buckets": null,
             "mode": "time",
-            "name": null,
             "show": true,
             "values": []
           },
@@ -6596,25 +6248,18 @@
             {
               "$$hashKey": "object:1121",
               "format": "Bps",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": true
             },
             {
               "$$hashKey": "object:1122",
               "format": "short",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": true
             }
           ],
           "yaxis": {
-            "align": false,
-            "alignLevel": null
+            "align": false
           }
         },
         {
@@ -6622,7 +6267,9 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "$Datasource",
+          "datasource": {
+            "uid": "$Datasource"
+          },
           "fieldConfig": {
             "defaults": {
               "custom": {}
@@ -6761,9 +6408,7 @@
             }
           ],
           "thresholds": [],
-          "timeFrom": null,
           "timeRegions": [],
-          "timeShift": null,
           "title": "Dropped packets $infra",
           "tooltip": {
             "shared": true,
@@ -6772,9 +6417,7 @@
           },
           "type": "graph",
           "xaxis": {
-            "buckets": null,
             "mode": "time",
-            "name": null,
             "show": true,
             "values": []
           },
@@ -6782,25 +6425,18 @@
             {
               "$$hashKey": "object:1701",
               "format": "short",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": true
             },
             {
               "$$hashKey": "object:1702",
               "format": "short",
-              "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
               "show": true
             }
           ],
           "yaxis": {
-            "align": false,
-            "alignLevel": null
+            "align": false
           }
         }
       ],
@@ -6810,7 +6446,7 @@
     }
   ],
   "refresh": false,
-  "schemaVersion": 30,
+  "schemaVersion": 34,
   "style": "dark",
   "tags": [],
   "templating": {
@@ -6821,8 +6457,6 @@
           "text": "Elasticsearch-system-metrics",
           "value": "Elasticsearch-system-metrics"
         },
-        "description": null,
-        "error": null,
         "hide": 0,
         "includeAll": false,
         "label": "Datasource",
@@ -6837,16 +6471,15 @@
         "type": "datasource"
       },
       {
-        "allValue": null,
         "current": {
           "selected": false,
-          "text": "11d8b7ff-8195-5608-83a1-4ada784805eb",
-          "value": "11d8b7ff-8195-5608-83a1-4ada784805eb"
+          "text": "1122d766-25eb-56ff-a256-d52a1ba22a68",
+          "value": "1122d766-25eb-56ff-a256-d52a1ba22a68"
         },
-        "datasource": "$Datasource",
+        "datasource": {
+          "uid": "$Datasource"
+        },
         "definition": "{\"find\": \"terms\", \"field\": \"uuid.keyword\"}",
-        "description": null,
-        "error": null,
         "hide": 0,
         "includeAll": false,
         "label": "UUID",
@@ -6864,16 +6497,15 @@
         "useTags": false
       },
       {
-        "allValue": null,
         "current": {
           "selected": false,
           "text": "All",
           "value": "$__all"
         },
-        "datasource": "$Datasource",
+        "datasource": {
+          "uid": "$Datasource"
+        },
         "definition": "{ \"find\" : \"terms\", \"field\": \"labels.node.keyword\", \"query\": \"metricName.keyword: nodeRoles AND labels.role.keyword: master AND uuid.keyword: $uuid\"}",
-        "description": null,
-        "error": null,
         "hide": 0,
         "includeAll": true,
         "label": "Master nodes",
@@ -6891,16 +6523,15 @@
         "useTags": false
       },
       {
-        "allValue": null,
         "current": {
           "selected": false,
           "text": "worker-0",
           "value": "worker-0"
         },
-        "datasource": "$Datasource",
+        "datasource": {
+          "uid": "$Datasource"
+        },
         "definition": "{ \"find\" : \"terms\", \"field\": \"labels.node.keyword\", \"query\": \"metricName.keyword: nodeRoles AND labels.role.keyword: worker AND uuid.keyword: $uuid\"}",
-        "description": null,
-        "error": null,
         "hide": 0,
         "includeAll": false,
         "label": "Worker nodes",
@@ -6918,17 +6549,16 @@
         "useTags": false
       },
       {
-        "allValue": null,
         "current": {
           "isNone": true,
           "selected": false,
           "text": "None",
           "value": ""
         },
-        "datasource": "$Datasource",
+        "datasource": {
+          "uid": "$Datasource"
+        },
         "definition": "{ \"find\" : \"terms\", \"field\": \"labels.node.keyword\",  \"query\": \"metricName.keyword: nodeRoles AND labels.role.keyword: infra AND uuid.keyword: $uuid\"}",
-        "description": null,
-        "error": null,
         "hide": 0,
         "includeAll": false,
         "label": "Infra nodes",
@@ -6946,16 +6576,15 @@
         "useTags": false
       },
       {
-        "allValue": null,
         "current": {
           "selected": false,
           "text": "All",
           "value": "$__all"
         },
-        "datasource": "$Datasource",
+        "datasource": {
+          "uid": "$Datasource"
+        },
         "definition": "{ \"find\" : \"terms\", \"field\": \"labels.namespace.keyword\", \"query\": \"labels.namespace.keyword: /openshift-.*/ AND uuid.keyword: $uuid\"}",
-        "description": null,
-        "error": null,
         "hide": 0,
         "includeAll": true,
         "label": "Namespace",
@@ -6995,5 +6624,6 @@
   "timezone": "",
   "title": "system-metrics-report",
   "uid": "Cs7IOoHnk",
-  "version": 4
+  "version": 4,
+  "weekStart": ""
 }

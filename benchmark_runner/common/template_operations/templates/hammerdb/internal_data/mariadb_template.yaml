@@ -95,7 +95,7 @@ spec:
     volumeMode: Filesystem
     resources:
       requests:
-        storage: {{ storage }}Gi
+        storage: {{ storage }}
 {%- endif %}
 ---
 apiVersion: v1

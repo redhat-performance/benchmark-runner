@@ -15,7 +15,7 @@ template_data:
     perf_ci:
       db_num_workers: 32
       db_warehouses: 96
-      storage: 100
+      storage: 100Gi
       database_limits_cpu: 32
       database_limits_memory: 32Gi
       database_requests_cpu: 32
@@ -27,7 +27,7 @@ template_data:
     default:
       db_num_workers: 2
       db_warehouses: 2
-      storage: 10
+      storage: 10Gi
       database_limits_cpu: 4
       database_limits_memory: 16Gi
       database_requests_cpu: 10m

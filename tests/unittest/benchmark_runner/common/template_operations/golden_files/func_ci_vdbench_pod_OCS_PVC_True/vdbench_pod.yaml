@@ -3,21 +3,21 @@ kind: Namespace
 metadata:
   name: benchmark-runner
 ---
-kind: PersistentVolumeClaim
 apiVersion: v1
+kind: PersistentVolumeClaim
 metadata:
-  name: vdbench-pvc
+  name: vdbench-pod-pvc-claim
   namespace: benchmark-runner
 spec:
-  accessModes:
-    - ReadWriteOnce
   storageClassName: ocs-storagecluster-ceph-rbd
+  accessModes: [ "ReadWriteOnce" ]
+  volumeMode: Filesystem
   resources:
     requests:
       storage: 10Gi
 ---
-kind: Pod
 apiVersion: v1
+kind: Pod
 metadata:
   name: vdbench-pod-deadbeef
   namespace: benchmark-runner
@@ -32,13 +32,20 @@ spec:
       app: vdbench
   nodeSelector:
     kubernetes.io/hostname: pin-node-1
+  resources:
+    requests:
+      cpu: 10m
+      memory: 10Mi
+    limits:
+      cpu: 2
+      memory: 2Gi
   containers:
     - name: vdbench-pod
       namespace: benchmark-runner
-      image: quay.io/bbenshab/vdpod
+      image: quay.io/ebattat/centos-stream8-vdbench5.04.07-pod
       imagePullPolicy: "IfNotPresent"
       volumeMounts:
-        - name: vdbench-pvc
+        - name: vdbench-pod-pvc-claim
           mountPath: "/workload"
       env:
         - name: BLOCK_SIZES
@@ -88,14 +95,7 @@ spec:
     source:
       blank: {}
   volumes:
-    - name: vdbench-pvc
+    - name: vdbench-pod-pvc-claim
       namespace: benchmark-runner
       persistentVolumeClaim:
-        claimName: vdbench-pvc
-  resources:
-    requests:
-      cpu: 10m
-      memory: 10Mi
-    limits:
-      cpu: 20m
-      memory: 2Gi
+        claimName: vdbench-pod-pvc-claim
