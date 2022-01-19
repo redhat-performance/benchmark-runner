@@ -22,11 +22,11 @@ spec:
   runtimeClassName: kata
   resources:
     requests:
-      cpu: 500m
-      memory: 512Mi
+      cpu: 2
+      memory: 4Gi
     limits:
       cpu: 2
-      memory: 2Gi
+      memory: 4Gi
   containers:
     - name: vdbench-pod
       namespace: benchmark-runner

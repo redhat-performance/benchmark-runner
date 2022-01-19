@@ -15,25 +15,29 @@
           "type": "dashboard"
         },
         "type": "dashboard"
+      },
+      {
+        "enable": true,
+        "iconColor": "red",
+        "name": "New annotation"
       }
     ]
   },
   "editable": true,
-  "gnetId": null,
+  "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 9,
-  "iteration": 1634641351169,
+  "id": 18,
   "links": [],
+  "liveNow": false,
   "panels": [
     {
-      "datasource": null,
       "gridPos": {
-        "h": 6,
-        "w": 5,
+        "h": 7,
+        "w": 7,
         "x": 8,
         "y": 0
       },
-      "id": 35,
+      "id": 4,
       "links": [
         {
           "title": "benchmark-runner",
@@ -44,4199 +48,456 @@
         "content": "![alt text](https://github.com/redhat-performance/benchmark-runner/blob/main/media/benchmark_runner.png?raw=true \"Tooltip Text\")",
         "mode": "markdown"
       },
-      "pluginVersion": "8.1.5",
-      "timeFrom": null,
-      "timeShift": null,
-      "type": "text"
-    },
-    {
-      "datasource": null,
-      "gridPos": {
-        "h": 2,
-        "w": 24,
-        "x": 0,
-        "y": 6
-      },
-      "id": 37,
-      "options": {
-        "content": "# Workloads  ",
-        "mode": "markdown"
-      },
-      "pluginVersion": "8.1.5",
-      "timeFrom": null,
-      "timeShift": null,
-      "type": "text"
-    },
-    {
-      "collapsed": false,
-      "datasource": null,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 8
-      },
-      "id": 20,
-      "panels": [],
-      "repeat": "build",
-      "title": "Hammerdb",
-      "type": "row"
-    },
-    {
-      "datasource": "Elasticsearch-hammerdb-vm-results",
-      "gridPos": {
-        "h": 3,
-        "w": 24,
-        "x": 0,
-        "y": 9
-      },
-      "id": 11,
-      "links": [
-        {
-          "title": "hammerdb",
-          "url": "https://www.hammerdb.com/"
-        }
-      ],
-      "options": {
-        "content": "## Hammerdb workload results\n![alt text](https://www.hammerdb.com/images/hammerDB-logo-FINAL.jpg \"Tooltip Text\")",
-        "mode": "markdown"
-      },
-      "pluginVersion": "8.1.5",
+      "pluginVersion": "8.4.0-pre",
       "targets": [
         {
-          "alias": "TPM: 1 Worker",
+          "alias": "",
           "bucketAggs": [
             {
               "field": "timestamp",
               "id": "2",
               "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
+                "interval": "auto"
               },
               "type": "date_histogram"
             }
           ],
           "metrics": [
             {
-              "field": "tpm",
               "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
+              "type": "count"
             }
           ],
-          "query": "db_type:'mariadb' AND current_worker:1",
+          "query": "",
           "refId": "A",
-          "timeField": "timestamp"
-        },
-        {
-          "alias": "TPM: 2 Worker",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "metrics": [
-            {
-              "field": "tpm",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "db_type:'mariadb' AND current_worker:2",
-          "refId": "B",
           "timeField": "timestamp"
         }
       ],
-      "timeFrom": null,
-      "timeShift": null,
+      "title": "benchmark-runner/ benchmark-operator ci status",
       "type": "text"
     },
     {
-      "datasource": "Elasticsearch-hammerdb-vm-results",
-      "gridPos": {
-        "h": 7,
-        "w": 6,
-        "x": 0,
-        "y": 12
-      },
-      "id": 9,
-      "options": {
-        "content": "![alt text](https://seekvectorlogo.net/wp-content/uploads/2020/02/mariadb-vector-logo.png \"Tooltip Text\")",
-        "mode": "markdown"
-      },
-      "pluginVersion": "8.1.5",
-      "targets": [
-        {
-          "alias": "TPM: 1 Worker",
-          "bucketAggs": [
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-GrYlRd"
+          },
+          "custom": {
+            "align": "center",
+            "displayMode": "color-text",
+            "filterable": true
+          },
+          "mappings": [
             {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
+              "options": {
+                "failed": {
+                  "color": "red",
+                  "index": 0,
+                  "text": "Failed"
+                },
+                "pass": {
+                  "color": "green",
+                  "index": 1,
+                  "text": "Pass"
+                }
               },
-              "type": "date_histogram"
+              "type": "value"
             }
           ],
-          "metrics": [
-            {
-              "field": "tpm",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "db_type:'mariadb' AND current_worker:1",
-          "refId": "A",
-          "timeField": "timestamp"
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "string"
         },
-        {
-          "alias": "TPM: 2 Worker",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "timestamp"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "dateTimeAsIso"
               },
-              "type": "date_histogram"
-            }
-          ],
-          "metrics": [
-            {
-              "field": "tpm",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "db_type:'mariadb' AND current_worker:2",
-          "refId": "B",
-          "timeField": "timestamp"
-        }
-      ],
-      "timeFrom": null,
-      "timeShift": null,
-      "type": "text"
-    },
-    {
-      "aliasColors": {},
-      "bars": true,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "Elasticsearch-hammerdb-results",
-      "fill": 1,
-      "fillGradient": 0,
-      "gridPos": {
-        "h": 7,
-        "w": 18,
-        "x": 6,
-        "y": 12
-      },
-      "hiddenSeries": false,
-      "id": 2,
-      "legend": {
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "show": false,
-        "total": false,
-        "values": false
-      },
-      "lines": false,
-      "linewidth": 1,
-      "nullPointMode": "null",
-      "options": {
-        "alertThreshold": true
-      },
-      "percentage": false,
-      "pluginVersion": "8.1.5",
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "targets": [
-        {
-          "alias": "$ci_run_date1: VM 2 workers",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
+              {
+                "id": "custom.width",
+                "value": 166
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ocp_version.keyword"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "ocp version"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cnv_version.keyword"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "cnv version"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "benchmark_operator_id.keyword"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "benchmark runner version"
               },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "tpm",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "db_type:'mariadb' AND current_worker:2 AND kind:'vm' AND ci_run_date1=$ci_run_date1",
-          "refId": "A",
-          "timeField": "timestamp"
-        },
-        {
-          "alias": "$ci_run_date1: POD 2 workers",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
+              {
+                "id": "displayName",
+                "value": "benchmark operator id."
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "benchmark_wrapper_id.keyword"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "benchmark wrapper id"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ci_minutes_time"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "ci time (Min)"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ocs_version.keyword"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 340
               },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "tpm",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "db_type:'mariadb' AND current_worker:2 AND kind:'pod' AND ci_run_date=$ci_run_date1",
-          "refId": "B",
-          "timeField": "timestamp"
-        },
-        {
-          "alias": "$ci_run_date2: VM 2 workers",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
+              {
+                "id": "displayName",
+                "value": "ocs version"
               },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "tpm",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "db_type:'mariadb' AND current_worker:2 AND kind:'vm' AND ci_run_date=$ci_run_date2",
-          "refId": "C",
-          "timeField": "timestamp"
-        },
-        {
-          "alias": "$ci_run_date2: POD 2 workers",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
+              {
+                "id": "custom.filterable"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "runner_version.keyword"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "runner version"
               },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "tpm",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "db_type:'mariadb' AND current_worker:2 AND kind:'pod' AND ci_run_date=$ci_run_date2",
-          "refId": "D",
-          "timeField": "timestamp"
-        },
-        {
-          "alias": "$ci_run_date3: VM 2 workers",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
+              {
+                "id": "displayName"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ocs_version.keyword"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 124
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "runner_version.keyword"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "benchmark runner version"
               },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "tpm",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "db_type:'mariadb' AND current_worker:2 AND kind:'vm' AND ci_run_date=$ci_run_date3",
-          "refId": "E",
-          "timeField": "timestamp"
-        },
-        {
-          "alias": "$ci_run_date3: POD 2 workers",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
+              {
+                "id": "displayName",
+                "value": "benchmark runner"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ci_date.keyword"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "ci run date"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "status.keyword"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "status"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "kata_version.keyword"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 157
               },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "tpm",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "db_type:'mariadb' AND current_worker:2 AND kind:'pod' AND ci_run_date=$ci_run_date3",
-          "refId": "F",
-          "timeField": "timestamp"
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
-      "title": "TPM: Hammerdb-Mariadb",
-      "tooltip": {
-        "shared": false,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "series",
-        "name": null,
-        "show": true,
-        "values": [
-          "total"
+              {
+                "id": "displayName",
+                "value": "kata version"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName"
+            },
+            "properties": []
+          }
         ]
       },
-      "yaxes": [
-        {
-          "$$hashKey": "object:1704",
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": "0",
-          "show": true
-        },
-        {
-          "$$hashKey": "object:1705",
-          "decimals": 0,
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
-    {
-      "datasource": "Elasticsearch-hammerdb-vm-results",
-      "gridPos": {
-        "h": 7,
-        "w": 6,
-        "x": 0,
-        "y": 19
-      },
-      "id": 10,
-      "options": {
-        "content": "![alt text](https://miro.medium.com/max/2000/1*115cqXTggxGeZq5m-yFnrw.png \"Tooltip Text\")",
-        "mode": "markdown"
-      },
-      "pluginVersion": "8.1.5",
-      "targets": [
-        {
-          "alias": "TPM: 1 Worker",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "metrics": [
-            {
-              "field": "tpm",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "db_type:'mariadb' AND current_worker:1",
-          "refId": "A",
-          "timeField": "timestamp"
-        },
-        {
-          "alias": "TPM: 2 Worker",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "metrics": [
-            {
-              "field": "tpm",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "db_type:'mariadb' AND current_worker:2",
-          "refId": "B",
-          "timeField": "timestamp"
-        }
-      ],
-      "timeFrom": null,
-      "timeShift": null,
-      "type": "text"
-    },
-    {
-      "aliasColors": {},
-      "bars": true,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "Elasticsearch-hammerdb-results",
-      "fill": 1,
-      "fillGradient": 0,
-      "gridPos": {
-        "h": 7,
-        "w": 18,
-        "x": 6,
-        "y": 19
-      },
-      "hiddenSeries": false,
-      "id": 4,
-      "legend": {
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "show": false,
-        "total": false,
-        "values": false
-      },
-      "lines": false,
-      "linewidth": 1,
-      "nullPointMode": "null",
-      "options": {
-        "alertThreshold": true
-      },
-      "percentage": false,
-      "pluginVersion": "8.1.5",
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "targets": [
-        {
-          "alias": "$ci_run_date1: VM: 2 Workers",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "metrics": [
-            {
-              "field": "tpm",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "db_type:'pg' AND current_worker:2 AND kind:'vm' AND ci_run_date=$ci_run_date1",
-          "refId": "A",
-          "timeField": "timestamp"
-        },
-        {
-          "alias": "$ci_run_date1: POD: 2 Workers",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "metrics": [
-            {
-              "field": "tpm",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "db_type:'pg' AND current_worker:2 AND kind:'pod' AND ci_run_date=$ci_run_date1",
-          "refId": "B",
-          "timeField": "timestamp"
-        },
-        {
-          "alias": "$ci_run_date2: VM: 2 Workers",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "tpm",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "db_type:'pg' AND current_worker:2 AND kind:'vm' AND ci_run_date=$ci_run_date2",
-          "refId": "C",
-          "timeField": "timestamp"
-        },
-        {
-          "alias": "$ci_run_date2: POD: 2 Workers",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "tpm",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "db_type:'pg' AND current_worker:2 AND kind:'pod' AND ci_run_date=$ci_run_date2",
-          "refId": "D",
-          "timeField": "timestamp"
-        },
-        {
-          "alias": "$ci_run_date3: VM: 2 Workers",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "tpm",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "db_type:'pg' AND current_worker:2 AND kind:'vm' AND ci_run_date=$ci_run_date3",
-          "refId": "E",
-          "timeField": "timestamp"
-        },
-        {
-          "alias": "$ci_run_date3: POD: 2 Workers",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "tpm",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "db_type:'pg' AND current_worker:2 AND kind:'pod' AND ci_run_date=$ci_run_date3",
-          "refId": "F",
-          "timeField": "timestamp"
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
-      "title": "TPM: Hammerdb-Postgresql ",
-      "tooltip": {
-        "shared": false,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "series",
-        "name": null,
-        "show": true,
-        "values": [
-          "total"
-        ]
-      },
-      "yaxes": [
-        {
-          "$$hashKey": "object:175",
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": "0",
-          "show": true
-        },
-        {
-          "$$hashKey": "object:176",
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
-    {
-      "datasource": "Elasticsearch-hammerdb-vm-results",
-      "gridPos": {
-        "h": 9,
-        "w": 6,
-        "x": 0,
-        "y": 26
-      },
-      "id": 8,
-      "options": {
-        "content": "![alt text](https://surabaya.proxsisgroup.com/wp-content/uploads/2018/01/Microsoft-SQL-Server.png \"Tooltip Text\")",
-        "mode": "markdown"
-      },
-      "pluginVersion": "8.1.5",
-      "targets": [
-        {
-          "alias": "TPM: 1 Worker",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "metrics": [
-            {
-              "field": "tpm",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "db_type:'mariadb' AND current_worker:1",
-          "refId": "A",
-          "timeField": "timestamp"
-        },
-        {
-          "alias": "TPM: 2 Worker",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "metrics": [
-            {
-              "field": "tpm",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "db_type:'mariadb' AND current_worker:2",
-          "refId": "B",
-          "timeField": "timestamp"
-        }
-      ],
-      "timeFrom": null,
-      "timeShift": null,
-      "type": "text"
-    },
-    {
-      "aliasColors": {},
-      "bars": true,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "Elasticsearch-hammerdb-results",
-      "fill": 1,
-      "fillGradient": 0,
-      "gridPos": {
-        "h": 9,
-        "w": 18,
-        "x": 6,
-        "y": 26
-      },
-      "hiddenSeries": false,
-      "id": 3,
-      "legend": {
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "show": false,
-        "total": false,
-        "values": false
-      },
-      "lines": false,
-      "linewidth": 1,
-      "nullPointMode": "null",
-      "options": {
-        "alertThreshold": true
-      },
-      "percentage": false,
-      "pluginVersion": "8.1.5",
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "targets": [
-        {
-          "alias": "$ci_run_date1: VM: 2 workers",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "metrics": [
-            {
-              "field": "tpm",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "db_type:'mssql' AND current_worker:2 AND kind:’vm’ AND ci_run_date=$ci_run_date1",
-          "refId": "A",
-          "timeField": "timestamp"
-        },
-        {
-          "alias": "$ci_run_date1: Pod: 2 workers",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "metrics": [
-            {
-              "field": "tpm",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "db_type:'mssql' AND current_worker:2 AND kind:’pod’ AND ci_run_date=$ci_run_date1",
-          "refId": "B",
-          "timeField": "timestamp"
-        },
-        {
-          "alias": "$ci_run_date2: VM: 2 workers",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "tpm",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "db_type:'mssql' AND current_worker:2 AND kind:’vm’ AND ci_run_date=$ci_run_date2",
-          "refId": "C",
-          "timeField": "timestamp"
-        },
-        {
-          "alias": "$ci_run_date2: Pod: 2 workers",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "tpm",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "db_type:'mssql' AND current_worker:2 AND kind:’pod’ AND ci_run_date=$ci_run_date2",
-          "refId": "D",
-          "timeField": "timestamp"
-        },
-        {
-          "alias": "$ci_run_date3: VM: 2 workers",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "tpm",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "db_type:'mssql' AND current_worker:2 AND kind:’vm’ AND ci_run_date=$ci_run_date3",
-          "refId": "E",
-          "timeField": "timestamp"
-        },
-        {
-          "alias": "$ci_run_date3 Pod: 2 workers",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "tpm",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "db_type:'mssql' AND current_worker:2 AND kind:’pod’ AND ci_run_date=$ci_run_date3",
-          "refId": "F",
-          "timeField": "timestamp"
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
-      "title": "TPM: Hammerdb-MSSQL",
-      "tooltip": {
-        "shared": false,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "series",
-        "name": null,
-        "show": true,
-        "values": [
-          "total"
-        ]
-      },
-      "yaxes": [
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": "0",
-          "show": true
-        },
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
-    {
-      "collapsed": false,
-      "datasource": null,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 35
-      },
-      "id": 22,
-      "panels": [],
-      "title": "Uperf",
-      "type": "row"
-    },
-    {
-      "datasource": "Elasticsearch-hammerdb-vm-results",
-      "gridPos": {
-        "h": 3,
-        "w": 24,
-        "x": 0,
-        "y": 36
-      },
-      "id": 25,
-      "links": [
-        {
-          "title": "uperf",
-          "url": "http://uperf.org/"
-        }
-      ],
-      "options": {
-        "content": "## Uperf workload results",
-        "mode": "markdown"
-      },
-      "pluginVersion": "8.1.5",
-      "targets": [
-        {
-          "alias": "TPM: 1 Worker",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "metrics": [
-            {
-              "field": "tpm",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "db_type:'mariadb' AND current_worker:1",
-          "refId": "A",
-          "timeField": "timestamp"
-        },
-        {
-          "alias": "TPM: 2 Worker",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "metrics": [
-            {
-              "field": "tpm",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "db_type:'mariadb' AND current_worker:2",
-          "refId": "B",
-          "timeField": "timestamp"
-        }
-      ],
-      "timeFrom": null,
-      "timeShift": null,
-      "type": "text"
-    },
-    {
-      "aliasColors": {},
-      "bars": true,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "Elasticsearch-uperf-results",
-      "decimals": null,
-      "fill": 1,
-      "fillGradient": 0,
       "gridPos": {
         "h": 11,
-        "w": 24,
+        "w": 23,
         "x": 0,
-        "y": 39
+        "y": 7
       },
-      "hiddenSeries": false,
-      "id": 40,
-      "legend": {
-        "alignAsTable": false,
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "rightSide": false,
-        "show": false,
-        "sideWidth": null,
-        "total": false,
-        "values": false
-      },
-      "lines": false,
-      "linewidth": 1,
-      "nullPointMode": "null",
+      "id": 6,
       "options": {
-        "alertThreshold": true
+        "footer": {
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "frameIndex": 0,
+        "showHeader": true,
+        "sortBy": []
       },
-      "percentage": false,
-      "pluginVersion": "8.1.5",
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
+      "pluginVersion": "8.4.0-pre",
       "targets": [
         {
-          "alias": "$ci_run_date1:  VM 16384",
+          "alias": "",
           "bucketAggs": [
             {
-              "field": "uperf_ts",
-              "id": "2",
+              "field": "ci_date.keyword",
+              "id": "12",
               "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
+                "min_doc_count": "0",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
               },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
+              "type": "terms"
+            },
             {
-              "field": "norm_ltcy",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:1 AND ci_run_date=$ci_run_date1",
-          "refId": "A",
-          "timeField": "uperf_ts"
-        },
-        {
-          "alias": "$ci_run_date1:  POD 16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
+              "field": "status.keyword",
+              "id": "15",
               "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
+                "min_doc_count": "0",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
               },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
+              "type": "terms"
+            },
             {
-              "field": "norm_ltcy",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:1 AND ci_run_date=$ci_run_date1",
-          "refId": "B",
-          "timeField": "uperf_ts"
-        },
-        {
-          "alias": "$ci_run_date2:  VM 16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
+              "field": "runner_version.keyword",
+              "id": "17",
               "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
+                "min_doc_count": "0",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
               },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
+              "type": "terms"
+            },
             {
-              "field": "norm_ltcy",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:1 AND ci_run_date=$ci_run_date2",
-          "refId": "C",
-          "timeField": "uperf_ts"
-        },
-        {
-          "alias": "$ci_run_date2:  POD 16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
+              "field": "ocp_version.keyword",
+              "id": "18",
               "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
+                "min_doc_count": "0",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
               },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
+              "type": "terms"
+            },
             {
-              "field": "norm_ltcy",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:1 AND ci_run_date=$ci_run_date2",
-          "refId": "D",
-          "timeField": "uperf_ts"
-        },
-        {
-          "alias": "$ci_run_date3:  VM 16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
+              "field": "cnv_version.keyword",
+              "id": "19",
               "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
+                "min_doc_count": "1",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
               },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
+              "type": "terms"
+            },
             {
-              "field": "norm_ltcy",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:1 AND ci_run_date=$ci_run_date3",
-          "refId": "E",
-          "timeField": "uperf_ts"
-        },
-        {
-          "alias": "$ci_run_date3:  POD 16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
+              "field": "ocs_version.keyword",
+              "id": "20",
               "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
+                "min_doc_count": "1",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
               },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
+              "type": "terms"
+            },
             {
-              "field": "norm_ltcy",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:1 AND ci_run_date=$ci_run_date3",
-          "refId": "F",
-          "timeField": "uperf_ts"
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
-      "title": "Uperf - norm_ltcy  - 1 thread",
-      "tooltip": {
-        "shared": false,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "series",
-        "name": null,
-        "show": true,
-        "values": [
-          "total"
-        ]
-      },
-      "yaxes": [
-        {
-          "$$hashKey": "object:1024",
-          "format": "short",
-          "label": "",
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "$$hashKey": "object:1025",
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
-    {
-      "aliasColors": {},
-      "bars": true,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "Elasticsearch-uperf-results",
-      "decimals": null,
-      "fill": 1,
-      "fillGradient": 0,
-      "gridPos": {
-        "h": 11,
-        "w": 24,
-        "x": 0,
-        "y": 50
-      },
-      "hiddenSeries": false,
-      "id": 50,
-      "legend": {
-        "alignAsTable": false,
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "rightSide": false,
-        "show": false,
-        "sideWidth": null,
-        "total": false,
-        "values": false
-      },
-      "lines": false,
-      "linewidth": 1,
-      "nullPointMode": "null",
-      "options": {
-        "alertThreshold": true
-      },
-      "percentage": false,
-      "pluginVersion": "8.1.5",
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "targets": [
-        {
-          "alias": "$ci_run_date1: VM  16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
+              "field": "kata_version.keyword",
+              "id": "21",
               "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
+                "min_doc_count": "1",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
               },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
+              "type": "terms"
+            },
             {
-              "field": "norm_ltcy",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:2 AND ci_run_date=$ci_run_date1",
-          "refId": "A",
-          "timeField": "uperf_ts"
-        },
-        {
-          "alias": "$ci_run_date1: Pod  16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
+              "field": "benchmark_operator_id.keyword",
+              "id": "22",
               "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
+                "min_doc_count": "1",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
               },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
+              "type": "terms"
+            },
             {
-              "field": "norm_ltcy",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:2 AND ci_run_date=$ci_run_date1",
-          "refId": "B",
-          "timeField": "uperf_ts"
-        },
-        {
-          "alias": "$ci_run_date2: VM  16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
+              "field": "benchmark_wrapper_id.keyword",
+              "id": "23",
               "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
+                "min_doc_count": "1",
+                "order": "desc",
+                "orderBy": "1",
+                "size": "10"
               },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
+              "type": "terms"
+            },
             {
-              "field": "norm_ltcy",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:2 AND ci_run_date=$ci_run_date2",
-          "refId": "C",
-          "timeField": "uperf_ts"
-        },
-        {
-          "alias": "$ci_run_date2: POD  16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
+              "field": "ci_minutes_time",
+              "id": "24",
               "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
+                "min_doc_count": "1",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
               },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "norm_ltcy",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:2 AND ci_run_date=$ci_run_date2",
-          "refId": "D",
-          "timeField": "uperf_ts"
-        },
-        {
-          "alias": "$ci_run_date3: POD  16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "norm_ltcy",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:2 AND ci_run_date=$ci_run_date3",
-          "refId": "E",
-          "timeField": "uperf_ts"
-        },
-        {
-          "alias": "$ci_run_date3: POD  16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "norm_ltcy",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:2 AND ci_run_date=$ci_run_date3",
-          "refId": "F",
-          "timeField": "uperf_ts"
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
-      "title": "Uperf - norm_ltcy - 2 threads",
-      "tooltip": {
-        "shared": false,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "series",
-        "name": null,
-        "show": true,
-        "values": [
-          "total"
-        ]
-      },
-      "yaxes": [
-        {
-          "$$hashKey": "object:1024",
-          "format": "short",
-          "label": "",
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "$$hashKey": "object:1025",
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
-    {
-      "aliasColors": {},
-      "bars": true,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "Elasticsearch-uperf-results",
-      "fill": 1,
-      "fillGradient": 0,
-      "gridPos": {
-        "h": 10,
-        "w": 24,
-        "x": 0,
-        "y": 61
-      },
-      "hiddenSeries": false,
-      "id": 26,
-      "legend": {
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "show": false,
-        "total": false,
-        "values": false
-      },
-      "lines": false,
-      "linewidth": 1,
-      "nullPointMode": "null",
-      "options": {
-        "alertThreshold": true
-      },
-      "percentage": false,
-      "pluginVersion": "8.1.5",
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "targets": [
-        {
-          "alias": "$ci_run_date1: VM 16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "norm_ops",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:1 AND ci_run_date=$ci_run_date1",
-          "refId": "A",
-          "timeField": "uperf_ts"
-        },
-        {
-          "alias": "$ci_run_date1: POD 16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "norm_ops",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:1 AND ci_run_date=$ci_run_date1",
-          "refId": "B",
-          "timeField": "uperf_ts"
-        },
-        {
-          "alias": "$ci_run_date2: VM 16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "norm_ops",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:1 AND ci_run_date=$ci_run_date2",
-          "refId": "C",
-          "timeField": "uperf_ts"
-        },
-        {
-          "alias": "$ci_run_date2: POD 16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "norm_ops",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:1 AND ci_run_date=$ci_run_date2",
-          "refId": "D",
-          "timeField": "uperf_ts"
-        },
-        {
-          "alias": "$ci_run_date3: VM 16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "norm_ops",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:1 AND ci_run_date=$ci_run_date3",
-          "refId": "E",
-          "timeField": "uperf_ts"
-        },
-        {
-          "alias": "$ci_run_date3: POD 16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "norm_ops",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:1 AND ci_run_date=$ci_run_date3",
-          "refId": "F",
-          "timeField": "uperf_ts"
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
-      "title": "Uperf - norm_ops  - 1 thread",
-      "tooltip": {
-        "shared": false,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "series",
-        "name": null,
-        "show": true,
-        "values": [
-          "total"
-        ]
-      },
-      "yaxes": [
-        {
-          "$$hashKey": "object:971",
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "$$hashKey": "object:972",
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
-    {
-      "aliasColors": {},
-      "bars": true,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "Elasticsearch-uperf-results",
-      "fill": 1,
-      "fillGradient": 0,
-      "gridPos": {
-        "h": 10,
-        "w": 24,
-        "x": 0,
-        "y": 71
-      },
-      "hiddenSeries": false,
-      "id": 51,
-      "legend": {
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "show": false,
-        "total": false,
-        "values": false
-      },
-      "lines": false,
-      "linewidth": 1,
-      "nullPointMode": "null",
-      "options": {
-        "alertThreshold": true
-      },
-      "percentage": false,
-      "pluginVersion": "8.1.5",
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "targets": [
-        {
-          "alias": "$ci_run_date1: VM 16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "metrics": [
-            {
-              "field": "norm_ops",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:2 AND ci_run_date=$ci_run_date1",
-          "refId": "I",
-          "timeField": "uperf_ts"
-        },
-        {
-          "alias": "$ci_run_date1: POD 16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "norm_ops",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:2 AND ci_run_date=$ci_run_date1",
-          "refId": "F",
-          "timeField": "uperf_ts"
-        },
-        {
-          "alias": "$ci_run_date2: VM 16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "norm_ops",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:2 AND ci_run_date=$ci_run_date2",
-          "refId": "A",
-          "timeField": "uperf_ts"
-        },
-        {
-          "alias": "$ci_run_date2: POD 16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "norm_ops",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:2 AND ci_run_date=$ci_run_date2",
-          "refId": "B",
-          "timeField": "uperf_ts"
-        },
-        {
-          "alias": "$ci_run_date3: VM 16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "norm_ops",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:2 AND ci_run_date=$ci_run_date3",
-          "refId": "C",
-          "timeField": "uperf_ts"
-        },
-        {
-          "alias": "$ci_run_date3: POD 16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "norm_ops",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:2 AND ci_run_date=$ci_run_date3",
-          "refId": "D",
-          "timeField": "uperf_ts"
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
-      "title": "Uperf - norm_ops  - 2 threads",
-      "tooltip": {
-        "shared": false,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "series",
-        "name": null,
-        "show": true,
-        "values": [
-          "total"
-        ]
-      },
-      "yaxes": [
-        {
-          "$$hashKey": "object:971",
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "$$hashKey": "object:972",
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
-    {
-      "aliasColors": {},
-      "bars": true,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "Elasticsearch-uperf-results",
-      "decimals": null,
-      "fill": 1,
-      "fillGradient": 0,
-      "gridPos": {
-        "h": 10,
-        "w": 24,
-        "x": 0,
-        "y": 81
-      },
-      "hiddenSeries": false,
-      "id": 39,
-      "legend": {
-        "alignAsTable": false,
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "rightSide": false,
-        "show": false,
-        "sideWidth": null,
-        "total": false,
-        "values": false
-      },
-      "lines": false,
-      "linewidth": 1,
-      "nullPointMode": "null",
-      "options": {
-        "alertThreshold": true
-      },
-      "percentage": false,
-      "pluginVersion": "8.1.5",
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "targets": [
-        {
-          "alias": "$ci_run_date1: VM 16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "metrics": [
-            {
-              "field": "norm_byte",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:1 AND ci_run_date=$ci_run_date1",
-          "refId": "B",
-          "timeField": "uperf_ts"
-        },
-        {
-          "alias": "$ci_run_date1: POD 16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "norm_byte",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:1 AND ci_run_date=$ci_run_date1",
-          "refId": "C",
-          "timeField": "uperf_ts"
-        },
-        {
-          "alias": "$ci_run_date2: VM 16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "metrics": [
-            {
-              "field": "norm_byte",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:1 AND ci_run_date=$ci_run_date2",
-          "refId": "E",
-          "timeField": "uperf_ts"
-        },
-        {
-          "alias": "$ci_run_date2: POD 16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "norm_byte",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:1 AND ci_run_date=$ci_run_date2",
-          "refId": "D",
-          "timeField": "uperf_ts"
-        },
-        {
-          "alias": "$ci_run_date3: VM 16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "norm_byte",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:1 AND ci_run_date=$ci_run_date3",
-          "refId": "A",
-          "timeField": "uperf_ts"
-        },
-        {
-          "alias": "$ci_run_date3: POD 16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "norm_byte",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:1 AND ci_run_date=$ci_run_date3",
-          "refId": "F",
-          "timeField": "uperf_ts"
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
-      "title": "Uperf - norm_bytes - 1 thread",
-      "tooltip": {
-        "shared": false,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "series",
-        "name": null,
-        "show": true,
-        "values": [
-          "total"
-        ]
-      },
-      "yaxes": [
-        {
-          "$$hashKey": "object:1391",
-          "format": "short",
-          "label": "",
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "$$hashKey": "object:1392",
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
-    {
-      "aliasColors": {},
-      "bars": true,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "Elasticsearch-uperf-results",
-      "decimals": null,
-      "fill": 1,
-      "fillGradient": 0,
-      "gridPos": {
-        "h": 10,
-        "w": 24,
-        "x": 0,
-        "y": 91
-      },
-      "hiddenSeries": false,
-      "id": 52,
-      "legend": {
-        "alignAsTable": false,
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "rightSide": false,
-        "show": false,
-        "sideWidth": null,
-        "total": false,
-        "values": false
-      },
-      "lines": false,
-      "linewidth": 1,
-      "nullPointMode": "null",
-      "options": {
-        "alertThreshold": true
-      },
-      "percentage": false,
-      "pluginVersion": "8.1.5",
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "targets": [
-        {
-          "alias": "$ci_run_date1: VM 16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
-              "settings": {
-                "interval": "auto"
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "metrics": [
-            {
-              "field": "norm_byte",
-              "id": "1",
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:2 AND ci_run_date=$ci_run_date1",
-          "refId": "A",
-          "timeField": "uperf_ts"
-        },
-        {
-          "alias": "$ci_run_date1: POD 16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
-              "settings": {
-                "interval": "auto"
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "norm_byte",
-              "id": "1",
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:2 AND ci_run_date=$ci_run_date1",
-          "refId": "B",
-          "timeField": "uperf_ts"
-        },
-        {
-          "alias": "$ci_run_date2: VM 16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
-              "settings": {
-                "interval": "auto"
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "norm_byte",
-              "id": "1",
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:2 AND ci_run_date=$ci_run_date2",
-          "refId": "C",
-          "timeField": "uperf_ts"
-        },
-        {
-          "alias": "$ci_run_date2: POD 16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
-              "settings": {
-                "interval": "auto"
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "norm_byte",
-              "id": "1",
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:2 AND ci_run_date=$ci_run_date2",
-          "refId": "D",
-          "timeField": "uperf_ts"
-        },
-        {
-          "alias": "$ci_run_date3: VM 16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
-              "settings": {
-                "interval": "auto"
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "norm_byte",
-              "id": "1",
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:2 AND ci_run_date=$ci_run_date3",
-          "refId": "E",
-          "timeField": "uperf_ts"
-        },
-        {
-          "alias": "$ci_run_date3: POD 16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
-              "settings": {
-                "interval": "auto"
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "norm_byte",
-              "id": "1",
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:2 AND ci_run_date=$ci_run_date3",
-          "refId": "F",
-          "timeField": "uperf_ts"
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
-      "title": "Uperf - norm_bytes - 2 threads",
-      "tooltip": {
-        "shared": false,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "series",
-        "name": null,
-        "show": true,
-        "values": [
-          "total"
-        ]
-      },
-      "yaxes": [
-        {
-          "$$hashKey": "object:1391",
-          "format": "short",
-          "label": "",
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "$$hashKey": "object:1392",
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
-    {
-      "aliasColors": {},
-      "bars": true,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "Elasticsearch-uperf-results",
-      "decimals": null,
-      "fill": 1,
-      "fillGradient": 0,
-      "gridPos": {
-        "h": 10,
-        "w": 24,
-        "x": 0,
-        "y": 101
-      },
-      "hiddenSeries": false,
-      "id": 41,
-      "legend": {
-        "alignAsTable": false,
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "rightSide": false,
-        "show": false,
-        "sideWidth": null,
-        "total": false,
-        "values": false
-      },
-      "lines": false,
-      "linewidth": 1,
-      "nullPointMode": "null",
-      "options": {
-        "alertThreshold": true
-      },
-      "percentage": false,
-      "pluginVersion": "8.1.5",
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "targets": [
-        {
-          "alias": "$ci_run_date1: VM 16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "read_message_size",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:1 AND ci_run_date=$ci_run_date1",
-          "refId": "A",
-          "timeField": "uperf_ts"
-        },
-        {
-          "alias": "$ci_run_date1: POD 16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "read_message_size",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:1 AND ci_run_date=$ci_run_date1",
-          "refId": "B",
-          "timeField": "uperf_ts"
-        },
-        {
-          "alias": "$ci_run_date2: VM 16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "read_message_size",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:1 AND ci_run_date=$ci_run_date2",
-          "refId": "C",
-          "timeField": "uperf_ts"
-        },
-        {
-          "alias": "$ci_run_date2: POD 16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "read_message_size",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:1 AND ci_run_date=$ci_run_date2",
-          "refId": "D",
-          "timeField": "uperf_ts"
-        },
-        {
-          "alias": "$ci_run_date3: VM 16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "read_message_size",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:1 AND ci_run_date=$ci_run_date3",
-          "refId": "E",
-          "timeField": "uperf_ts"
-        },
-        {
-          "alias": "$ci_run_date3: POD 16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "read_message_size",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:1 AND ci_run_date=$ci_run_date3",
-          "refId": "F",
-          "timeField": "uperf_ts"
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
-      "title": "Uperf - read message size - 1 thread",
-      "tooltip": {
-        "shared": false,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "series",
-        "name": null,
-        "show": true,
-        "values": [
-          "total"
-        ]
-      },
-      "yaxes": [
-        {
-          "$$hashKey": "object:1444",
-          "format": "short",
-          "label": "",
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "$$hashKey": "object:1445",
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
-    {
-      "aliasColors": {},
-      "bars": true,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "Elasticsearch-uperf-results",
-      "decimals": null,
-      "fill": 1,
-      "fillGradient": 0,
-      "gridPos": {
-        "h": 10,
-        "w": 24,
-        "x": 0,
-        "y": 111
-      },
-      "hiddenSeries": false,
-      "id": 53,
-      "legend": {
-        "alignAsTable": false,
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "rightSide": false,
-        "show": false,
-        "sideWidth": null,
-        "total": false,
-        "values": false
-      },
-      "lines": false,
-      "linewidth": 1,
-      "nullPointMode": "null",
-      "options": {
-        "alertThreshold": true
-      },
-      "percentage": false,
-      "pluginVersion": "8.1.5",
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "targets": [
-        {
-          "alias": "$ci_run_date1: VM 16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "metrics": [
-            {
-              "field": "read_message_size",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:2 AND ci_run_date=$ci_run_date1",
-          "refId": "B",
-          "timeField": "uperf_ts"
-        },
-        {
-          "alias": "$ci_run_date1: POD 16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "read_message_size",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:2 AND ci_run_date=$ci_run_date1",
-          "refId": "C",
-          "timeField": "uperf_ts"
-        },
-        {
-          "alias": "$ci_run_date2: VM 16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "read_message_size",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:2 AND ci_run_date=$ci_run_date2",
-          "refId": "E",
-          "timeField": "uperf_ts"
-        },
-        {
-          "alias": "$ci_run_date2: POD 16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "read_message_size",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:2 AND ci_run_date=$ci_run_date2",
-          "refId": "D",
-          "timeField": "uperf_ts"
-        },
-        {
-          "alias": "$ci_run_date3: VM 16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "read_message_size",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'vm' AND num_threads:2 AND ci_run_date=$ci_run_date3",
-          "refId": "G",
-          "timeField": "uperf_ts"
-        },
-        {
-          "alias": "$ci_run_date3: POD 16384",
-          "bucketAggs": [
-            {
-              "field": "uperf_ts",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "read_message_size",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "read_message_size:16384 AND kind:'pod' AND num_threads:2 AND ci_run_date=$ci_run_date3",
-          "refId": "F",
-          "timeField": "uperf_ts"
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
-      "title": "Uperf - read message size - 2 threads",
-      "tooltip": {
-        "shared": false,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "series",
-        "name": null,
-        "show": true,
-        "values": [
-          "total"
-        ]
-      },
-      "yaxes": [
-        {
-          "$$hashKey": "object:1444",
-          "format": "short",
-          "label": "",
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "$$hashKey": "object:1445",
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
-    {
-      "collapsed": false,
-      "datasource": null,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 121
-      },
-      "id": 24,
-      "panels": [],
-      "title": "Stressng",
-      "type": "row"
-    },
-    {
-      "datasource": "Elasticsearch-hammerdb-vm-results",
-      "gridPos": {
-        "h": 2,
-        "w": 24,
-        "x": 0,
-        "y": 122
-      },
-      "id": 12,
-      "links": [
-        {
-          "title": "stressng",
-          "url": "https://wiki.ubuntu.com/Kernel/Reference/stress-ng"
-        }
-      ],
-      "options": {
-        "content": "## Stressng workload results",
-        "mode": "markdown"
-      },
-      "pluginVersion": "8.1.5",
-      "targets": [
-        {
-          "alias": "TPM: 1 Worker",
-          "bucketAggs": [
+              "type": "terms"
+            },
             {
               "field": "timestamp",
-              "id": "2",
+              "id": "25",
               "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
+                "min_doc_count": "1",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
               },
-              "type": "date_histogram"
+              "type": "terms"
             }
           ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "mg2W2WD7z"
+          },
+          "hide": false,
           "metrics": [
             {
-              "field": "tpm",
+              "field": "version",
+              "hide": true,
               "id": "1",
-              "meta": {},
               "settings": {},
               "type": "max"
             }
           ],
-          "query": "db_type:'mariadb' AND current_worker:1",
+          "query": "",
           "refId": "A",
           "timeField": "timestamp"
-        },
-        {
-          "alias": "TPM: 2 Worker",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "metrics": [
-            {
-              "field": "tpm",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "db_type:'mariadb' AND current_worker:2",
-          "refId": "B",
-          "timeField": "timestamp"
         }
       ],
-      "timeFrom": null,
-      "timeShift": null,
-      "type": "text"
-    },
-    {
-      "aliasColors": {},
-      "bars": true,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "Elasticsearch-stressng-results",
-      "fill": 1,
-      "fillGradient": 0,
-      "gridPos": {
-        "h": 8,
-        "w": 24,
-        "x": 0,
-        "y": 124
-      },
-      "hiddenSeries": false,
-      "id": 47,
-      "legend": {
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "show": false,
-        "total": false,
-        "values": false
-      },
-      "lines": true,
-      "linewidth": 1,
-      "nullPointMode": "null",
-      "options": {
-        "alertThreshold": true
-      },
-      "percentage": false,
-      "pluginVersion": "8.1.5",
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "targets": [
+      "title": "CI Status",
+      "transformations": [
         {
-          "alias": "$ci_run_date1: VM CPU ",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "metrics": [
-            {
-              "field": "cpu",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "kind:'vm' AND ci_run_date=$ci_run_date1",
-          "refId": "A",
-          "timeField": "timestamp"
-        },
-        {
-          "alias": "$ci_run_date1: POD CPU",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "cpu",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "kind:'pod' AND ci_run_date=$ci_run_date1",
-          "refId": "B",
-          "timeField": "timestamp"
-        },
-        {
-          "alias": "$ci_run_date2: VM CPU",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "cpu",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "kind:'vm' AND ci_run_date=$ci_run_date2",
-          "refId": "C",
-          "timeField": "timestamp"
-        },
-        {
-          "alias": "$ci_run_date2: POD CPU",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "cpu",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "kind:'pod' AND ci_run_date=$ci_run_date2",
-          "refId": "D",
-          "timeField": "timestamp"
-        },
-        {
-          "alias": "$ci_run_date3: VM CPU",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "cpu",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "kind:'vm' AND ci_run_date=$ci_run_date3",
-          "refId": "E",
-          "timeField": "timestamp"
-        },
-        {
-          "alias": "$ci_run_date3: POD CPU",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "cpu",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "kind:'pod' AND ci_run_date=$ci_run_date3",
-          "refId": "F",
-          "timeField": "timestamp"
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Max": true,
+              "Max version": true
+            },
+            "indexByName": {},
+            "renameByName": {}
+          }
         }
       ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
-      "title": "Stressng - CPU",
-      "tooltip": {
-        "shared": false,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "series",
-        "name": null,
-        "show": true,
-        "values": [
-          "total"
-        ]
-      },
-      "yaxes": [
-        {
-          "$$hashKey": "object:223",
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "$$hashKey": "object:224",
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
-    {
-      "aliasColors": {},
-      "bars": true,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "Elasticsearch-stressng-results",
-      "fill": 1,
-      "fillGradient": 0,
-      "gridPos": {
-        "h": 8,
-        "w": 24,
-        "x": 0,
-        "y": 132
-      },
-      "hiddenSeries": false,
-      "id": 54,
-      "legend": {
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "show": false,
-        "total": false,
-        "values": false
-      },
-      "lines": true,
-      "linewidth": 1,
-      "nullPointMode": "null",
-      "options": {
-        "alertThreshold": true
-      },
-      "percentage": false,
-      "pluginVersion": "8.1.5",
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "targets": [
-        {
-          "alias": "$ci_run_date1: VM Memcpy ",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "metrics": [
-            {
-              "field": "memcpy",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "kind:'vm' AND ci_run_date=$ci_run_date1",
-          "refId": "A",
-          "timeField": "timestamp"
-        },
-        {
-          "alias": "$ci_run_date1: POD Memcpy",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "memcpy",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "kind:'pod' AND ci_run_date=$ci_run_date1",
-          "refId": "B",
-          "timeField": "timestamp"
-        },
-        {
-          "alias": "$ci_run_date2: VM Memcpy",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "memcpy",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "kind:'vm' AND ci_run_date=$ci_run_date2",
-          "refId": "C",
-          "timeField": "timestamp"
-        },
-        {
-          "alias": "$ci_run_date2: POD Memcpy",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "memcpy",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "kind:'pod' AND ci_run_date=$ci_run_date2",
-          "refId": "D",
-          "timeField": "timestamp"
-        },
-        {
-          "alias": "$ci_run_date3: VM Memcpy",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "memcpy",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "kind:'vm' AND ci_run_date=$ci_run_date3",
-          "refId": "E",
-          "timeField": "timestamp"
-        },
-        {
-          "alias": "$ci_run_date3: POD Memcpy",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "memcpy",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "kind:'pod' AND ci_run_date=$ci_run_date3",
-          "refId": "F",
-          "timeField": "timestamp"
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
-      "title": "Stressng - Memcpy",
-      "tooltip": {
-        "shared": false,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "series",
-        "name": null,
-        "show": true,
-        "values": [
-          "total"
-        ]
-      },
-      "yaxes": [
-        {
-          "$$hashKey": "object:223",
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "$$hashKey": "object:224",
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
-    {
-      "aliasColors": {},
-      "bars": true,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "Elasticsearch-stressng-results",
-      "fill": 1,
-      "fillGradient": 0,
-      "gridPos": {
-        "h": 8,
-        "w": 24,
-        "x": 0,
-        "y": 140
-      },
-      "hiddenSeries": false,
-      "id": 55,
-      "legend": {
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "show": false,
-        "total": false,
-        "values": false
-      },
-      "lines": true,
-      "linewidth": 1,
-      "nullPointMode": "null",
-      "options": {
-        "alertThreshold": true
-      },
-      "percentage": false,
-      "pluginVersion": "8.1.5",
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "targets": [
-        {
-          "alias": "$ci_run_date1: VM VM ",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "metrics": [
-            {
-              "field": "vm",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "kind:'vm' AND ci_run_date=$ci_run_date1",
-          "refId": "A",
-          "timeField": "timestamp"
-        },
-        {
-          "alias": "$ci_run_date1: POD VM",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "vm",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "kind:'pod' AND ci_run_date=$ci_run_date1",
-          "refId": "B",
-          "timeField": "timestamp"
-        },
-        {
-          "alias": "$ci_run_date2: VM VM",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "vm",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "kind:'vm' AND ci_run_date=$ci_run_date2",
-          "refId": "C",
-          "timeField": "timestamp"
-        },
-        {
-          "alias": "$ci_run_date2: POD VM",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "vm",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "kind:'pod' AND ci_run_date=$ci_run_date2",
-          "refId": "D",
-          "timeField": "timestamp"
-        },
-        {
-          "alias": "$ci_run_date3: VM VM",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "vm",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "kind:'vm' AND ci_run_date=$ci_run_date3",
-          "refId": "E",
-          "timeField": "timestamp"
-        },
-        {
-          "alias": "$ci_run_date3: POD VM",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "hide": false,
-          "metrics": [
-            {
-              "field": "vm",
-              "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "max"
-            }
-          ],
-          "query": "kind:'pod' AND ci_run_date=$ci_run_date3",
-          "refId": "F",
-          "timeField": "timestamp"
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
-      "title": "Stressng - VM",
-      "tooltip": {
-        "shared": false,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "series",
-        "name": null,
-        "show": true,
-        "values": [
-          "total"
-        ]
-      },
-      "yaxes": [
-        {
-          "$$hashKey": "object:223",
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "$$hashKey": "object:224",
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
-    {
-      "datasource": null,
-      "gridPos": {
-        "h": 4,
-        "w": 3,
-        "x": 21,
-        "y": 148
-      },
-      "id": 49,
-      "links": [],
-      "options": {
-        "content": "![alt text](https://www.redhat.com/cms/managed-files/Brand_Standars-Red_Hat-_color_on-black.svg?itok=wPCF1-sX \"Tooltip Text\")",
-        "mode": "markdown"
-      },
-      "pluginVersion": "8.1.5",
-      "timeFrom": null,
-      "timeShift": null,
-      "type": "text"
+      "type": "table"
     }
   ],
   "refresh": "",
-  "schemaVersion": 30,
+  "schemaVersion": 34,
   "style": "dark",
   "tags": [],
   "templating": {
-    "list": [
-      {
-        "allValue": null,
-        "current": {
-          "selected": false,
-          "text": "2021_10_19",
-          "value": "2021_10_19"
-        },
-        "datasource": "Elasticsearch-hammerdb-results",
-        "definition": "{\"find\":\"terms\",\"field\":\"ci_date.keyword\"}",
-        "description": null,
-        "error": null,
-        "hide": 0,
-        "includeAll": false,
-        "label": "ci_run_date1",
-        "multi": false,
-        "name": "ci_run_date1",
-        "options": [],
-        "query": "{\"find\":\"terms\",\"field\":\"ci_date.keyword\"}",
-        "refresh": 2,
-        "regex": "",
-        "skipUrlSync": false,
-        "sort": 0,
-        "tagValuesQuery": "",
-        "tagsQuery": "",
-        "type": "query",
-        "useTags": false
-      },
-      {
-        "allValue": null,
-        "current": {
-          "selected": false,
-          "text": "2021_10_19",
-          "value": "2021_10_19"
-        },
-        "datasource": "Elasticsearch-hammerdb-results",
-        "definition": "{\"find\":\"terms\",\"field\":\"ci_date.keyword\"}",
-        "description": null,
-        "error": null,
-        "hide": 0,
-        "includeAll": false,
-        "label": "ci_run_date2",
-        "multi": false,
-        "name": "ci_run_date2",
-        "options": [],
-        "query": "{\"find\":\"terms\",\"field\":\"ci_date.keyword\"}",
-        "refresh": 2,
-        "regex": "",
-        "skipUrlSync": false,
-        "sort": 0,
-        "tagValuesQuery": "",
-        "tagsQuery": "",
-        "type": "query",
-        "useTags": false
-      },
-      {
-        "allValue": null,
-        "current": {
-          "selected": false,
-          "text": "2021_10_19",
-          "value": "2021_10_19"
-        },
-        "datasource": "Elasticsearch-hammerdb-results",
-        "definition": "{\"find\":\"terms\",\"field\":\"ci_date.keyword\"}",
-        "description": null,
-        "error": null,
-        "hide": 0,
-        "includeAll": false,
-        "label": "ci_run_date3",
-        "multi": false,
-        "name": "ci_run_date3",
-        "options": [],
-        "query": "{\"find\":\"terms\",\"field\":\"ci_date.keyword\"}",
-        "refresh": 2,
-        "regex": "",
-        "skipUrlSync": false,
-        "sort": 0,
-        "tagValuesQuery": "",
-        "tagsQuery": "",
-        "type": "query",
-        "useTags": false
-      }
-    ]
+    "list": []
   },
   "time": {
     "from": "now-24h",
@@ -4244,7 +505,8 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "benchmark-runner-compare-3-ci-dates-report",
-  "uid": "Cf4r_2O7z",
-  "version": 3
+  "title": "benchmark-runner-ci-status-report",
+  "uid": "tUclnRNnz",
+  "version": 2,
+  "weekStart": ""
 }

@@ -23,9 +23,9 @@ template_data:
       FILES_PER_DIRECTORY: 10
       SIZE_PER_FILE: 10
       limits_cpu: 2
-      limits_memory: 2Gi
+      limits_memory: 4Gi
       requests_cpu: 2
-      requests_memory: 2Gi
+      requests_memory: 4Gi
       storage: 64Gi
     default:
       BLOCK_SIZES: 64,oltp1

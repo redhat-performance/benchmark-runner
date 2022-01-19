@@ -37,7 +37,7 @@ spec:
         kubernetes.io/hostname: pin-node-1
       domain:
         cpu:
-          sockets: 4
+          sockets: 2
           cores: 1
           threads: 1
         devices:

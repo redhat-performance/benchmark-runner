@@ -24,7 +24,7 @@ spec:
         kubernetes.io/hostname: pin-node-1
       domain:
         cpu:
-          sockets: 60
+          sockets: 2
           cores: 1
           threads: 1
         devices:
@@ -43,11 +43,11 @@ spec:
           type: ""
         resources:
           requests:
-            cpu: 500m
-            memory: 512Mi
+            cpu: 2
+            memory: 4Gi
           limits:
             cpu: 2
-            memory: 2Gi
+            memory: 4Gi
       terminationGracePeriodSeconds: 0
       volumes:
         - containerDisk:
