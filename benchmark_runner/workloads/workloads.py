@@ -66,7 +66,7 @@ class Workloads(WorkloadsOperations):
         except Exception as err:
             # save run artifacts logs
             result = self._create_pod_run_artifacts(pod_name=self.__pod_name)
-            self._upload_to_es(kind=self.__kind, status='failed', result=result)
+            self._upload_to_es(index=self.__es_index, kind=self.__kind, status='failed', result=result)
             self._oc.delete_pod_sync(
                 yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.vdbench_pod.__name__}.yaml'),
                 pod_name=self.__pod_name)
@@ -119,7 +119,7 @@ class Workloads(WorkloadsOperations):
         except Exception as err:
             # save run artifacts logs
             result = self._create_vm_run_artifacts(vm_name=self.__vm_name, start_stamp=self.__vm_name, end_stamp='@@~@@END-WORKLOAD@@~@@')
-            self._upload_to_es(kind=self.__kind, status='failed', result=result)
+            self._upload_to_es(index=self.__es_index, kind=self.__kind, status='failed', result=result)
             self._oc.delete_vm_sync(
                 yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.vdbench_vm.__name__}.yaml'),
                 vm_name=self.__vm_name)
