@@ -177,7 +177,7 @@ class WorkloadsOperations:
         :param pod_name: pod name
         :return: run results dict
         """
-        result_dict = {'pod': pod_name}
+        result_list = []
         pod_log_file = self.__create_pod_log(pod=pod_name)
         workload_name = self._environment_variables_dict.get('workload', '').replace('_', '-')
         # csv to dictionary
@@ -185,10 +185,14 @@ class WorkloadsOperations:
         for line_dict in the_reader:
             for key, value in line_dict.items():
                 if self.__is_float(value):
-                    line_dict[key] = float(value)
-            result_dict[line_dict['Run']] = line_dict
-        result_dict['run_artifacts_url'] = os.path.join(self._run_artifacts_url, f'{self.__get_run_artifacts_hierarchy(workload_name=workload_name, is_file=True)}-{self._time_stamp_format}.tar.gz')
-        return result_dict
+                    num = float(value)
+                    line_dict[key] = round(num, 3)
+                elif value == 'n/a':
+                    line_dict[key] = 0.0
+            line_dict['pod_name'] = pod_name
+            line_dict['run_artifacts_url'] = os.path.join(self._run_artifacts_url, f'{self.__get_run_artifacts_hierarchy(workload_name=workload_name, is_file=True)}-{self._time_stamp_format}.tar.gz')
+            result_list.append(dict(line_dict))
+        return result_list
 
     def _create_vm_run_artifacts(self, vm_name: str, start_stamp: str, end_stamp: str):
         """
@@ -198,7 +202,7 @@ class WorkloadsOperations:
         :param end_stamp: end stamp
         :return: run results dict
         """
-        result_dict = {'vm': vm_name}
+        result_list = []
         results_list = self._oc.extract_vm_results(vm_name=vm_name, start_stamp=start_stamp, end_stamp=end_stamp)
         workload_name = self._environment_variables_dict.get('workload', '').replace('_', '-')
         # insert results to csv
@@ -211,10 +215,14 @@ class WorkloadsOperations:
         for line_dict in the_reader:
             for key, value in line_dict.items():
                 if self.__is_float(value):
-                    line_dict[key] = float(value)
-            result_dict[line_dict['Run']] = line_dict
-        result_dict['run_artifacts_url'] = os.path.join(self._run_artifacts_url, f'{self.__get_run_artifacts_hierarchy(workload_name=workload_name, is_file=True)}-{self._time_stamp_format}.tar.gz')
-        return result_dict
+                    num = float(value)
+                    line_dict[key] = round(num, 3)
+                elif value == 'n/a':
+                    line_dict[key] = 0.0
+            line_dict['vm_name'] = vm_name
+            line_dict['run_artifacts_url'] = os.path.join(self._run_artifacts_url, f'{self.__get_run_artifacts_hierarchy(workload_name=workload_name, is_file=True)}-{self._time_stamp_format}.tar.gz')
+            result_list.append(dict(line_dict))
+        return result_list
 
     def __make_run_artifacts_tarfile(self, workload: str):
         """
