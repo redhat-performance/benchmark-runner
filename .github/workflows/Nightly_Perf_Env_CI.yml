@@ -1,6 +1,6 @@
 # Nightly CI https://github.com/marketplace/actions/deploy-nightly
 # This is a nightly CI Pipeline against Performance environment
-# Github Actions limit 6 hours for each Job
+# GitHub Actions is limited 6 hours for each job
 name: Deploy Perf Env Nightly CI
 
 on:
