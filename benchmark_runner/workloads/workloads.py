@@ -50,9 +50,11 @@ class Workloads(WorkloadsOperations):
             self.__status = self._oc.wait_for_pod_completed(label=f'app=vdbench-{self._trunc_uuid}', label_uuid=False, job=False)
             self.__status = 'complete' if self.__status else 'failed'
             # save run artifacts logs
-            result = self._create_pod_run_artifacts(pod_name=self.__pod_name)
+            result_list = self._create_pod_run_artifacts(pod_name=self.__pod_name)
             if self._es_host:
-                self._upload_to_es(index=self.__es_index, kind=self.__kind, status=self.__status, result=result)
+                # upload several run results
+                for result in result_list:
+                    self._upload_to_es(index=self.__es_index, kind=self.__kind, status=self.__status, result=result)
                 # verify that data upload to elastic search according to unique uuid
                 self._verify_es_data_uploaded(index=self.__es_index, uuid=self._uuid)
             self._oc.delete_pod_sync(
@@ -65,8 +67,12 @@ class Workloads(WorkloadsOperations):
             raise err
         except Exception as err:
             # save run artifacts logs
-            result = self._create_pod_run_artifacts(pod_name=self.__pod_name)
-            self._upload_to_es(index=self.__es_index, kind=self.__kind, status='failed', result=result)
+            result_list = self._create_pod_run_artifacts(pod_name=self.__pod_name)
+            # upload several run results
+            for result in result_list:
+                self._upload_to_es(index=self.__es_index, kind=self.__kind, status='failed', result=result)
+            # verify that data upload to elastic search according to unique uuid
+            self._verify_es_data_uploaded(index=self.__es_index, uuid=self._uuid)
             self._oc.delete_pod_sync(
                 yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.vdbench_pod.__name__}.yaml'),
                 pod_name=self.__pod_name)
@@ -91,7 +97,6 @@ class Workloads(WorkloadsOperations):
                 self.__es_index = 'vdbench-test-ci-results'
             else:
                 self.__es_index = 'vdbench-results'
-
             self.__workload = self.vdbench_vm.__name__.replace('_', '-')
             self.__vm_name = f'{self.__workload}-{self._trunc_uuid}'
             self.__kind = 'vm'
@@ -103,9 +108,11 @@ class Workloads(WorkloadsOperations):
             self.__status = self._oc.wait_for_vm_log_completed(vm_name=self.__vm_name, end_stamp='@@~@@END-WORKLOAD@@~@@')
             self.__status = 'complete' if self.__status else 'failed'
             # save run artifacts logs
-            result = self._create_vm_run_artifacts(vm_name=self.__vm_name, start_stamp=self.__vm_name, end_stamp='@@~@@END-WORKLOAD@@~@@')
+            result_list = self._create_vm_run_artifacts(vm_name=self.__vm_name, start_stamp=self.__vm_name, end_stamp='@@~@@END-WORKLOAD@@~@@')
             if self._es_host:
-                self._upload_to_es(index=self.__es_index, kind=self.__kind, status=self.__status, result=result)
+                # upload several run results
+                for result in result_list:
+                    self._upload_to_es(index=self.__es_index, kind=self.__kind, status=self.__status, result=result)
                 # verify that data upload to elastic search according to unique uuid
                 self._verify_es_data_uploaded(index=self.__es_index, uuid=self._uuid)
             self._oc.delete_vm_sync(
@@ -118,8 +125,12 @@ class Workloads(WorkloadsOperations):
             raise err
         except Exception as err:
             # save run artifacts logs
-            result = self._create_vm_run_artifacts(vm_name=self.__vm_name, start_stamp=self.__vm_name, end_stamp='@@~@@END-WORKLOAD@@~@@')
-            self._upload_to_es(index=self.__es_index, kind=self.__kind, status='failed', result=result)
+            result_list = self._create_vm_run_artifacts(vm_name=self.__vm_name, start_stamp=self.__vm_name, end_stamp='@@~@@END-WORKLOAD@@~@@')
+            # upload several run results
+            for result in result_list:
+                self._upload_to_es(index=self.__es_index, kind=self.__kind, status='failed', result=result)
+            # verify that data upload to elastic search according to unique uuid
+            self._verify_es_data_uploaded(index=self.__es_index, uuid=self._uuid)
             self._oc.delete_vm_sync(
                 yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.vdbench_vm.__name__}.yaml'),
                 vm_name=self.__vm_name)
