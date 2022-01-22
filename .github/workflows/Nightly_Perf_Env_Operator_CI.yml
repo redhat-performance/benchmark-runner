@@ -1,6 +1,7 @@
 # Nightly CI https://github.com/marketplace/actions/deploy-nightly
 # https://crontab.guru/
 # This is a nightly CI Pipeline against Performance environment using IPI installer - run on Sunday
+# Github Actions limit 6 hours for each Job
 name: Deploy Operator Perf Env Nightly CI
 # Only trigger, when the build workflow succeeded
 on:
