@@ -1,4 +1,4 @@
-FROM centos:centos8
+FROM quay.io/centos/centos:stream8
 
 # benchmark-runner latest version
 ARG VERSION

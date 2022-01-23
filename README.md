@@ -24,7 +24,7 @@ Reference:
 ## Documentation
 Documentation is available at [benchmark-runner.readthedocs.io](https://benchmark-runner.readthedocs.io/en/latest/)
 
-![](media/docker1.png)
+![](media/docker2.png)
 
 _**Table of Contents**_
 
