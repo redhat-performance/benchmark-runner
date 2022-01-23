@@ -169,7 +169,7 @@ class EnvironmentVariables:
         # Benchmark runner run artifacts url
         self._environment_variables_dict['run_artifacts_url'] = os.environ.get(f'{self.__ocp_env_flavor}_RUN_ARTIFACTS_URL', '')
 
-        # Parameters below related to 'update_ci_status()'
+        # Parameters below related to 'update_ci_status()' - No need to configure update auto by ci
         # CI run time
         self._environment_variables_dict['ci_minutes_time'] = os.environ.get('CI_MINUTES_TIME', 0)
         # Get this parameter from install resource process
