@@ -102,6 +102,7 @@ jobs:
         build_version="$(cut -d'=' -f2 <<<"$build")"
         ssh -t provision "podman pull quay.io/ebattat/benchmark-runner:latest"
         ssh -t provision "podman images"
-        echo "sudo podman rmi -f \$(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)" > "$RUNNER_PATH/remove_image.sh"
+        #echo "sudo podman rmi -f \$(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)" > "$RUNNER_PATH/remove_image.sh"
+        echo "if [[ \"\$(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)\" != \"\" ]]; then sudo podman rmi -f \$(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null); fi" > "$RUNNER_PATH/remove_image.sh"
         scp -r "$RUNNER_PATH/remove_image.sh" provision:"/tmp/remove_image.sh"
         ssh -t provision "chmod +x /tmp/remove_image.sh;/tmp/./remove_image.sh"
