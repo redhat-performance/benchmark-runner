@@ -49,8 +49,8 @@ jobs:
         END
     - name: Install latest benchmark-runner
       run: |
-        python -m pip install --upgrade pip
-        pip install benchmark-runner
+        #python -m pip install --upgrade pip
+        #pip install benchmark-runner
     - name: ⚙ Set Kubeconfig
       env:
         KUBECONFIG: ${{ secrets.FUNC_KUBECONFIG }}
@@ -102,5 +102,5 @@ jobs:
         build_version="$(cut -d'=' -f2 <<<"$build")"
         ssh -t provision "podman pull quay.io/ebattat/benchmark-runner:latest"
         ssh -t provision "podman images"
-        ssh -t provision "echo if [[ '$(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)' != '' ]]; then sudo podman rmi -f $(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null); fi" > /tmp/clear_image.sh
+        ssh -t provision "echo 'if [[ '$(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)' != '' ]]; then sudo podman rmi -f $(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null); fi ' > /tmp/clear_image.sh"
         ssh -t provision "chmod +x /tmp/clear_image.sh;/tmp/./clear_image.sh"
