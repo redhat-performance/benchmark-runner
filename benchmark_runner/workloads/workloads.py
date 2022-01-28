@@ -54,9 +54,9 @@ class Workloads(WorkloadsOperations):
             if self._es_host:
                 # upload several run results
                 for result in result_list:
-                    self._upload_to_es(index=self.__es_index, kind=self.__kind, status=self.__status, result=result)
+                    self._upload_to_elasticsearch(index=self.__es_index, kind=self.__kind, status=self.__status, result=result)
                 # verify that data upload to elastic search according to unique uuid
-                self._verify_es_data_uploaded(index=self.__es_index, uuid=self._uuid)
+                self._verify_elasticsearch_data_uploaded(index=self.__es_index, uuid=self._uuid)
             self._oc.delete_pod_sync(
                 yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.vdbench_pod.__name__}.yaml'),
                 pod_name=self.__pod_name)
@@ -70,9 +70,9 @@ class Workloads(WorkloadsOperations):
             result_list = self._create_pod_run_artifacts(pod_name=self.__pod_name)
             # upload several run results
             for result in result_list:
-                self._upload_to_es(index=self.__es_index, kind=self.__kind, status='failed', result=result)
+                self._upload_to_elasticsearch(index=self.__es_index, kind=self.__kind, status='failed', result=result)
             # verify that data upload to elastic search according to unique uuid
-            self._verify_es_data_uploaded(index=self.__es_index, uuid=self._uuid)
+            self._verify_elasticsearch_data_uploaded(index=self.__es_index, uuid=self._uuid)
             self._oc.delete_pod_sync(
                 yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.vdbench_pod.__name__}.yaml'),
                 pod_name=self.__pod_name)
@@ -112,9 +112,9 @@ class Workloads(WorkloadsOperations):
             if self._es_host:
                 # upload several run results
                 for result in result_list:
-                    self._upload_to_es(index=self.__es_index, kind=self.__kind, status=self.__status, result=result)
+                    self._upload_to_elasticsearch(index=self.__es_index, kind=self.__kind, status=self.__status, result=result)
                 # verify that data upload to elastic search according to unique uuid
-                self._verify_es_data_uploaded(index=self.__es_index, uuid=self._uuid)
+                self._verify_elasticsearch_data_uploaded(index=self.__es_index, uuid=self._uuid)
             self._oc.delete_vm_sync(
                 yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.vdbench_vm.__name__}.yaml'),
                 vm_name=self.__vm_name)
@@ -128,9 +128,9 @@ class Workloads(WorkloadsOperations):
             result_list = self._create_vm_run_artifacts(vm_name=self.__vm_name, start_stamp=self.__vm_name, end_stamp='@@~@@END-WORKLOAD@@~@@')
             # upload several run results
             for result in result_list:
-                self._upload_to_es(index=self.__es_index, kind=self.__kind, status='failed', result=result)
+                self._upload_to_elasticsearch(index=self.__es_index, kind=self.__kind, status='failed', result=result)
             # verify that data upload to elastic search according to unique uuid
-            self._verify_es_data_uploaded(index=self.__es_index, uuid=self._uuid)
+            self._verify_elasticsearch_data_uploaded(index=self.__es_index, uuid=self._uuid)
             self._oc.delete_vm_sync(
                 yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.vdbench_vm.__name__}.yaml'),
                 vm_name=self.__vm_name)

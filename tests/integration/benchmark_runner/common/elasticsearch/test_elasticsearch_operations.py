@@ -2,7 +2,7 @@
 import pytest
 
 from benchmark_runner.common.oc.oc import OC
-from benchmark_runner.common.elasticsearch.es_operations import ESOperations
+from benchmark_runner.common.elasticsearch.elasticsearch_operations import ElasticSearchOperations
 from benchmark_runner.common.elasticsearch.elasticsearch_exceptions import ElasticSearchDataNotUploaded
 from benchmark_runner.common.template_operations.render_yaml_from_template import render_yaml_file
 from benchmark_runner.benchmark_operator.benchmark_operator_workloads_operations import BenchmarkOperatorWorkloadsOperations
@@ -66,7 +66,7 @@ def before_after_each_test_fixture():
     print('Test End')
 
 
-def test_verify_es_data_uploaded_stressng_pod():
+def test_verify_elasticsearch_data_uploaded_stressng_pod():
     """
     This method verify that the data upload properly to elasticsearch
     :return:
@@ -81,15 +81,15 @@ def test_verify_es_data_uploaded_stressng_pod():
         oc.wait_for_pod_completed(label='app=stressng_workload', workload=workload)
         # system-metrics
         if test_environment_variable['system_metrics'] == 'True':
-            es = ESOperations(es_host=test_environment_variable.get('elasticsearch', ''), es_port=test_environment_variable.get('elasticsearch_port', ''), es_user=test_environment_variable.get('elasticsearch_user', ''), es_password=test_environment_variable.get('elasticsearch_password', ''))
+            es = ElasticSearchOperations(es_host=test_environment_variable.get('elasticsearch', ''), es_port=test_environment_variable.get('elasticsearch_port', ''), es_user=test_environment_variable.get('elasticsearch_user', ''), es_password=test_environment_variable.get('elasticsearch_password', ''))
             assert oc.wait_for_pod_create(pod_name='system-metrics-collector')
             assert oc.wait_for_initialized(label='app=system-metrics-collector', workload=workload)
             assert oc.wait_for_pod_completed(label='app=system-metrics-collector', workload=workload)
-            assert es.verify_es_data_uploaded(index='system-metrics-test', uuid=oc.get_long_uuid(workload=workload))
+            assert es.verify_elasticsearch_data_uploaded(index='system-metrics-test', uuid=oc.get_long_uuid(workload=workload))
         if test_environment_variable['elasticsearch']:
             # verify that data upload to elastic search
-            es = ESOperations(es_host=test_environment_variable.get('elasticsearch', ''), es_port=test_environment_variable.get('elasticsearch_port', ''), es_user=test_environment_variable.get('elasticsearch_user', ''), es_password=test_environment_variable.get('elasticsearch_password', ''))
-            assert es.verify_es_data_uploaded(index='stressng-pod-test-results', uuid=oc.get_long_uuid(workload=workload))
+            es = ElasticSearchOperations(es_host=test_environment_variable.get('elasticsearch', ''), es_port=test_environment_variable.get('elasticsearch_port', ''), es_user=test_environment_variable.get('elasticsearch_user', ''), es_password=test_environment_variable.get('elasticsearch_password', ''))
+            assert es.verify_elasticsearch_data_uploaded(index='stressng-pod-test-results', uuid=oc.get_long_uuid(workload=workload))
     except ElasticSearchDataNotUploaded as err:
         raise err
     except Exception as err:

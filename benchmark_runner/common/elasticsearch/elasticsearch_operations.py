@@ -9,7 +9,7 @@ from benchmark_runner.common.elasticsearch.elasticsearch_exceptions import Elast
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 
 
-class ESOperations:
+class ElasticSearchOperations:
     """
     This class contains elastic search operations
     """
@@ -50,9 +50,9 @@ class ESOperations:
             index, uuid, workload = value
         except ValueError:
             raise ValueError("Pass an iterable with two items")
-        self._hits = self.__es_get_index_hits(index=index, uuid=uuid, workload=workload)
+        self._hits = self.__elasticsearch_get_index_hits(index=index, uuid=uuid, workload=workload)
 
-    def __es_get_index_hits(self, index: str, uuid: str = '', workload: str = '', fast_check: bool = False, id: bool = False):
+    def __elasticsearch_get_index_hits(self, index: str, uuid: str = '', workload: str = '', fast_check: bool = False, id: bool = False):
         """
         This method search for data per index in last 2 minutes and return the number of docs or zero
         :param index:
@@ -105,7 +105,7 @@ class ESOperations:
 
     @typechecked()
     @logger_time_stamp
-    def verify_es_data_uploaded(self, index: str, uuid: str = '', workload: str = '', fast_check: bool = False):
+    def verify_elasticsearch_data_uploaded(self, index: str, uuid: str = '', workload: str = '', fast_check: bool = False):
         """
         The method wait till data upload to elastic search and wait if there is new data, search in last 15 minutes
         :param index:
@@ -120,17 +120,17 @@ class ESOperations:
         # waiting for any hits
         while current_wait_time <= self.__timeout:
             # waiting for new hits
-            new_hits = self.__es_get_index_hits(index=index, uuid=uuid, workload=workload, fast_check=fast_check)
+            new_hits = self.__elasticsearch_get_index_hits(index=index, uuid=uuid, workload=workload, fast_check=fast_check)
             if current_hits < new_hits:
                 logger.info(f'Data with index: {index} and uuid={uuid} was uploaded to ElasticSearch successfully')
-                return self.__es_get_index_hits(index=index, uuid=uuid, workload=workload, id=True, fast_check=fast_check)
+                return self.__elasticsearch_get_index_hits(index=index, uuid=uuid, workload=workload, id=True, fast_check=fast_check)
             # sleep for x seconds
             time.sleep(self.SLEEP_TIME)
             current_wait_time += self.SLEEP_TIME
         raise ElasticSearchDataNotUploaded
 
     @typechecked()
-    def upload_to_es(self, index: str, data: dict, doc_type: str = '_doc', es_add_items: dict = None):
+    def upload_to_elasticsearch(self, index: str, data: dict, doc_type: str = '_doc', es_add_items: dict = None):
         """
         This method is upload json data into elasticsearch
         :param index: index name to be stored in elasticsearch
@@ -162,7 +162,7 @@ class ESOperations:
             raise err
 
     @typechecked()
-    def update_es_index(self, index: str, id: str, metadata: dict = ''):
+    def update_elasticsearch_index(self, index: str, id: str, metadata: dict = ''):
         """
         This method update existing index
         :param index: index name
@@ -174,7 +174,7 @@ class ESOperations:
 
     @typechecked()
     @logger_time_stamp
-    def get_es_index_by_id(self, index: str, id: str):
+    def get_elasticsearch_index_by_id(self, index: str, id: str):
         """
         This method return elastic search index data by id
         :param index: index name

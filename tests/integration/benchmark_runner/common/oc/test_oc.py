@@ -4,7 +4,7 @@ import pytest
 
 from benchmark_runner.common.oc.oc import OC
 from benchmark_runner.common.oc.oc_exceptions import LoginFailed, PodNotCreateTimeout, PodTerminateTimeout, VMNotCreateTimeout, YAMLNotExist
-from benchmark_runner.common.elasticsearch.es_operations import ESOperations
+from benchmark_runner.common.elasticsearch.elasticsearch_operations import ElasticSearchOperations
 from benchmark_runner.common.template_operations.render_yaml_from_template import render_yaml_file
 from benchmark_runner.benchmark_operator.benchmark_operator_workloads_operations import BenchmarkOperatorWorkloadsOperations
 from tests.integration.benchmark_runner.test_environment_variables import *
@@ -224,14 +224,14 @@ def test_vm_create_initialized_ready_completed_system_metrics_deleted():
     assert oc.wait_for_vm_completed(workload=workload)
     # system-metrics
     if test_environment_variable['system_metrics'] == 'True':
-        es = ESOperations(es_host=test_environment_variable.get('elasticsearch', ''), es_port=test_environment_variable.get('elasticsearch_port', ''), es_user=test_environment_variable.get('elasticsearch_user', ''), es_password=test_environment_variable.get('elasticsearch_password', ''))
+        es = ElasticSearchOperations(es_host=test_environment_variable.get('elasticsearch', ''), es_port=test_environment_variable.get('elasticsearch_port', ''), es_user=test_environment_variable.get('elasticsearch_user', ''), es_password=test_environment_variable.get('elasticsearch_password', ''))
         assert oc.wait_for_pod_create(pod_name='system-metrics-collector')
         assert oc.wait_for_initialized(label='app=system-metrics-collector', workload=workload)
         assert oc.wait_for_pod_completed(label='app=system-metrics-collector', workload=workload)
-        assert es.verify_es_data_uploaded(index='system-metrics-test', uuid=oc.get_long_uuid(workload=workload))
+        assert es.verify_elasticsearch_data_uploaded(index='system-metrics-test', uuid=oc.get_long_uuid(workload=workload))
     if test_environment_variable['elasticsearch']:
-        es = ESOperations(es_host=test_environment_variable.get('elasticsearch', ''), es_port=test_environment_variable.get('elasticsearch_port', ''), es_user=test_environment_variable.get('elasticsearch_user', ''), es_password=test_environment_variable.get('elasticsearch_password', ''))
-        assert es.verify_es_data_uploaded(index='stressng-vm-test-results', uuid=oc.get_long_uuid(workload=workload))
+        es = ElasticSearchOperations(es_host=test_environment_variable.get('elasticsearch', ''), es_port=test_environment_variable.get('elasticsearch_port', ''), es_user=test_environment_variable.get('elasticsearch_user', ''), es_password=test_environment_variable.get('elasticsearch_password', ''))
+        assert es.verify_elasticsearch_data_uploaded(index='stressng-vm-test-results', uuid=oc.get_long_uuid(workload=workload))
     assert oc.delete_vm_sync(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'),
                              vm_name='stressng-vm-workload')
 
