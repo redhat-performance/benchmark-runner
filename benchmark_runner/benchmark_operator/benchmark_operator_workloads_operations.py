@@ -9,7 +9,7 @@ from typeguard import typechecked
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 from benchmark_runner.common.oc.oc import OC
 from benchmark_runner.common.template_operations.template_operations import TemplateOperations
-from benchmark_runner.common.elasticsearch.es_operations import ESOperations
+from benchmark_runner.common.elasticsearch.elasticsearch_operations import ElasticSearchOperations
 from benchmark_runner.common.ssh.ssh import SSH
 from benchmark_runner.benchmark_operator.benchmark_operator_exceptions import OCSNonInstalled, SystemMetricsRequiredElasticSearch
 from benchmark_runner.main.environment_variables import environment_variables
@@ -54,11 +54,11 @@ class BenchmarkOperatorWorkloadsOperations:
         self._ssh = SSH()
         # Elasticsearch connection
         if self._es_host and self._es_port:
-            self.__es_operations = ESOperations(es_host=self._es_host,
-                                                es_port=self._es_port,
-                                                es_user=self._es_user,
-                                                es_password=self._es_password,
-                                                timeout=self._timeout)
+            self.__es_operations = ElasticSearchOperations(es_host=self._es_host,
+                                                           es_port=self._es_port,
+                                                           es_user=self._es_user,
+                                                           es_password=self._es_password,
+                                                           timeout=self._timeout)
         # Generate template class
         self._template = TemplateOperations(workload=self._workload)
         # set oc login
@@ -199,7 +199,7 @@ class BenchmarkOperatorWorkloadsOperations:
         # verify that data upload to elastic search
         if self._es_host:
             # workload: system metrics, in case of uperf take timestamp and not uperf_ts
-            self._verify_es_data_uploaded(index=es_index, uuid=self._oc.get_long_uuid(workload=workload), workload='system-metrics', fast_check = True)
+            self._verify_elasticsearch_data_uploaded(index=es_index, uuid=self._oc.get_long_uuid(workload=workload), workload='system-metrics', fast_check = True)
 
     def __get_metadata(self, kind: str = None, database: str = None, status: str = None, run_artifacts_url: str = None) -> dict:
         """
@@ -242,7 +242,7 @@ class BenchmarkOperatorWorkloadsOperations:
         return metadata
 
     @logger_time_stamp
-    def _update_es_index(self, index: str, id: str, kind: str, status: str, run_artifacts_url: str, database: str = ''):
+    def _update_elasticsearch_index(self, index: str, id: str, kind: str, status: str, run_artifacts_url: str, database: str = ''):
         """
         This method update elasticsearch id
         :param index:
@@ -253,9 +253,9 @@ class BenchmarkOperatorWorkloadsOperations:
         :param run_artifacts_url:
         :return:
         """
-        self.__es_operations.update_es_index(index=index, id=id, metadata=self.__get_metadata(kind=kind, database=database, status=status, run_artifacts_url=run_artifacts_url))
+        self.__es_operations.update_elasticsearch_index(index=index, id=id, metadata=self.__get_metadata(kind=kind, database=database, status=status, run_artifacts_url=run_artifacts_url))
 
-    def _upload_to_es(self, index: str, kind: str, status: str, run_artifacts_url: str, database: str = ''):
+    def _upload_to_elasticsearch(self, index: str, kind: str, status: str, run_artifacts_url: str, database: str = ''):
         """
         This method upload to elasticsearch
         :param index:
@@ -265,9 +265,9 @@ class BenchmarkOperatorWorkloadsOperations:
         :param database:
         :return:
         """
-        self.__es_operations.upload_to_es(index=index, data=self.__get_metadata(kind=kind, database=database, status=status, run_artifacts_url=run_artifacts_url))
+        self.__es_operations.upload_to_elasticsearch(index=index, data=self.__get_metadata(kind=kind, database=database, status=status, run_artifacts_url=run_artifacts_url))
 
-    def _verify_es_data_uploaded(self, index: str, uuid: str, workload: str = '', fast_check: bool = False):
+    def _verify_elasticsearch_data_uploaded(self, index: str, uuid: str, workload: str = '', fast_check: bool = False):
         """
         This method verify that elasticsearch data uploaded
         :param index:
@@ -277,9 +277,9 @@ class BenchmarkOperatorWorkloadsOperations:
         :return: ids
         """
         if workload:
-            return self.__es_operations.verify_es_data_uploaded(index=index, uuid=uuid, workload=workload, fast_check=fast_check)
+            return self.__es_operations.verify_elasticsearch_data_uploaded(index=index, uuid=uuid, workload=workload, fast_check=fast_check)
         else:
-            return self.__es_operations.verify_es_data_uploaded(index=index, uuid=uuid, workload=self._workload_name, fast_check=fast_check)
+            return self.__es_operations.verify_elasticsearch_data_uploaded(index=index, uuid=uuid, workload=self._workload_name, fast_check=fast_check)
 
     def _create_vm_log(self, labels: list) -> str:
         """

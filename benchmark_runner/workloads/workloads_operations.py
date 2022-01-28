@@ -8,7 +8,7 @@ from csv import DictReader
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp
 from benchmark_runner.workloads.workloads_exceptions import OCSNonInstalled
 from benchmark_runner.common.oc.oc import OC
-from benchmark_runner.common.elasticsearch.es_operations import ESOperations
+from benchmark_runner.common.elasticsearch.elasticsearch_operations import ElasticSearchOperations
 from benchmark_runner.main.environment_variables import environment_variables
 from benchmark_runner.common.clouds.shared.s3.s3_operations import S3Operations
 from benchmark_runner.common.prometheus.prometheus_snapshot import PrometheusSnapshot
@@ -49,11 +49,11 @@ class WorkloadsOperations:
         self._timeout = int(self._environment_variables_dict.get('timeout', ''))
         # Elasticsearch connection
         if self._es_host and self._es_port:
-            self.__es_operations = ESOperations(es_host=self._es_host,
-                                                es_port=self._es_port,
-                                                es_user=self._es_user,
-                                                es_password=self._es_password,
-                                                timeout=self._timeout)
+            self.__es_operations = ElasticSearchOperations(es_host=self._es_host,
+                                                           es_port=self._es_port,
+                                                           es_user=self._es_user,
+                                                           es_password=self._es_password,
+                                                           timeout=self._timeout)
         # Generate templates class
         self._template = TemplateOperations(workload=self._workload)
         # set oc login
@@ -290,7 +290,7 @@ class WorkloadsOperations:
 
         return metadata
 
-    def _upload_to_es(self, index: str, kind: str, status: str, result: dict = None):
+    def _upload_to_elasticsearch(self, index: str, kind: str, status: str, result: dict = None):
         """
         This method upload to elasticsearch
         :param index:
@@ -299,16 +299,16 @@ class WorkloadsOperations:
         :param result:
         :return:
         """
-        self.__es_operations.upload_to_es(index=index, data=self.__get_metadata(kind=kind, status=status, result=result))
+        self.__es_operations.upload_to_elasticsearch(index=index, data=self.__get_metadata(kind=kind, status=status, result=result))
 
-    def _verify_es_data_uploaded(self, index: str, uuid: str):
+    def _verify_elasticsearch_data_uploaded(self, index: str, uuid: str):
         """
         This method verify that elasticsearch data uploaded
         :param index:
         :param uuid:
         :return:
         """
-        self.__es_operations.verify_es_data_uploaded(index=index, uuid=uuid)
+        self.__es_operations.verify_elasticsearch_data_uploaded(index=index, uuid=uuid)
 
     @logger_time_stamp
     def update_ci_status(self, status: str, ci_minutes_time: int, benchmark_operator_id: str, benchmark_wrapper_id: str, ocp_install_minutes_time: int = 0, ocp_resource_install_minutes_time: int = 0):
@@ -334,7 +334,7 @@ class WorkloadsOperations:
             ocp_install_minutes_time = ibm_operations.get_ocp_install_time()
             ibm_operations.ibm_disconnect()
         metadata.update({'status': status, 'status#': status_dict[status], 'ci_minutes_time': ci_minutes_time, 'benchmark_operator_id': benchmark_operator_id, 'benchmark_wrapper_id': benchmark_wrapper_id, 'ocp_install_minutes_time': ocp_install_minutes_time, 'ocp_resource_install_minutes_time': ocp_resource_install_minutes_time})
-        self.__es_operations.upload_to_es(index=es_index, data=metadata)
+        self.__es_operations.upload_to_elasticsearch(index=es_index, data=metadata)
 
     def initialize_workload(self):
         """

@@ -51,10 +51,10 @@ class BenchmarkOperatorWorkloads(BenchmarkOperatorWorkloadsOperations):
             run_artifacts_url = self._create_run_artifacts(workload=self.__workload)
             if self._es_host:
                 # verify that data upload to elastic search according to unique uuid
-                ids = self._verify_es_data_uploaded(index=self.__es_index, uuid=self._oc.get_long_uuid(workload=self.__workload))
+                ids = self._verify_elasticsearch_data_uploaded(index=self.__es_index, uuid=self._oc.get_long_uuid(workload=self.__workload))
                 # update metadata
                 for id in ids:
-                    self._update_es_index(index=self.__es_index, id=id, kind=self.__kind, status=self.__status, run_artifacts_url=run_artifacts_url)
+                    self._update_elasticsearch_index(index=self.__es_index, id=id, kind=self.__kind, status=self.__status, run_artifacts_url=run_artifacts_url)
             self._oc.delete_pod_sync(
                 yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.stressng_pod.__name__}.yaml'),
                 pod_name=f'{self.__workload}-workload')
@@ -65,7 +65,7 @@ class BenchmarkOperatorWorkloads(BenchmarkOperatorWorkloadsOperations):
         except Exception as err:
             # save run artifacts logs
             run_artifacts_url = self._create_run_artifacts(workload=self.__workload)
-            self._upload_to_es(index=self.__es_index, kind=self.__kind, status='failed', run_artifacts_url=run_artifacts_url)
+            self._upload_to_elasticsearch(index=self.__es_index, kind=self.__kind, status='failed', run_artifacts_url=run_artifacts_url)
             self.tear_down_pod_after_error(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.stressng_pod.__name__}.yaml'),
                                            pod_name=f'{self.__workload}-workload')
             raise err
@@ -106,10 +106,10 @@ class BenchmarkOperatorWorkloads(BenchmarkOperatorWorkloadsOperations):
             run_artifacts_url = self._create_run_artifacts(workload=self.__workload, pod=False)
             # verify that data upload to elastic search
             if self._es_host:
-                ids = self._verify_es_data_uploaded(index=self.__es_index, uuid=self._oc.get_long_uuid(workload=self.__workload))
+                ids = self._verify_elasticsearch_data_uploaded(index=self.__es_index, uuid=self._oc.get_long_uuid(workload=self.__workload))
                 # update metadata
                 for id in ids:
-                    self._update_es_index(index=self.__es_index, id=id, kind=self._environment_variables_dict.get('kind', ''), status=self.__status, run_artifacts_url=run_artifacts_url)
+                    self._update_elasticsearch_index(index=self.__es_index, id=id, kind=self._environment_variables_dict.get('kind', ''), status=self.__status, run_artifacts_url=run_artifacts_url)
             self._oc.delete_vm_sync(
                 yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.stressng_vm.__name__}.yaml'),
                 vm_name=f'{self.__workload}-workload')
@@ -120,7 +120,7 @@ class BenchmarkOperatorWorkloads(BenchmarkOperatorWorkloadsOperations):
         except Exception as err:
             # save run artifacts logs
             run_artifacts_url = self._create_run_artifacts(workload=self.__workload, pod=False)
-            self._upload_to_es(index=self.__es_index, kind=self._environment_variables_dict.get('kind', ''), status='failed', run_artifacts_url=run_artifacts_url)
+            self._upload_to_elasticsearch(index=self.__es_index, kind=self._environment_variables_dict.get('kind', ''), status='failed', run_artifacts_url=run_artifacts_url)
             self.tear_down_vm_after_error(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.stressng_vm.__name__}.yaml'),
                                           vm_name=f'{self.__workload}-workload')
             raise err
@@ -172,10 +172,10 @@ class BenchmarkOperatorWorkloads(BenchmarkOperatorWorkloadsOperations):
             run_artifacts_url = self._create_run_artifacts(workload=self.__workload, labels=['uperf-client', 'uperf-server'])
             if self._es_host:
                 # verify that data upload to elastic search
-                ids = self._verify_es_data_uploaded(index=self.__es_index, uuid=self._oc.get_long_uuid(workload=self.__workload))
+                ids = self._verify_elasticsearch_data_uploaded(index=self.__es_index, uuid=self._oc.get_long_uuid(workload=self.__workload))
                 # update metadata
                 for id in ids:
-                    self._update_es_index(index=self.__es_index, id=id, kind=self.__kind, status=self.__status, run_artifacts_url=run_artifacts_url)
+                    self._update_elasticsearch_index(index=self.__es_index, id=id, kind=self.__kind, status=self.__status, run_artifacts_url=run_artifacts_url)
             self._oc.delete_pod_sync(
                 yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.uperf_pod.__name__}.yaml'),
                 pod_name=f'uperf-client')
@@ -185,7 +185,7 @@ class BenchmarkOperatorWorkloads(BenchmarkOperatorWorkloadsOperations):
         except Exception as err:
             # save run artifacts logs
             run_artifacts_url = self._create_run_artifacts(workload=self.__workload, labels=['uperf-client', 'uperf-server'])
-            self._upload_to_es(index=self.__es_index, kind=self.__kind, status='failed', run_artifacts_url=run_artifacts_url)
+            self._upload_to_elasticsearch(index=self.__es_index, kind=self.__kind, status='failed', run_artifacts_url=run_artifacts_url)
             self.tear_down_pod_after_error(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.uperf_pod.__name__}.yaml'), pod_name=f'uperf-client')
             raise err
 
@@ -230,10 +230,10 @@ class BenchmarkOperatorWorkloads(BenchmarkOperatorWorkloadsOperations):
             run_artifacts_url = self._create_run_artifacts(workload=self.__workload, pod=False)
             # verify that data upload to elastic search
             if self._es_host:
-                ids = self._verify_es_data_uploaded(index=self.__es_index, uuid=self._oc.get_long_uuid(workload=self.__workload))
+                ids = self._verify_elasticsearch_data_uploaded(index=self.__es_index, uuid=self._oc.get_long_uuid(workload=self.__workload))
                 # update metadata
                 for id in ids:
-                    self._update_es_index(index=self.__es_index, id=id, kind=self._environment_variables_dict.get('kind', ''), status=self.__status, run_artifacts_url=run_artifacts_url)
+                    self._update_elasticsearch_index(index=self.__es_index, id=id, kind=self._environment_variables_dict.get('kind', ''), status=self.__status, run_artifacts_url=run_artifacts_url)
             self._oc.delete_vm_sync(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.uperf_vm.__name__}.yaml'),
                                      vm_name='uperf-server')
         except ElasticSearchDataNotUploaded as err:
@@ -242,7 +242,7 @@ class BenchmarkOperatorWorkloads(BenchmarkOperatorWorkloadsOperations):
         except Exception as err:
             # save run artifacts logs of benchmark-controller-manager and system-metrics
             run_artifacts_url = self._create_run_artifacts(workload=self.__workload, pod=False)
-            self._upload_to_es(index=self.__es_index, kind=self._environment_variables_dict.get('kind', ''), status='failed', run_artifacts_url=run_artifacts_url)
+            self._upload_to_elasticsearch(index=self.__es_index, kind=self._environment_variables_dict.get('kind', ''), status='failed', run_artifacts_url=run_artifacts_url)
             self.tear_down_vm_after_error(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.uperf_vm.__name__}.yaml'), vm_name='uperf-server')
             raise err
 
@@ -289,10 +289,10 @@ class BenchmarkOperatorWorkloads(BenchmarkOperatorWorkloadsOperations):
             run_artifacts_url = self._create_run_artifacts(labels=[f'{self.__workload}-creator', f'{self.__workload}-workload'], database=database)
             if self._es_host:
                 # verify that data upload to elastic search
-                ids = self._verify_es_data_uploaded(index=self.__es_index, uuid=self._oc.get_long_uuid(workload=self.__workload))
+                ids = self._verify_elasticsearch_data_uploaded(index=self.__es_index, uuid=self._oc.get_long_uuid(workload=self.__workload))
                 # update metadata
                 for id in ids:
-                    self._update_es_index(index=self.__es_index, id=id, kind=self.__kind, database=database, status=self.__status, run_artifacts_url=run_artifacts_url)
+                    self._update_elasticsearch_index(index=self.__es_index, id=id, kind=self.__kind, database=database, status=self.__status, run_artifacts_url=run_artifacts_url)
             # delete hammerdb
             self._oc.delete_pod_sync(
                 yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.hammerdb_pod.__name__}_{database}.yaml'),
@@ -312,7 +312,7 @@ class BenchmarkOperatorWorkloads(BenchmarkOperatorWorkloadsOperations):
         except Exception as err:
             # save run artifacts logs
             run_artifacts_url = self._create_run_artifacts(labels=[f'{self.__workload}-creator', f'{self.__workload}-workload'], database=database)
-            self._upload_to_es(index=self.__es_index, kind=self.__kind, status='failed', run_artifacts_url=run_artifacts_url, database=database)
+            self._upload_to_elasticsearch(index=self.__es_index, kind=self.__kind, status='failed', run_artifacts_url=run_artifacts_url, database=database)
         # delete hammerdb
             self.tear_down_pod_after_error(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.hammerdb_pod.__name__}_{database}.yaml'),
                                            pod_name=f'{self.__workload}-creator')
@@ -360,10 +360,10 @@ class BenchmarkOperatorWorkloads(BenchmarkOperatorWorkloadsOperations):
             run_artifacts_url = self._create_run_artifacts(workload=self.__workload, pod=False)
             # verify that data upload to elastic search
             if self._es_host:
-                ids = self._verify_es_data_uploaded(index=self.__es_index, uuid=self._oc.get_long_uuid(workload=self.__workload))
+                ids = self._verify_elasticsearch_data_uploaded(index=self.__es_index, uuid=self._oc.get_long_uuid(workload=self.__workload))
                 # update metadata
                 for id in ids:
-                    self._update_es_index(index=self.__es_index, id=id, kind=self._environment_variables_dict.get('kind', ''), status=self.__status, run_artifacts_url=run_artifacts_url, database=database)
+                    self._update_elasticsearch_index(index=self.__es_index, id=id, kind=self._environment_variables_dict.get('kind', ''), status=self.__status, run_artifacts_url=run_artifacts_url, database=database)
             self._oc.delete_vm_sync(
                 yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.hammerdb_vm.__name__}_{database}.yaml'),
                 vm_name=f'{self.__workload}-workload')
@@ -373,7 +373,7 @@ class BenchmarkOperatorWorkloads(BenchmarkOperatorWorkloadsOperations):
             raise VMNotCompletedTimeout(workload=self.__workload)
         except Exception as err:
             run_artifacts_url = self._create_run_artifacts(workload=self.__workload, pod=False)
-            self._upload_to_es(index=self.__es_index, kind=self._environment_variables_dict.get('kind', ''), status='failed', run_artifacts_url=run_artifacts_url, database=database)
+            self._upload_to_elasticsearch(index=self.__es_index, kind=self._environment_variables_dict.get('kind', ''), status='failed', run_artifacts_url=run_artifacts_url, database=database)
             # delete hammerdb
             self.tear_down_vm_after_error(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.hammerdb_vm.__name__}_{database}.yaml'),
                                           vm_name=f'{self.__workload}-workload')
