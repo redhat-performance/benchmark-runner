@@ -170,9 +170,6 @@ jobs:
         IBM_KEY: ${{ secrets.IBM_KEY }}
         FUNC_RUN_ARTIFACTS_URL: ${{ secrets.FUNC_RUN_ARTIFACTS_URL }}
       run: |
-        # Functional CI MUST update hosts ci file
-        sudo echo "${{ secrets.FUNC_HOSTS_API }}" | sudo tee -a /etc/hosts
-        sudo echo "${{ secrets.FUNC_HOSTS_OAUTH }}" | sudo tee -a /etc/hosts
         # get repository last id 'benchmark-operator' already cloned in pyest
         declare -a repositories=('benchmark-wrapper')
         for repository in "${repositories[@]}"

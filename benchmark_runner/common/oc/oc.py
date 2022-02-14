@@ -861,7 +861,8 @@ class OC(SSH):
                 if '01_operator.yaml' == resource:
                     # Wait for kataconfig CRD to exist
                     self.wait_for_ocp_resource_create(resource='kata',
-                                                      verify_cmd='oc get crd kataconfigs.kataconfiguration.openshift.io')
+                                                      verify_cmd='if oc get crd kataconfigs.kataconfiguration.openshift.io >/dev/null 2>&1 ; then echo succeeded ; fi',
+                                                      status='succeeded')
                 # for second script wait for kataconfig installation to no longer be in progress
                 elif '02_config.yaml' == resource:
                     self.wait_for_ocp_resource_create(resource='kata',
