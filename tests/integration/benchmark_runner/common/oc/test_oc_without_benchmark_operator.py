@@ -38,7 +38,7 @@ def test_oc_get_cnv_version():
     oc.login()
     assert oc.get_cnv_version()
 
-
+@pytest.mark.skip(reason="Need to change it to ODF")
 def test_oc_get_ocs_version():
     """
     This method get ocs version
