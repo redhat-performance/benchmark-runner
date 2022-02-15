@@ -4,15 +4,15 @@
  
 name: Func Env E2E Test CI
 
-#on:
-#  workflow_run:
-#    workflows: ["Test1"]
-#    types:
-#      - completed
-
 on:
-  push:
-    branches: [ main ]
+  workflow_run:
+    workflows: ["Test1"]
+    types:
+      - completed
+
+#on:
+#  push:
+#    branches: [ main ]
 
 jobs:
   nightly:
