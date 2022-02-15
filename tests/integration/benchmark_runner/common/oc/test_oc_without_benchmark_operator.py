@@ -1,11 +1,12 @@
 
 # Tests that are not required benchmark-operator pod
 
-from benchmark_runner.common.oc.oc import OC
-from tests.integration.benchmark_runner.test_environment_variables import *
 import tempfile
 import tarfile
 import time
+import pytest
+from benchmark_runner.common.oc.oc import OC
+from tests.integration.benchmark_runner.test_environment_variables import *
 from benchmark_runner.common.prometheus.prometheus_snapshot import PrometheusSnapshot
 
 
