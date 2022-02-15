@@ -854,10 +854,10 @@ class OC(SSH):
                 self._create_async(yaml=os.path.join(path, resource))
                 # for first script wait for virt-operator
                 if '01_operator.yaml' == resource:
-                    # Wait that cnv operator will be created
+                    # Wait for kataconfig CRD to exist
                     self.wait_for_ocp_resource_create(resource='kata',
-                                                      verify_cmd='oc -n openshift-sandboxed-containers-operator wait deployment/sandboxed-containers-operator-controller-manager --for=condition=Available',
-                                                      status='deployment.apps/sandboxed-containers-operator-controller-manager condition met')
+                                                      verify_cmd='if oc get crd kataconfigs.kataconfiguration.openshift.io >/dev/null 2>&1 ; then echo succeeded ; fi',
+                                                      status='succeeded')
                 # for second script wait for kataconfig installation to no longer be in progress
                 elif '02_config.yaml' == resource:
                     self.wait_for_ocp_resource_create(resource='kata',
