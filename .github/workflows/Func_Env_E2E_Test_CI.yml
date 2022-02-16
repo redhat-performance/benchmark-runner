@@ -79,9 +79,6 @@ jobs:
         IBM_KEY: ${{ secrets.IBM_KEY }}
         FUNC_RUN_ARTIFACTS_URL: ${{ secrets.FUNC_RUN_ARTIFACTS_URL }}
       run: |
-        oc get nodes
-        oc version
-        oc version -ojson | jq '.openshiftVersion'
         # get repository last id
         declare -a repositories=('benchmark-operator' 'benchmark-wrapper')
         for repository in "${repositories[@]}"
