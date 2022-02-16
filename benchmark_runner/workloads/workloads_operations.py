@@ -18,6 +18,7 @@ from benchmark_runner.common.clouds.IBM.ibm_operations import IBMOperations
 
 
 class WorkloadsOperations:
+    oc = None
     """
     This class run workloads
     """
@@ -59,7 +60,11 @@ class WorkloadsOperations:
         # Generate templates class
         self._template = TemplateOperations(workload=self._workload)
         # set oc login
-        self._oc = self.set_login(kubeadmin_password=self._kubeadmin_password)
+
+        if WorkloadsOperations.oc is None:
+            WorkloadsOperations.oc = self.set_login(kubeadmin_password=self._kubeadmin_password)
+        self._oc = WorkloadsOperations.oc
+
         # PrometheusSnapshot
         if self._enable_prometheus_snapshot:
             self._snapshot = PrometheusSnapshot(oc=self._oc, artifacts_path=self._run_artifacts_path, verbose=True)
