@@ -13,6 +13,22 @@ class EnvironmentVariables:
 
         self._environment_variables_dict = {}
 
+        # env files override true ENV. Not best order, but easier to write :/
+        # .env.generated can be auto-generated (by an external tool) based on the local cluster's configuration.
+
+        for env in ".env", ".env.generated":
+            try:
+                with open(env) as f:
+                    for line in f.readlines():
+                        key, found , value = line.strip().partition("=")
+                        if not found:
+                            print("ERROR: invalid line in {env}: {line.strip()}")
+                            continue
+                        if key in os.environ: continue # prefer env to env file
+                        os.environ[key] = value
+
+            except FileNotFoundError: pass # ignore
+
         ##################################################################################################
         # dynamic parameters - configure for local run
         # parameters for running workload
