@@ -67,6 +67,8 @@ class TemplateOperations:
                 return dict()
             template_data = template_root_data.get('template_data')
             shared_data = template_data.get('shared')
+            if shared_data is None:
+                shared_data = {}
             kind_data = get_sub_dict(template_data, 'kind', self.__workload_kind)
             run_type_data = get_sub_dict(template_data, 'run_type', self.__run_type)
             kind_runtype_data = get_sub_dict(kind_data, 'run_type', self.__run_type)
