@@ -1,10 +1,9 @@
 
 # Tests that are not required benchmark-operator pod
 
+import time
 import tempfile
 import tarfile
-import time
-import pytest
 from benchmark_runner.common.oc.oc import OC
 from tests.integration.benchmark_runner.test_environment_variables import *
 from benchmark_runner.common.prometheus.prometheus_snapshot import PrometheusSnapshot
@@ -39,15 +38,15 @@ def test_oc_get_cnv_version():
     oc.login()
     assert oc.get_cnv_version()
 
-@pytest.mark.skip(reason="Need to change it to ODF")
-def test_oc_get_ocs_version():
+    
+def test_oc_get_odf_version():
     """
-    This method get ocs version
+    This method get odf version
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
-    assert oc.get_ocs_version()
+    assert oc.get_odf_version()
 
 
 def test_oc_get_master_nodes():
