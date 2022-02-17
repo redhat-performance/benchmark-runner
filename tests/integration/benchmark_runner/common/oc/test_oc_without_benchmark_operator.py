@@ -39,14 +39,14 @@ def test_oc_get_cnv_version():
     assert oc.get_cnv_version()
 
     
-def test_oc_get_odf_version():
+def test_oc_get_ocs_version():
     """
-    This method get odf version
+    This method get ocs version
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
-    assert oc.get_odf_version()
+    assert oc.get_ocs_version()
 
 
 def test_oc_get_master_nodes():
