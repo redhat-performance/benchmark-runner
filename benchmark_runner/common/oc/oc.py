@@ -57,11 +57,25 @@ class OC(SSH):
         """
         return self.run("oc get csv -n openshift-sandboxed-containers-operator $(oc get csv -n openshift-sandboxed-containers-operator --no-headers | awk '{ print $1; }') -ojsonpath='{.spec.version}' ")
 
+    def _get_kata_default_channel(self):
+        """
+        Retrieve the default channel for Kata
+        """
+        return self.run("oc get packagemanifest -n openshift-marketplace sandboxed-containers-operator -ojsonpath='{.status.defaultChannel}'")
+
+    def _get_kata_default_channel_field(self, channel_field: str):
+        """
+        Retrieve a field from the packagemanifest for the default Kata channel
+        """
+        default_channel = f'"{self._get_kata_default_channel()}"'
+        command=f"oc get packagemanifest -n openshift-marketplace sandboxed-containers-operator -ojson | jq -r '[foreach .status.channels[] as $channel ([[],[]];0; (if ($channel.name == {default_channel}) then $channel.{channel_field} else null end))] | flatten | map (select (. != null))[]'"
+        return self.run(command)
+
     def _get_kata_csv(self):
         """
         Retrieve the CSV of the sandboxed containers operator for installation"
         """
-        return self.run("oc get packagemanifest -n openshift-marketplace sandboxed-containers-operator -ojsonpath='{.status.channels[0].currentCSV}'")
+        return self._get_kata_default_channel_field("currentCSV")
 
     def _get_kata_catalog_source(self):
         """
@@ -73,13 +87,13 @@ class OC(SSH):
         """
         Retrieve the channel of the sandboxed containers operator for installation"
         """
-        return self.run("oc get packagemanifest -n openshift-marketplace sandboxed-containers-operator -ojsonpath='{.status.channels[0].name}'")
+        return self._get_kata_default_channel_field("name")
 
     def _get_kata_namespace(self):
         """
         Retrieve the namespace of the sandboxed containers operator for installation"
         """
-        return self.run(r"oc get packagemanifest -n openshift-marketplace sandboxed-containers-operator -ojsonpath='{.status.channels[0].currentCSVDesc.annotations.operatorframework\.io/suggested-namespace}'")
+        return self._get_kata_default_channel_field('currentCSVDesc.annotations."operatorframework.io/suggested-namespace"')
 
     @typechecked
     def populate_additional_template_variables(self, env: dict):
