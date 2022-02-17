@@ -43,12 +43,12 @@ class OC(SSH):
         """
         return self.run("oc get csv -n openshift-cnv $(oc get csv -n openshift-cnv --no-headers | awk '{ print $1; }') -ojsonpath='{.spec.version}'")
 
-    def get_ocs_version(self):
+    def get_odf_version(self):
         """
-        This method return ocs version
+        This method return odf version
         :return:
         """
-        return self.run("oc get csv -n openshift-storage $(oc get csv -n openshift-storage --no-headers | awk '{ print $1; }') -ojsonpath='{.spec.version}' ")
+        return self.run("oc get csv -n openshift-storage -ojsonpath='{.items[0].spec.labels.full_version}'")
 
     def get_kata_version(self):
         """
