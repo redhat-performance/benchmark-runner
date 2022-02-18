@@ -66,7 +66,8 @@ jobs:
         sudo podman push localhost/${{ secrets.PACKAGE_NAME }}:v$build_version quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:latest
         echo '⌛ Wait 30 sec till image will be updated in quay.io'
         sleep 30
-    - name: ✔️ E2E tests using latest quay.io
+    - name: ✔️ Run workloads
+      continue-on-error: true
       env:
         KUBEADMIN_PASSWORD: ${{ secrets.FUNC_KUBEADMIN_PASSWORD }}
         PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.FUNC_PIN_NODE_BENCHMARK_OPERATOR }}
