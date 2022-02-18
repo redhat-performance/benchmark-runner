@@ -202,7 +202,8 @@ jobs:
           mkdir -p "$RUNNER_PATH/.kube/"
           echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
           echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
-    - name: ✔️ E2E tests using latest quay.io
+    - name: ✔️ Run Stressng workload
+      continue-on-error: true
       env:
         KUBEADMIN_PASSWORD: ${{ secrets.PERF_KUBEADMIN_PASSWORD }}
         PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.PERF_PIN_NODE_BENCHMARK_OPERATOR }}
@@ -312,7 +313,8 @@ jobs:
           mkdir -p "$RUNNER_PATH/.kube/"
           echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
           echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
-    - name: ✔️ E2E tests using latest quay.io
+    - name: ✔️ Run Uperf workload
+      continue-on-error: true
       env:
         KUBEADMIN_PASSWORD: ${{ secrets.PERF_KUBEADMIN_PASSWORD }}
         PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.PERF_PIN_NODE_BENCHMARK_OPERATOR }}
@@ -422,7 +424,8 @@ jobs:
           mkdir -p "$RUNNER_PATH/.kube/"
           echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
           echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
-    - name: ✔️ E2E tests using latest quay.io
+    - name: ✔️ Run Hammerdb mariadb workload
+      continue-on-error: true
       env:
         KUBEADMIN_PASSWORD: ${{ secrets.PERF_KUBEADMIN_PASSWORD }}
         PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.PERF_PIN_NODE_BENCHMARK_OPERATOR }}
@@ -532,7 +535,8 @@ jobs:
           mkdir -p "$RUNNER_PATH/.kube/"
           echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
           echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
-    - name: ✔️ E2E tests using latest quay.io
+    - name: ✔️ Run Hammerdb PostgreSQL workload
+      continue-on-error: true
       env:
         KUBEADMIN_PASSWORD: ${{ secrets.PERF_KUBEADMIN_PASSWORD }}
         PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.PERF_PIN_NODE_BENCHMARK_OPERATOR }}
@@ -642,7 +646,8 @@ jobs:
           mkdir -p "$RUNNER_PATH/.kube/"
           echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
           echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
-    - name: ✔️ E2E tests using latest quay.io
+    - name: ✔️ Run Hammerdb MSSQL workload
+      continue-on-error: true
       env:
         KUBEADMIN_PASSWORD: ${{ secrets.PERF_KUBEADMIN_PASSWORD }}
         PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.PERF_PIN_NODE_BENCHMARK_OPERATOR }}
@@ -752,7 +757,8 @@ jobs:
           mkdir -p "$RUNNER_PATH/.kube/"
           echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
           echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
-      - name: ✔️ E2E tests using latest quay.io
+      - name: ✔️ Run Vdbench pod workload
+        continue-on-error: true
         env:
           KUBEADMIN_PASSWORD: ${{ secrets.PERF_KUBEADMIN_PASSWORD }}
           PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.PERF_PIN_NODE_BENCHMARK_OPERATOR }}
@@ -862,7 +868,8 @@ jobs:
           mkdir -p "$RUNNER_PATH/.kube/"
           echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
           echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
-      - name: ✔️ E2E tests using latest quay.io
+      - name: ✔️ Run Vdbench kata workload
+        continue-on-error: true
         env:
           KUBEADMIN_PASSWORD: ${{ secrets.PERF_KUBEADMIN_PASSWORD }}
           PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.PERF_PIN_NODE_BENCHMARK_OPERATOR }}
@@ -972,7 +979,8 @@ jobs:
           mkdir -p "$RUNNER_PATH/.kube/"
           echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
           echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
-      - name: ✔️ E2E tests using latest quay.io
+      - name: ✔️ Run Vdbench vm workload
+        continue-on-error: true
         env:
           KUBEADMIN_PASSWORD: ${{ secrets.PERF_KUBEADMIN_PASSWORD }}
           PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.PERF_PIN_NODE_BENCHMARK_OPERATOR }}
@@ -1082,7 +1090,8 @@ jobs:
           mkdir -p "$RUNNER_PATH/.kube/"
           echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
           echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
-    - name: ✔️ E2E tests using latest quay.io
+    - name: ✔️ Update run status
+      continue-on-error: true
       env:
         KUBEADMIN_PASSWORD: ${{ secrets.PERF_KUBEADMIN_PASSWORD }}
         PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.PERF_PIN_NODE_BENCHMARK_OPERATOR }}
