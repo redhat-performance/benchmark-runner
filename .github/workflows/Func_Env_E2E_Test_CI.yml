@@ -26,7 +26,8 @@ jobs:
         python-version: 3.9
     - name: ⚙ Set START CI TIME
       continue-on-error: true
-      run: sffdsfds
+      run: |
+          exit 1 
   nightly:
     name: Deploy Func Nightly
     runs-on: ubuntu-latest
