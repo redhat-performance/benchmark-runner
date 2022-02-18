@@ -4,17 +4,29 @@
  
 name: Func Env E2E Test CI
 
-on:
-  workflow_run:
-    workflows: ["Test1"]
-    types:
-      - completed
-
 #on:
-#  push:
-#    branches: [ main ]
+#  workflow_run:
+#    workflows: ["Test1"]
+#    types:
+#      - completed
+
+on:
+  push:
+    branches: [ main ]
 
 jobs:
+  start:
+    name: Start
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: ⚙ Set START CI TIME
+      continue-on-error: true
+      run: sffdsfds
   nightly:
     name: Deploy Func Nightly
     runs-on: ubuntu-latest
