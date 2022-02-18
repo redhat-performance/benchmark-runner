@@ -25,7 +25,7 @@ jobs:
       with:
         python-version: 3.9
     - name: ⚙ Set START CI TIME
-      #continue-on-error: true
+      continue-on-error: true
       run: |
           exit 1 
   nightly:
