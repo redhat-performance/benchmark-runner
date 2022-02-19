@@ -67,7 +67,6 @@ jobs:
         echo '⌛ Wait 30 sec till image will be updated in quay.io'
         sleep 30
     - name: ✔️ Run workloads
-      continue-on-error: true
       env:
         KUBEADMIN_PASSWORD: ${{ secrets.FUNC_KUBEADMIN_PASSWORD }}
         PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.FUNC_PIN_NODE_BENCHMARK_OPERATOR }}
