@@ -25,9 +25,10 @@ jobs:
       with:
         python-version: 3.9
     - name: ⚙ Set START CI TIME
-      continue-on-error: true
       run: |
-          exit 1 
+          exit 1
+      if: always() 
+
   nightly:
     needs: start
     name: Deploy Func Nightly
@@ -39,11 +40,6 @@ jobs:
       with:
         python-version: 3.9
     - name: ⚙ Set START CI TIME
-    - run: exit 1
-    - run: echo runs on success or failure
-      if: succeeded() || failed()
-    - run: echo runs always, even if the prior step was cancelled
-      if: always() key
       #run: echo "START_CI=$(printf '%(%s)T' -1)" >> "$GITHUB_ENV"
     - name: ⚙️ SET SSH key
       env:
