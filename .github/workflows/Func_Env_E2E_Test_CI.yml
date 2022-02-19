@@ -38,7 +38,7 @@ jobs:
       run: |
           echo ${{ job.status }} > $RUNNER_PATH/job_status.txt
           cat $RUNNER_PATH/job_status.txt
-          echo "STATUS=$RUNNER_PATH/job_status.txt" >> "$GITHUB_ENV"
+          echo "STATUS=$(cat $RUNNER_PATH/job_status.txt)" >> "$GITHUB_ENV"
           echo $STATUS
      
   nightly:
@@ -57,7 +57,7 @@ jobs:
         FUNC_PROVISION_PRIVATE_KEY: ${{ secrets.FUNC_PROVISION_PRIVATE_KEY }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
       run: |
-          #echo "STATUS=$RUNNER_PATH/job_status.txt" >> "$GITHUB_ENV"
+          echo "STATUS=$(cat $RUNNER_PATH/job_status.txt)" >> "$GITHUB_ENV"
           echo $STATUS
     - name: ⚙ Set START CI TIME
       continue-on-error: true
