@@ -10,7 +10,7 @@ name: Func Env E2E Test CI
 #    types:
 #      - completed
 env:
-  Status: "True"
+  status: "pass"
 on:
   push:
     branches: [ main ]
@@ -32,6 +32,9 @@ jobs:
       run: |
           echo "test"
           echo ${{ job.status }}
+          echo status
+          status = ${{ job.status }}
+          echo status
       
   nightly:
     if: always()
