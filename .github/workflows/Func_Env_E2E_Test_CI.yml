@@ -64,7 +64,7 @@ jobs:
       if: always()
       run: |
           echo ${{needs.start.outputs.start_job_status}}
-          if [["${{needs.start.outputs.start_job_status}}" == "Success" && "${{needs.start.outputs.start_job_status}}" == "Success"]]; then echo "Success"; else echo "failure"; fi
+          if [[ "${{needs.start.outputs.start_job_status}}" == "Success" && "${{needs.start.outputs.start_job_status}}" == "Success" ]]; then echo "Success"; else echo "failure"; fi
     - name: ⚙️ SET SSH key
       env:
         FUNC_PROVISION_PRIVATE_KEY: ${{ secrets.FUNC_PROVISION_PRIVATE_KEY }}
