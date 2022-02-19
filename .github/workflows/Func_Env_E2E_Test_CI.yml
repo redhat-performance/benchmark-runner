@@ -31,6 +31,7 @@ jobs:
       run: |
           echo "test"
     - name: job status
+      if: always()
       run: |
           echo ${{ job.status }} > job_status.txt
           echo "STATUS=job_status.txt" >> "$GITHUB_ENV"
