@@ -18,7 +18,7 @@ jobs:
   start:
     name: Deploy start
     outputs:
-      start_job_status: ${{ steps.nightly_start_step.outputs.start_time }}
+      start_job_status: ${{ steps.nightly_job_step.outputs.status }}
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -39,8 +39,9 @@ jobs:
       if: ${{ failure() }}
       run: |
           echo "test"
-    - id: start_job_status
-      run: echo "::set-output name=start_job_status::$(job.status)"
+    - id: nightly_job_step
+      if: always()
+      run: echo "::set-output name=status::$(job.status)"
 
   nightly:
     if: always()
@@ -60,9 +61,9 @@ jobs:
       #continue-on-error: true
       run: exit 1
     - name: next step
-      #if: always()
+      if: always()
       run: |
-          echo ${{needs.start.outputs.output1}}
+          echo ${{needs.start.outputs.start_job_status}}
     - name: ⚙️ SET SSH key
       env:
         FUNC_PROVISION_PRIVATE_KEY: ${{ secrets.FUNC_PROVISION_PRIVATE_KEY }}
