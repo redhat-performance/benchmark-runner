@@ -26,6 +26,9 @@ jobs:
         python-version: 3.9
     - name: ⚙ Set START CI TIME
       run: exit 1
+    - name: next step
+      if: always()
+      run: echo "test"
       
   nightly:
     if: always()
