@@ -37,6 +37,7 @@ jobs:
       if: always()
       run: |
           echo ${{ job.status }} > $RUNNER_PATH/job_status.txt
+          job-status: ${{ job.status }}
 
   nightly:
     if: always()
