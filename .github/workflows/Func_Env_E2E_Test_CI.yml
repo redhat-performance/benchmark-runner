@@ -41,7 +41,7 @@ jobs:
           echo "test"
     - id: nightly_job_step
       if: always()
-      run: echo "::set-output name=status::$(job.status)"
+      run: echo "::set-output name=status::${{ job.status }}"
 
   nightly:
     if: always()
