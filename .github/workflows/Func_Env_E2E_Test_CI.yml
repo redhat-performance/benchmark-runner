@@ -27,12 +27,12 @@ jobs:
     
     - name: ⚙ Set START CI TIME
       run: |
-          exit 1   
-    - name: Next step
-      if: always() 
-      run: |
-          echo "pass"
-      
+        exit 1
+    if: always()
+     - name: Next step 
+       run: |
+         echo "pass"
+
 
   nightly:
     needs: start
