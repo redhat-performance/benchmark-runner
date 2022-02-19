@@ -34,6 +34,7 @@ jobs:
           echo ${{ job.status }}
           #if: ${{ job.status }} == 'failure'
           echo "::set-env name=STATUS::${{ job.status }}"
+          echo "STATUS=${{ job.status }}"" >> "$GITHUB_ENV"
           echo $STATUS
       
   nightly:
