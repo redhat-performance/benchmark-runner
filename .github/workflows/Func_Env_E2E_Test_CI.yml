@@ -30,14 +30,12 @@ jobs:
     - name: next step
       if: always()
       run: |
-          #echo $STATUS
-          #echo ${{ job.status }}
-          #if: ${{ job.status }} == 'failure'
-          #echo "::set-env name=STATUS::${{ job.status }}"
-          #echo "STATUS=${{ job.status }}"" >> "$GITHUB_ENV"
-          echo "$STATUS = ${{ job.status }}"
-          #echo $STATUS
-      
+          echo "test"
+    - name: job status
+      run: |
+          echo ${{ job.status }} > job_status.txt
+          echo job_status.txt
+     
   nightly:
     if: always()
     needs: [start]
@@ -49,6 +47,9 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: 3.9
+    - name: job status
+      run: |
+          echo job_status.txt
     - name: ⚙ Set START CI TIME
       continue-on-error: true
       run: exit 1
@@ -139,3 +140,4 @@ jobs:
         ssh -t provision "chmod +x /tmp/remove_image.sh;/tmp/./remove_image.sh;rm -f /tmp/remove_image.sh"
         
         ssh -t provision "podman images"
+      
