@@ -50,8 +50,8 @@ jobs:
       with:
         python-version: 3.9
     - name: Check Job Status status and fail if they are red
-      if: env.WORKFLOW_CONCLUSION == 'failure'
-      run: echo $env.WORKFLOW_CONCLUSION
+      run: |
+          echo $env.WORKFLOW_CONCLUSION
     - name: ⚙ Set START CI TIME
       continue-on-error: true
       run: exit 1
