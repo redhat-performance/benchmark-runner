@@ -28,6 +28,9 @@ jobs:
       run: |
           exit 1
       if: always() 
+    - name: Next step
+      run: |
+          echo "pass"
 
   nightly:
     needs: start
