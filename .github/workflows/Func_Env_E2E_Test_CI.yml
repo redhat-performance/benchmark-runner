@@ -39,7 +39,12 @@ jobs:
       with:
         python-version: 3.9
     - name: ⚙ Set START CI TIME
-      run: echo "START_CI=$(printf '%(%s)T' -1)" >> "$GITHUB_ENV"
+    - run: exit 1
+    - run: echo runs on success or failure
+      if: succeeded() || failed()
+    - run: echo runs always, even if the prior step was cancelled
+      if: always() key
+      #run: echo "START_CI=$(printf '%(%s)T' -1)" >> "$GITHUB_ENV"
     - name: ⚙️ SET SSH key
       env:
         FUNC_PROVISION_PRIVATE_KEY: ${{ secrets.FUNC_PROVISION_PRIVATE_KEY }}
