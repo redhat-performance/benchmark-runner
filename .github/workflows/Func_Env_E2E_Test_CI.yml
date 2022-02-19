@@ -27,7 +27,8 @@ jobs:
     - name: ⚙ Set START CI TIME
       run: exit 1
     - name: next step
-      if: always() 
+      #if: always()
+      continue-on-error: true
       run: |
           echo "test"
     - name: ⚙️ SET SSH key
