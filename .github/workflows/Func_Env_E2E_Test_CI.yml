@@ -32,7 +32,7 @@ jobs:
       run: |
           echo $STATUS
           echo ${{ job.status }}
-          STATUS = ${{ job.status }}
+          run: echo "::set-env name=STATUS::${{ job.status }}"
           echo $STATUS
       
   nightly:
