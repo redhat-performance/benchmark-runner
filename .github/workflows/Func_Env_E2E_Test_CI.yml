@@ -28,10 +28,10 @@ jobs:
     - name: ⚙ Set START CI TIME
       run: |
         exit 1
-    if: always()
-     - name: Next step 
-       run: |
-         echo "pass"
+    - name: next run
+      if: ${{ always() }}
+      run: |
+        echo "pass"
 
 
   nightly:
