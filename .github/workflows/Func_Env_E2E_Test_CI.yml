@@ -9,8 +9,7 @@ name: Func Env E2E Test CI
 #    workflows: ["Test1"]
 #    types:
 #      - completed
-env:
-  STATUS: "pass"
+
 on:
   push:
     branches: [ main ]
@@ -34,7 +33,8 @@ jobs:
     - name: job status
       run: |
           echo ${{ job.status }} > job_status.txt
-          echo job_status.txt
+          echo "STATUS=job_status.txt" >> "$GITHUB_ENV"
+          echo $STATUS
      
   nightly:
     if: always()
