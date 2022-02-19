@@ -57,8 +57,7 @@ jobs:
         FUNC_PROVISION_PRIVATE_KEY: ${{ secrets.FUNC_PROVISION_PRIVATE_KEY }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
       run: |
-          echo "STATUS=$(cat $RUNNER_PATH/job_status.txt)" >> "$GITHUB_ENV"
-          echo $STATUS
+          cat $RUNNER_PATH/job_status.txt
     - name: ⚙ Set START CI TIME
       continue-on-error: true
       run: exit 1
