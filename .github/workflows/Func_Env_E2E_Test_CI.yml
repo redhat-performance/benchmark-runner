@@ -17,6 +17,8 @@ on:
 jobs:
   start:
     name: Deploy start
+    outputs:
+      start_job_status: ${{ steps.nightly_start_step.outputs.start_time }}
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -37,6 +39,8 @@ jobs:
       if: ${{ failure() }}
       run: |
           echo "test"
+    - id: start_job_status
+      run: echo "::set-output name=start_job_status::$(job.status)"
 
   nightly:
     if: always()
@@ -53,12 +57,12 @@ jobs:
       run: |
           echo ${{ needs.start.outputs.job-status }}
     - name: ⚙ Set START CI TIME
-      continue-on-error: true
+      #continue-on-error: true
       run: exit 1
     - name: next step
       #if: always()
       run: |
-          echo "test"
+          echo ${{needs.start.outputs.output1}}
     - name: ⚙️ SET SSH key
       env:
         FUNC_PROVISION_PRIVATE_KEY: ${{ secrets.FUNC_PROVISION_PRIVATE_KEY }}
