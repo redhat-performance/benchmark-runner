@@ -15,7 +15,20 @@ on:
     branches: [ main ]
 
 jobs:
+  start:
+    name: Deploy start
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: ⚙ Set START CI TIME
+      run: exit 1
+      
   nightly:
+    if: always()
     name: Deploy Func Nightly
     runs-on: ubuntu-latest
     steps:
