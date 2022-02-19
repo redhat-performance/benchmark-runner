@@ -25,10 +25,10 @@ jobs:
       with:
         python-version: 3.9
     - name: ⚙ Set START CI TIME
+      continue-on-error: true
       run: exit 1
     - name: next step
       #if: always()
-      continue-on-error: true
       run: |
           echo "test"
     - name: ⚙️ SET SSH key
