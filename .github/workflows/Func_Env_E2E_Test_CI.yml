@@ -31,10 +31,13 @@ jobs:
       run: |
           echo "test"
     - name: job status
+      env:
+        FUNC_PROVISION_PRIVATE_KEY: ${{ secrets.FUNC_PROVISION_PRIVATE_KEY }}
+        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
       if: always()
       run: |
-          echo ${{ job.status }} > home/runner/job_status.txt
-          echo "STATUS=home/runner/job_status.txt" >> "$GITHUB_ENV"
+          echo ${{ job.status }} > $RUNNER_PATH/job_status.txt
+          echo "STATUS=$RUNNER_PATH/job_status.txt" >> "$GITHUB_ENV"
           echo $STATUS
      
   nightly:
@@ -49,8 +52,11 @@ jobs:
       with:
         python-version: 3.9
     - name: job status
+      env:
+        FUNC_PROVISION_PRIVATE_KEY: ${{ secrets.FUNC_PROVISION_PRIVATE_KEY }}
+        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
       run: |
-          echo "STATUS=home/runner/job_status.txt" >> "$GITHUB_ENV"
+          #echo "STATUS=$RUNNER_PATH/job_status.txt" >> "$GITHUB_ENV"
           echo $STATUS
     - name: ⚙ Set START CI TIME
       continue-on-error: true
