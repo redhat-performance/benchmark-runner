@@ -9,7 +9,8 @@ name: Func Env E2E Test CI
 #    workflows: ["Test1"]
 #    types:
 #      - completed
-
+env:
+  Status: "True"
 on:
   push:
     branches: [ main ]
@@ -28,7 +29,9 @@ jobs:
       run: exit 1
     - name: next step
       if: always()
-      run: echo "test"
+      run: |
+          echo "test"
+          echo ${{ job.status }}
       
   nightly:
     if: always()
