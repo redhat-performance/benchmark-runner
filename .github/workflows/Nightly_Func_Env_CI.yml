@@ -38,7 +38,8 @@ jobs:
   func_nightly:
     name: Deploy func nightly
     runs-on: ubuntu-latest
-    
+    outputs:
+      job_status: ${{ steps.job_step.outputs.status }}
     needs: initialize_func_nightly     
     strategy:
        # run one job every time
@@ -108,7 +109,7 @@ jobs:
       run: |
         build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
         build_version="$(cut -d'=' -f2 <<<"$build")"
-        if [[ "${{ matrix.workload }}" == 'stressng_pod' ]]
+        if [[ "${{ matrix.workload }}" == "stressng_pod" ]]
         then
             exit 1
         fi
@@ -117,27 +118,13 @@ jobs:
         #ssh -t provision "podman run --rm -t -e WORKLOAD='${{ matrix.workload }}' -e KUBEADMIN_PASSWORD='$KUBEADMIN_PASSWORD' -e PIN_NODE_BENCHMARK_OPERATOR='$PIN_NODE_BENCHMARK_OPERATOR' -e PIN_NODE1='$PIN_NODE1' -e PIN_NODE2='$PIN_NODE2' -e ELASTICSEARCH='$ELASTICSEARCH' -e ELASTICSEARCH_PORT='$ELASTICSEARCH_PORT' -e ELASTICSEARCH_USER='$ELASTICSEARCH_USER' -e ELASTICSEARCH_PASSWORD='$ELASTICSEARCH_PASSWORD' -e IBM_REGION_NAME='$IBM_REGION_NAME' -e IBM_ENDPOINT_URL='$IBM_ENDPOINT_URL' -e IBM_ACCESS_KEY_ID='$IBM_ACCESS_KEY_ID' -e IBM_SECRET_ACCESS_KEY='$IBM_SECRET_ACCESS_KEY' -e IBM_BUCKET='$IBM_BUCKET' -e IBM_KEY='$IBM_KEY' -e FUNC_RUN_ARTIFACTS_URL='$FUNC_RUN_ARTIFACTS_URL' -e BUILD_VERSION='$build_version' -e RUN_TYPE='func_ci' -e FUNC_TIMEOUT='2000' -e log_level='INFO' -v '$CONTAINER_KUBECONFIG_PATH':'$CONTAINER_KUBECONFIG_PATH' --privileged 'quay.io/ebattat/benchmark-runner:latest'"
         #ssh -t provision "podman rmi -f 'quay.io/ebattat/benchmark-runner:latest'"
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End E2E workload:'${{ matrix.workload }} '>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
-    - name: ❎ CI status failed
-      env:
-        KUBEADMIN_PASSWORD: ${{ secrets.FUNC_KUBEADMIN_PASSWORD }}
-        PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.FUNC_PIN_NODE_BENCHMARK_OPERATOR }}
-        PIN_NODE1: ${{ secrets.FUNC_PIN_NODE1 }}
-        PIN_NODE2: ${{ secrets.FUNC_PIN_NODE2 }}
-        ELASTICSEARCH: ${{ secrets.FUNC_ELASTICSEARCH }}
-        ELASTICSEARCH_PORT: ${{ secrets.FUNC_ELASTICSEARCH_PORT }}
-        ELASTICSEARCH_USER: ${{ secrets.FUNC_ELASTICSEARCH_USER }}
-        ELASTICSEARCH_PASSWORD: ${{ secrets.FUNC_ELASTICSEARCH_PASSWORD }}
-        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-        CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
-      if: ${{ failure() }}
+    - id: job_step
+      if: always()
       run: |
-        build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
-        build_version="$(cut -d'=' -f2 <<<"$build")"
-        end=$(printf '%(%s)T' -1)
-        ci_minutes_time=$(( (end - START_CI) / 60))
-        echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Update CI status failed >>>>>>>>>>>>>>>>>>>>>>>>>>'
-        podman run --rm -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e ELASTICSEARCH_USER="$ELASTICSEARCH_USER" -e ELASTICSEARCH_PASSWORD="$ELASTICSEARCH_PASSWORD" -e BUILD_VERSION="$build_version" -e CI_STATUS="failed" -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e RUN_TYPE="func_ci" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e FUNC_TIMEOUT="2000" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
-    
+          if [ "${{ job.status }}" == "failure" ]
+          then 
+            echo "::set-output name=status::${{ job.status }}" 
+   
   finilize_func_nightly:
     name: finilize func nightly 
     runs-on: ubuntu-latest
@@ -224,6 +211,8 @@ jobs:
         build_version="$(cut -d'=' -f2 <<<"$build")"
         end=$(printf '%(%s)T' -1)
         ci_minutes_time=$(( (end - START_CI) / 60))
+        # Check for workload failure or success => return pass/failed
+        if [[ "${{needs.func_nightly.outputs.job_status}}" == "failure" ]]; then status="failed"; else status="pass"; fi
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Update CI status pass >>>>>>>>>>>>>>>>>>>>>>>>>>'
         podman run --rm -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e ELASTICSEARCH_USER="$ELASTICSEARCH_USER" -e ELASTICSEARCH_PASSWORD="$ELASTICSEARCH_PASSWORD" -e BUILD_VERSION="$build_version" -e CI_STATUS="pass" -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e RUN_TYPE="func_ci" -e FUNC_TIMEOUT="2000" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
     - name: ❎ CI status failed
