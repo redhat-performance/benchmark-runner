@@ -22,9 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
        matrix: 
-         workload:
-           - stressng
-           - uperf 
+         workload: [ 'stressng' , 'uperf' ] 
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.9
