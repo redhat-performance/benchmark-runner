@@ -38,7 +38,6 @@ jobs:
   func_nightly:
     name: Deploy func nightly
     runs-on: ubuntu-latest
-    if: always()
     needs: initialize_func_nightly     
     strategy:
        max-parallel: 1
@@ -72,6 +71,7 @@ jobs:
           ServerAliveCountMax 5
         END
     - name: Install latest benchmark-runner
+      if: always()
       run: |
         #python -m pip install --upgrade pip
         #pip install benchmark-runner
