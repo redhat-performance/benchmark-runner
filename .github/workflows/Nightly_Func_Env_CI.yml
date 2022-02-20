@@ -17,7 +17,7 @@ concurrency:
 
 jobs:
   initialize_func_nightly:
-      name: initialize nightly
+      name: initialize func nightly
       runs-on: ubuntu-latest
       outputs:
        start_time_output: ${{ steps.nightly_start_step.outputs.start_time }}
@@ -29,14 +29,14 @@ jobs:
         run: |
           build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
           build_version=$(cut -d'=' -f2 <<<"$build")
-          sudo podman build --build-arg VERSION=$build_version --layers=false -t ${{ secrets.PACKAGE_NAME }}:v$build_version .
-          sudo podman login quay.io -u ${{ secrets.QAUYIO_ROBOT_USER }} -p ${{ secrets.QAUYIO_ROBOT_TOKEN }}
-          sudo podman push localhost/${{ secrets.PACKAGE_NAME }}:v$build_version quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:latest
-          echo '⌛ Wait 30 sec till image will be updated in quay.io'
-          sleep 30
+          #sudo podman build --build-arg VERSION=$build_version --layers=false -t ${{ secrets.PACKAGE_NAME }}:v$build_version .
+          #sudo podman login quay.io -u ${{ secrets.QAUYIO_ROBOT_USER }} -p ${{ secrets.QAUYIO_ROBOT_TOKEN }}
+          #sudo podman push localhost/${{ secrets.PACKAGE_NAME }}:v$build_version quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:latest
+          #echo '⌛ Wait 30 sec till image will be updated in quay.io'
+          #sleep 30
   
   func_nightly:
-    name: Deploy Func Nightly
+    name: Deploy func nightly
     runs-on: ubuntu-latest
     if: always()
     needs: initialize_func_nightly     
@@ -132,7 +132,7 @@ jobs:
         podman run --rm -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e ELASTICSEARCH_USER="$ELASTICSEARCH_USER" -e ELASTICSEARCH_PASSWORD="$ELASTICSEARCH_PASSWORD" -e BUILD_VERSION="$build_version" -e CI_STATUS="failed" -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e RUN_TYPE="func_ci" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e FUNC_TIMEOUT="2000" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
     
   finilize_nightly:
-    name: nightly finilize
+    name: finilize nightly
     runs-on: ubuntu-latest
     needs: [initialize_func_nightly, func_nightly]      
     steps:
