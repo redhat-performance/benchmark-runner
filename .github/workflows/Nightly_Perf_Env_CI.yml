@@ -64,8 +64,8 @@ jobs:
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Copy config to provision  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
         scp -r "$RUNNER_PATH/.kube/config" provision:"$CONTAINER_KUBECONFIG_PATH"
 
-  nightly:
-    name: nightly
+  workload:
+    name: workload
     runs-on: ubuntu-latest
     outputs:
       job_status: ${{ steps.job_step.outputs.status }}
@@ -152,7 +152,7 @@ jobs:
     name: finilize nightly
     runs-on: ubuntu-latest
     if: always()
-    needs: [initialize_nightly, nightly]
+    needs: [initialize_nightly, workload]
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.9
