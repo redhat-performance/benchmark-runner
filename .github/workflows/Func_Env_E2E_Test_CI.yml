@@ -34,7 +34,7 @@ jobs:
         python-version: 3.9
     - name: ⚙ Run workload
       run: |
-          if [ "${{ matrix.workload }}" == "hammerdb" ]:
+          if [ "${{ matrix.workload }}" == "hammerdb" ]
           then
               echo ${{ matrix.workload }}_${{ matrix.type }}_${{ matrix.db }}
           else
