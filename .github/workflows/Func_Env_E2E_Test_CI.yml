@@ -37,7 +37,7 @@ jobs:
           if [ "${{ matrix.workload }}" == "hammerdb" ]:
           then
               echo ${{ matrix.workload }}_${{ matrix.type }}_${{ matrix.db }}
-          else:
+          else
               echo ${{ matrix.workload }}_${{ matrix.type }}
           fi
     - name: next step
