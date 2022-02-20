@@ -83,7 +83,7 @@ jobs:
           mkdir -p "$RUNNER_PATH/.kube/"
           echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
           echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
-    - name: ✔️ Run workload "${{ matrix.workload }}"
+    - name: ✔️ Run workload ${{ matrix.workload }}
       env:
         KUBEADMIN_PASSWORD: ${{ secrets.FUNC_KUBEADMIN_PASSWORD }}
         PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.FUNC_PIN_NODE_BENCHMARK_OPERATOR }}
