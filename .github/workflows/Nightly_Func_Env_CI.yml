@@ -38,6 +38,7 @@ jobs:
   func_nightly:
     name: Deploy func nightly
     runs-on: ubuntu-latest
+    
     needs: initialize_func_nightly     
     strategy:
        # run one job every time
@@ -77,7 +78,6 @@ jobs:
       run: |
         #python -m pip install --upgrade pip
         #pip install benchmark-runner
-        exit 1
     - name: ⚙ Set Kubeconfig
       env:
         KUBECONFIG: ${{ secrets.FUNC_KUBECONFIG }}
@@ -108,6 +108,10 @@ jobs:
       run: |
         build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
         build_version="$(cut -d'=' -f2 <<<"$build")"
+        if [[ "${{ matrix.workload }}" == 'stressng_pod' ]]
+        then
+            exit 1
+        fi
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start E2E workload:' ${{ matrix.workload }} '>>>>>>>>>>>>>>>>>>>>>>>>>>'
         #scp -r "$RUNNER_PATH/.kube/config" provision:"$CONTAINER_KUBECONFIG_PATH"
         #ssh -t provision "podman run --rm -t -e WORKLOAD='${{ matrix.workload }}' -e KUBEADMIN_PASSWORD='$KUBEADMIN_PASSWORD' -e PIN_NODE_BENCHMARK_OPERATOR='$PIN_NODE_BENCHMARK_OPERATOR' -e PIN_NODE1='$PIN_NODE1' -e PIN_NODE2='$PIN_NODE2' -e ELASTICSEARCH='$ELASTICSEARCH' -e ELASTICSEARCH_PORT='$ELASTICSEARCH_PORT' -e ELASTICSEARCH_USER='$ELASTICSEARCH_USER' -e ELASTICSEARCH_PASSWORD='$ELASTICSEARCH_PASSWORD' -e IBM_REGION_NAME='$IBM_REGION_NAME' -e IBM_ENDPOINT_URL='$IBM_ENDPOINT_URL' -e IBM_ACCESS_KEY_ID='$IBM_ACCESS_KEY_ID' -e IBM_SECRET_ACCESS_KEY='$IBM_SECRET_ACCESS_KEY' -e IBM_BUCKET='$IBM_BUCKET' -e IBM_KEY='$IBM_KEY' -e FUNC_RUN_ARTIFACTS_URL='$FUNC_RUN_ARTIFACTS_URL' -e BUILD_VERSION='$build_version' -e RUN_TYPE='func_ci' -e FUNC_TIMEOUT='2000' -e log_level='INFO' -v '$CONTAINER_KUBECONFIG_PATH':'$CONTAINER_KUBECONFIG_PATH' --privileged 'quay.io/ebattat/benchmark-runner:latest'"
@@ -137,6 +141,7 @@ jobs:
   finilize_func_nightly:
     name: finilize func nightly 
     runs-on: ubuntu-latest
+    if: always()
     needs: [initialize_func_nightly, func_nightly]      
     steps:
     - uses: actions/checkout@v2
