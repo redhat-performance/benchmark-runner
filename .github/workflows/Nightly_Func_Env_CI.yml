@@ -109,7 +109,7 @@ jobs:
       run: |
         #build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
         #build_version="$(cut -d'=' -f2 <<<"$build")"
-        if [[ "${{ matrix.workload }}" == "stressng_pod" ]]
+        if [[ "${{ matrix.workload }}" == "uperf_pod" ]]
         then
             exit 1
         fi
