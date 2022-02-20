@@ -21,6 +21,7 @@ jobs:
       start_job_status: ${{ steps.nightly_job_step.outputs.status }}
     runs-on: ubuntu-latest
     strategy:
+       max-parallel: 1
        matrix: 
           workload: [ 'stressng' , 'uperf' ] 
     steps:
