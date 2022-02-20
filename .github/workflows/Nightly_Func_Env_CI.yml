@@ -107,8 +107,8 @@ jobs:
         IBM_KEY: ${{ secrets.IBM_KEY }}
         FUNC_RUN_ARTIFACTS_URL: ${{ secrets.FUNC_RUN_ARTIFACTS_URL }}
       run: |
-        build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
-        build_version="$(cut -d'=' -f2 <<<"$build")"
+        #build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
+        #build_version="$(cut -d'=' -f2 <<<"$build")"
         if [[ "${{ matrix.workload }}" == "stressng_pod" ]]
         then
             exit 1
