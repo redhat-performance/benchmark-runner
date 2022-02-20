@@ -32,12 +32,7 @@ jobs:
         python-version: 3.9
     - name: ⚙ Run workload
       run: |
-          if [ "${{ matrix.workload }}" == "hammerdb" ]
-          then
-              echo ${{ matrix.workload }}_${{ matrix.type }}_${{ matrix.db }}
-          else
-              echo ${{ matrix.workload }}_${{ matrix.type }}
-          fi
+          echo ${{ matrix.workload }}
     - name: next step
       if: always()
       run: |
