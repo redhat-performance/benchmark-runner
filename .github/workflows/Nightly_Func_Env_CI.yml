@@ -20,6 +20,7 @@ jobs:
       name: Build image latest benchmark-operator
       runs-on: ubuntu-latest
       steps:
+      - uses: actions/checkout@v2
       - name: ⌛ Upload 🐋 to quay.io - latest benchmark-operator
         run: |
           build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
