@@ -4,15 +4,15 @@
  
 name: Func Env E2E Test CI
 
-on:
-  workflow_run:
-    workflows: ["Test1"]
-    types:
-      - completed
-
 #on:
-#  push:
-#    branches: [ main ]
+#  workflow_run:
+#    workflows: ["Test1"]
+#    types:
+#      - completed
+
+on:
+  push:
+    branches: [ main ]
 
 jobs:
   start:
@@ -20,14 +20,20 @@ jobs:
     outputs:
       start_job_status: ${{ steps.nightly_job_step.outputs.status }}
     runs-on: ubuntu-latest
+    strategy:
+       matrix: 
+         workload:
+           - stressng
+           - uperf 
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.9
       uses: actions/setup-python@v2
       with:
         python-version: 3.9
-    #- name: ⚙ Set START CI TIME
-    #  run: exit 1
+    - name: ⚙ Run workload
+      run: |
+          echo ${{ martix.workload }}
     - name: next step
       if: always()
       run: |
