@@ -23,7 +23,8 @@ jobs:
     strategy:
        max-parallel: 1
        matrix: 
-          workload: [ 'stressng' , 'uperf' ] 
+          workload: [ 'stressng' , 'uperf' ]
+          type: [ 'pod', 'kata', 'vm']
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.9
@@ -32,7 +33,7 @@ jobs:
         python-version: 3.9
     - name: ⚙ Run workload
       run: |
-          echo ${{ matrix.workload }}
+          echo ${{ matrix.workload }}_${{ matrix.type }}
     - name: next step
       if: always()
       run: |
