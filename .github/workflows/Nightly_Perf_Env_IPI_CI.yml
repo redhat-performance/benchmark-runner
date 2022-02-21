@@ -37,7 +37,6 @@ jobs:
       - name: ⚙️ SET SSH key
         env:
           PERF_PROVISION_PRIVATE_KEY: ${{ secrets.PERF_PROVISION_PRIVATE_KEY }}
-          PERF_PROVISION_KNOWN_HOSTS: ${{ secrets.PERF_PROVISION_KNOWN_HOSTS }}
           RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
           PERF_PROVISION_IP: ${{ secrets.PERF_PROVISION_IP }}
           PERF_PROVISION_USER: ${{ secrets.PERF_PROVISION_USER }}
