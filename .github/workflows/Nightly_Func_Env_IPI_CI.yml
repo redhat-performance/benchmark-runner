@@ -3,17 +3,17 @@
 # This is a nightly CI Pipeline against Performance environment using IPI installer - run on Sunday
 name: Deploy IPI FUNC Env Nightly CI
 # @todo patch disable sunday OCP installation
-on:
-  workflow_run:
-    workflows: ["Deploy Operator FUNC Env Nightly CI"]
-    types:
-      - completed
+#on:
+#  workflow_run:
+#    workflows: ["Deploy Operator FUNC Env Nightly CI"]
+#    types:
+#      - completed
 #on:
 #  schedule:
 #    - cron: '0 4 * * 0' # run on Sunday at 4 AM UTC/ 0 AM EDT
-#on:
-#  push:
-#    branches: [ main ]
+on:
+  push:
+    branches: [ main ]
 
 # Ensures that only one deploy task per branch/environment will run at a time.
 concurrency:
