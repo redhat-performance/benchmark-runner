@@ -143,10 +143,7 @@ jobs:
     - id: job_step
       if: always()
       run: |
-          if [ "${{ job.status }}" == "failure" ]
-          then 
-            echo "::set-output name=status::${{ job.status }}" 
-          fi
+          if [[ "${{ job.status }}" == "failure" || "${{ job.status }}" == "cancelled" ]]; then echo "::set-output name=status::${{ job.status }}"; fi
         
   finilize_nightly:
     name: finilize nightly
@@ -227,7 +224,7 @@ jobs:
         end=$(printf '%(%s)T' -1)
         ci_minutes_time=$(( (end - START_CI) / 60))
         # Check for workload failure or success => return pass/failed
-        if [[ "${{needs.nightly.outputs.job_status}}" == "failure" ]]; then status="failed"; else status="pass"; fi
+        if [[ "${{needs.nightly.outputs.job_status}}" == "failure" || "${{needs.nightly.outputs.job_status}}" == "cancelled" ]]; then status="failed"; else status="pass"; fi
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Update CI status $status >>>>>>>>>>>>>>>>>>>>>>>>>>'
         podman run --rm -e OCP_ENV_FLAVOR="PERF" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e ELASTICSEARCH_USER="$ELASTICSEARCH_USER" -e ELASTICSEARCH_PASSWORD="$ELASTICSEARCH_PASSWORD" -e BUILD_VERSION="$build_version" -e CI_STATUS="$status" -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e RUN_TYPE="perf_ci" -e PERF_TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Remove image on provision >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
