@@ -111,10 +111,7 @@ jobs:
     - id: job_step
       if: always()
       run: |
-          if [[ "${{ job.status }}" == "failure" || "${{ job.status }}" == "cancelled" ]]
-          then 
-            echo "::set-output name=status::${{ job.status }}" 
-          fi
+          if [[ "${{ job.status }}" == "failure" || "${{ job.status }}" == "cancelled" ]]; then echo "::set-output name=status::${{ job.status }}"; fi
    
   finilize_nightly:
     name: finilize nightly 
