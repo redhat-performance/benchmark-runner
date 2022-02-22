@@ -872,6 +872,14 @@ class OC(SSH):
                     self.wait_for_ocp_resource_create(resource='kata',
                                                       verify_cmd='if oc get crd kataconfigs.kataconfiguration.openshift.io >/dev/null 2>&1 ; then echo succeeded ; fi',
                                                       status='succeeded')
+                    # This appears to be needed because on a fresh cluster I observe that even when
+                    # the kataconfig CRD exists, trying to apply the actual kataconfig doesn't work
+                    # immediately.  I don't believe that this is a proper fix, but the proper fix
+                    # would likely involve applying the kataconfig until it works.  On a cluster
+                    # that has already had kata installed, even if it's later uninstalled and the
+                    # kataconfig CRD removed, whatever's going on is quick enough that this
+                    # doesn't recur.
+                    time.sleep(10)
                 # for second script wait for kataconfig installation to no longer be in progress
                 elif '02_config.yaml' == resource:
                     self.wait_for_ocp_resource_create(resource='kata',
