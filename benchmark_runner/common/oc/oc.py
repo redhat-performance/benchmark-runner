@@ -57,11 +57,25 @@ class OC(SSH):
         """
         return self.run("oc get csv -n openshift-sandboxed-containers-operator $(oc get csv -n openshift-sandboxed-containers-operator --no-headers | awk '{ print $1; }') -ojsonpath='{.spec.version}' ")
 
+    def _get_kata_default_channel(self):
+        """
+        Retrieve the default channel for Kata
+        """
+        return self.run("oc get packagemanifest -n openshift-marketplace sandboxed-containers-operator -ojsonpath='{.status.defaultChannel}'")
+
+    def _get_kata_default_channel_field(self, channel_field: str):
+        """
+        Retrieve a field from the packagemanifest for the default Kata channel
+        """
+        default_channel = f'"{self._get_kata_default_channel()}"'
+        command=f"oc get packagemanifest -n openshift-marketplace sandboxed-containers-operator -ojson | jq -r '[foreach .status.channels[] as $channel ([[],[]];0; (if ($channel.name == {default_channel}) then $channel.{channel_field} else null end))] | flatten | map (select (. != null))[]'"
+        return self.run(command)
+
     def _get_kata_csv(self):
         """
         Retrieve the CSV of the sandboxed containers operator for installation"
         """
-        return self.run("oc get packagemanifest -n openshift-marketplace sandboxed-containers-operator -ojsonpath='{.status.channels[0].currentCSV}'")
+        return self._get_kata_default_channel_field("currentCSV")
 
     def _get_kata_catalog_source(self):
         """
@@ -73,13 +87,13 @@ class OC(SSH):
         """
         Retrieve the channel of the sandboxed containers operator for installation"
         """
-        return self.run("oc get packagemanifest -n openshift-marketplace sandboxed-containers-operator -ojsonpath='{.status.channels[0].name}'")
+        return self._get_kata_default_channel_field("name")
 
     def _get_kata_namespace(self):
         """
         Retrieve the namespace of the sandboxed containers operator for installation"
         """
-        return self.run(r"oc get packagemanifest -n openshift-marketplace sandboxed-containers-operator -ojsonpath='{.status.channels[0].currentCSVDesc.annotations.operatorframework\.io/suggested-namespace}'")
+        return self._get_kata_default_channel_field('currentCSVDesc.annotations."operatorframework.io/suggested-namespace"')
 
     @typechecked
     def populate_additional_template_variables(self, env: dict):
@@ -848,28 +862,51 @@ class OC(SSH):
         :param resource_list: kata resource lists
         :return:
         """
+        def install_and_wait_for_resource(self, yaml_file: str, resource_type: str, resource: str):
+            """
+            Create a resource where the creation process itself may fail and has to be retried
+            :param yaml_file:YAML file to create the resource
+            :param resource_type:type of resource to create
+            :param resource: name of resource to create
+            :return:
+            """
+            current_wait_time = 0
+            while current_wait_time < int(environment_variables.environment_variables_dict['timeout']):
+                self._create_async(yaml_file)
+                # We cannot wait for a condition here, because the
+                # create_async may simply not work even if it returns success.
+                time.sleep(OC.SLEEP_TIME)
+                if self.run(f'if oc get {resource_type} {resource} > /dev/null 2>&1 ; then echo succeeded; fi') == 'succeeded':
+                    return True
+                current_wait_time += OC.SLEEP_TIME
+            return False
+
         for resource in resource_list:
             logger.info(f'run {resource}')
-            if resource.endswith('.yaml'):
-                self._create_async(yaml=os.path.join(path, resource))
-                # for first script wait for virt-operator
-                if '01_operator.yaml' == resource:
-                    # Wait for kataconfig CRD to exist
-                    self.wait_for_ocp_resource_create(resource='kata',
-                                                      verify_cmd='if oc get crd kataconfigs.kataconfiguration.openshift.io >/dev/null 2>&1 ; then echo succeeded ; fi',
-                                                      status='succeeded')
-                # for second script wait for kataconfig installation to no longer be in progress
-                elif '02_config.yaml' == resource:
-                    self.wait_for_ocp_resource_create(resource='kata',
-                                                      verify_cmd="oc get kataconfig -ojsonpath='{.items[0].status.installationStatus.IsInProgress}'",
-                                                      status='false')
-                    total_nodes_count = self.run(cmd="oc get kataconfig -ojsonpath='{.items[0].status.total_nodes_count}'")
-                    completed_nodes_count = self.run(cmd="oc get kataconfig -ojsonpath='{.items[0].status.installationStatus.completed.completed_nodes_count}'")
-                    if total_nodes_count != completed_nodes_count:
-                        raise KataInstallationFailed(f'not all nodes installed successfully total {total_nodes_count} != completed {completed_nodes_count}')
-            else:
-                if '03_ocp48_patch.sh' == resource:
-                    self.run(cmd=f'chmod +x {os.path.join(path, resource)}; {path}/./{resource}')
+            if '01_operator.yaml' == resource:
+                # Wait for kataconfig CRD to exist
+                self._create_async(os.path.join(path, resource))
+                self.wait_for_ocp_resource_create(resource='kata',
+                                                  verify_cmd='if oc get crd kataconfigs.kataconfiguration.openshift.io >/dev/null 2>&1 ; then echo succeeded ; fi',
+                                                  status='succeeded')
+            elif '02_config.yaml' == resource:
+                # This one's tricky.  The problem is that it appears
+                # that the kataconfigs CRD can exist, but attempting
+                # to apply it doesn't "take" unless some other things
+                # are already up.  So we have to keep applying the
+                # kataconfig until it's present.
+                if not install_and_wait_for_resource(self, os.path.join(path, resource), 'kataconfig', 'example-kataconfig'):
+                    raise KataInstallationFailed('Failed to apply kataconfig resource')
+                # Next, we have to wait for the kata bits to actually install
+                self.wait_for_ocp_resource_create(resource='kata',
+                                                  verify_cmd="oc get kataconfig -ojsonpath='{.items[0].status.installationStatus.IsInProgress}'",
+                                                  status='false')
+                total_nodes_count = self.run(cmd="oc get kataconfig -ojsonpath='{.items[0].status.total_nodes_count}'")
+                completed_nodes_count = self.run(cmd="oc get kataconfig -ojsonpath='{.items[0].status.installationStatus.completed.completed_nodes_count}'")
+                if total_nodes_count != completed_nodes_count:
+                    raise KataInstallationFailed(f'not all nodes installed successfully total {total_nodes_count} != completed {completed_nodes_count}')
+            elif '03_ocp48_patch.sh' == resource:
+                self.run(cmd=f'chmod +x {os.path.join(path, resource)}; {path}/./{resource}')
         return True
 
     @logger_time_stamp
