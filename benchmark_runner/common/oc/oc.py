@@ -862,36 +862,52 @@ class OC(SSH):
         :param resource_list: kata resource lists
         :return:
         """
+        def install_and_wait_for_resource(self, yaml_file: str, resource_type: str, resource: str):
+            """
+            Create a resource where the creation process itself may fail and has to be retried
+            :param yaml_file:YAML file to create the resource
+            :param resource_type:type of resource to create
+            :param resource: name of resource to create
+            :return:
+            """
+            def install_and_check_for_resource(self, yaml_file: str, resource_type: str, resource: str):
+                self._create_async(yaml_file)
+                time.sleep(OC.SLEEP_TIME)
+                return self.run(f'if oc get {resource_type} {resource} > /dev/null 2>&1 ; then echo succeeded; fi') == 'succeeded'
+
+            while current_wait_time < timeout:
+                if self.install_and_check_for_resource(yaml_file, resource_type, resource)
+                    return True
+                time.sleep(OC.SLEEP_TIME)
+                current_wait_time += OC.SLEEP_TIME
+            return False
+
         for resource in resource_list:
             logger.info(f'run {resource}')
-            if resource.endswith('.yaml'):
-                self._create_async(yaml=os.path.join(path, resource))
-                # for first script wait for virt-operator
-                if '01_operator.yaml' == resource:
-                    # Wait for kataconfig CRD to exist
-                    self.wait_for_ocp_resource_create(resource='kata',
-                                                      verify_cmd='if oc get crd kataconfigs.kataconfiguration.openshift.io >/dev/null 2>&1 ; then echo succeeded ; fi',
-                                                      status='succeeded')
-                    # This appears to be needed because on a fresh cluster I observe that even when
-                    # the kataconfig CRD exists, trying to apply the actual kataconfig doesn't work
-                    # immediately.  I don't believe that this is a proper fix, but the proper fix
-                    # would likely involve applying the kataconfig until it works.  On a cluster
-                    # that has already had kata installed, even if it's later uninstalled and the
-                    # kataconfig CRD removed, whatever's going on is quick enough that this
-                    # doesn't recur.
-                    time.sleep(10)
-                # for second script wait for kataconfig installation to no longer be in progress
-                elif '02_config.yaml' == resource:
-                    self.wait_for_ocp_resource_create(resource='kata',
-                                                      verify_cmd="oc get kataconfig -ojsonpath='{.items[0].status.installationStatus.IsInProgress}'",
-                                                      status='false')
-                    total_nodes_count = self.run(cmd="oc get kataconfig -ojsonpath='{.items[0].status.total_nodes_count}'")
-                    completed_nodes_count = self.run(cmd="oc get kataconfig -ojsonpath='{.items[0].status.installationStatus.completed.completed_nodes_count}'")
-                    if total_nodes_count != completed_nodes_count:
-                        raise KataInstallationFailed(f'not all nodes installed successfully total {total_nodes_count} != completed {completed_nodes_count}')
-            else:
-                if '03_ocp48_patch.sh' == resource:
-                    self.run(cmd=f'chmod +x {os.path.join(path, resource)}; {path}/./{resource}')
+            if '01_operator.yaml' == resource:
+                # Wait for kataconfig CRD to exist
+                self._create_async(os.path.join(path, resource))
+                self.wait_for_ocp_resource_create(resource='kata',
+                                                  verify_cmd='if oc get crd kataconfigs.kataconfiguration.openshift.io >/dev/null 2>&1 ; then echo succeeded ; fi',
+                                                  status='succeeded')
+            elif '02_config.yaml' == resource:
+                # This one's tricky.  The problem is that it appears
+                # that the kataconfigs CRD can exist, but attempting
+                # to apply it doesn't "take" unless some other things
+                # are already up.  So we have to keep applying the
+                # kataconfig until it's present.
+                if not self.install_and_wait_for_resource(os.path.join(path, resource), 'kataconfig', 'example-kataconfig'):
+                    raise KataInstallationFailed(f'Failed to apply kataconfig resource')
+                # Next, we have to wait 
+                self.wait_for_ocp_resource_create(resource='kata',
+                                                  verify_cmd="oc get kataconfig -ojsonpath='{.items[0].status.installationStatus.IsInProgress}'",
+                                                  status='false')
+                total_nodes_count = self.run(cmd="oc get kataconfig -ojsonpath='{.items[0].status.total_nodes_count}'")
+                completed_nodes_count = self.run(cmd="oc get kataconfig -ojsonpath='{.items[0].status.installationStatus.completed.completed_nodes_count}'")
+                if total_nodes_count != completed_nodes_count:
+                    raise KataInstallationFailed(f'not all nodes installed successfully total {total_nodes_count} != completed {completed_nodes_count}')
+            elif '03_ocp48_patch.sh' == resource:
+                self.run(cmd=f'chmod +x {os.path.join(path, resource)}; {path}/./{resource}')
         return True
 
     @logger_time_stamp
