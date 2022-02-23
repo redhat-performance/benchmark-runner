@@ -14,6 +14,7 @@ concurrency:
   
 jobs:
   test:
+    name: test
     runs-on: ubuntu-latest
     outputs:
        start_time_output: ${{ steps.start_step.outputs.start_time }}
@@ -88,6 +89,7 @@ jobs:
         COVERALLS_REPO_TOKEN=${{ secrets.COVERALLS_REPO_TOKEN }} coveralls
 
   build:
+    name: build
     needs: [test]
     runs-on: ubuntu-latest
     steps:
@@ -142,6 +144,7 @@ jobs:
         sleep 30
 
   e2e:
+    name: e2e
     needs: [test, build]
     runs-on: ubuntu-latest
     strategy:
@@ -219,6 +222,7 @@ jobs:
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End E2E workload: ${{ matrix.workload }} >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
         
   finilize:
+    name: finilize
     needs: [test, build, e2e]
     runs-on: ubuntu-latest
     steps:
@@ -298,7 +302,3 @@ jobs:
         git pull https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} main
         git push https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} main
         git push https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} --tag
-
-      
-
-      
