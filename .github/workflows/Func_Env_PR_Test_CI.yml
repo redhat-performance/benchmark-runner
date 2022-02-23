@@ -14,7 +14,8 @@ concurrency:
   cancel-in-progress: false
   
 jobs:
-  pytest:
+  test:
+    name: test
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -76,6 +77,33 @@ jobs:
 
         # run pytest
         python -m pytest
+  
+  e2e:
+    name: e2e
+    needs: [test]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 pytest pytest-cov
+        if [[ -f requirements.txt ]]; then pip install -r requirements.txt; fi
+        if [[ -f tests_requirements.txt ]]; then pip install -r tests_requirements.txt; fi
+    - name: ⚙️ Set Kubeconfig
+      env:
+        KUBECONFIG: ${{ secrets.FUNC_KUBECONFIG }}
+        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+      run: |
+          mkdir -p "$RUNNER_PATH/.kube/"
+          echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
+          echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
     - name: 📃 E2E test
       env:
         WORKLOAD: "stressng_pod"
@@ -89,5 +117,16 @@ jobs:
         ELASTICSEARCH_USER: ${{ secrets.FUNC_ELASTICSEARCH_USER }}
         ELASTICSEARCH_PASSWORD: ${{ secrets.FUNC_ELASTICSEARCH_PASSWORD }}
       run: |
+        # Install Dockerfile content for pytest
+        # install oc/kubctl
+        oc_version=4.7.0-0.okd-2021-05-22-050008
+        curl -L https://github.com/openshift/okd/releases/download/${oc_version}/openshift-client-linux-${oc_version}.tar.gz -o $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz
+        tar -xzvf $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz -C $RUNNER_PATH/
+        rm $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz
+        cp $RUNNER_PATH/kubectl /usr/local/bin/kubectl
+        cp $RUNNER_PATH/oc /usr/local/bin/oc
+
+        # clone benchmark-operator
+        git clone https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
         # run main
         PYTHONPATH=. python benchmark_runner/main/main.py
