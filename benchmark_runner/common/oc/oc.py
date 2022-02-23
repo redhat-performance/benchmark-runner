@@ -870,15 +870,14 @@ class OC(SSH):
             :param resource: name of resource to create
             :return:
             """
-            def install_and_check_for_resource(self, yaml_file: str, resource_type: str, resource: str):
+            current_wait_time = 0
+            while current_wait_time < int(environment_variables.environment_variables_dict['timeout']):
                 self._create_async(yaml_file)
+                # We cannot wait for a condition here, because the
+                # create_async may simply not work even if it returns success.
                 time.sleep(OC.SLEEP_TIME)
-                return self.run(f'if oc get {resource_type} {resource} > /dev/null 2>&1 ; then echo succeeded; fi') == 'succeeded'
-
-            while current_wait_time < timeout:
-                if self.install_and_check_for_resource(yaml_file, resource_type, resource)
+                if self.run(f'if oc get {resource_type} {resource} > /dev/null 2>&1 ; then echo succeeded; fi') == 'succeeded':
                     return True
-                time.sleep(OC.SLEEP_TIME)
                 current_wait_time += OC.SLEEP_TIME
             return False
 
@@ -896,9 +895,9 @@ class OC(SSH):
                 # to apply it doesn't "take" unless some other things
                 # are already up.  So we have to keep applying the
                 # kataconfig until it's present.
-                if not self.install_and_wait_for_resource(os.path.join(path, resource), 'kataconfig', 'example-kataconfig'):
-                    raise KataInstallationFailed(f'Failed to apply kataconfig resource')
-                # Next, we have to wait 
+                if not install_and_wait_for_resource(self, os.path.join(path, resource), 'kataconfig', 'example-kataconfig'):
+                    raise KataInstallationFailed('Failed to apply kataconfig resource')
+                # Next, we have to wait for the kata bits to actually install
                 self.wait_for_ocp_resource_create(resource='kata',
                                                   verify_cmd="oc get kataconfig -ojsonpath='{.items[0].status.installationStatus.IsInProgress}'",
                                                   status='false')
