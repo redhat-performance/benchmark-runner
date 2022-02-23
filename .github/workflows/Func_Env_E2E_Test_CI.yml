@@ -15,7 +15,42 @@ on:
 #    branches: [ main ]
 
 jobs:
+  start:
+    name: Deploy start
+    outputs:
+      start_job_status: ${{ steps.nightly_job_step.outputs.status }}
+    runs-on: ubuntu-latest
+    strategy:
+       max-parallel: 1
+       matrix: 
+          workload: [ 'stressng_pod', 'stressng_kata', 'stressng_vm', 'uperf_pod', 'uperf_kata', 'uperf_vm', 'hammerdb_pod_mariadb', 'hammerdb_kata_mariadb', 'hammerdb_vm_mariadb', 'hammerdb_pod_postgres', 'hammerdb_kata_postgres', 'hammerdb_vm_postgres', 'hammerdb_pod_mssql', 'hammerdb_kata_mssql', 'hammerdb_vm_mssql', 'vdbench_pod', 'vdbench_kata', 'vdbench_vm']
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: ⚙ Run workload
+      run: |
+          echo ${{ matrix.workload }}
+    - name: next step
+      if: always()
+      run: |
+          echo "test"
+    - name: job status
+      env:
+        FUNC_PROVISION_PRIVATE_KEY: ${{ secrets.FUNC_PROVISION_PRIVATE_KEY }}
+        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+      if: ${{ failure() }}
+      run: |
+          echo "test"
+    - id: nightly_job_step
+      if: always()
+      run: echo "::set-output name=status::${{ job.status }}"
+
   nightly:
+    if: always()
+    needs: [start]
     name: Deploy Func Nightly
     runs-on: ubuntu-latest
     steps:
@@ -24,8 +59,17 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: 3.9
+    - name: Check Job Status status and fail if they are red
+      run: |
+          echo ${{ needs.start.outputs.job-status }}
     - name: ⚙ Set START CI TIME
-      run: echo "START_CI=$(printf '%(%s)T' -1)" >> "$GITHUB_ENV"
+      #continue-on-error: true
+      run: exit 1
+    - name: next step
+      if: always()
+      run: |
+          if [[ "${{needs.start.outputs.start_job_status}}" == "success" && "${{job.status}}" == "success" ]]; then status="success"; else status="failure"; fi
+          echo $status
     - name: ⚙️ SET SSH key
       env:
         FUNC_PROVISION_PRIVATE_KEY: ${{ secrets.FUNC_PROVISION_PRIVATE_KEY }}
@@ -49,8 +93,8 @@ jobs:
         END
     - name: Install latest benchmark-runner
       run: |
-        python -m pip install --upgrade pip
-        pip install benchmark-runner
+        #python -m pip install --upgrade pip
+        #pip install benchmark-runner
     - name: ⚙ Set Kubeconfig
       env:
         KUBECONFIG: ${{ secrets.FUNC_KUBECONFIG }}
@@ -79,6 +123,9 @@ jobs:
         IBM_KEY: ${{ secrets.IBM_KEY }}
         FUNC_RUN_ARTIFACTS_URL: ${{ secrets.FUNC_RUN_ARTIFACTS_URL }}
       run: |
+        # Functional CI MUST update hosts ci file
+        sudo echo "${{ secrets.FUNC_HOSTS_API }}" | sudo tee -a /etc/hosts
+        sudo echo "${{ secrets.FUNC_HOSTS_OAUTH }}" | sudo tee -a /etc/hosts
         # get repository last id
         declare -a repositories=('benchmark-operator' 'benchmark-wrapper')
         for repository in "${repositories[@]}"
@@ -98,11 +145,12 @@ jobs:
         build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
         build_version="$(cut -d'=' -f2 <<<"$build")"
         #ssh -t provision "podman pull quay.io/ebattat/benchmark-runner:v1.0.289"
-        #ssh -t provision "podman images"
+        ssh -t provision "podman images"
         #echo "sudo podman rmi -f \$(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)" > "$RUNNER_PATH/remove_image.sh"
         
-        #echo "if [[ \"\$(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)\" != \"\" ]]; then sudo podman rmi -f \$(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null); fi" > "$RUNNER_PATH/remove_image.sh"
-        #scp -r "$RUNNER_PATH/remove_image.sh" provision:"/tmp/remove_image.sh"
-        #ssh -t provision "chmod +x /tmp/remove_image.sh;/tmp/./remove_image.sh;rm -f /tmp/remove_image.sh"
-        podman run --rm -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e ELASTICSEARCH_USER="$ELASTICSEARCH_USER" -e ELASTICSEARCH_PASSWORD="$ELASTICSEARCH_PASSWORD" -e BUILD_VERSION="$build_version" -e CI_STATUS="pass" -e CI_MINUTES_TIME="0" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e RUN_TYPE="func_ci" -e FUNC_TIMEOUT="2000" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
-
+        echo "if [[ \"\$(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)\" != \"\" ]]; then sudo podman rmi -f \$(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null); fi" > "$RUNNER_PATH/remove_image.sh"
+        scp -r "$RUNNER_PATH/remove_image.sh" provision:"/tmp/remove_image.sh"
+        ssh -t provision "chmod +x /tmp/remove_image.sh;/tmp/./remove_image.sh;rm -f /tmp/remove_image.sh"
+        
+        ssh -t provision "podman images"
+      
