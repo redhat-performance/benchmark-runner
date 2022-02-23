@@ -157,6 +157,10 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: 3.9
+    - name: Install latest benchmark-runner
+      run: |
+        python -m pip install --upgrade pip
+        pip install benchmark-runner
     - name: ⚙️ SET SSH key
       env:
         FUNC_PROVISION_PRIVATE_KEY: ${{ secrets.FUNC_PROVISION_PRIVATE_KEY }}
@@ -225,6 +229,10 @@ jobs:
         python-version: 3.9
     - name: ⚙ Set START CI TIME
       run: echo "START_CI=${{ needs.test.outputs.start_time_output }}" >> "$GITHUB_ENV"
+    - name: Install latest benchmark-runner
+      run: |
+        python -m pip install --upgrade pip
+        pip install benchmark-runner
     - name: ⚙️ Set Kubeconfig
       env:
         KUBECONFIG: ${{ secrets.FUNC_KUBECONFIG }}
