@@ -123,7 +123,7 @@ class IBMOperations:
 
     def __restart_pod_ci(self):
         """
-        This method restart pod ci - solved connectivity issue after installation
+        This method restart pod ci: elastic, kibana, grafana, nginx and flask - solved connectivity issue after installation
         :return:
         """
         self.__remote_ssh.run_command('podman pod restart pod_ci')
@@ -229,7 +229,6 @@ class IBMOperations:
         This verify that install complete
         :return: True if installation success and raise exception if installation failed
         """
-        self.__restart_pod_ci()
         complete = self.__wait_for_install_complete()
         if not complete:
             # Workers issue: workaround for solving IBM workers stuck on BIOS page after reboot
@@ -251,6 +250,7 @@ class IBMOperations:
                 logger.info('Installation failed, retry again')
                 raise Exception(f'Installation failed after 3 retries')
         else:
+            self.__restart_pod_ci()
             return True
 
     @logger_time_stamp

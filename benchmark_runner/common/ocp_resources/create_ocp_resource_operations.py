@@ -120,14 +120,6 @@ class CreateOCPResourceOperations:
                 # verify current status
                 check_status = 'oc get InstallPlan -n namespace -ojsonpath={..spec.approved}'.replace('namespace', namespace).strip()
                 result = self.__oc.run(cmd=check_status).split()[index]
-                # current_wait_time = 0
-                # while result == 'false' and current_wait_time < 300:
-                #     current_wait_time += OC.SLEEP_TIME
-                #     logger.info(f'wait {OC.SLEEP_TIME} sec till running install plan')
-                #     logger.info(f'run {run_install_plan_cmd} ')
-                #     time.sleep(OC.SLEEP_TIME)
-                #     check_status = 'oc get InstallPlan -n namespace -ojsonpath={..spec.approved}'.replace('namespace', namespace).strip()
-                #     result = self.__oc.run(cmd=check_status).split()[index]
                 if result == 'true':
                     if resource == 'odf':
                         for ind in range(3):
@@ -288,7 +280,7 @@ class CreateOCPResourceOperations:
             logger.info(f'run {resource}')
             if '01_operator.yaml' == resource:
                 # Wait for kataconfig CRD to exist
-                self.__oc._create_async(os.path.join(path, resource))
+                self.__oc._create_async(yaml=os.path.join(path, resource))
                 self.wait_for_ocp_resource_create(resource='kata',
                                                   verify_cmd='if oc get crd kataconfigs.kataconfiguration.openshift.io >/dev/null 2>&1 ; then echo succeeded ; fi',
                                                   status='succeeded')
@@ -298,7 +290,7 @@ class CreateOCPResourceOperations:
                 # to apply it doesn't "take" unless some other things
                 # are already up.  So we have to keep applying the
                 # kataconfig until it's present.
-                if not self.__install_and_wait_for_resource(self, os.path.join(path, resource), 'kataconfig', 'example-kataconfig'):
+                if not self.__install_and_wait_for_resource(os.path.join(path, resource), 'kataconfig', 'example-kataconfig'):
                     raise KataInstallationFailed('Failed to apply kataconfig resource')
                 # Next, we have to wait for the kata bits to actually install
                 self.wait_for_ocp_resource_create(resource='kata',
