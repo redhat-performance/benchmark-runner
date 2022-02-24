@@ -212,7 +212,7 @@ Boilerplate data that is independent of workload has been moved to `common.yaml`
          3. `pin_node1` - workload first node selector
          4. `elasticsearch` - elasticsearch url without http prefix
          5. `elasticsearch_port` - elasticsearch port
-      2. Run the selected test using pytest [test_oc.py](/tests/integration/benchmark_runner/common/oc/test_oc_benchmark_operator.py)
+      2. Run the selected test using pytest [test_oc.py](/tests/integration/benchmark_runner/common/oc/test_oc.py)
          1. Enable pytest in Pycharm: Configure pytest in Pycharm -> File -> settings -> tools -> Python integrated tools -> Testing -> pytest -> ok), and run the selected test
          2. Run pytest through terminal: python -m pytest -v tests/ (pip install pytest)
 5. There are three separate flavors of test: `test-ci`, `func-ci`, and

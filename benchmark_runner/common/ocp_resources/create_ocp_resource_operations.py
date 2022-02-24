@@ -1,12 +1,11 @@
 
-import os
 import time
 from typeguard import typechecked
 
 from benchmark_runner.common.oc.oc import OC
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 from benchmark_runner.main.environment_variables import environment_variables
-from benchmark_runner.common.ocp_resources.create_ocp_resource_exceptions import OCPResourceNotCreateTimeout, KataInstallationFailed
+from benchmark_runner.common.ocp_resources.create_ocp_resource_exceptions import OCPResourceNotCreateTimeout
 
 
 class CreateOCPResourceOperations:
@@ -14,13 +13,12 @@ class CreateOCPResourceOperations:
     This class is create OCP resources
     """
     def __init__(self, oc: OC):
-        self.__environment_variables_dict = environment_variables.environment_variables_dict
-        self.__kubeadmin_password = self.__environment_variables_dict.get('kubeadmin_password', '')
+        self._environment_variables_dict = environment_variables.environment_variables_dict
         self.__oc = oc
 
     @staticmethod
     @typechecked
-    def __replace_in_file(file_path: str, old_value: str, new_value: str):
+    def _replace_in_file(file_path: str, old_value: str, new_value: str):
         """
         This method replace string in file
         :param file_path:
@@ -39,7 +37,7 @@ class CreateOCPResourceOperations:
         with open(file_path, 'w') as file:
             file.write(file_data)
 
-    def __install_and_wait_for_resource(self, yaml_file: str, resource_type: str, resource: str):
+    def _install_and_wait_for_resource(self, yaml_file: str, resource_type: str, resource: str):
             """
             Create a resource where the creation process itself may fail and has to be retried
             :param yaml_file:YAML file to create the resource
@@ -143,163 +141,3 @@ class CreateOCPResourceOperations:
         while 'false' in approved_values_list:
             self.apply_non_approved_patch(approved_values_list, namespace, resource)
             approved_values_list = self.__oc.run(cmd=install_plan_cmd).split()
-
-    @typechecked
-    @logger_time_stamp
-    def create_custom(self, path: str, resource_list: list):
-        """
-        This method create custom resource
-        :param path:path of resource files
-        :param resource_list: cnv resource lists
-        :return:
-        """
-        for resource in resource_list:
-            logger.info(f'run {resource}')
-            if resource.endswith('.sh'):
-                self.__oc.run(cmd=f'chmod +x {os.path.join(path, resource)}; {path}/./{resource}')
-            else:
-                self.__oc._create_async(yaml=os.path.join(path, resource))
-
-    @typechecked
-    @logger_time_stamp
-    def create_cnv(self, path: str, resource_list: list):
-        """
-        This method create cnv resource
-        :param path:path of resource files
-        :param resource_list: cnv resource lists
-        :return:
-        """
-        cnv_version = self.__environment_variables_dict.get('cnv_version', '')
-        for resource in resource_list:
-            logger.info(f'run {resource}')
-            if resource.endswith('.sh'):
-                self.__oc.run(cmd=f'chmod +x {os.path.join(path, resource)}; {path}/./{resource}')
-            else:
-                self.__oc._create_async(yaml=os.path.join(path, resource))
-                if '02_cnv_nightly_catalog_source.yaml' in resource:
-                    logger.info('wait for cnv-nightly kubevirt-hyperconverged')
-                    self.wait_for_ocp_resource_create(resource=resource,
-                                                      verify_cmd="oc get packagemanifest -l catalog=cnv-nightly-catalog-source | grep kubevirt-hyperconverged",
-                                                      status="kubevirt-hyperconverged")
-                    starting_csv = self.__oc.run(""" oc get packagemanifest -l "catalog=cnv-nightly-catalog-source" -o jsonpath="{$.items[?(@.metadata.name=='kubevirt-hyperconverged')].status.channels[?(@.name==\\"nightly-cnv_version\\")].currentCSV}" """.replace('cnv_version', cnv_version))
-                    self.__replace_in_file(file_path=os.path.join(path, '03_operator.yaml'), old_value="@starting_csv@", new_value=starting_csv)
-                if '03_operator.yaml' in resource:
-                    # wait till get the patch
-                    self.wait_for_ocp_resource_create(resource=resource,
-                                                      verify_cmd="oc get InstallPlan -n openshift-cnv -ojsonpath={.items[0].metadata.name}",
-                                                      status="install-")
-                    self.apply_patch(namespace='openshift-cnv', resource='cnv')
-                # for second script wait for refresh status
-                if '04_hyperconverge.yaml' in resource:
-                    # Wait that till succeeded
-                    self.wait_for_ocp_resource_create(resource='cnv',
-                                                      verify_cmd="oc get csv -n openshift-cnv -ojsonpath='{.items[0].status.phase}'",
-                                                      status='Succeeded')
-        return True
-
-    @typechecked
-    @logger_time_stamp
-    def create_local_storage(self, path: str, resource_list: list):
-        """
-        This method create local storage
-        :param path:path of resource files
-        :param resource_list: local storage resource lists
-        :return:
-        """
-        for resource in resource_list:
-            logger.info(f'run {resource}')
-            self.__oc._create_async(yaml=os.path.join(path, resource))
-        # verify once after create all resource files
-        self.wait_for_ocp_resource_create(resource='local_storage',
-                                          verify_cmd="oc -n openshift-local-storage wait deployment/local-storage-operator --for=condition=Available",
-                                          status='deployment.apps/local-storage-operator condition met')
-        return True
-
-    @typechecked
-    @logger_time_stamp
-    def create_odf(self, path: str, resource_list: list, ibm_blk_disk_name: list):
-        """
-        This method create odf
-        :param ibm_blk_disk_name: ibm odf disk blk name
-        :param path:path of resource files
-        :param resource_list: odf resource lists
-        :return:
-        """
-        for resource in resource_list:
-            logger.info(f'run {resource}')
-            if resource.endswith('.sh'):
-                # build sgdisks path dynamically
-                if '01_sgdisks.sh' == resource:
-                    sgdisk_list = ''
-                    for disk_name in ibm_blk_disk_name:
-                        sgdisk_list += f'sgdisk --zap-all /dev/{disk_name};'
-                    self.__oc.run(cmd=f'chmod +x {os.path.join(path, resource)}; {path}/./{resource} "{sgdisk_list}"')
-                else:
-                    self.__oc.run(cmd=f'chmod +x {os.path.join(path, resource)}; {path}/./{resource}')
-            else:  # yaml
-                self.__oc._create_async(yaml=os.path.join(path, resource))
-                if '04_local_volume_set.yaml' in resource:
-                    # openshift local storage
-                    self.wait_for_ocp_resource_create(resource='odf',
-                                                      verify_cmd=r"""oc get pod -n openshift-local-storage -o jsonpath="{range .items[*]}{.metadata.name}{'\n'}{end}" | grep diskmaker""")
-                    self.wait_for_ocp_resource_create(resource='odf',
-                                                      verify_cmd=r"""oc get pod -n openshift-local-storage -o jsonpath="{range .items[*]}{.metadata.name}{'\n'}{end}" | grep diskmaker | wc -l""", count_local_storage=True)
-                    # openshift persistence volume (pv)
-                    self.wait_for_ocp_resource_create(resource='odf',
-                                                      verify_cmd=r"""oc get pv -o jsonpath="{range .items[*]}{.metadata.name}{'\n'}{end}" | grep local""")
-                    self.wait_for_ocp_resource_create(resource='odf',
-                                                      verify_cmd=r"""oc get pv -o jsonpath="{range .items[*]}{.metadata.name}{'\n'}{end}" | grep local | wc -l""",
-                                                      count_openshift_storage=True)
-                if '07_subscription.yaml' in resource:
-                    # wait till get the patch
-                    self.wait_for_ocp_resource_create(resource=resource,
-                                                      verify_cmd="oc get InstallPlan -n openshift-storage -ojsonpath={.items[0].metadata.name}",
-                                                      status="install-")
-                    self.apply_patch(namespace='openshift-storage', resource='odf')
-                elif '08_storage_cluster.yaml' in resource:
-                    self.wait_for_ocp_resource_create(resource='odf',
-                                                      verify_cmd=r"""oc get pod -n openshift-storage | grep osd | grep -v prepare""")
-                    self.wait_for_ocp_resource_create(resource='odf',
-                                                      verify_cmd="oc get csv -n openshift-storage -ojsonpath='{.items[0].status.phase}'",
-                                                      status='Succeeded')
-                    self.wait_for_ocp_resource_create(resource='odf',
-                                                      verify_cmd='oc get pod -n openshift-storage | grep osd | grep -v prepare | wc -l',
-                                                      count_openshift_storage=True)
-        return True
-
-    @typechecked
-    @logger_time_stamp
-    def create_kata(self, path: str, resource_list: list):
-        """
-        This method create kata resource
-        :param path:path of resource files
-        :param resource_list: kata resource lists
-        :return:
-        """
-        for resource in resource_list:
-            logger.info(f'run {resource}')
-            if '01_operator.yaml' == resource:
-                # Wait for kataconfig CRD to exist
-                self.__oc._create_async(yaml=os.path.join(path, resource))
-                self.wait_for_ocp_resource_create(resource='kata',
-                                                  verify_cmd='if oc get crd kataconfigs.kataconfiguration.openshift.io >/dev/null 2>&1 ; then echo succeeded ; fi',
-                                                  status='succeeded')
-            elif '02_config.yaml' == resource:
-                # This one's tricky.  The problem is that it appears
-                # that the kataconfigs CRD can exist, but attempting
-                # to apply it doesn't "take" unless some other things
-                # are already up.  So we have to keep applying the
-                # kataconfig until it's present.
-                if not self.__install_and_wait_for_resource(os.path.join(path, resource), 'kataconfig', 'example-kataconfig'):
-                    raise KataInstallationFailed('Failed to apply kataconfig resource')
-                # Next, we have to wait for the kata bits to actually install
-                self.wait_for_ocp_resource_create(resource='kata',
-                                                  verify_cmd="oc get kataconfig -ojsonpath='{.items[0].status.installationStatus.IsInProgress}'",
-                                                  status='false')
-                total_nodes_count = self.__oc.run(cmd="oc get kataconfig -ojsonpath='{.items[0].status.total_nodes_count}'")
-                completed_nodes_count = self.__oc.run(cmd="oc get kataconfig -ojsonpath='{.items[0].status.installationStatus.completed.completed_nodes_count}'")
-                if total_nodes_count != completed_nodes_count:
-                    raise KataInstallationFailed(f'not all nodes installed successfully total {total_nodes_count} != completed {completed_nodes_count}')
-            elif '03_ocp48_patch.sh' == resource:
-                self.__oc.run(cmd=f'chmod +x {os.path.join(path, resource)}; {path}/./{resource}')
-        return True

@@ -4,7 +4,7 @@ name: Deploy Func Env Nightly CI
 
 on:  
   schedule:
-    - cron: '0 4 * * *' # run at 4 AM UTC/ 0 AM EDT
+    - cron: '0 4 * * 0,1,2,3,4,6' # run at 4 AM UTC/ 0 AM EDT
 
 # Ensures that only one deploy task per branch/environment will run at a time.
 concurrency:
