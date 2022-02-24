@@ -17,10 +17,13 @@ include benchmark_runner/common/template_operations/templates/vdbench/*.yaml
 include benchmark_runner/common/template_operations/templates/vdbench/internal_data/*.yaml
 
 # ocp resource
+include benchmark_runner/common/ocp_resources/cnv/template/*.sh
 include benchmark_runner/common/ocp_resources/cnv/template/*.yaml
 include benchmark_runner/common/ocp_resources/kata/template/*.sh
 include benchmark_runner/common/ocp_resources/kata/template/*.yaml
+include benchmark_runner/common/ocp_resources/local_storage/template/*.sh
 include benchmark_runner/common/ocp_resources/local_storage/template/*.yaml
-include benchmark_runner/common/ocp_resources/ocs/template/*.sh
-include benchmark_runner/common/ocp_resources/ocs/template/*.yaml
-
+include benchmark_runner/common/ocp_resources/odf/template/*.sh
+include benchmark_runner/common/ocp_resources/odf/template/*.yaml
+include benchmark_runner/common/ocp_resources/custom/template/*.sh
+include benchmark_runner/common/ocp_resources/custom/template/*.yaml

@@ -1,11 +1,12 @@
 
 # Tests that are not required benchmark-operator pod
 
-from benchmark_runner.common.oc.oc import OC
-from tests.integration.benchmark_runner.test_environment_variables import *
 import tempfile
 import tarfile
 import time
+import pytest
+from benchmark_runner.common.oc.oc import OC
+from tests.integration.benchmark_runner.test_environment_variables import *
 from benchmark_runner.common.prometheus.prometheus_snapshot import PrometheusSnapshot
 
 
@@ -16,7 +17,7 @@ def test_oc_get_ocp_server_version():
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
-    assert oc.get_ocp_server_version()
+    print(oc.get_ocp_server_version())
 
 
 def test_oc_get_kata_version():
@@ -39,14 +40,14 @@ def test_oc_get_cnv_version():
     assert oc.get_cnv_version()
 
 
-def test_oc_get_ocs_version():
+def test_oc_get_odf_version():
     """
-    This method get ocs version
+    This method get odf version
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
-    assert oc.get_ocs_version()
+    oc.get_odf_version()
 
 
 def test_oc_get_master_nodes():
@@ -116,14 +117,14 @@ def test_is_kata_installed():
     assert oc.is_kata_installed()
 
 
-def test_is_ocs_installed():
+def test_is_odf_installed():
     """
-    This method check if ocs operator is installed
+    This method check if odf operator is installed
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
-    assert oc.is_ocs_installed()
+    assert oc.is_odf_installed()
 
 
 def test_is_kata_installed():

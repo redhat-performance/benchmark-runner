@@ -70,7 +70,7 @@ spec:
           - name: mariadb-custom-config
             mountPath: /etc/my.cnf
             subPath: custom.conf #should be the name used in the ConfigMap
-          {%- if ocs_pvc == True %}
+          {%- if odf_pvc == True %}
           - name: mariadb-persistent-storage
             mountPath: /var/lib/mysql
             readOnly: false
@@ -79,7 +79,7 @@ spec:
         - name: mariadb-custom-config
           configMap:
             name: mariadb-custom-config
-        {%- if ocs_pvc == True %}
+        {%- if odf_pvc == True %}
         - name: mariadb-persistent-storage
           persistentVolumeClaim:
             claimName: mariadb-persistent-storage

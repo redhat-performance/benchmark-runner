@@ -1,5 +1,7 @@
 
 import os
+import time
+
 from typeguard import typechecked
 
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger

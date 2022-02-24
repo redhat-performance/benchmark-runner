@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: {{ namespace }}
-{%- if ocs_pvc == True %}
+{%- if odf_pvc == True %}
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1
@@ -67,7 +67,7 @@ spec:
             memory: {{ limits_memory }}
       terminationGracePeriodSeconds: 0
       volumes:
-{%- if ocs_pvc == True %}
+{%- if odf_pvc == True %}
         - name: data-volume
           persistentVolumeClaim:
             claimName: vdbench-pvc-claim

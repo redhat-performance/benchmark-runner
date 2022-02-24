@@ -64,7 +64,7 @@ spec:
             - name: postgres-custom-config
               mountPath: /var/lib/pgsql/data/pg_hba.conf
               subPath: custom.pg_hba.conf #should be the name used in the ConfigMap
-          {%- if ocs_pvc == True %}
+          {%- if odf_pvc == True %}
             - name: postgres-persistent-storage
               mountPath: /var/lib/pgsql/data
               readOnly: false
@@ -73,7 +73,7 @@ spec:
         - name: postgres-custom-config
           configMap:
             name: postgres-custom-config
-        {%- if ocs_pvc == True %}
+        {%- if odf_pvc == True %}
         - name: postgres-persistent-storage
           persistentVolumeClaim:
             claimName: postgres-persistent-storage
