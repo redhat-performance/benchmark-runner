@@ -149,7 +149,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
        # run one job every time
-       max-parallel: 2
+       max-parallel: 1
        # continue to next job if failed
        fail-fast: false
        matrix: 
