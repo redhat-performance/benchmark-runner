@@ -29,8 +29,8 @@ def __get_test_environment_variable():
     # Constant parameters
 
     test_environment_variable['namespace'] = os.environ.get('NAMESPACE', 'benchmark-operator')
-    # run Hammerdb workload with odf pvc
-    test_environment_variable['odf_pvc'] = os.environ.get('ODF_PVC', 'True')
+    # run Hammerdb workload with ocs pvc
+    test_environment_variable['ocs_pvc'] = os.environ.get('OCS_PVC', 'True')
     test_environment_variable['system_metrics'] = os.environ.get('SYSTEM_METRICS', 'True')
     # Azure details
     test_environment_variable['azure_cluster_stop'] = os.environ.get('AZURE_CLUSTER_STOP', '')

@@ -15,7 +15,42 @@ on:
 #    branches: [ main ]
 
 jobs:
+  start:
+    name: Deploy start
+    outputs:
+      start_job_status: ${{ steps.nightly_job_step.outputs.status }}
+    runs-on: ubuntu-latest
+    strategy:
+       max-parallel: 1
+       matrix: 
+          workload: [ 'stressng_pod', 'stressng_kata', 'stressng_vm', 'uperf_pod', 'uperf_kata', 'uperf_vm', 'hammerdb_pod_mariadb', 'hammerdb_kata_mariadb', 'hammerdb_vm_mariadb', 'hammerdb_pod_postgres', 'hammerdb_kata_postgres', 'hammerdb_vm_postgres', 'hammerdb_pod_mssql', 'hammerdb_kata_mssql', 'hammerdb_vm_mssql', 'vdbench_pod', 'vdbench_kata', 'vdbench_vm']
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: ⚙ Run workload
+      run: |
+          echo ${{ matrix.workload }}
+    - name: next step
+      if: always()
+      run: |
+          echo "test"
+    - name: job status
+      env:
+        FUNC_PROVISION_PRIVATE_KEY: ${{ secrets.FUNC_PROVISION_PRIVATE_KEY }}
+        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+      if: ${{ failure() }}
+      run: |
+          echo "test"
+    - id: nightly_job_step
+      if: always()
+      run: echo "::set-output name=status::${{ job.status }}"
+
   nightly:
+    if: always()
+    needs: [start]
     name: Deploy Func Nightly
     runs-on: ubuntu-latest
     steps:
@@ -24,8 +59,17 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: 3.9
+    - name: Check Job Status status and fail if they are red
+      run: |
+          echo ${{ needs.start.outputs.job-status }}
     - name: ⚙ Set START CI TIME
-      run: echo "START_CI=$(printf '%(%s)T' -1)" >> "$GITHUB_ENV"
+      #continue-on-error: true
+      run: exit 1
+    - name: next step
+      if: always()
+      run: |
+          if [[ "${{needs.start.outputs.start_job_status}}" == "success" && "${{job.status}}" == "success" ]]; then status="success"; else status="failure"; fi
+          echo $status
     - name: ⚙️ SET SSH key
       env:
         FUNC_PROVISION_PRIVATE_KEY: ${{ secrets.FUNC_PROVISION_PRIVATE_KEY }}
@@ -109,3 +153,4 @@ jobs:
         ssh -t provision "chmod +x /tmp/remove_image.sh;/tmp/./remove_image.sh;rm -f /tmp/remove_image.sh"
         
         ssh -t provision "podman images"
+      

@@ -1,237 +1,163 @@
 
+# Tests that are not required benchmark-operator pod
+
 import time
-import pytest
-
+import tempfile
+import tarfile
 from benchmark_runner.common.oc.oc import OC
-from benchmark_runner.common.oc.oc_exceptions import LoginFailed, PodNotCreateTimeout, PodTerminateTimeout, VMNotCreateTimeout, YAMLNotExist
-from benchmark_runner.common.elasticsearch.elasticsearch_operations import ElasticSearchOperations
-from benchmark_runner.common.template_operations.render_yaml_from_template import render_yaml_file
-from benchmark_runner.benchmark_operator.benchmark_operator_workloads_operations import BenchmarkOperatorWorkloadsOperations
 from tests.integration.benchmark_runner.test_environment_variables import *
+from benchmark_runner.common.prometheus.prometheus_snapshot import PrometheusSnapshot
 
 
-def __generate_yamls(workload: str, kind: str):
+def test_oc_get_ocp_server_version():
     """
-    This method creates YAML files from templates, substituting environment variables.
-    :return:
-    """
-    yaml_template = f'{workload}_{kind}_template.yaml'
-    yaml_file = f'{workload}_{kind}.yaml'
-    data = render_yaml_file(dir_path=templates_path, yaml_file=yaml_template, environment_variable_dict=test_environment_variable)
-    with open(os.path.join(templates_path, yaml_file), 'w') as f:
-        f.write(data)
-
-
-def __delete_test_objects(workload: str, kind: str):
-    """
-    Delete objects and YAML files if they exist
-    """
-    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
-    workload_name = f'{workload}-{kind}-workload'
-    workload_yaml = f'{workload}_{kind}.yaml'
-    if oc._is_pod_exist(pod_name=workload_name, namespace=test_environment_variable['namespace']):
-        oc.delete_pod_sync(yaml=os.path.join(templates_path, workload_yaml), pod_name=workload_name)
-    if os.path.isfile(os.path.join(templates_path, workload_yaml)):
-        os.remove(os.path.join(templates_path, workload_yaml))
-
-
-@pytest.fixture(scope="session", autouse=True)
-def before_after_all_tests_fixture():
-    """
-    This method is create benchmark operator pod once for ALL tests
-    :return:
-    """
-    print('Deploy benchmark-operator pod')
-    benchmark_operator = BenchmarkOperatorWorkloadsOperations()
-    benchmark_operator.set_login(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    benchmark_operator.make_undeploy_benchmark_controller_manager_if_exist(runner_path=test_environment_variable['runner_path'])
-    benchmark_operator.make_deploy_benchmark_controller_manager(runner_path=test_environment_variable['runner_path'])
-    yield
-    print('UnDeploy benchmark-operator pod')
-    benchmark_operator.make_undeploy_benchmark_controller_manager(runner_path=test_environment_variable['runner_path'])
-
-
-@pytest.fixture(autouse=True)
-def before_after_each_test_fixture():
-    """
-    This method creates and deletes YAML files and test objects before and after each test
-    :return:
-    """
-    # before all test: setup
-    kinds = ('pod', 'kata', 'vm')
-    for kind in kinds:
-        __generate_yamls(workload='stressng', kind=kind)
-    yield
-    # After all tests
-    for kind in kinds:
-        __delete_test_objects(workload='stressng', kind=kind)
-    print('Test End')
-
-###################################################### POD Tests ##################################################
-
-
-def test_oc_get_pod_name_and_is_pod_exist():
-    """
-    This method test get_pod_name and is_pod_exist
+    This method get ocp server version
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
-    assert oc._get_pod_name(pod_name='benchmark-controller-manager', namespace=test_environment_variable['namespace'])
-    assert oc._is_pod_exist(pod_name='benchmark-controller-manager', namespace=test_environment_variable['namespace'])
+    print(oc.get_ocp_server_version())
 
 
-def test_yaml_file_not_exist_error():
+def test_oc_get_kata_version():
     """
-    This method create pod with timeout error
+    This method gets the sandboxed containers (kata) version
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
-    with pytest.raises(YAMLNotExist) as err:
-        oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng1.yaml'), pod_name='stressng-pod-workload', timeout=-1)
+    assert oc.get_kata_version()
 
 
-def test_create_sync_pod_timeout_error():
+def test_oc_get_cnv_version():
     """
-    This method create pod with timeout error
+    This method get cnv version
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
-    with pytest.raises(PodNotCreateTimeout) as err:
-        oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_pod.yaml'), pod_name='stressng-pod-workload', timeout=-1)
+    assert oc.get_cnv_version()
 
 
-def test_delete_sync_pod_timeout_error():
+def test_oc_get_odf_version():
     """
-    This method delete pod with timeout error
+    This method get odf version
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
-    oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_pod.yaml'), pod_name='stressng-pod-workload')
-    with pytest.raises(PodTerminateTimeout) as err:
-        oc.delete_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_pod.yaml'), pod_name='stressng-pod-workload', timeout=-1)
+    oc.get_odf_version()
 
 
-def test_get_long_short_uuid():
+def test_oc_get_master_nodes():
     """
-    This method test short and long uuid
+    This method test get master nodes
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
-    oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_pod.yaml'), pod_name='stressng-pod-workload')
-    assert len(oc.get_long_uuid(workload='stressng-pod')) == 36
-    assert len(oc._OC__get_short_uuid(workload='stressng-pod')) == 8
+    assert oc.get_master_nodes()
 
 
-@pytest.mark.skip(reason="Already verified in 'test_es_operations:test_verify_es_data_uploaded_stressng_pod' ")
-def test_wait_for_pod_create_initialized_ready_completed_system_metrics_deleted():
+def test_login():
     """
-    This method test wait for pod create, initialized, ready, completed, system-metrics, delete
+    This method test login
     :return:
     """
-    workload = 'stressng-pod'
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
-    assert oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_pod.yaml'), pod_name='stressng-pod-workload')
-    assert oc.wait_for_initialized(label='app=stressng_workload', workload=workload)
-    assert oc.wait_for_ready(label='app=stressng_workload', workload=workload)
-    assert oc.wait_for_pod_completed(label='app=stressng_workload', workload=workload)
-    # system-metrics
-    assert oc.wait_for_pod_create(pod_name='system-metrics-collector')
-    assert oc.wait_for_initialized(label='app=system-metrics-collector', workload=workload)
-    assert oc.wait_for_pod_completed(label='app=system-metrics-collector', workload=workload)
-    assert oc.delete_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_pod.yaml'), pod_name='stressng-pod-workload')
+    assert oc.login()
 
 
-def test_wait_for_kata_create_initialized_ready_completed_system_metrics_deleted():
+def test_oc_get_pod_name():
     """
-    This method test wait for pod create, initialized, ready, completed, system-metrics, delete
+    This test run oc get pod by name
     :return:
     """
-    workload = 'stressng-kata'
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
-    assert oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_kata.yaml'), pod_name='stressng-kata-workload')
-    assert oc.wait_for_initialized(label='app=stressng_workload', workload=workload)
-    assert oc.wait_for_ready(label='app=stressng_workload', workload=workload)
-    assert oc.wait_for_pod_completed(label='app=stressng_workload', workload=workload)
-    # system-metrics
-    assert oc.wait_for_pod_create(pod_name='system-metrics-collector')
-    assert oc.wait_for_initialized(label='app=system-metrics-collector', workload=workload)
-    assert oc.wait_for_pod_completed(label='app=system-metrics-collector', workload=workload)
-    assert oc.delete_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_kata.yaml'), pod_name='stressng-kata-workload')
+    assert oc._get_pod_name(pod_name='erererer', namespace=test_environment_variable['namespace']) == ''
 
 
-###################################################### VM Tests ##################################################
-
-
-def test_create_sync_vm_timeout_error():
+def test_oc_get_pods():
     """
-    This method create vm with timeout error
+    This test run oc get pods
+    :return:
+    """
+    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
+    assert oc.get_pods()
+
+
+def test_get_prom_token():
+    """
+    This method return prom token from cluster
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
-    with pytest.raises(VMNotCreateTimeout) as err:
-        oc.create_vm_sync(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'), vm_name='stressng-vm-workload', timeout=-1)
+    assert oc.get_prom_token()
 
 
-@pytest.mark.skip(reason="Already verified in: test_vm_create_initialized_ready_completed_system_metrics_deleted ")
-def test_oc_get_vm_name_and_is_vm_exist():
+def test_is_cnv_installed():
     """
-    This method test get_vm_name and is_vm_exist
+    This method check if cnv operator is installed
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
-    oc._create_async(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'))
-    # wait 60 sec till vm will be created
-    time.sleep(60)
-    assert oc._get_vm_name(vm_name='stressng-vm-workload', namespace=test_environment_variable['namespace'])
-    assert oc._is_vm_exist(vm_name='stressng-vm-workload', namespace=test_environment_variable['namespace'])
+    assert oc.is_cnv_installed()
 
 
-@pytest.mark.skip(reason="Already verified in: test_vm_create_initialized_ready_completed_system_metrics_deleted ")
-def test_wait_for_vm_created():
+def test_is_kata_installed():
     """
-    This method wait for vm to be created
+    This method checks if the sandboxed containers (kata) operator is installed
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
-    oc._create_async(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'))
-    assert oc.wait_for_vm_create(vm_name='stressng-vm-workload')
+    assert oc.is_kata_installed()
 
 
-def test_vm_create_initialized_ready_completed_system_metrics_deleted():
+def test_is_odf_installed():
     """
-    This method test create, get_vm, initialize, ready, completed, system-metrics, deleted
-    Must have running ElasticSearch server
+    This method check if odf operator is installed
     :return:
     """
-    workload = 'stressng-vm'
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
-    assert oc.create_vm_sync(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'), vm_name='stressng-vm-workload')
-    assert oc.get_vm()
-    assert oc.wait_for_initialized(label='app=stressng_workload', workload=workload)
-    assert oc.wait_for_ready(label='app=stressng_workload', workload=workload)
-    assert oc.wait_for_vm_completed(workload=workload)
-    # system-metrics
-    if test_environment_variable['system_metrics'] == 'True':
-        es = ElasticSearchOperations(es_host=test_environment_variable.get('elasticsearch', ''), es_port=test_environment_variable.get('elasticsearch_port', ''), es_user=test_environment_variable.get('elasticsearch_user', ''), es_password=test_environment_variable.get('elasticsearch_password', ''))
-        assert oc.wait_for_pod_create(pod_name='system-metrics-collector')
-        assert oc.wait_for_initialized(label='app=system-metrics-collector', workload=workload)
-        assert oc.wait_for_pod_completed(label='app=system-metrics-collector', workload=workload)
-        assert es.verify_elasticsearch_data_uploaded(index='system-metrics-test', uuid=oc.get_long_uuid(workload=workload))
-    if test_environment_variable['elasticsearch']:
-        es = ElasticSearchOperations(es_host=test_environment_variable.get('elasticsearch', ''), es_port=test_environment_variable.get('elasticsearch_port', ''), es_user=test_environment_variable.get('elasticsearch_user', ''), es_password=test_environment_variable.get('elasticsearch_password', ''))
-        assert es.verify_elasticsearch_data_uploaded(index='stressng-vm-test-results', uuid=oc.get_long_uuid(workload=workload))
-    assert oc.delete_vm_sync(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'),
-                             vm_name='stressng-vm-workload')
+    assert oc.is_odf_installed()
 
+
+def test_is_kata_installed():
+    """
+    This method check if kata operator is installed
+    :return:
+    """
+    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
+    oc.login()
+    assert oc.is_kata_installed()
+
+
+def test_oc_exec():
+    """
+    Test that oc exec works
+    :return:
+    """
+    test_message = "I am here"
+    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
+    oc.login()
+    answer = oc.exec(pod_name="prometheus-k8s-0", namespace="openshift-monitoring", container='prometheus', command=f'echo "{test_message}"')
+    assert answer == test_message
+
+
+def test_collect_prometheus():
+    """
+    Test that Prometheus data can be collected.  TBD test that data is valid.
+    :return:
+    """
+    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
+    oc.login()
+    with tempfile.TemporaryDirectory() as dirname:
+        snapshot = PrometheusSnapshot(oc=oc, artifacts_path=dirname, verbose=True)
+        snapshot.prepare_for_snapshot(pre_wait_time=1)
+        time.sleep(10)
+        tarball = snapshot.retrieve_snapshot(post_wait_time=1)
+        assert tarfile.is_tarfile(tarball)

@@ -1,0 +1,83 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: benchmark-runner
+---
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: vdbench-vm-deadbeef
+  namespace: benchmark-runner
+  labels:
+    app: vdbench-deadbeef
+    type: vdbench-vm-deadbeef
+    benchmark-uuid: deadbeef-0123-3210-cdef-01234567890abcdef
+    benchmark-runner-workload: vdbench
+spec:
+  running: true
+  template:
+    metadata:
+      labels:
+        kubevirt-vm: vdbench
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: pin-node-1
+      domain:
+        cpu:
+          sockets: 2
+          cores: 1
+          threads: 1
+        devices:
+          disks:
+            - disk:
+                bus: virtio
+              name: containerdisk
+            - disk:
+                bus: virtio
+              name: cloudinitdisk
+            - disk:
+                bus: virtio
+              name: data-volume
+              serial: vdbenchdata
+        machine:
+          type: ""
+        resources:
+          requests:
+            cpu: 10m
+            memory: 10Mi
+          limits:
+            cpu: 2
+            memory: 2Gi
+      terminationGracePeriodSeconds: 0
+      volumes:
+        - containerDisk:
+            image: quay.io/ebattat/centos-stream8-vdbench5.04.07-container-disk:latest
+          name: containerdisk
+        - cloudInitNoCloud:
+            userData: |-
+              #cloud-config
+              password: centos
+              chpasswd: { expire: False }
+              bootcmd:
+                - "mkdir -p /workload || true"
+                - "[ -e /dev/disk/by-id/*vdbenchdata ] && disk=$(shopt -s nullglob; basename /dev/disk/by-id/*vdbenchdata) && mkfs.ext4 /dev/disk/by-id/$disk && mount /dev/disk/by-id/$disk /workload"
+              runcmd:
+                - export BLOCK_SIZES=64,oltp1
+                - export IO_OPERATION=write,oltp1
+                - export IO_THREADS=1,3
+                - export FILES_IO=random,oltp1
+                - export IO_RATE=max,max
+                - export MIX_PRECENTAGE # used for mixed workload 0-100
+                - export DURATION=20
+                - export PAUSE=0
+                - export WARMUP=0
+                - export FILES_SELECTION=random
+                - export COMPRESSION_RATIO=2
+                - export RUN_FILLUP=no
+                - export DIRECTORIES=300
+                - export FILES_PER_DIRECTORY=3
+                - export SIZE_PER_FILE=10
+                - echo @@~@@START-WORKLOAD@@~@@
+                - /vdbench/vdbench_runner.sh
+                - echo @@~@@END-WORKLOAD@@~@@
+          name: cloudinitdisk

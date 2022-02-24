@@ -22,7 +22,7 @@
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
   "id": 16,
-  "iteration": 1642582901949,
+  "iteration": 1645551428298,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -78,6 +78,247 @@
       "fieldConfig": {
         "defaults": {
           "color": {
+            "fixedColor": "super-light-blue",
+            "mode": "fixed"
+          },
+          "custom": {
+            "fillOpacity": 70,
+            "lineWidth": 3
+          },
+          "mappings": [
+            {
+              "options": {
+                "102": {
+                  "index": 8,
+                  "text": "1.0.2"
+                },
+                "110": {
+                  "index": 9,
+                  "text": "1.1.0"
+                },
+                "483": {
+                  "index": 0,
+                  "text": "4.8.3"
+                },
+                "484": {
+                  "index": 1,
+                  "text": "4.8.4"
+                },
+                "485": {
+                  "index": 2,
+                  "text": "4.8.5"
+                },
+                "486": {
+                  "index": 3,
+                  "text": "4.8.6"
+                },
+                "487": {
+                  "index": 4,
+                  "text": "4.8.7"
+                },
+                "488": {
+                  "index": 5,
+                  "text": "4.8.8"
+                },
+                "4814": {
+                  "index": 6,
+                  "text": "4.8.14"
+                },
+                "41002": {
+                  "index": 11,
+                  "text": "4.10.0-rc.2"
+                },
+                "41003": {
+                  "index": 12,
+                  "text": "4.10.0-rc.3"
+                },
+                "49211": {
+                  "index": 7,
+                  "text": "4.9.2-11"
+                },
+                "4100683": {
+                  "index": 10,
+                  "text": "4.10.0-683"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 24,
+        "x": 0,
+        "y": 5
+      },
+      "id": 111,
+      "interval": "1d",
+      "options": {
+        "alignValue": "left",
+        "legend": {
+          "displayMode": "hidden",
+          "placement": "bottom"
+        },
+        "mergeValues": true,
+        "rowHeight": 0.9,
+        "showValue": "always",
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "pluginVersion": "8.4.0-pre",
+      "targets": [
+        {
+          "alias": "ocp_version",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "auto"
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "xQGAtZvnk"
+          },
+          "hide": false,
+          "metrics": [
+            {
+              "field": "tpm",
+              "id": "1",
+              "settings": {
+                "script": "Integer.parseInt(\"0\"+doc['ocp_version.keyword'].value.replace(\".\",\"\").replace(\"r\",\"\").replace(\"c\",\"\").replace(\"f\",\"\").replace(\"-\",\"\"))"
+              },
+              "type": "max"
+            }
+          ],
+          "query": "_exists_:ocp_version",
+          "refId": "A",
+          "timeField": "timestamp"
+        },
+        {
+          "alias": "ocs_version",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "auto"
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "xQGAtZvnk"
+          },
+          "hide": false,
+          "metrics": [
+            {
+              "field": "tpm",
+              "id": "1",
+              "settings": {
+                "script": "Integer.parseInt(\"0\"+doc['ocs_version.keyword'].value.replace(\".\",\"\").replace(\"r\",\"\").replace(\"c\",\"\").replace(\"f\",\"\").replace(\"-\",\"\"))"
+              },
+              "type": "max"
+            }
+          ],
+          "query": "_exists_:ocs_version",
+          "refId": "B",
+          "timeField": "timestamp"
+        },
+        {
+          "alias": "cnv_version",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "auto"
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "xQGAtZvnk"
+          },
+          "hide": false,
+          "metrics": [
+            {
+              "field": "tpm",
+              "id": "1",
+              "settings": {
+                "script": "Integer.parseInt(\"0\"+doc['cnv_version.keyword'].value.replace(\".\",\"\").replace(\"r\",\"\").replace(\"c\",\"\").replace(\"f\",\"\").replace(\"-\",\"\"))"
+              },
+              "type": "max"
+            }
+          ],
+          "query": "_exists_:cnv_version",
+          "refId": "C",
+          "timeField": "timestamp"
+        },
+        {
+          "alias": "kata_version",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "auto"
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "xQGAtZvnk"
+          },
+          "hide": false,
+          "metrics": [
+            {
+              "field": "tpm",
+              "id": "1",
+              "settings": {
+                "script": "Integer.parseInt(doc['kata_version.keyword'].value.replace(\".\",\"\"))"
+              },
+              "type": "max"
+            }
+          ],
+          "query": "_exists_:kata_version",
+          "refId": "D",
+          "timeField": "timestamp"
+        }
+      ],
+      "title": "Product Version Numbers",
+      "type": "state-timeline"
+    },
+    {
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "xQGAtZvnk"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
             "mode": "thresholds"
           },
           "custom": {
@@ -118,9 +359,9 @@
         "h": 28,
         "w": 24,
         "x": 0,
-        "y": 5
+        "y": 11
       },
-      "id": 111,
+      "id": 120,
       "interval": "1d",
       "options": {
         "alignValue": "center",
@@ -252,7 +493,7 @@
         "h": 15,
         "w": 24,
         "x": 0,
-        "y": 33
+        "y": 39
       },
       "id": 115,
       "interval": "1d",
@@ -389,7 +630,7 @@
         "h": 15,
         "w": 24,
         "x": 0,
-        "y": 48
+        "y": 54
       },
       "id": 116,
       "interval": "1d",
@@ -589,7 +830,7 @@
         "h": 5,
         "w": 24,
         "x": 0,
-        "y": 63
+        "y": 69
       },
       "id": 117,
       "interval": "1d",
@@ -705,7 +946,7 @@
         "h": 5,
         "w": 24,
         "x": 0,
-        "y": 68
+        "y": 74
       },
       "id": 119,
       "interval": "1d",
@@ -819,7 +1060,7 @@
         "h": 5,
         "w": 24,
         "x": 0,
-        "y": 73
+        "y": 79
       },
       "id": 118,
       "interval": "1d",
@@ -896,10 +1137,6 @@
           "selected": false,
           "text": "4.8.14",
           "value": "4.8.14"
-        },
-        "datasource": {
-          "type": "elasticsearch",
-          "uid": "xQGAtZvnk"
         },
         "definition": "{\"find\":\"terms\",\"field\":\"ocp_version.keyword\"}",
         "hide": 2,
@@ -1002,13 +1239,13 @@
     ]
   },
   "time": {
-    "from": "2021-12-15T18:43:24.700Z",
-    "to": "2022-01-10T17:45:54.573Z"
+    "from": "now-45d",
+    "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "regression-summary",
   "uid": "T4775LKnzzmichey",
-  "version": 2,
+  "version": 10,
   "weekStart": ""
 }

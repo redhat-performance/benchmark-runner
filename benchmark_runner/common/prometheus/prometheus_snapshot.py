@@ -58,9 +58,6 @@ class PrometheusSnapshot:
     def __exec(self, command: str):
         """
         Run a command on the Prometheus pod (by default)
-        :param pod_name:
-        :param namespace:
-        :param container:
         :param command:
         """
         return self.__oc.exec(pod_name=self.__pod_name, namespace=self.__namespace, container=self.__container, command=command)
