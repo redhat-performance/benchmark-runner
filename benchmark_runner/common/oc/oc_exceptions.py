@@ -103,20 +103,6 @@ class VMNotCompletedTimeout(OCError):
         super(VMNotCompletedTimeout, self).__init__(self.message)
 
 
-class OCPResourceNotCreateTimeout(OCError):
-    """This exception return resource create timeout error"""
-    def __init__(self, resource):
-        self.message = f'The {resource} resource does not created'
-        super(OCPResourceNotCreateTimeout, self).__init__(self.message)
-
-
-class KataInstallationFailed(OCError):
-    """This exception returns failure to install sandboxed containers"""
-    def __init__(self, reason):
-        self.message = f'Installation of sandboxed containers failed: {reason}'
-        super(KataInstallationFailed, self).__init__(self.message)
-
-
 class ExecFailed(OCError):
     """exec command on pod failed"""
     def __init__(self, pod, command, reason):

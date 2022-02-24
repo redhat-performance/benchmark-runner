@@ -203,7 +203,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "ocs_version.keyword"
+              "options": "odf_version.keyword"
             },
             "properties": [
               {
@@ -212,7 +212,7 @@
               },
               {
                 "id": "displayName",
-                "value": "ocs version"
+                "value": "odf version"
               },
               {
                 "id": "custom.filterable"
@@ -237,7 +237,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "ocs_version.keyword"
+              "options": "odf_version.keyword"
             },
             "properties": [
               {
@@ -390,7 +390,7 @@
               "type": "terms"
             },
             {
-              "field": "ocs_version.keyword",
+              "field": "odf_version.keyword",
               "id": "20",
               "settings": {
                 "min_doc_count": "1",

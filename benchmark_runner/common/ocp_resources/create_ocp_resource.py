@@ -1,24 +1,26 @@
 
 import os
 from jinja2 import Template
+
 from benchmark_runner.common.oc.oc import OC
 from benchmark_runner.main.environment_variables import environment_variables
-from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp
+from benchmark_runner.common.ocp_resources.create_local_storage import CreateLocalStorage
+from benchmark_runner.common.ocp_resources.create_odf import CreateODF
+from benchmark_runner.common.ocp_resources.create_kata import CreateKata
+from benchmark_runner.common.ocp_resources.create_cnv import CreateCNV
+from benchmark_runner.common.ocp_resources.create_custom import CreateCustom
 
 
-class CreateOcpResource:
+class CreateOCPResource:
     """
     This class create ocp resources
     """
     def __init__(self):
         self.__dir_path = f'{os.path.dirname(os.path.realpath(__file__))}'
-        self.__environment_variable_dict = environment_variables.environment_variables_dict
-        # In order to load the openshift-sandboxed-containers-operator,
-        # we need to get information from the package manifest to render
-        # the template.  As the template files are rendered here rather
-        # than in oc.py, we need to have that environmental knowledge.
-        oc = OC(kubeadmin_password=self.__environment_variable_dict.get('kubeadmin_password', ''))
-        oc.populate_additional_template_variables(self.__environment_variable_dict)
+        self.__environment_variables_dict = environment_variables.environment_variables_dict
+        self.__oc = OC(kubeadmin_password=self.__environment_variables_dict.get('kubeadmin_password', ''))
+        self.__oc.login()
+        self.__oc.populate_additional_template_variables(self.__environment_variables_dict)
 
     @staticmethod
     def __get_yaml_files(path: str, extensions: list = ['.yaml', '.sh']):
@@ -50,7 +52,7 @@ class CreateOcpResource:
             with open(os.path.join(self.__dir_path, resource, 'template', resource_file)) as f:
                 template_str = f.read()
             tm = Template(template_str)
-            data = tm.render(self.__environment_variable_dict)
+            data = tm.render(self.__environment_variables_dict)
             resource_file = resource_file.replace('_template', '')
             with open(os.path.join(self.__dir_path, resource, resource_file), 'w') as f:
                 f.write(data)
@@ -68,15 +70,21 @@ class CreateOcpResource:
         # remove resource files
         self.remove_resource_files(path=os.path.join(self.__dir_path, resource))
         resource_files = self.get_sorted_resources(resource=resource)
-        oc = OC(kubeadmin_password=self.__environment_variable_dict.get('kubeadmin_password', ''))
-        if 'cnv' == resource:
-            oc.create_cnv(path=os.path.join(self.__dir_path, resource), resource_list=resource_files)
-        elif 'local_storage' == resource:
-            oc.create_local_storage(path=os.path.join(self.__dir_path, resource), resource_list=resource_files)
-        elif 'ocs' == resource:
-            oc.create_ocs(path=os.path.join(self.__dir_path, resource), resource_list=resource_files, ibm_blk_disk_name=ibm_blk_disk_name)
+        if 'local_storage' == resource:
+            self.__create_local_storage = CreateLocalStorage(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files)
+            self.__create_local_storage.create_local_storage()
+        elif 'odf' == resource:
+            self.__create_odf = CreateODF(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files, ibm_blk_disk_name=ibm_blk_disk_name)
+            self.__create_odf.create_odf()
         elif 'kata' == resource:
-            oc.create_kata(path=os.path.join(self.__dir_path, resource), resource_list=resource_files)
-        # remove resource files
+            self.__create_kata = CreateKata(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files)
+            self.__create_kata.create_kata()
+        elif 'cnv' == resource:
+            self.__create_cnv = CreateCNV(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files)
+            self.__create_cnv.create_cnv()
+        elif 'custom' == resource:
+            self.__create_custom = CreateCustom(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files)
+            self.__create_custom.create_custom()
+            # remove resource files
         self.remove_resource_files(path=os.path.join(self.__dir_path, resource))
 

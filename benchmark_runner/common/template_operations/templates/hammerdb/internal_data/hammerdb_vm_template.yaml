@@ -90,8 +90,8 @@ spec:
         extra_options:
           - none
           #- hostpassthrough
-        # OCS PVC
-        pvc: {{ ocs_pvc }} # enable for OCS PVC
+        # ODF PVC
+        pvc: {{ odf_pvc }} # enable for ODF PVC
         pvc_storageclass: ocs-storagecluster-ceph-rbd
         # Can be one of ReadWriteOnce,ReadOnlyMany,ReadWriteMany Default: ReadWriteOnce
         pvc_pvcaccessmode: ReadWriteMany

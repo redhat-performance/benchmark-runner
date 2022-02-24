@@ -51,7 +51,7 @@ Choose one from the following list:
 
 **auto:** NAMESPACE=benchmark-operator [ The default namespace is benchmark-operator ]
 
-**auto:** OCS_PVC=True [ True=OCS PVC storage, False=Ephemeral storage, default True ]
+**auto:** ODF_PVC=True [ True=ODF PVC storage, False=Ephemeral storage, default True ]
 
 **auto:** EXTRACT_PROMETHEUS_SNAPSHOT=True [ True=extract Prometheus snapshot into artifacts, false=don't, default True ]
 

@@ -5,13 +5,13 @@ class BenchmarkOperatorError(Exception):
     pass
 
 
-class OCSNonInstalled(BenchmarkOperatorError):
+class ODFNonInstalled(BenchmarkOperatorError):
     """
-    This class is error that OCS operator is not installed
+    This class is error that ODF operator is not installed
     """
     def __init__(self):
-        self.message = "OCS is not installed, set 'OCS_PVC' to False"
-        super(OCSNonInstalled, self).__init__(self.message)
+        self.message = "ODF is not installed, set 'ODF_PVC' to False"
+        super(ODFNonInstalled, self).__init__(self.message)
 
 
 class SystemMetricsRequiredElasticSearch(BenchmarkOperatorError):

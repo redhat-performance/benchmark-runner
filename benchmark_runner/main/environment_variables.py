@@ -62,10 +62,10 @@ class EnvironmentVariables:
             # TBD if this is not set
             self._environment_variables_dict['namespace'] = 'benchmark-operator'
 
-        # run workload with ocs pvc True/False. True=OCS, False=Ephemeral
-        self._environment_variables_dict['ocs_pvc'] = os.environ.get('OCS_PVC', 'True')
-        # Workloads that required OCS
-        self._environment_variables_dict['workloads_ocs_pvc'] = ['vdbench', 'hammerdb']
+        # run workload with odf pvc True/False. True=ODF, False=Ephemeral
+        self._environment_variables_dict['odf_pvc'] = os.environ.get('ODF_PVC', 'True')
+        # Workloads that required ODF
+        self._environment_variables_dict['workloads_odf_pvc'] = ['vdbench', 'hammerdb']
         # This parameter get from Test_CI.yml file
         self._environment_variables_dict['build_version'] = os.environ.get('BUILD_VERSION', '1.0.0')
         # collect system metrics True/False
@@ -116,7 +116,7 @@ class EnvironmentVariables:
         self._environment_variables_dict['key'] = os.environ.get('IBM_KEY', '')
 
         # Parameters below related to 'install_ocp()'
-        # MANDATORY for OCP install: install ocp version - insert version to install i.e. 'latest-4.8'
+        # MANDATORY for OCP install: install ocp version - insert version to install i.e. 'latest-4.8' : https://mirror.openshift.com/pub/openshift-v4/clients/ocp
         self._environment_variables_dict['install_ocp_version'] = os.environ.get('INSTALL_OCP_VERSION', '')
         # There are 2 steps run_ibm_ocp_ipi_installer/verify_install_complete
         self._environment_variables_dict['install_step'] = os.environ.get('INSTALL_STEP', '')
@@ -130,10 +130,14 @@ class EnvironmentVariables:
         self._environment_variables_dict['install_ocp_resources'] = os.environ.get('INSTALL_OCP_RESOURCES', '')
         # cnv version
         self._environment_variables_dict['cnv_version'] = os.environ.get('CNV_VERSION', '')
-        # ocs version
-        self._environment_variables_dict['ocs_version'] = os.environ.get('OCS_VERSION', '')
-        # number of ocs disk
-        self._environment_variables_dict['num_ocs_disk'] = os.environ.get('NUM_OCS_DISK', 1)
+        # QUAY_USERNAME for nightly build
+        self._environment_variables_dict['quay_username'] = os.environ.get('QUAY_USERNAME', '')
+        # QUAY_PASSWORD for nightly build
+        self._environment_variables_dict['quay_password'] = os.environ.get('QUAY_PASSWORD', '')
+        # odf version
+        self._environment_variables_dict['odf_version'] = os.environ.get('ODF_VERSION', '')
+        # number fo odf disk from ['sdb', 'sdc', 'sdd', 'sde']
+        self._environment_variables_dict['num_odf_disk'] = os.environ.get('NUM_ODF_DISK', 1)
         # install resources list
         self._environment_variables_dict['install_resources_list'] = os.environ.get('INSTALL_RESOURCES_LIST', '')
 

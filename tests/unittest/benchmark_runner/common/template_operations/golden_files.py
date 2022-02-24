@@ -30,10 +30,10 @@ class GoldenFiles:
                 if file.endswith('.yaml'):
                     os.remove(os.path.join(dir, file))
 
-    def __generate_yaml_dir_name(self, run_type: str, workload: str, ocs_pvc: str, dest: str=None):
+    def __generate_yaml_dir_name(self, run_type: str, workload: str, odf_pvc: str, dest: str=None):
         if dest is None:
             dest = self.__file_path
-        return os.path.join(dest, f'{run_type}_{workload}_OCS_PVC_{ocs_pvc}')
+        return os.path.join(dest, f'{run_type}_{workload}_ODF_PVC_{odf_pvc}')
 
     def __copy_yaml_files_to_dir(self, src: str, dest: str):
         if os.path.isdir(dest):
@@ -52,8 +52,8 @@ class GoldenFiles:
         if os.path.isdir(dest):
             shutil.rmtree(dest)
         os.mkdir(dest)
-        for ocs_pvc in 'True', 'False':
-            environment_variables.environment_variables_dict['ocs_pvc'] = ocs_pvc
+        for odf_pvc in 'True', 'False':
+            environment_variables.environment_variables_dict['odf_pvc'] = odf_pvc
             for run_type in environment_variables.run_types_list:
                 environment_variables.environment_variables_dict['run_type'] = run_type
                 for workload in environment_variables.workloads_list:
@@ -61,7 +61,7 @@ class GoldenFiles:
                     template = TemplateOperations(workload)
                     srcdir = template.get_current_run_path()
                     self.__clear_directory_yaml(srcdir)
-                    destdir = self.__generate_yaml_dir_name(run_type=run_type, workload=workload, ocs_pvc=ocs_pvc, dest=dest)
+                    destdir = self.__generate_yaml_dir_name(run_type=run_type, workload=workload, odf_pvc=odf_pvc, dest=dest)
                     template.generate_yamls()
                     self.__copy_yaml_files_to_dir(src=srcdir, dest=destdir)
                     self.__clear_directory_yaml(srcdir)

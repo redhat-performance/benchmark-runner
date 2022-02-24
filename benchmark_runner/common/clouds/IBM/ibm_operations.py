@@ -9,7 +9,7 @@ from enum import Enum
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger, datetime_format
 from benchmark_runner.main.environment_variables import environment_variables
 from benchmark_runner.common.remote_ssh.remote_ssh import ConnectionData, RemoteSsh
-from benchmark_runner.common.ocp_resources.create_ocp_resource import CreateOcpResource
+from benchmark_runner.common.ocp_resources.create_ocp_resource import CreateOCPResource
 from benchmark_runner.common.oc.oc import OC
 from benchmark_runner.common.github.github_operations import GitHubOperations
 from benchmark_runner.common.clouds.IBM.ibm_exceptions import IBMMachineNotLoad, MissingMasterNodes, MissingWorkerNodes, IBMOCPInstallationFailed
@@ -48,7 +48,7 @@ class IBMOperations:
         self.__provision_installer_log = self.__environment_variables_dict.get('provision_installer_log', '')
         self.__install_ocp_version = self.__environment_variables_dict.get('install_ocp_version', '')
         self.__ocp_version_build = self.__environment_variables_dict.get('ocp_version_build', '')
-        self.__num_ocs_disks = int(self.__environment_variables_dict.get('num_ocs_disk', 1))
+        self.__num_odf_disks = int(self.__environment_variables_dict.get('num_odf_disk', 1))
         self.__provision_ip = self.__environment_variables_dict.get('provision_ip', '')
         self.__provision_port = int(self.__environment_variables_dict.get('provision_port', ''))
         self.__provision_timeout = int(self.__environment_variables_dict.get('provision_timeout', ''))
@@ -121,6 +121,13 @@ class IBMOperations:
             current_wait_time += sleep_time
         raise IBMMachineNotLoad()
 
+    def __restart_pod_ci(self):
+        """
+        This method restart pod ci: elastic, kibana, grafana, nginx and flask - solved connectivity issue after installation
+        :return:
+        """
+        self.__remote_ssh.run_command('podman pod restart pod_ci')
+
     def __wait_for_install_complete(self, sleep_time: int = 600):
         """
         This method wait till ocp install complete
@@ -163,7 +170,7 @@ class IBMOperations:
         :return:
         """
         ibm_blk = ['sdb', 'sdc', 'sdd', 'sde']
-        return ibm_blk[:self.__num_ocs_disks]
+        return ibm_blk[:self.__num_odf_disks]
 
     @logger_time_stamp
     def ibm_connect(self):
@@ -242,8 +249,8 @@ class IBMOperations:
             else:
                 logger.info('Installation failed, retry again')
                 raise Exception(f'Installation failed after 3 retries')
-
         else:
+            self.__restart_pod_ci()
             return True
 
     @logger_time_stamp
@@ -282,12 +289,12 @@ class IBMOperations:
     @typechecked
     def install_ocp_resources(resources: list, ibm_blk_disk_name: list = []):
         """
-        This method install OCP resources 'cnv', 'local_storage', 'ocs'
+        This method install OCP resources 'cnv', 'local_storage', 'odf'
         :param ibm_blk_disk_name: ibm blk disk name
         :param resources:
         :return:
         """
-        create_ocp_resource = CreateOcpResource()
+        create_ocp_resource = CreateOCPResource()
         for resource in resources:
             create_ocp_resource.create_resource(resource=resource, ibm_blk_disk_name=ibm_blk_disk_name)
 

@@ -45,7 +45,7 @@ spec:
             value: "Y"
           - name: MSSQL_SA_PASSWORD
             value: "s3curePasswordString"
-        {%- if ocs_pvc == True %}
+        {%- if odf_pvc == True %}
         volumeMounts:
           - name: mssql-persistent-storage
             mountPath: /var/opt/mssql

@@ -6,7 +6,7 @@ import shutil
 from csv import DictReader
 
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp
-from benchmark_runner.workloads.workloads_exceptions import OCSNonInstalled
+from benchmark_runner.workloads.workloads_exceptions import ODFNonInstalled
 from benchmark_runner.common.oc.oc import OC
 from benchmark_runner.common.elasticsearch.elasticsearch_operations import ElasticSearchOperations
 from benchmark_runner.main.environment_variables import environment_variables
@@ -26,8 +26,8 @@ class WorkloadsOperations:
         self._environment_variables_dict = environment_variables.environment_variables_dict
         self._workload = self._environment_variables_dict.get('workload', '')
         self._build_version = self._environment_variables_dict.get('build_version', '')
-        self._workloads_ocs_pvc = list(self._environment_variables_dict.get('workloads_ocs_pvc', ''))
-        self._ocs_pvc = self._environment_variables_dict.get('ocs_pvc', '')
+        self._workloads_odf_pvc = list(self._environment_variables_dict.get('workloads_odf_pvc', ''))
+        self._odf_pvc = self._environment_variables_dict.get('odf_pvc', '')
         self._kubeadmin_password = self._environment_variables_dict.get('kubeadmin_password', '')
         self._run_type = self._environment_variables_dict.get('run_type', '')
         self._trunc_uuid = self._environment_variables_dict.get('trunc_uuid', '')
@@ -109,15 +109,15 @@ class WorkloadsOperations:
                 raise err
             
     @logger_time_stamp
-    def ocs_pvc_verification(self):
+    def odf_pvc_verification(self):
         """
-        This method verified if ocs or pvc is required for workload, raise error in case of missing ocs
+        This method verified if odf or pvc is required for workload, raise error in case of missing odf
         :return:
         """
         workload_name = self._workload.split('_')
-        if self._ocs_pvc == 'True' and workload_name[0] in self._workloads_ocs_pvc:
-            if not self._oc.is_ocs_installed():
-                raise OCSNonInstalled()
+        if self._odf_pvc == 'True' and workload_name[0] in self._workloads_odf_pvc:
+            if not self._oc.is_odf_installed():
+                raise ODFNonInstalled()
 
     def _create_vm_log(self, labels: list) -> str:
         """
@@ -273,7 +273,7 @@ class WorkloadsOperations:
         metadata = {'ocp_version': self._oc.get_ocp_server_version(),
                     'cnv_version': self._oc.get_cnv_version(),
                     'kata_version': self._oc.get_kata_version(),
-                    'ocs_version': self._oc.get_ocs_version(),
+                    'odf_version': self._oc.get_odf_version(),
                     'runner_version': self._build_version,
                     'version': int(self._build_version.split('.')[-1]),
                     'vm_os_version': 'centos8',
@@ -342,7 +342,7 @@ class WorkloadsOperations:
         :return: 
         """
         self.delete_all()
-        self.ocs_pvc_verification()
+        self.odf_pvc_verification()
         self._template.generate_yamls()
         self.start_prometheus()
         

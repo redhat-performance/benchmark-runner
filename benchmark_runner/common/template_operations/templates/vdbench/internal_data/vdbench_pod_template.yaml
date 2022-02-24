@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: {{ namespace }}
-{%- if ocs_pvc == True %}
+{%- if odf_pvc == True %}
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -51,7 +51,7 @@ spec:
       namespace: {{ namespace }}
       image: quay.io/ebattat/centos-stream8-vdbench5.04.07-pod
       imagePullPolicy: "IfNotPresent"
-      {%- if ocs_pvc == True %}
+      {%- if odf_pvc == True %}
       volumeMounts:
         - name: vdbench-pod-pvc-claim
           mountPath: "/workload"
@@ -103,7 +103,7 @@ spec:
       storageClassName: ocs-storagecluster-ceph-rbd
     source:
       blank: {}
-  {%- if ocs_pvc == True %}
+  {%- if odf_pvc == True %}
   volumes:
     - name: vdbench-pod-pvc-claim
       namespace: {{ namespace }}

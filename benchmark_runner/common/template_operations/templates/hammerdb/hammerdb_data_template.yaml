@@ -9,7 +9,7 @@ template_data:
     pin_node1: {{ pin_node1 }}
     pin_node2: {{ pin_node2 }}
     transactions: 100000
-    ocs_pvc: {{ ocs_pvc }}
+    odf_pvc: {{ odf_pvc }}
     resources: true
   run_type:
     perf_ci:

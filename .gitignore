@@ -201,11 +201,14 @@ fabric.properties
 .idea/httpRequests
 
 # custom file configuration
-empty_environment_variables.py
-empty_test_environment_variables.py
-filled_func_environment_variables.py
-filled_perf_environment_variables.py
-install_perf_environment_variables.py
+/benchmark_runner/main/empty_environment_variables.py
+/benchmark_runner/main/empty_test_environment_variables.py
+/benchmark_runner/main/filled_func_environment_variables.py
+/benchmark_runner/main/filled_perf_environment_variables.py
+/benchmark_runner/main/install_perf_environment_variables.py
+/benchmark_runner/main/install_func_environment_variables.py
+/benchmark_runner/main/operator_perf_environment_variables.py
+/benchmark_runner/main/operator_func_environment_variables.py
 /tests/integration/benchmark_runner/empty_test_environment_variables.py
 /tests/integration/benchmark_runner/filled_test_environment_variables.py
 /benchmark_runner/main/key.txt
@@ -213,3 +216,4 @@ install_perf_environment_variables.py
 # Emacs autosave and backup files
 *~
 **/#*#
+

@@ -3,7 +3,7 @@ metadata:
 template_data:
   shared:
     pin_node: {{ pin_node1 }}
-    ocs_pvc: {{ ocs_pvc }}
+    odf_pvc: {{ odf_pvc }}
     uuid: {{ uuid }}
   run_type:
     perf_ci:

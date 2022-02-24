@@ -11,7 +11,7 @@ from benchmark_runner.common.oc.oc import OC
 from benchmark_runner.common.template_operations.template_operations import TemplateOperations
 from benchmark_runner.common.elasticsearch.elasticsearch_operations import ElasticSearchOperations
 from benchmark_runner.common.ssh.ssh import SSH
-from benchmark_runner.benchmark_operator.benchmark_operator_exceptions import OCSNonInstalled, SystemMetricsRequiredElasticSearch
+from benchmark_runner.benchmark_operator.benchmark_operator_exceptions import ODFNonInstalled, SystemMetricsRequiredElasticSearch
 from benchmark_runner.main.environment_variables import environment_variables
 from benchmark_runner.common.clouds.shared.s3.s3_operations import S3Operations
 from benchmark_runner.common.prometheus.prometheus_snapshot import PrometheusSnapshot
@@ -30,8 +30,8 @@ class BenchmarkOperatorWorkloadsOperations:
         self._time_stamp_format = self._environment_variables_dict.get('time_stamp_format', '')
         self._runner_version = self._environment_variables_dict.get('build_version', '')
         self._run_type = self._environment_variables_dict.get('run_type', '')
-        self._workloads_ocs_pvc = list(self._environment_variables_dict.get('workloads_ocs_pvc', ''))
-        self._ocs_pvc = self._environment_variables_dict.get('ocs_pvc', '')
+        self._workloads_odf_pvc = list(self._environment_variables_dict.get('workloads_odf_pvc', ''))
+        self._odf_pvc = self._environment_variables_dict.get('odf_pvc', '')
         self._system_metrics = self._environment_variables_dict.get('system_metrics', '')
         self._elasticsearch = self._environment_variables_dict.get('elasticsearch', '')
         self._run_artifacts = self._environment_variables_dict.get('run_artifacts', '')
@@ -214,7 +214,7 @@ class BenchmarkOperatorWorkloadsOperations:
         metadata = {'ocp_version': self._oc.get_ocp_server_version(),
                     'cnv_version': self._oc.get_cnv_version(),
                     'kata_version': self._oc.get_kata_version(),
-                    'ocs_version': self._oc.get_ocs_version(),
+                    'odf_version': self._oc.get_odf_version(),
                     'runner_version': self._runner_version,
                     'version': int(self._runner_version.split('.')[-1]),
                     'ci_date': datetime.datetime.now().strftime(date_format),
@@ -415,15 +415,15 @@ class BenchmarkOperatorWorkloadsOperations:
                 raise err
 
     @logger_time_stamp
-    def ocs_pvc_verification(self):
+    def odf_pvc_verification(self):
         """
-        This method verified if ocs or pvc is required for workload, raise error in case of missing ocs
+        This method verified if odf or pvc is required for workload, raise error in case of missing odf
         :return:
         """
         workload_name = self._workload.split('_')
-        if self._ocs_pvc == 'True' and workload_name[0] in self._workloads_ocs_pvc:
-            if not self._oc.is_ocs_installed():
-                raise OCSNonInstalled()
+        if self._odf_pvc == 'True' and workload_name[0] in self._workloads_odf_pvc:
+            if not self._oc.is_odf_installed():
+                raise ODFNonInstalled()
 
     @logger_time_stamp
     def delete_all(self):
@@ -446,7 +446,7 @@ class BenchmarkOperatorWorkloadsOperations:
         self.__check_elasticsearch_exist_for_system_metrics()
         # make deploy benchmark controller manager
         self.make_deploy_benchmark_controller_manager(runner_path=environment_variables.environment_variables_dict['runner_path'])
-        self.ocs_pvc_verification()
+        self.odf_pvc_verification()
         self._template.generate_yamls()
         self.start_prometheus()
 
