@@ -20,10 +20,60 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-
+  
+  initialize_nightly:
+    name: initialize perf nightly
+    runs-on: ubuntu-latest
+    outputs:
+      start_time_output: ${{ steps.nightly_start_step.outputs.start_time }}
+    steps:
+      - uses: actions/checkout@v2
+      - id: nightly_start_step
+        run: echo "::set-output name=start_time::$(printf '%(%s)T' -1)"
+      - name: ⚙️ Set SSH key
+        env:
+          PERF_PROVISION_PRIVATE_KEY: ${{ secrets.PERF_PROVISION_PRIVATE_KEY }}
+          RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+          PERF_PROVISION_IP: ${{ secrets.PERF_PROVISION_IP }}
+          PERF_PROVISION_USER: ${{ secrets.PERF_PROVISION_USER }}
+        run: |
+          mkdir -p "$RUNNER_PATH/.ssh/"
+          echo "$PERF_PROVISION_PRIVATE_KEY" > $RUNNER_PATH/private_key.txt
+          sudo chmod 600 $RUNNER_PATH/private_key.txt
+          echo "PERF_PROVISION_PRIVATE_KEY_PATH=$RUNNER_PATH/private_key.txt" >> "$GITHUB_ENV"
+          cat >> "$RUNNER_PATH/.ssh/config" <<END
+          Host provision
+            HostName $PERF_PROVISION_IP
+            User $PERF_PROVISION_USER
+            IdentityFile $RUNNER_PATH/private_key.txt
+            StrictHostKeyChecking no
+            ServerAliveInterval 30
+            ServerAliveCountMax 5
+          END
+      - name: ⚙ Set Kubeconfig
+        env:
+          KUBECONFIG: ${{ secrets.PERF_KUBECONFIG }}
+          RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+        run: |
+          mkdir -p "$RUNNER_PATH/.kube/"
+          echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
+          echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
+      - name: ⚙ Copy config to provision
+        env:
+          CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
+          RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+        run: |
+          echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Remove image on provision  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
+          echo "if [[ \"\$(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)\" != \"\" ]]; then sudo podman rmi -f \$(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null); fi" > "$RUNNER_PATH/remove_image.sh"
+          scp -r "$RUNNER_PATH/remove_image.sh" provision:"/tmp/remove_image.sh"
+          ssh -t provision "chmod +x /tmp/remove_image.sh;/tmp/./remove_image.sh;rm -f /tmp/remove_image.sh"
+          echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Copy config to provision  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
+          scp -r "$RUNNER_PATH/.kube/config" provision:"$CONTAINER_KUBECONFIG_PATH"
+          
   ocp_operator_installation:
     name: OCP Operator Installation
     runs-on: ubuntu-latest
+    needs: [initialize_nightly]
     outputs:
       install_resource_time_output: ${{ steps.ocp_install_resource_step.outputs.install_resource_time }}
     steps:
@@ -78,7 +128,7 @@ jobs:
           build_version="$(cut -d'=' -f2 <<<"$build")"
           start=$(printf '%(%s)T' -1)
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start OCP Resource Install >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
-          podman run --rm -e OCP_ENV_FLAVOR="PERF" -e IBM_API_KEY="$IBM_API_KEY" -e GITHUB_TOKEN="$GITHUB_TOKEN" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e INSTALL_OCP_RESOURCES="True" -e CNV_VERSION="$CNV_VERSION" -e QUAY_USERNAME="$QUAY_USERNAME" -e QUAY_PASSWORD="$QUAY_PASSWORD" -e ODF_VERSION="$ODF_VERSION" -e NUM_ODF_DISK="$NUM_ODF_DISK" -e INSTALL_RESOURCES_LIST="['local_storage', 'odf', 'kata', 'cnv', 'custom']" -e PERF_WORKER_IDS="$PERF_WORKER_IDS" -e PERF_PROVISION_IP="$PERF_PROVISION_IP" -e CONTAINER_PRIVATE_KEY_PATH="$CONTAINER_PRIVATE_KEY_PATH" -e PERF_PROVISION_USER="$PERF_PROVISION_USER" -e PERF_PROVISION_OC_USER="$PERF_PROVISION_OC_USER" -e PERF_PROVISION_PORT="$PERF_PROVISION_PORT" -e GITHUB_REPOSITORY_SHORT="$GITHUB_REPOSITORY_SHORT" -e PERF_PROVISION_TIMEOUT="3600" -e log_level="INFO" -v "$PERF_PROVISION_PRIVATE_KEY_PATH":"$CONTAINER_PRIVATE_KEY_PATH" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+          ssh -t provision "podman run --rm -e OCP_ENV_FLAVOR='PERF' -e IBM_API_KEY='$IBM_API_KEY' -e GITHUB_TOKEN='$GITHUB_TOKEN' -e KUBEADMIN_PASSWORD='$KUBEADMIN_PASSWORD' -e INSTALL_OCP_RESOURCES='True' -e CNV_VERSION='$CNV_VERSION' -e QUAY_USERNAME='$QUAY_USERNAME' -e QUAY_PASSWORD='$QUAY_PASSWORD' -e ODF_VERSION='$ODF_VERSION' -e NUM_ODF_DISK='$NUM_ODF_DISK' -e INSTALL_RESOURCES_LIST='['local_storage', 'odf', 'kata', 'cnv', 'custom']' -e PERF_WORKER_IDS='$PERF_WORKER_IDS' -e PERF_PROVISION_IP='$PERF_PROVISION_IP' -e CONTAINER_PRIVATE_KEY_PATH='$CONTAINER_PRIVATE_KEY_PATH' -e PERF_PROVISION_USER='$PERF_PROVISION_USER' -e PERF_PROVISION_OC_USER='$PERF_PROVISION_OC_USER' -e PERF_PROVISION_PORT='$PERF_PROVISION_PORT' -e GITHUB_REPOSITORY_SHORT='$GITHUB_REPOSITORY_SHORT' -e PERF_PROVISION_TIMEOUT='3600' -e log_level='INFO' -v '$PERF_PROVISION_PRIVATE_KEY_PATH':'$CONTAINER_PRIVATE_KEY_PATH' -v '$KUBECONFIG_PATH':'$CONTAINER_KUBECONFIG_PATH' --privileged 'quay.io/ebattat/benchmark-runner:v$build_version'"
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End OCP Resource Install   >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
           end=$(printf '%(%s)T' -1)
           echo "INSTALL_OCP_RESOURCE_MINUTES_TIME=$(( (( end - start )) / 60))" >> "$GITHUB_ENV"
@@ -108,67 +158,17 @@ jobs:
           build_version="$(cut -d'=' -f2 <<<"$build")"
           start=$(printf '%(%s)T' -1)
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start OCP Resource Install >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
-          podman run --rm -e OCP_ENV_FLAVOR="PERF" -e IBM_API_KEY="$IBM_API_KEY" -e GITHUB_TOKEN="$GITHUB_TOKEN" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e INSTALL_OCP_RESOURCES="True" -e CNV_VERSION="$CNV_VERSION" -e QUAY_USERNAME="$QUAY_USERNAME" -e QUAY_PASSWORD="$QUAY_PASSWORD" -e ODF_VERSION="$ODF_VERSION" -e NUM_ODF_DISK="$NUM_ODF_DISK" -e INSTALL_RESOURCES_LIST="['local_storage', 'odf', 'kata', 'cnv', 'custom']" -e PERF_WORKER_IDS="$PERF_WORKER_IDS" -e PERF_PROVISION_IP="$PERF_PROVISION_IP" -e CONTAINER_PRIVATE_KEY_PATH="$CONTAINER_PRIVATE_KEY_PATH" -e PERF_PROVISION_USER="$PERF_PROVISION_USER" -e PERF_PROVISION_OC_USER="$PERF_PROVISION_OC_USER" -e PERF_PROVISION_PORT="$PERF_PROVISION_PORT" -e GITHUB_REPOSITORY_SHORT="$GITHUB_REPOSITORY_SHORT" -e PERF_PROVISION_TIMEOUT="3600" -e log_level="INFO" -v "$PERF_PROVISION_PRIVATE_KEY_PATH":"$CONTAINER_PRIVATE_KEY_PATH" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+          ssh -t provision "podman run --rm -e OCP_ENV_FLAVOR='PERF' -e IBM_API_KEY='$IBM_API_KEY' -e GITHUB_TOKEN='$GITHUB_TOKEN' -e KUBEADMIN_PASSWORD='$KUBEADMIN_PASSWORD' -e INSTALL_OCP_RESOURCES='True' -e CNV_VERSION='$CNV_VERSION' -e QUAY_USERNAME='$QUAY_USERNAME' -e QUAY_PASSWORD='$QUAY_PASSWORD' -e ODF_VERSION='$ODF_VERSION' -e NUM_ODF_DISK='$NUM_ODF_DISK' -e INSTALL_RESOURCES_LIST='['local_storage', 'odf', 'kata', 'cnv', 'custom']' -e PERF_WORKER_IDS='$PERF_WORKER_IDS' -e PERF_PROVISION_IP='$PERF_PROVISION_IP' -e CONTAINER_PRIVATE_KEY_PATH='$CONTAINER_PRIVATE_KEY_PATH' -e PERF_PROVISION_USER='$PERF_PROVISION_USER' -e PERF_PROVISION_OC_USER='$PERF_PROVISION_OC_USER' -e PERF_PROVISION_PORT='$PERF_PROVISION_PORT' -e GITHUB_REPOSITORY_SHORT='$GITHUB_REPOSITORY_SHORT' -e PERF_PROVISION_TIMEOUT='3600' -e log_level='INFO' -v '$PERF_PROVISION_PRIVATE_KEY_PATH':'$CONTAINER_PRIVATE_KEY_PATH' -v '$KUBECONFIG_PATH':'$CONTAINER_KUBECONFIG_PATH' --privileged 'quay.io/ebattat/benchmark-runner:v$build_version'"
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End OCP Resource Install   >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
           end=$(printf '%(%s)T' -1)
           echo "INSTALL_OCP_RESOURCE_MINUTES_TIME=$(( (( end - start )) / 60))" >> "$GITHUB_ENV"
-
-  initialize_nightly:
-    name: initialize perf nightly
-    runs-on: ubuntu-latest
-    needs: [ocp_operator_installation]
-    outputs:
-      start_time_output: ${{ steps.nightly_start_step.outputs.start_time }}
-    steps:
-      - uses: actions/checkout@v2
-      - id: nightly_start_step
-        run: echo "::set-output name=start_time::$(printf '%(%s)T' -1)"
-      - name: ⚙️ Set SSH key
-        env:
-          PERF_PROVISION_PRIVATE_KEY: ${{ secrets.PERF_PROVISION_PRIVATE_KEY }}
-          RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-          PERF_PROVISION_IP: ${{ secrets.PERF_PROVISION_IP }}
-          PERF_PROVISION_USER: ${{ secrets.PERF_PROVISION_USER }}
-        run: |
-          mkdir -p "$RUNNER_PATH/.ssh/"
-          echo "$PERF_PROVISION_PRIVATE_KEY" > $RUNNER_PATH/private_key.txt
-          sudo chmod 600 $RUNNER_PATH/private_key.txt
-          echo "PERF_PROVISION_PRIVATE_KEY_PATH=$RUNNER_PATH/private_key.txt" >> "$GITHUB_ENV"
-          cat >> "$RUNNER_PATH/.ssh/config" <<END
-          Host provision
-            HostName $PERF_PROVISION_IP
-            User $PERF_PROVISION_USER
-            IdentityFile $RUNNER_PATH/private_key.txt
-            StrictHostKeyChecking no
-            ServerAliveInterval 30
-            ServerAliveCountMax 5
-          END
-      - name: ⚙ Set Kubeconfig
-        env:
-          KUBECONFIG: ${{ secrets.PERF_KUBECONFIG }}
-          RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-        run: |
-          mkdir -p "$RUNNER_PATH/.kube/"
-          echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
-          echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
-      - name: ⚙ Copy config to provision
-        env:
-          CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
-          RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-        run: |
-          echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Remove image on provision  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
-          echo "if [[ \"\$(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)\" != \"\" ]]; then sudo podman rmi -f \$(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null); fi" > "$RUNNER_PATH/remove_image.sh"
-          scp -r "$RUNNER_PATH/remove_image.sh" provision:"/tmp/remove_image.sh"
-          ssh -t provision "chmod +x /tmp/remove_image.sh;/tmp/./remove_image.sh;rm -f /tmp/remove_image.sh"
-          echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Copy config to provision  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
-          scp -r "$RUNNER_PATH/.kube/config" provision:"$CONTAINER_KUBECONFIG_PATH"
 
   workload:
     name: workload
     runs-on: ubuntu-latest
     outputs:
       job_status: ${{ steps.job_step.outputs.status }}
-    needs: initialize_nightly
+    needs: [initialize_nightly, ocp_operator_installation]
     strategy:
       # run one job every time
       max-parallel: 1
@@ -249,7 +249,7 @@ jobs:
     name: finilize nightly
     runs-on: ubuntu-latest
     if: always()
-    needs: [initialize_nightly, workload]
+    needs: [initialize_nightly, ocp_operator_installation, workload]
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python 3.9
