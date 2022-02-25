@@ -123,6 +123,7 @@ jobs:
           CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
           CONTAINER_PRIVATE_KEY_PATH: ${{ secrets.CONTAINER_PRIVATE_KEY_PATH }}
           KUBEADMIN_PASSWORD: ${{ secrets.PERF_KUBEADMIN_PASSWORD }}
+          RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
         run: |
           build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
           build_version="$(cut -d'=' -f2 <<<"$build")"
@@ -154,6 +155,7 @@ jobs:
           CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
           CONTAINER_PRIVATE_KEY_PATH: ${{ secrets.CONTAINER_PRIVATE_KEY_PATH }}
           KUBEADMIN_PASSWORD: ${{ secrets.PERF_KUBEADMIN_PASSWORD }}
+          RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
         if: ${{ failure() }}
         run: |
           build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
