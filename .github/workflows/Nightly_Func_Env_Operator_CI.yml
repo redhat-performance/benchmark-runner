@@ -10,6 +10,7 @@ name: Deploy Operator FUNC Env Nightly CI
 #    types:
 #      - completed
 
+
 on:
   push:
     branches: [ main ]
