@@ -21,102 +21,9 @@ concurrency:
 
 jobs:
 
-  ocp_operator_installation:
-    name: OCP Operator Installation
-    runs-on: ubuntu-latest
-    outputs:
-      install_resource_time_output: ${{ steps.ocp_install_resource_step.outputs.install_resource_time }}
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python 3.9
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.9
-      - name: Install latest benchmark-runner
-        run: |
-          python -m pip install --upgrade pip
-          pip install benchmark-runner
-      - name: ⚙️ Set SSH key
-        env:
-          FUNC_PROVISION_PRIVATE_KEY: ${{ secrets.FUNC_PROVISION_PRIVATE_KEY }}
-          RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-          FUNC_PROVISION_IP: ${{ secrets.FUNC_PROVISION_IP }}
-          FUNC_PROVISION_USER: ${{ secrets.FUNC_PROVISION_USER }}
-        run: |
-          mkdir -p "$RUNNER_PATH/.ssh/"
-          echo "$FUNC_PROVISION_PRIVATE_KEY" > $RUNNER_PATH/private_key.txt
-          sudo chmod 600 $RUNNER_PATH/private_key.txt
-          echo "FUNC_PROVISION_PRIVATE_KEY_PATH=$RUNNER_PATH/private_key.txt" >> "$GITHUB_ENV"
-      - name: ⚙ Set Kubeconfig after OCP installation
-        env:
-          KUBECONFIG: ${{ secrets.FUNC_KUBECONFIG }}
-          RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-        run: |
-          mkdir -p "$RUNNER_PATH/.kube/"
-          echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
-          echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
-      - name: ☉ OCP Operator Reources install
-        env:
-          CNV_VERSION: "4.10"
-          ODF_VERSION: "4.9"
-          NUM_ODF_DISK : "1"
-          QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
-          QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
-          IBM_API_KEY: ${{ secrets.IBM_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
-          FUNC_WORKER_IDS: ${{ secrets.FUNC_WORKER_IDS }}
-          FUNC_PROVISION_IP: ${{ secrets.FUNC_PROVISION_IP }}
-          FUNC_PROVISION_USER: ${{ secrets.FUNC_PROVISION_USER }}
-          FUNC_PROVISION_OC_USER: ${{ secrets.FUNC_PROVISION_OC_USER }}
-          FUNC_PROVISION_PORT: ${{ secrets.FUNC_PROVISION_PORT }}
-          GITHUB_REPOSITORY_SHORT: ${{ secrets.GIT_REPOSITORY_SHORT }}
-          CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
-          CONTAINER_PRIVATE_KEY_PATH: ${{ secrets.CONTAINER_PRIVATE_KEY_PATH }}
-          KUBEADMIN_PASSWORD: ${{ secrets.FUNC_KUBEADMIN_PASSWORD }}
-        run: |
-          build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
-          build_version="$(cut -d'=' -f2 <<<"$build")"
-          start=$(printf '%(%s)T' -1)
-          echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start OCP Resource Install >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
-          podman run --rm -e OCP_ENV_FLAVOR="FUNC" -e IBM_API_KEY="$IBM_API_KEY" -e GITHUB_TOKEN="$GITHUB_TOKEN" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e INSTALL_OCP_RESOURCES="True" -e CNV_VERSION="$CNV_VERSION" -e QUAY_USERNAME="$QUAY_USERNAME" -e QUAY_PASSWORD="$QUAY_PASSWORD" -e ODF_VERSION="$ODF_VERSION" -e NUM_ODF_DISK="$NUM_ODF_DISK" -e INSTALL_RESOURCES_LIST="['local_storage', 'odf', 'kata', 'cnv', 'custom']" -e FUNC_WORKER_IDS="$FUNC_WORKER_IDS" -e FUNC_PROVISION_IP="$FUNC_PROVISION_IP" -e CONTAINER_PRIVATE_KEY_PATH="$CONTAINER_PRIVATE_KEY_PATH" -e FUNC_PROVISION_USER="$FUNC_PROVISION_USER" -e FUNC_PROVISION_OC_USER="$FUNC_PROVISION_OC_USER" -e FUNC_PROVISION_PORT="$FUNC_PROVISION_PORT" -e GITHUB_REPOSITORY_SHORT="$GITHUB_REPOSITORY_SHORT" -e FUNC_PROVISION_TIMEOUT="3600" -e log_level="INFO" -v "$FUNC_PROVISION_PRIVATE_KEY_PATH":"$CONTAINER_PRIVATE_KEY_PATH" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
-          echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End OCP Resource Install   >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
-          end=$(printf '%(%s)T' -1)
-          echo "INSTALL_OCP_RESOURCE_MINUTES_TIME=$(( (( end - start )) / 60))" >> "$GITHUB_ENV"
-      - id: ocp_install_resource_step
-        run: echo "::set-output name=install_resource_time::$INSTALL_OCP_RESOURCE_MINUTES_TIME"
-      - name: ☉ Rerun OCP Operator Reources install after failure
-        env:
-          CNV_VERSION: "4.10"
-          ODF_VERSION: "4.9"
-          NUM_ODF_DISK: "1"
-          QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
-          QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
-          IBM_API_KEY: ${{ secrets.IBM_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
-          FUNC_WORKER_IDS: ${{ secrets.FUNC_WORKER_IDS }}
-          FUNC_PROVISION_IP: ${{ secrets.FUNC_PROVISION_IP }}
-          FUNC_PROVISION_USER: ${{ secrets.FUNC_PROVISION_USER }}
-          FUNC_PROVISION_OC_USER: ${{ secrets.FUNC_PROVISION_OC_USER }}
-          FUNC_PROVISION_PORT: ${{ secrets.FUNC_PROVISION_PORT }}
-          GITHUB_REPOSITORY_SHORT: ${{ secrets.GIT_REPOSITORY_SHORT }}
-          CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
-          CONTAINER_PRIVATE_KEY_PATH: ${{ secrets.CONTAINER_PRIVATE_KEY_PATH }}
-          KUBEADMIN_PASSWORD: ${{ secrets.FUNC_KUBEADMIN_PASSWORD }}
-        if: ${{ failure() }}
-        run: |
-          build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
-          build_version="$(cut -d'=' -f2 <<<"$build")"
-          start=$(printf '%(%s)T' -1)
-          echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start OCP Resource Install >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
-          podman run --rm -e OCP_ENV_FLAVOR="FUNC" -e IBM_API_KEY="$IBM_API_KEY" -e GITHUB_TOKEN="$GITHUB_TOKEN" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e INSTALL_OCP_RESOURCES="True" -e CNV_VERSION="$CNV_VERSION" -e QUAY_USERNAME="$QUAY_USERNAME" -e QUAY_PASSWORD="$QUAY_PASSWORD" -e ODF_VERSION="$ODF_VERSION" -e NUM_ODF_DISK="$NUM_ODF_DISK" -e INSTALL_RESOURCES_LIST="['local_storage', 'odf', 'kata', 'cnv', 'custom']" -e FUNC_WORKER_IDS="$FUNC_WORKER_IDS" -e FUNC_PROVISION_IP="$FUNC_PROVISION_IP" -e CONTAINER_PRIVATE_KEY_PATH="$CONTAINER_PRIVATE_KEY_PATH" -e FUNC_PROVISION_USER="$FUNC_PROVISION_USER" -e FUNC_PROVISION_OC_USER="$FUNC_PROVISION_OC_USER" -e FUNC_PROVISION_PORT="$FUNC_PROVISION_PORT" -e GITHUB_REPOSITORY_SHORT="$GITHUB_REPOSITORY_SHORT" -e FUNC_PROVISION_TIMEOUT="3600" -e log_level="INFO" -v "$FUNC_PROVISION_PRIVATE_KEY_PATH":"$CONTAINER_PRIVATE_KEY_PATH" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
-          echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End OCP Resource Install   >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
-          end=$(printf '%(%s)T' -1)
-          echo "INSTALL_OCP_RESOURCE_MINUTES_TIME=$(( (( end - start )) / 60))" >> "$GITHUB_ENV"
-
   initialize_nightly:
     name: initialize FUNC nightly
     runs-on: ubuntu-latest
-    needs: [ocp_operator_installation]
     outputs:
       start_time_output: ${{ steps.nightly_start_step.outputs.start_time }}
     steps:
@@ -162,6 +69,108 @@ jobs:
           ssh -t provision "chmod +x /tmp/remove_image.sh;/tmp/./remove_image.sh;rm -f /tmp/remove_image.sh"
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Copy config to provision  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
           scp -r "$RUNNER_PATH/.kube/config" provision:"$CONTAINER_KUBECONFIG_PATH"
+
+  ocp_operator_installation:
+    name: OCP Operator Installation
+    runs-on: ubuntu-latest
+    needs: [initialize_nightly]
+    outputs:
+      install_resource_time_output: ${{ steps.ocp_install_resource_step.outputs.install_resource_time }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Install latest benchmark-runner
+        run: |
+          python -m pip install --upgrade pip
+          pip install benchmark-runner
+      - name: ⚙️ Set SSH key
+        env:
+          FUNC_PROVISION_PRIVATE_KEY: ${{ secrets.FUNC_PROVISION_PRIVATE_KEY }}
+          RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+          FUNC_PROVISION_IP: ${{ secrets.FUNC_PROVISION_IP }}
+          FUNC_PROVISION_USER: ${{ secrets.FUNC_PROVISION_USER }}
+        run: |
+          mkdir -p "$RUNNER_PATH/.ssh/"
+          echo "$FUNC_PROVISION_PRIVATE_KEY" > $RUNNER_PATH/private_key.txt
+          sudo chmod 600 $RUNNER_PATH/private_key.txt
+          echo "FUNC_PROVISION_PRIVATE_KEY_PATH=$RUNNER_PATH/private_key.txt" >> "$GITHUB_ENV"
+          cat >> "$RUNNER_PATH/.ssh/config" <<END
+          Host provision
+            HostName $FUNC_PROVISION_IP
+            User $FUNC_PROVISION_USER
+            IdentityFile $RUNNER_PATH/private_key.txt
+            StrictHostKeyChecking no
+            ServerAliveInterval 30
+            ServerAliveCountMax 5
+          END
+      - name: ⚙ Set Kubeconfig after OCP installation
+        env:
+          KUBECONFIG: ${{ secrets.FUNC_KUBECONFIG }}
+          RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+        run: |
+          mkdir -p "$RUNNER_PATH/.kube/"
+          echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
+          echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
+      - name: ☉ OCP Operator Reources install
+        env:
+          CNV_VERSION: "4.10"
+          ODF_VERSION: "4.9"
+          NUM_ODF_DISK : "1"
+          QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
+          QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
+          IBM_API_KEY: ${{ secrets.IBM_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+          FUNC_WORKER_IDS: ${{ secrets.FUNC_WORKER_IDS }}
+          FUNC_PROVISION_IP: ${{ secrets.FUNC_PROVISION_IP }}
+          FUNC_PROVISION_USER: ${{ secrets.FUNC_PROVISION_USER }}
+          FUNC_PROVISION_OC_USER: ${{ secrets.FUNC_PROVISION_OC_USER }}
+          FUNC_PROVISION_PORT: ${{ secrets.FUNC_PROVISION_PORT }}
+          GITHUB_REPOSITORY_SHORT: ${{ secrets.GIT_REPOSITORY_SHORT }}
+          CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
+          CONTAINER_PRIVATE_KEY_PATH: ${{ secrets.CONTAINER_PRIVATE_KEY_PATH }}
+          KUBEADMIN_PASSWORD: ${{ secrets.FUNC_KUBEADMIN_PASSWORD }}
+        run: |
+          build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
+          build_version="$(cut -d'=' -f2 <<<"$build")"
+          start=$(printf '%(%s)T' -1)
+          echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start OCP Resource Install >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
+          ssh -t provision "podman run --rm -e OCP_ENV_FLAVOR='FUNC' -e IBM_API_KEY='$IBM_API_KEY' -e GITHUB_TOKEN='$GITHUB_TOKEN' -e KUBEADMIN_PASSWORD='$KUBEADMIN_PASSWORD' -e INSTALL_OCP_RESOURCES='True' -e CNV_VERSION='$CNV_VERSION' -e QUAY_USERNAME='$QUAY_USERNAME' -e QUAY_PASSWORD='$QUAY_PASSWORD' -e ODF_VERSION='$ODF_VERSION' -e NUM_ODF_DISK='$NUM_ODF_DISK' -e INSTALL_RESOURCES_LIST='['local_storage', 'odf', 'kata', 'cnv', 'custom']' -e FUNC_WORKER_IDS='$FUNC_WORKER_IDS' -e FUNC_PROVISION_IP='$FUNC_PROVISION_IP' -e CONTAINER_PRIVATE_KEY_PATH='$CONTAINER_PRIVATE_KEY_PATH' -e FUNC_PROVISION_USER='$FUNC_PROVISION_USER' -e FUNC_PROVISION_OC_USER='$FUNC_PROVISION_OC_USER' -e FUNC_PROVISION_PORT='$FUNC_PROVISION_PORT' -e GITHUB_REPOSITORY_SHORT='$GITHUB_REPOSITORY_SHORT' -e FUNC_PROVISION_TIMEOUT='3600' -e log_level='INFO' -v '$FUNC_PROVISION_PRIVATE_KEY_PATH':'$CONTAINER_PRIVATE_KEY_PATH' -v '$KUBECONFIG_PATH':'$CONTAINER_KUBECONFIG_PATH' --privileged 'quay.io/ebattat/benchmark-runner:v$build_version'"
+          echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End OCP Resource Install   >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
+          end=$(printf '%(%s)T' -1)
+          echo "INSTALL_OCP_RESOURCE_MINUTES_TIME=$(( (( end - start )) / 60))" >> "$GITHUB_ENV"
+      - id: ocp_install_resource_step
+        run: echo "::set-output name=install_resource_time::$INSTALL_OCP_RESOURCE_MINUTES_TIME"
+      - name: ☉ Rerun OCP Operator Reources install after failure
+        env:
+          CNV_VERSION: "4.10"
+          ODF_VERSION: "4.9"
+          NUM_ODF_DISK: "1"
+          QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
+          QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
+          IBM_API_KEY: ${{ secrets.IBM_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+          FUNC_WORKER_IDS: ${{ secrets.FUNC_WORKER_IDS }}
+          FUNC_PROVISION_IP: ${{ secrets.FUNC_PROVISION_IP }}
+          FUNC_PROVISION_USER: ${{ secrets.FUNC_PROVISION_USER }}
+          FUNC_PROVISION_OC_USER: ${{ secrets.FUNC_PROVISION_OC_USER }}
+          FUNC_PROVISION_PORT: ${{ secrets.FUNC_PROVISION_PORT }}
+          GITHUB_REPOSITORY_SHORT: ${{ secrets.GIT_REPOSITORY_SHORT }}
+          CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
+          CONTAINER_PRIVATE_KEY_PATH: ${{ secrets.CONTAINER_PRIVATE_KEY_PATH }}
+          KUBEADMIN_PASSWORD: ${{ secrets.FUNC_KUBEADMIN_PASSWORD }}
+        if: ${{ failure() }}
+        run: |
+          build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
+          build_version="$(cut -d'=' -f2 <<<"$build")"
+          start=$(printf '%(%s)T' -1)
+          echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start OCP Resource Install >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
+          ssh -t provision "podman run --rm -e OCP_ENV_FLAVOR='FUNC' -e IBM_API_KEY='$IBM_API_KEY' -e GITHUB_TOKEN='$GITHUB_TOKEN' -e KUBEADMIN_PASSWORD='$KUBEADMIN_PASSWORD' -e INSTALL_OCP_RESOURCES='True' -e CNV_VERSION='$CNV_VERSION' -e QUAY_USERNAME='$QUAY_USERNAME' -e QUAY_PASSWORD='$QUAY_PASSWORD' -e ODF_VERSION='$ODF_VERSION' -e NUM_ODF_DISK='$NUM_ODF_DISK' -e INSTALL_RESOURCES_LIST='['local_storage', 'odf', 'kata', 'cnv', 'custom']' -e FUNC_WORKER_IDS='$FUNC_WORKER_IDS' -e FUNC_PROVISION_IP='$FUNC_PROVISION_IP' -e CONTAINER_PRIVATE_KEY_PATH='$CONTAINER_PRIVATE_KEY_PATH' -e FUNC_PROVISION_USER='$FUNC_PROVISION_USER' -e FUNC_PROVISION_OC_USER='$FUNC_PROVISION_OC_USER' -e FUNC_PROVISION_PORT='$FUNC_PROVISION_PORT' -e GITHUB_REPOSITORY_SHORT='$GITHUB_REPOSITORY_SHORT' -e FUNC_PROVISION_TIMEOUT='3600' -e log_level='INFO' -v '$FUNC_PROVISION_PRIVATE_KEY_PATH':'$CONTAINER_PRIVATE_KEY_PATH' -v '$KUBECONFIG_PATH':'$CONTAINER_KUBECONFIG_PATH' --privileged 'quay.io/ebattat/benchmark-runner:v$build_version'"
+          echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End OCP Resource Install   >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
+          end=$(printf '%(%s)T' -1)
+          echo "INSTALL_OCP_RESOURCE_MINUTES_TIME=$(( (( end - start )) / 60))" >> "$GITHUB_ENV"
 
   workload:
     name: workload
@@ -262,26 +271,6 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install benchmark-runner
-      - name: ⚙️ Set SSH key
-        env:
-          FUNC_PROVISION_PRIVATE_KEY: ${{ secrets.FUNC_PROVISION_PRIVATE_KEY }}
-          RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-          FUNC_PROVISION_IP: ${{ secrets.FUNC_PROVISION_IP }}
-          FUNC_PROVISION_USER: ${{ secrets.FUNC_PROVISION_USER }}
-        run: |
-          mkdir -p "$RUNNER_PATH/.ssh/"
-          echo "$FUNC_PROVISION_PRIVATE_KEY" > $RUNNER_PATH/private_key.txt
-          sudo chmod 600 $RUNNER_PATH/private_key.txt
-          echo "FUNC_PROVISION_PRIVATE_KEY_PATH=$RUNNER_PATH/private_key.txt" >> "$GITHUB_ENV"
-          cat >> "$RUNNER_PATH/.ssh/config" <<END
-          Host provision
-            HostName $FUNC_PROVISION_IP
-            User $FUNC_PROVISION_USER
-            IdentityFile $RUNNER_PATH/private_key.txt
-            StrictHostKeyChecking no
-            ServerAliveInterval 30
-            ServerAliveCountMax 5
-          END
       - name: ⚙ Set Kubeconfig
         env:
           KUBECONFIG: ${{ secrets.FUNC_KUBECONFIG }}
