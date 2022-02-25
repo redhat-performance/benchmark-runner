@@ -8,7 +8,7 @@ class OCError(Exception):
 class OCPResourceNotCreateTimeout(OCError):
     """This exception return resource create timeout error"""
     def __init__(self, resource):
-        self.message = f'The {resource} resource does not created'
+        self.message = f'The {resource} resource was not created'
         super(OCPResourceNotCreateTimeout, self).__init__(self.message)
 
 
