@@ -12,7 +12,6 @@ Run dnf group install -y "Development Tools"
 # install podman and jq
 Run dnf config-manager --set-enabled powertools \
     && dnf install -y @container-tools \
-    && dnf install -y @container-tools \
     && dnf install -y jq
 
 # install python 3.9 - take several minutes
