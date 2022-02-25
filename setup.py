@@ -4,7 +4,8 @@ from os import path
 from setuptools import setup, find_packages
 
 
-__version__ = '1.0.160'
+__version__ = '1.0.302'
+
 
 here = path.abspath(path.dirname(__file__))
 
@@ -39,18 +40,22 @@ setup(
 
     install_requires=[
         'typing==3.7.4.3',
-        'elasticsearch==7.13.2',
-        'elasticsearch_dsl==7.3.0',  # for deep search
+        'elasticsearch==7.16.1',
+        'elasticsearch_dsl==7.4.0',  # for deep search
         'pandas',  # required latest
-        'jinja2==3.0.1',
+        'jinja2==3.0.3',
         'typeguard==2.12.1',
-        'PyYAML==5.4.1',
+        'PyYAML==6.0',
         'azure==4.0.0',
         'paramiko==2.8.0',
         'tenacity==8.0.1',  # retry decorator
         'PyGitHub==1.55',  # update secrets
-        'myst-parser==0.15.2'  # readthedocs
-        # add new package inside requirements.txt
+        'myst-parser==0.16.0',  # readthedocs
+        'boto3==1.20.24',  # s3
+        'botocore==1.23.24',  # s3
+        "sphinx==4.0.2",  # readthedocs
+        "sphinx_rtd_theme==0.4.3",  # readthedocs
+        # must add new package inside requirements.txt
     ],
 
     setup_requires=['pytest', 'pytest-runner', 'wheel', 'coverage'],

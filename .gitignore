@@ -51,6 +51,8 @@ tests/results.xml
 */tests/results.xml
 results.xml
 
+#Runtime
+**/current_run/
 
 # Translations
 *.mo
@@ -199,6 +201,19 @@ fabric.properties
 .idea/httpRequests
 
 # custom file configuration
-empty_environment_variables.py
-filled_environment_variables.py
-key.txt
+/benchmark_runner/main/empty_environment_variables.py
+/benchmark_runner/main/empty_test_environment_variables.py
+/benchmark_runner/main/filled_func_environment_variables.py
+/benchmark_runner/main/filled_perf_environment_variables.py
+/benchmark_runner/main/install_perf_environment_variables.py
+/benchmark_runner/main/install_func_environment_variables.py
+/benchmark_runner/main/operator_perf_environment_variables.py
+/benchmark_runner/main/operator_func_environment_variables.py
+/tests/integration/benchmark_runner/empty_test_environment_variables.py
+/tests/integration/benchmark_runner/filled_test_environment_variables.py
+/benchmark_runner/main/key.txt
+
+# Emacs autosave and backup files
+*~
+**/#*#
+

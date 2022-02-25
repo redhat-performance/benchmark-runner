@@ -1,0 +1,87 @@
+apiVersion: ripsaw.cloudbulldozer.io/v1alpha1
+kind: Benchmark
+metadata:
+ name: uperf-vm
+ namespace: {{ namespace }}
+spec:
+ clustername: test-cluster
+ test_user: user # user is a key that points to user triggering benchmark-operator, useful to search results in ES
+ system_metrics:
+    collection: {{ system_metrics }}
+    prom_url: "{{ prom_url }}"
+    es_url: "{{ es_url }}"
+    prom_token: "{{ prom_token }}"
+    metrics_profile: "{{ metrics_profile }}"
+    index_name: {{ sm_index_name }}
+ elasticsearch:
+    url: "{{ es_url }}"
+    index_name: {{ es_index_name }}
+ metadata:
+   collection: false
+ cleanup: false
+ workload:
+   name: uperf
+   args:
+     hostnetwork: false # irrelevant for vms
+     serviceip: false # irrelevant for vms
+     networkpolicy: {{ networkpolicy }}
+     pin: {{ pin }}
+     pin_server: "{{ pin_server }}"
+     pin_client: "{{ pin_client }}"
+     samples: {{ samples }}
+     pair: {{ pair }}
+     test_types:
+       {%- for test_type in test_types %}
+       - {{ test_type -}}
+       {% endfor %}
+     protos:
+       {%- for proto in protos %}
+       - {{ proto -}}
+       {% endfor %}
+     sizes:
+       {%- for size in sizes %}
+       - {{ size -}}
+       {% endfor %}
+     nthrs:
+       {%- for nthr in nthrs %}
+       - {{ nthr -}}
+       {% endfor %}
+     runtime: {{ runtime }}
+     kind: vm
+     server_vm:
+       dedicatedcpuplacement: false
+       sockets: {{ sockets }}
+       cores: {{ cores }}
+       threads: 1
+       image: quay.io/kubevirt/fedora-container-disk-images:34
+       limits:
+         memory: {{ limits_memory }}
+       requests:
+         memory: {{ requests_memory }}
+       network:
+         front_end: masquerade
+         multiqueue:
+           enabled: true
+           queues: {{ net_queues }} # must be given if enabled is set to true and ideally should be set to vcpus ideally so sockets*threads*cores, your image must've ethtool installed
+       extra_options:
+         - none
+         #- hostpassthrough
+     client_vm:
+       dedicatedcpuplacement: false
+       sockets: {{ sockets }}
+       cores: {{ cores }}
+       threads: 1
+       image: quay.io/kubevirt/fedora-container-disk-images:34
+       limits:
+         memory: {{ limits_memory }}
+       requests:
+         memory: {{ requests_memory }}
+       network:
+         front_end: masquerade
+         multiqueue:
+           enabled: true
+           queues: {{ net_queues }} # must be given if enabled is set to true and ideally should be set to vcpus ideally so sockets*threads*cores, your image must've ethtool installed
+       extra_options:
+         - none
+         #- hostpassthrough
+

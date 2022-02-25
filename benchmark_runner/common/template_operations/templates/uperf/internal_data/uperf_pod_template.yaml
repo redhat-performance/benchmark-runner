@@ -1,0 +1,67 @@
+apiVersion: ripsaw.cloudbulldozer.io/v1alpha1
+kind: Benchmark
+metadata:
+  name: uperf-{{ kind }}
+  namespace: {{ namespace }}
+spec:
+  system_metrics:
+    collection: {{ system_metrics }}
+    prom_url: "{{ prom_url }}"
+    es_url: "{{ es_url }}"
+    prom_token: "{{ prom_token }}"
+    metrics_profile: "{{ metrics_profile }}"
+    index_name: {{ sm_index_name }}
+  elasticsearch:
+    url: "{{ es_url }}"
+    index_name: {{ es_index_name }}
+  metadata:
+    collection: true
+  cleanup: false
+  workload:
+    name: uperf
+    args:
+      client_resources:
+        requests:
+          cpu: {{ requests_cpu }}
+          memory: {{ requests_memory }}
+        limits:
+          cpu: {{ limits_cpu }}
+          memory: {{ limits_memory }}
+      server_resources:
+        requests:
+          cpu: {{ requests_cpu }}
+          memory: {{ requests_memory }}
+        limits:
+          cpu: {{ limits_cpu }}
+          memory: {{ limits_memory }}
+      pin: {{ pin }}
+      pin_server: "{{ pin_server }}"
+      pin_client: "{{ pin_client }}"
+      serviceip: {{ serviceip }}
+      hostnetwork: {{ hostnetwork }}
+      networkpolicy: {{ networkpolicy }}
+      multus:
+        enabled: {{ multus }}
+      samples: {{ samples }}
+      pair: {{ pair }}
+      test_types:
+        {%- for test_type in test_types %}
+        - {{ test_type -}}
+        {% endfor %}
+      protos:
+        {%- for proto in protos %}
+        - {{ proto -}}
+        {% endfor %}
+      sizes:
+        {%- for size in sizes %}
+        - {{ size -}}
+        {% endfor %}
+      nthrs:
+        {%- for nthr in nthrs %}
+        - {{ nthr -}}
+        {% endfor %}
+      runtime: {{ runtime }}
+      {%- if kind == 'kata' %}
+      runtime_class: kata
+      {%- endif %}
+      kind: pod

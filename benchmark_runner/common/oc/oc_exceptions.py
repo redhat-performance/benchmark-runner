@@ -103,8 +103,15 @@ class VMNotCompletedTimeout(OCError):
         super(VMNotCompletedTimeout, self).__init__(self.message)
 
 
-class OCPResourceNotCreateTimeout(OCError):
-    """This exception return resource create timeout error"""
-    def __init__(self, resource):
-        self.message = f'The {resource} resource does not created'
-        super(OCPResourceNotCreateTimeout, self).__init__(self.message)
+class ExecFailed(OCError):
+    """exec command on pod failed"""
+    def __init__(self, pod, command, reason):
+        self.message = f'exec {command} on {pod} failed: {reason}'
+        super(ExecFailed, self).__init__(self.message)
+
+
+class PodFailed(OCError):
+    """exec command on pod failed"""
+    def __init__(self, pod):
+        self.message = f'pod {pod} failed'
+        super(PodFailed, self).__init__(self.message)

@@ -1,0 +1,38 @@
+metadata:
+  name: stressng
+template_data:
+  shared:
+    pin_node: {{ pin_node1 }}
+    runtype: parallel
+    instances: 1
+    # cpu stressor options
+    cpu_percentage: 100
+    # vm stressor option
+    vm_stressors: 1
+    # mem stressor options
+    mem_stressors: 1
+    resources: true
+  run_type:
+    perf_ci:
+      timeout: 300
+      cpu_stressors: 60
+      vm_bytes: 60G
+      limits_cpu: 60
+      limits_memory: 75Gi
+      requests_cpu: 60
+      requests_memory: 75Gi
+    default:
+      timeout: 30
+      cpu_stressors: 1
+      vm_bytes: 128M
+      limits_cpu: 4
+      limits_memory: 16Gi
+      requests_cpu: 10m
+      requests_memory: 10Mi
+  kind:
+    vm:
+      run_type:
+        perf_ci:
+          sockets: 60
+        default:
+          sockets: 4

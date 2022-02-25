@@ -1,18 +1,19 @@
 
-from datetime import time, datetime
+import time
+from datetime import datetime
 from typeguard import typechecked
 from tenacity import retry, stop_after_attempt
 import ast  # change string list to list
 from enum import Enum
-import pathlib
 
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger, datetime_format
 from benchmark_runner.main.environment_variables import environment_variables
 from benchmark_runner.common.remote_ssh.remote_ssh import ConnectionData, RemoteSsh
-from benchmark_runner.common.ocp_resources.create_ocp_resource import CreateOcpResource
+from benchmark_runner.common.ocp_resources.create_ocp_resource import CreateOCPResource
 from benchmark_runner.common.oc.oc import OC
 from benchmark_runner.common.github.github_operations import GitHubOperations
-from benchmark_runner.common.clouds.IBM.ibm_exceptions import IBMMachineNotLoad, MissingMasterNodes, MissingWorkerNodes
+from benchmark_runner.common.clouds.IBM.ibm_exceptions import IBMMachineNotLoad, MissingMasterNodes, MissingWorkerNodes, IBMOCPInstallationFailed
+from benchmark_runner.common.ssh.ssh import SSH
 
 
 class Actions(Enum):
@@ -33,6 +34,7 @@ class IBMOperations:
     def __init__(self, user: str):
         self.__environment_variables_dict = environment_variables.environment_variables_dict
         self.__ibm_api_key = self.__environment_variables_dict.get('ibm_api_key', '')
+        self.__user = user
         self.__ibm_oc_user = self.__environment_variables_dict.get('provision_oc_user', '')
         self.__ibm_worker_ids = self.__environment_variables_dict.get('worker_ids', '')
         self.__ocp_env_flavor = self.__environment_variables_dict.get('ocp_env_flavor', '')
@@ -42,20 +44,23 @@ class IBMOperations:
         self.__provision_kubeadmin_password_path = self.__environment_variables_dict.get('provision_kubeadmin_password_path', '')
         self.__provision_kubeconfig_path = self.__environment_variables_dict.get('provision_kubeconfig_path', '')
         self.__provision_installer_path = self.__environment_variables_dict.get('provision_installer_path', '')
-        self.__installer_path = pathlib.Path(self.__provision_installer_path).parent.resolve()
         self.__provision_installer_cmd = self.__environment_variables_dict.get('provision_installer_cmd', '')
+        self.__provision_installer_log = self.__environment_variables_dict.get('provision_installer_log', '')
         self.__install_ocp_version = self.__environment_variables_dict.get('install_ocp_version', '')
         self.__ocp_version_build = self.__environment_variables_dict.get('ocp_version_build', '')
-        self.__num_ocs_disks = int(self.__environment_variables_dict.get('num_ocs_disk', 1))
-        self.__ssh_key= self.__environment_variables_dict.get('container_private_key_path', '')
-        self.__connection_data = ConnectionData(host_name=self.__environment_variables_dict.get('provision_ip', ''),
-                                                user_name=user,
-                                                port=int(self.__environment_variables_dict.get('provision_port', '')),
-                                                timeout=int(
-                                                    self.__environment_variables_dict.get('provision_timeout', '')),
-                                                ssh_key=self.__environment_variables_dict.get('container_private_key_path', ''))
+        self.__num_odf_disks = int(self.__environment_variables_dict.get('num_odf_disk', 1))
+        self.__provision_ip = self.__environment_variables_dict.get('provision_ip', '')
+        self.__provision_port = int(self.__environment_variables_dict.get('provision_port', ''))
+        self.__provision_timeout = int(self.__environment_variables_dict.get('provision_timeout', ''))
+        self.__container_private_key_path = self.__environment_variables_dict.get('container_private_key_path', '')
+        self.__connection_data = ConnectionData(host_name=self.__provision_ip,
+                                                user_name=self.__user,
+                                                port=self.__provision_port,
+                                                timeout=self.__provision_timeout,
+                                                ssh_key=self.__container_private_key_path)
         self.__remote_ssh = RemoteSsh(self.__connection_data)
         self.__github_operations = GitHubOperations()
+        self.__ssh = SSH()
 
     def __get_kubeadmin_password(self):
         """
@@ -78,7 +83,7 @@ class IBMOperations:
         This method return ibm login command
         :return:
         """
-        return f'ibmcloud login --apikey {self.__ibm_api_key}'
+        return f'ibmcloud login --apikey {self.__ibm_api_key} 1>/dev/null 2>&1'
 
     # private method: machine id
     def __get_ibm_machine_status(self, machine_id: str):
@@ -116,6 +121,32 @@ class IBMOperations:
             current_wait_time += sleep_time
         raise IBMMachineNotLoad()
 
+    def __restart_pod_ci(self):
+        """
+        This method restart pod ci: elastic, kibana, grafana, nginx and flask - solved connectivity issue after installation
+        :return:
+        """
+        self.__remote_ssh.run_command('podman pod restart pod_ci')
+
+    def __wait_for_install_complete(self, sleep_time: int = 600):
+        """
+        This method wait till ocp install complete
+        :param sleep_time:
+        :return:
+        """
+        current_wait_time = 0
+        while current_wait_time <= self.__provision_timeout:
+            install_log = self.__remote_ssh.run_command(self.__provision_installer_log)
+            if 'Install complete!' in install_log:
+                return True
+            elif 'level=error' in install_log:
+                return False
+            logger.info(f'Waiting till OCP install complete, waiting {int(current_wait_time/60)} minutes')
+            # sleep for x seconds
+            time.sleep(sleep_time)
+            current_wait_time += sleep_time
+        raise IBMOCPInstallationFailed()
+
     @staticmethod
     def __ibm_logout_cmd():
         """
@@ -139,7 +170,7 @@ class IBMOperations:
         :return:
         """
         ibm_blk = ['sdb', 'sdc', 'sdd', 'sde']
-        return ibm_blk[:self.__num_ocs_disks]
+        return ibm_blk[:self.__num_odf_disks]
 
     @logger_time_stamp
     def ibm_connect(self):
@@ -173,18 +204,33 @@ class IBMOperations:
                                             value=f'"{self.__ocp_version_build}"')
 
     @logger_time_stamp
-    @retry(stop=stop_after_attempt(3))
     def run_ibm_ocp_ipi_installer(self):
         """
         This method run ocp ipi installer with retry mechanism
         :return: True if installation success and raise exception if installation failed
         """
-        logger.info(f'IBM Login, Start time: {datetime.now().strftime(datetime_format)}')
-        result = self.__remote_ssh.run_command(self.__ibm_login_cmd())
         logger.info(f'Starting OCP IPI installer, Start time: {datetime.now().strftime(datetime_format)}')
-        result = self.__remote_ssh.run_command(self.__ibm_ipi_install_ocp_cmd())
-        logger.info(f'Ending OCP IPI installer, Start time: {datetime.now().strftime(datetime_format)}')
-        if 'failed=1' in result:
+        # update ssh config - must add it and also mount it
+        self.__ssh.run(f"echo Host provision >> /{self.__user}/.ssh/config")
+        self.__ssh.run(f"echo -e '\t'HostName {self.__provision_ip} >> /{self.__user}/.ssh/config")
+        self.__ssh.run(f"echo -e '\t'User {self.__user} >> /{self.__user}/.ssh/config")
+        self.__ssh.run(f"echo -e '\t'IdentityFile {self.__container_private_key_path} >> /{self.__user}/.ssh/config")
+        self.__ssh.run(f"echo -e '\t'StrictHostKeyChecking no >> /{self.__user}/.ssh/config")
+        self.__ssh.run(f"echo -e '\t'ServerAliveInterval 30 >> /{self.__user}/.ssh/config")
+        self.__ssh.run(f"echo -e '\t'ServerAliveCountMax 5 >> /{self.__user}/.ssh/config")
+        self.__ssh.run(f"chmod 600 /{self.__user}/.ssh/config")
+        # Must add -t otherwise remote ssh of ansible will not end
+        self.__ssh.run(cmd=f"ssh -t provision \"{self.__ibm_login_cmd()};{self.__ibm_ipi_install_ocp_cmd()}\" ")
+        logger.info(f'End OCP IPI installer, End time: {datetime.now().strftime(datetime_format)}')
+
+    @logger_time_stamp
+    def verify_install_complete(self):
+        """
+        This verify that install complete
+        :return: True if installation success and raise exception if installation failed
+        """
+        complete = self.__wait_for_install_complete()
+        if not complete:
             # Workers issue: workaround for solving IBM workers stuck on BIOS page after reboot
             logger.info('Installation failed, checking worker nodes status')
             # Check if first worker is down
@@ -203,8 +249,8 @@ class IBMOperations:
             else:
                 logger.info('Installation failed, retry again')
                 raise Exception(f'Installation failed after 3 retries')
-
         else:
+            self.__restart_pod_ci()
             return True
 
     @logger_time_stamp
@@ -229,11 +275,12 @@ class IBMOperations:
             logger.info('master nodes are up and running')
             if self.__ocp_env_flavor == 'PERF':
                 worker_nodes = oc.get_worker_nodes()
-                # In perf we have more than 1 worker
-                if len(worker_nodes.split()) >= 1:
-                    logger.info('worker nodes are up and running')
-                else:
-                    raise MissingWorkerNodes()
+                # if there are worker nodes, they must be 3
+                if len(worker_nodes.split()) > 1:
+                    if len(worker_nodes.split()) == 3:
+                        logger.info('worker nodes are up and running')
+                    else:
+                        raise MissingWorkerNodes()
         else:
             raise MissingMasterNodes()
 
@@ -242,12 +289,12 @@ class IBMOperations:
     @typechecked
     def install_ocp_resources(resources: list, ibm_blk_disk_name: list = []):
         """
-        This method install OCP resources 'cnv', 'local_storage', 'ocs'
+        This method install OCP resources 'cnv', 'local_storage', 'odf'
         :param ibm_blk_disk_name: ibm blk disk name
         :param resources:
         :return:
         """
-        create_ocp_resource = CreateOcpResource()
+        create_ocp_resource = CreateOCPResource()
         for resource in resources:
             create_ocp_resource.create_resource(resource=resource, ibm_blk_disk_name=ibm_blk_disk_name)
 
@@ -260,3 +307,13 @@ class IBMOperations:
         self.__github_operations.create_secret(secret_name=f'{self.__ocp_env_flavor}_KUBECONFIG', unencrypted_value=self.__get_kubeconfig())
         self.__github_operations.create_secret(secret_name=f'{self.__ocp_env_flavor}_KUBEADMIN_PASSWORD',
                                                 unencrypted_value=self.__get_kubeadmin_password())
+
+    def get_ocp_install_time(self):
+        """
+        This method return install time
+        :param self:
+        :return:
+        """
+        install_log = self.__remote_ssh.run_command(self.__provision_installer_log)
+        return install_log.split()[-1].strip('"')
+

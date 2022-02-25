@@ -9,11 +9,10 @@ on Kubernetes/OpenShift Pod or VM.
 
 This tool support the following workloads:
 
-* [hammerdb](https://hammerdb.com/): running hammerdb workload on the following databases: MSSQL, Mariadb, Postgresql on Pod and VM with [Configuration](benchmark_runner/benchmark_operator/workload_flavors/func_ci/hammerdb)
-* [stressng](https://wiki.ubuntu.com/Kernel/Reference/stress-ng): running stressng workload on Pod or VM with [Configuration](benchmark_runner/benchmark_operator/workload_flavors/func_ci/stressng)
-* [uperf](http://uperf.org/): running uperf workload on Pod or VM with [Configuration](benchmark_runner/benchmark_operator/workload_flavors/func_ci/uperf)
-
-** First Phase: supports [benchmark-operator workloads](https://github.com/cloud-bulldozer/benchmark-operator)
+* [hammerdb](https://hammerdb.com/): running hammerdb workload on the following databases: MSSQL, Mariadb, Postgresql on Pod and VM with [Configuration](benchmark_runner/templates/hammerdb)
+* [stressng](https://wiki.ubuntu.com/Kernel/Reference/stress-ng): running stressng workload on Pod or VM with [Configuration](benchmark_runner/templates/stressng)
+* [uperf](http://uperf.org/): running uperf workload on Pod or VM with [Configuration](benchmark_runner/templates/uperf)
+* [vdbench](https://wiki.lustre.org/VDBench/): running vdbench workload in a pod with [Configuration](benchmark_runner/templates/vdbench)
 
 Benchmark-runner grafana dashboard example:
 ![](media/grafana.png)
@@ -25,15 +24,18 @@ Reference:
 ## Documentation
 Documentation is available at [benchmark-runner.readthedocs.io](https://benchmark-runner.readthedocs.io/en/latest/)
 
-![](media/docker1.png)
+![](media/docker2.png)
 
 _**Table of Contents**_
 
 <!-- TOC -->
-- [Run workload using Podman or Docker](#run-workload-using-podman-or-docker)
-- [Run workload in Pod using Kubernetes or OpenShift](#run-workload-in-pod-using-kubernetes-or-openshift)
-- [Grafana dashboards](#grafana-dashboards)
-- [How to add new workload](#how-to-add-new-workload)
+- [Benchmark-Runner](#benchmark-runner)
+    - [Documentation](#documentation)
+    - [Run workload using Podman or Docker](#run-workload-using-podman-or-docker)
+    - [Run workload in Pod using Kubernetes or OpenShift](#run-workload-in-pod-using-kubernetes-or-openshift)
+    - [Grafana dashboards](#grafana-dashboards)
+    - [Inspect Prometheus Metrics](#inspect-prometheus-metrics)
+    - [How to develop in benchmark-runner](#how-to-develop-in-benchmark-runner)
 
 <!-- /TOC -->
 
@@ -45,15 +47,17 @@ _**Table of Contents**_
 
 Choose one from the following list:
 
-`['stressng_pod', 'stressng_vm','uperf_pod', 'uperf_vm', 'hammerdb_pod_mariadb', 'hammerdb_pod_mssql', 'hammerdb_pod_postgres', 'hammerdb_vm_mariadb', 'hammerdb_vm_mssql', 'hammerdb_vm_postgres']`
+`['stressng_pod', 'stressng_vm', 'stressng_kata','uperf_pod', 'uperf_vm', 'uperf_kata', 'hammerdb_pod_mariadb', 'hammerdb_pod_mssql', 'hammerdb_pod_postgres', 'hammerdb_vm_mariadb', 'hammerdb_vm_mssql', 'hammerdb_vm_postgres', 'hammerdb_kata_mariadb', 'hammerdb_kata_mssql', 'hammerdb_kata_postgres', 'vdbench_pod', 'vdbench_kata', 'vdbench_vm']`
 
 **auto:** NAMESPACE=benchmark-operator [ The default namespace is benchmark-operator ]
 
-**auto:** OCS_PVC=True [ True=OCS PVC storage, False=Ephemeral storage, default True ]
+**auto:** ODF_PVC=True [ True=ODF PVC storage, False=Ephemeral storage, default True ]
+
+**auto:** EXTRACT_PROMETHEUS_SNAPSHOT=True [ True=extract Prometheus snapshot into artifacts, false=don't, default True ]
 
 **auto:** SYSTEM_METRICS=True [ True=collect metric, False=not collect metrics, default True ]
 
-**auto:** RUNNER_PATH=/ [ The default work space is / ]
+**auto:** RUNNER_PATH=/tmp [ The default work space is /tmp ]
 
 **optional:** KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD
 
@@ -84,15 +88,44 @@ There are 3 grafana dashboards templates:
 ![](media/benchmark-runner-ci-status.png)
 2. [benchmark-runner-report.json](grafana/benchmark-runner-report.json)
 ![](media/benchmark-runner-report.png)
-3. [benchmark-runner-compare-3-ci-dates-report.json](grafana/benchmark-runner-compare-3-ci-dates-report.json)
-![](media/benchmark-runner-compare-3-ci-dates-report.png)
-4. [benchmark-runner-compare-3-ocp-versions-report.json](grafana/benchmark-runner-compare-3-ocp-versions-report.json)
-![](media/benchmark-runner-compare-3-ocp-versions-report.png)
-5. [system-metrics-report.json](grafana/system-metrics-report.json)
-![](media/system-metrics-report.png)
 
-** After importing json in grafana, need to configure elasticsearch data source. (for more details: see [HOW_TO.md](HOW_TO.md))
+** After importing json in grafana, you need to configure elasticsearch data source. (for more details: see [HOW_TO.md](HOW_TO.md))
 
-## How to add new workload
+## Inspect Prometheus Metrics
+
+The CI jobs store snapshots of the Prometheus database for each run as part of the artifacts.  Within the artifact directory is a Prometheus snapshot directory named:
+
+```
+promdb-YYYY_MM_DDTHH_mm_ss+0000_YYYY_MM_DDTHH_mm_ss+0000.tar
+```
+
+The timestamps are for the start and end of the metrics capture; they
+are stored in UTC time (`+0000`).  It is possible to run containerized
+Prometheus on it to inspect the metrics.  *Note that Prometheus
+requires write access to its database, so it will actually write to
+the snapshot.* So for example if you have downloaded artifacts for a
+run named `hammerdb-vm-mariadb-2022-01-04-08-21-23` and the Prometheus
+snapshot within is named
+`promdb_2022_01_04T08_21_52+0000_2022_01_04T08_45_47+0000`, you could run as follows:
+
+```
+$ local_prometheus_snapshot=/hammerdb-vm-mariadb-2022-01-04-08-21-23/promdb_2022_01_04T08_21_52+0000_2022_01_04T08_45_47+0000
+$ chmod -R g-s,a+rw "$local_prometheus_snapshot"
+$ sudo podman run --rm -p 9090:9090 -uroot -v "$local_prometheus_snapshot:/prometheus" --privileged prom/prometheus --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheus --storage.tsdb.retention.time=100000d --storage.tsdb.retention.size=1000PB
+```
+
+and point your browser at port 9090 on your local system, you can run queries against it, e. g.
+
+```
+sum(irate(node_cpu_seconds_total[2m])) by (mode,instance) > 0
+```
+
+It is important to use the `--storage.tsdb.retention.time` option to
+Prometheus, as otherwise Prometheus may discard the data in the
+snapshot.  And note that you must set the time bounds on the
+Prometheus query to fit the start and end times as recorded in the
+name of the promdb snapshot.
+
+## How to develop in benchmark-runner
 
 see [HOW_TO.md](HOW_TO.md)

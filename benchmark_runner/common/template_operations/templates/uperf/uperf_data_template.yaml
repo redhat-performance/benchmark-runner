@@ -1,0 +1,67 @@
+metadata:
+  name: uperf
+template_data:
+  shared:
+    pin_server: {{ pin_node1 }}
+    pin_client: {{ pin_node2 }}
+    serviceip: false
+    hostnetwork: false
+    networkpolicy: false
+    multus: false
+    samples: 1
+    pair: 1
+    protos:
+      - tcp
+  run_type:
+    perf_ci:
+      test_types:
+        - stream
+        - rr
+      sizes:
+        - 64
+        - 1024
+        - 8192
+      nthrs:
+        - 1
+        - 8
+      runtime: 60
+    default:
+      test_types:
+        - stream
+      sizes:
+        - 64
+        - 256
+        - 1024
+        - 4096
+        - 16384
+      nthrs:
+        - 1
+        - 2
+      runtime: 30
+  kind:
+    vm:
+      run_type:
+        perf_ci:
+          sockets: 8
+          cores: 1
+          limits_memory: 8Gi
+          requests_memory: 8Gi
+          net_queues: 8
+        default:
+          sockets: 1
+          cores: 4
+          limits_memory: 16Gi
+          requests_memory: 10Mi
+          net_queues: 4
+    default:
+      run_type:
+        perf_ci:
+          limits_cpu: 8
+          limits_memory: 8Gi
+          requests_cpu: 8
+          requests_memory: 8Gi
+        default:
+          limits_cpu: 4
+          limits_memory: 16Gi
+          requests_cpu: 10m
+          requests_memory: 10Mi

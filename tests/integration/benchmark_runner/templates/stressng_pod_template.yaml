@@ -2,17 +2,17 @@ apiVersion: ripsaw.cloudbulldozer.io/v1alpha1
 kind: Benchmark
 metadata:
   name: stressng-pod
-  namespace: benchmark-operator
+  namespace: {{ namespace }}
 spec:
   system_metrics:
     collection: {{ system_metrics }}
     prom_url: "https://prometheus-k8s.openshift-monitoring.svc.cluster.local:9091"
-    es_url: "http://{{ elasticsearch_url }}"
+    es_url: "{{ elasticsearch_url }}"
     prom_token: "{{ prom_token }}"
     metrics_profile: node-metrics.yml
     index_name: system-metrics-test
   elasticsearch:
-    url: "http://{{ elasticsearch_url }}"
+    url: "{{ elasticsearch_url }}"
     index_name: stressng-pod-test
   metadata:
     collection: false
