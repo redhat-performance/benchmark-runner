@@ -4,15 +4,15 @@
 # GitHub Actions is limited 6 hours for each job
 name: Deploy Operator FUNC Env Nightly CI
 # Only trigger, when the build workflow succeeded
-#on:
-#  workflow_run:
-#    workflows: ["Deploy IPI FUNC Env Nightly CI"]
-#    types:
-#      - completed
-
 on:
-  push:
-    branches: [ main ]
+  workflow_run:
+    workflows: ["Deploy IPI FUNC Env Nightly CI"]
+    types:
+      - completed
+
+#on:
+#  push:
+#    branches: [ main ]
 
 # Ensures that only one deploy task per branch/environment will run at a time.
 concurrency:
