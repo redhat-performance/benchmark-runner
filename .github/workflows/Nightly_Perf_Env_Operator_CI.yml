@@ -6,7 +6,7 @@ name: Deploy Operator Perf Env Nightly CI
 # Only trigger, when the build workflow succeeded
 on:
   workflow_run:
-    workflows: ["Deploy IPI Perf Env Nightly CI"]
+    workflows: ["XDeploy IPI Perf Env Nightly CI"]
     types:
       - completed
 
