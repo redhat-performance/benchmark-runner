@@ -1,6 +1,5 @@
 
 import os
-import time
 
 from benchmark_runner.common.oc.oc import OC
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
