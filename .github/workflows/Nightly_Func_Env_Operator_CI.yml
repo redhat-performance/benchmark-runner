@@ -137,13 +137,10 @@ jobs:
           start=$(printf '%(%s)T' -1)
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start OCP Resource Install >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
           # cnv-nightly
-          if [[ "${{ matrix.resource }}" == "cnv" ]]
-          then
-             scp -r "$RUNNER_PATH/.kube/config" provision:"$CONTAINER_KUBECONFIG_PATH"
-             echo -e "QUAY_USERNAME=$QUAY_USERNAME\nQUAY_PASSWORD=$QUAY_PASSWORD\n$REGISTERED_NIGHTLY_CNV" > "$RUNNER_PATH/registered_nightly_cnv.sh"
-             scp -r "$RUNNER_PATH/registered_nightly_cnv.sh" provision:"/tmp/registered_nightly_cnv.sh"
-             ssh -t provision "chmod +x /tmp/registered_nightly_cnv.sh;/tmp/./registered_nightly_cnv.sh;rm -f /tmp/registered_nightly_cnv.sh"
-          fi
+          scp -r "$RUNNER_PATH/.kube/config" provision:"$CONTAINER_KUBECONFIG_PATH"
+          echo -e "QUAY_USERNAME=$QUAY_USERNAME\nQUAY_PASSWORD=$QUAY_PASSWORD\n$REGISTERED_NIGHTLY_CNV" > "$RUNNER_PATH/registered_nightly_cnv.sh"
+          scp -r "$RUNNER_PATH/registered_nightly_cnv.sh" provision:"/tmp/registered_nightly_cnv.sh"
+          ssh -t provision "chmod +x /tmp/registered_nightly_cnv.sh;/tmp/./registered_nightly_cnv.sh;rm -f /tmp/registered_nightly_cnv.sh"
           podman run --rm -e OCP_ENV_FLAVOR="FUNC" -e IBM_API_KEY="$IBM_API_KEY" -e GITHUB_TOKEN="$GITHUB_TOKEN" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e INSTALL_OCP_RESOURCES="True" -e CNV_VERSION="$CNV_VERSION" -e QUAY_USERNAME="$QUAY_USERNAME" -e QUAY_PASSWORD="$QUAY_PASSWORD" -e ODF_VERSION="$ODF_VERSION" -e NUM_ODF_DISK="$NUM_ODF_DISK" -e INSTALL_RESOURCES_LIST="[ 'cnv' ]" -e FUNC_WORKER_IDS="$FUNC_WORKER_IDS" -e FUNC_PROVISION_IP="$FUNC_PROVISION_IP" -e CONTAINER_PRIVATE_KEY_PATH="$CONTAINER_PRIVATE_KEY_PATH" -e FUNC_PROVISION_USER="$FUNC_PROVISION_USER" -e FUNC_PROVISION_OC_USER="$FUNC_PROVISION_OC_USER" -e FUNC_PROVISION_PORT="$FUNC_PROVISION_PORT" -e GITHUB_REPOSITORY_SHORT="$GITHUB_REPOSITORY_SHORT" -e FUNC_PROVISION_TIMEOUT="3600" -e log_level="INFO" -v "$FUNC_PROVISION_PRIVATE_KEY_PATH":"$CONTAINER_PRIVATE_KEY_PATH" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End OCP Resource Install   >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
           end=$(printf '%(%s)T' -1)
