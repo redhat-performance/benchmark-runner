@@ -106,7 +106,7 @@ jobs:
              echo -e "QUAY_USERNAME=$QUAY_USERNAME\nQUAY_PASSWORD=$QUAY_PASSWORD\n$CNV_NIGHTLY_REGISTERED" > "$RUNNER_PATH/nightly_cnv_registered.sh"
              echo -e "$CNV_NIGHTLY_CATALOG_SOURCE" > "$RUNNER_PATH/cnv_nightly_catlog_source.yaml"
              echo -e "$CNV_NIGHTLY_CATALOG_SOURCE" > "$RUNNER_PATH/cnv_nightly_catlog_source.yaml"
-             sed -i 's/{{ cnv_version }}/$CNV_VERSION/g' $RUNNER_PATH/cnv_nightly_catlog_source.yaml
+             sed -i "s/{{ cnv_version }}/$CNV_VERSION/g" $RUNNER_PATH/cnv_nightly_catlog_source.yaml
              scp -r "$RUNNER_PATH/cnv_nightly_catlog_source.yaml" provision:"/tmp/cnv_nightly_catlog_source.yaml"
              scp -r "$RUNNER_PATH/nightly_cnv_registered.sh" provision:"/tmp/nightly_cnv_registered.sh"
              ssh -t provision "chmod +x /tmp/nightly_cnv_registered.sh;/tmp/./nightly_cnv_registered.sh;oc create -f /tmp/cnv_nightly_catlog_source.yaml;rm -f /tmp/nightly_cnv_registered.sh"
