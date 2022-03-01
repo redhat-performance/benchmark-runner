@@ -5,15 +5,15 @@
 name: Deploy Operator FUNC Env Nightly CI
 # Only trigger, when the build workflow succeeded
 
-#on:
-#  workflow_run:
-#    workflows: ["Deploy IPI FUNC Env Nightly CI"]
-#    types:
-#      - completed
-
 on:
-  push:
-    branches: [ main ]
+  workflow_run:
+    workflows: ["Deploy IPI FUNC Env Nightly CI"]
+    types:
+      - completed
+
+#on:
+#  push:
+#    branches: [ main ]
 
 # Ensures that only one deploy task per branch/environment will run at a time.
 concurrency:
@@ -23,7 +23,7 @@ concurrency:
 jobs:
 
   ocp_operator_installation:
-    name: OCP Operator Installation
+    name: Operator
     runs-on: ubuntu-latest
     strategy:
        # run one job every time
@@ -31,8 +31,7 @@ jobs:
        # continue to next job if failed
        fail-fast: false
        matrix: 
-          #resource: ['local_storage', 'odf', 'kata', 'cnv', 'custom']
-          resource: [ 'cnv', 'custom']
+          resource: ['local_storage', 'odf', 'kata', 'cnv', 'custom']
     outputs:
       install_resource_time_output: ${{ steps.ocp_install_resource_step.outputs.install_resource_time }}
     steps:
@@ -92,6 +91,8 @@ jobs:
           CONTAINER_PRIVATE_KEY_PATH: ${{ secrets.CONTAINER_PRIVATE_KEY_PATH }}
           KUBEADMIN_PASSWORD: ${{ secrets.FUNC_KUBEADMIN_PASSWORD }}
           RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+          CNV_NIGHTLY_REGISTERED: ${{ secrets.CNV_NIGHTLY_REGISTERED }}
+          CNV_NIGHTLY_CATALOG_SOURCE: ${{ secrets.CNV_NIGHTLY_CATALOG_SOURCE }}
         run: |
           build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
           build_version="$(cut -d'=' -f2 <<<"$build")"
@@ -101,10 +102,12 @@ jobs:
           if [[ "${{ matrix.resource }}" == "cnv" ]]
           then
              scp -r "$RUNNER_PATH/.kube/config" provision:"$CONTAINER_KUBECONFIG_PATH"
-             echo "oc get secret pull-secret -n openshift-config -o json | jq -r '.data.".dockerconfigjson"' | base64 -d > global-pull-secret.json;QUAY_AUTH=$(echo -n "${QUAY_USERNAME}:${QUAY_PASSWORD}" | base64 -w 0);podman login quay.io -u $QUAY_USERNAME -p $QUAY_PASSWORD;QUAY_AUTH=$(sudo cat /run/user/$(id -u)/containers/auth.json | jq -r '.auths["quay.io"].auth');jq --arg QUAY_AUTH "$QUAY_AUTH" '.auths += {"quay.io/openshift-cnv": {"auth":$QUAY_AUTH,"email":""}}' global-pull-secret.json > global-pull-secret.json.tmp;mv -f global-pull-secret.json.tmp global-pull-secret.json;oc set data secret/pull-secret -n openshift-config --from-file=.dockerconfigjson=global-pull-secret.json;rm -f global-pull-secret.json;oc wait mcp master worker --for condition=updated --timeout=20m;" > "$RUNNER_PATH/registered_nightly_cnv.sh"
-             scp -r "$RUNNER_PATH/registered_nightly_cnv.sh" provision:"/tmp/registered_nightly_cnv.sh"
-             ssh -t provision "chmod +x /tmp/registered_nightly_cnv.sh;/tmp/./registered_nightly_cnv.sh;" 
-             #rm -f /tmp/registered_nightly_cnv.sh"
+             echo -e "QUAY_USERNAME=$QUAY_USERNAME\nQUAY_PASSWORD=$QUAY_PASSWORD\n$CNV_NIGHTLY_REGISTERED" > "$RUNNER_PATH/nightly_cnv_registered.sh"
+             echo -e "$CNV_NIGHTLY_CATALOG_SOURCE" > "$RUNNER_PATH/cnv_nightly_catlog_source.yaml"
+             sed -i "s/{{ cnv_version }}/$CNV_VERSION/g" $RUNNER_PATH/cnv_nightly_catlog_source.yaml
+             scp -r "$RUNNER_PATH/cnv_nightly_catlog_source.yaml" provision:"/tmp/cnv_nightly_catlog_source.yaml"
+             scp -r "$RUNNER_PATH/nightly_cnv_registered.sh" provision:"/tmp/nightly_cnv_registered.sh"
+             ssh -t provision "chmod +x /tmp/nightly_cnv_registered.sh;/tmp/./nightly_cnv_registered.sh;oc create -f /tmp/cnv_nightly_catlog_source.yaml;rm -f /tmp/nightly_cnv_registered.sh;rm -f /tmp/cnv_nightly_catlog_source.yaml"
           fi
           podman run --rm -e OCP_ENV_FLAVOR="FUNC" -e IBM_API_KEY="$IBM_API_KEY" -e GITHUB_TOKEN="$GITHUB_TOKEN" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e INSTALL_OCP_RESOURCES="True" -e CNV_VERSION="$CNV_VERSION" -e QUAY_USERNAME="$QUAY_USERNAME" -e QUAY_PASSWORD="$QUAY_PASSWORD" -e ODF_VERSION="$ODF_VERSION" -e NUM_ODF_DISK="$NUM_ODF_DISK" -e INSTALL_RESOURCES_LIST="['${{ matrix.resource }}']" -e FUNC_WORKER_IDS="$FUNC_WORKER_IDS" -e FUNC_PROVISION_IP="$FUNC_PROVISION_IP" -e CONTAINER_PRIVATE_KEY_PATH="$CONTAINER_PRIVATE_KEY_PATH" -e FUNC_PROVISION_USER="$FUNC_PROVISION_USER" -e FUNC_PROVISION_OC_USER="$FUNC_PROVISION_OC_USER" -e FUNC_PROVISION_PORT="$FUNC_PROVISION_PORT" -e GITHUB_REPOSITORY_SHORT="$GITHUB_REPOSITORY_SHORT" -e FUNC_PROVISION_TIMEOUT="3600" -e log_level="INFO" -v "$FUNC_PROVISION_PRIVATE_KEY_PATH":"$CONTAINER_PRIVATE_KEY_PATH" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>>> End ${{ matrix.resource }} installation >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
@@ -131,6 +134,8 @@ jobs:
           CONTAINER_PRIVATE_KEY_PATH: ${{ secrets.CONTAINER_PRIVATE_KEY_PATH }}
           KUBEADMIN_PASSWORD: ${{ secrets.FUNC_KUBEADMIN_PASSWORD }}
           RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+          CNV_NIGHTLY_REGISTERED: ${{ secrets.CNV_NIGHTLY_REGISTERED }}
+          CNV_NIGHTLY_CATALOG_SOURCE: ${{ secrets.CNV_NIGHTLY_CATALOG_SOURCE }}
         if: ${{ failure() }}
         run: |
           build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
@@ -138,12 +143,14 @@ jobs:
           start=$(printf '%(%s)T' -1)
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start OCP Resource Install >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
           # cnv-nightly
-          if [[ "${{ matrix.resource }}" == "cnv" ]]
-          then
-             scp -r "$RUNNER_PATH/.kube/config" provision:"$CONTAINER_KUBECONFIG_PATH"
-             ssh -t provision "oc get secret pull-secret -n openshift-config -o json | jq -r '.data.".dockerconfigjson"' | base64 -d > global-pull-secret.json;QUAY_AUTH=$(echo -n "${QUAY_USERNAME}:${QUAY_PASSWORD}" | base64 -w 0);podman login quay.io -u $QUAY_USERNAME -p $QUAY_PASSWORD;QUAY_AUTH=$(sudo cat /run/user/$(id -u)/containers/auth.json | jq -r '.auths["quay.io"].auth');jq --arg QUAY_AUTH "$QUAY_AUTH" '.auths += {"quay.io/openshift-cnv": {"auth":$QUAY_AUTH,"email":""}}' global-pull-secret.json > global-pull-secret.json.tmp;mv -f global-pull-secret.json.tmp global-pull-secret.json;oc set data secret/pull-secret -n openshift-config --from-file=.dockerconfigjson=global-pull-secret.json;rm -f global-pull-secret.json;oc wait mcp master worker --for condition=updated --timeout=20m;"
-          fi
-          podman run --rm -e OCP_ENV_FLAVOR="FUNC" -e IBM_API_KEY="$IBM_API_KEY" -e GITHUB_TOKEN="$GITHUB_TOKEN" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e INSTALL_OCP_RESOURCES="True" -e CNV_VERSION="$CNV_VERSION" -e QUAY_USERNAME="$QUAY_USERNAME" -e QUAY_PASSWORD="$QUAY_PASSWORD" -e ODF_VERSION="$ODF_VERSION" -e NUM_ODF_DISK="$NUM_ODF_DISK" -e INSTALL_RESOURCES_LIST="[ 'cnv' ]" -e FUNC_WORKER_IDS="$FUNC_WORKER_IDS" -e FUNC_PROVISION_IP="$FUNC_PROVISION_IP" -e CONTAINER_PRIVATE_KEY_PATH="$CONTAINER_PRIVATE_KEY_PATH" -e FUNC_PROVISION_USER="$FUNC_PROVISION_USER" -e FUNC_PROVISION_OC_USER="$FUNC_PROVISION_OC_USER" -e FUNC_PROVISION_PORT="$FUNC_PROVISION_PORT" -e GITHUB_REPOSITORY_SHORT="$GITHUB_REPOSITORY_SHORT" -e FUNC_PROVISION_TIMEOUT="3600" -e log_level="INFO" -v "$FUNC_PROVISION_PRIVATE_KEY_PATH":"$CONTAINER_PRIVATE_KEY_PATH" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+          scp -r "$RUNNER_PATH/.kube/config" provision:"$CONTAINER_KUBECONFIG_PATH"
+          echo -e "QUAY_USERNAME=$QUAY_USERNAME\nQUAY_PASSWORD=$QUAY_PASSWORD\n$CNV_NIGHTLY_REGISTERED" > "$RUNNER_PATH/nightly_cnv_registered.sh"
+          echo -e "$CNV_NIGHTLY_CATALOG_SOURCE" > "$RUNNER_PATH/cnv_nightly_catlog_source.yaml"
+          sed -i "s/{{ cnv_version }}/$CNV_VERSION/g" $RUNNER_PATH/cnv_nightly_catlog_source.yaml
+          scp -r "$RUNNER_PATH/cnv_nightly_catlog_source.yaml" provision:"/tmp/cnv_nightly_catlog_source.yaml"
+          scp -r "$RUNNER_PATH/nightly_cnv_registered.sh" provision:"/tmp/nightly_cnv_registered.sh"
+          ssh -t provision "chmod +x /tmp/nightly_cnv_registered.sh;/tmp/./nightly_cnv_registered.sh;oc create -f /tmp/cnv_nightly_catlog_source.yaml;rm -f /tmp/nightly_cnv_registered.sh;rm -f /tmp/cnv_nightly_catlog_source.yaml"
+          podman run --rm -e OCP_ENV_FLAVOR="FUNC" -e IBM_API_KEY="$IBM_API_KEY" -e GITHUB_TOKEN="$GITHUB_TOKEN" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e INSTALL_OCP_RESOURCES="True" -e CNV_VERSION="$CNV_VERSION" -e QUAY_USERNAME="$QUAY_USERNAME" -e QUAY_PASSWORD="$QUAY_PASSWORD" -e ODF_VERSION="$ODF_VERSION" -e NUM_ODF_DISK="$NUM_ODF_DISK" -e INSTALL_RESOURCES_LIST="['local_storage', 'odf', 'kata', 'cnv', 'custom']" -e FUNC_WORKER_IDS="$FUNC_WORKER_IDS" -e FUNC_PROVISION_IP="$FUNC_PROVISION_IP" -e CONTAINER_PRIVATE_KEY_PATH="$CONTAINER_PRIVATE_KEY_PATH" -e FUNC_PROVISION_USER="$FUNC_PROVISION_USER" -e FUNC_PROVISION_OC_USER="$FUNC_PROVISION_OC_USER" -e FUNC_PROVISION_PORT="$FUNC_PROVISION_PORT" -e GITHUB_REPOSITORY_SHORT="$GITHUB_REPOSITORY_SHORT" -e FUNC_PROVISION_TIMEOUT="3600" -e log_level="INFO" -v "$FUNC_PROVISION_PRIVATE_KEY_PATH":"$CONTAINER_PRIVATE_KEY_PATH" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End OCP Resource Install   >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
           end=$(printf '%(%s)T' -1)
           echo "INSTALL_OCP_RESOURCE_MINUTES_TIME=$(( (( end - start )) / 60))" >> "$GITHUB_ENV"

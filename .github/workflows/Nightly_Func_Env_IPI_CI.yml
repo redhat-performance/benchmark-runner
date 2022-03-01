@@ -8,9 +8,11 @@ name: Deploy IPI FUNC Env Nightly CI
 #    workflows: ["Deploy Operator FUNC Env Nightly CI"]
 #    types:
 #      - completed
+
 on:
   schedule:
-    - cron: '0 4 * * 5' # run on Saturday at 4 AM UTC/ 0 AM EDT
+    - cron: '0 4 * * 6' # run on Saturday at 4 AM UTC/ 0 AM EDT
+
 #on:
 #  push:
 #    branches: [ main ]
@@ -22,7 +24,7 @@ concurrency:
 
 jobs:
   ocp_ipi_installation:
-    name: OCP IBM IPI Installation
+    name: OCP
     runs-on: ubuntu-latest
     strategy:
        # run one job every time
