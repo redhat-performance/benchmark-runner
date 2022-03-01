@@ -11,7 +11,7 @@ name: Deploy IPI FUNC Env Nightly CI
 
 on:
   schedule:
-    - cron: '0 4 * * 5' # run on Saturday at 4 AM UTC/ 0 AM EDT
+    - cron: '0 4 * * 6' # run on Saturday at 4 AM UTC/ 0 AM EDT
 
 #on:
 #  push:
