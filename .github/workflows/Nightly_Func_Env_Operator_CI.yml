@@ -134,6 +134,8 @@ jobs:
           CONTAINER_PRIVATE_KEY_PATH: ${{ secrets.CONTAINER_PRIVATE_KEY_PATH }}
           KUBEADMIN_PASSWORD: ${{ secrets.FUNC_KUBEADMIN_PASSWORD }}
           RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+          CNV_NIGHTLY_REGISTERED: ${{ secrets.CNV_NIGHTLY_REGISTERED }}
+          CNV_NIGHTLY_CATALOG_SOURCE: ${{ secrets.CNV_NIGHTLY_CATALOG_SOURCE }}
         if: ${{ failure() }}
         run: |
           build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
