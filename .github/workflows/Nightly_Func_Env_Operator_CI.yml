@@ -23,7 +23,7 @@ concurrency:
 jobs:
 
   ocp_operator_installation:
-    name: OCP Operator Installation
+    name: Operator
     runs-on: ubuntu-latest
     strategy:
        # run one job every time
