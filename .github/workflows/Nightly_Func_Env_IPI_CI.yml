@@ -65,8 +65,8 @@ jobs:
           END
       - name: ▶ OCP IPI install
         env:
-          INSTALL_OCP_VERSION: "4.10.0-fc.2"
-          OCP_VERSION_BUILD: "dev"
+          INSTALL_OCP_VERSION: "candidate-4.10"
+          OCP_VERSION_BUILD: "ga"
           IBM_API_KEY: ${{ secrets.IBM_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
           FUNC_WORKER_IDS: ${{ secrets.FUNC_WORKER_IDS }}
@@ -90,8 +90,8 @@ jobs:
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>> OCP end step: ${{ matrix.step }}   >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
       - name: ▶ Rerun OCP IPI install after failure
         env:
-          INSTALL_OCP_VERSION: "4.10.0-fc.2"
-          OCP_VERSION_BUILD: "dev"
+          INSTALL_OCP_VERSION: "candidate-4.10"
+          OCP_VERSION_BUILD: "ga"
           IBM_API_KEY: ${{ secrets.IBM_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
           FUNC_WORKER_IDS: ${{ secrets.FUNC_WORKER_IDS }}
