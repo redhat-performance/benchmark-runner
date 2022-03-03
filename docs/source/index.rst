@@ -156,7 +156,7 @@ promdb snapshot.
 How to develop in benchmark-runner
 ----------------------------------
 
-see `HOW_TO.md <HOW_TO.md>`__
+see `HOW_TO.md <../../HOW_TO.md>`__
 
 .. |Actions Status| image:: https://github.com/redhat-performance/benchmark-runner/workflows/CI/badge.svg
    :target: https://github.com/redhat-performance/benchmark-runner/actions
