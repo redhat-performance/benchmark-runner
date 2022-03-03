@@ -34,9 +34,6 @@ Reference: \* The benchmark-runner package is located in
 benchmark-runner container image is located in
 `Quay.io <https://quay.io/repository/ebattat/benchmark-runner>`__
 
-Documentation
--------------
-
 Documentation is available at
 `benchmark-runner.readthedocs.io <https://benchmark-runner.readthedocs.io/en/latest/>`__
 
@@ -68,7 +65,6 @@ Run workload using Podman or Docker
 -----------------------------------
 
 Environment variables description:
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **mandatory:** WORKLOAD=$WORKLOAD
 
