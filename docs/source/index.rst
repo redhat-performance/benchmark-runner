@@ -45,17 +45,11 @@ Documentation is available at
 
    <!-- TOC -->
 
--  `Benchmark-Runner <#benchmark-runner>`__
-
-   -  `Documentation <#documentation>`__
-   -  `Run workload using Podman or
-      Docker <#run-workload-using-podman-or-docker>`__
-   -  `Run workload in Pod using Kubernetes or
-      OpenShift <#run-workload-in-pod-using-kubernetes-or-openshift>`__
+   -  `Run workload using Podman or Docker <#run-workload-using-podman-or-docker>`__
+   -  `Run workload in Pod using Kubernetes or OpenShift <#run-workload-in-pod-using-kubernetes-or-openshift>`__
    -  `Grafana dashboards <#grafana-dashboards>`__
    -  `Inspect Prometheus Metrics <#inspect-prometheus-metrics>`__
-   -  `How to develop in
-      benchmark-runner <#how-to-develop-in-benchmark-runner>`__
+   -  `How to develop in benchmark-runner <#how-to-develop-in-benchmark-runner>`__
 
 .. raw:: html
 
