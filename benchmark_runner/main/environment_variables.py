@@ -37,6 +37,10 @@ class EnvironmentVariables:
         self._environment_variables_dict['elasticsearch_user'] = os.environ.get('ELASTICSEARCH_USER', '')
         self._environment_variables_dict['elasticsearch_password'] = os.environ.get('ELASTICSEARCH_PASSWORD', '')
 
+        # Workaround for Kata CPU offline problem in 4.9/4.10
+        # Set to True to
+        self._environment_variables_dict['kata_cpuoffline_workaround'] = os.environ.get('KATA_CPUOFFLINE_WORKAROUND', '')
+
         # default parameter - change only if needed
         # Parameters below related to 'run_workload()'
         self._environment_variables_dict['workloads'] = ['stressng_pod', 'stressng_vm', 'stressng_kata',
