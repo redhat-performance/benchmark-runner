@@ -1,7 +1,12 @@
 |Actions Status| |Coverage Status|
 
-Benchmark-Runner
-================
+ <h3 align="center">
+
+Benchmark runner
+
+.. raw:: html
+
+ </h3>
 
 This tool provides a lightweight and flexible framework for running
 benchmark workloads on Kubernetes/OpenShift Pod or VM.
