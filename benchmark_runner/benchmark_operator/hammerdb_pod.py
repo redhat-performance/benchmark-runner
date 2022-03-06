@@ -17,82 +17,85 @@ class HammerdbPod(BenchmarkOperatorWorkloadsOperations):
         All inherit from WorkloadsOperations
         """
         super().__init__()
-        self.__workload = ''
+        self.__name = ''
+        self.__workload_name = ''
+        self.__database = ''
         self.__es_index = ''
         self.__kind = ''
         self.__status = ''
 
-    @typechecked
     @logger_time_stamp
-    def hammerdb_pod(self, database: str, name: str = ''):
+    def run(self):
         """
         This method run hammerdb workload
         :return:
         """
         try:
-            if name == '':
-                name = self.hammerdb_pod.__name__
-            self.__workload = name.replace('_', '-')
-            self.__kind = 'pod'
-            if '_kata' in name:
+            self.__name = f"{self._workload.split('_')[0]}_{self._workload.split('_')[1]}"
+            self.__database = self._workload.split('_')[2]
+            if 'kata' in self._workload:
                 self.__kind = 'kata'
+                self.__name = self.__name.replace('kata', 'pod')
+            else:
+                self.__kind = 'pod'
+            self.__workload_name = f"{self._workload.split('_')[0]}-{self._workload.split('_')[1]}"
             if self._run_type == 'test_ci':
                 self.__es_index = 'hammerdb-test-ci-results'
             else:
                 self.__es_index = 'hammerdb-results'
             environment_variables.environment_variables_dict['kind'] = self.__kind
             # database
-            self._oc.create_pod_sync(yaml=os.path.join(f'{self._run_artifacts_path}', f'{database}.yaml'), pod_name=database, namespace=f'{database}-db')
-            self._oc.wait_for_initialized(label=f'app={database}', workload=database, namespace=f'{database}-db', label_uuid=False)
-            self._oc.wait_for_ready(label=f'app={database}', workload=database, namespace=f'{database}-db', label_uuid=False)
+            self._oc.create_pod_sync(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__database}.yaml'), pod_name=self.__database, namespace=f'{self.__database}-db')
+            self._oc.wait_for_initialized(label=f'app={self.__database}', workload=self.__database, namespace=f'{self.__database}-db', label_uuid=False)
+            self._oc.wait_for_ready(label=f'app={self.__database}', workload=self.__database, namespace=f'{self.__database}-db', label_uuid=False)
             # hammerdb
-            self._oc.create_pod_sync(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.hammerdb_pod.__name__}_{database}.yaml'), pod_name=f'{self.__workload}-creator')
+            self._oc.create_pod_sync(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}_{self.__database}.yaml'), pod_name=f'{self.__workload_name}-creator')
             # hammerdb creator
-            self._oc.wait_for_pod_create(pod_name=f'{self.__workload}-creator')
-            self._oc.wait_for_initialized(label='app=hammerdb_creator', workload=self.__workload)
-            self._oc.wait_for_ready(label='app=hammerdb_creator', workload=self.__workload)
-            self._oc.wait_for_pod_completed(label='app=hammerdb_creator', workload=self.__workload)
+            self._oc.wait_for_pod_create(pod_name=f'{self.__workload_name}-creator')
+            self._oc.wait_for_initialized(label='app=hammerdb_creator', workload=self.__workload_name)
+            self._oc.wait_for_ready(label='app=hammerdb_creator', workload=self.__workload_name)
+            self._oc.wait_for_pod_completed(label='app=hammerdb_creator', workload=self.__workload_name)
             # hammerdb workload
-            self._oc.wait_for_pod_create(pod_name=f'{self.__workload}-workload')
-            self._oc.wait_for_initialized(label='app=hammerdb_workload', workload=self.__workload)
-            self._oc.wait_for_ready(label='app=hammerdb_workload', workload=self.__workload)
-            self.__status = self._oc.wait_for_pod_completed(label='app=hammerdb_workload', workload=self.__workload)
+            self._oc.wait_for_pod_create(pod_name=f'{self.__workload_name}-workload')
+            self._oc.wait_for_initialized(label='app=hammerdb_workload', workload=self.__workload_name)
+            self._oc.wait_for_ready(label='app=hammerdb_workload', workload=self.__workload_name)
+            self.__status = self._oc.wait_for_pod_completed(label='app=hammerdb_workload', workload=self.__workload_name)
             self.__status = 'complete' if self.__status else 'failed'
             # system metrics
             if environment_variables.environment_variables_dict['system_metrics'] == 'True':
-                self.system_metrics_collector(workload=self.__workload)
+                self.system_metrics_collector(workload=self.__workload_name)
             # save run artifacts logs
-            run_artifacts_url = self._create_run_artifacts(labels=[f'{self.__workload}-creator', f'{self.__workload}-workload'], database=database)
+            run_artifacts_url = self._create_run_artifacts(labels=[f'{self.__workload_name}-creator', f'{self.__workload_name}-workload'], database=self.__database)
             if self._es_host:
                 # verify that data upload to elastic search
-                ids = self._verify_elasticsearch_data_uploaded(index=self.__es_index, uuid=self._oc.get_long_uuid(workload=self.__workload))
+                ids = self._verify_elasticsearch_data_uploaded(index=self.__es_index, uuid=self._oc.get_long_uuid(workload=self.__workload_name))
                 # update metadata
                 for id in ids:
-                    self._update_elasticsearch_index(index=self.__es_index, id=id, kind=self.__kind, database=database, status=self.__status, run_artifacts_url=run_artifacts_url)
+                    self._update_elasticsearch_index(index=self.__es_index, id=id, kind=self.__kind, database=self.__database, status=self.__status, run_artifacts_url=run_artifacts_url)
             # delete hammerdb
             self._oc.delete_pod_sync(
-                yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.hammerdb_pod.__name__}_{database}.yaml'),
-                pod_name=f'{self.__workload}-creator')
+                yaml=os.path.join(f'{self._run_artifacts_path}',  f'{self.__name}_{self.__database}.yaml'),
+                pod_name=f'{self.__workload_name}-creator')
             # delete database
-            self._oc.delete_pod_sync(yaml=os.path.join(f'{self._run_artifacts_path}', f'{database}.yaml'),
-                                     pod_name=database,
-                                     namespace=f'{database}-db')
+            self._oc.delete_pod_sync(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__database}.yaml'),
+                                     pod_name=self.__database,
+                                     namespace=f'{self.__database}-db')
         except ElasticSearchDataNotUploaded as err:
             # delete hammerdb
-            self.tear_down_pod_after_error(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.hammerdb_pod.__name__}_{database}.yaml'),
-                                           pod_name=f'{self.__workload}-creator')
+            self.tear_down_pod_after_error(yaml=os.path.join(f'{self._run_artifacts_path}',  f'{self.__name}_{self.__database}.yaml'),
+                                           pod_name=f'{self.__workload_name}-creator')
             # delete database
-            self._oc.delete_pod_sync(yaml=os.path.join(f'{self._run_artifacts_path}', f'{database}.yaml'), pod_name=database,
-                                     namespace=f'{database}-db')
+            self._oc.delete_pod_sync(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__database}.yaml'), pod_name=self.__database,
+                                     namespace=f'{self.__database}-db')
             raise err
         except Exception as err:
             # save run artifacts logs
-            run_artifacts_url = self._create_run_artifacts(labels=[f'{self.__workload}-creator', f'{self.__workload}-workload'], database=database)
-            self._upload_to_elasticsearch(index=self.__es_index, kind=self.__kind, status='failed', run_artifacts_url=run_artifacts_url, database=database)
+            run_artifacts_url = self._create_run_artifacts(labels=[f'{self.__workload_name}-creator', f'{self.__workload_name}-workload'], database=self.__database)
+            self._upload_to_elasticsearch(index=self.__es_index, kind=self.__kind, status='failed', run_artifacts_url=run_artifacts_url, database=self.__database)
             # delete hammerdb
-            self.tear_down_pod_after_error(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.hammerdb_pod.__name__}_{database}.yaml'),
-                                           pod_name=f'{self.__workload}-creator')
+            self.tear_down_pod_after_error(yaml=os.path.join(f'{self._run_artifacts_path}',  f'{self.___file_name}_{self.__database}.yaml'),
+                                           pod_name=f'{self.__workload_name}-creator')
             # delete database
-            self._oc.delete_pod_sync(yaml=os.path.join(f'{self._run_artifacts_path}', f'{database}.yaml'), pod_name=database,
-                                     namespace=f'{database}-db')
+            self._oc.delete_pod_sync(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__database}.yaml'), pod_name=self.__database,
+                                     namespace=f'{self.__database}-db')
             raise err

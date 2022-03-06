@@ -12,7 +12,8 @@ class VdbenchVM(WorkloadsOperations):
     """
     def __init__(self):
         super().__init__()
-        self.__workload = ''
+        self.__name = ''
+        self.__workload_name = ''
         self.__es_index = ''
         self.__kind = ''
         self.__status = ''
@@ -20,24 +21,25 @@ class VdbenchVM(WorkloadsOperations):
         self.__vm_name = ''
 
     @logger_time_stamp
-    def vdbench_vm(self):
+    def run(self):
         """
         This method run the workload
         :return:
         """
         try:
+            self.__name = self._workload
             if self._run_type == 'test_ci':
                 self.__es_index = 'vdbench-test-ci-results'
             else:
                 self.__es_index = 'vdbench-results'
-            self.__workload = self.vdbench_vm.__name__.replace('_', '-')
-            self.__vm_name = f'{self.__workload}-{self._trunc_uuid}'
+            self.__workload_name = self._workload.replace('_', '-')
+            self.__vm_name = f'{self.__workload_name}-{self._trunc_uuid}'
             self.__kind = 'vm'
             self._environment_variables_dict['kind'] = 'vm'
-            self._oc.create_vm_sync(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.vdbench_vm.__name__}.yaml'), vm_name=self.__vm_name)
+            self._oc.create_vm_sync(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}.yaml'), vm_name=self.__vm_name)
             self._oc.wait_for_ready(label=f'app=vdbench-{self._trunc_uuid}', run_type='vm', label_uuid=False)
             # Create vm log should be direct after vm is ready
-            self.__vm_name = self._create_vm_log(labels=[self.__workload])
+            self.__vm_name = self._create_vm_log(labels=[self.__workload_name])
             self.__status = self._oc.wait_for_vm_log_completed(vm_name=self.__vm_name, end_stamp='@@~@@END-WORKLOAD@@~@@')
             self.__status = 'complete' if self.__status else 'failed'
             # save run artifacts logs
@@ -49,11 +51,11 @@ class VdbenchVM(WorkloadsOperations):
                 # verify that data upload to elastic search according to unique uuid
                 self._verify_elasticsearch_data_uploaded(index=self.__es_index, uuid=self._uuid)
             self._oc.delete_vm_sync(
-                yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.vdbench_vm.__name__}.yaml'),
+                yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}.yaml'),
                 vm_name=self.__vm_name)
         except ElasticSearchDataNotUploaded as err:
             self._oc.delete_vm_sync(
-                yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.vdbench_vm.__name__}.yaml'),
+                yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}.yaml'),
                 vm_name=self.__vm_name)
             raise err
         except Exception as err:
@@ -65,6 +67,6 @@ class VdbenchVM(WorkloadsOperations):
             # verify that data upload to elastic search according to unique uuid
             self._verify_elasticsearch_data_uploaded(index=self.__es_index, uuid=self._uuid)
             self._oc.delete_vm_sync(
-                yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.vdbench_vm.__name__}.yaml'),
+                yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}.yaml'),
                 vm_name=self.__vm_name)
             raise err
