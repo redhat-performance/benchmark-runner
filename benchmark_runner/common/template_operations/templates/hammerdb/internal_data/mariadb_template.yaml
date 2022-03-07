@@ -39,6 +39,10 @@ spec:
       labels:
         app: mariadb
         type: mariadb-database-server
+      {%- if kind == 'kata' and kata_cpuoffline_workaround == True %}
+      annotations:
+        io.katacontainers.config.hypervisor.default_vcpus: "{{ database_limits_cpu }}"
+      {%- endif %}
     spec:
       nodeSelector:
         kubernetes.io/hostname: "{{ pin_node2 }}"
@@ -57,7 +61,9 @@ spec:
             cpu: {{ database_requests_cpu }}
             memory: {{ database_requests_memory }}
           limits:
+          {%- if kind != 'kata' or kata_cpuoffline_workaround != True %}
             cpu: {{ database_limits_cpu }}
+            {%- endif %}
             memory: {{ database_limits_memory }}
         env:
            - name: MYSQL_USER

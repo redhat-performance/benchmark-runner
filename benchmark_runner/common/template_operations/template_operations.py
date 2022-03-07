@@ -3,7 +3,7 @@ import os
 import yaml
 from jinja2 import Template
 from benchmark_runner.common.template_operations.render_yaml_from_template import render_yaml_file
-from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp
+from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 from benchmark_runner.main.environment_variables import environment_variables
 
 
@@ -28,6 +28,8 @@ class TemplateOperations:
         Kata shares templates with pod
         """
         if self.__workload_kind == 'kata' or self.__workload_kind == 'pod':
+            if self.__environment_variables_dict.get('kata_cpuoffline_workaround', '') == 'True':
+                logger.warn('*** WARNING: Enabling Kata CPU offline workaround ***')
             return 'pod'
         elif self.__workload_kind == 'vm':
             return 'vm'
