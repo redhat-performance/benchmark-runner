@@ -22,7 +22,7 @@
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
   "id": 16,
-  "iteration": 1645551428298,
+  "iteration": 1646590936807,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -125,11 +125,11 @@
                   "text": "4.8.14"
                 },
                 "41002": {
-                  "index": 11,
+                  "index": 12,
                   "text": "4.10.0-rc.2"
                 },
                 "41003": {
-                  "index": 12,
+                  "index": 13,
                   "text": "4.10.0-rc.3"
                 },
                 "49211": {
@@ -139,6 +139,10 @@
                 "4100683": {
                   "index": 10,
                   "text": "4.10.0-683"
+                },
+                "4100688": {
+                  "index": 11,
+                  "text": "4.10.0-688"
                 }
               },
               "type": "value"
@@ -243,6 +247,37 @@
           ],
           "query": "_exists_:ocs_version",
           "refId": "B",
+          "timeField": "timestamp"
+        },
+        {
+          "alias": "odf_version",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "auto"
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "xQGAtZvnk"
+          },
+          "hide": false,
+          "metrics": [
+            {
+              "field": "tpm",
+              "id": "1",
+              "settings": {
+                "script": "Integer.parseInt(\"0\"+doc['odf_version.keyword'].value.replace(\".\",\"\").replace(\"r\",\"\").replace(\"c\",\"\").replace(\"f\",\"\").replace(\"-\",\"\"))"
+              },
+              "type": "max"
+            }
+          ],
+          "query": "_exists_:odf_version",
+          "refId": "E",
           "timeField": "timestamp"
         },
         {
@@ -1246,6 +1281,6 @@
   "timezone": "",
   "title": "regression-summary",
   "uid": "T4775LKnzzmichey",
-  "version": 10,
+  "version": 12,
   "weekStart": ""
 }

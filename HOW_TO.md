@@ -5,8 +5,9 @@ _**Table of Contents**_
 <!-- TOC -->
 - [Benchmark-runner: How to?](#benchmark-runner-how-to)
     - [Add any new Python code](#add-any-new-python-code)
-    - [Add new workload, modify parameters to workload, or change parameters for any CI job](#add-new-workload-modify-parameters-to-workload-or-change-parameters-for-any-ci-job)
+    - [Update workload, modify parameters to workload, or change parameters for any CI job](#add-new-workload-modify-parameters-to-workload-or-change-parameters-for-any-ci-job)
     - [Add new benchmark operator workload to benchmark runner](#add-new-benchmark-operator-workload-to-benchmark-runner)
+    - [Add new custom workload to benchmark runner](#add-new-custom-workload-to-benchmark-runner)
     - [Add workload to grafana dashboard](#add-workload-to-grafana-dashboard)
         - [Data template](#data-template)
     - [Monitor and debug workload](#monitor-and-debug-workload)
@@ -102,23 +103,114 @@ any template .yaml files.
 3. Install prerequisites (these commands assume RHEL/CentOS/Fedora):
    - dnf install make
    - dnf install python3-pip
-4. Open [benchmark_operator_workloads.py](benchmark_runner/benchmark_operator/benchmark_operator_workloads.py)
-5. Create new `workload method` for Pod and VM under `Workloads` section in [benchmark_operator_workloads.py](benchmark_runner/benchmark_operator/benchmark_operator_workloads.py).
+4. Open [benchmark_runner/benchmark_operator/benchmark_operator_workloads.py](benchmark_runner/benchmark_operator/benchmark_operator_workloads.py)
+5. Create new `workload method` for Pod and VM under `BenchmarkOperatorWorkloads class` section in [benchmark_runner/benchmark_operator/benchmark_operator_workloads.py](benchmark_runner/benchmark_operator/benchmark_operator_workloads.py).
    It can be duplicated from existing workload method: `def stressng_pod` or `def stressng_vm` and customized workload run steps accordingly
-6. Add workload method name (workload_pod/workload_vm) to environment_variables_dict['workloads'] in [environment_variables.py](benchmark_runner/main/environment_variables.py)
-7. Create workload folder in the [templates](benchmark_runner/common/template_operations/templates) directory.  Create the following files in that directory:
-   1. workload_data_template for configuration parameters, e. g. [stressng_data_template.yaml](benchmark_runner/common/template_operations/templates/stressng/stressng_data_template.yaml).  The data template is structured as discussed [below](#data-template).
-   2. workload pod and VM custom resource template inside [internal_data](benchmark_runner/common/template_operations/templates/stressng/internal_data)
-8. Add workload folder path in [MANIFEST.in](MANIFEST.in), add 2 paths: the workload path to 'workload_data_template.yaml' and path to 'internal_data' Pod and VM template yaml files
-9. Add tests for all new methods you write under `tests/integration`.
-10. Update the golden unit test files as described [above](#add-new-workload-modify-parameters-to-workload-or-change-parameters-for-any-ci-job)
-11. For test and debug workload, need to configure [environment_variables.py](benchmark_runner/main/environment_variables.py)
-   1. Fill parameters: workload, kubeadmin_password, pin_node_benchmark_operator, pin_node1, pin_node2, elasticsearch, elasticsearch_port
-   2. Run [main.py](/benchmark_runner/main/main.py)  and verify that the workload run correctly
-   3. The workload can be monitored and checked through 'current run' folder inside the run workload flavor (default flavor: 'test_ci')
-12. Open Kibana url and verify workload index populate with data:
-   1. Create the workload index: Kibana -> Hamburger tab -> Stack Management -> Index patterns -> Create index pattern -> workload-results -> timestamp -> Done
-   2. Verify workload-results index is populated: Kibana -> Hamburger tab -> Discover -> workload-results (index) -> verify that there is a new data
+6. Create dedicated `<workload> class` WorkloadPod or WorkloadVM in dedicated module `<workload>_pod.py` or `<workload>_vm.py` and customized workload run steps accordingly e.g. [benchmark_runner/benchmark_operator/stressng_pod.py](benchmark_runner/benchmark_operator/stressng_pod.py) 
+7. Add workload method name (workload_pod/workload_vm) to environment_variables_dict['workloads'] in [benchmark_runner/main/environment_variables.py](benchmark_runner/main/environment_variables.py)
+8. Create workload folder in the [benchmark_runner/common/template_operations/templates](benchmark_runner/common/template_operations/templates) directory.  Create the following files in that directory:
+   1. Add workload_data_template for configuration parameters, e.g. [benchmark_runner/common/template_operations/templates/stressng/stressng_data_template.yaml](benchmark_runner/common/template_operations/templates/stressng/stressng_data_template.yaml).  
+   2. The data template is structured as discussed [below](#data-template).
+   3. Add workload pod and VM custom resource template inside [benchmark_runner/common/template_operations/templates/stressng/internal_data](benchmark_runner/common/template_operations/templates/stressng/internal_data)
+9. Add workload folder path in [MANIFEST.in](MANIFEST.in), add 2 paths: the workload path to 'workload_data_template.yaml' and path to 'internal_data' Pod and VM template yaml files. e.g.
+   ```
+     include benchmark_runner/common/template_operations/templates/stressng/*.yaml
+     include benchmark_runner/common/template_operations/templates/stressng/internal_data/*.yaml
+   ```
+10. Add tests for all new methods you write under `tests/integration`.
+11. Update the golden unit test files as described [above](#add-new-workload-modify-parameters-to-workload-or-change-parameters-for-any-ci-job)
+12. For test and debug workload, need to configure [benchmark_runner/main/environment_variables.py](benchmark_runner/main/environment_variables.py)
+13. Fill parameters: workload, kubeadmin_password, pin_node_benchmark_operator, pin_node1, pin_node2, elasticsearch, elasticsearch_port
+14. Run [/benchmark_runner/main/main.py](/benchmark_runner/main/main.py)  and verify that the workload run correctly
+15. The workload can be monitored and checked through 'current run' folder inside the run workload flavor (default flavor: 'test_ci')
+16. Open Kibana url and verify workload index populate with data:
+17. Create the workload index: Kibana -> Hamburger tab -> Stack Management -> Index patterns -> Create index pattern -> workload-results -> timestamp -> Done
+18. Verify workload-results index is populated: Kibana -> Hamburger tab -> Discover -> workload-results (index) -> verify that there is a new data
+
+## Add new custom workload to benchmark runner
+This section also applies to modifying an existing workload, including
+any template .yaml files.
+1. git clone https://github.com/redhat-performance/benchmark-runner
+2. cd benchmark-runner
+3. Install prerequisites (these commands assume RHEL/CentOS/Fedora):
+   - dnf install python3-pip
+4. Create workload Dockerfile, example:
+   ```
+   FROM quay.io/centos/centos:stream8
+   Shell/Python that run workload
+   Result in Json (redirect to stdout)
+   Wrap Json output with begin/end workload stamp
+   start_stamp='@@~@@START-WORKLOAD@@~@@'
+   end_stamp='@@~@@END-WORKLOAD@@~@@'
+   ```
+5. Upload image to quay.io
+6. Create workload pod yaml, example:
+   ```
+   kind: Pod
+   apiVersion: v1
+   metadata:
+   name: vdbench-pod
+   namespace: default
+   spec:
+   containers:
+   - name: vdbench-pod
+     namespace: default
+     image: quay.io/ebattat/centos-stream8-vdbench5.04.07-pod:latest
+     imagePullPolicy: "Always"
+     volumeMounts:
+      - name: vdbench-pvc
+        mountPath: "/workload"
+        env:
+      - name: BLOCK_SIZES
+   ```
+   output pod example:
+   ```
+   '@@~@@START-WORKLOAD@@~@@'
+   {
+   "workload": "Name",
+   "Run": "1",
+   "Thread": 1,
+   "IOPS": "30"
+   }
+   '@@~@@END-WORKLOAD@@~@@'
+   ```
+7. Benchmark-runner - add workload Template in [benchmark_runner/common/template_operations/templates](benchmark_runner/common/template_operations/templates)
+   1. Create workload directory for example [benchmark_runner/common/template_operations/templates/vdbench](benchmark_runner/common/template_operations/templates/vdbench)
+   2. Create custom_data_template.yaml for example [benchmark_runner/common/template_operations/templates/vdbench/vdbench_data_template.yaml](benchmark_runner/common/template_operations/templates/vdbench/vdbench_data_template.yaml)
+      put here all the data that should be replaced by Jinja in
+   3. Create custom pod template [benchmark_runner/common/template_operations/templates/vdbench/internal_data/vdbench_pod_template.yaml](benchmark_runner/common/template_operations/templates/vdbench/internal_data/vdbench_pod_template.yaml)
+8. Create Workload class [benchmark_runner/workloads/workloads.py](benchmark_runner/workloads/workloads.py)
+   1. Add custom workload method, example:
+   ```
+      @typechecked
+      @logger_time_stamp
+      def vdbench_pod(self, name: str = ''):
+      """
+      This method run vdbench pod workload
+      :return:
+      """
+      if name == '':
+      name = self.vdbench_pod.__name__
+      run = VdbenchPod()
+      run.vdbench_pod(name=name)
+   ```
+   2. Add custom workload class, [benchmark_runner/workloads/vdbench_pod.py](benchmark_runner/workloads/vdbench_pod.py):
+   Please copy the whole class and functionality
+9. Add workload method name (workload_pod/workload_vm) to environment_variables_dict['workloads'] in [benchmark_runner/main/environment_variables.py](benchmark_runner/main/environment_variables.py)
+10. Add workload folder path in [MANIFEST.in](MANIFEST.in), add 2 paths: the workload path to 'workload_data_template.yaml' and path to 'internal_data' Pod and VM template yaml files
+   ```
+   include benchmark_runner/common/template_operations/templates/vdbench/*.yaml
+   include benchmark_runner/common/template_operations/templates/vdbench/internal_data/*.yaml
+   ```
+11. Add tests for all new methods you write under `tests/integration`.
+12. Update the golden unit test files as described [above](#add-new-workload-modify-parameters-to-workload-or-change-parameters-for-any-ci-job)
+13. For test and debug workload, need to configure [benchmark_runner/main/environment_variables.py](benchmark_runner/main/environment_variables.py)
+14. Fill parameters: workload, kubeadmin_password, pin_node_benchmark_operator, pin_node1, pin_node2, elasticsearch, elasticsearch_port
+15. Run [/benchmark_runner/main/main.py](/benchmark_runner/main/main.py)  and verify that the workload run correctly
+16. The workload can be monitored and checked through 'current run' folder inside the run workload flavor (default flavor: 'test_ci')
+17. Open Kibana url and verify workload index populate with data:
+18. Create the workload index: Kibana -> Hamburger tab -> Stack Management -> Index patterns -> Create index pattern -> workload-results -> timestamp -> Done
+19. Verify workload-results index is populated: Kibana -> Hamburger tab -> Discover -> workload-results (index) -> verify that there is a new data
 
 ## Add workload to grafana dashboard
 1. Create Elasticsearch data source
@@ -131,7 +223,7 @@ any template .yaml files.
       6. Save & test
 2. Open grafana dashboard benchmark-runner-report:
    1. Open grafana
-   2. Create(+) -> import -> paste [benchmark-runner-report.json](grafana/benchmark-runner-report.json) -> Load
+   2. Create(+) -> import -> paste [grafana/benchmark-runner-report.json](grafana/benchmark-runner-report.json) -> Load
    3. Create panel from scratch or duplicate existing on (stressng/uperf)
    4. Configure the workload related metrics
    5. Save dashboard -> share -> Export -> view json -> Copy to clipboard -> override existing one [benchmark-runner-report.json](grafana/benchmark-runner-report.json)
@@ -191,8 +283,8 @@ Boilerplate data that is independent of workload has been moved to `common.yaml`
    $ . venv/bin/activate
 ```
 4. There are 2 options to run workload:
-   1. Run workload through [main.py](/benchmark_runner/main/main.py)
-      1. Need to configure all mandatory parameters in [environment_variables.py](benchmark_runner/main/environment_variables.py)
+   1. Run workload through [/benchmark_runner/main/main.py](/benchmark_runner/main/main.py)
+      1. Need to configure all mandatory parameters in [benchmark_runner/main/environment_variables.py](benchmark_runner/main/environment_variables.py)
          1. `workloads` = e.g. stressng_pod
          2. `runner_path` = path to local cloned benchmark-operator (e.g. /home/user/)
             1. git clone https://github.com/cloud-bulldozer/benchmark-operator  (inside 'runner_path')
@@ -202,17 +294,17 @@ Boilerplate data that is independent of workload has been moved to `common.yaml`
          6. `pin_node2` - workload second node selector (for workload with client server e.g. uperf)
          7. `elasticsearch` - elasticsearch url without http prefix
          8. `elasticsearch_port` - elasticsearch port
-      2. Run [main.py](/benchmark_runner/main/main.py)
+      2. Run [/benchmark_runner/main/main.py](/benchmark_runner/main/main.py)
       3. Verify that benchmark-runner run the workload
    2. Run workload through integration/unittest tests [using pytest]
-      1. Need to configure all mandatory parameters [test_environment_variables.py](tests/integration/benchmark_runner/test_environment_variables.py)
+      1. Need to configure all mandatory parameters [tests/integration/benchmark_runner/test_environment_variables.py](tests/integration/benchmark_runner/test_environment_variables.py)
          1. `runner_path` = path to local cloned benchmark-operator (e.g. /home/user/)
             1. git clone https://github.com/cloud-bulldozer/benchmark-operator (inside 'runner_path')
          2. `kubeadmin_password`
          3. `pin_node1` - workload first node selector
          4. `elasticsearch` - elasticsearch url without http prefix
          5. `elasticsearch_port` - elasticsearch port
-      2. Run the selected test using pytest [test_oc.py](/tests/integration/benchmark_runner/common/oc/test_oc.py)
+      2. Run the selected test using pytest [/tests/integration/benchmark_runner/common/oc/test_oc.py](/tests/integration/benchmark_runner/common/oc/test_oc.py)
          1. Enable pytest in Pycharm: Configure pytest in Pycharm -> File -> settings -> tools -> Python integrated tools -> Testing -> pytest -> ok), and run the selected test
          2. Run pytest through terminal: python -m pytest -v tests/ (pip install pytest)
 5. There are three separate flavors of test: `test-ci`, `func-ci`, and
@@ -235,10 +327,8 @@ Boilerplate data that is independent of workload has been moved to `common.yaml`
 
 ## Determine the version of benchmark-runner in the current container image
 
-The version of [benchmark-runner on
-PyPi](https://pypi.org/project/benchmark-runner/) should match the
-version in `setup.py`, and the [container
-image version](https://quay.io/repository/ebattat/benchmark-runner?tab=tags)
+The version of [https://pypi.org/project/benchmark-runner/](https://pypi.org/project/benchmark-runner/) should match the
+version in `setup.py`, and the [https://quay.io/repository/ebattat/benchmark-runner?tab=tags](https://quay.io/repository/ebattat/benchmark-runner?tab=tags)
 should also match that version.  However, if the version on PyPi is
 not updated quickly enough, the container image may remain stale.
 This may result in unexpected errors.
