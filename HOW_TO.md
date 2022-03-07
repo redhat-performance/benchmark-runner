@@ -106,13 +106,13 @@ any template .yaml files.
 4. Open [benchmark_runner/benchmark_operator/benchmark_operator_workloads.py](benchmark_runner/benchmark_operator/benchmark_operator_workloads.py)
 5. Create new `workload method` for Pod and VM under `BenchmarkOperatorWorkloads class` section in [benchmark_runner/benchmark_operator/benchmark_operator_workloads.py](benchmark_runner/benchmark_operator/benchmark_operator_workloads.py).
    It can be duplicated from existing workload method: `def stressng_pod` or `def stressng_vm` and customized workload run steps accordingly
-6. Create dedicated `workload class` StressngPod or StressngVM in dedicated module `stressng_pod.py` or `stressng_vm.py` and customized workload run steps accordingly [benchmark_runner/benchmark_operator/stressng_pod.py](benchmark_runner/benchmark_operator/stressng_pod.py) 
+6. Create dedicated `workload class` WorkloadPod or WorkloadVM in dedicated module `workload_pod.py` or `workload_vm.py` and customized workload run steps accordingly e.g. [benchmark_runner/benchmark_operator/stressng_pod.py](benchmark_runner/benchmark_operator/stressng_pod.py) 
 7. Add workload method name (workload_pod/workload_vm) to environment_variables_dict['workloads'] in [benchmark_runner/main/environment_variables.py](benchmark_runner/main/environment_variables.py)
 8. Create workload folder in the [benchmark_runner/common/template_operations/templates](benchmark_runner/common/template_operations/templates) directory.  Create the following files in that directory:
    1. Add workload_data_template for configuration parameters, e.g. [benchmark_runner/common/template_operations/templates/stressng/stressng_data_template.yaml](benchmark_runner/common/template_operations/templates/stressng/stressng_data_template.yaml).  
    2. The data template is structured as discussed [below](#data-template).
    3. Add workload pod and VM custom resource template inside [benchmark_runner/common/template_operations/templates/stressng/internal_data](benchmark_runner/common/template_operations/templates/stressng/internal_data)
-9. Add workload folder path in [MANIFEST.in](MANIFEST.in), add 2 paths: the workload path to 'workload_data_template.yaml' and path to 'internal_data' Pod and VM template yaml files
+9. Add workload folder path in [MANIFEST.in](MANIFEST.in), add 2 paths: the workload path to 'workload_data_template.yaml' and path to 'internal_data' Pod and VM template yaml files. e.g.
    ```
      include benchmark_runner/common/template_operations/templates/stressng/*.yaml
      include benchmark_runner/common/template_operations/templates/stressng/internal_data/*.yaml
