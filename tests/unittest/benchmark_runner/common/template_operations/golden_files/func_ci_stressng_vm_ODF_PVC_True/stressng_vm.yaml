@@ -22,7 +22,7 @@ spec:
       pin: True # enable for nodeSelector
       pin_node: "pin-node-1"
       # general options
-      runtype: "parallel"
+      runtype: "sequential"
       timeout: "30"
       instances: 1
       # cpu stressor options

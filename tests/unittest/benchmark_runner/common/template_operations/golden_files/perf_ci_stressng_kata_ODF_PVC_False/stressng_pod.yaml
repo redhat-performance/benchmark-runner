@@ -28,8 +28,8 @@ spec:
       limits_cpu: 60
       limits_memory: 75Gi
       # general options
-      runtype: "parallel"
-      timeout: "300"
+      runtype: "sequential"
+      timeout: "120"
       instances: 1
       # cpu stressor options
       cpu_stressors: "60"

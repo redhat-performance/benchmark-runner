@@ -22,8 +22,8 @@ spec:
       pin: True # enable for nodeSelector
       pin_node: "pin-node-1"
       # general options
-      runtype: "parallel"
-      timeout: "300"
+      runtype: "sequential"
+      timeout: "120"
       instances: 1
       # cpu stressor options
       cpu_stressors: "60"
