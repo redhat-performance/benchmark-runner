@@ -3,7 +3,7 @@ metadata:
 template_data:
   shared:
     pin_node: {{ pin_node1 }}
-    runtype: parallel
+    runtype: sequential
     instances: 1
     # cpu stressor options
     cpu_percentage: 100
@@ -14,7 +14,7 @@ template_data:
     resources: true
   run_type:
     perf_ci:
-      timeout: 300
+      timeout: 120
       cpu_stressors: 60
       vm_bytes: 60G
       limits_cpu: 60
