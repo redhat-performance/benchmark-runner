@@ -108,7 +108,11 @@ class EnvironmentVariables:
         self._environment_variables_dict['date_key'] = datetime.datetime.now().strftime("%Y/%m/%d")
         self._environment_variables_dict['time_stamp_format'] = os.path.join(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d-%H-%M-%S'))
         # Benchmark runner local run artifacts path with time stamp format
-        self._environment_variables_dict['run_artifacts_path'] = os.path.join(self._environment_variables_dict['run_artifacts'], f"{self._environment_variables_dict['workload'].replace('_', '-')}-{self._environment_variables_dict['time_stamp_format']}")
+
+        self._environment_variables_dict['run_artifacts_path'] = os.environ.get('RUN_ARTIFACTS_PATH')
+        if not self._environment_variables_dict['run_artifacts_path']:
+            self._environment_variables_dict['run_artifacts_path'] = os.path.join(self._environment_variables_dict['run_artifacts'], f"{self._environment_variables_dict['workload'].replace('_', '-')}-{self._environment_variables_dict['time_stamp_format']}")
+
         # None(Default)/ 'True' to save local(/tmp) artifacts files
         self._environment_variables_dict['save_artifacts_local'] = os.environ.get('SAVE_ARTIFACTS_LOCAL', None)
         # None/ 'True'(Default) to enable prometheus snapshot
