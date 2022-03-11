@@ -4,6 +4,7 @@ import yaml
 import sys
 
 from jinja2 import Template
+import benchmark_runner
 from benchmark_runner.common.template_operations.render_yaml_from_template import render_yaml_file
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 from benchmark_runner.main.environment_variables import environment_variables
@@ -94,7 +95,10 @@ class TemplateOperations:
         else:
             self.__standard_output_file = f"{'_'.join([self.__workload_name, self.__workload_template_kind])}.yaml"
         self.__standard_template_file = f"{'_'.join([self.__workload_name, self.__workload_template_kind])}_template.yaml"
-        workload_dir_path = os.path.join(self.__dir_path, self.__workload_name)
+        workload_dir_path = os.path.join((os.path.dirname(benchmark_runner.__file__)), "workloads", self.__workload, "template") \
+            if self.__environment_variables_dict['template_in_workload_dir'] \
+               else os.path.join(self.__dir_path, self.__workload_name)
+
 
         template_render_data = {
             'kind': self.__workload_kind,

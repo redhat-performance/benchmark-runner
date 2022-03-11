@@ -118,6 +118,8 @@ class EnvironmentVariables:
 
         self._environment_variables_dict['config_from_args'] = os.environ.get('CONFIG_FROM_ARGS')
 
+        self._environment_variables_dict['template_in_workload_dir'] = os.environ.get('TEMPLATE_IN_WORKLOAD_DIR')
+
         # end dynamic parameters - configure for local run
         ##################################################################################################
 
