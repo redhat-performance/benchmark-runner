@@ -18,6 +18,8 @@ logger.setLevel(level=log_level)
 # python -m venv venv
 # . venv/bin/activate
 
+SYSTEM_EXIT_BENCHMARK_FAILED = 1
+SYSTEM_EXIT_UNKNOWN_EXECUTION_TYPE = 2
 
 @logger_time_stamp
 def main():
@@ -140,7 +142,7 @@ def main():
         :return:
         """
         # benchmark-operator node selector
-        benchmark_runner_workload.run()
+        return benchmark_runner_workload.run()
 
     # azure_cluster_start_stop
     if azure_cluster_stop or azure_cluster_start:
@@ -156,10 +158,13 @@ def main():
         update_ci_status()
     elif is_benchmark_operator_workload:
         run_benchmark_operator_workload()
+
     elif is_benchmark_runner_workload:
-        run_benchmark_runner_workload()
+        success = run_benchmark_runner_workload()
+        if not success:
+            raise SystemExit(SYSTEM_EXIT_BENCHMARK_FAILED)
     else:
         logger.error("ERROR: could not determine the type of execution.")
-        sys.exit(1)
+        raise SystemExit(SYSTEM_EXIT_UNKNOWN_EXECUTION_TYPE)
 
 main()

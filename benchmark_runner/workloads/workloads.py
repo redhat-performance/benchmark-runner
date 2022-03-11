@@ -44,13 +44,16 @@ class Workloads(WorkloadsOperations):
 
         try:
             initialize_workload()
-
+            success = True
             # extract workload module and class
             for cls in inspect.getmembers(workload_module, inspect.isclass):
                 if workload.replace('_', '').lower() == cls[0].lower():
-                    cls[1]().run()
+                    if cls[1]().run() == False:
+                        success = False
 
             finalize_workload()
+
+            return success
         except Exception as err:
             finalize_workload()
             raise err
