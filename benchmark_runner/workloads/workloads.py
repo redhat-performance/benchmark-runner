@@ -22,16 +22,35 @@ class Workloads(WorkloadsOperations):
         The method run workload
         :return:
         """
+
+        # kata use pod module - replace kata to pod
+        workload = self._workload.replace('kata', 'pod')
+        # load the workload module before doing anything else (in case it fails)
+        workload_module = importlib.import_module(f'benchmark_runner.workloads.{workload}')
+
         try:
-            self.initialize_workload()
-            # kata use pod module - replace kata to pod
-            workload = self._workload.replace('kata', 'pod')
+            _initialize_workload = getattr(workload_module, "initialize_workload")
+            initialize_workload = lambda: _initialize_workload(self)
+        except AttributeError:
+            logger.info(f"{workload} module has no initialize_workload method. Using the default one.")
+            initialize_workload = self.initialize_workload
+
+        try:
+            _finalize_workload = getattr(workload_module, "finalize_workload")
+            finalize_workload = lambda: _finalize_workload(self)
+        except AttributeError:
+            logger.info(f"{workload} module has no finalize_workload method. Using the default one.")
+            finalize_workload = self.finalize_workload
+
+        try:
+            initialize_workload()
+
             # extract workload module and class
-            workload_module = importlib.import_module(f'benchmark_runner.workloads.{workload}')
             for cls in inspect.getmembers(workload_module, inspect.isclass):
                 if workload.replace('_', '').lower() == cls[0].lower():
                     cls[1]().run()
-            self.finalize_workload()
+
+            finalize_workload()
         except Exception as err:
-            self.finalize_workload()
+            finalize_workload()
             raise err
