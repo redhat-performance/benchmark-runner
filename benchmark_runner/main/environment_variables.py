@@ -115,6 +115,9 @@ class EnvironmentVariables:
         self._environment_variables_dict['enable_prometheus_snapshot'] = os.environ.get('ENABLE_PROMETHEUS_SNAPSHOT', 'True')
 
         self._environment_variables_dict['runner_type'] = os.environ.get('RUNNER_TYPE')
+
+        self._environment_variables_dict['config_from_args'] = os.environ.get('CONFIG_FROM_ARGS')
+
         # end dynamic parameters - configure for local run
         ##################################################################################################
 

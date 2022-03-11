@@ -1,6 +1,8 @@
 
 import os
 import yaml
+import sys
+
 from jinja2 import Template
 from benchmark_runner.common.template_operations.render_yaml_from_template import render_yaml_file
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
@@ -107,6 +109,11 @@ class TemplateOperations:
         template_render_data = {**self.__environment_variables_dict, **common_data}
 
         workload_data = yaml.load(render_yaml_file(workload_dir_path, f'{self.__workload_name}_data_template.yaml', template_render_data), Loader=yaml.FullLoader)
+
+        if self.__environment_variables_dict.get("config_from_args") == "True":
+            config = dict([kv.split("=") for kv in sys.argv[1:]])
+            workload_data["template_data"]["run_type"]["default"] = config
+
         render_data = build_template_data(template_render_data, workload_data)
 
         answer = {}
