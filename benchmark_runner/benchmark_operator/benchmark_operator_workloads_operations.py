@@ -228,7 +228,7 @@ class BenchmarkOperatorWorkloadsOperations:
         if run_artifacts_url:
             metadata.update({'run_artifacts_url': run_artifacts_url})
         if database:
-            metadata.update({'vm_os_version': 'centos8'})
+            metadata.update({'vm_os_version': 'centos-stream8'})
         else:
             metadata.update({'vm_os_version': 'fedora34'})
 
