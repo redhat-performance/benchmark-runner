@@ -113,6 +113,8 @@ class EnvironmentVariables:
         self._environment_variables_dict['save_artifacts_local'] = os.environ.get('SAVE_ARTIFACTS_LOCAL', None)
         # None/ 'True'(Default) to enable prometheus snapshot
         self._environment_variables_dict['enable_prometheus_snapshot'] = os.environ.get('ENABLE_PROMETHEUS_SNAPSHOT', 'True')
+
+        self._environment_variables_dict['runner_type'] = os.environ.get('RUNNER_TYPE')
         # end dynamic parameters - configure for local run
         ##################################################################################################
 

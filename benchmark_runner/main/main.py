@@ -1,4 +1,4 @@
-
+import sys
 import ast  # change string list to list
 
 from benchmark_runner.main.environment_variables import *
@@ -35,6 +35,9 @@ def main():
     install_ocp_version = environment_variables_dict.get('install_ocp_version', '')
     install_ocp_resources = environment_variables_dict.get('install_ocp_resources', '')
     run_type = environment_variables_dict.get('run_type', '')
+
+    is_benchmark_operator_workload = 'benchmark-operator' in (environment_variables.get_workload_namespace(workload), environment_variables_dict.get("runner_type"))
+    is_benchmark_runner_workload = 'benchmark-runner' in (environment_variables.get_workload_namespace(workload), environment_variables_dict.get("runner_type"))
     # workload name validation
     if workload and not ci_status:
         if workload not in environment_variables.workloads_list:
@@ -44,9 +47,9 @@ def main():
         if run_type not in environment_variables.run_types_list:
             logger.info(f'Enter valid run type {environment_variables.run_types_list}')
             raise Exception(f'Invalid run type: {run_type} \n, choose one from the list: {environment_variables.run_types_list}')
-        if environment_variables.get_workload_namespace(workload) == 'benchmark-operator':
+        if is_benchmark_operator_workload:
             benchmark_operator_workload = BenchmarkOperatorWorkloads()
-        elif environment_variables.get_workload_namespace(workload) == 'benchmark-runner':
+        elif is_benchmark_runner_workload:
             benchmark_runner_workload = Workloads()
 
     @logger_time_stamp
@@ -151,11 +154,12 @@ def main():
         install_resources()
     elif ci_status == 'pass' or ci_status == 'failed':
         update_ci_status()
-    elif environment_variables.get_workload_namespace(workload) == 'benchmark-operator':
+    elif is_benchmark_operator_workload:
         run_benchmark_operator_workload()
-    elif environment_variables.get_workload_namespace(workload) == 'benchmark-runner':
+    elif is_benchmark_runner_workload:
         run_benchmark_runner_workload()
-
+    else:
+        logger.error("ERROR: could not determine the type of execution.")
+        sys.exit(1)
 
 main()
-
