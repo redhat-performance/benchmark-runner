@@ -21,6 +21,7 @@ spec:
     args:
       {%- if kind == 'kata' %}
       runtime_class: kata
+      job_timeout: 5400
       {%- endif %}
       pin: {{ pin }} # enable for nodeSelector
       pin_node: "{{ pin_node1 }}"
