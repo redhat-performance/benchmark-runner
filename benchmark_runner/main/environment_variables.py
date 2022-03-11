@@ -77,7 +77,9 @@ class EnvironmentVariables:
 
         # Choose default namespace
         base_workload = self._environment_variables_dict['workload'].split('_')[0]
-        if base_workload in self._environment_variables_dict['workload_namespaces']:
+        if os.environ.get('NAMESPACE'):
+            self._environment_variables_dict['namespace'] = os.environ.get('NAMESPACE')
+        elif base_workload in self._environment_variables_dict['workload_namespaces']:
             default_namespace = self._environment_variables_dict['workload_namespaces'][base_workload]
             self._environment_variables_dict['namespace'] = os.environ.get('NAMESPACE', default_namespace)
         else:
