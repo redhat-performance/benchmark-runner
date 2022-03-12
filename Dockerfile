@@ -21,7 +21,7 @@ RUN dnf install -y python3.9 \
 # install & run benchmark-runner (--no-cache-dir for take always the latest)
 RUN python3.9 -m pip --no-cache-dir install --upgrade pip && pip --no-cache-dir install benchmark-runner --upgrade
 
-# centos stream enable firewall ( solve virtctl issue )
+# enable firewall in centos stream ( solve virtctl issue )
 RUN dnf install firewalld -y \
     && firewall-offline-cmd --add-port=22/tcp \
     && systemctl enable firewalld
@@ -34,7 +34,7 @@ RUN  curl -L https://github.com/openshift/okd/releases/download/${oc_version}/op
      && cp ~/kubectl /usr/local/bin/kubectl \
      && cp ~/oc /usr/local/bin/oc \
      && rm -rf ~/kubectl \
-     && rm -rf ~/oc \
+     && rm -rf ~/oc
 
 # install virtctl for VNC
 ARG virtctl_version=0.48.1
