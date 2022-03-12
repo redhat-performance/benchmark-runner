@@ -21,7 +21,7 @@ RUN dnf install -y python3.9 \
 # install & run benchmark-runner (--no-cache-dir for take always the latest)
 RUN python3.9 -m pip --no-cache-dir install --upgrade pip && pip --no-cache-dir install benchmark-runner --upgrade
 
-# enable firewall
+# centos stream enable firewall ( solve virtctl issue )
 RUN dnf install firewalld -y \
     && firewall-offline-cmd --add-port=22/tcp \
     && systemctl enable firewalld
