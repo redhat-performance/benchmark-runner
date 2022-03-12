@@ -21,10 +21,10 @@ RUN dnf install -y python3.9 \
 # install & run benchmark-runner (--no-cache-dir for take always the latest)
 RUN python3.9 -m pip --no-cache-dir install --upgrade pip && pip --no-cache-dir install benchmark-runner --upgrade
 
-# install helm
-RUN curl -fsSL -o ~/get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 \
-    && chmod 700 ~/get_helm.sh \
-    && ~/./get_helm.sh
+# enable firewall
+RUN dnf install firewalld -y \
+    && firewall-offline-cmd --add-port=22/tcp \
+    && systemctl enable firewalld
 
 # install oc/kubectl client tools for OpenShift/Kubernetes
 ARG oc_version=4.9.0-0.okd-2022-01-29-035536
