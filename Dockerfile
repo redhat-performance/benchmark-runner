@@ -21,11 +21,6 @@ RUN dnf install -y python3.9 \
 # install & run benchmark-runner (--no-cache-dir for take always the latest)
 RUN python3.9 -m pip --no-cache-dir install --upgrade pip && pip --no-cache-dir install benchmark-runner --upgrade
 
-# enable firewall in centos stream ( solve virtctl issue )
-RUN dnf install firewalld -y \
-    && firewall-offline-cmd --add-port=22/tcp \
-    && systemctl enable firewalld
-
 # install oc/kubectl client tools for OpenShift/Kubernetes
 ARG oc_version=4.9.0-0.okd-2022-01-29-035536
 RUN  curl -L https://github.com/openshift/okd/releases/download/${oc_version}/openshift-client-linux-${oc_version}.tar.gz -o  ~/openshift-client-linux-${oc_version}.tar.gz \
