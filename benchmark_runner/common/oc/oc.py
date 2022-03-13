@@ -737,6 +737,8 @@ class OC(SSH):
         :param output_filename:
         :return:
         """
+        data_index = 1
+        title_index = 2
         if not output_filename:
             output_filename = os.path.join(self.__run_artifacts, vm_name)
         results_list = []
@@ -745,11 +747,17 @@ class OC(SSH):
             for line in infile:
                 if start_stamp in line:
                     copy = True
-                    results_list.append(line.strip().split(':')[2:])
                     continue
                 elif end_stamp in line:
                     copy = False
                     continue
                 elif copy:
-                    results_list.append(line.strip().split(':')[1:])
+                    # Strip line prefix from VM output
+                    if 'cloud-init' in line:
+                        if vm_name in line:
+                            # filter the title, placed after the second :
+                            results_list.append(line.strip().split(':')[title_index:])
+                        else:
+                            # filter the data, placed after the first :
+                            results_list.append(line.strip().split(':')[data_index:])
         return results_list
