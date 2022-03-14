@@ -209,7 +209,8 @@ class WorkloadsOperations:
         csv_result_file = os.path.join(self._run_artifacts_path, 'vdbench_vm_result.csv')
         with open(csv_result_file, 'w') as out:
             for row in results_list:
-                out.write(f'{row[0].strip()}\n')
+                if row:
+                    out.write(f'{row[0].strip()}\n')
         # csv to dictionary
         the_reader = DictReader(open(csv_result_file, 'r'))
         for line_dict in the_reader:

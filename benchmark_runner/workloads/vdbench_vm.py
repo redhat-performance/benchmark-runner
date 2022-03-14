@@ -10,6 +10,9 @@ class VdbenchVM(WorkloadsOperations):
     """
     This class run vdbench vm
     """
+    START_STAMP = '@@~@@START-WORKLOAD@@~@@'
+    END_STAMP = '@@~@@END-WORKLOAD@@~@@'
+
     def __init__(self):
         super().__init__()
         self.__name = ''
@@ -40,10 +43,10 @@ class VdbenchVM(WorkloadsOperations):
             self._oc.wait_for_ready(label=f'app=vdbench-{self._trunc_uuid}', run_type='vm', label_uuid=False)
             # Create vm log should be direct after vm is ready
             self.__vm_name = self._create_vm_log(labels=[self.__workload_name])
-            self.__status = self._oc.wait_for_vm_log_completed(vm_name=self.__vm_name, end_stamp='@@~@@END-WORKLOAD@@~@@')
+            self.__status = self._oc.wait_for_vm_log_completed(vm_name=self.__vm_name, end_stamp=self.END_STAMP)
             self.__status = 'complete' if self.__status else 'failed'
             # save run artifacts logs
-            result_list = self._create_vm_run_artifacts(vm_name=self.__vm_name, start_stamp=self.__vm_name, end_stamp='@@~@@END-WORKLOAD@@~@@')
+            result_list = self._create_vm_run_artifacts(vm_name=self.__vm_name, start_stamp=self.START_STAMP, end_stamp=self.END_STAMP)
             if self._es_host:
                 # upload several run results
                 for result in result_list:
@@ -60,7 +63,7 @@ class VdbenchVM(WorkloadsOperations):
             raise err
         except Exception as err:
             # save run artifacts logs
-            result_list = self._create_vm_run_artifacts(vm_name=self.__vm_name, start_stamp=self.__vm_name, end_stamp='@@~@@END-WORKLOAD@@~@@')
+            result_list = self._create_vm_run_artifacts(vm_name=self.__vm_name, start_stamp=self.START_STAMP, end_stamp=self.END_STAMP)
             # upload several run results
             for result in result_list:
                 self._upload_to_elasticsearch(index=self.__es_index, kind=self.__kind, status='failed', result=result)
