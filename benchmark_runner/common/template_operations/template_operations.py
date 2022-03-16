@@ -120,7 +120,7 @@ class TemplateOperations:
                 template_file = f'{file_components[0]}_template{file_components[1]}'
             with open(os.path.join(workload_dir_path, 'internal_data', template_file)) as f:
                 template = Template(f.read())
-            answer[filename] = template.render(render_data)
+            answer[filename] = f"{template.render(render_data)}\n"
         return answer
 
     @logger_time_stamp
