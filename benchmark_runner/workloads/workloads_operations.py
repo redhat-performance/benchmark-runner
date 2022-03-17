@@ -86,12 +86,12 @@ class WorkloadsOperations:
         :return:
         """
         self._oc.delete_all_resources(resources=['vm', 'pods', 'pvc'])
-    
+
     @logger_time_stamp
     def start_prometheus(self):
         """
         This method start collection of Prometheus snapshot
-        :return: 
+        :return:
         """
         if self._enable_prometheus_snapshot:
             try:
@@ -100,12 +100,12 @@ class WorkloadsOperations:
                 raise PrometheusSnapshotError(err)
             except Exception as err:
                 raise err
-    
+
     @logger_time_stamp
     def end_prometheus(self):
         """
         This method retrieve the Prometheus snapshot
-        :return: 
+        :return:
         """
         if self._enable_prometheus_snapshot:
             try:
@@ -114,7 +114,7 @@ class WorkloadsOperations:
                 raise PrometheusSnapshotError(err)
             except Exception as err:
                 raise err
-            
+
     @logger_time_stamp
     def odf_pvc_verification(self):
         """
@@ -346,18 +346,18 @@ class WorkloadsOperations:
 
     def initialize_workload(self):
         """
-        This method includes all the initialization of workload 
-        :return: 
+        This method includes all the initialization of workload
+        :return:
         """
         self.delete_all()
         self.odf_pvc_verification()
         self._template.generate_yamls()
         self.start_prometheus()
-        
+
     def finalize_workload(self):
         """
-        This method includes all the finalization of workload 
-        :return: 
+        This method includes all the finalization of workload
+        :return:
         """
         self.end_prometheus()
         self.upload_run_artifacts_to_s3()
