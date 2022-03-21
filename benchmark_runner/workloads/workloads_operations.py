@@ -54,7 +54,7 @@ class WorkloadsOperations:
                                                            es_port=self._es_port,
                                                            es_user=self._es_user,
                                                            es_password=self._es_password,
-                                                           es_url_protocol=self.es_url_protocol,
+                                                           es_url_protocol=self._es_url_protocol,
                                                            timeout=self._timeout)
         # Generate templates class
         self._template = TemplateOperations(workload=self._workload)

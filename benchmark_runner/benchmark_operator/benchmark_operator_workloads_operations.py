@@ -52,6 +52,7 @@ class BenchmarkOperatorWorkloadsOperations:
         self._es_password = self._environment_variables_dict.get('elasticsearch_password', '')
         self._timeout = int(self._environment_variables_dict.get('timeout', ''))
         self._uuid = self._environment_variables_dict.get('uuid', '')
+        self._es_url_protocol = self._environment_variables_dict['elasticsearch_url_protocol']
         self._ssh = SSH()
         # Elasticsearch connection
         if self._es_host and self._es_port:
@@ -59,6 +60,7 @@ class BenchmarkOperatorWorkloadsOperations:
                                                            es_port=self._es_port,
                                                            es_user=self._es_user,
                                                            es_password=self._es_password,
+                                                           es_url_protocol=self._es_url_protocol,
                                                            timeout=self._timeout)
         # Generate template class
         self._template = TemplateOperations(workload=self._workload)
