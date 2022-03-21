@@ -19,6 +19,7 @@ spec:
   workload:
     name: stressng
     args:
+      image: quay.io/cloud-bulldozer/stressng:latest-amd64
       runtime_class: kata
       pin: True # enable for nodeSelector
       pin_node: "pin-node-1"
