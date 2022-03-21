@@ -1,7 +1,6 @@
 
 import os
 
-from typeguard import typechecked
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 from benchmark_runner.common.elasticsearch.elasticsearch_exceptions import ElasticSearchDataNotUploaded
 from benchmark_runner.main.environment_variables import environment_variables
@@ -67,8 +66,18 @@ class HammerdbVM(BenchmarkOperatorWorkloadsOperations):
                                           vm_name=f'{self.__workload_name}-workload')
             raise err
         except Exception as err:
-            run_artifacts_url = self._create_run_artifacts(workload=self.__workload_name, pod=False)
-            self._upload_to_elasticsearch(index=self.__es_index, kind=self._environment_variables_dict.get('kind', ''), status='failed', run_artifacts_url=run_artifacts_url, database=self.__database)
+            # save run artifacts logs
+            if self._oc._is_pod_exist(pod_name='benchmark-controller-manager'):
+                self._create_pod_log(label='benchmark-controller-manager')
+            full_name = f'{self.__workload_name}-{self.__database}'
+            run_artifacts_url = os.path.join(self._environment_variables_dict.get('run_artifacts_url', ''), f'{self._get_run_artifacts_hierarchy(workload_name=full_name, is_file=True)}-{self._time_stamp_format}.tar.gz')
+            ids = self._verify_elasticsearch_data_uploaded(index=self.__es_index, uuid=self._oc.get_long_uuid(workload=self.__workload_name), timeout=3)
+            if ids:
+                for id in ids:
+                    self._update_elasticsearch_index(index=self.__es_index, id=id, kind=self.__kind, status='failed', run_artifacts_url=run_artifacts_url, database=self.__database)
+            else:
+                self._upload_to_elasticsearch(index=self.__es_index, kind=self.__kind, status='failed', run_artifacts_url=run_artifacts_url, database=self.__database, uuid=self._uuid)
+                self._verify_elasticsearch_data_uploaded(index=self.__es_index, uuid=self._uuid)
             # delete hammerdb
             self.tear_down_vm_after_error(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}_{self.__database}.yaml'),
                                           vm_name=f'{self.__workload_name}-workload')

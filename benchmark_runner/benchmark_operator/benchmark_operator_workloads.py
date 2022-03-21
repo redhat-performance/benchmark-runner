@@ -19,14 +19,18 @@ class BenchmarkOperatorWorkloads(BenchmarkOperatorWorkloadsOperations):
         The method run workload
         :return:
         """
-        self.initialize_workload()
-        # kata use pod module - replace kata to pod
-        workload = self._workload.replace('kata', 'pod')
-        # if hammerdb split the database
-        workload = f"{workload.split('_')[0]}_{workload.split('_')[1]}"
-        # extract workload module and class
-        workload_module = importlib.import_module(f'benchmark_runner.benchmark_operator.{workload}')
-        for cls in inspect.getmembers(workload_module, inspect.isclass):
-            if workload.replace('_', '').lower() == cls[0].lower():
-                cls[1]().run()
-        self.finalize_workload()
+        try:
+            self.initialize_workload()
+            # kata use pod module - replace kata to pod
+            workload = self._workload.replace('kata', 'pod')
+            # if hammerdb split the database
+            workload = f"{workload.split('_')[0]}_{workload.split('_')[1]}"
+            # extract workload module and class
+            workload_module = importlib.import_module(f'benchmark_runner.benchmark_operator.{workload}')
+            for cls in inspect.getmembers(workload_module, inspect.isclass):
+                if workload.replace('_', '').lower() == cls[0].lower():
+                    cls[1]().run()
+            self.finalize_workload()
+        except Exception as err:
+            self.finalize_workload()
+            raise err

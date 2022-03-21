@@ -40,13 +40,10 @@ class CreateKata(CreateOCPResourceOperations):
             current_wait_time += OC.SLEEP_TIME
         return False
 
-    @typechecked
     @logger_time_stamp
     def create_kata(self):
         """
         This method create kata resource
-        :param path:path of resource files
-        :param resource_list: kata resource lists
         :return:
         """
         for resource in self.__resource_list:
