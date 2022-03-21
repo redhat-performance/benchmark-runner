@@ -36,6 +36,8 @@ class EnvironmentVariables:
         self._environment_variables_dict['elasticsearch_port'] = os.environ.get('ELASTICSEARCH_PORT', '')
         self._environment_variables_dict['elasticsearch_user'] = os.environ.get('ELASTICSEARCH_USER', '')
         self._environment_variables_dict['elasticsearch_password'] = os.environ.get('ELASTICSEARCH_PASSWORD', '')
+        # 'http'(Default) / 'https' to use SSL to connect ElasticSearch
+        self._environment_variables_dict['elasticsearch_url_protocol'] = os.environ.get('ELASTICSEARCH_URL_PROTOCOL', 'http')
 
         # Workaround for Kata CPU offline problem in 4.9/4.10
         # Set to True to
@@ -198,10 +200,10 @@ class EnvironmentVariables:
 
         # ElasticSearch url
         if self._environment_variables_dict.get('elasticsearch_password', ''):
-            self._environment_variables_dict['elasticsearch_url'] = f"http://{self._environment_variables_dict.get('elasticsearch_user', '')}:{self._environment_variables_dict.get('elasticsearch_password', '')}@{self._environment_variables_dict.get('elasticsearch', '')}:{self._environment_variables_dict.get('elasticsearch_port', '')}"
+            self._environment_variables_dict['elasticsearch_url'] = f"{self._environment_variables_dict['elasticsearch_url_protocol']}://{self._environment_variables_dict.get('elasticsearch_user', '')}:{self._environment_variables_dict.get('elasticsearch_password', '')}@{self._environment_variables_dict.get('elasticsearch', '')}:{self._environment_variables_dict.get('elasticsearch_port', '')}"
         else:
             if self._environment_variables_dict['elasticsearch'] and self._environment_variables_dict.get('elasticsearch_port', ''):
-                self._environment_variables_dict['elasticsearch_url'] = f"http://{self._environment_variables_dict.get('elasticsearch', '')}:{self._environment_variables_dict.get('elasticsearch_port', '')}"
+                self._environment_variables_dict['elasticsearch_url'] = f"{self._environment_variables_dict['elasticsearch_url_protocol']}://{self._environment_variables_dict.get('elasticsearch', '')}:{self._environment_variables_dict.get('elasticsearch_port', '')}"
             else:
                 self._environment_variables_dict['elasticsearch_url'] = ''
 
