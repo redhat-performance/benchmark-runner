@@ -131,7 +131,7 @@ class WorkloadsOperations:
             self._oc.save_vm_log(vm_name=vm_name)
         return vm_name
 
-    def __create_pod_log(self, pod: str = ''):
+    def _create_pod_log(self, pod: str = ''):
         """
         This method create pod log per workload
         :param pod: pod name
@@ -140,7 +140,7 @@ class WorkloadsOperations:
         pod_name = self._oc.get_pod(label=pod)
         return self._oc.save_pod_log(pod_name=pod_name)
 
-    def __get_run_artifacts_hierarchy(self, workload_name: str = '', is_file: bool = False):
+    def _get_run_artifacts_hierarchy(self, workload_name: str = '', is_file: bool = False):
         """
         This method return log hierarchy
         :param workload_name: workload name
@@ -178,7 +178,7 @@ class WorkloadsOperations:
         :return: run results dict
         """
         result_list = []
-        pod_log_file = self.__create_pod_log(pod=pod_name)
+        pod_log_file = self._create_pod_log(pod=pod_name)
         workload_name = self._environment_variables_dict.get('workload', '').replace('_', '-')
         # csv to dictionary
         the_reader = DictReader(open(pod_log_file, 'r'))
@@ -190,7 +190,7 @@ class WorkloadsOperations:
                 elif value == 'n/a':
                     line_dict[key] = 0.0
             line_dict['pod_name'] = pod_name
-            line_dict['run_artifacts_url'] = os.path.join(self._run_artifacts_url, f'{self.__get_run_artifacts_hierarchy(workload_name=workload_name, is_file=True)}-{self._time_stamp_format}.tar.gz')
+            line_dict['run_artifacts_url'] = os.path.join(self._run_artifacts_url, f'{self._get_run_artifacts_hierarchy(workload_name=workload_name, is_file=True)}-{self._time_stamp_format}.tar.gz')
             result_list.append(dict(line_dict))
         return result_list
 
@@ -221,7 +221,7 @@ class WorkloadsOperations:
                 elif value == 'n/a':
                     line_dict[key] = 0.0
             line_dict['vm_name'] = vm_name
-            line_dict['run_artifacts_url'] = os.path.join(self._run_artifacts_url, f'{self.__get_run_artifacts_hierarchy(workload_name=workload_name, is_file=True)}-{self._time_stamp_format}.tar.gz')
+            line_dict['run_artifacts_url'] = os.path.join(self._run_artifacts_url, f'{self._get_run_artifacts_hierarchy(workload_name=workload_name, is_file=True)}-{self._time_stamp_format}.tar.gz')
             result_list.append(dict(line_dict))
         return result_list
 
@@ -244,7 +244,7 @@ class WorkloadsOperations:
         """
         workload = self._workload.replace('_', '-')
         tar_run_artifacts_path = self.__make_run_artifacts_tarfile(workload)
-        run_artifacts_hierarchy = self.__get_run_artifacts_hierarchy(workload_name=workload)
+        run_artifacts_hierarchy = self._get_run_artifacts_hierarchy(workload_name=workload)
         # Upload when endpoint_url is not None
         if self._endpoint_url:
             s3operations = S3Operations()

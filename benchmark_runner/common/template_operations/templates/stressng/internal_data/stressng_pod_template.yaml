@@ -19,6 +19,7 @@ spec:
   workload:
     name: stressng
     args:
+      image: quay.io/cloud-bulldozer/stressng:latest-amd64
       {%- if kind == 'kata' %}
       runtime_class: kata
       {%- endif %}

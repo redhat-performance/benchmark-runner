@@ -90,10 +90,25 @@ class HammerdbPod(BenchmarkOperatorWorkloadsOperations):
             raise err
         except Exception as err:
             # save run artifacts logs
-            run_artifacts_url = self._create_run_artifacts(labels=[f'{self.__workload_name}-creator', f'{self.__workload_name}-workload'], database=self.__database)
-            self._upload_to_elasticsearch(index=self.__es_index, kind=self.__kind, status='failed', run_artifacts_url=run_artifacts_url, database=self.__database)
+            if self._oc._is_pod_exist(pod_name='benchmark-controller-manager'):
+                self._create_pod_log(label='benchmark-controller-manager')
+            if self._oc._is_pod_exist(pod_name=self.__database, namespace=f'{self.__database}-db'):
+                self._create_pod_log(database=self.__database)
+            if self._oc._is_pod_exist(pod_name=f'{self.__workload_name}-creator'):
+                self._create_pod_log(label=f'{self.__workload_name}-creator')
+            if self._oc._is_pod_exist(pod_name=f'{self.__workload_name}-workload'):
+                self._create_pod_log(label=f'{self.__workload_name}-workload')
+            full_name = f'{self.__workload_name}-{self.__database}'
+            run_artifacts_url = os.path.join(self._environment_variables_dict.get('run_artifacts_url', ''), f'{self._get_run_artifacts_hierarchy(workload_name=full_name, is_file=True)}-{self._time_stamp_format}.tar.gz')
+            ids = self._verify_elasticsearch_data_uploaded(index=self.__es_index, uuid=self._oc.get_long_uuid(workload=self.__workload_name), timeout=3)
+            if ids:
+                for id in ids:
+                    self._update_elasticsearch_index(index=self.__es_index, id=id, kind=self.__kind, status='failed', run_artifacts_url=run_artifacts_url)
+            else:
+                self._upload_to_elasticsearch(index=self.__es_index, kind=self.__kind, status='failed', run_artifacts_url=run_artifacts_url, database=self.__database, uuid=self._uuid)
+                self._verify_elasticsearch_data_uploaded(index=self.__es_index, uuid=self._uuid)
             # delete hammerdb
-            self.tear_down_pod_after_error(yaml=os.path.join(f'{self._run_artifacts_path}',  f'{self.___file_name}_{self.__database}.yaml'),
+            self.tear_down_pod_after_error(yaml=os.path.join(f'{self._run_artifacts_path}',  f'{self.__name}_{self.__database}.yaml'),
                                            pod_name=f'{self.__workload_name}-creator')
             # delete database
             self._oc.delete_pod_sync(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__database}.yaml'), pod_name=self.__database,
