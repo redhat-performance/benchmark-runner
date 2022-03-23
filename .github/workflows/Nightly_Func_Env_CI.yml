@@ -2,7 +2,12 @@
 # This is a nightly CI Pipeline against Functional environment
 name: Deploy Func Env Nightly CI
 
-on:  
+  
+on:
+  workflow_run:
+    workflows: ["Deploy Operator FUNC Env Nightly CI"]
+    types:
+      - completed
   schedule:
     - cron: '0 4 * * 0-5' # run at 4 AM UTC/ 0 AM EDT
 
