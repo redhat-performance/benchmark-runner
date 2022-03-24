@@ -1,7 +1,10 @@
 
 import os
 import yaml
+import sys
+
 from jinja2 import Template
+import benchmark_runner
 from benchmark_runner.common.template_operations.render_yaml_from_template import render_yaml_file
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 from benchmark_runner.main.environment_variables import environment_variables
@@ -67,6 +70,8 @@ class TemplateOperations:
                 return dict()
             template_data = template_root_data.get('template_data')
             shared_data = template_data.get('shared')
+            if shared_data is None:
+                shared_data = {}
             kind_data = get_sub_dict(template_data, 'kind', self.__workload_kind)
             run_type_data = get_sub_dict(template_data, 'run_type', self.__run_type)
             kind_runtype_data = get_sub_dict(kind_data, 'run_type', self.__run_type)
@@ -90,7 +95,10 @@ class TemplateOperations:
         else:
             self.__standard_output_file = f"{'_'.join([self.__workload_name, self.__workload_template_kind])}.yaml"
         self.__standard_template_file = f"{'_'.join([self.__workload_name, self.__workload_template_kind])}_template.yaml"
-        workload_dir_path = os.path.join(self.__dir_path, self.__workload_name)
+        workload_dir_path = os.path.join((os.path.dirname(benchmark_runner.__file__)), "workloads", self.__workload, "template") \
+            if self.__environment_variables_dict['template_in_workload_dir'] \
+               else os.path.join(self.__dir_path, self.__workload_name)
+
 
         template_render_data = {
             'kind': self.__workload_kind,
@@ -105,6 +113,11 @@ class TemplateOperations:
         template_render_data = {**self.__environment_variables_dict, **common_data}
 
         workload_data = yaml.load(render_yaml_file(workload_dir_path, f'{self.__workload_name}_data_template.yaml', template_render_data), Loader=yaml.FullLoader)
+
+        if self.__environment_variables_dict.get("config_from_args") == "True":
+            config = dict([kv.split("=") for kv in sys.argv[1:]])
+            workload_data["template_data"]["run_type"]["default"] = config
+
         render_data = build_template_data(template_render_data, workload_data)
 
         answer = {}

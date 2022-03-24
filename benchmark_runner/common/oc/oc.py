@@ -171,14 +171,14 @@ class OC(SSH):
         return count_nodes
 
     @typechecked
-    def _create_async(self, yaml: str):
+    def _create_async(self, yaml: str, is_check: bool = False):
         """
         This method create yaml in async
         :param yaml:
         :return:
         """
         if os.path.isfile(yaml):
-            return self.run(f'oc create -f {yaml}')
+            return self.run(f'oc create -f {yaml}', is_check=is_check)
         else:
             raise YAMLNotExist(yaml)
 

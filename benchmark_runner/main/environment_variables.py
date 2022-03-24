@@ -13,6 +13,22 @@ class EnvironmentVariables:
 
         self._environment_variables_dict = {}
 
+        # env files override true ENV. Not best order, but easier to write :/
+        # .env.generated can be auto-generated (by an external tool) based on the local cluster's configuration.
+
+        for env in ".env", ".env.generated":
+            try:
+                with open(env) as f:
+                    for line in f.readlines():
+                        key, found , value = line.strip().partition("=")
+                        if not found:
+                            print("ERROR: invalid line in {env}: {line.strip()}")
+                            continue
+                        if key in os.environ: continue # prefer env to env file
+                        os.environ[key] = value
+
+            except FileNotFoundError: pass # ignore
+
         ##################################################################################################
         # dynamic parameters - configure for local run
         # parameters for running workload
@@ -61,7 +77,9 @@ class EnvironmentVariables:
 
         # Choose default namespace
         base_workload = self._environment_variables_dict['workload'].split('_')[0]
-        if base_workload in self._environment_variables_dict['workload_namespaces']:
+        if os.environ.get('NAMESPACE'):
+            self._environment_variables_dict['namespace'] = os.environ.get('NAMESPACE')
+        elif base_workload in self._environment_variables_dict['workload_namespaces']:
             default_namespace = self._environment_variables_dict['workload_namespaces'][base_workload]
             self._environment_variables_dict['namespace'] = os.environ.get('NAMESPACE', default_namespace)
         else:
@@ -90,11 +108,22 @@ class EnvironmentVariables:
         self._environment_variables_dict['date_key'] = datetime.datetime.now().strftime("%Y/%m/%d")
         self._environment_variables_dict['time_stamp_format'] = os.path.join(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d-%H-%M-%S'))
         # Benchmark runner local run artifacts path with time stamp format
-        self._environment_variables_dict['run_artifacts_path'] = os.path.join(self._environment_variables_dict['run_artifacts'], f"{self._environment_variables_dict['workload'].replace('_', '-')}-{self._environment_variables_dict['time_stamp_format']}")
+
+        self._environment_variables_dict['run_artifacts_path'] = os.environ.get('RUN_ARTIFACTS_PATH')
+        if not self._environment_variables_dict['run_artifacts_path']:
+            self._environment_variables_dict['run_artifacts_path'] = os.path.join(self._environment_variables_dict['run_artifacts'], f"{self._environment_variables_dict['workload'].replace('_', '-')}-{self._environment_variables_dict['time_stamp_format']}")
+
         # None(Default)/ 'True' to save local(/tmp) artifacts files
         self._environment_variables_dict['save_artifacts_local'] = os.environ.get('SAVE_ARTIFACTS_LOCAL', None)
         # None/ 'True'(Default) to enable prometheus snapshot
         self._environment_variables_dict['enable_prometheus_snapshot'] = os.environ.get('ENABLE_PROMETHEUS_SNAPSHOT', 'True')
+
+        self._environment_variables_dict['runner_type'] = os.environ.get('RUNNER_TYPE')
+
+        self._environment_variables_dict['config_from_args'] = os.environ.get('CONFIG_FROM_ARGS')
+
+        self._environment_variables_dict['template_in_workload_dir'] = os.environ.get('TEMPLATE_IN_WORKLOAD_DIR')
+
         # end dynamic parameters - configure for local run
         ##################################################################################################
 
