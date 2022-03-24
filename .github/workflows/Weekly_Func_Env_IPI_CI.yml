@@ -1,7 +1,7 @@
 # Nightly CI https://github.com/marketplace/actions/deploy-nightly
 # https://crontab.guru/
 # This is a nightly CI Pipeline against Performance environment using IPI installer - run on Sunday
-name: Deploy IPI FUNC Env Nightly CI
+name: Deploy IPI FUNC Env Weekly CI
 
 on:
   schedule:
