@@ -2,14 +2,16 @@
 # This is a nightly CI Pipeline against Functional environment
 name: Deploy Func Env Nightly CI
 
-  
 on:
-  workflow_run:
-    workflows: ["Deploy Operator FUNC Env Nightly CI"]
-    types:
-      - completed
+  # Run on Nightly
   schedule:
     - cron: '0 4 * * 0-5' # run at 4 AM UTC/ 0 AM EDT
+  # Run on weekly after IPI and operator completed
+  workflow_run:
+    workflows: ["Deploy Operator FUNC Env Weekly CI"]
+    types:
+      - completed
+
 
 # Ensures that only one deploy task per branch/environment will run at a time.
 concurrency:
@@ -208,4 +210,3 @@ jobs:
         if [[ "${{needs.nightly.outputs.job_status}}" == "failure" || "${{needs.nightly.outputs.job_status}}" == "cancelled" ]]; then status="failed"; else status="pass"; fi
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Update CI status $status >>>>>>>>>>>>>>>>>>>>>>>>>>'
         podman run --rm -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e ELASTICSEARCH_USER="$ELASTICSEARCH_USER" -e ELASTICSEARCH_PASSWORD="$ELASTICSEARCH_PASSWORD" -e BUILD_VERSION="$build_version" -e CI_STATUS="$status" -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e RUN_TYPE="func_ci" -e FUNC_TIMEOUT="2000" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
-        
