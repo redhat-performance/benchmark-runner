@@ -144,6 +144,7 @@ def main():
         # benchmark-operator node selector
         return benchmark_runner_workload.run()
 
+    success = True
     # azure_cluster_start_stop
     if azure_cluster_stop or azure_cluster_start:
         azure_cluster_start_stop()
@@ -157,14 +158,17 @@ def main():
     elif ci_status == 'pass' or ci_status == 'failed':
         update_ci_status()
     elif is_benchmark_operator_workload:
-        run_benchmark_operator_workload()
+        success = run_benchmark_operator_workload()
 
     elif is_benchmark_runner_workload:
         success = run_benchmark_runner_workload()
-        if not success:
-            raise SystemExit(SYSTEM_EXIT_BENCHMARK_FAILED)
+
     else:
         logger.error("ERROR: could not determine the type of execution.")
         raise SystemExit(SYSTEM_EXIT_UNKNOWN_EXECUTION_TYPE)
+
+    if not success:
+        raise SystemExit(SYSTEM_EXIT_BENCHMARK_FAILED)
+
 
 main()
