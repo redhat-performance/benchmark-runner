@@ -133,7 +133,7 @@ def main():
             benchmark_operator_workload.update_node_selector(runner_path=environment_variables_dict.get('runner_path', ''),
                                                              yaml_path='benchmark-operator/config/manager/manager.yaml',
                                                              pin_node='pin_node_benchmark_operator')
-        benchmark_operator_workload.run()
+        return benchmark_operator_workload.run()
 
     @logger_time_stamp
     def run_benchmark_runner_workload():
@@ -164,10 +164,11 @@ def main():
         success = run_benchmark_runner_workload()
 
     else:
-        logger.error("ERROR: could not determine the type of execution.")
+        logger.error("could not determine the type of execution.")
         raise SystemExit(SYSTEM_EXIT_UNKNOWN_EXECUTION_TYPE)
 
     if not success:
+        logger.error("Benchmark failed.")
         raise SystemExit(SYSTEM_EXIT_BENCHMARK_FAILED)
 
 
