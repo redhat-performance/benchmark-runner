@@ -3,8 +3,8 @@ FROM quay.io/centos/centos:stream8
 # benchmark-runner latest version
 ARG VERSION
 
-# Update
-RUN dnf update -y
+# Update and use not only best candidate packages (avoiding failures)
+RUN dnf update -y --nobest
 
 # install make
 Run dnf group install -y "Development Tools"
