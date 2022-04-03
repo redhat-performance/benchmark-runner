@@ -4,7 +4,7 @@ from os import path
 from setuptools import setup, find_packages
 
 
-__version__ = '1.0.324'
+__version__ = '1.0.325'
 
 
 here = path.abspath(path.dirname(__file__))
@@ -55,7 +55,7 @@ setup(
         'botocore==1.23.24',  # s3
         'sphinx==4.0.2',  # readthedocs
         'sphinx_rtd_theme==0.4.3',  # readthedocs
-        'myst_parser==0.17.0',  # readthedocs
+        'myst-parser==0.16.0'  # readthedocs
         # must add new package inside requirements.txt
     ],
 
