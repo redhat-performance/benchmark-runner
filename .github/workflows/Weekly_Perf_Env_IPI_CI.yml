@@ -58,6 +58,8 @@ jobs:
             ServerAliveCountMax 5
           END
       - name: ▶ OCP IPI install
+        # green when failed because retry
+        continue-on-error: true
         env:
           INSTALL_OCP_VERSION: "candidate-4.10"
           OCP_VERSION_BUILD: "ga"
