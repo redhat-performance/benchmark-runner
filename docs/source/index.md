@@ -32,6 +32,6 @@ Documentation is available at [benchmark-runner.readthedocs.io](https://benchmar
 ```{toctree}
 podman
 grafana
-prometeus
+prometheus
 develop
 ```
