@@ -15,7 +15,7 @@ This tool support the following workloads:
 * [vdbench](https://wiki.lustre.org/VDBench/): running vdbench workload in a pod with [Configuration](benchmark_runner/templates/vdbench)
 
 Benchmark-runner grafana dashboard example:
-![](media/grafana.png)
+![](../../media/grafana.png)
 
 Reference:
 * The benchmark-runner package is located in [PyPi](https://pypi.org/project/benchmark-runner)
@@ -24,9 +24,9 @@ Reference:
 ## Documentation
 Documentation is available at [benchmark-runner.readthedocs.io](https://benchmark-runner.readthedocs.io/en/latest/)
 
-![](media/docker2.png)
+![](../../media/docker2.png)
 
-![](media/demo.gif)
+![](../../media/demo.gif)
 
 <!-- Table of contents -->
 ```{toctree}
