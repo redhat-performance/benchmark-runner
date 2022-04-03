@@ -3,8 +3,8 @@ FROM quay.io/centos/centos:stream8
 # benchmark-runner latest version
 ARG VERSION
 
-# Update
-RUN dnf update -y
+# Update and use not only best candidate packages (avoiding failures)
+RUN dnf update -y --nobest
 
 # install make
 Run dnf group install -y "Development Tools"
@@ -21,11 +21,6 @@ RUN dnf install -y python3.9 \
 # install & run benchmark-runner (--no-cache-dir for take always the latest)
 RUN python3.9 -m pip --no-cache-dir install --upgrade pip && pip --no-cache-dir install benchmark-runner --upgrade
 
-# install helm
-RUN curl -fsSL -o ~/get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 \
-    && chmod 700 ~/get_helm.sh \
-    && ~/./get_helm.sh
-
 # install oc/kubectl client tools for OpenShift/Kubernetes
 ARG oc_version=4.9.0-0.okd-2022-01-29-035536
 RUN  curl -L https://github.com/openshift/okd/releases/download/${oc_version}/openshift-client-linux-${oc_version}.tar.gz -o  ~/openshift-client-linux-${oc_version}.tar.gz \
@@ -34,7 +29,7 @@ RUN  curl -L https://github.com/openshift/okd/releases/download/${oc_version}/op
      && cp ~/kubectl /usr/local/bin/kubectl \
      && cp ~/oc /usr/local/bin/oc \
      && rm -rf ~/kubectl \
-     && rm -rf ~/oc \
+     && rm -rf ~/oc
 
 # install virtctl for VNC
 ARG virtctl_version=0.48.1

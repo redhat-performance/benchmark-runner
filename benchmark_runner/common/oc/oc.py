@@ -56,11 +56,25 @@ class OC(SSH):
         """
         return self.run("oc get csv -n openshift-sandboxed-containers-operator $(oc get csv -n openshift-sandboxed-containers-operator --no-headers | awk '{ print $1; }') -ojsonpath='{.spec.version}' ")
 
+    def _get_kata_default_channel(self):
+        """
+        Retrieve the default channel for Kata
+        """
+        return self.run("oc get packagemanifest -n openshift-marketplace sandboxed-containers-operator -ojsonpath='{.status.defaultChannel}'")
+
+    def _get_kata_default_channel_field(self, channel_field: str):
+        """
+        Retrieve a field from the packagemanifest for the default Kata channel
+        """
+        default_channel = f'"{self._get_kata_default_channel()}"'
+        command=f"oc get packagemanifest -n openshift-marketplace sandboxed-containers-operator -ojson | jq -r '[foreach .status.channels[] as $channel ([[],[]];0; (if ($channel.name == {default_channel}) then $channel.{channel_field} else null end))] | flatten | map (select (. != null))[]'"
+        return self.run(command)
+
     def _get_kata_csv(self):
         """
         Retrieve the CSV of the sandboxed containers operator for installation"
         """
-        return self.run("oc get packagemanifest -n openshift-marketplace sandboxed-containers-operator -ojsonpath='{.status.channels[0].currentCSV}'")
+        return self._get_kata_default_channel_field("currentCSV")
 
     def _get_kata_catalog_source(self):
         """
@@ -72,13 +86,13 @@ class OC(SSH):
         """
         Retrieve the channel of the sandboxed containers operator for installation"
         """
-        return self.run("oc get packagemanifest -n openshift-marketplace sandboxed-containers-operator -ojsonpath='{.status.channels[0].name}'")
+        return self._get_kata_default_channel_field("name")
 
     def _get_kata_namespace(self):
         """
         Retrieve the namespace of the sandboxed containers operator for installation"
         """
-        return self.run(r"oc get packagemanifest -n openshift-marketplace sandboxed-containers-operator -ojsonpath='{.status.channels[0].currentCSVDesc.annotations.operatorframework\.io/suggested-namespace}'")
+        return self._get_kata_default_channel_field('currentCSVDesc.annotations."operatorframework.io/suggested-namespace"')
 
     @typechecked
     def populate_additional_template_variables(self, env: dict):
@@ -157,14 +171,14 @@ class OC(SSH):
         return count_nodes
 
     @typechecked
-    def _create_async(self, yaml: str):
+    def _create_async(self, yaml: str, is_check: bool = False):
         """
         This method create yaml in async
         :param yaml:
         :return:
         """
         if os.path.isfile(yaml):
-            return self.run(f'oc create -f {yaml}')
+            return self.run(f'oc create -f {yaml}', is_check=is_check)
         else:
             raise YAMLNotExist(yaml)
 
@@ -737,6 +751,8 @@ class OC(SSH):
         :param output_filename:
         :return:
         """
+        data_index = 1
+        title_index = 2
         if not output_filename:
             output_filename = os.path.join(self.__run_artifacts, vm_name)
         results_list = []
@@ -745,11 +761,17 @@ class OC(SSH):
             for line in infile:
                 if start_stamp in line:
                     copy = True
-                    results_list.append(line.strip().split(':')[2:])
                     continue
                 elif end_stamp in line:
                     copy = False
                     continue
                 elif copy:
-                    results_list.append(line.strip().split(':')[1:])
+                    # Strip line prefix from VM output
+                    if 'cloud-init' in line:
+                        if vm_name in line:
+                            # filter the title, placed after the second :
+                            results_list.append(line.strip().split(':')[title_index:])
+                        else:
+                            # filter the data, placed after the first :
+                            results_list.append(line.strip().split(':')[data_index:])
         return results_list

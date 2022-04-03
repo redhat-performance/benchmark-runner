@@ -139,12 +139,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "ocp_version.keyword"
+              "options": "odf_version.keyword"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "ocp version"
+                "value": "odf version"
               }
             ]
           },
@@ -203,7 +203,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "odf_version.keyword"
+              "options": "ocs_version.keyword"
             },
             "properties": [
               {
@@ -212,7 +212,7 @@
               },
               {
                 "id": "displayName",
-                "value": "odf version"
+                "value": "ocs version"
               },
               {
                 "id": "custom.filterable"
@@ -237,7 +237,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "odf_version.keyword"
+              "options": "ocs_version.keyword"
             },
             "properties": [
               {
@@ -301,12 +301,6 @@
                 "value": "kata version"
               }
             ]
-          },
-          {
-            "matcher": {
-              "id": "byName"
-            },
-            "properties": []
           }
         ]
       },
@@ -507,6 +501,6 @@
   "timezone": "",
   "title": "benchmark-runner-ci-status-report",
   "uid": "tUclnRNnz",
-  "version": 2,
+  "version": 4,
   "weekStart": ""
 }

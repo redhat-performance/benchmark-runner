@@ -30,7 +30,7 @@ spec:
   containers:
     - name: vdbench-pod
       namespace: benchmark-runner
-      image: quay.io/ebattat/centos-stream8-vdbench5.04.07-pod
+      image: quay.io/ebattat/centos-stream8-vdbench5.04.07-pod:latest
       imagePullPolicy: "IfNotPresent"
       env:
         - name: BLOCK_SIZES
@@ -79,3 +79,4 @@ spec:
       storageClassName: ocs-storagecluster-ceph-rbd
     source:
       blank: {}
+

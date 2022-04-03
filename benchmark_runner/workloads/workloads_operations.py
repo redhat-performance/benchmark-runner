@@ -18,6 +18,7 @@ from benchmark_runner.common.clouds.IBM.ibm_operations import IBMOperations
 
 
 class WorkloadsOperations:
+    oc = None
     """
     This class run workloads
     """
@@ -46,6 +47,7 @@ class WorkloadsOperations:
         self._es_port = self._environment_variables_dict.get('elasticsearch_port', '')
         self._es_user = self._environment_variables_dict.get('elasticsearch_user', '')
         self._es_password = self._environment_variables_dict.get('elasticsearch_password', '')
+        self._es_url_protocol = self._environment_variables_dict['elasticsearch_url_protocol']
         self._timeout = int(self._environment_variables_dict.get('timeout', ''))
         # Elasticsearch connection
         if self._es_host and self._es_port:
@@ -53,11 +55,16 @@ class WorkloadsOperations:
                                                            es_port=self._es_port,
                                                            es_user=self._es_user,
                                                            es_password=self._es_password,
+                                                           es_url_protocol=self._es_url_protocol,
                                                            timeout=self._timeout)
         # Generate templates class
         self._template = TemplateOperations(workload=self._workload)
         # set oc login
-        self._oc = self.set_login(kubeadmin_password=self._kubeadmin_password)
+
+        if WorkloadsOperations.oc is None:
+            WorkloadsOperations.oc = self.set_login(kubeadmin_password=self._kubeadmin_password)
+        self._oc = WorkloadsOperations.oc
+
         # PrometheusSnapshot
         if self._enable_prometheus_snapshot:
             self._snapshot = PrometheusSnapshot(oc=self._oc, artifacts_path=self._run_artifacts_path, verbose=True)
@@ -79,12 +86,12 @@ class WorkloadsOperations:
         :return:
         """
         self._oc.delete_all_resources(resources=['vm', 'pods', 'pvc'])
-    
+
     @logger_time_stamp
     def start_prometheus(self):
         """
         This method start collection of Prometheus snapshot
-        :return: 
+        :return:
         """
         if self._enable_prometheus_snapshot:
             try:
@@ -93,12 +100,12 @@ class WorkloadsOperations:
                 raise PrometheusSnapshotError(err)
             except Exception as err:
                 raise err
-    
+
     @logger_time_stamp
     def end_prometheus(self):
         """
         This method retrieve the Prometheus snapshot
-        :return: 
+        :return:
         """
         if self._enable_prometheus_snapshot:
             try:
@@ -107,7 +114,7 @@ class WorkloadsOperations:
                 raise PrometheusSnapshotError(err)
             except Exception as err:
                 raise err
-            
+
     @logger_time_stamp
     def odf_pvc_verification(self):
         """
@@ -131,7 +138,7 @@ class WorkloadsOperations:
             self._oc.save_vm_log(vm_name=vm_name)
         return vm_name
 
-    def __create_pod_log(self, pod: str = ''):
+    def _create_pod_log(self, pod: str = ''):
         """
         This method create pod log per workload
         :param pod: pod name
@@ -140,7 +147,7 @@ class WorkloadsOperations:
         pod_name = self._oc.get_pod(label=pod)
         return self._oc.save_pod_log(pod_name=pod_name)
 
-    def __get_run_artifacts_hierarchy(self, workload_name: str = '', is_file: bool = False):
+    def _get_run_artifacts_hierarchy(self, workload_name: str = '', is_file: bool = False):
         """
         This method return log hierarchy
         :param workload_name: workload name
@@ -178,7 +185,7 @@ class WorkloadsOperations:
         :return: run results dict
         """
         result_list = []
-        pod_log_file = self.__create_pod_log(pod=pod_name)
+        pod_log_file = self._create_pod_log(pod=pod_name)
         workload_name = self._environment_variables_dict.get('workload', '').replace('_', '-')
         # csv to dictionary
         the_reader = DictReader(open(pod_log_file, 'r'))
@@ -190,7 +197,7 @@ class WorkloadsOperations:
                 elif value == 'n/a':
                     line_dict[key] = 0.0
             line_dict['pod_name'] = pod_name
-            line_dict['run_artifacts_url'] = os.path.join(self._run_artifacts_url, f'{self.__get_run_artifacts_hierarchy(workload_name=workload_name, is_file=True)}-{self._time_stamp_format}.tar.gz')
+            line_dict['run_artifacts_url'] = os.path.join(self._run_artifacts_url, f'{self._get_run_artifacts_hierarchy(workload_name=workload_name, is_file=True)}-{self._time_stamp_format}.tar.gz')
             result_list.append(dict(line_dict))
         return result_list
 
@@ -209,7 +216,8 @@ class WorkloadsOperations:
         csv_result_file = os.path.join(self._run_artifacts_path, 'vdbench_vm_result.csv')
         with open(csv_result_file, 'w') as out:
             for row in results_list:
-                out.write(f'{row[0].strip()}\n')
+                if row:
+                    out.write(f'{row[0].strip()}\n')
         # csv to dictionary
         the_reader = DictReader(open(csv_result_file, 'r'))
         for line_dict in the_reader:
@@ -220,7 +228,7 @@ class WorkloadsOperations:
                 elif value == 'n/a':
                     line_dict[key] = 0.0
             line_dict['vm_name'] = vm_name
-            line_dict['run_artifacts_url'] = os.path.join(self._run_artifacts_url, f'{self.__get_run_artifacts_hierarchy(workload_name=workload_name, is_file=True)}-{self._time_stamp_format}.tar.gz')
+            line_dict['run_artifacts_url'] = os.path.join(self._run_artifacts_url, f'{self._get_run_artifacts_hierarchy(workload_name=workload_name, is_file=True)}-{self._time_stamp_format}.tar.gz')
             result_list.append(dict(line_dict))
         return result_list
 
@@ -243,7 +251,7 @@ class WorkloadsOperations:
         """
         workload = self._workload.replace('_', '-')
         tar_run_artifacts_path = self.__make_run_artifacts_tarfile(workload)
-        run_artifacts_hierarchy = self.__get_run_artifacts_hierarchy(workload_name=workload)
+        run_artifacts_hierarchy = self._get_run_artifacts_hierarchy(workload_name=workload)
         # Upload when endpoint_url is not None
         if self._endpoint_url:
             s3operations = S3Operations()
@@ -276,7 +284,7 @@ class WorkloadsOperations:
                     'odf_version': self._oc.get_odf_version(),
                     'runner_version': self._build_version,
                     'version': int(self._build_version.split('.')[-1]),
-                    'vm_os_version': 'centos8',
+                    'vm_os_version': 'centos-stream8',
                     'ci_date': datetime.datetime.now().strftime(date_format),
                     'uuid': self._uuid,
                     'pin_node1': self._pin_node1,
@@ -338,18 +346,18 @@ class WorkloadsOperations:
 
     def initialize_workload(self):
         """
-        This method includes all the initialization of workload 
-        :return: 
+        This method includes all the initialization of workload
+        :return:
         """
         self.delete_all()
         self.odf_pvc_verification()
         self._template.generate_yamls()
         self.start_prometheus()
-        
+
     def finalize_workload(self):
         """
-        This method includes all the finalization of workload 
-        :return: 
+        This method includes all the finalization of workload
+        :return:
         """
         self.end_prometheus()
         self.upload_run_artifacts_to_s3()

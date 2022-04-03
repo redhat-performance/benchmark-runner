@@ -1,4 +1,4 @@
-
+import sys
 import ast  # change string list to list
 
 from benchmark_runner.main.environment_variables import *
@@ -18,6 +18,8 @@ logger.setLevel(level=log_level)
 # python -m venv venv
 # . venv/bin/activate
 
+SYSTEM_EXIT_BENCHMARK_FAILED = 1
+SYSTEM_EXIT_UNKNOWN_EXECUTION_TYPE = 2
 
 @logger_time_stamp
 def main():
@@ -35,6 +37,9 @@ def main():
     install_ocp_version = environment_variables_dict.get('install_ocp_version', '')
     install_ocp_resources = environment_variables_dict.get('install_ocp_resources', '')
     run_type = environment_variables_dict.get('run_type', '')
+
+    is_benchmark_operator_workload = 'benchmark-operator' in (environment_variables.get_workload_namespace(workload), environment_variables_dict.get("runner_type"))
+    is_benchmark_runner_workload = 'benchmark-runner' in (environment_variables.get_workload_namespace(workload), environment_variables_dict.get("runner_type"))
     # workload name validation
     if workload and not ci_status:
         if workload not in environment_variables.workloads_list:
@@ -44,9 +49,9 @@ def main():
         if run_type not in environment_variables.run_types_list:
             logger.info(f'Enter valid run type {environment_variables.run_types_list}')
             raise Exception(f'Invalid run type: {run_type} \n, choose one from the list: {environment_variables.run_types_list}')
-        if environment_variables.get_workload_namespace(workload) == 'benchmark-operator':
+        if is_benchmark_operator_workload:
             benchmark_operator_workload = BenchmarkOperatorWorkloads()
-        elif environment_variables.get_workload_namespace(workload) == 'benchmark-runner':
+        elif is_benchmark_runner_workload:
             benchmark_runner_workload = Workloads()
 
     @logger_time_stamp
@@ -128,7 +133,7 @@ def main():
             benchmark_operator_workload.update_node_selector(runner_path=environment_variables_dict.get('runner_path', ''),
                                                              yaml_path='benchmark-operator/config/manager/manager.yaml',
                                                              pin_node='pin_node_benchmark_operator')
-        benchmark_operator_workload.run()
+        return benchmark_operator_workload.run()
 
     @logger_time_stamp
     def run_benchmark_runner_workload():
@@ -137,8 +142,9 @@ def main():
         :return:
         """
         # benchmark-operator node selector
-        benchmark_runner_workload.run()
+        return benchmark_runner_workload.run()
 
+    success = True
     # azure_cluster_start_stop
     if azure_cluster_stop or azure_cluster_start:
         azure_cluster_start_stop()
@@ -151,11 +157,19 @@ def main():
         install_resources()
     elif ci_status == 'pass' or ci_status == 'failed':
         update_ci_status()
-    elif environment_variables.get_workload_namespace(workload) == 'benchmark-operator':
-        run_benchmark_operator_workload()
-    elif environment_variables.get_workload_namespace(workload) == 'benchmark-runner':
-        run_benchmark_runner_workload()
+    elif is_benchmark_operator_workload:
+        success = run_benchmark_operator_workload()
+
+    elif is_benchmark_runner_workload:
+        success = run_benchmark_runner_workload()
+
+    else:
+        logger.error("could not determine the type of execution.")
+        raise SystemExit(SYSTEM_EXIT_UNKNOWN_EXECUTION_TYPE)
+
+    if not success:
+        logger.error("Benchmark failed.")
+        raise SystemExit(SYSTEM_EXIT_BENCHMARK_FAILED)
 
 
 main()
-

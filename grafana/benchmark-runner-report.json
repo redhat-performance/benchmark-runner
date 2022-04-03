@@ -22,7 +22,7 @@
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
   "id": 7,
-  "iteration": 1642582571004,
+  "iteration": 1646591034614,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -31,7 +31,7 @@
       "gridPos": {
         "h": 6,
         "w": 5,
-        "x": 8,
+        "x": 9,
         "y": 0
       },
       "id": 35,
@@ -163,7 +163,7 @@
         "uid": "Elasticsearch-hammerdb-vm-results"
       },
       "gridPos": {
-        "h": 3,
+        "h": 4,
         "w": 2,
         "x": 11,
         "y": 13
@@ -247,7 +247,7 @@
         "h": 9,
         "w": 24,
         "x": 0,
-        "y": 16
+        "y": 17
       },
       "hiddenSeries": false,
       "id": 2,
@@ -496,7 +496,7 @@
         "h": 9,
         "w": 24,
         "x": 0,
-        "y": 25
+        "y": 26
       },
       "hiddenSeries": false,
       "id": 54,
@@ -745,7 +745,7 @@
         "h": 9,
         "w": 24,
         "x": 0,
-        "y": 34
+        "y": 35
       },
       "hiddenSeries": false,
       "id": 55,
@@ -1059,7 +1059,7 @@
         "h": 5,
         "w": 24,
         "x": 0,
-        "y": 43
+        "y": 44
       },
       "id": 82,
       "options": {
@@ -1117,7 +1117,7 @@
         "h": 4,
         "w": 2,
         "x": 11,
-        "y": 48
+        "y": 49
       },
       "id": 10,
       "options": {
@@ -1198,7 +1198,7 @@
         "h": 9,
         "w": 24,
         "x": 0,
-        "y": 52
+        "y": 53
       },
       "hiddenSeries": false,
       "id": 58,
@@ -1447,7 +1447,7 @@
         "h": 9,
         "w": 24,
         "x": 0,
-        "y": 61
+        "y": 62
       },
       "hiddenSeries": false,
       "id": 60,
@@ -1696,7 +1696,7 @@
         "h": 9,
         "w": 24,
         "x": 0,
-        "y": 70
+        "y": 71
       },
       "hiddenSeries": false,
       "id": 56,
@@ -2010,7 +2010,7 @@
         "h": 5,
         "w": 24,
         "x": 0,
-        "y": 79
+        "y": 80
       },
       "id": 81,
       "options": {
@@ -2068,7 +2068,7 @@
         "h": 4,
         "w": 2,
         "x": 11,
-        "y": 84
+        "y": 85
       },
       "id": 8,
       "options": {
@@ -2149,7 +2149,7 @@
         "h": 9,
         "w": 24,
         "x": 0,
-        "y": 88
+        "y": 89
       },
       "hiddenSeries": false,
       "id": 59,
@@ -2398,7 +2398,7 @@
         "h": 9,
         "w": 24,
         "x": 0,
-        "y": 97
+        "y": 98
       },
       "hiddenSeries": false,
       "id": 57,
@@ -2647,7 +2647,7 @@
         "h": 9,
         "w": 24,
         "x": 0,
-        "y": 106
+        "y": 107
       },
       "hiddenSeries": false,
       "id": 61,
@@ -2961,7 +2961,7 @@
         "h": 5,
         "w": 24,
         "x": 0,
-        "y": 115
+        "y": 116
       },
       "id": 80,
       "options": {
@@ -3017,7 +3017,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 120
+        "y": 121
       },
       "id": 22,
       "panels": [],
@@ -3032,7 +3032,7 @@
         "h": 3,
         "w": 24,
         "x": 0,
-        "y": 121
+        "y": 122
       },
       "id": 25,
       "links": [
@@ -3119,7 +3119,7 @@
         "h": 11,
         "w": 24,
         "x": 0,
-        "y": 124
+        "y": 125
       },
       "hiddenSeries": false,
       "id": 66,
@@ -3470,7 +3470,7 @@
         "h": 11,
         "w": 24,
         "x": 0,
-        "y": 135
+        "y": 136
       },
       "hiddenSeries": false,
       "id": 68,
@@ -3821,7 +3821,7 @@
         "h": 11,
         "w": 24,
         "x": 0,
-        "y": 146
+        "y": 147
       },
       "hiddenSeries": false,
       "id": 72,
@@ -4172,7 +4172,7 @@
         "h": 11,
         "w": 24,
         "x": 0,
-        "y": 157
+        "y": 158
       },
       "hiddenSeries": false,
       "id": 73,
@@ -4588,7 +4588,7 @@
         "h": 5,
         "w": 24,
         "x": 0,
-        "y": 168
+        "y": 169
       },
       "id": 79,
       "options": {
@@ -4644,7 +4644,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 173
+        "y": 174
       },
       "id": 24,
       "panels": [],
@@ -4659,7 +4659,7 @@
         "h": 2,
         "w": 24,
         "x": 0,
-        "y": 174
+        "y": 175
       },
       "id": 12,
       "links": [
@@ -4746,7 +4746,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 176
+        "y": 177
       },
       "hiddenSeries": false,
       "id": 47,
@@ -4920,7 +4920,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 184
+        "y": 185
       },
       "hiddenSeries": false,
       "id": 77,
@@ -5094,7 +5094,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 192
+        "y": 193
       },
       "hiddenSeries": false,
       "id": 78,
@@ -5333,7 +5333,7 @@
         "h": 5,
         "w": 24,
         "x": 0,
-        "y": 200
+        "y": 201
       },
       "id": 76,
       "options": {
@@ -5384,11 +5384,4173 @@
       "type": "table"
     },
     {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 206
+      },
+      "id": 86,
+      "panels": [],
+      "title": "Vdbench",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "uid": "Elasticsearch-hammerdb-vm-results"
+      },
+      "gridPos": {
+        "h": 2,
+        "w": 24,
+        "x": 0,
+        "y": 207
+      },
+      "id": 87,
+      "links": [
+        {
+          "title": "stressng",
+          "url": "https://wiki.ubuntu.com/Kernel/Reference/stress-ng"
+        }
+      ],
+      "options": {
+        "content": "## Vdbench workload results",
+        "mode": "markdown"
+      },
+      "pluginVersion": "8.4.0-pre",
+      "targets": [
+        {
+          "alias": "TPM: 1 Worker",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "metrics": [
+            {
+              "field": "tpm",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "max"
+            }
+          ],
+          "query": "db_type:'mariadb' AND current_worker:1",
+          "refId": "A",
+          "timeField": "timestamp"
+        },
+        {
+          "alias": "TPM: 2 Worker",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "metrics": [
+            {
+              "field": "tpm",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "max"
+            }
+          ],
+          "query": "db_type:'mariadb' AND current_worker:2",
+          "refId": "B",
+          "timeField": "timestamp"
+        }
+      ],
+      "type": "text"
+    },
+    {
+      "aliasColors": {},
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "bwnEiMx7k"
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 209
+      },
+      "hiddenSeries": false,
+      "id": 99,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": false,
+        "total": false,
+        "values": false
+      },
+      "lines": false,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.4.0-pre",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "auto"
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "bwnEiMx7k"
+          },
+          "metrics": [
+            {
+              "field": "cpu_kernel",
+              "id": "1",
+              "type": "max"
+            },
+            {
+              "field": "cpu_used",
+              "id": "3",
+              "type": "max"
+            },
+            {
+              "field": "cpu_user",
+              "id": "4",
+              "type": "max"
+            },
+            {
+              "field": "MB_write",
+              "id": "5",
+              "type": "max"
+            },
+            {
+              "field": "Write_resp_max",
+              "id": "9",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate",
+              "id": "10",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_max",
+              "id": "12",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_std",
+              "id": "13",
+              "type": "max"
+            },
+            {
+              "field": "MB_read",
+              "id": "14",
+              "type": "max"
+            }
+          ],
+          "query": "kind:'pod' AND Run:'oltp1' AND ci_date:$ci_run_date",
+          "refId": "A",
+          "timeField": "timestamp"
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Vdbench pod: oltp1",
+      "tooltip": {
+        "shared": false,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "transparent": true,
+      "type": "graph",
+      "xaxis": {
+        "mode": "series",
+        "show": true,
+        "values": [
+          "total"
+        ]
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:195",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:196",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "bwnEiMx7k"
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 219
+      },
+      "hiddenSeries": false,
+      "id": 98,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": false,
+        "total": false,
+        "values": false
+      },
+      "lines": false,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.4.0-pre",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "auto"
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "bwnEiMx7k"
+          },
+          "metrics": [
+            {
+              "field": "cpu_kernel",
+              "id": "1",
+              "type": "max"
+            },
+            {
+              "field": "cpu_used",
+              "id": "3",
+              "type": "max"
+            },
+            {
+              "field": "cpu_user",
+              "id": "4",
+              "type": "max"
+            },
+            {
+              "field": "MB_write",
+              "id": "5",
+              "type": "max"
+            },
+            {
+              "field": "Write_resp_max",
+              "id": "9",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate",
+              "id": "10",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_max",
+              "id": "12",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_std",
+              "id": "13",
+              "type": "max"
+            },
+            {
+              "field": "MB_read",
+              "id": "14",
+              "type": "max"
+            }
+          ],
+          "query": "kind:'pod' AND Run:'oltp2' AND ci_date:$ci_run_date",
+          "refId": "A",
+          "timeField": "timestamp"
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Vdbench pod: oltp2",
+      "tooltip": {
+        "shared": false,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "transparent": true,
+      "type": "graph",
+      "xaxis": {
+        "mode": "series",
+        "show": true,
+        "values": [
+          "total"
+        ]
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:195",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:196",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "bwnEiMx7k"
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 229
+      },
+      "hiddenSeries": false,
+      "id": 95,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": false,
+        "total": false,
+        "values": false
+      },
+      "lines": false,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.4.0-pre",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "auto"
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "bwnEiMx7k"
+          },
+          "metrics": [
+            {
+              "field": "cpu_kernel",
+              "id": "1",
+              "type": "max"
+            },
+            {
+              "field": "cpu_used",
+              "id": "3",
+              "type": "max"
+            },
+            {
+              "field": "cpu_user",
+              "id": "4",
+              "type": "max"
+            },
+            {
+              "field": "MB_write",
+              "id": "5",
+              "type": "max"
+            },
+            {
+              "field": "Write_resp_max",
+              "id": "9",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate",
+              "id": "10",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_max",
+              "id": "12",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_std",
+              "id": "13",
+              "type": "max"
+            },
+            {
+              "field": "MB_read",
+              "id": "14",
+              "type": "max"
+            }
+          ],
+          "query": "kind:'pod' AND Run:'odss128' AND ci_date:$ci_run_date",
+          "refId": "A",
+          "timeField": "timestamp"
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Vdbench pod: odss128",
+      "tooltip": {
+        "shared": false,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "transparent": true,
+      "type": "graph",
+      "xaxis": {
+        "mode": "series",
+        "show": true,
+        "values": [
+          "total"
+        ]
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:195",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:196",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "bwnEiMx7k"
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 239
+      },
+      "hiddenSeries": false,
+      "id": 96,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": false,
+        "total": false,
+        "values": false
+      },
+      "lines": false,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.4.0-pre",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "auto"
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "bwnEiMx7k"
+          },
+          "metrics": [
+            {
+              "field": "cpu_kernel",
+              "id": "1",
+              "type": "max"
+            },
+            {
+              "field": "cpu_used",
+              "id": "3",
+              "type": "max"
+            },
+            {
+              "field": "cpu_user",
+              "id": "4",
+              "type": "max"
+            },
+            {
+              "field": "MB_write",
+              "id": "5",
+              "type": "max"
+            },
+            {
+              "field": "Write_resp_max",
+              "id": "9",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate",
+              "id": "10",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_max",
+              "id": "12",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_std",
+              "id": "13",
+              "type": "max"
+            },
+            {
+              "field": "MB_read",
+              "id": "14",
+              "type": "max"
+            }
+          ],
+          "query": "kind:'pod' AND Run:'odss2' AND ci_date:$ci_run_date",
+          "refId": "A",
+          "timeField": "timestamp"
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Vdbench pod: odss2",
+      "tooltip": {
+        "shared": false,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "transparent": true,
+      "type": "graph",
+      "xaxis": {
+        "mode": "series",
+        "show": true,
+        "values": [
+          "total"
+        ]
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:195",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:196",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "bwnEiMx7k"
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 249
+      },
+      "hiddenSeries": false,
+      "id": 97,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": false,
+        "total": false,
+        "values": false
+      },
+      "lines": false,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.4.0-pre",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "auto"
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "bwnEiMx7k"
+          },
+          "metrics": [
+            {
+              "field": "cpu_kernel",
+              "id": "1",
+              "type": "max"
+            },
+            {
+              "field": "cpu_used",
+              "id": "3",
+              "type": "max"
+            },
+            {
+              "field": "cpu_user",
+              "id": "4",
+              "type": "max"
+            },
+            {
+              "field": "MB_write",
+              "id": "5",
+              "type": "max"
+            },
+            {
+              "field": "Write_resp_max",
+              "id": "9",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate",
+              "id": "10",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_max",
+              "id": "12",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_std",
+              "id": "13",
+              "type": "max"
+            },
+            {
+              "field": "MB_read",
+              "id": "14",
+              "type": "max"
+            }
+          ],
+          "query": "kind:'pod' AND Run:'oltphw' AND ci_date:$ci_run_date",
+          "refId": "A",
+          "timeField": "timestamp"
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Vdbench pod: oltphw",
+      "tooltip": {
+        "shared": false,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "transparent": true,
+      "type": "graph",
+      "xaxis": {
+        "mode": "series",
+        "show": true,
+        "values": [
+          "total"
+        ]
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:195",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:196",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "bwnEiMx7k"
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 259
+      },
+      "hiddenSeries": false,
+      "id": 89,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": false,
+        "total": false,
+        "values": false
+      },
+      "lines": false,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.4.0-pre",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "auto"
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "bwnEiMx7k"
+          },
+          "metrics": [
+            {
+              "field": "cpu_kernel",
+              "id": "1",
+              "type": "max"
+            },
+            {
+              "field": "cpu_used",
+              "id": "3",
+              "type": "max"
+            },
+            {
+              "field": "cpu_user",
+              "id": "4",
+              "type": "max"
+            },
+            {
+              "field": "MB_write",
+              "id": "5",
+              "type": "max"
+            },
+            {
+              "field": "Write_resp_max",
+              "id": "9",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate",
+              "id": "10",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_max",
+              "id": "12",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_std",
+              "id": "13",
+              "type": "max"
+            },
+            {
+              "field": "MB_read",
+              "id": "14",
+              "type": "max"
+            }
+          ],
+          "query": "kind:'pod' AND Run:'4kb_read_2threads' AND ci_date:$ci_run_date",
+          "refId": "A",
+          "timeField": "timestamp"
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Vdbench pod: 4kb_read_2threads",
+      "tooltip": {
+        "shared": false,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "transparent": true,
+      "type": "graph",
+      "xaxis": {
+        "mode": "series",
+        "show": true,
+        "values": [
+          "total"
+        ]
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:195",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:196",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "bwnEiMx7k"
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 269
+      },
+      "hiddenSeries": false,
+      "id": 93,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": false,
+        "total": false,
+        "values": false
+      },
+      "lines": false,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.4.0-pre",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "auto"
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "bwnEiMx7k"
+          },
+          "metrics": [
+            {
+              "field": "cpu_kernel",
+              "id": "1",
+              "type": "max"
+            },
+            {
+              "field": "cpu_used",
+              "id": "3",
+              "type": "max"
+            },
+            {
+              "field": "cpu_user",
+              "id": "4",
+              "type": "max"
+            },
+            {
+              "field": "MB_write",
+              "id": "5",
+              "type": "max"
+            },
+            {
+              "field": "Write_resp_max",
+              "id": "9",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate",
+              "id": "10",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_max",
+              "id": "12",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_std",
+              "id": "13",
+              "type": "max"
+            },
+            {
+              "field": "MB_read",
+              "id": "14",
+              "type": "max"
+            }
+          ],
+          "query": "kind:'pod' AND Run:'4kb_write_2threads' AND ci_date:$ci_run_date",
+          "refId": "A",
+          "timeField": "timestamp"
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Vdbench pod: 4kb_write_2threads",
+      "tooltip": {
+        "shared": false,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "transparent": true,
+      "type": "graph",
+      "xaxis": {
+        "mode": "series",
+        "show": true,
+        "values": [
+          "total"
+        ]
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:195",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:196",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "bwnEiMx7k"
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 279
+      },
+      "hiddenSeries": false,
+      "id": 91,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": false,
+        "total": false,
+        "values": false
+      },
+      "lines": false,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.4.0-pre",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "auto"
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "bwnEiMx7k"
+          },
+          "metrics": [
+            {
+              "field": "cpu_kernel",
+              "id": "1",
+              "type": "max"
+            },
+            {
+              "field": "cpu_used",
+              "id": "3",
+              "type": "max"
+            },
+            {
+              "field": "cpu_user",
+              "id": "4",
+              "type": "max"
+            },
+            {
+              "field": "MB_write",
+              "id": "5",
+              "type": "max"
+            },
+            {
+              "field": "Write_resp_max",
+              "id": "9",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate",
+              "id": "10",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_max",
+              "id": "12",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_std",
+              "id": "13",
+              "type": "max"
+            },
+            {
+              "field": "MB_read",
+              "id": "14",
+              "type": "max"
+            }
+          ],
+          "query": "kind:'pod' AND Run:'4kb_cache_read_4threads' AND ci_date:$ci_run_date",
+          "refId": "A",
+          "timeField": "timestamp"
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Vdbench pod: 4kb_cache_read_4threads",
+      "tooltip": {
+        "shared": false,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "transparent": true,
+      "type": "graph",
+      "xaxis": {
+        "mode": "series",
+        "show": true,
+        "values": [
+          "total"
+        ]
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:195",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:196",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "bwnEiMx7k"
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 289
+      },
+      "hiddenSeries": false,
+      "id": 84,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": false,
+        "total": false,
+        "values": false
+      },
+      "lines": false,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.4.0-pre",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "auto"
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "bwnEiMx7k"
+          },
+          "metrics": [
+            {
+              "field": "cpu_kernel",
+              "id": "1",
+              "type": "max"
+            },
+            {
+              "field": "cpu_used",
+              "id": "3",
+              "type": "max"
+            },
+            {
+              "field": "cpu_user",
+              "id": "4",
+              "type": "max"
+            },
+            {
+              "field": "MB_write",
+              "id": "5",
+              "type": "max"
+            },
+            {
+              "field": "Write_resp_max",
+              "id": "9",
+              "type": "max"
+            },
+            {
+              "field": "Write_resp_std",
+              "id": "10",
+              "type": "max"
+            }
+          ],
+          "query": "kind:'pod' AND Run:'4kb_cache_write_4threads' AND ci_date:$ci_run_date",
+          "refId": "A",
+          "timeField": "timestamp"
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Vdbench pod: 4kb_cache_write_4threads",
+      "tooltip": {
+        "shared": false,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "transparent": true,
+      "type": "graph",
+      "xaxis": {
+        "mode": "series",
+        "show": true,
+        "values": [
+          "total"
+        ]
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:195",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:196",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "bwnEiMx7k"
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 299
+      },
+      "hiddenSeries": false,
+      "id": 88,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": false,
+        "total": false,
+        "values": false
+      },
+      "lines": false,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.4.0-pre",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "auto"
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "bwnEiMx7k"
+          },
+          "metrics": [
+            {
+              "field": "cpu_kernel",
+              "id": "1",
+              "type": "max"
+            },
+            {
+              "field": "cpu_used",
+              "id": "3",
+              "type": "max"
+            },
+            {
+              "field": "cpu_user",
+              "id": "4",
+              "type": "max"
+            },
+            {
+              "field": "MB_write",
+              "id": "5",
+              "type": "max"
+            },
+            {
+              "field": "Write_resp_max",
+              "id": "9",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate",
+              "id": "10",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_max",
+              "id": "12",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_std",
+              "id": "13",
+              "type": "max"
+            },
+            {
+              "field": "MB_read",
+              "id": "14",
+              "type": "max"
+            }
+          ],
+          "query": "kind:'pod' AND Run:64kb_read_2threads' AND ci_date:$ci_run_date",
+          "refId": "A",
+          "timeField": "timestamp"
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Vdbench pod: 64kb_read_2threads",
+      "tooltip": {
+        "shared": false,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "transparent": true,
+      "type": "graph",
+      "xaxis": {
+        "mode": "series",
+        "show": true,
+        "values": [
+          "total"
+        ]
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:195",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:196",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "bwnEiMx7k"
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 309
+      },
+      "hiddenSeries": false,
+      "id": 94,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": false,
+        "total": false,
+        "values": false
+      },
+      "lines": false,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.4.0-pre",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "auto"
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "bwnEiMx7k"
+          },
+          "metrics": [
+            {
+              "field": "cpu_kernel",
+              "id": "1",
+              "type": "max"
+            },
+            {
+              "field": "cpu_used",
+              "id": "3",
+              "type": "max"
+            },
+            {
+              "field": "cpu_user",
+              "id": "4",
+              "type": "max"
+            },
+            {
+              "field": "MB_write",
+              "id": "5",
+              "type": "max"
+            },
+            {
+              "field": "Write_resp_max",
+              "id": "9",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate",
+              "id": "10",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_max",
+              "id": "12",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_std",
+              "id": "13",
+              "type": "max"
+            },
+            {
+              "field": "MB_read",
+              "id": "14",
+              "type": "max"
+            }
+          ],
+          "query": "kind:'pod' AND Run:'64kb_write_2threads' AND ci_date:$ci_run_date",
+          "refId": "A",
+          "timeField": "timestamp"
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Vdbench pod: 64kb_write_2threads",
+      "tooltip": {
+        "shared": false,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "transparent": true,
+      "type": "graph",
+      "xaxis": {
+        "mode": "series",
+        "show": true,
+        "values": [
+          "total"
+        ]
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:195",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:196",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "bwnEiMx7k"
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 319
+      },
+      "hiddenSeries": false,
+      "id": 90,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": false,
+        "total": false,
+        "values": false
+      },
+      "lines": false,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.4.0-pre",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "auto"
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "bwnEiMx7k"
+          },
+          "metrics": [
+            {
+              "field": "cpu_kernel",
+              "id": "1",
+              "type": "max"
+            },
+            {
+              "field": "cpu_used",
+              "id": "3",
+              "type": "max"
+            },
+            {
+              "field": "cpu_user",
+              "id": "4",
+              "type": "max"
+            },
+            {
+              "field": "MB_write",
+              "id": "5",
+              "type": "max"
+            },
+            {
+              "field": "Write_resp_max",
+              "id": "9",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate",
+              "id": "10",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_max",
+              "id": "12",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_std",
+              "id": "13",
+              "type": "max"
+            },
+            {
+              "field": "MB_read",
+              "id": "14",
+              "type": "max"
+            }
+          ],
+          "query": "kind:'pod' AND Run:'64kb_cache_read_4threads' AND ci_date:$ci_run_date",
+          "refId": "A",
+          "timeField": "timestamp"
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Vdbench pod: 64kb_cache_read_4threads",
+      "tooltip": {
+        "shared": false,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "transparent": true,
+      "type": "graph",
+      "xaxis": {
+        "mode": "series",
+        "show": true,
+        "values": [
+          "total"
+        ]
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:195",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:196",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "bwnEiMx7k"
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 329
+      },
+      "hiddenSeries": false,
+      "id": 92,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": false,
+        "total": false,
+        "values": false
+      },
+      "lines": false,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.4.0-pre",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "auto"
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "bwnEiMx7k"
+          },
+          "metrics": [
+            {
+              "field": "cpu_kernel",
+              "id": "1",
+              "type": "max"
+            },
+            {
+              "field": "cpu_used",
+              "id": "3",
+              "type": "max"
+            },
+            {
+              "field": "cpu_user",
+              "id": "4",
+              "type": "max"
+            },
+            {
+              "field": "MB_write",
+              "id": "5",
+              "type": "max"
+            },
+            {
+              "field": "Write_resp_max",
+              "id": "9",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate",
+              "id": "10",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_max",
+              "id": "12",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_std",
+              "id": "13",
+              "type": "max"
+            },
+            {
+              "field": "MB_read",
+              "id": "14",
+              "type": "max"
+            }
+          ],
+          "query": "kind:'pod' AND Run:'64kb_cache_write_4threads' AND ci_date:$ci_run_date",
+          "refId": "A",
+          "timeField": "timestamp"
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Vdbench pod: 64kb_cache_write_4threads",
+      "tooltip": {
+        "shared": false,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "transparent": true,
+      "type": "graph",
+      "xaxis": {
+        "mode": "series",
+        "show": true,
+        "values": [
+          "total"
+        ]
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:195",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:196",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "bwnEiMx7k"
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 339
+      },
+      "hiddenSeries": false,
+      "id": 100,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": false,
+        "total": false,
+        "values": false
+      },
+      "lines": false,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.4.0-pre",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "auto"
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "bwnEiMx7k"
+          },
+          "metrics": [
+            {
+              "field": "cpu_kernel",
+              "id": "1",
+              "type": "max"
+            },
+            {
+              "field": "cpu_used",
+              "id": "3",
+              "type": "max"
+            },
+            {
+              "field": "cpu_user",
+              "id": "4",
+              "type": "max"
+            },
+            {
+              "field": "MB_write",
+              "id": "5",
+              "type": "max"
+            },
+            {
+              "field": "Write_resp_max",
+              "id": "9",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate",
+              "id": "10",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_max",
+              "id": "12",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_std",
+              "id": "13",
+              "type": "max"
+            },
+            {
+              "field": "MB_read",
+              "id": "14",
+              "type": "max"
+            }
+          ],
+          "query": "kind:'pod' AND Run:'fillup' AND ci_date:$ci_run_date",
+          "refId": "A",
+          "timeField": "timestamp"
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Vdbench pod: fillup",
+      "tooltip": {
+        "shared": false,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "transparent": true,
+      "type": "graph",
+      "xaxis": {
+        "mode": "series",
+        "show": true,
+        "values": [
+          "total"
+        ]
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:195",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:196",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "bwnEiMx7k"
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 349
+      },
+      "hiddenSeries": false,
+      "id": 102,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": false,
+        "total": false,
+        "values": false
+      },
+      "lines": false,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.4.0-pre",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "auto"
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "bwnEiMx7k"
+          },
+          "metrics": [
+            {
+              "field": "cpu_kernel",
+              "id": "1",
+              "type": "max"
+            },
+            {
+              "field": "cpu_used",
+              "id": "3",
+              "type": "max"
+            },
+            {
+              "field": "cpu_user",
+              "id": "4",
+              "type": "max"
+            },
+            {
+              "field": "MB_write",
+              "id": "5",
+              "type": "max"
+            },
+            {
+              "field": "Write_resp_max",
+              "id": "9",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate",
+              "id": "10",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_max",
+              "id": "12",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_std",
+              "id": "13",
+              "type": "max"
+            },
+            {
+              "field": "MB_read",
+              "id": "14",
+              "type": "max"
+            }
+          ],
+          "query": "kind:'kata' AND Run:'oltp1' AND ci_date:$ci_run_date",
+          "refId": "A",
+          "timeField": "timestamp"
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Vdbench kata: oltp1",
+      "tooltip": {
+        "shared": false,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "transparent": true,
+      "type": "graph",
+      "xaxis": {
+        "mode": "series",
+        "show": true,
+        "values": [
+          "total"
+        ]
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:195",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:196",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "bwnEiMx7k"
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 359
+      },
+      "hiddenSeries": false,
+      "id": 103,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": false,
+        "total": false,
+        "values": false
+      },
+      "lines": false,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.4.0-pre",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "auto"
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "bwnEiMx7k"
+          },
+          "metrics": [
+            {
+              "field": "cpu_kernel",
+              "id": "1",
+              "type": "max"
+            },
+            {
+              "field": "cpu_used",
+              "id": "3",
+              "type": "max"
+            },
+            {
+              "field": "cpu_user",
+              "id": "4",
+              "type": "max"
+            },
+            {
+              "field": "MB_write",
+              "id": "5",
+              "type": "max"
+            },
+            {
+              "field": "Write_resp_max",
+              "id": "9",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate",
+              "id": "10",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_max",
+              "id": "12",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_std",
+              "id": "13",
+              "type": "max"
+            },
+            {
+              "field": "MB_read",
+              "id": "14",
+              "type": "max"
+            }
+          ],
+          "query": "kind:'kata' AND Run:'oltp2' AND ci_date:$ci_run_date",
+          "refId": "A",
+          "timeField": "timestamp"
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Vdbench kata: oltp2",
+      "tooltip": {
+        "shared": false,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "transparent": true,
+      "type": "graph",
+      "xaxis": {
+        "mode": "series",
+        "show": true,
+        "values": [
+          "total"
+        ]
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:195",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:196",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "bwnEiMx7k"
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 369
+      },
+      "hiddenSeries": false,
+      "id": 104,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": false,
+        "total": false,
+        "values": false
+      },
+      "lines": false,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.4.0-pre",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "auto"
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "bwnEiMx7k"
+          },
+          "metrics": [
+            {
+              "field": "cpu_kernel",
+              "id": "1",
+              "type": "max"
+            },
+            {
+              "field": "cpu_used",
+              "id": "3",
+              "type": "max"
+            },
+            {
+              "field": "cpu_user",
+              "id": "4",
+              "type": "max"
+            },
+            {
+              "field": "MB_write",
+              "id": "5",
+              "type": "max"
+            },
+            {
+              "field": "Write_resp_max",
+              "id": "9",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate",
+              "id": "10",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_max",
+              "id": "12",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_std",
+              "id": "13",
+              "type": "max"
+            },
+            {
+              "field": "MB_read",
+              "id": "14",
+              "type": "max"
+            }
+          ],
+          "query": "kind:'kata' AND Run:'odss128' AND ci_date:$ci_run_date",
+          "refId": "A",
+          "timeField": "timestamp"
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Vdbench kata: odss128",
+      "tooltip": {
+        "shared": false,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "transparent": true,
+      "type": "graph",
+      "xaxis": {
+        "mode": "series",
+        "show": true,
+        "values": [
+          "total"
+        ]
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:195",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:196",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "bwnEiMx7k"
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 379
+      },
+      "hiddenSeries": false,
+      "id": 105,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": false,
+        "total": false,
+        "values": false
+      },
+      "lines": false,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.4.0-pre",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "auto"
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "bwnEiMx7k"
+          },
+          "metrics": [
+            {
+              "field": "cpu_kernel",
+              "id": "1",
+              "type": "max"
+            },
+            {
+              "field": "cpu_used",
+              "id": "3",
+              "type": "max"
+            },
+            {
+              "field": "cpu_user",
+              "id": "4",
+              "type": "max"
+            },
+            {
+              "field": "MB_write",
+              "id": "5",
+              "type": "max"
+            },
+            {
+              "field": "Write_resp_max",
+              "id": "9",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate",
+              "id": "10",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_max",
+              "id": "12",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_std",
+              "id": "13",
+              "type": "max"
+            },
+            {
+              "field": "MB_read",
+              "id": "14",
+              "type": "max"
+            }
+          ],
+          "query": "kind:'kata' AND Run:'odss2' AND ci_date:$ci_run_date",
+          "refId": "A",
+          "timeField": "timestamp"
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Vdbench kata: odss2",
+      "tooltip": {
+        "shared": false,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "transparent": true,
+      "type": "graph",
+      "xaxis": {
+        "mode": "series",
+        "show": true,
+        "values": [
+          "total"
+        ]
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:195",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:196",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "bwnEiMx7k"
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 389
+      },
+      "hiddenSeries": false,
+      "id": 106,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": false,
+        "total": false,
+        "values": false
+      },
+      "lines": false,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.4.0-pre",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "auto"
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "bwnEiMx7k"
+          },
+          "metrics": [
+            {
+              "field": "cpu_kernel",
+              "id": "1",
+              "type": "max"
+            },
+            {
+              "field": "cpu_used",
+              "id": "3",
+              "type": "max"
+            },
+            {
+              "field": "cpu_user",
+              "id": "4",
+              "type": "max"
+            },
+            {
+              "field": "MB_write",
+              "id": "5",
+              "type": "max"
+            },
+            {
+              "field": "Write_resp_max",
+              "id": "9",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate",
+              "id": "10",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_max",
+              "id": "12",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_std",
+              "id": "13",
+              "type": "max"
+            },
+            {
+              "field": "MB_read",
+              "id": "14",
+              "type": "max"
+            }
+          ],
+          "query": "kind:'kata' AND Run:'oltphw' AND ci_date:$ci_run_date",
+          "refId": "A",
+          "timeField": "timestamp"
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Vdbench kata: oltphw",
+      "tooltip": {
+        "shared": false,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "transparent": true,
+      "type": "graph",
+      "xaxis": {
+        "mode": "series",
+        "show": true,
+        "values": [
+          "total"
+        ]
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:195",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:196",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "bwnEiMx7k"
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 399
+      },
+      "hiddenSeries": false,
+      "id": 107,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": false,
+        "total": false,
+        "values": false
+      },
+      "lines": false,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.4.0-pre",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "auto"
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "bwnEiMx7k"
+          },
+          "metrics": [
+            {
+              "field": "cpu_kernel",
+              "id": "1",
+              "type": "max"
+            },
+            {
+              "field": "cpu_used",
+              "id": "3",
+              "type": "max"
+            },
+            {
+              "field": "cpu_user",
+              "id": "4",
+              "type": "max"
+            },
+            {
+              "field": "MB_write",
+              "id": "5",
+              "type": "max"
+            },
+            {
+              "field": "Write_resp_max",
+              "id": "9",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate",
+              "id": "10",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_max",
+              "id": "12",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_std",
+              "id": "13",
+              "type": "max"
+            },
+            {
+              "field": "MB_read",
+              "id": "14",
+              "type": "max"
+            }
+          ],
+          "query": "kind:'kata' AND Run:'4kb_read_2threads' AND ci_date:$ci_run_date",
+          "refId": "A",
+          "timeField": "timestamp"
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Vdbench kata: 4kb_read_2threads",
+      "tooltip": {
+        "shared": false,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "transparent": true,
+      "type": "graph",
+      "xaxis": {
+        "mode": "series",
+        "show": true,
+        "values": [
+          "total"
+        ]
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:195",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:196",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "bwnEiMx7k"
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 409
+      },
+      "hiddenSeries": false,
+      "id": 108,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": false,
+        "total": false,
+        "values": false
+      },
+      "lines": false,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.4.0-pre",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "auto"
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "bwnEiMx7k"
+          },
+          "metrics": [
+            {
+              "field": "cpu_kernel",
+              "id": "1",
+              "type": "max"
+            },
+            {
+              "field": "cpu_used",
+              "id": "3",
+              "type": "max"
+            },
+            {
+              "field": "cpu_user",
+              "id": "4",
+              "type": "max"
+            },
+            {
+              "field": "MB_write",
+              "id": "5",
+              "type": "max"
+            },
+            {
+              "field": "Write_resp_max",
+              "id": "9",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate",
+              "id": "10",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_max",
+              "id": "12",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_std",
+              "id": "13",
+              "type": "max"
+            },
+            {
+              "field": "MB_read",
+              "id": "14",
+              "type": "max"
+            }
+          ],
+          "query": "kind:'kata' AND Run:'4kb_write_2threads' AND ci_date:$ci_run_date",
+          "refId": "A",
+          "timeField": "timestamp"
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Vdbench kata: 4kb_write_2threads",
+      "tooltip": {
+        "shared": false,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "transparent": true,
+      "type": "graph",
+      "xaxis": {
+        "mode": "series",
+        "show": true,
+        "values": [
+          "total"
+        ]
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:195",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:196",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "bwnEiMx7k"
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 419
+      },
+      "hiddenSeries": false,
+      "id": 109,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": false,
+        "total": false,
+        "values": false
+      },
+      "lines": false,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.4.0-pre",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "auto"
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "bwnEiMx7k"
+          },
+          "metrics": [
+            {
+              "field": "cpu_kernel",
+              "id": "1",
+              "type": "max"
+            },
+            {
+              "field": "cpu_used",
+              "id": "3",
+              "type": "max"
+            },
+            {
+              "field": "cpu_user",
+              "id": "4",
+              "type": "max"
+            },
+            {
+              "field": "MB_write",
+              "id": "5",
+              "type": "max"
+            },
+            {
+              "field": "Write_resp_max",
+              "id": "9",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate",
+              "id": "10",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_max",
+              "id": "12",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_std",
+              "id": "13",
+              "type": "max"
+            },
+            {
+              "field": "MB_read",
+              "id": "14",
+              "type": "max"
+            }
+          ],
+          "query": "kind:'kata' AND Run:'4kb_cache_read_4threads' AND ci_date:$ci_run_date",
+          "refId": "A",
+          "timeField": "timestamp"
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Vdbench kata: 4kb_cache_read_4threads",
+      "tooltip": {
+        "shared": false,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "transparent": true,
+      "type": "graph",
+      "xaxis": {
+        "mode": "series",
+        "show": true,
+        "values": [
+          "total"
+        ]
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:195",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:196",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "bwnEiMx7k"
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 429
+      },
+      "hiddenSeries": false,
+      "id": 110,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": false,
+        "total": false,
+        "values": false
+      },
+      "lines": false,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.4.0-pre",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "auto"
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "bwnEiMx7k"
+          },
+          "metrics": [
+            {
+              "field": "cpu_kernel",
+              "id": "1",
+              "type": "max"
+            },
+            {
+              "field": "cpu_used",
+              "id": "3",
+              "type": "max"
+            },
+            {
+              "field": "cpu_user",
+              "id": "4",
+              "type": "max"
+            },
+            {
+              "field": "MB_write",
+              "id": "5",
+              "type": "max"
+            },
+            {
+              "field": "Write_resp_max",
+              "id": "9",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate",
+              "id": "10",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_max",
+              "id": "12",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_std",
+              "id": "13",
+              "type": "max"
+            },
+            {
+              "field": "MB_read",
+              "id": "14",
+              "type": "max"
+            }
+          ],
+          "query": "kind:'kata' AND Run:'64kb_cache_write_4threads' AND ci_date:$ci_run_date",
+          "refId": "A",
+          "timeField": "timestamp"
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Vdbench kata: 64kb_cache_write_4threads",
+      "tooltip": {
+        "shared": false,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "transparent": true,
+      "type": "graph",
+      "xaxis": {
+        "mode": "series",
+        "show": true,
+        "values": [
+          "total"
+        ]
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:195",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:196",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "bwnEiMx7k"
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 439
+      },
+      "hiddenSeries": false,
+      "id": 111,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": false,
+        "total": false,
+        "values": false
+      },
+      "lines": false,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.4.0-pre",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "auto"
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "bwnEiMx7k"
+          },
+          "metrics": [
+            {
+              "field": "cpu_kernel",
+              "id": "1",
+              "type": "max"
+            },
+            {
+              "field": "cpu_used",
+              "id": "3",
+              "type": "max"
+            },
+            {
+              "field": "cpu_user",
+              "id": "4",
+              "type": "max"
+            },
+            {
+              "field": "MB_write",
+              "id": "5",
+              "type": "max"
+            },
+            {
+              "field": "Write_resp_max",
+              "id": "9",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate",
+              "id": "10",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_max",
+              "id": "12",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_std",
+              "id": "13",
+              "type": "max"
+            },
+            {
+              "field": "MB_read",
+              "id": "14",
+              "type": "max"
+            }
+          ],
+          "query": "kind:'kata' AND Run:64kb_read_2threads' AND ci_date:$ci_run_date",
+          "refId": "A",
+          "timeField": "timestamp"
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Vdbench kata: 64kb_read_2threads",
+      "tooltip": {
+        "shared": false,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "transparent": true,
+      "type": "graph",
+      "xaxis": {
+        "mode": "series",
+        "show": true,
+        "values": [
+          "total"
+        ]
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:195",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:196",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "bwnEiMx7k"
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 449
+      },
+      "hiddenSeries": false,
+      "id": 112,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": false,
+        "total": false,
+        "values": false
+      },
+      "lines": false,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.4.0-pre",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "auto"
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "bwnEiMx7k"
+          },
+          "metrics": [
+            {
+              "field": "cpu_kernel",
+              "id": "1",
+              "type": "max"
+            },
+            {
+              "field": "cpu_used",
+              "id": "3",
+              "type": "max"
+            },
+            {
+              "field": "cpu_user",
+              "id": "4",
+              "type": "max"
+            },
+            {
+              "field": "MB_write",
+              "id": "5",
+              "type": "max"
+            },
+            {
+              "field": "Write_resp_max",
+              "id": "9",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate",
+              "id": "10",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_max",
+              "id": "12",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_std",
+              "id": "13",
+              "type": "max"
+            },
+            {
+              "field": "MB_read",
+              "id": "14",
+              "type": "max"
+            }
+          ],
+          "query": "kind:'kata' AND Run:'64kb_write_2threads' AND ci_date:$ci_run_date",
+          "refId": "A",
+          "timeField": "timestamp"
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Vdbench kata: 64kb_write_2threads",
+      "tooltip": {
+        "shared": false,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "transparent": true,
+      "type": "graph",
+      "xaxis": {
+        "mode": "series",
+        "show": true,
+        "values": [
+          "total"
+        ]
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:195",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:196",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "bwnEiMx7k"
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 459
+      },
+      "hiddenSeries": false,
+      "id": 113,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": false,
+        "total": false,
+        "values": false
+      },
+      "lines": false,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.4.0-pre",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "auto"
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "bwnEiMx7k"
+          },
+          "metrics": [
+            {
+              "field": "cpu_kernel",
+              "id": "1",
+              "type": "max"
+            },
+            {
+              "field": "cpu_used",
+              "id": "3",
+              "type": "max"
+            },
+            {
+              "field": "cpu_user",
+              "id": "4",
+              "type": "max"
+            },
+            {
+              "field": "MB_write",
+              "id": "5",
+              "type": "max"
+            },
+            {
+              "field": "Write_resp_max",
+              "id": "9",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate",
+              "id": "10",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_max",
+              "id": "12",
+              "type": "max"
+            },
+            {
+              "field": "Read_rate_std",
+              "id": "13",
+              "type": "max"
+            },
+            {
+              "field": "MB_read",
+              "id": "14",
+              "type": "max"
+            }
+          ],
+          "query": "kind:'kata' AND Run:'64kb_cache_read_4threads' AND ci_date:$ci_run_date",
+          "refId": "A",
+          "timeField": "timestamp"
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Vdbench kata: 64kb_cache_read_4threads",
+      "tooltip": {
+        "shared": false,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "transparent": true,
+      "type": "graph",
+      "xaxis": {
+        "mode": "series",
+        "show": true,
+        "values": [
+          "total"
+        ]
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:195",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:196",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "bwnEiMx7k"
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 469
+      },
+      "hiddenSeries": false,
+      "id": 114,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": false,
+        "total": false,
+        "values": false
+      },
+      "lines": false,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.4.0-pre",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "auto"
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "bwnEiMx7k"
+          },
+          "metrics": [
+            {
+              "field": "cpu_kernel",
+              "id": "1",
+              "type": "max"
+            },
+            {
+              "field": "cpu_used",
+              "id": "3",
+              "type": "max"
+            },
+            {
+              "field": "cpu_user",
+              "id": "4",
+              "type": "max"
+            },
+            {
+              "field": "MB_write",
+              "id": "5",
+              "type": "max"
+            },
+            {
+              "field": "Write_resp_max",
+              "id": "9",
+              "type": "max"
+            },
+            {
+              "field": "Write_resp_std",
+              "id": "10",
+              "type": "max"
+            }
+          ],
+          "query": "kind:'kata' AND Run:'4kb_cache_write_4threads' AND ci_date:$ci_run_date",
+          "refId": "A",
+          "timeField": "timestamp"
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Vdbench kata: 4kb_cache_write_4threads",
+      "tooltip": {
+        "shared": false,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "transparent": true,
+      "type": "graph",
+      "xaxis": {
+        "mode": "series",
+        "show": true,
+        "values": [
+          "total"
+        ]
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:195",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:196",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "bwnEiMx7k"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "run_artifacts_url.keyword"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Run artifacts url"
+              },
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "targetBlank": true,
+                    "title": "link",
+                    "url": "${__value.text}"
+                  }
+                ]
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-text"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "continuous-BlYlRd"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Max"
+            },
+            "properties": [
+              {
+                "id": "custom.hidden",
+                "value": true
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 24,
+        "x": 0,
+        "y": 479
+      },
+      "id": 101,
+      "options": {
+        "footer": {
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "8.4.0-pre",
+      "targets": [
+        {
+          "alias": "",
+          "bucketAggs": [
+            {
+              "field": "run_artifacts_url.keyword",
+              "id": "2",
+              "settings": {
+                "min_doc_count": "1",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            }
+          ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "bwnEiMx7k"
+          },
+          "metrics": [
+            {
+              "field": "version",
+              "hide": true,
+              "id": "1",
+              "type": "max"
+            }
+          ],
+          "query": "ci_run_date=$ci_run_date",
+          "refId": "A",
+          "timeField": "timestamp"
+        }
+      ],
+      "title": "Vdbench run artifacts",
+      "type": "table"
+    },
+    {
       "gridPos": {
         "h": 4,
         "w": 3,
         "x": 21,
-        "y": 205
+        "y": 484
       },
       "id": 49,
       "links": [],
@@ -5409,8 +9571,8 @@
       {
         "current": {
           "selected": false,
-          "text": "2022_01_19",
-          "value": "2022_01_19"
+          "text": "2022_03_06",
+          "value": "2022_03_06"
         },
         "datasource": {
           "type": "elasticsearch",
@@ -5436,8 +9598,8 @@
       {
         "current": {
           "selected": false,
-          "text": "1122d766-25eb-56ff-a256-d52a1ba22a68",
-          "value": "1122d766-25eb-56ff-a256-d52a1ba22a68"
+          "text": "6e742129-880c-59d6-8b64-d728c328bef0",
+          "value": "6e742129-880c-59d6-8b64-d728c328bef0"
         },
         "datasource": {
           "type": "elasticsearch",
@@ -5470,6 +9632,6 @@
   "timezone": "",
   "title": "benchmark-runner-report",
   "uid": "mjAMHGN7z",
-  "version": 25,
+  "version": 31,
   "weekStart": ""
 }

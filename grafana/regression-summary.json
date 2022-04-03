@@ -22,7 +22,7 @@
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
   "id": 16,
-  "iteration": 1645551428298,
+  "iteration": 1648536002150,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -89,12 +89,16 @@
             {
               "options": {
                 "102": {
-                  "index": 8,
+                  "index": 10,
                   "text": "1.0.2"
                 },
                 "110": {
-                  "index": 9,
+                  "index": 11,
                   "text": "1.1.0"
+                },
+                "120": {
+                  "index": 12,
+                  "text": "1.2.0"
                 },
                 "483": {
                   "index": 0,
@@ -120,25 +124,73 @@
                   "index": 5,
                   "text": "4.8.8"
                 },
+                "4102": {
+                  "index": 22,
+                  "text": "4.10.2"
+                },
+                "4104": {
+                  "index": 23,
+                  "text": "4.10.4"
+                },
+                "4105": {
+                  "index": 24,
+                  "text": "4.10.5"
+                },
+                "4106": {
+                  "index": 25,
+                  "text": "4.10.6"
+                },
                 "4814": {
                   "index": 6,
                   "text": "4.8.14"
                 },
+                "4932": {
+                  "index": 8,
+                  "text": "4.9.3-2"
+                },
+                "4947": {
+                  "index": 9,
+                  "text": "4.9.4-7"
+                },
                 "41002": {
-                  "index": 11,
+                  "index": 19,
                   "text": "4.10.0-rc.2"
                 },
                 "41003": {
-                  "index": 12,
+                  "index": 20,
                   "text": "4.10.0-rc.3"
+                },
+                "41007": {
+                  "index": 21,
+                  "text": "4.10.0-rc.7"
+                },
+                "41016": {
+                  "index": 17,
+                  "text": "4.10.1-6"
                 },
                 "49211": {
                   "index": 7,
                   "text": "4.9.2-11"
                 },
+                "410129": {
+                  "index": 18,
+                  "text": "4.10.1-29"
+                },
                 "4100683": {
-                  "index": 10,
+                  "index": 13,
                   "text": "4.10.0-683"
+                },
+                "4100688": {
+                  "index": 14,
+                  "text": "4.10.0-688"
+                },
+                "4100700": {
+                  "index": 15,
+                  "text": "4.10.0-700"
+                },
+                "4100729": {
+                  "index": 16,
+                  "text": "4.10.0-729"
                 }
               },
               "type": "value"
@@ -169,7 +221,7 @@
       "id": 111,
       "interval": "1d",
       "options": {
-        "alignValue": "left",
+        "alignValue": "right",
         "legend": {
           "displayMode": "hidden",
           "placement": "bottom"
@@ -243,6 +295,37 @@
           ],
           "query": "_exists_:ocs_version",
           "refId": "B",
+          "timeField": "timestamp"
+        },
+        {
+          "alias": "odf_version",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "auto"
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "xQGAtZvnk"
+          },
+          "hide": false,
+          "metrics": [
+            {
+              "field": "tpm",
+              "id": "1",
+              "settings": {
+                "script": "Integer.parseInt(\"0\"+doc['odf_version.keyword'].value.replace(\".\",\"\").replace(\"r\",\"\").replace(\"c\",\"\").replace(\"f\",\"\").replace(\"-\",\"\"))"
+              },
+              "type": "max"
+            }
+          ],
+          "query": "_exists_:odf_version",
+          "refId": "E",
           "timeField": "timestamp"
         },
         {
@@ -888,12 +971,57 @@
               "type": "max"
             }
           ],
-          "query": "*",
+          "query": "timestamp:<1646928000000",
           "refId": "A",
+          "timeField": "timestamp"
+        },
+        {
+          "alias": "",
+          "bucketAggs": [
+            {
+              "field": "kind.keyword",
+              "id": "6",
+              "settings": {
+                "min_doc_count": "1",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            },
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": "0",
+                "timeZone": "utc",
+                "trimEdges": "0"
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "dpwevWDnz"
+          },
+          "hide": false,
+          "metrics": [
+            {
+              "field": "cpu",
+              "id": "1",
+              "settings": {
+                "script": "_value/1000000"
+              },
+              "type": "max"
+            }
+          ],
+          "query": "timestamp:>1646928000000",
+          "refId": "B",
           "timeField": "timestamp"
         }
       ],
-      "title": "stressng cpu bogo ops (millions)",
+      "title": "stressng cpu bogo ops (millions) [Note: result scale changed on March 11th]",
       "transformations": [],
       "type": "state-timeline"
     },
@@ -1002,12 +1130,54 @@
               "type": "max"
             }
           ],
-          "query": "*",
+          "query": "timestamp:<1646928000000",
           "refId": "C",
+          "timeField": "timestamp"
+        },
+        {
+          "alias": "",
+          "bucketAggs": [
+            {
+              "field": "kind.keyword",
+              "id": "3",
+              "settings": {
+                "min_doc_count": "1",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            },
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "auto"
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "dpwevWDnz"
+          },
+          "hide": false,
+          "metrics": [
+            {
+              "field": "vm",
+              "id": "1",
+              "settings": {
+                "script": "_value/1000000"
+              },
+              "type": "max"
+            }
+          ],
+          "query": "timestamp:>1646928000000",
+          "refId": "A",
           "timeField": "timestamp"
         }
       ],
-      "title": "stressng vm bogo ops (millions)",
+      "title": "stressng vm bogo ops (millions) [Note: result scale changed on March 11th]",
       "transformations": [],
       "type": "state-timeline"
     },
@@ -1116,12 +1286,54 @@
               "type": "max"
             }
           ],
-          "query": "*",
+          "query": "timestamp:<1646928000000",
           "refId": "B",
+          "timeField": "timestamp"
+        },
+        {
+          "alias": "",
+          "bucketAggs": [
+            {
+              "field": "kind.keyword",
+              "id": "3",
+              "settings": {
+                "min_doc_count": "1",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            },
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "auto"
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "dpwevWDnz"
+          },
+          "hide": false,
+          "metrics": [
+            {
+              "field": "memcpy",
+              "id": "1",
+              "settings": {
+                "script": "_value/1000"
+              },
+              "type": "max"
+            }
+          ],
+          "query": "timestamp:>1646928000000",
+          "refId": "A",
           "timeField": "timestamp"
         }
       ],
-      "title": "stressng memcpy bogo ops (thousands)",
+      "title": "stressng memcpy bogo ops (thousands) [Note: result scale changed on March 11th]",
       "transformations": [],
       "type": "state-timeline"
     }
@@ -1246,6 +1458,6 @@
   "timezone": "",
   "title": "regression-summary",
   "uid": "T4775LKnzzmichey",
-  "version": 10,
+  "version": 22,
   "weekStart": ""
 }

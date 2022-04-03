@@ -11,5 +11,5 @@ class SSHSubprocessError(SSHError):
     This class exception is for Subprocess
     """
     def __init__(self):
-        self.message = 'Subprocess is end with errors'
+        self.message = 'Subprocess ended with errors'
         super(SSHSubprocessError, self).__init__(self.message)

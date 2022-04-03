@@ -8,5 +8,6 @@ common_data:
   prom_token: {{ prom_token }}
   sm_index_name: system-metrics{{ es_suffix }}
   metrics_profile: node-metrics.yml
+  kata_cpuoffline_workaround: {{ kata_cpuoffline_workaround }}
   #metrics_profile: https://raw.githubusercontent.com/cloud-bulldozer/benchmark-operator/master/roles/kube-burner/files/metrics.yaml
   pin: {{ pin }}

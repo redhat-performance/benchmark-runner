@@ -51,6 +51,8 @@ class BenchmarkOperatorWorkloadsOperations:
         self._es_user = self._environment_variables_dict.get('elasticsearch_user', '')
         self._es_password = self._environment_variables_dict.get('elasticsearch_password', '')
         self._timeout = int(self._environment_variables_dict.get('timeout', ''))
+        self._uuid = self._environment_variables_dict.get('uuid', '')
+        self._es_url_protocol = self._environment_variables_dict['elasticsearch_url_protocol']
         self._ssh = SSH()
         # Elasticsearch connection
         if self._es_host and self._es_port:
@@ -58,6 +60,7 @@ class BenchmarkOperatorWorkloadsOperations:
                                                            es_port=self._es_port,
                                                            es_user=self._es_user,
                                                            es_password=self._es_password,
+                                                           es_url_protocol=self._es_url_protocol,
                                                            timeout=self._timeout)
         # Generate template class
         self._template = TemplateOperations(workload=self._workload)
@@ -199,9 +202,9 @@ class BenchmarkOperatorWorkloadsOperations:
         # verify that data upload to elastic search
         if self._es_host:
             # workload: system metrics, in case of uperf take timestamp and not uperf_ts
-            self._verify_elasticsearch_data_uploaded(index=es_index, uuid=self._oc.get_long_uuid(workload=workload), workload='system-metrics', fast_check = True)
+            self._verify_elasticsearch_data_uploaded(index=es_index, uuid=self._oc.get_long_uuid(workload=workload), workload='system-metrics', fast_check=True)
 
-    def __get_metadata(self, kind: str = None, database: str = None, status: str = None, run_artifacts_url: str = None) -> dict:
+    def __get_metadata(self, kind: str = None, database: str = None, status: str = None, run_artifacts_url: str = None, uuid: str = None) -> dict:
         """
         This method return metadata kind and database argument are optional
         @param kind: optional: pod, vm, or kata
@@ -228,10 +231,11 @@ class BenchmarkOperatorWorkloadsOperations:
         if run_artifacts_url:
             metadata.update({'run_artifacts_url': run_artifacts_url})
         if database:
-            metadata.update({'vm_os_version': 'centos8'})
+            metadata.update({'vm_os_version': 'centos-stream8'})
         else:
             metadata.update({'vm_os_version': 'fedora34'})
-
+        if uuid:
+            metadata.update({'uuid': uuid})
         # for hammerdb
         if database == 'mssql':
             metadata.update({'db_version': 2019})
@@ -255,7 +259,7 @@ class BenchmarkOperatorWorkloadsOperations:
         """
         self.__es_operations.update_elasticsearch_index(index=index, id=id, metadata=self.__get_metadata(kind=kind, database=database, status=status, run_artifacts_url=run_artifacts_url))
 
-    def _upload_to_elasticsearch(self, index: str, kind: str, status: str, run_artifacts_url: str, database: str = ''):
+    def _upload_to_elasticsearch(self, index: str, kind: str, status: str, run_artifacts_url: str, database: str = '', uuid: str = ''):
         """
         This method upload to elasticsearch
         :param index:
@@ -265,21 +269,42 @@ class BenchmarkOperatorWorkloadsOperations:
         :param database:
         :return:
         """
-        self.__es_operations.upload_to_elasticsearch(index=index, data=self.__get_metadata(kind=kind, database=database, status=status, run_artifacts_url=run_artifacts_url))
+        self.__es_operations.upload_to_elasticsearch(index=index, data=self.__get_metadata(kind=kind, database=database, status=status, run_artifacts_url=run_artifacts_url, uuid=uuid))
 
-    def _verify_elasticsearch_data_uploaded(self, index: str, uuid: str, workload: str = '', fast_check: bool = False):
+    def _verify_elasticsearch_data_uploaded(self, index: str, uuid: str, workload: str = '', fast_check: bool = False, timeout: int = None):
         """
         This method verify that elasticsearch data uploaded
         :param index:
         :param uuid:
         :param workload:
         :param fast_check:
+        :param timeout:
         :return: ids
         """
         if workload:
-            return self.__es_operations.verify_elasticsearch_data_uploaded(index=index, uuid=uuid, workload=workload, fast_check=fast_check)
+            return self.__es_operations.verify_elasticsearch_data_uploaded(index=index, uuid=uuid, workload=workload, fast_check=fast_check, timeout=timeout)
         else:
-            return self.__es_operations.verify_elasticsearch_data_uploaded(index=index, uuid=uuid, workload=self._workload_name, fast_check=fast_check)
+            return self.__es_operations.verify_elasticsearch_data_uploaded(index=index, uuid=uuid, workload=self._workload_name, fast_check=fast_check, timeout=timeout)
+
+    def _upload_workload_to_elasticsearch(self, index: str, kind: str, status: str, result: dict = None):
+        """
+        This method upload to elasticsearch
+        :param index:
+        :param kind:
+        :param status:
+        :param result:
+        :return:
+        """
+        self.__es_operations.upload_to_elasticsearch(index=index, data=self.__get_metadata(kind=kind, status=status, result=result))
+
+    def _verify_elasticsearch_workload_data_uploaded(self, index: str, uuid: str):
+        """
+        This method verify that elasticsearch data uploaded
+        :param index:
+        :param uuid:
+        :return:
+        """
+        self.__es_operations.verify_elasticsearch_data_uploaded(index=index, uuid=uuid)
 
     def _create_vm_log(self, labels: list) -> str:
         """
@@ -293,7 +318,7 @@ class BenchmarkOperatorWorkloadsOperations:
             self._oc.save_vm_log(vm_name=vm_name)
         return vm_name
 
-    def __create_pod_log(self, label: str = '', database: str = '') -> str:
+    def _create_pod_log(self, label: str = '', database: str = '') -> str:
         """
         This method create pod log per workload
         :param label:pod label
@@ -306,7 +331,7 @@ class BenchmarkOperatorWorkloadsOperations:
         else:
             self._oc.save_pod_log(pod_name=pod_name)
 
-    def __get_run_artifacts_hierarchy(self, workload_name: str = '', is_file: bool = False):
+    def _get_run_artifacts_hierarchy(self, workload_name: str = '', is_file: bool = False):
         """
         This method return log hierarchy
         :param workload_name: workload name
@@ -333,21 +358,21 @@ class BenchmarkOperatorWorkloadsOperations:
         :param labels: list of labels of pod names - using it when it different from workload name
         :return: run artifacts url
         """
-        self.__create_pod_log(label='benchmark-controller-manager')
+        self._create_pod_log(label='benchmark-controller-manager')
         if environment_variables.environment_variables_dict['system_metrics'] == 'True':
-            self.__create_pod_log(label='system-metrics')
+            self._create_pod_log(label='system-metrics')
         # for vm call to create_vm_log
         if pod:
             # workload that contains 2 pods
             if labels:
                 for label in labels:
-                    self.__create_pod_log(label=label)
+                    self._create_pod_log(label=label)
             else:
-                self.__create_pod_log(label=workload)
+                self._create_pod_log(label=workload)
             if database:
-                self.__create_pod_log(database=database)
+                self._create_pod_log(database=database)
         workload_name = self._workload_name
-        return os.path.join(self._environment_variables_dict.get('run_artifacts_url', ''), f'{self.__get_run_artifacts_hierarchy(workload_name=workload_name, is_file=True)}-{self._time_stamp_format}.tar.gz')
+        return os.path.join(self._environment_variables_dict.get('run_artifacts_url', ''), f'{self._get_run_artifacts_hierarchy(workload_name=workload_name, is_file=True)}-{self._time_stamp_format}.tar.gz')
 
     def __make_run_artifacts_tarfile(self, workload: str):
         """
@@ -368,7 +393,7 @@ class BenchmarkOperatorWorkloadsOperations:
         """
         workload = self._workload_name
         tar_run_artifacts_path = self.__make_run_artifacts_tarfile(workload)
-        run_artifacts_hierarchy = self.__get_run_artifacts_hierarchy(workload_name=workload)
+        run_artifacts_hierarchy = self._get_run_artifacts_hierarchy(workload_name=workload)
         # Upload when endpoint_url is not None
         if self._endpoint_url:
             s3operations = S3Operations()

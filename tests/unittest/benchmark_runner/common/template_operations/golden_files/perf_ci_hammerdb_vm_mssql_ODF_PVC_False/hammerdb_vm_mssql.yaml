@@ -77,7 +77,7 @@ spec:
         sockets: 32
         cores: 1
         threads: 1
-        image: quay.io/cloud-bulldozer/centos8-mssql2019-container-disk:latest
+        image: quay.io/cloud-bulldozer/centos-stream8-mssql2019-container-disk:latest
         limits:
           memory: 32Gi
         requests:

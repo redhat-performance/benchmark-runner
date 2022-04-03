@@ -1,7 +1,10 @@
 
 import time
+import ssl
+import urllib3
 from typeguard import typechecked
 from elasticsearch import Elasticsearch
+from elasticsearch.connection import create_ssl_context
 from elasticsearch_dsl import Search
 from datetime import datetime
 
@@ -22,20 +25,33 @@ class ElasticSearchOperations:
     MAX_SEARCH_RESULTS = 1000
     MIN_SEARCH_RESULTS = 100
 
-    def __init__(self, es_host: str, es_port: str, es_user: str = '', es_password: str = '', timeout: int = 2000):
+    def __init__(self, es_host: str, es_port: str, es_user: str = '', es_password: str = '', es_url_protocol: str = 'http', timeout: int = 2000):
         self.__es_host = es_host
         self.__es_port = es_port
         self.__es_user = es_user
         self.__es_password = es_password
+        self.__es_url_protocol = es_url_protocol
         self.__timeout = timeout
+
+        kwargs = {}
+        if self.__es_url_protocol == 'https':
+            ssl_context = create_ssl_context()
+            ssl_context.check_hostname = False
+            ssl_context.verify_mode = ssl.CERT_NONE
+
+            kwargs["ssl_context"] = ssl_context
+
         if self.__es_password:
-            self.__es_url = f"http://{self.__es_user}:{self.__es_password}@{self.__es_host}:{self.__es_port}"
-            self.__es = Elasticsearch([self.__es_url])
+            self.__es_url = f"{self.__es_url_protocol}://{self.__es_user}:{self.__es_password}@{self.__es_host}:{self.__es_port}"
+
+            host_arg = self.__es_url
         else:
+            host_arg = dict(host=self.__es_host)
             if self.__es_port:
-                self.__es = Elasticsearch([{'host': self.__es_host, 'port': self.__es_port}])
-            else:
-                self.__es = Elasticsearch([{'host': self.__es_host}])
+                host_arg['port'] = self.__es_port
+
+        self.__es = Elasticsearch([host_arg], **kwargs)
+
         self._hits = 0
 
     @property
@@ -105,7 +121,7 @@ class ElasticSearchOperations:
 
     @typechecked()
     @logger_time_stamp
-    def verify_elasticsearch_data_uploaded(self, index: str, uuid: str = '', workload: str = '', fast_check: bool = False):
+    def verify_elasticsearch_data_uploaded(self, index: str, uuid: str = '', workload: str = '', fast_check: bool = False, timeout: int = None):
         """
         The method wait till data upload to elastic search and wait if there is new data, search in last 15 minutes
         :param index:
@@ -117,6 +133,7 @@ class ElasticSearchOperations:
         """
         current_wait_time = 0
         current_hits = 0
+        self.__timeout = timeout if timeout else self.__timeout
         # waiting for any hits
         while current_wait_time <= self.__timeout:
             # waiting for new hits
@@ -127,7 +144,11 @@ class ElasticSearchOperations:
             # sleep for x seconds
             time.sleep(self.SLEEP_TIME)
             current_wait_time += self.SLEEP_TIME
-        raise ElasticSearchDataNotUploaded
+        # not raise error in case of timeout parameter
+        if timeout:
+            return False
+        else:
+            raise ElasticSearchDataNotUploaded
 
     @typechecked()
     def upload_to_elasticsearch(self, index: str, data: dict, doc_type: str = '_doc', es_add_items: dict = None):
@@ -148,7 +169,10 @@ class ElasticSearchOperations:
                 data[key] = value
 
         # utcnow - solve timestamp issue
-        data['timestamp'] = datetime.utcnow()  # datetime.now()
+        if 'uperf' in index:
+            data['uperf_ts'] = datetime.utcnow()  # datetime.now()
+        else:
+            data['timestamp'] = datetime.utcnow()  # datetime.now()
 
         # Upload data to elastic search server
         try:

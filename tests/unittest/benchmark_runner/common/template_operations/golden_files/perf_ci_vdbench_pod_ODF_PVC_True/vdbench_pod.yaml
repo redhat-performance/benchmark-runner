@@ -42,7 +42,7 @@ spec:
   containers:
     - name: vdbench-pod
       namespace: benchmark-runner
-      image: quay.io/ebattat/centos-stream8-vdbench5.04.07-pod
+      image: quay.io/ebattat/centos-stream8-vdbench5.04.07-pod:latest
       imagePullPolicy: "IfNotPresent"
       volumeMounts:
         - name: vdbench-pod-pvc-claim
@@ -99,3 +99,4 @@ spec:
       namespace: benchmark-runner
       persistentVolumeClaim:
         claimName: vdbench-pod-pvc-claim
+

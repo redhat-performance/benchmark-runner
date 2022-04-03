@@ -13,6 +13,22 @@ class EnvironmentVariables:
 
         self._environment_variables_dict = {}
 
+        # env files override true ENV. Not best order, but easier to write :/
+        # .env.generated can be auto-generated (by an external tool) based on the local cluster's configuration.
+
+        for env in ".env", ".env.generated":
+            try:
+                with open(env) as f:
+                    for line in f.readlines():
+                        key, found , value = line.strip().partition("=")
+                        if not found:
+                            print("ERROR: invalid line in {env}: {line.strip()}")
+                            continue
+                        if key in os.environ: continue # prefer env to env file
+                        os.environ[key] = value
+
+            except FileNotFoundError: pass # ignore
+
         ##################################################################################################
         # dynamic parameters - configure for local run
         # parameters for running workload
@@ -36,6 +52,12 @@ class EnvironmentVariables:
         self._environment_variables_dict['elasticsearch_port'] = os.environ.get('ELASTICSEARCH_PORT', '')
         self._environment_variables_dict['elasticsearch_user'] = os.environ.get('ELASTICSEARCH_USER', '')
         self._environment_variables_dict['elasticsearch_password'] = os.environ.get('ELASTICSEARCH_PASSWORD', '')
+        # 'http'(Default) / 'https' to use SSL to connect ElasticSearch
+        self._environment_variables_dict['elasticsearch_url_protocol'] = os.environ.get('ELASTICSEARCH_URL_PROTOCOL', 'http')
+
+        # Workaround for Kata CPU offline problem in 4.9/4.10
+        # Set to True to
+        self._environment_variables_dict['kata_cpuoffline_workaround'] = os.environ.get('KATA_CPUOFFLINE_WORKAROUND', '')
 
         # default parameter - change only if needed
         # Parameters below related to 'run_workload()'
@@ -55,7 +77,9 @@ class EnvironmentVariables:
 
         # Choose default namespace
         base_workload = self._environment_variables_dict['workload'].split('_')[0]
-        if base_workload in self._environment_variables_dict['workload_namespaces']:
+        if os.environ.get('NAMESPACE'):
+            self._environment_variables_dict['namespace'] = os.environ.get('NAMESPACE')
+        elif base_workload in self._environment_variables_dict['workload_namespaces']:
             default_namespace = self._environment_variables_dict['workload_namespaces'][base_workload]
             self._environment_variables_dict['namespace'] = os.environ.get('NAMESPACE', default_namespace)
         else:
@@ -84,11 +108,22 @@ class EnvironmentVariables:
         self._environment_variables_dict['date_key'] = datetime.datetime.now().strftime("%Y/%m/%d")
         self._environment_variables_dict['time_stamp_format'] = os.path.join(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d-%H-%M-%S'))
         # Benchmark runner local run artifacts path with time stamp format
-        self._environment_variables_dict['run_artifacts_path'] = os.path.join(self._environment_variables_dict['run_artifacts'], f"{self._environment_variables_dict['workload'].replace('_', '-')}-{self._environment_variables_dict['time_stamp_format']}")
+
+        self._environment_variables_dict['run_artifacts_path'] = os.environ.get('RUN_ARTIFACTS_PATH')
+        if not self._environment_variables_dict['run_artifacts_path']:
+            self._environment_variables_dict['run_artifacts_path'] = os.path.join(self._environment_variables_dict['run_artifacts'], f"{self._environment_variables_dict['workload'].replace('_', '-')}-{self._environment_variables_dict['time_stamp_format']}")
+
         # None(Default)/ 'True' to save local(/tmp) artifacts files
         self._environment_variables_dict['save_artifacts_local'] = os.environ.get('SAVE_ARTIFACTS_LOCAL', None)
         # None/ 'True'(Default) to enable prometheus snapshot
         self._environment_variables_dict['enable_prometheus_snapshot'] = os.environ.get('ENABLE_PROMETHEUS_SNAPSHOT', 'True')
+
+        self._environment_variables_dict['runner_type'] = os.environ.get('RUNNER_TYPE')
+
+        self._environment_variables_dict['config_from_args'] = os.environ.get('CONFIG_FROM_ARGS')
+
+        self._environment_variables_dict['template_in_workload_dir'] = os.environ.get('TEMPLATE_IN_WORKLOAD_DIR')
+
         # end dynamic parameters - configure for local run
         ##################################################################################################
 
@@ -194,10 +229,10 @@ class EnvironmentVariables:
 
         # ElasticSearch url
         if self._environment_variables_dict.get('elasticsearch_password', ''):
-            self._environment_variables_dict['elasticsearch_url'] = f"http://{self._environment_variables_dict.get('elasticsearch_user', '')}:{self._environment_variables_dict.get('elasticsearch_password', '')}@{self._environment_variables_dict.get('elasticsearch', '')}:{self._environment_variables_dict.get('elasticsearch_port', '')}"
+            self._environment_variables_dict['elasticsearch_url'] = f"{self._environment_variables_dict['elasticsearch_url_protocol']}://{self._environment_variables_dict.get('elasticsearch_user', '')}:{self._environment_variables_dict.get('elasticsearch_password', '')}@{self._environment_variables_dict.get('elasticsearch', '')}:{self._environment_variables_dict.get('elasticsearch_port', '')}"
         else:
             if self._environment_variables_dict['elasticsearch'] and self._environment_variables_dict.get('elasticsearch_port', ''):
-                self._environment_variables_dict['elasticsearch_url'] = f"http://{self._environment_variables_dict.get('elasticsearch', '')}:{self._environment_variables_dict.get('elasticsearch_port', '')}"
+                self._environment_variables_dict['elasticsearch_url'] = f"{self._environment_variables_dict['elasticsearch_url_protocol']}://{self._environment_variables_dict.get('elasticsearch', '')}:{self._environment_variables_dict.get('elasticsearch_port', '')}"
             else:
                 self._environment_variables_dict['elasticsearch_url'] = ''
 

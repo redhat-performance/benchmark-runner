@@ -28,7 +28,7 @@ spec:
       limits_cpu: 4
       limits_memory: 16Gi
       # general options
-      runtype: "parallel"
+      runtype: "sequential"
       timeout: "30"
       instances: 1
       # cpu stressor options
