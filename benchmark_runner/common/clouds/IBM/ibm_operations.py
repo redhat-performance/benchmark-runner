@@ -226,29 +226,12 @@ class IBMOperations:
     @logger_time_stamp
     def verify_install_complete(self):
         """
-        This verify that install complete
+        This method verify that installation complete
         :return: True if installation success and raise exception if installation failed
         """
         complete = self.__wait_for_install_complete()
         if not complete:
-            # Workers issue: workaround for solving IBM workers stuck on BIOS page after reboot
-            logger.info('Installation failed, checking worker nodes status')
-            # Check if first worker is down
-            if self.__get_ibm_machine_status(machine_id=self.__ibm_worker_ids_list()[0]) != 'ACTIVE':
-                logger.info('One Worker is down, reboot all workers')
-                # reboot all not active workers
-                for worker_id in self.__ibm_worker_ids_list():
-                    if self.__get_ibm_machine_status(machine_id=worker_id) != 'ACTIVE':
-                        self.__async_set_action_ibm_machine(action=Actions.REBOOT.value, machine_id=worker_id)
-                # Wait till all worker will be active
-                for worker_id in self.__ibm_worker_ids_list():
-                    self.__wait_for_active_machine(machine_id=worker_id)
-                logger.info('All workers are up and running now')
-                return True
-            # Another issue that is not related to workers
-            else:
-                logger.info('Installation failed, retry again')
-                raise Exception(f'Installation failed after 3 retries')
+            raise Exception(f'Installation failed')
         else:
             self.__restart_pod_ci()
             return True
