@@ -21,6 +21,7 @@ logger.setLevel(level=log_level)
 SYSTEM_EXIT_BENCHMARK_FAILED = 1
 SYSTEM_EXIT_UNKNOWN_EXECUTION_TYPE = 2
 
+
 @logger_time_stamp
 def main():
     """
