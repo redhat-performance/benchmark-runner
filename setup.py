@@ -50,11 +50,11 @@ setup(
         'paramiko==2.8.0',
         'PyGitHub==1.55',  # update secrets
         'PyYAML==6.0',
+        'sphinx==4.5.0',  # readthedocs
+        'sphinx-rtd-theme==1.0.0',  # readthedocs
         'tenacity==8.0.1',  # retry decorator
         'typeguard==2.12.1',
         'typing==3.7.4.3',
-        'sphinx==4.5.0',  # readthedocs
-        'sphinx-rtd-theme==1.0.0',  # readthedocs
         # must add new package inside requirements.txt
     ],
 
