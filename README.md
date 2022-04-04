@@ -1,6 +1,7 @@
 
 [![Actions Status](https://github.com/redhat-performance/benchmark-runner/workflows/CI/badge.svg)](https://github.com/redhat-performance/benchmark-runner/actions)
 [![Coverage Status](https://coveralls.io/repos/github/redhat-performance/benchmark-runner/badge.svg?branch=main)](https://coveralls.io/github/redhat-performance/benchmark-runner?branch=main)
+[![Documentation Status](https://readthedocs.org/projects/benchmark-runner/badge/?version=latest)](https://benchmark-runner.readthedocs.io/en/latest/?badge=latest)
 
 # Benchmark-Runner
 
@@ -22,7 +23,7 @@ Reference:
 * The benchmark-runner container image is located in [Quay.io](https://quay.io/repository/ebattat/benchmark-runner)
 
 ## Documentation
-Documentation is available at [benchmark-runner.readthedocs.io](https://benchmark-runner.readthedocs.io/en/stable/)
+Documentation is available at [benchmark-runner.readthedocs.io](https://benchmark-runner.readthedocs.io/en/latest/)
 
 ![](media/docker2.png)
 
