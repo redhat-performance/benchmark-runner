@@ -1,7 +1,9 @@
 <div align="center">
   <img src="https://github.com/redhat-performance/benchmark-runner/blob/main/media/benchmark_runner.png"><br>
 </div>
+
 -----------------
+
 # Benchmark-Runner: Running and visualizing benchmark on Kubernetes/ OpenShift
 [![PyPI Latest Release](https://img.shields.io/pypi/v/benchmark-runner.svg)](https://pypi.org/project/benchmark-runner/)
 [![Actions Status](https://github.com/redhat-performance/benchmark-runner/workflows/CI/badge.svg)](https://github.com/redhat-performance/benchmark-runner/actions)
