@@ -1,10 +1,12 @@
 
 # Benchmark-Runner
 
-This tool provides a lightweight and flexible framework for running benchmark workloads
-on Kubernetes/OpenShift Pod or VM.
+## What is it?
 
-This tool support the following workloads:
+**benchmark-runner** is a containerized Python lightweight and flexible framework for running benchmark workloads 
+on Kubernetes/OpenShift runtype kinds Pod, kata and VM.
+
+This framework support the following workloads:
 
 * [hammerdb](https://hammerdb.com/): running hammerdb workload on the following databases: MSSQL, Mariadb, Postgresql on Pod and VM with [Configuration](benchmark_runner/templates/hammerdb)
 * [stressng](https://wiki.ubuntu.com/Kernel/Reference/stress-ng): running stressng workload on Pod or VM with [Configuration](benchmark_runner/templates/stressng)
