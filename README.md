@@ -4,7 +4,7 @@
 
 -----------------
 
-# Benchmark-Runner: Running and visualizing benchmark on Kubernetes/ OpenShift
+# Benchmark-Runner: Running and visualizing benchmark
 [![PyPI Latest Release](https://img.shields.io/pypi/v/benchmark-runner.svg)](https://pypi.org/project/benchmark-runner/)
 [![Actions Status](https://github.com/redhat-performance/benchmark-runner/workflows/CI/badge.svg)](https://github.com/redhat-performance/benchmark-runner/actions)
 [![Coverage Status](https://coveralls.io/repos/github/redhat-performance/benchmark-runner/badge.svg?branch=main)](https://coveralls.io/github/redhat-performance/benchmark-runner?branch=main&kill_cache=1)
