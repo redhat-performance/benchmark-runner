@@ -24,8 +24,10 @@ setup(
     long_description_content_type='text/markdown',
     author='Red Hat',
     author_email='ebattat@redhat.com',
-    url='',
+    url='https://github.com/redhat-performance/benchmark-runner',
+    license="Apache License 2.0",
     classifiers=[
+        'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
