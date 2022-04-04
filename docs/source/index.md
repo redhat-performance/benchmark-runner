@@ -21,12 +21,10 @@ Reference:
 * The benchmark-runner package is located in [PyPi](https://pypi.org/project/benchmark-runner)
 * The benchmark-runner container image is located in [Quay.io](https://quay.io/repository/ebattat/benchmark-runner)
 
-## Documentation
-Documentation is available at [benchmark-runner.readthedocs.io](https://benchmark-runner.readthedocs.io/en/latest/)
-
 ![](../../media/docker2.png)
 
 ![](../../media/demo.gif)
+
 
 <!-- Table of contents -->
 ```{toctree}
