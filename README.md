@@ -1,16 +1,20 @@
-
+<div align="center">
+  <img src="https://github.com/redhat-performance/benchmark-runner/blob/main/media/benchmark_runner.png"><br>
+</div>
+-----------------
+# Benchmark-Runner: Running and visualizing benchmark on Kubernetes/ OpenShift
 [![PyPI Latest Release](https://img.shields.io/pypi/v/benchmark-runner.svg)](https://pypi.org/project/benchmark-runner/)
 [![Actions Status](https://github.com/redhat-performance/benchmark-runner/workflows/CI/badge.svg)](https://github.com/redhat-performance/benchmark-runner/actions)
 [![Coverage Status](https://coveralls.io/repos/github/redhat-performance/benchmark-runner/badge.svg?branch=main)](https://coveralls.io/github/redhat-performance/benchmark-runner?branch=main&kill_cache=1)
 [![Documentation Status](https://readthedocs.org/projects/benchmark-runner/badge/?version=latest)](https://benchmark-runner.readthedocs.io/en/latest/?badge=latest)
 [![License](https://img.shields.io/pypi/l/benchmark-runner.svg)](https://github.com/redhat-performance/benchmark-runner/blob/main/LICENSE)
 
-# Benchmark-Runner
+## What is it?
 
-This tool provides a lightweight and flexible framework for running benchmark workloads 
-on Kubernetes/OpenShift Pod or VM.
+**benchmark-runner** is a containerized Python lightweight and flexible framework for running benchmark workloads 
+on Kubernetes/OpenShift runtype kinds Pod, kata and VM.
 
-This tool support the following workloads:
+This framework support the following workloads:
 
 * [hammerdb](https://hammerdb.com/): running hammerdb workload on the following databases: MSSQL, Mariadb, Postgresql on Pod and VM with [Configuration](benchmark_runner/templates/hammerdb)
 * [stressng](https://wiki.ubuntu.com/Kernel/Reference/stress-ng): running stressng workload on Pod or VM with [Configuration](benchmark_runner/templates/stressng)
