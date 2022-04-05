@@ -18,10 +18,10 @@ on Kubernetes/OpenShift runtype kinds Pod, kata and VM.
 
 This framework support the following workloads:
 
-* [hammerdb](https://hammerdb.com/): running hammerdb workload on the following databases: MSSQL, Mariadb, Postgresql on Pod and VM with [Configuration](benchmark_runner/templates/hammerdb)
-* [stressng](https://wiki.ubuntu.com/Kernel/Reference/stress-ng): running stressng workload on Pod or VM with [Configuration](benchmark_runner/templates/stressng)
-* [uperf](http://uperf.org/): running uperf workload on Pod or VM with [Configuration](benchmark_runner/templates/uperf)
-* [vdbench](https://wiki.lustre.org/VDBench/): running vdbench workload in a pod with [Configuration](benchmark_runner/templates/vdbench)
+* [hammerdb](https://hammerdb.com/): running hammerdb workload on the following databases: MSSQL, Mariadb, Postgresql on Pod, Kata or VM with [Configuration](benchmark_runner/templates/hammerdb)
+* [stressng](https://wiki.ubuntu.com/Kernel/Reference/stress-ng): running stressng workload on Pod, Kata or VM [Configuration](benchmark_runner/templates/stressng)
+* [uperf](http://uperf.org/): running uperf workload on Pod, Kata or VM with [Configuration](benchmark_runner/templates/uperf)
+* [vdbench](https://wiki.lustre.org/VDBench/): running vdbench workload on Pod, Kata or VM with [Configuration](benchmark_runner/templates/vdbench)
 
 Benchmark-runner grafana dashboard example:
 ![](media/grafana.png)
