@@ -75,8 +75,8 @@ jobs:
         sleep 30
 
 
-  finilize:
-    name: finilize
+  finalize:
+    name: finalize
     needs: [build]
     runs-on: ubuntu-latest
     steps:

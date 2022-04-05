@@ -123,8 +123,8 @@ jobs:
       run: |
           if [[ "${{ job.status }}" == "failure" || "${{ job.status }}" == "cancelled" ]]; then echo "::set-output name=status::${{ job.status }}"; fi
    
-  finilize_nightly:
-    name: finilize nightly 
+  finalize_nightly:
+    name: finalize nightly
     runs-on: ubuntu-latest
     if: always()
     needs: [initialize_nightly, workload]      
