@@ -7,7 +7,6 @@ name: Deploy IPI FUNC Env Weekly CI
 #  schedule:
 #    - cron: '0 4 * * 6' # run on Saturday at 4 AM UTC/ 0 AM EDT
 
-
 on:
   push:
     branches: [ main ]
@@ -62,7 +61,7 @@ jobs:
         # green when failed because retry
         continue-on-error: true
         env:
-          INSTALL_OCP_VERSION: "candidate-4.10"
+          INSTALL_OCP_VERSION: "latest-4.10"
           OCP_VERSION_BUILD: "ga"
           IBM_API_KEY: ${{ secrets.IBM_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
