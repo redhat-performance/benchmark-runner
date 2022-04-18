@@ -148,6 +148,12 @@ class OC(SSH):
         """
         return self.run(r""" oc get nodes -l node-role.kubernetes.io/worker= -o jsonpath="{range .items[*]}{.metadata.name}{'\n'}{end}" """)
 
+    def clear_nodes_cache(self):
+        """
+        This method clears the node's buffer cache
+        """
+        return self.run(r""" oc get nodes -l node-role.kubernetes.io/worker= -o jsonpath="{range .items[*]}{.metadata.name}{'\n'}{end}" |  xargs -I{} oc debug node/{} -- chroot /host sh -c "sync; echo 3 > /proc/sys/vm/drop_caches" """)
+
     def __get_short_uuid(self, workload: str):
         """
         This method return uuid
