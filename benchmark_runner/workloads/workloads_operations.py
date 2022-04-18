@@ -350,6 +350,7 @@ class WorkloadsOperations:
         :return:
         """
         self.delete_all()
+        self._oc.clear_nodes_cache()
         self.odf_pvc_verification()
         self._template.generate_yamls()
         self.start_prometheus()
