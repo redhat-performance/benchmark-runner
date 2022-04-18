@@ -467,6 +467,7 @@ class BenchmarkOperatorWorkloadsOperations:
         :return:
         """
         self.delete_all()
+        self._oc.clear_nodes_cache()
         # check that there is elasticsearch when system metric is True
         self.__check_elasticsearch_exist_for_system_metrics()
         # make deploy benchmark controller manager
