@@ -10,6 +10,7 @@ name: Func Env E2E Test CI
 #    types:
 #      - completed
 
+
 on:
   push:
     branches: [ main ]
