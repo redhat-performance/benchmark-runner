@@ -4,15 +4,15 @@
  
 name: Func Env E2E Test CI
 
-on:
-  workflow_run:
-    workflows: ["Test1"]
-    types:
-      - completed
-
 #on:
-#  push:
-#    branches: [ main ]
+#  workflow_run:
+#    workflows: ["Test1"]
+#    types:
+#      - completed
+
+on:
+  push:
+    branches: [ main ]
 
 jobs:
   start:
@@ -145,7 +145,8 @@ jobs:
         build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
         build_version="$(cut -d'=' -f2 <<<"$build")"
         #ssh -t provision "podman pull quay.io/ebattat/benchmark-runner:v1.0.289"
-        ssh -t provision "podman images"
+        #ssh -t provision "podman images"
+        ssh -t provision "oc get nodes -l node-role.kubernetes.io/master= "
         #echo "sudo podman rmi -f \$(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)" > "$RUNNER_PATH/remove_image.sh"
         
         echo "if [[ \"\$(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)\" != \"\" ]]; then sudo podman rmi -f \$(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null); fi" > "$RUNNER_PATH/remove_image.sh"
