@@ -9,6 +9,7 @@ from benchmark_runner.common.ocp_resources.create_odf import CreateODF
 from benchmark_runner.common.ocp_resources.create_kata import CreateKata
 from benchmark_runner.common.ocp_resources.create_cnv import CreateCNV
 from benchmark_runner.common.ocp_resources.create_custom import CreateCustom
+from benchmark_runner.common.ocp_resources.migrate_infra import MigrateInfra
 
 
 class CreateOCPResource:
@@ -82,6 +83,9 @@ class CreateOCPResource:
         elif 'cnv' == resource:
             self.__create_cnv = CreateCNV(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files)
             self.__create_cnv.create_cnv()
+        elif 'infra' == resource:
+            self.__create_infra = MigrateInfra(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files)
+            self.__create_infra.migrate_infra()
         elif 'custom' == resource:
             self.__create_custom = CreateCustom(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files)
             self.__create_custom.create_custom()
