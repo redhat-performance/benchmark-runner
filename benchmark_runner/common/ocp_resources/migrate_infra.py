@@ -6,7 +6,7 @@ from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, 
 from benchmark_runner.common.ocp_resources.create_ocp_resource_operations import CreateOCPResourceOperations
 
 
-class CreateODF(CreateOCPResourceOperations):
+class MigrateInfra(CreateOCPResourceOperations):
     """
     This class is create OCP resources
     """
