@@ -11,7 +11,6 @@ on:
   push:
     branches: [ main ]
 
-
 # Ensures that only one deploy task per branch/environment will run at a time.
 concurrency:
   group: functional-environment
