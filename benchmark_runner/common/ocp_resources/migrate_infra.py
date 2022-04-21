@@ -26,7 +26,7 @@ class MigrateInfra(CreateOCPResourceOperations):
             logger.info(f'run {resource}')
             if resource == '01_cluster-monitoring-configmap-template.yaml':
                 nodes = self.__oc.get_master_nodes().split()
-                if len(nodes) >= 1:
+                if nodes:
                     for node in nodes:
                         self.run(f'oc label {node} node-role.kubernetes.io/infra=')
                     self.__oc._create_async(yaml=os.path.join(self.__path, resource))
