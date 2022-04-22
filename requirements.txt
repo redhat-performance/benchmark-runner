@@ -4,15 +4,16 @@ botocore==1.23.24
 elasticsearch==7.16.1
 elasticsearch_dsl==7.4.0
 jinja2==3.0.3
-myst-parser==0.16.0
+myst-parser==0.17.0
 pandas
 paramiko==2.8.0
 PyGitHub==1.55
 PyYAML==6.0
-sphinx==4.0.2
-sphinx_rtd_theme==0.4.3
+sphinx==4.5.0
+sphinx_rtd_theme==1.0.0
 tenacity==8.0.1
 typeguard==2.12.1
 typing==3.7.4.3
+attrs=21.4.0
 
 
