@@ -8,7 +8,7 @@ from benchmark_runner.common.ocp_resources.create_ocp_resource_operations import
 
 class MigrateInfra(CreateOCPResourceOperations):
     """
-    This class is create OCP resources
+    Migrate infrastructure to master nodes
     """
     def __init__(self, oc: OC, path: str, resource_list: list):
         super().__init__(oc)
@@ -19,8 +19,8 @@ class MigrateInfra(CreateOCPResourceOperations):
     @logger_time_stamp
     def migrate_infra(self):
         """
-        This method create odf
-        :return:
+        Actually migrate infrastructure
+        :return: False if anything fails or if no master nodes are found.
         """
         for resource in self.__resource_list:
             logger.info(f'run {resource}')
@@ -30,4 +30,5 @@ class MigrateInfra(CreateOCPResourceOperations):
                     for node in nodes:
                         self.run(f'oc label {node} node-role.kubernetes.io/infra=')
                     return self.__oc._create_async(yaml=os.path.join(self.__path, resource))
-
+                else:
+                    return False
