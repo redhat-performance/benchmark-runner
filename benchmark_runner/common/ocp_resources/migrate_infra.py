@@ -28,7 +28,8 @@ class MigrateInfra(CreateOCPResourceOperations):
                 nodes = self.__oc.get_master_nodes().split()
                 if nodes:
                     for node in nodes:
-                        self.run(f'oc label {node} node-role.kubernetes.io/infra=')
+                        self.__oc.run(f'oc label node {node} node-role.kubernetes.io/infra=')
                     return self.__oc._create_async(yaml=os.path.join(self.__path, resource))
                 else:
                     return False
+        return False
