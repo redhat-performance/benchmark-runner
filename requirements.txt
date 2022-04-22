@@ -14,5 +14,6 @@ sphinx-rtd-theme==1.0.0
 tenacity==8.0.1
 typeguard==2.12.1
 typing==3.7.4.3
+attr==0.3.1
 
 
