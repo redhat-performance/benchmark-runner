@@ -9,8 +9,8 @@ pandas
 paramiko==2.8.0
 PyGitHub==1.55
 PyYAML==6.0
-sphinx==4.5.0
-sphinx-rtd-theme==1.0.0
+sphinx==4.0.2
+sphinx_rtd_theme==0.4.3
 tenacity==8.0.1
 typeguard==2.12.1
 typing==3.7.4.3
