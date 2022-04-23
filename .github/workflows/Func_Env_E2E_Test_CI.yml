@@ -6,7 +6,7 @@ name: Func Env E2E Test CI
 
 on:
   workflow_run:
-    workflows: ["Deploy IPI FUNC Env Weekly CI"]
+    workflows: ["ADeploy IPI FUNC Env Weekly"]
     types:
       - completed
 
