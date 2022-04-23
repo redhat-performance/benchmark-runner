@@ -22,7 +22,7 @@ Reference:
 
 ![](../../media/docker2.png)
 
-![](../../media/demo.gif)
+![](../../media/benchmark-runner-demo.gif)
 
 
 <!-- Table of contents -->
