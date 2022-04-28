@@ -14,6 +14,7 @@ class GoldenFiles:
 
     def __init__(self):
         self.__file_path = os.path.join(f'{os.path.dirname(os.path.realpath(__file__))}', 'golden_files')
+        environment_variables.environment_variables_dict['system_metrics'] = 'True'
         environment_variables.environment_variables_dict['elasticsearch'] = 'elasticsearch.example.com'
         environment_variables.environment_variables_dict['elasticsearch_port'] = '9999'
         environment_variables.environment_variables_dict['elasticsearch_url'] = 'http://elasticsearch.example.com:gol9999'

@@ -34,4 +34,7 @@ Choose one from the following list:
 ```sh
 podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:latest
 ```
-
+SAVE ARTIFACTS LOCAL:
+1. add "-e SAVE_ARTIFACTS_LOCAL='True'"
+2. add "-v /tmp:/tmp"
+3. git clone https://github.com/cloud-bulldozer/benchmark-operator /tmp/benchmark-operator

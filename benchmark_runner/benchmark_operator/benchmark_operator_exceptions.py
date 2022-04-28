@@ -14,15 +14,6 @@ class ODFNonInstalled(BenchmarkOperatorError):
         super(ODFNonInstalled, self).__init__(self.message)
 
 
-class SystemMetricsRequiredElasticSearch(BenchmarkOperatorError):
-    """
-    This class for raise error when running system metrics without ElasticSearch
-    """
-    def __init__(self):
-        self.message = "System metrics is required ElasticSearch, set 'SYSTEM_METRICS' to False"
-        super(SystemMetricsRequiredElasticSearch, self).__init__(self.message)
-
-
 class PrometheusSnapshotFailed(BenchmarkOperatorError):
     """
     Prometheus snapshot failed

@@ -2,12 +2,12 @@
 # https://crontab.guru/
 # This is a nightly CI Pipeline against Performance environment using IPI installer - run on Sunday
 # GitHub Actions is limited 6 hours for each job
-name: Deploy Operator FUNC Env Weekly CI
+name: Deploy Operator Func Env Weekly CI
 # Only trigger, when the build workflow succeeded
 
 on:
   workflow_run:
-    workflows: ["Deploy IPI FUNC Env Weekly CI"]
+    workflows: ["Deploy IPI Func Env Weekly CI"]
     types:
       - completed
 

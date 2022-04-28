@@ -84,12 +84,8 @@ class ElasticSearchOperations:
         # https://github.com/elastic/elasticsearch-dsl-py/issues/49
         self.__es.indices.refresh(index=index)
         # timestamp name in Elasticsearch is different
-        if 'uperf' in workload:
-            search = Search(using=self.__es, index=index).filter('range', uperf_ts={
-                'gte': f'now-{self.ES_FETCH_MIN_TIME}m', 'lt': 'now'})
-        else:
-            search = Search(using=self.__es, index=index).filter('range', timestamp={
-                'gte': f'now-{self.ES_FETCH_MIN_TIME}m', 'lt': 'now'})
+        search = Search(using=self.__es, index=index).filter('range', timestamp={
+            'gte': f'now-{self.ES_FETCH_MIN_TIME}m', 'lt': 'now'})
         # reduce the search result
         if fast_check:
             search = search[0:self.MIN_SEARCH_RESULTS]
@@ -169,10 +165,7 @@ class ElasticSearchOperations:
                 data[key] = value
 
         # utcnow - solve timestamp issue
-        if 'uperf' in index:
-            data['uperf_ts'] = datetime.utcnow()  # datetime.now()
-        else:
-            data['timestamp'] = datetime.utcnow()  # datetime.now()
+        data['timestamp'] = datetime.utcnow()  # datetime.now()
 
         # Upload data to elastic search server
         try:

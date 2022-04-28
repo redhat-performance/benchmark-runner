@@ -12,7 +12,8 @@ include benchmark_runner/common/template_operations/templates/stressng/internal_
 include benchmark_runner/common/template_operations/templates/uperf/*.yaml
 include benchmark_runner/common/template_operations/templates/uperf/internal_data/*.yaml
 
-# benchmark runner templates (custom workloads)
+# benchmark runner templates (embedded workloads)
+include benchmark_runner/common/template_operations/templates/scale/*.yaml
 include benchmark_runner/common/template_operations/templates/vdbench/*.yaml
 include benchmark_runner/common/template_operations/templates/vdbench/internal_data/*.yaml
 
