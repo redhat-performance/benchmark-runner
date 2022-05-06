@@ -148,7 +148,7 @@ class OC(SSH):
         """
         return self.run(r""" oc get nodes -l node-role.kubernetes.io/worker= -o jsonpath="{range .items[*]}{.metadata.name}{'\n'}{end}" """)
 
-    def clear_nodes_cache(self):
+    def clear_node_caches(self):
         """
         This method clears the node's buffer cache
         """
@@ -297,7 +297,7 @@ class OC(SSH):
                 is_check=True).rstrip().decode('ascii')
         else:
             return self.run(
-                "oc get pods -n " + environment_variables.environment_variables_dict['namespace'] + " --no-headers | awk '{ print $1; }' | grep " + label,
+                "oc get pods -n " + environment_variables.environment_variables_dict['namespace'] + " --no-headers | awk '{ print $1; }' | grep -w " + label,
                 is_check=True).rstrip().decode('ascii')
 
     @typechecked
@@ -310,7 +310,7 @@ class OC(SSH):
         """
         if label:
             return self.run(
-                cmd="oc get vmi -n " + namespace + " --no-headers | awk '{ print $1; }' | grep " + label,
+                cmd="oc get vmi -n " + namespace + " --no-headers | awk '{ print $1; }' | grep -w " + label,
                 is_check=True).rstrip().decode('ascii')
         else:
             return self.run('oc get vmi', is_check=True)
@@ -525,15 +525,13 @@ class OC(SSH):
             return False
 
     @typechecked
-    def delete_all_resources(self, resources: list, namespace: str = environment_variables.environment_variables_dict['namespace']):
+    def delete_namespace(self, namespace: str = environment_variables.environment_variables_dict['namespace']):
         """
-        This method delete all resources in namespace
-        :param resources: default list = ('pods', 'pvc')
+        This method delete namespace
         :param namespace:
         :return:
         """
-        for resource in resources:
-            self.run(f'oc delete -n {namespace} --all {resource}')
+        self.run(f'oc delete ns {namespace}')
 
     @typechecked
     @logger_time_stamp

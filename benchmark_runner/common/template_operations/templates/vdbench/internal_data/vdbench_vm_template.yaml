@@ -1,13 +1,19 @@
+{% if not scale %}
 apiVersion: v1
 kind: Namespace
 metadata:
   name: {{ namespace }}
+{%- endif %}
 {%- if odf_pvc == True %}
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
+  {% if not scale -%}
   name: vdbench-pvc-claim
+  {%- else -%}
+  name: vdbench-pvc-claim-{{ scale }}
+  {%- endif %}
   namespace: {{ namespace }}
 spec:
   storageClassName: ocs-storagecluster-ceph-rbd
@@ -21,11 +27,20 @@ spec:
 apiVersion: kubevirt.io/v1
 kind: VirtualMachine
 metadata:
+  {% if not scale -%}
   name: vdbench-{{ kind }}-{{ trunc_uuid }}
+  {%- else -%}
+  name: vdbench-{{ kind }}-{{ trunc_uuid }}-{{ scale }}
+  {%- endif %}
   namespace: {{ namespace }}
   labels:
+    {% if not scale -%}
     app: vdbench-{{ trunc_uuid }}
     type: vdbench-{{ kind }}-{{ trunc_uuid }}
+    {%- else -%}
+    app: vdbench-{{ trunc_uuid }}-{{ scale }}
+    type: vdbench-{{ kind }}-{{ trunc_uuid }}-{{ scale }}
+    {%- endif %}
     benchmark-uuid: {{ uuid }}
     benchmark-runner-workload: vdbench
 spec:
@@ -35,9 +50,13 @@ spec:
       labels:
         kubevirt-vm: vdbench
     spec:
-      {%- if pin_node != '' %}
+      {%- if pin_node1 or scale_node %}
       nodeSelector:
+        {% if not scale -%}
         kubernetes.io/hostname: {{ pin_node1 }}
+        {%- else -%}
+        kubernetes.io/hostname: {{ scale_node }}
+        {%- endif %}
       {%- endif %}
       domain:
         cpu:
@@ -70,10 +89,14 @@ spec:
 {%- if odf_pvc == True %}
         - name: data-volume
           persistentVolumeClaim:
+            {% if not scale -%}
             claimName: vdbench-pvc-claim
+            {%- else -%}
+            claimName: vdbench-pvc-claim-{{ scale }}
+            {%- endif %}
 {%- endif %}
         - containerDisk:
-            image: quay.io/ebattat/centos-stream8-vdbench5.04.07-container-disk:latest
+            image: quay.io/ebattat/centos-stream8-vdbench5.04.07-container-disk:v1.0.5
           name: containerdisk
         - cloudInitNoCloud:
             userData: |-
@@ -99,7 +122,14 @@ spec:
                 - export DIRECTORIES={{ DIRECTORIES }}
                 - export FILES_PER_DIRECTORY={{ FILES_PER_DIRECTORY }}
                 - export SIZE_PER_FILE={{ SIZE_PER_FILE }}
+                - export REDIS_HOST={{ redis }}
+                - export WORKLOAD_METHOD="/vdbench/vdbench_runner.sh"
+                - export TIMEOUT={{ timeout }}
                 - echo @@~@@START-WORKLOAD@@~@@
+                {% if not scale -%}
                 - /vdbench/vdbench_runner.sh
+                {%- else -%}
+                - python3.9 /state_signals_responder.py '$REDIS_HOST' '$WORKLOAD_METHOD' '$TIMEOUT'
+                {%- endif %}
                 - echo @@~@@END-WORKLOAD@@~@@
           name: cloudinitdisk

@@ -36,7 +36,7 @@ class EnvironmentVariables:
         # This path is github actions runner path (benchmark-operator should be cloned here)
         self._environment_variables_dict['runner_path'] = os.environ.get('RUNNER_PATH', '/tmp')
         # This path is for vm/pod/prometheus run artifacts
-        self._environment_variables_dict['run_artifacts'] = os.environ.get('RUN_ARTIFACTS', '/tmp/benchmark-runner-run-artifacts')
+        self._environment_variables_dict['run_artifacts'] = os.environ.get('RUN_ARTIFACTS', os.path.join(self._environment_variables_dict['runner_path'], 'benchmark-runner-run-artifacts'))
 
         # dynamic parameters - configure for local run
         self._environment_variables_dict['workload'] = os.environ.get('WORKLOAD', '')
@@ -58,6 +58,12 @@ class EnvironmentVariables:
         # Workaround for Kata CPU offline problem in 4.9/4.10
         # Set to True to
         self._environment_variables_dict['kata_cpuoffline_workaround'] = os.environ.get('KATA_CPUOFFLINE_WORKAROUND', '')
+
+        # Scale
+        self._environment_variables_dict['scale'] = os.environ.get('SCALE', '')
+        # list of nodes per pod/vm, all will run on the same node when 1 node, e.g: [ 'master-1', 'master-2' ]
+        self._environment_variables_dict['scale_nodes'] = os.environ.get('SCALE_NODES', "")
+        self._environment_variables_dict['redis'] = os.environ.get('REDIS', '')
 
         # default parameter - change only if needed
         # Parameters below related to 'run_workload()'
@@ -92,14 +98,20 @@ class EnvironmentVariables:
         self._environment_variables_dict['workloads_odf_pvc'] = ['vdbench', 'hammerdb']
         # This parameter get from Test_CI.yml file
         self._environment_variables_dict['build_version'] = os.environ.get('BUILD_VERSION', '1.0.0')
-        # collect system metrics True/False
-        self._environment_variables_dict['system_metrics'] = os.environ.get('SYSTEM_METRICS', 'True')
+        # collect system metrics True/False - required by benchmark-operator
+        if self._environment_variables_dict['elasticsearch']:
+            self._environment_variables_dict['system_metrics'] = os.environ.get('SYSTEM_METRICS', 'True')
+        else:
+            self._environment_variables_dict['system_metrics'] = os.environ.get('SYSTEM_METRICS', 'False')
         # CI status update once at the end of CI pass/failed
         self._environment_variables_dict['ci_status'] = os.environ.get('CI_STATUS', '')
         # Valid run types
         self._environment_variables_dict['run_types'] = ['test_ci', 'func_ci', 'perf_ci']
         # Run type test_ci/func_ci/perf_ci, default test_ci same environment as func_ci
         self._environment_variables_dict['run_type'] = os.environ.get('RUN_TYPE', 'test_ci')
+        self._environment_variables_dict['runner_type'] = os.environ.get('RUNNER_TYPE')
+        self._environment_variables_dict['config_from_args'] = os.environ.get('CONFIG_FROM_ARGS')
+        self._environment_variables_dict['template_in_workload_dir'] = os.environ.get('TEMPLATE_IN_WORKLOAD_DIR')
 
         # Run uuid
         self._environment_variables_dict['uuid'] = os.environ.get('UUID', str(uuid4()))
@@ -117,12 +129,6 @@ class EnvironmentVariables:
         self._environment_variables_dict['save_artifacts_local'] = os.environ.get('SAVE_ARTIFACTS_LOCAL', None)
         # None/ 'True'(Default) to enable prometheus snapshot
         self._environment_variables_dict['enable_prometheus_snapshot'] = os.environ.get('ENABLE_PROMETHEUS_SNAPSHOT', 'True')
-
-        self._environment_variables_dict['runner_type'] = os.environ.get('RUNNER_TYPE')
-
-        self._environment_variables_dict['config_from_args'] = os.environ.get('CONFIG_FROM_ARGS')
-
-        self._environment_variables_dict['template_in_workload_dir'] = os.environ.get('TEMPLATE_IN_WORKLOAD_DIR')
 
         # end dynamic parameters - configure for local run
         ##################################################################################################

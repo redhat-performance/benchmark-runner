@@ -1,4 +1,5 @@
 
+import ast
 import os
 import datetime
 import tarfile
@@ -48,6 +49,12 @@ class WorkloadsOperations:
         self._es_user = self._environment_variables_dict.get('elasticsearch_user', '')
         self._es_password = self._environment_variables_dict.get('elasticsearch_password', '')
         self._es_url_protocol = self._environment_variables_dict['elasticsearch_url_protocol']
+        self._scale = self._environment_variables_dict.get('scale', '')
+        if self._scale:
+            self._scale_node = self._environment_variables_dict.get('scale_nodes', '')
+            self._scale_node_list = ast.literal_eval(self._scale_node)
+        else:
+            self._scale_node_list = []
         self._timeout = int(self._environment_variables_dict.get('timeout', ''))
         # Elasticsearch connection
         if self._es_host and self._es_port:
@@ -85,7 +92,7 @@ class WorkloadsOperations:
         This method delete all resources in namespace
         :return:
         """
-        self._oc.delete_all_resources(resources=['vm', 'pods', 'pvc'])
+        self._oc.delete_namespace()
 
     @logger_time_stamp
     def start_prometheus(self):
@@ -122,7 +129,7 @@ class WorkloadsOperations:
         :return:
         """
         workload_name = self._workload.split('_')
-        if self._odf_pvc == 'True' and workload_name[0] in self._workloads_odf_pvc:
+        if workload_name[0] in self._workloads_odf_pvc:
             if not self._oc.is_odf_installed():
                 raise ODFNonInstalled()
 
@@ -178,6 +185,14 @@ class WorkloadsOperations:
         except ValueError:
             return False
 
+    def _create_scale_logs(self):
+        """
+        The method create scale logs
+        :return:
+        """
+        self._create_pod_log(pod='state-signals-exporter')
+        self._create_pod_log(pod='redis-master')
+
     def _create_pod_run_artifacts(self, pod_name: str):
         """
         This method create pod run artifacts
@@ -212,6 +227,10 @@ class WorkloadsOperations:
         result_list = []
         results_list = self._oc.extract_vm_results(vm_name=vm_name, start_stamp=start_stamp, end_stamp=end_stamp)
         workload_name = self._environment_variables_dict.get('workload', '').replace('_', '-')
+        # save scale pod logs
+        if self._scale:
+            self._create_pod_log(pod='state-signals-exporter')
+            self._create_pod_log(pod='redis-master')
         # insert results to csv
         csv_result_file = os.path.join(self._run_artifacts_path, 'vdbench_vm_result.csv')
         with open(csv_result_file, 'w') as out:
@@ -246,21 +265,19 @@ class WorkloadsOperations:
     def upload_run_artifacts_to_s3(self):
         """
         This method uploads log to s3
-        :param workload:
         :return:
         """
         workload = self._workload.replace('_', '-')
         tar_run_artifacts_path = self.__make_run_artifacts_tarfile(workload)
         run_artifacts_hierarchy = self._get_run_artifacts_hierarchy(workload_name=workload)
         # Upload when endpoint_url is not None
-        if self._endpoint_url:
-            s3operations = S3Operations()
-            # change workload to key convention
-            upload_file = f"{workload}-{self._time_stamp_format}.tar.gz"
-            s3operations.upload_file(file_name_path=tar_run_artifacts_path,
-                                     bucket=self._environment_variables_dict.get('bucket', ''),
-                                     key=run_artifacts_hierarchy,
-                                     upload_file=upload_file)
+        s3operations = S3Operations()
+        # change workload to key convention
+        upload_file = f"{workload}-{self._time_stamp_format}.tar.gz"
+        s3operations.upload_file(file_name_path=tar_run_artifacts_path,
+                                 bucket=self._environment_variables_dict.get('bucket', ''),
+                                 key=run_artifacts_hierarchy,
+                                 upload_file=upload_file)
         # remove local run artifacts workload folder
         # verify that its not empty path
         if len(self._run_artifacts_path) > 3 and self._run_artifacts_path != '/' and self._run_artifacts_path and tar_run_artifacts_path and os.path.isfile(tar_run_artifacts_path) and not self._save_artifacts_local:
@@ -293,6 +310,13 @@ class WorkloadsOperations:
             metadata.update({'kind': kind})
         if status:
             metadata.update({'run_status': status})
+        if self._scale:
+            metadata.update({'scale': int(self._scale)})
+            for i, node in enumerate(self._scale_node_list):
+                if len(self._scale_node_list) == 1:
+                    metadata.update({f'{kind}-scale-node-{i+1}': self._scale_node_list[0]})
+                else:
+                    metadata.update({f'{kind}-scale-node-{i+1}': node})
         if result:
             metadata.update(result)
 
@@ -344,22 +368,33 @@ class WorkloadsOperations:
         metadata.update({'status': status, 'status#': status_dict[status], 'ci_minutes_time': ci_minutes_time, 'benchmark_operator_id': benchmark_operator_id, 'benchmark_wrapper_id': benchmark_wrapper_id, 'ocp_install_minutes_time': ocp_install_minutes_time, 'ocp_resource_install_minutes_time': ocp_resource_install_minutes_time})
         self.__es_operations.upload_to_elasticsearch(index=es_index, data=metadata)
 
+    @logger_time_stamp
+    def clear_nodes_cache(self):
+        """
+        This method clear nodes cache
+        """
+        self._oc.clear_node_caches()
+
     def initialize_workload(self):
         """
         This method includes all the initialization of workload
         :return:
         """
         self.delete_all()
-        self._oc.clear_nodes_cache()
-        self.odf_pvc_verification()
-        self._template.generate_yamls()
-        self.start_prometheus()
+        self.clear_nodes_cache()
+        if self._odf_pvc == 'True':
+            self.odf_pvc_verification()
+        self._template.generate_yamls(scale=self._scale, scale_nodes=self._scale_node_list)
+        if self._enable_prometheus_snapshot:
+            self.start_prometheus()
 
     def finalize_workload(self):
         """
         This method includes all the finalization of workload
         :return:
         """
-        self.end_prometheus()
-        self.upload_run_artifacts_to_s3()
+        if self._enable_prometheus_snapshot:
+            self.end_prometheus()
+        if self._endpoint_url:
+            self.upload_run_artifacts_to_s3()
         self.delete_all()

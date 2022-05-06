@@ -100,13 +100,14 @@ class HammerdbPod(BenchmarkOperatorWorkloadsOperations):
                 self._create_pod_log(label=f'{self.__workload_name}-workload')
             full_name = f'{self.__workload_name}-{self.__database}'
             run_artifacts_url = os.path.join(self._environment_variables_dict.get('run_artifacts_url', ''), f'{self._get_run_artifacts_hierarchy(workload_name=full_name, is_file=True)}-{self._time_stamp_format}.tar.gz')
-            ids = self._verify_elasticsearch_data_uploaded(index=self.__es_index, uuid=self._oc.get_long_uuid(workload=self.__workload_name), timeout=3)
-            if ids:
-                for id in ids:
-                    self._update_elasticsearch_index(index=self.__es_index, id=id, kind=self.__kind, status='failed', run_artifacts_url=run_artifacts_url)
-            else:
-                self._upload_to_elasticsearch(index=self.__es_index, kind=self.__kind, status='failed', run_artifacts_url=run_artifacts_url, database=self.__database, uuid=self._uuid)
-                self._verify_elasticsearch_data_uploaded(index=self.__es_index, uuid=self._uuid)
+            if self._es_host:
+                ids = self._verify_elasticsearch_data_uploaded(index=self.__es_index, uuid=self._oc.get_long_uuid(workload=self.__workload_name), timeout=3)
+                if ids:
+                    for id in ids:
+                        self._update_elasticsearch_index(index=self.__es_index, id=id, kind=self.__kind, status='failed', run_artifacts_url=run_artifacts_url)
+                else:
+                    self._upload_to_elasticsearch(index=self.__es_index, kind=self.__kind, status='failed', run_artifacts_url=run_artifacts_url, database=self.__database, uuid=self._uuid)
+                    self._verify_elasticsearch_data_uploaded(index=self.__es_index, uuid=self._uuid)
             # delete hammerdb
             self.tear_down_pod_after_error(yaml=os.path.join(f'{self._run_artifacts_path}',  f'{self.__name}_{self.__database}.yaml'),
                                            pod_name=f'{self.__workload_name}-creator')
