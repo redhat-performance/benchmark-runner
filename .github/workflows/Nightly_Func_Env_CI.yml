@@ -109,7 +109,8 @@ jobs:
         IBM_BUCKET: ${{ secrets.IBM_BUCKET }}
         IBM_KEY: ${{ secrets.IBM_KEY }}
         FUNC_RUN_ARTIFACTS_URL: ${{ secrets.FUNC_RUN_ARTIFACTS_URL }}
-        FUNC_SCALE_NODES: ${{ secrets.FUNC_SCALE_NODES }}
+        #FUNC_SCALE_NODES: ${{ secrets.FUNC_SCALE_NODES }}
+        FUNC_SCALE_NODES: "['master-1', 'master-2']"
         FUNC_REDIS: ${{ secrets.FUNC_REDIS }}
         SCALE: "2"
       run: |
