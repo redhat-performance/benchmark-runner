@@ -51,8 +51,9 @@ class WorkloadsOperations:
         self._es_url_protocol = self._environment_variables_dict['elasticsearch_url_protocol']
         self._scale = self._environment_variables_dict.get('scale', '')
         if self._scale:
-            self._scale_node = self._environment_variables_dict.get('scale_nodes', '')
-            self._scale_node_list = ast.literal_eval(self._scale_node)
+            self._scale = int(self._scale)
+            self._scale_nodes = self._environment_variables_dict.get('scale_nodes', '')
+            self._scale_node_list = ast.literal_eval(self._scale_nodes)
         else:
             self._scale_node_list = []
         self._timeout = int(self._environment_variables_dict.get('timeout', ''))

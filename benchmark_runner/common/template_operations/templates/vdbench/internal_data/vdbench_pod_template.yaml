@@ -68,7 +68,7 @@ spec:
   containers:
     - name: vdbench-pod
       namespace: {{ namespace }}
-      image: quay.io/ebattat/centos-stream8-vdbench5.04.07-pod:v1.0.5
+      image: quay.io/ebattat/centos-stream8-vdbench5.04.07-pod:v1.0.10
       imagePullPolicy: "IfNotPresent"
       {%- if odf_pvc == True %}
       volumeMounts:
@@ -123,7 +123,7 @@ spec:
       {% if not scale -%}
       args: ["-c", "$WORKLOAD_METHOD"]
       {%- else -%}
-      args: ["-c", "python3.9 /state_signals_responder.py '$REDIS_HOST' '$WORKLOAD_METHOD' '$TIMEOUT'"]
+      args: ["-c", "python3.9 /state_signals_responder.py $REDIS_HOST $WORKLOAD_METHOD $TIMEOUT"]
       {%- endif %}
   restartPolicy: "Never"
   spec:

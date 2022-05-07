@@ -25,7 +25,7 @@ spec:
   containers:
     - name: state-signals-exporter-pod
       namespace: {{ namespace }}
-      image: quay.io/ebattat/state-signals-exporter:v1.0.6
+      image: quay.io/ebattat/state-signals-exporter:v1.0.10
       imagePullPolicy: "IfNotPresent"
       env:
         - name: REDIS_HOST
@@ -35,5 +35,5 @@ spec:
         - name: TIMEOUT
           value: "{{ timeout }}"
       command: ["/bin/bash"]
-      args: ["-c", "python3.9 /state_signals_exporter.py '$REDIS_HOST' '$SCALE_NUM' '$TIMEOUT'"]
+      args: ["-c", "python3.9 /state_signals_exporter.py $REDIS_HOST $SCALE_NUM $TIMEOUT"]
   restartPolicy: "Never"

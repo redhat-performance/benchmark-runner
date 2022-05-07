@@ -96,7 +96,7 @@ spec:
             {%- endif %}
 {%- endif %}
         - containerDisk:
-            image: quay.io/ebattat/centos-stream8-vdbench5.04.07-container-disk:v1.0.5
+            image: quay.io/ebattat/centos-stream8-vdbench5.04.07-container-disk:v1.0.10
           name: containerdisk
         - cloudInitNoCloud:
             userData: |-
@@ -129,7 +129,7 @@ spec:
                 {% if not scale -%}
                 - /vdbench/vdbench_runner.sh
                 {%- else -%}
-                - python3.9 /state_signals_responder.py '$REDIS_HOST' '$WORKLOAD_METHOD' '$TIMEOUT'
+                - python3.9 /state_signals_responder.py $REDIS_HOST $WORKLOAD_METHOD $TIMEOUT
                 {%- endif %}
                 - echo @@~@@END-WORKLOAD@@~@@
           name: cloudinitdisk
