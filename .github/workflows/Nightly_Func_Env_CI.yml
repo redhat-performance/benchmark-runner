@@ -12,7 +12,6 @@ name: Deploy Func Env Nightly CI
 #    types:
 #      - completed
 
-
 on:
   push:
     branches: [ main ]
