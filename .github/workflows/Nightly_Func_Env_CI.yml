@@ -33,9 +33,9 @@ jobs:
         run: echo "::set-output name=start_time::$(printf '%(%s)T' -1)"
       - name: ⌛ Upload 🐋 to quay.io - latest benchmark-operator
         run: |
-          #sudo podman build --build-arg VERSION=latest --layers=false -t ${{ secrets.PACKAGE_NAME }}:latest .
-          #sudo podman login quay.io -u ${{ secrets.QAUYIO_ROBOT_USER }} -p ${{ secrets.QAUYIO_ROBOT_TOKEN }}
-          #sudo podman push localhost/${{ secrets.PACKAGE_NAME }}:latest quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:latest
+          sudo podman build --build-arg VERSION=latest --layers=false -t ${{ secrets.PACKAGE_NAME }}:latest .
+          sudo podman login quay.io -u ${{ secrets.QAUYIO_ROBOT_USER }} -p ${{ secrets.QAUYIO_ROBOT_TOKEN }}
+          sudo podman push localhost/${{ secrets.PACKAGE_NAME }}:latest quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:latest
   
   workload:
     name: workload
