@@ -314,10 +314,7 @@ class WorkloadsOperations:
         if self._scale:
             metadata.update({'scale': int(self._scale)})
             for i, node in enumerate(self._scale_node_list):
-                if len(self._scale_node_list) == 1:
-                    metadata.update({f'{kind}-scale-node-{i+1}': self._scale_node_list[0]})
-                else:
-                    metadata.update({f'{kind}-scale-node-{i+1}': node})
+                metadata.update({f'{kind}-scale-node-{i+1}': node})
         if result:
             metadata.update(result)
 

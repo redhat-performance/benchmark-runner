@@ -45,6 +45,7 @@ setup(
         'azure==4.0.0',
         'boto3==1.20.24',  # s3
         'botocore==1.23.24',  # s3
+        'cryptography==36.0.2',  # Remove once https://github.com/paramiko/paramiko/issues/2038 gets fixed.
         'elasticsearch==7.16.1',
         'elasticsearch_dsl==7.4.0',  # for deep search
         'jinja2==3.0.3',
