@@ -20,8 +20,9 @@ def render_yaml_string(template_str: str, environment_variable_dict: dict = None
         environment_variable_dict['prom_token'] = environment_variable_dict.get('prom_token_override', '')
     else:
         oc = OC(kubeadmin_password=environment_variable_dict.get('kubeadmin_password', ''))
-        # set prom token
-        environment_variable_dict['prom_token'] = oc.get_prom_token()
+        # set prom token, skip if running on kubernetes just for now
+        if environment_variable_dict.get("cluster") != 'kubernetes':
+            environment_variable_dict['prom_token'] = oc.get_prom_token()
     return Template(template_str).render(environment_variable_dict)
 
 
