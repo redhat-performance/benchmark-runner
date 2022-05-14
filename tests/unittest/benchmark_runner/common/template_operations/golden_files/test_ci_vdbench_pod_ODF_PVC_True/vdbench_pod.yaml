@@ -33,18 +33,17 @@ spec:
       app: vdbench
   nodeSelector:
     kubernetes.io/hostname: pin-node-1
-  resources:
-    requests:
-      cpu: 10m
-      memory: 10Mi
-    limits:
-      cpu: 2
-      memory: 4Gi
   containers:
     - name: vdbench-pod
-      namespace: benchmark-runner
       image: quay.io/ebattat/centos-stream8-vdbench5.04.07-pod:v1.0.10
       imagePullPolicy: "IfNotPresent"
+      resources:
+        requests:
+          cpu: 10m
+          memory: 10Mi
+        limits:
+          cpu: 2
+          memory: 4Gi
       volumeMounts:
         - name: vdbench-pod-pvc-claim
           mountPath: "/workload"

@@ -37,6 +37,8 @@ class EnvironmentVariables:
         self._environment_variables_dict['runner_path'] = os.environ.get('RUNNER_PATH', '/tmp')
         # This path is for vm/pod/prometheus run artifacts
         self._environment_variables_dict['run_artifacts'] = os.environ.get('RUN_ARTIFACTS', os.path.join(self._environment_variables_dict['runner_path'], 'benchmark-runner-run-artifacts'))
+        # cluster: 'openshift'(Default)/ 'kubernetes'
+        self._environment_variables_dict['cluster'] = os.environ.get('CLUSTER', 'openshift')
 
         # dynamic parameters - configure for local run
         self._environment_variables_dict['workload'] = os.environ.get('WORKLOAD', '')
@@ -129,7 +131,6 @@ class EnvironmentVariables:
         self._environment_variables_dict['save_artifacts_local'] = os.environ.get('SAVE_ARTIFACTS_LOCAL', None)
         # None/ 'True'(Default) to enable prometheus snapshot
         self._environment_variables_dict['enable_prometheus_snapshot'] = os.environ.get('ENABLE_PROMETHEUS_SNAPSHOT', 'True')
-
         # end dynamic parameters - configure for local run
         ##################################################################################################
 
@@ -241,6 +242,15 @@ class EnvironmentVariables:
                 self._environment_variables_dict['elasticsearch_url'] = f"{self._environment_variables_dict['elasticsearch_url_protocol']}://{self._environment_variables_dict.get('elasticsearch', '')}:{self._environment_variables_dict.get('elasticsearch_port', '')}"
             else:
                 self._environment_variables_dict['elasticsearch_url'] = ''
+
+        # OpenShift or kubernetes support, OpenShift: oc, kubectl || kubernetes: kubectl
+        if self._environment_variables_dict['cluster'] == 'kubernetes':
+            self._environment_variables_dict['cli'] = 'kubectl'
+            self._environment_variables_dict['odf_pvc'] = 'False'
+            self._environment_variables_dict['enable_prometheus_snapshot'] = None
+        else:
+            self._environment_variables_dict['cli'] = os.environ.get('CLI', 'oc')
+
 
     @property
     def workloads_list(self):
