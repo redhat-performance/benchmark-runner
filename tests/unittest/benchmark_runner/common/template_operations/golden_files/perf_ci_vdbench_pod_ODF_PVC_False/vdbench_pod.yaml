@@ -4,6 +4,7 @@ kind: Namespace
 metadata:
   name: benchmark-runner
 ---
+---
 apiVersion: v1
 kind: Pod
 metadata:
@@ -20,18 +21,17 @@ spec:
       app: vdbench
   nodeSelector:
     kubernetes.io/hostname: pin-node-1
-  resources:
-    requests:
-      cpu: 2
-      memory: 4Gi
-    limits:
-      cpu: 2
-      memory: 4Gi
   containers:
     - name: vdbench-pod
-      namespace: benchmark-runner
       image: quay.io/ebattat/centos-stream8-vdbench5.04.07-pod:v1.0.10
       imagePullPolicy: "IfNotPresent"
+      resources:
+        requests:
+          cpu: 2
+          memory: 4Gi
+        limits:
+          cpu: 2
+          memory: 4Gi
       env:
         - name: BLOCK_SIZES
           value: "oltp1,oltp2,oltphw,odss2,odss128,4_cache,64_cache,4,64,4_cache,64_cache,4,64"
