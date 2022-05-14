@@ -245,7 +245,9 @@ class EnvironmentVariables:
 
         # OpenShift or kubernetes support, OpenShift: oc, kubectl || kubernetes: kubectl
         if self._environment_variables_dict['cluster'] == 'kubernetes':
-            self._environment_variables_dict['cli'] = os.environ.get('CLI', 'kubectl')
+            self._environment_variables_dict['cli'] = 'kubectl'
+            self._environment_variables_dict['odf_pvc'] = 'False'
+            self._environment_variables_dict['enable_prometheus_snapshot'] = None
         else:
             self._environment_variables_dict['cli'] = os.environ.get('CLI', 'oc')
 
