@@ -165,16 +165,16 @@ class TemplateOperations:
         else:
             proc = []
             scale = int(scale)
-            # Verify that the scale number is equal to the nodes list
-            if scale != len(scale_nodes):
-                raise Exception(f'Incorrect scale nodes number, scale: {scale} != scale_nodes: {len(scale_nodes)}')
             if scale_nodes:
-                for scale_num in range(scale):
-                    p = Process(target=self.generate_files, args=(self.generate_yamls_internal(scale=str(scale_num+1), scale_node=scale_nodes[scale_num]), ))
-                    p.start()
-                    proc.append(p)
-                for p in proc:
-                    p.join()
+                count = 0
+                for scale_node in range(len(scale_nodes)):
+                    for scale_num in range(scale):
+                        count += 1
+                        p = Process(target=self.generate_files, args=(self.generate_yamls_internal(scale=str(count), scale_node=scale_nodes[scale_node]), ))
+                        p.start()
+                        proc.append(p)
+                    for p in proc:
+                        p.join()
             else:
                 for scale_num in range(scale):
                     self.generate_files(self.generate_yamls_internal(scale=str(scale_num+1)))
