@@ -63,7 +63,7 @@ class EnvironmentVariables:
 
         # Scale
         self._environment_variables_dict['scale'] = os.environ.get('SCALE', '')
-        # list of nodes per pod/vm, all will run on the same node when 1 node, e.g: [ 'master-1', 'master-2' ]
+        # list of nodes per pod/vm, scale number per node, e.g: [ 'master-1', 'master-2' ] - run 1 pod/vm in each node
         self._environment_variables_dict['scale_nodes'] = os.environ.get('SCALE_NODES', "")
         self._environment_variables_dict['redis'] = os.environ.get('REDIS', '')
 

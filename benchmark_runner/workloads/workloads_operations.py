@@ -77,6 +77,16 @@ class WorkloadsOperations:
         if self._enable_prometheus_snapshot:
             self._snapshot = PrometheusSnapshot(oc=self._oc, artifacts_path=self._run_artifacts_path, verbose=True)
 
+    def __get_workload_file_name(self, workload):
+            """
+            This method returns workload name
+            :return:
+            """
+            if self._scale:
+                return f'{workload}-scale-{self._time_stamp_format}'
+            else:
+                return f'{workload}-{self._time_stamp_format}'
+
     def set_login(self, kubeadmin_password: str = ''):
         """
         This method set oc login
@@ -213,7 +223,8 @@ class WorkloadsOperations:
                 elif value == 'n/a':
                     line_dict[key] = 0.0
             line_dict['pod_name'] = pod_name
-            line_dict['run_artifacts_url'] = os.path.join(self._run_artifacts_url, f'{self._get_run_artifacts_hierarchy(workload_name=workload_name, is_file=True)}-{self._time_stamp_format}.tar.gz')
+            workload = self.__get_workload_file_name(workload=self._get_run_artifacts_hierarchy(workload_name=workload_name, is_file=True))
+            line_dict['run_artifacts_url'] = os.path.join(self._run_artifacts_url, f'{workload}.tar.gz')
             result_list.append(dict(line_dict))
         return result_list
 
@@ -248,7 +259,8 @@ class WorkloadsOperations:
                 elif value == 'n/a':
                     line_dict[key] = 0.0
             line_dict['vm_name'] = vm_name
-            line_dict['run_artifacts_url'] = os.path.join(self._run_artifacts_url, f'{self._get_run_artifacts_hierarchy(workload_name=workload_name, is_file=True)}-{self._time_stamp_format}.tar.gz')
+            workload = self.__get_workload_file_name(workload=self._get_run_artifacts_hierarchy(workload_name=workload_name, is_file=True))
+            line_dict['run_artifacts_url'] = os.path.join(self._run_artifacts_url, f'{workload}.tar.gz')
             result_list.append(dict(line_dict))
         return result_list
 
@@ -259,7 +271,8 @@ class WorkloadsOperations:
         """
         tar_run_artifacts_path = f"{self._run_artifacts_path}.tar.gz"
         with tarfile.open(tar_run_artifacts_path, mode='w:gz') as archive:
-            archive.add(self._run_artifacts_path, arcname=f'{workload}-{self._time_stamp_format}', recursive=True)
+            workload_file_name = self.__get_workload_file_name(workload)
+            archive.add(self._run_artifacts_path, arcname=workload_file_name, recursive=True)
         return tar_run_artifacts_path
 
     @logger_time_stamp
@@ -274,7 +287,8 @@ class WorkloadsOperations:
         # Upload when endpoint_url is not None
         s3operations = S3Operations()
         # change workload to key convention
-        upload_file = f"{workload}-{self._time_stamp_format}.tar.gz"
+        workload_file_name = self.__get_workload_file_name(workload)
+        upload_file = f"{workload_file_name}.tar.gz"
         s3operations.upload_file(file_name_path=tar_run_artifacts_path,
                                  bucket=self._environment_variables_dict.get('bucket', ''),
                                  key=run_artifacts_hierarchy,
@@ -313,8 +327,11 @@ class WorkloadsOperations:
             metadata.update({'run_status': status})
         if self._scale:
             metadata.update({'scale': int(self._scale)})
-            for i, node in enumerate(self._scale_node_list):
-                metadata.update({f'{kind}-scale-node-{i+1}': node})
+            count = 0
+            for scale_node in range(len(self._scale_node_list)):
+                for scale_num in range(self._scale):
+                    count += 1
+                    metadata.update({f'{kind}-scale-node-{count}': self._scale_node_list[scale_node]})
         if result:
             metadata.update(result)
 

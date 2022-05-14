@@ -1,5 +1,6 @@
 
 import os
+
 from multiprocessing import Process
 
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
@@ -93,11 +94,13 @@ class VdbenchPod(WorkloadsOperations):
                     self._oc.wait_for_ready(label=f'app={name}', label_uuid=False)
                 proc = []
                 scale = int(self._scale)
-                # create all pods
-                for scale_num in range(scale):
-                    p = Process(target=self.__run_pod, args=(str(scale_num+1), ))
-                    p.start()
-                    proc.append(p)
+                count = 0
+                for scale_node in range(len(self._scale_node_list)):
+                    for scale_num in range(scale):
+                        count += 1
+                        p = Process(target=self.__run_pod, args=(str(count), ))
+                        p.start()
+                        proc.append(p)
                 for p in proc:
                     p.join()
                 self._create_scale_logs()
