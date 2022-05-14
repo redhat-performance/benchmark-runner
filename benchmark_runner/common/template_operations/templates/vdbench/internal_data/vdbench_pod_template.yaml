@@ -1,11 +1,41 @@
-{% if not scale %}
+{%- if not scale %}
 apiVersion: v1
 kind: Namespace
 metadata:
   name: {{ namespace }}
+---
+{%- endif %}
+{%- if cluster == "kubernetes" %}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: vdbench-pv
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: {{ storage }}
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: vdbench-pod-pvc-claim
+  namespace: {{ namespace }}
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: {{ storage }}
 {%- endif %}
 {%- if odf_pvc == True %}
----
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -44,9 +74,17 @@ metadata:
     benchmark-uuid: {{ uuid }}
     benchmark-runner-workload: vdbench
 spec:
+  {%- if cluster != "kubernetes" %}
   selector:
     matchLabels:
       app: vdbench
+  {%- endif %}
+  {%- if cluster == "kubernetes" %}
+  volumes:
+    - name: vdbench-pod-vol
+      persistentVolumeClaim:
+        claimName: vdbench-pod-pvc-claim
+  {%- endif %}
   {%- if pin_node1 or scale_node %}
   nodeSelector:
     {% if not scale -%}
@@ -58,18 +96,22 @@ spec:
   {%- if kind == 'kata' %}
   runtimeClassName: kata
   {%- endif %}
-  resources:
-    requests:
-      cpu: {{ requests_cpu }}
-      memory: {{ requests_memory }}
-    limits:
-      cpu: {{ limits_cpu }}
-      memory: {{ limits_memory }}
   containers:
     - name: vdbench-pod
-      namespace: {{ namespace }}
       image: quay.io/ebattat/centos-stream8-vdbench5.04.07-pod:v1.0.10
       imagePullPolicy: "IfNotPresent"
+      resources:
+        requests:
+          cpu: {{ requests_cpu }}
+          memory: {{ requests_memory }}
+        limits:
+          cpu: {{ limits_cpu }}
+          memory: {{ limits_memory }}
+      {%- if cluster == "kubernetes" %}
+      volumeMounts:
+        - name: vdbench-pod-vol
+          mountPath: "/workload"
+      {%- endif %}
       {%- if odf_pvc == True %}
       volumeMounts:
         {% if not scale -%}
@@ -126,6 +168,7 @@ spec:
       args: ["-c", "python3.9 /state_signals_responder.py $REDIS_HOST $WORKLOAD_METHOD $TIMEOUT"]
       {%- endif %}
   restartPolicy: "Never"
+  {%- if cluster != "kubernetes" %}
   spec:
     pvc:
       accessModes:
@@ -137,6 +180,7 @@ spec:
       storageClassName: ocs-storagecluster-ceph-rbd
     source:
       blank: {}
+  {%- endif %}
   {%- if odf_pvc == True %}
   volumes:
     {% if not scale -%}
