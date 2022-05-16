@@ -54,7 +54,7 @@ spec:
         - name: IO_OPERATION
           value: "oltp1,oltp2,oltphw,odss2,odss128,read,read,read,read,write,write,write,write"
         - name: IO_THREADS
-          value: "16,16,16,16,16,4,4,2,2,4,4,2,2"
+          value: "8,8,8,8,16,32,4,16,4,32,4,16,4"
         - name: FILES_IO #How file IO will be done
           value: "oltp1,oltp2,oltphw,odss2,odss128,random,random,random,random,random,random,random,random"
         - name: IO_RATE # an integer or "max"

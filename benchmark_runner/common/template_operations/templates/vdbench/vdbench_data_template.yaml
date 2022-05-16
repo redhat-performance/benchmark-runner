@@ -9,7 +9,7 @@ template_data:
     perf_ci:
       BLOCK_SIZES: oltp1,oltp2,oltphw,odss2,odss128,4_cache,64_cache,4,64,4_cache,64_cache,4,64
       IO_OPERATION: oltp1,oltp2,oltphw,odss2,odss128,read,read,read,read,write,write,write,write
-      IO_THREADS: 16,16,16,16,16,4,4,2,2,4,4,2,2
+      IO_THREADS: 8,8,8,8,16,32,4,16,4,32,4,16,4
       # How file IO will be done
       FILES_IO: oltp1,oltp2,oltphw,odss2,odss128,random,random,random,random,random,random,random,random
       # an integer or "max"
