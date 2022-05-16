@@ -22,8 +22,11 @@ Reference:
 
 ![](../../media/docker2.png)
 
+### Run vdbench workload in Pod using OpenShift 
 ![](../../media/benchmark-runner-demo.gif)
 
+### Run vdbench workload in Pod using Kubernetes
+![](../../media/benchmark-runner-k8s-demo.gif)
 
 <!-- Table of contents -->
 ```{toctree}
