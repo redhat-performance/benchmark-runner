@@ -50,8 +50,10 @@ setup(
         'elasticsearch_dsl==7.4.0',  # for deep search
         'jinja2==3.0.3',
         'myst-parser==0.17.0',  # readthedocs
+        'openshift-client==1.0.14', # clusterbuster, until it uses kubernetes client rather than openshift.
         'pandas',  # required latest
         'paramiko==2.8.0',
+        'prometheus-api-client==0.5.0',   # clusterbuster
         'PyGitHub==1.55',  # update secrets
         'PyYAML==6.0',
         'sphinx==4.5.0',  # readthedocs
