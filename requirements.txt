@@ -7,8 +7,10 @@ elasticsearch==7.16.1
 elasticsearch_dsl==7.4.0
 jinja2==3.0.3
 myst-parser==0.17.0
+openshift-client==1.0.14
 pandas
 paramiko==2.8.0
+prometheus-api-client==0.5.0
 PyGitHub==1.55
 PyYAML==6.0
 sphinx==4.5.0
