@@ -90,7 +90,12 @@ SAVE ARTIFACTS LOCAL:
 1. add "-e SAVE_ARTIFACTS_LOCAL='True'"
 2. add "-v /tmp:/tmp" 
 3. git clone https://github.com/cloud-bulldozer/benchmark-operator /tmp/benchmark-operator
+
+### Run vdbench workload in Pod using OpenShift 
 ![](media/benchmark-runner-demo.gif)
+
+### Run vdbench workload in Pod using Kubernetes
+![](media/benchmark-runner-k8s-demo.gif)
 
 ## Run workload in Pod using Kubernetes or OpenShift
 
