@@ -12,18 +12,21 @@ include benchmark_runner/common/template_operations/templates/stressng/internal_
 include benchmark_runner/common/template_operations/templates/uperf/*.yaml
 include benchmark_runner/common/template_operations/templates/uperf/internal_data/*.yaml
 
-# benchmark runner templates (custom workloads)
+# benchmark runner templates (embedded workloads)
+include benchmark_runner/common/template_operations/templates/scale/*.yaml
 include benchmark_runner/common/template_operations/templates/vdbench/*.yaml
 include benchmark_runner/common/template_operations/templates/vdbench/internal_data/*.yaml
 
 # ocp resource
-include benchmark_runner/common/ocp_resources/cnv/template/*.sh
-include benchmark_runner/common/ocp_resources/cnv/template/*.yaml
-include benchmark_runner/common/ocp_resources/kata/template/*.sh
-include benchmark_runner/common/ocp_resources/kata/template/*.yaml
 include benchmark_runner/common/ocp_resources/local_storage/template/*.sh
 include benchmark_runner/common/ocp_resources/local_storage/template/*.yaml
 include benchmark_runner/common/ocp_resources/odf/template/*.sh
 include benchmark_runner/common/ocp_resources/odf/template/*.yaml
+include benchmark_runner/common/ocp_resources/infra/template/*.sh
+include benchmark_runner/common/ocp_resources/infra/template/*.yaml
+include benchmark_runner/common/ocp_resources/kata/template/*.sh
+include benchmark_runner/common/ocp_resources/kata/template/*.yaml
+include benchmark_runner/common/ocp_resources/cnv/template/*.sh
+include benchmark_runner/common/ocp_resources/cnv/template/*.yaml
 include benchmark_runner/common/ocp_resources/custom/template/*.sh
 include benchmark_runner/common/ocp_resources/custom/template/*.yaml

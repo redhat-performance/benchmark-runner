@@ -21,6 +21,7 @@ logger.setLevel(level=log_level)
 SYSTEM_EXIT_BENCHMARK_FAILED = 1
 SYSTEM_EXIT_UNKNOWN_EXECUTION_TYPE = 2
 
+
 @logger_time_stamp
 def main():
     """
@@ -164,7 +165,7 @@ def main():
         success = run_benchmark_runner_workload()
 
     else:
-        logger.error("could not determine the type of execution.")
+        logger.error(f"empty workload, choose one from the list: {environment_variables.workloads_list}")
         raise SystemExit(SYSTEM_EXIT_UNKNOWN_EXECUTION_TYPE)
 
     if not success:

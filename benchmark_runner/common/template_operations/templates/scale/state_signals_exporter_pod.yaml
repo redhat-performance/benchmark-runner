@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: state-signals-exporter
+  namespace: {{ namespace }}
+  labels:
+    app: state-signals-exporter
+    type: state-signals-exporter
+    benchmark-uuid: {{ uuid }}
+spec:
+  selector:
+    matchLabels:
+      app: state-signals-exporter
+  {%- if pin_node1 %}
+  nodeSelector:
+    kubernetes.io/hostname: {{ pin_node1 }}
+  {%- endif %}
+  resources:
+    requests:
+      cpu: 10m
+      memory: 10Mi
+    limits:
+      cpu: 2
+      memory: 2Gi
+  containers:
+    - name: state-signals-exporter-pod
+      namespace: {{ namespace }}
+      image: quay.io/ebattat/state-signals-exporter:v1.0.10
+      imagePullPolicy: "IfNotPresent"
+      env:
+        - name: REDIS_HOST
+          value: "{{ redis }}"
+        - name: SCALE_NUM
+          value: "{{ scale }}"
+        - name: TIMEOUT
+          value: "{{ timeout }}"
+      command: ["/bin/bash"]
+      args: ["-c", "python3.9 /state_signals_exporter.py $REDIS_HOST $SCALE_NUM $TIMEOUT"]
+  restartPolicy: "Never"

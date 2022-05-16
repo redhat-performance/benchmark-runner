@@ -11,7 +11,7 @@ from benchmark_runner.common.oc.oc import OC
 from benchmark_runner.common.template_operations.template_operations import TemplateOperations
 from benchmark_runner.common.elasticsearch.elasticsearch_operations import ElasticSearchOperations
 from benchmark_runner.common.ssh.ssh import SSH
-from benchmark_runner.benchmark_operator.benchmark_operator_exceptions import ODFNonInstalled, SystemMetricsRequiredElasticSearch
+from benchmark_runner.benchmark_operator.benchmark_operator_exceptions import ODFNonInstalled
 from benchmark_runner.main.environment_variables import environment_variables
 from benchmark_runner.common.clouds.shared.s3.s3_operations import S3Operations
 from benchmark_runner.common.prometheus.prometheus_snapshot import PrometheusSnapshot
@@ -79,15 +79,6 @@ class BenchmarkOperatorWorkloadsOperations:
         self._oc = OC(kubeadmin_password=kubeadmin_password)
         self._oc.login()
         return self._oc
-
-    def __check_elasticsearch_exist_for_system_metrics(self):
-        """
-        This method check if elasticsearch exist for system metrics
-        :return:
-        """
-        if self._system_metrics == 'True':
-            if not self._elasticsearch:
-                raise SystemMetricsRequiredElasticSearch()
 
     @logger_time_stamp
     def update_node_selector(self, runner_path: str = environment_variables.environment_variables_dict['runner_path'], yaml_path: str = '', pin_node: str = ''):
@@ -395,14 +386,13 @@ class BenchmarkOperatorWorkloadsOperations:
         tar_run_artifacts_path = self.__make_run_artifacts_tarfile(workload)
         run_artifacts_hierarchy = self._get_run_artifacts_hierarchy(workload_name=workload)
         # Upload when endpoint_url is not None
-        if self._endpoint_url:
-            s3operations = S3Operations()
-            # change workload to key convention
-            upload_file = f"{workload}-{self._time_stamp_format}.tar.gz"
-            s3operations.upload_file(file_name_path=tar_run_artifacts_path,
-                                     bucket=self._environment_variables_dict.get('bucket', ''),
-                                     key=run_artifacts_hierarchy,
-                                     upload_file=upload_file)
+        s3operations = S3Operations()
+        # change workload to key convention
+        upload_file = f"{workload}-{self._time_stamp_format}.tar.gz"
+        s3operations.upload_file(file_name_path=tar_run_artifacts_path,
+                                 bucket=self._environment_variables_dict.get('bucket', ''),
+                                 key=run_artifacts_hierarchy,
+                                 upload_file=upload_file)
         # remove local run artifacts workload folder
         # verify that its not empty path
         if len(self._run_artifacts_path) > 3 and self._run_artifacts_path != '/' and self._run_artifacts_path and tar_run_artifacts_path and os.path.isfile(tar_run_artifacts_path) and not self._save_artifacts_local:
@@ -446,7 +436,7 @@ class BenchmarkOperatorWorkloadsOperations:
         :return:
         """
         workload_name = self._workload.split('_')
-        if self._odf_pvc == 'True' and workload_name[0] in self._workloads_odf_pvc:
+        if workload_name[0] in self._workloads_odf_pvc:
             if not self._oc.is_odf_installed():
                 raise ODFNonInstalled()
 
@@ -459,7 +449,14 @@ class BenchmarkOperatorWorkloadsOperations:
         # make undeploy benchmark controller manager if exist
         self.make_undeploy_benchmark_controller_manager_if_exist(runner_path=environment_variables.environment_variables_dict['runner_path'])
         if 'hammerdb' in self._workload:
-            self._oc.delete_all_resources(resources=['deployments', 'services', 'pvc'], namespace=f"{self._workload.split('_')[2]}-db")
+            self._oc.delete_namespace(namespace=f"{self._workload.split('_')[2]}-db")
+
+    @logger_time_stamp
+    def clear_nodes_cache(self):
+        """
+        This method clear nodes cache
+        """
+        self._oc.clear_node_caches()
 
     def initialize_workload(self):
         """
@@ -467,19 +464,22 @@ class BenchmarkOperatorWorkloadsOperations:
         :return:
         """
         self.delete_all()
-        # check that there is elasticsearch when system metric is True
-        self.__check_elasticsearch_exist_for_system_metrics()
+        self.clear_nodes_cache()
         # make deploy benchmark controller manager
         self.make_deploy_benchmark_controller_manager(runner_path=environment_variables.environment_variables_dict['runner_path'])
-        self.odf_pvc_verification()
+        if self._odf_pvc == 'True':
+            self.odf_pvc_verification()
         self._template.generate_yamls()
-        self.start_prometheus()
+        if self._enable_prometheus_snapshot:
+            self.start_prometheus()
 
     def finalize_workload(self):
         """
         This method includes all the finalization of workload
         :return:
         """
-        self.end_prometheus()
-        self.upload_run_artifacts_to_s3()
+        if self._enable_prometheus_snapshot:
+            self.end_prometheus()
+        if self._endpoint_url:
+            self.upload_run_artifacts_to_s3()
         self.delete_all()

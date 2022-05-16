@@ -1,18 +1,28 @@
+<div align="center">
+  <img src="https://github.com/redhat-performance/benchmark-runner/blob/main/media/benchmark_runner.png"><br>
+</div>
 
+-----------------
+
+# Benchmark-Runner: Running benchmarks
 [![Actions Status](https://github.com/redhat-performance/benchmark-runner/workflows/CI/badge.svg)](https://github.com/redhat-performance/benchmark-runner/actions)
-[![Coverage Status](https://coveralls.io/repos/github/redhat-performance/benchmark-runner/badge.svg?branch=main)](https://coveralls.io/github/redhat-performance/benchmark-runner?branch=main)
+[![PyPI Latest Release](https://img.shields.io/pypi/v/benchmark-runner.svg)](https://pypi.org/project/benchmark-runner/)
+[![Container Repository on Quay](https://quay.io/repository/projectquay/quay/status "Container Repository on Quay")](https://quay.io/repository/ebattat/benchmark-runner?tab=tags)
+[![Coverage Status](https://coveralls.io/repos/github/redhat-performance/benchmark-runner/badge.svg?branch=main)](https://coveralls.io/github/redhat-performance/benchmark-runner?branch=main&kill_cache=1)
+[![Documentation Status](https://readthedocs.org/projects/benchmark-runner/badge/?version=latest)](https://benchmark-runner.readthedocs.io/en/latest/?badge=latest)
+[![License](https://img.shields.io/pypi/l/benchmark-runner.svg)](https://github.com/redhat-performance/benchmark-runner/blob/main/LICENSE)
 
-# Benchmark-Runner
+## What is it?
 
-This tool provides a lightweight and flexible framework for running benchmark workloads 
-on Kubernetes/OpenShift Pod or VM.
+**benchmark-runner** is a containerized Python lightweight and flexible framework for running benchmark workloads 
+on Kubernetes/OpenShift runtype kinds Pod, kata and VM.
 
-This tool support the following workloads:
+This framework support the following embedded workloads:
 
-* [hammerdb](https://hammerdb.com/): running hammerdb workload on the following databases: MSSQL, Mariadb, Postgresql on Pod and VM with [Configuration](benchmark_runner/templates/hammerdb)
-* [stressng](https://wiki.ubuntu.com/Kernel/Reference/stress-ng): running stressng workload on Pod or VM with [Configuration](benchmark_runner/templates/stressng)
-* [uperf](http://uperf.org/): running uperf workload on Pod or VM with [Configuration](benchmark_runner/templates/uperf)
-* [vdbench](https://wiki.lustre.org/VDBench/): running vdbench workload in a pod with [Configuration](benchmark_runner/templates/vdbench)
+* [hammerdb](https://hammerdb.com/): running hammerdb workload on the following databases: MSSQL, Mariadb, Postgresql in Pod, Kata or VM with [Configuration](benchmark_runner/templates/hammerdb)
+* [stressng](https://wiki.ubuntu.com/Kernel/Reference/stress-ng): running stressng workload in Pod, Kata or VM [Configuration](benchmark_runner/templates/stressng)
+* [uperf](http://uperf.org/): running uperf workload in Pod, Kata or VM with [Configuration](benchmark_runner/templates/uperf)
+* [vdbench](https://wiki.lustre.org/VDBench/): running vdbench workload in Pod, Kata or VM with [Configuration](benchmark_runner/templates/vdbench)
 
 Benchmark-runner grafana dashboard example:
 ![](media/grafana.png)
@@ -71,11 +81,16 @@ Choose one from the following list:
 
 **optional:** ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT
 
+**optional:** CLUSTER=$CLUSTER [ set CLUSTER='kubernetes' to run workload on a kubernetes cluster, default 'openshift' ]
+
 ```sh
 podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:latest
 ```
-
-![](media/demo.gif)
+SAVE ARTIFACTS LOCAL: 
+1. add "-e SAVE_ARTIFACTS_LOCAL='True'"
+2. add "-v /tmp:/tmp" 
+3. git clone https://github.com/cloud-bulldozer/benchmark-operator /tmp/benchmark-operator
+![](media/benchmark-runner-demo.gif)
 
 ## Run workload in Pod using Kubernetes or OpenShift
 

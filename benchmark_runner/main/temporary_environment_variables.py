@@ -2,7 +2,8 @@
 import copy
 from benchmark_runner.main.environment_variables import environment_variables
 
-class TemporaryEnvironmentVariables():
+
+class TemporaryEnvironmentVariables:
     """
     Allow temporary replacement of environment variables for testing purposes.
     Intended to be used as

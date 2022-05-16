@@ -49,7 +49,7 @@ def before_after_each_test_fixture():
     test_environment_variable['namespace'] = 'benchmark-runner'
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
-    oc.delete_all_resources(resources=['vm', 'pods', 'pvc'], namespace=test_environment_variable['namespace'])
+    oc.delete_namespace(namespace=test_environment_variable['namespace'])
     # @TODO add vm once implement
     kinds = ('vm', 'pod', 'kata')
     for kind in kinds:
@@ -58,7 +58,7 @@ def before_after_each_test_fixture():
     # After all tests
     for kind in kinds:
         __delete_test_objects(workload='vdbench', kind=kind)
-    oc.delete_all_resources(resources=['pods', 'pvc'], namespace=test_environment_variable['namespace'])
+    oc.delete_namespace(namespace=test_environment_variable['namespace'])
     # revert to defaults namespace
     test_environment_variable['namespace'] = 'benchmark-operator'
     print('Test End')

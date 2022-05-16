@@ -1,3 +1,4 @@
+
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -47,11 +48,11 @@ spec:
             memory: 10Mi
           limits:
             cpu: 2
-            memory: 2Gi
+            memory: 4Gi
       terminationGracePeriodSeconds: 0
       volumes:
         - containerDisk:
-            image: quay.io/ebattat/centos-stream8-vdbench5.04.07-container-disk:latest
+            image: quay.io/ebattat/centos-stream8-vdbench5.04.07-container-disk:v1.0.10
           name: containerdisk
         - cloudInitNoCloud:
             userData: |-
@@ -64,19 +65,22 @@ spec:
               runcmd:
                 - export BLOCK_SIZES=64,oltp1
                 - export IO_OPERATION=write,oltp1
-                - export IO_THREADS=1,3
+                - export IO_THREADS=16,3
                 - export FILES_IO=random,oltp1
                 - export IO_RATE=max,max
                 - export MIX_PRECENTAGE # used for mixed workload 0-100
                 - export DURATION=20
                 - export PAUSE=0
-                - export WARMUP=0
+                - export WARMUP=20
                 - export FILES_SELECTION=random
                 - export COMPRESSION_RATIO=2
-                - export RUN_FILLUP=no
-                - export DIRECTORIES=300
-                - export FILES_PER_DIRECTORY=3
-                - export SIZE_PER_FILE=10
+                - export RUN_FILLUP=yes
+                - export DIRECTORIES=100
+                - export FILES_PER_DIRECTORY=10
+                - export SIZE_PER_FILE=5
+                - export REDIS_HOST=
+                - export WORKLOAD_METHOD="/vdbench/vdbench_runner.sh"
+                - export TIMEOUT=3600
                 - echo @@~@@START-WORKLOAD@@~@@
                 - /vdbench/vdbench_runner.sh
                 - echo @@~@@END-WORKLOAD@@~@@
