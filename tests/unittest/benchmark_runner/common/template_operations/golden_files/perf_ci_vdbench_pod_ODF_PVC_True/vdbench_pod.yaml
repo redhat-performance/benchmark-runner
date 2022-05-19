@@ -22,6 +22,7 @@ kind: Pod
 metadata:
   name: vdbench-pod-deadbeef
   namespace: benchmark-runner
+  annotations:
   labels:
     app: vdbench-deadbeef
     type: vdbench-pod-deadbeef
@@ -35,7 +36,7 @@ spec:
     kubernetes.io/hostname: pin-node-1
   containers:
     - name: vdbench-pod
-      image: quay.io/ebattat/centos-stream8-vdbench5.04.07-pod:v1.0.10
+      image: quay.io/ebattat/centos-stream8-vdbench5.04.07-pod:v1.0.11
       imagePullPolicy: "IfNotPresent"
       resources:
         requests:
@@ -53,7 +54,7 @@ spec:
         - name: IO_OPERATION
           value: "oltp1,oltp2,oltphw,odss2,odss128,read,read,read,read,write,write,write,write"
         - name: IO_THREADS
-          value: "16,16,16,16,16,4,4,2,2,4,4,2,2"
+          value: "8,8,8,8,16,32,4,16,4,32,4,16,4"
         - name: FILES_IO #How file IO will be done
           value: "oltp1,oltp2,oltphw,odss2,odss128,random,random,random,random,random,random,random,random"
         - name: IO_RATE # an integer or "max"

@@ -68,7 +68,7 @@ spec:
           persistentVolumeClaim:
             claimName: vdbench-pvc-claim
         - containerDisk:
-            image: quay.io/ebattat/centos-stream8-vdbench5.04.07-container-disk:v1.0.10
+            image: quay.io/ebattat/centos-stream8-vdbench5.04.07-container-disk:v1.0.11
           name: containerdisk
         - cloudInitNoCloud:
             userData: |-
@@ -81,7 +81,7 @@ spec:
               runcmd:
                 - export BLOCK_SIZES=oltp1,oltp2,oltphw,odss2,odss128,4_cache,64_cache,4,64,4_cache,64_cache,4,64
                 - export IO_OPERATION=oltp1,oltp2,oltphw,odss2,odss128,read,read,read,read,write,write,write,write
-                - export IO_THREADS=16,16,16,16,16,4,4,2,2,4,4,2,2
+                - export IO_THREADS=8,8,8,8,16,32,4,16,4,32,4,16,4
                 - export FILES_IO=oltp1,oltp2,oltphw,odss2,odss128,random,random,random,random,random,random,random,random
                 - export IO_RATE=max,max,max,max,max,max,max,max,max,max,max,max,max
                 - export MIX_PRECENTAGE # used for mixed workload 0-100
