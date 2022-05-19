@@ -63,6 +63,10 @@ metadata:
   name: vdbench-{{ kind }}-{{ trunc_uuid }}-{{ scale }}
   {%- endif %}
   namespace: {{ namespace }}
+  annotations:
+    {%- if kind == 'kata' %}
+    io.katacontainers.config.hypervisor.virtio_fs_extra_args: '["-o","allow_direct_io"]'
+    {%- endif %}
   labels:
     {% if not scale -%}
     app: vdbench-{{ trunc_uuid }}
@@ -98,7 +102,7 @@ spec:
   {%- endif %}
   containers:
     - name: vdbench-pod
-      image: quay.io/ebattat/centos-stream8-vdbench5.04.07-pod:v1.0.10
+      image: quay.io/ebattat/centos-stream8-vdbench5.04.07-pod:v1.0.11
       imagePullPolicy: "IfNotPresent"
       resources:
         requests:

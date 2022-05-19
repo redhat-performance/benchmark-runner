@@ -10,6 +10,7 @@ kind: Pod
 metadata:
   name: vdbench-pod-deadbeef
   namespace: benchmark-runner
+  annotations:
   labels:
     app: vdbench-deadbeef
     type: vdbench-pod-deadbeef
@@ -23,7 +24,7 @@ spec:
     kubernetes.io/hostname: pin-node-1
   containers:
     - name: vdbench-pod
-      image: quay.io/ebattat/centos-stream8-vdbench5.04.07-pod:v1.0.10
+      image: quay.io/ebattat/centos-stream8-vdbench5.04.07-pod:v1.0.11
       imagePullPolicy: "IfNotPresent"
       resources:
         requests:
