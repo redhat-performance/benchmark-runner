@@ -48,11 +48,11 @@ spec:
             memory: 4Gi
           limits:
             cpu: 2
-            memory: 4Gi
+            memory: 32Gi
       terminationGracePeriodSeconds: 0
       volumes:
         - containerDisk:
-            image: quay.io/ebattat/centos-stream8-vdbench5.04.07-container-disk:v1.0.12
+            image: quay.io/ebattat/centos-stream8-vdbench5.04.07-container-disk:v1.0.13
           name: containerdisk
         - cloudInitNoCloud:
             userData: |-
@@ -81,7 +81,7 @@ spec:
                 - export REDIS_HOST=
                 - export WORKLOAD_METHOD="/vdbench/vdbench_runner.sh"
                 - export TIMEOUT=3600
-                - export LOGS_DIR="/workload"
+                - export LOGS_DIR=/workload/
                 - echo @@~@@START-WORKLOAD@@~@@
                 - /vdbench/vdbench_runner.sh
                 - echo @@~@@END-WORKLOAD@@~@@

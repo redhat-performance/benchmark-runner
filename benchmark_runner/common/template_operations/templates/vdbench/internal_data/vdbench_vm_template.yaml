@@ -96,7 +96,7 @@ spec:
             {%- endif %}
 {%- endif %}
         - containerDisk:
-            image: quay.io/ebattat/centos-stream8-vdbench5.04.07-container-disk:v1.0.12
+            image: quay.io/ebattat/centos-stream8-vdbench5.04.07-container-disk:v1.0.13
           name: containerdisk
         - cloudInitNoCloud:
             userData: |-
@@ -125,7 +125,7 @@ spec:
                 - export REDIS_HOST={{ redis }}
                 - export WORKLOAD_METHOD="/vdbench/vdbench_runner.sh"
                 - export TIMEOUT={{ timeout }}
-                - export LOGS_DIR="/workload"
+                - export LOGS_DIR={{ LOGS_DIR }}
                 - echo @@~@@START-WORKLOAD@@~@@
                 {% if not scale -%}
                 - /vdbench/vdbench_runner.sh

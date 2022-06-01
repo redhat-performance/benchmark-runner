@@ -36,7 +36,7 @@ spec:
     kubernetes.io/hostname: pin-node-1
   containers:
     - name: vdbench-pod
-      image: quay.io/ebattat/centos-stream8-vdbench5.04.07-pod:v1.0.12
+      image: quay.io/ebattat/centos-stream8-vdbench5.04.07-pod:v1.0.13
       imagePullPolicy: "IfNotPresent"
       resources:
         requests:
@@ -72,7 +72,7 @@ spec:
           value: "random"
         - name: COMPRESSION_RATIO #ratio is 1:X e.g 2 = 50% compressible
           value: "2"
-        - name: RUN_FILLUP #will it run a fillup before testing starts yes/no
+        - name: RUN_FILLUP # will it run a fillup before testing starts yes/no
           value: "yes"
         - name: LOGS_DIR # logs directory
           value: "/workload/"

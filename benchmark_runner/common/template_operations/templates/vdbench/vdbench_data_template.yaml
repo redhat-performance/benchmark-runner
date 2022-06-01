@@ -28,13 +28,14 @@ template_data:
       COMPRESSION_RATIO: 2
       # will it run a fillup before testing starts yes/no
       RUN_FILLUP: "yes"
+      LOGS_DIR: "/workload/"
       # how many directories to create
       DIRECTORIES: 600
       FILES_PER_DIRECTORY: 10
       # size in MB
       SIZE_PER_FILE: 10
       limits_cpu: 2
-      limits_memory: 4Gi
+      limits_memory: 32Gi
       requests_cpu: 2
       requests_memory: 4Gi
       storage: 64Gi
@@ -58,6 +59,7 @@ template_data:
       COMPRESSION_RATIO: 2
       # will it run a fillup before testing starts yes/no
       RUN_FILLUP: "yes"
+      LOGS_DIR: "/workload/"
       # how many directories to create
       DIRECTORIES: 100
       FILES_PER_DIRECTORY: 10
