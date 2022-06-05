@@ -61,7 +61,7 @@ spec:
             memory: 10Mi
           limits:
             cpu: 2
-            memory: 4Gi
+            memory: 10Mi
       terminationGracePeriodSeconds: 0
       volumes:
         - name: data-volume
