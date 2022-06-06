@@ -45,10 +45,10 @@ spec:
         resources:
           requests:
             cpu: 10m
-            memory: 10Mi
+            memory: 4Gi
           limits:
             cpu: 2
-            memory: 10Mi
+            memory: 4Gi
       terminationGracePeriodSeconds: 0
       volumes:
         - containerDisk:
