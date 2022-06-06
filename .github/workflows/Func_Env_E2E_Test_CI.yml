@@ -22,6 +22,7 @@ concurrency:
 
 jobs:
 
+
   ocp_operator_installation:
     name: Operator
     runs-on: ubuntu-latest
