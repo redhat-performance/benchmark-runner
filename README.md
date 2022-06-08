@@ -10,6 +10,7 @@
 [![Container Repository on Quay](https://quay.io/repository/projectquay/quay/status "Container Repository on Quay")](https://quay.io/repository/ebattat/benchmark-runner?tab=tags)
 [![Coverage Status](https://coveralls.io/repos/github/redhat-performance/benchmark-runner/badge.svg?branch=main)](https://coveralls.io/github/redhat-performance/benchmark-runner?branch=main&kill_cache=1)
 [![Documentation Status](https://readthedocs.org/projects/benchmark-runner/badge/?version=latest)](https://benchmark-runner.readthedocs.io/en/latest/?badge=latest)
+[![python](https://img.shields.io/pypi/pyversions/benchmark-runner.svg?color=%2334D058)](https://pypi.org/project/benchmark-runner)
 [![License](https://img.shields.io/pypi/l/benchmark-runner.svg)](https://github.com/redhat-performance/benchmark-runner/blob/main/LICENSE)
 
 ## What is it?
