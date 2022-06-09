@@ -102,7 +102,7 @@ spec:
   {%- endif %}
   containers:
     - name: vdbench-pod
-      image: quay.io/ebattat/centos-stream8-vdbench5.04.07-pod:v1.0.13
+      image: {{ vdbench_image }}
       imagePullPolicy: "IfNotPresent"
       resources:
         requests:
