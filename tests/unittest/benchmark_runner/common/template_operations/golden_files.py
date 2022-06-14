@@ -24,6 +24,12 @@ class GoldenFiles:
         environment_variables.environment_variables_dict['prom_token_override'] = 'fake_prom_token'
         environment_variables.environment_variables_dict['uuid'] = 'deadbeef-0123-3210-cdef-01234567890abcdef'
         environment_variables.environment_variables_dict['trunc_uuid'] = environment_variables.environment_variables_dict['uuid'].split('-')[0]
+        environment_variables.environment_variables_dict['workloads'] = ['stressng_pod', 'stressng_vm', 'stressng_kata',
+                                                         'uperf_pod', 'uperf_vm', 'uperf_kata',
+                                                         'hammerdb_pod_mariadb', 'hammerdb_vm_mariadb', 'hammerdb_kata_mariadb',
+                                                         'hammerdb_pod_postgres', 'hammerdb_vm_postgres', 'hammerdb_kata_postgres',
+                                                         'hammerdb_pod_mssql', 'hammerdb_vm_mssql', 'hammerdb_kata_mssql',
+                                                         'vdbench_pod', 'vdbench_kata', 'vdbench_vm']
 
     def __clear_directory_yaml(self, dir):
         if os.path.isdir(dir):
