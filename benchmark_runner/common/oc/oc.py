@@ -769,8 +769,8 @@ class OC(SSH):
                     copy = False
                     continue
                 elif copy:
-                    # Strip line prefix from VM output
-                    if 'cloud-init' in line:
+                    # Filter 'cloud-init' and CSV lines only
+                    if 'cloud-init' in line and ',' in line:
                         if vm_name in line:
                             # filter the title, placed after the second :
                             results_list.append(line.strip().split(':')[title_index:])

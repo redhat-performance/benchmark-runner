@@ -244,7 +244,7 @@ class WorkloadsOperations:
             self._create_pod_log(pod='state-signals-exporter')
             self._create_pod_log(pod='redis-master')
         # insert results to csv
-        csv_result_file = os.path.join(self._run_artifacts_path, 'vdbench_vm_result.csv')
+        csv_result_file = os.path.join(self._run_artifacts_path, f'{vm_name}_result.csv')
         with open(csv_result_file, 'w') as out:
             for row in results_list:
                 if row:
@@ -331,7 +331,7 @@ class WorkloadsOperations:
             for scale_node in range(len(self._scale_node_list)):
                 for scale_num in range(self._scale):
                     count += 1
-                    metadata.update({f'{kind}-scale-node-{count}': self._scale_node_list[scale_node]})
+                    metadata.update({f'scale-{kind}--node-{count}': self._scale_node_list[scale_node]})
         if result:
             metadata.update(result)
 
