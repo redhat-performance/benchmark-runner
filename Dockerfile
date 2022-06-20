@@ -53,6 +53,10 @@ RUN mkdir -p /tmp/run_artifacts
 # download benchmark-operator to /tmp default path
 RUN git clone https://github.com/cloud-bulldozer/benchmark-operator /tmp/benchmark-operator
 
+# download cluster-buster to /tmp default path && install cluster-buster dependency
+RUN git clone https://github.com/RobertKrawitz/OpenShift4-tools /tmp/OpenShift4-tools \
+    && dnf install -y hostname bc
+
 # Add main
 COPY benchmark_runner/main/main.py /benchmark_runner/main/main.py
 

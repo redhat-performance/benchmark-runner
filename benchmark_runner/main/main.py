@@ -8,7 +8,7 @@ from benchmark_runner.workloads.workloads import Workloads
 from benchmark_runner.main.environment_variables import environment_variables
 from benchmark_runner.common.clouds.Azure.azure_operations import AzureOperations
 from benchmark_runner.common.clouds.IBM.ibm_operations import IBMOperations
-
+from benchmark_runner.cluster_buster.cluster_buster_workloads import ClusterBusterWorkloads
 
 # logger
 log_level = os.environ.get('log_level', 'INFO').upper()
@@ -29,6 +29,7 @@ def main():
     """
     benchmark_operator_workload = None
     benchmark_runner_workload = None
+    cluster_buster_workload = None
     environment_variables_dict = environment_variables.environment_variables_dict
     # environment variables data
     workload = environment_variables_dict.get('workload', '')
@@ -41,6 +42,7 @@ def main():
 
     is_benchmark_operator_workload = 'benchmark-operator' in (environment_variables.get_workload_namespace(workload), environment_variables_dict.get("runner_type"))
     is_benchmark_runner_workload = 'benchmark-runner' in (environment_variables.get_workload_namespace(workload), environment_variables_dict.get("runner_type"))
+    is_cluster_buster_workload = 'cluster_buster' in workload
     # workload name validation
     if workload and not ci_status:
         if workload not in environment_variables.workloads_list:
@@ -50,7 +52,9 @@ def main():
         if run_type not in environment_variables.run_types_list:
             logger.info(f'Enter valid run type {environment_variables.run_types_list}')
             raise Exception(f'Invalid run type: {run_type} \n, choose one from the list: {environment_variables.run_types_list}')
-        if is_benchmark_operator_workload:
+        if is_cluster_buster_workload:
+            cluster_buster_workload = ClusterBusterWorkloads()
+        elif is_benchmark_operator_workload:
             benchmark_operator_workload = BenchmarkOperatorWorkloads()
         elif is_benchmark_runner_workload:
             benchmark_runner_workload = Workloads()
@@ -142,8 +146,17 @@ def main():
         This method run benchmark-runner workload
         :return:
         """
-        # benchmark-operator node selector
+        # benchmark-runner node selector
         return benchmark_runner_workload.run()
+
+    @logger_time_stamp
+    def run_cluster_buster_workload():
+        """
+        This method run cluster-buster workload
+        :return:
+        """
+        # benchmark-operator node selector
+        return cluster_buster_workload.run()
 
     success = True
     # azure_cluster_start_stop
@@ -160,10 +173,10 @@ def main():
         update_ci_status()
     elif is_benchmark_operator_workload:
         success = run_benchmark_operator_workload()
-
     elif is_benchmark_runner_workload:
         success = run_benchmark_runner_workload()
-
+    elif is_cluster_buster_workload:
+        success = run_cluster_buster_workload()
     else:
         logger.error(f"empty workload, choose one from the list: {environment_variables.workloads_list}")
         raise SystemExit(SYSTEM_EXIT_UNKNOWN_EXECUTION_TYPE)

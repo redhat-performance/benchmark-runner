@@ -58,7 +58,9 @@ _**Table of Contents**_
 
 Choose one from the following list:
 
-`['stressng_pod', 'stressng_vm', 'stressng_kata','uperf_pod', 'uperf_vm', 'uperf_kata', 'hammerdb_pod_mariadb', 'hammerdb_pod_mssql', 'hammerdb_pod_postgres', 'hammerdb_vm_mariadb', 'hammerdb_vm_mssql', 'hammerdb_vm_postgres', 'hammerdb_kata_mariadb', 'hammerdb_kata_mssql', 'hammerdb_kata_postgres', 'vdbench_pod', 'vdbench_kata', 'vdbench_vm']`
+`['stressng_pod', 'stressng_vm', 'stressng_kata','uperf_pod', 'uperf_vm', 'uperf_kata', 'hammerdb_pod_mariadb', 'hammerdb_pod_mssql', 'hammerdb_pod_postgres', 'hammerdb_vm_mariadb', 'hammerdb_vm_mssql', 'hammerdb_vm_postgres', 'hammerdb_kata_mariadb', 'hammerdb_kata_mssql', 'hammerdb_kata_postgres', 'vdbench_pod', 'vdbench_kata', 'vdbench_vm', 'vdbench_pod_scale', 'vdbench_kata_scale', 'vdbench_vm_scale', 'cluster_buster']`
+
+** cluster_buster workloads: cpusoaker, files, fio, uperf. for more details [see](https://github.com/RobertKrawitz/OpenShift4-tools)
 
 **auto:** NAMESPACE=benchmark-operator [ The default namespace is benchmark-operator ]
 
@@ -84,10 +86,16 @@ Choose one from the following list:
 
 **optional:** CLUSTER=$CLUSTER [ set CLUSTER='kubernetes' to run workload on a kubernetes cluster, default 'openshift' ]
 
+**optional:** SCALE=SCALE [For Vdbench only: Scale in each node]
+
+**optional:** SCALE_NODES=SCALE_NODES [For Vdbench only: Scale's node]
+
+**optional:** REDIS=REDIS [For Vdbench only: redis for scale synchronization]
+
 ```sh
 podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:latest
 ```
-SAVE ARTIFACTS LOCAL: 
+SAVE RUN ARTIFACTS LOCAL: 
 1. add "-e SAVE_ARTIFACTS_LOCAL='True'"
 2. add "-v /tmp:/tmp" 
 3. git clone https://github.com/cloud-bulldozer/benchmark-operator /tmp/benchmark-operator
@@ -135,7 +143,7 @@ $ chmod -R g-s,a+rw "$local_prometheus_snapshot"
 $ sudo podman run --rm -p 9090:9090 -uroot -v "$local_prometheus_snapshot:/prometheus" --privileged prom/prometheus --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheus --storage.tsdb.retention.time=100000d --storage.tsdb.retention.size=1000PB
 ```
 
-and point your browser at port 9090 on your local system, you can run queries against it, e. g.
+and point your browser at port 9090 on your local system, you can run queries against it, e.g.
 
 ```
 sum(irate(node_cpu_seconds_total[2m])) by (mode,instance) > 0

@@ -61,7 +61,7 @@ class EnvironmentVariables:
         # Set to True to
         self._environment_variables_dict['kata_cpuoffline_workaround'] = os.environ.get('KATA_CPUOFFLINE_WORKAROUND', '')
 
-        # Scale
+        # Scale in each node
         self._environment_variables_dict['scale'] = os.environ.get('SCALE', '')
         # list of nodes per pod/vm, scale number per node, e.g: [ 'master-1', 'master-2' ] - run 1 pod/vm in each node
         self._environment_variables_dict['scale_nodes'] = os.environ.get('SCALE_NODES', "")
@@ -74,8 +74,9 @@ class EnvironmentVariables:
                                                          'hammerdb_pod_mariadb', 'hammerdb_vm_mariadb', 'hammerdb_kata_mariadb',
                                                          'hammerdb_pod_postgres', 'hammerdb_vm_postgres', 'hammerdb_kata_postgres',
                                                          'hammerdb_pod_mssql', 'hammerdb_vm_mssql', 'hammerdb_kata_mssql',
-                                                         'vdbench_pod', 'vdbench_kata', 'vdbench_vm']
-        # benchmark-operator workload types
+                                                         'vdbench_pod', 'vdbench_kata', 'vdbench_vm',
+                                                         'cluster_buster']
+        # workloads namespace
         self._environment_variables_dict['workload_namespaces'] = {
             'stressng': 'benchmark-operator',
             'hammerdb': 'benchmark-operator',
@@ -83,7 +84,7 @@ class EnvironmentVariables:
             'vdbench': 'benchmark-runner',
         }
 
-        # Choose default namespace
+        # Update namespace
         base_workload = self._environment_variables_dict['workload'].split('_')[0]
         if os.environ.get('NAMESPACE'):
             self._environment_variables_dict['namespace'] = os.environ.get('NAMESPACE')
@@ -91,8 +92,7 @@ class EnvironmentVariables:
             default_namespace = self._environment_variables_dict['workload_namespaces'][base_workload]
             self._environment_variables_dict['namespace'] = os.environ.get('NAMESPACE', default_namespace)
         else:
-            # TBD if this is not set
-            self._environment_variables_dict['namespace'] = 'benchmark-operator'
+            self._environment_variables_dict['namespace'] = 'benchmark-runner'
 
         # run workload with odf pvc True/False. True=ODF, False=Ephemeral
         self._environment_variables_dict['odf_pvc'] = os.environ.get('ODF_PVC', 'True')
