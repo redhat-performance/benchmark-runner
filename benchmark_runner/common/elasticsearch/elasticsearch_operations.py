@@ -1,7 +1,7 @@
 
 import time
 import ssl
-import urllib3
+
 from typeguard import typechecked
 from elasticsearch import Elasticsearch
 from elasticsearch.connection import create_ssl_context
