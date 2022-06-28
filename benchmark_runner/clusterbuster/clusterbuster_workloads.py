@@ -6,7 +6,7 @@ from benchmark_runner.common.ssh.ssh import SSH
 from benchmark_runner.main.environment_variables import environment_variables
 from benchmark_runner.common.elasticsearch.elasticsearch_operations import ElasticSearchOperations
 from benchmark_runner.clusterbuster.clusterbuster_exceptions import MissingResultReport, MissingElasticSearch
-from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp
+from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 
 
 class ClusterBusterWorkloads:
@@ -57,7 +57,7 @@ class ClusterBusterWorkloads:
                 index = f'clusterbuster-{workload}-test-ci-results'
             else:
                 index = f'clusterbuster-{workload}-results'
-            print(index)
+            logger.info(f'upload index: {index}')
             if workload != 'metadata':
                 for clusterbuster_test in clusterbuster_tests:
                     self.__es_operations.upload_to_elasticsearch(index=index, data=clusterbuster_test)
