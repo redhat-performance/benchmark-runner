@@ -79,7 +79,7 @@ jobs:
        # continue to next job if failed
        fail-fast: false
        matrix: 
-          workload: [ 'stressng_pod', 'stressng_kata', 'stressng_vm', 'uperf_pod', 'uperf_kata', 'uperf_vm', 'hammerdb_pod_mariadb', 'hammerdb_kata_mariadb', 'hammerdb_vm_mariadb', 'hammerdb_pod_postgres', 'hammerdb_kata_postgres', 'hammerdb_vm_postgres', 'hammerdb_pod_mssql', 'hammerdb_kata_mssql', 'hammerdb_vm_mssql', 'vdbench_pod', 'vdbench_kata', 'vdbench_vm', 'clusterbuster']
+          workload: [ 'stressng_pod', 'stressng_kata', 'stressng_vm', 'uperf_pod', 'uperf_kata', 'uperf_vm', 'hammerdb_pod_mariadb', 'hammerdb_kata_mariadb', 'hammerdb_vm_mariadb', 'hammerdb_pod_postgres', 'hammerdb_kata_postgres', 'hammerdb_vm_postgres', 'hammerdb_pod_mssql', 'hammerdb_kata_mssql', 'hammerdb_vm_mssql', 'vdbench_pod', 'vdbench_kata', 'vdbench_vm']
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.9
