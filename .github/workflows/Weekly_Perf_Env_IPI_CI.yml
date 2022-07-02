@@ -3,15 +3,16 @@
 # This is a nightly CI Pipeline against Performance environment using IPI installer - run on Sunday
 name: Deploy IPI Perf Env Weekly CI
 
-#on:
-#  schedule:
-#    - cron: '0 4 * * 0' # run on Sunday at 4 AM UTC/ 0 AM EDT
-
 on:
-  workflow_run:
-    workflows: ["Deploy IPI Func Env Weekly CI1"]
-    types:
-      - completed
+  schedule:
+    - cron: '0 4 * * 0' # run on Sunday at 4 AM UTC/ 0 AM EDT
+
+#on:
+#  workflow_run:
+#    workflows: ["Deploy IPI Func Env Weekly CI1"]
+#    types:
+#      - completed
+
 #on:
 #  push:
 #    branches: [ main ]
