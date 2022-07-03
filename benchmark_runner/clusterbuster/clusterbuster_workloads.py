@@ -3,45 +3,24 @@ import os
 import json
 
 from benchmark_runner.common.ssh.ssh import SSH
-from benchmark_runner.main.environment_variables import environment_variables
-from benchmark_runner.common.elasticsearch.elasticsearch_operations import ElasticSearchOperations
 from benchmark_runner.clusterbuster.clusterbuster_exceptions import MissingResultReport, MissingElasticSearch
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
+from benchmark_runner.workloads.workloads_operations import WorkloadsOperations
 
 
-class ClusterBusterWorkloads:
+class ClusterBusterWorkloads(WorkloadsOperations):
     """
     This class is responsible for all ClusterBuster workloads
     """
 
     def __init__(self):
-        self.result_report = '/tmp/clusterbuster-report.json'
-        self.__ssh = SSH()
+        super().__init__()
+        self.__clusterbuster_path = '/tmp/OpenShift4-tools/CI/./run-kata-perf-suite'
         # environment variables
-        self.__environment_variables_dict = environment_variables.environment_variables_dict
-        self.__namespace = self.__environment_variables_dict.get('namespace', '')
-        self.__run_type = self.__environment_variables_dict.get('run_type', '')
-        self.__pin_node1 = self.__environment_variables_dict.get('pin_node1', '')
-        self.__pin_node2 = self.__environment_variables_dict.get('pin_node2', '')
-        # ElasticSearch connection
-        self.__es_host = self.__environment_variables_dict.get('elasticsearch', '')
-        self.__es_port = self.__environment_variables_dict.get('elasticsearch_port', '')
-        self.__es_user = self.__environment_variables_dict.get('elasticsearch_user', '')
-        self.__es_password = self.__environment_variables_dict.get('elasticsearch_password', '')
-        self.__timeout = int(self.__environment_variables_dict.get('timeout', ''))
-        self.__uuid = self.__environment_variables_dict.get('uuid', '')
-        self.__es_url_protocol = self.__environment_variables_dict['elasticsearch_url_protocol']
-        self._ssh = SSH()
-        # ElasticSearch connection
-        if self.__es_host and self.__es_port:
-            self.__es_operations = ElasticSearchOperations(es_host=self.__es_host,
-                                                           es_port=self.__es_port,
-                                                           es_user=self.__es_user,
-                                                           es_password=self.__es_password,
-                                                           es_url_protocol=self.__es_url_protocol,
-                                                           timeout=self.__timeout)
-        else:
-            raise MissingElasticSearch()
+        self.__namespace = self._environment_variables_dict.get('namespace', '')
+        self.__result_report = os.path.join(self._run_artifacts_path, 'clusterbuster-report.json')
+        self.__clusterbuster_log = os.path.join(self._run_artifacts_path, 'clusterbuster.log')
+        self.__ssh = SSH()
 
     @logger_time_stamp
     def upload_clusterbuster_result_to_elasticsearch(self):
@@ -49,32 +28,85 @@ class ClusterBusterWorkloads:
         This method upload to ElasticSearch the results
         :return:
         """
-        result_report_json_file = open(self.result_report)
+        result_report_json_file = open(self.__result_report)
         result_report_json_str = result_report_json_file.read()
         result_report_json_data = json.loads(result_report_json_str)
         for workload, clusterbuster_tests in result_report_json_data.items():
-            if self.__run_type == 'test_ci':
+            if self._run_type == 'test_ci':
                 index = f'clusterbuster-{workload}-test-ci-results'
             else:
                 index = f'clusterbuster-{workload}-results'
             logger.info(f'upload index: {index}')
             if workload != 'metadata':
                 for clusterbuster_test in clusterbuster_tests:
-                    self.__es_operations.upload_to_elasticsearch(index=index, data=clusterbuster_test)
+                    self._es_operations.upload_to_elasticsearch(index=index, data=clusterbuster_test)
             # metadata
             elif workload == 'metadata':
-                self.__es_operations.upload_to_elasticsearch(index=index, data=result_report_json_data['metadata'])
-                self.__es_operations.verify_elasticsearch_data_uploaded(index=index, uuid=result_report_json_data['metadata']['uuid'])
+                # run artifacts data
+                result_report_json_data['metadata']['run_artifacts_url'] = os.path.join(self._run_artifacts_url, f'{self._get_run_artifacts_hierarchy(workload_name=self._workload, is_file=True)}-{self._time_stamp_format}.tar.gz')
+                self._es_operations.upload_to_elasticsearch(index=index, data=result_report_json_data['metadata'])
+                self._es_operations.verify_elasticsearch_data_uploaded(index=index, uuid=result_report_json_data['metadata']['uuid'])
+
+    @logger_time_stamp
+    def delete_all(self):
+        """
+        This method delete all resource that related to ClusterBuster resource
+        :return:
+        """
+        self.__ssh.run(cmd=f'oc delete pod -A -l {self.__namespace}')
+
+    def initialize_workload(self):
+        """
+        This method includes all the initialization of ClusterBuster workload
+        :return:
+        """
+        self.delete_all()
+        self.clear_nodes_cache()
+        if self._enable_prometheus_snapshot:
+            self.start_prometheus()
+
+    def finalize_workload(self):
+        """
+        This method includes all the finalization of ClusterBuster workload
+        :return:
+        """
+        # Upload to ElasticSearch
+        if os.path.exists(os.path.join(self.__result_report)):
+            self.upload_clusterbuster_result_to_elasticsearch()
+        else:
+            raise MissingResultReport()
+        if self._enable_prometheus_snapshot:
+            self.end_prometheus()
+        if self._endpoint_url:
+            self.upload_run_artifacts_to_s3()
+        self.delete_all()
+
+    @logger_time_stamp
+    def run_workload(self):
+        """
+        This method run ClusterBuster workload
+        :return:
+        """
+        self.__ssh.run(cmd=f'{self.__clusterbuster_path} --run_type={self._run_type} --client-pin-node={self._pin_node1} --server-pin-node={self._pin_node2} --sync-pin-node={self._pin_node2} --basename={self.__namespace} --artifactdir={self._run_artifacts_path} --analyze={self.__result_report} > {self.__clusterbuster_log}')
 
     @logger_time_stamp
     def run(self):
         """
-        This method run clusterbuster workloads
+        This method run ClusterBuster workloads
         :return:
         """
-        self.__ssh.run(cmd=f'cd /tmp/OpenShift4-tools/CI; ./run-kata-perf-suite --run_type={self.__run_type} --client-pin-node={self.__pin_node1} --server-pin-node={self.__pin_node2} --sync-pin-node={self.__pin_node2} --basename={self.__namespace} --artifactdir=/tmp/clusterbuster-ci --analyze=/tmp/clusterbuster-report.json')
-        if os.path.exists(os.path.join(self.result_report)):
-            self.upload_clusterbuster_result_to_elasticsearch()
-            return True
-        else:
-            raise MissingResultReport()
+        try:
+            # initialize workload
+            self.initialize_workload()
+            # Run workload
+            self.run_workload()
+            # finalize workload
+            self.finalize_workload()
+        # when error raised finalize workload
+        except Exception:
+            logger.info(f'{self._workload} workload raised an exception')
+            # finalize workload
+            self.finalize_workload()
+            return False
+
+        return True
