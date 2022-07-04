@@ -59,7 +59,7 @@ class WorkloadsOperations:
         self._timeout = int(self._environment_variables_dict.get('timeout', ''))
         # Elasticsearch connection
         if self._es_host and self._es_port:
-            self.__es_operations = ElasticSearchOperations(es_host=self._es_host,
+            self._es_operations = ElasticSearchOperations(es_host=self._es_host,
                                                            es_port=self._es_port,
                                                            es_user=self._es_user,
                                                            es_password=self._es_password,
@@ -346,7 +346,7 @@ class WorkloadsOperations:
         :param result:
         :return:
         """
-        self.__es_operations.upload_to_elasticsearch(index=index, data=self.__get_metadata(kind=kind, status=status, result=result))
+        self._es_operations.upload_to_elasticsearch(index=index, data=self.__get_metadata(kind=kind, status=status, result=result))
 
     def _verify_elasticsearch_data_uploaded(self, index: str, uuid: str):
         """
@@ -355,7 +355,7 @@ class WorkloadsOperations:
         :param uuid:
         :return:
         """
-        self.__es_operations.verify_elasticsearch_data_uploaded(index=index, uuid=uuid)
+        self._es_operations.verify_elasticsearch_data_uploaded(index=index, uuid=uuid)
 
     @logger_time_stamp
     def update_ci_status(self, status: str, ci_minutes_time: int, benchmark_operator_id: str, benchmark_wrapper_id: str, ocp_install_minutes_time: int = 0, ocp_resource_install_minutes_time: int = 0):
@@ -381,7 +381,7 @@ class WorkloadsOperations:
             ocp_install_minutes_time = ibm_operations.get_ocp_install_time()
             ibm_operations.ibm_disconnect()
         metadata.update({'status': status, 'status#': status_dict[status], 'ci_minutes_time': ci_minutes_time, 'benchmark_operator_id': benchmark_operator_id, 'benchmark_wrapper_id': benchmark_wrapper_id, 'ocp_install_minutes_time': ocp_install_minutes_time, 'ocp_resource_install_minutes_time': ocp_resource_install_minutes_time})
-        self.__es_operations.upload_to_elasticsearch(index=es_index, data=metadata)
+        self._es_operations.upload_to_elasticsearch(index=es_index, data=metadata)
 
     @logger_time_stamp
     def clear_nodes_cache(self):
@@ -399,7 +399,7 @@ class WorkloadsOperations:
         self.clear_nodes_cache()
         if self._odf_pvc == 'True':
             self.odf_pvc_verification()
-        self._template.generate_yamls(scale=self._scale, scale_nodes=self._scale_node_list)
+        self._template.generate_yamls(scale=str(self._scale), scale_nodes=self._scale_node_list)
         if self._enable_prometheus_snapshot:
             self.start_prometheus()
 
