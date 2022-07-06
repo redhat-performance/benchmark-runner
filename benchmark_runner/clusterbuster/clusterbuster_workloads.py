@@ -18,7 +18,8 @@ class ClusterBusterWorkloads(WorkloadsOperations):
         self.__clusterbuster_path = '/tmp/OpenShift4-tools/CI/./run-kata-perf-suite'
         # environment variables
         self.__namespace = self._environment_variables_dict.get('namespace', '')
-        self.__result_report = os.path.join(self._run_artifacts_path, 'clusterbuster-report.json')
+        self.__result_report = '/tmp/clusterbuster-report.json'
+        self.__artifactdir = os.path.join(self._run_artifacts_path, 'clusterbuster-ci')
         self.__clusterbuster_log = os.path.join(self._run_artifacts_path, 'clusterbuster.log')
         self.__ssh = SSH()
 
@@ -70,10 +71,19 @@ class ClusterBusterWorkloads(WorkloadsOperations):
         This method includes all the finalization of ClusterBuster workload
         :return:
         """
-        # Upload to ElasticSearch
-        if os.path.exists(os.path.join(self.__result_report)):
+        # Result file exist and not empty
+        if os.path.exists(os.path.join(self.__result_report)) and not os.stat(self.__result_report).st_size == 0:
             self.upload_clusterbuster_result_to_elasticsearch()
         else:
+            result_report_json_data = {}
+            result_report_json_data['result'] = 'Failed'
+            result_report_json_data['run_artifacts_url'] = os.path.join(self._run_artifacts_url, f'{self._get_run_artifacts_hierarchy(workload_name=self._workload, is_file=True)}-{self._time_stamp_format}.tar.gz')
+            if self._run_type == 'test_ci':
+                index = f'clusterbuster-metadata-test-ci-results'
+            else:
+                index = f'clusterbuster-metadata-results'
+            logger.info(f'upload index: {index}')
+            self._es_operations.upload_to_elasticsearch(index=index, data=result_report_json_data)
             raise MissingResultReport()
         if self._enable_prometheus_snapshot:
             self.end_prometheus()
@@ -87,7 +97,7 @@ class ClusterBusterWorkloads(WorkloadsOperations):
         This method run ClusterBuster workload
         :return:
         """
-        self.__ssh.run(cmd=f'{self.__clusterbuster_path} --run_type={self._run_type} --client-pin-node={self._pin_node1} --server-pin-node={self._pin_node2} --sync-pin-node={self._pin_node2} --basename={self.__namespace} --artifactdir={self._run_artifacts_path} --analyze={self.__result_report} > {self.__clusterbuster_log}')
+        self.__ssh.run(cmd=f'{self.__clusterbuster_path} --run_type={self._run_type} --client-pin-node={self._pin_node1} --server-pin-node={self._pin_node2} --sync-pin-node={self._pin_node2} --basename={self.__namespace} --artifactdir={self.__artifactdir} --analyze={self.__result_report} > {self.__clusterbuster_log}')
 
     @logger_time_stamp
     def run(self):
