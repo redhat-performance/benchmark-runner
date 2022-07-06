@@ -268,8 +268,14 @@ class OC(SSH):
         This method return prometheus token
         :return:
         """
-        long_uuid = self.run(f"{self.__cli} -n openshift-monitoring sa get-token prometheus-k8s")
-        return long_uuid
+        major_version = int(self.get_ocp_server_version().split('.')[0])
+        minor_version = int(self.get_ocp_server_version().split('.')[1])
+        # OCP 4.10 and below
+        if major_version <= 4 and minor_version <= 10:
+            prom_token = self.run(f"{self.__cli} -n openshift-monitoring sa get-token prometheus-k8s")
+        else:
+            prom_token = self.run(f"{self.__cli} sa new-token -n openshift-monitoring prometheus-k8s")
+        return prom_token
 
     @logger_time_stamp
     def login(self):
