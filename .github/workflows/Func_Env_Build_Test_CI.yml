@@ -88,8 +88,8 @@ jobs:
         pip install coveralls
         COVERALLS_REPO_TOKEN=${{ secrets.COVERALLS_REPO_TOKEN }} coveralls
 
-  build:
-    name: build
+  pypi_upload:
+    name: pypi_upload
     needs: [test]
     runs-on: ubuntu-latest
     steps:
@@ -107,8 +107,24 @@ jobs:
         pip install setuptools wheel twine
         python setup.py sdist bdist_wheel
         twine upload dist/*
+
+  pypi_validate:
+    name: pypi_validate
+    needs: [test, pypi_upload]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: Validate upload to PyPI
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+      run: |
         echo '⌛ Wait till package will be updated in PyPI'
-        # Verfiy and wait till latest benchamrk runner version will be updated in Pypi (timeout 900 seconds)
+        # Verify and wait till latest benchmark-runner version will be updated in Pypi (timeout 900 seconds)
         timeout=900
         sleep_time=30
         expected_version=$(python3 setup.py --version)
@@ -134,19 +150,30 @@ jobs:
               fi
             fi
         done
-    - name: ⌛ Upload 🐋 to quay.io
-      run: |
-        version=$(python3 setup.py --version)
-        sudo podman build --build-arg VERSION=$version --layers=false -t ${{ secrets.PACKAGE_NAME }}:v$version .
-        sudo podman login quay.io -u ${{ secrets.QAUYIO_ROBOT_USER }} -p ${{ secrets.QAUYIO_ROBOT_TOKEN }}
-        sudo podman push localhost/${{ secrets.PACKAGE_NAME }}:v$version quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:v$version
-        sudo podman push localhost/${{ secrets.PACKAGE_NAME }}:v$version quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:latest
-        echo '⌛ Wait 30 sec till image will be updated in quay.io'
-        sleep 30
+
+  quay_upload:
+    name: quay_upload
+    needs: [ test, pypi_upload, pypi_validate]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: ⌛ Upload 🐋 to quay.io
+        run: |
+          version=$(python3 setup.py --version)
+          sudo podman build --build-arg VERSION=$version --layers=false -t ${{ secrets.PACKAGE_NAME }}:v$version .
+          sudo podman login quay.io -u ${{ secrets.QAUYIO_ROBOT_USER }} -p ${{ secrets.QAUYIO_ROBOT_TOKEN }}
+          sudo podman push localhost/${{ secrets.PACKAGE_NAME }}:v$version quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:v$version
+          sudo podman push localhost/${{ secrets.PACKAGE_NAME }}:v$version quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:latest
+          echo '⌛ Wait 30 sec till image will be updated in quay.io'
+          sleep 30
 
   bump_version:
     name: bump_version
-    needs: [test, build]
+    needs: [test, pypi_upload, pypi_validate, quay_upload]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -228,7 +255,7 @@ jobs:
 
   e2e:
     name: e2e
-    needs: [test, build, bump_version]
+    needs: [test, pypi_upload, pypi_validate, quay_upload, bump_version]
     runs-on: ubuntu-latest
     strategy:
        # run one job every time
