@@ -46,10 +46,7 @@ class UperfPod(BenchmarkOperatorWorkloadsOperations):
             # uperf server
             server_name = self._environment_variables_dict.get('pin_node1', '')
             if server_name:
-                # uperf server name is limited up to 27 chars
-                if len(server_name) > 27:
-                    server_name = server_name[:28]
-                label = f'app=uperf-bench-server-{server_name}-0'
+                label = f'app=uperf-bench-server-0'
                 self._oc.wait_for_initialized(label=label, workload=self.__workload_name)
                 self._oc.wait_for_ready(label=label, workload=self.__workload_name)
             # in case that no pin node
