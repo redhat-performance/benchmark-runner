@@ -55,7 +55,7 @@ jobs:
         mkdir -p "$RUNNER_PATH/.kube/"
         echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
         echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
-    - name: ⚙ Copy config to provision
+    - name: ⚙ Remove images and copy config to provision
       env:
         CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
