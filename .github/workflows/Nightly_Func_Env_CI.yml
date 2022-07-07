@@ -2,19 +2,19 @@
 # This is a nightly CI Pipeline against Functional environment
 name: Deploy Func Env Nightly CI
 
-#on:
-#  # Run on Nightly
-#  schedule:
-#    - cron: '0 4 * * 0-5' # run at 4 AM UTC/ 0 AM EDT
-#  # Run on weekly after IPI and operator completed
-#  workflow_run:
-#    workflows: ["Deploy Operator FUNC Env Weekly CI"]
-#    types:
-#      - completed
-
 on:
-  push:
-    branches: [ main ]
+  # Run on Nightly
+  schedule:
+    - cron: '0 4 * * 0-5' # run at 4 AM UTC/ 0 AM EDT
+  # Run on weekly after IPI and operator completed
+  workflow_run:
+    workflows: ["Deploy Operator FUNC Env Weekly CI"]
+    types:
+      - completed
+
+#on:
+#  push:
+#    branches: [ main ]
 
 # Ensures that only one deploy task per branch/environment will run at a time.
 concurrency:
@@ -59,7 +59,7 @@ jobs:
         mkdir -p "$RUNNER_PATH/.kube/"
         echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
         echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
-    - name: ⚙ Remove benchmark-runner images on provistion and copy config to provision 
+    - name: ⚙ Remove images on provistion and copy config to provision 
       env:
         CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
