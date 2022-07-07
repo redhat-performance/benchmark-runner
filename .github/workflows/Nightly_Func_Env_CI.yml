@@ -2,19 +2,19 @@
 # This is a nightly CI Pipeline against Functional environment
 name: Deploy Func Env Nightly CI
 
-on:
-  # Run on Nightly
-  schedule:
-    - cron: '0 4 * * 0-5' # run at 4 AM UTC/ 0 AM EDT
-  # Run on weekly after IPI and operator completed
-  workflow_run:
-    workflows: ["Deploy Operator FUNC Env Weekly CI"]
-    types:
-      - completed
-
 #on:
-#  push:
-#    branches: [ main ]
+#  # Run on Nightly
+#  schedule:
+#    - cron: '0 4 * * 0-5' # run at 4 AM UTC/ 0 AM EDT
+#  # Run on weekly after IPI and operator completed
+#  workflow_run:
+#    workflows: ["Deploy Operator FUNC Env Weekly CI"]
+#    types:
+#      - completed
+
+on:
+  push:
+    branches: [ main ]
 
 # Ensures that only one deploy task per branch/environment will run at a time.
 concurrency:
@@ -23,19 +23,58 @@ concurrency:
 
 jobs:
   initialize_nightly:
-      name: initialize nightly
-      runs-on: ubuntu-latest
-      outputs:
-       start_time_output: ${{ steps.nightly_start_step.outputs.start_time }}
-      steps:
-      - uses: actions/checkout@v2
-      - id: nightly_start_step
-        run: echo "::set-output name=start_time::$(printf '%(%s)T' -1)"
-      - name: ⌛ Upload 🐋 to quay.io - latest benchmark-operator
-        run: |
-          sudo podman build --build-arg VERSION=latest --layers=false -t ${{ secrets.PACKAGE_NAME }}:latest .
-          sudo podman login quay.io -u ${{ secrets.QAUYIO_ROBOT_USER }} -p ${{ secrets.QAUYIO_ROBOT_TOKEN }}
-          sudo podman push localhost/${{ secrets.PACKAGE_NAME }}:latest quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:latest
+    name: initialize func nightly
+    runs-on: ubuntu-latest
+    outputs:
+      start_time_output: ${{ steps.nightly_start_step.outputs.start_time }}
+    steps:
+    - uses: actions/checkout@v2
+    - id: nightly_start_step
+      run: echo "::set-output name=start_time::$(printf '%(%s)T' -1)"
+    - name: ⚙️ Set SSH key
+      env:
+        FUNC_PROVISION_PRIVATE_KEY: ${{ secrets.FUNC_PROVISION_PRIVATE_KEY }}
+        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+        FUNC_PROVISION_IP: ${{ secrets.FUNC_PROVISION_IP }}
+        FUNC_PROVISION_USER: ${{ secrets.FUNC_PROVISION_USER }}
+      run: |
+        mkdir -p "$RUNNER_PATH/.ssh/"
+        echo "$FUNC_PROVISION_PRIVATE_KEY" > $RUNNER_PATH/private_key.txt
+        sudo chmod 600 $RUNNER_PATH/private_key.txt
+        echo "FUNC_PROVISION_PRIVATE_KEY_PATH=$RUNNER_PATH/private_key.txt" >> "$GITHUB_ENV"
+        cat >> "$RUNNER_PATH/.ssh/config" <<END
+        Host provision
+          HostName $FUNC_PROVISION_IP
+          User $FUNC_PROVISION_USER
+          IdentityFile $RUNNER_PATH/private_key.txt
+          StrictHostKeyChecking no
+          ServerAliveInterval 30
+          ServerAliveCountMax 5
+        END
+    - name: ⚙ Set Kubeconfig
+      env:
+        KUBECONFIG: ${{ secrets.FUNC_KUBECONFIG }}
+        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+      run: |
+        mkdir -p "$RUNNER_PATH/.kube/"
+        echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
+        echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
+    - name: ⚙ Remove benchmark-runner images on provistion and copy config to provision 
+      env:
+        CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
+        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+      run: |
+        echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Remove image on provision  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
+        echo "if [[ \"\$(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)\" != \"\" ]]; then sudo podman rmi -f \$(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null); fi" > "$RUNNER_PATH/remove_image.sh"
+        scp -r "$RUNNER_PATH/remove_image.sh" provision:"/tmp/remove_image.sh"
+        ssh -t provision "chmod +x /tmp/remove_image.sh;/tmp/./remove_image.sh;rm -f /tmp/remove_image.sh"
+        echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Copy config to provision  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
+        scp -r "$RUNNER_PATH/.kube/config" provision:"$CONTAINER_KUBECONFIG_PATH"
+    - name: ⌛ Upload 🐋 to quay.io - latest benchmark-operator
+      run: |
+        sudo podman build --build-arg VERSION=latest --layers=false -t ${{ secrets.PACKAGE_NAME }}:latest .
+        sudo podman login quay.io -u ${{ secrets.QAUYIO_ROBOT_USER }} -p ${{ secrets.QAUYIO_ROBOT_TOKEN }}
+        sudo podman push localhost/${{ secrets.PACKAGE_NAME }}:latest quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:latest
   
   workload:
     name: workload
