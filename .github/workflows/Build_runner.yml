@@ -3,15 +3,15 @@
 # This is Test CI Pipeline against Functional environment when merging to main
 name: Build Runner
 
-#on:
-#  workflow_run:
-#    workflows: ["AAA"]
-#    types:
-#      - completed
-
 on:
-  push:
-    branches: [ main ]
+ workflow_run:
+   workflows: ["AAA"]
+   types:
+     - completed
+
+# on:
+#   push:
+#     branches: [ main ]
 
 # Ensures that only one deploy task per branch/environment will run at a time.
 concurrency:
@@ -29,41 +29,41 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: 3.9
-#     - name: 🔨 Build and publish distribution 📦 to PyPI
-#       env:
-#         TWINE_USERNAME: __token__
-#         TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-#       run: |
-#         pip install setuptools wheel twine
-#         python setup.py sdist bdist_wheel
-#         twine upload dist/*
-#         echo '⌛ Wait till package will be updated in PyPI'
-#         # Verfiy and wait till latest benchamrk runner version will be updated in Pypi (timeout 900 seconds)
-#         timeout=900
-#         sleep_time=30
-#         expected_version=$(python3 setup.py --version)
-#         pip --no-cache-dir install benchmark-runner --upgrade
-#         build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
-#         actual_version="$(cut -d'=' -f2 <<<"$build")"
-#         current_wait_time=0
-#         while [[ $current_wait_time < $timeout ]]; do
-#             if [[ "$expected_version" = "$actual_version" ]]; then
-#               echo 'benchmark runner version: ' $expected_version 'was updated in Pypi'
-#               break;
-#             else
-#               # sleep for x seconds
-#               echo 'wait' "$((current_wait_time+sleep_time))" 'seconds'
-#               sleep $sleep_time
-#               current_wait_time="$((current_wait_time+sleep_time))"
-#               pip --no-cache-dir install benchmark-runner --upgrade
-#               build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
-#               actual_version="$(cut -d'=' -f2 <<<"$build")"
-#               if (( $current_wait_time == $timeout )); then
-#               echo "Benchamrk runner lastet version did not update in Pypi after 900 seconds - raise failure"
-#               exit 1
-#               fi
-#             fi
-#         done
+    - name: 🔨 Build and publish distribution 📦 to PyPI
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+      run: |
+        pip install setuptools wheel twine
+        python setup.py sdist bdist_wheel
+        twine upload dist/*
+        echo '⌛ Wait till package will be updated in PyPI'
+        # Verfiy and wait till latest benchamrk runner version will be updated in Pypi (timeout 900 seconds)
+        timeout=900
+        sleep_time=30
+        expected_version=$(python3 setup.py --version)
+        pip --no-cache-dir install benchmark-runner --upgrade
+        build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
+        actual_version="$(cut -d'=' -f2 <<<"$build")"
+        current_wait_time=0
+        while [[ $current_wait_time < $timeout ]]; do
+            if [[ "$expected_version" = "$actual_version" ]]; then
+              echo 'benchmark runner version: ' $expected_version 'was updated in Pypi'
+              break;
+            else
+              # sleep for x seconds
+              echo 'wait' "$((current_wait_time+sleep_time))" 'seconds'
+              sleep $sleep_time
+              current_wait_time="$((current_wait_time+sleep_time))"
+              pip --no-cache-dir install benchmark-runner --upgrade
+              build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
+              actual_version="$(cut -d'=' -f2 <<<"$build")"
+              if (( $current_wait_time == $timeout )); then
+              echo "Benchamrk runner lastet version did not update in Pypi after 900 seconds - raise failure"
+              exit 1
+              fi
+            fi
+        done
     - name: ⌛ Upload 🐋 to quay.io
       run: |
         version=$(python3 setup.py --version)
