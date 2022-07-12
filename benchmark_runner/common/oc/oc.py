@@ -598,10 +598,10 @@ class OC(SSH):
             if 'met' in result.decode("utf-8"):
                 return True
         except Exception as err:
-            if 'pod' in workload:
-                raise PodNotReadyTimeout(workload=workload)
-            else:
+            if 'vm' in workload:
                 raise VMNotReadyTimeout(workload=workload)
+            else:
+                raise PodNotReadyTimeout(workload=workload)
 
     @typechecked
     @logger_time_stamp

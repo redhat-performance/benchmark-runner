@@ -47,6 +47,8 @@ spec:
           - name: mssql-persistent-storage
             mountPath: /var/opt/mssql
             readOnly: false
+        securityContext:
+          allowPrivilegeEscalation: true
       volumes:
         - name: mssql-persistent-storage
           persistentVolumeClaim:
