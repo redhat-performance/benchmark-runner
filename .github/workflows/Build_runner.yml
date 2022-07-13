@@ -22,7 +22,7 @@ jobs:
 
   build:
     name: build
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.10
@@ -66,6 +66,8 @@ jobs:
 #         done
     - name: ⌛ Upload 🐋 to quay.io
       run: |
+        sudo apt-get -y update
+        sudo apt-get -y install podman
         pip install wheel
         version=$(python3 setup.py --version)
         sudo podman build --build-arg VERSION=$version --layers=false -t ${{ secrets.PACKAGE_NAME }}:latest .
