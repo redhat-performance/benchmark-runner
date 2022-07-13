@@ -4,7 +4,7 @@ FROM quay.io/centos/centos:stream8
 ARG VERSION
 
 # Update and use not only best candidate packages (avoiding failures)
-#RUN dnf update -y --nobest
+RUN dnf update -y --nobest
 
 # install make
 Run dnf group install -y "Development Tools"
