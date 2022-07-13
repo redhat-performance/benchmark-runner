@@ -22,7 +22,7 @@ jobs:
 
   build:
     name: build
-    runs-on: ubuntu-latest
+    runs-on: mac-latest
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python 3.9
@@ -66,6 +66,10 @@ jobs:
 #         done
     - name: ⌛ Upload 🐋 to quay.io
       run: |
+        brew install podman
+        podman machine init
+        podman machine start
+        podman info
         version=$(python3 setup.py --version)
         sudo podman build --build-arg VERSION=$version --layers=false -t ${{ secrets.PACKAGE_NAME }}:latest .
         sudo podman login quay.io -u ${{ secrets.QAUYIO_ROBOT_USER }} -p ${{ secrets.QAUYIO_ROBOT_TOKEN }}
