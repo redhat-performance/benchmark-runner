@@ -28,7 +28,7 @@ jobs:
     - name: Set up Python 3.9
       uses: actions/setup-python@v2
       with:
-        python-version: 3.9
+        python-version: 3.10
 #     - name: 🔨 Build and publish distribution 📦 to PyPI
 #       env:
 #         TWINE_USERNAME: __token__
@@ -66,8 +66,9 @@ jobs:
 #         done
     - name: ⌛ Upload 🐋 to quay.io
       run: |
+        pip install wheel
         version=$(python3 setup.py --version)
-        sudo docker build --build-arg VERSION=$version --layers=false -t ${{ secrets.PACKAGE_NAME }}:latest .
+        sudo podman build --build-arg VERSION=$version --layers=false -t ${{ secrets.PACKAGE_NAME }}:latest .
         sudo podman login quay.io -u ${{ secrets.QAUYIO_ROBOT_USER }} -p ${{ secrets.QAUYIO_ROBOT_TOKEN }}
         #sudo podman push localhost/${{ secrets.PACKAGE_NAME }}:v$version quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:v$version
         sudo podman push localhost/${{ secrets.PACKAGE_NAME }}:latest quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:latest
