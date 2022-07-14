@@ -8,7 +8,7 @@ jobs:
     steps:
       - name: Create container
         run: |
-          cat <<EOF | sudo XDG_RUNTIME_DIR= podman build -t test-container -f - .
+          cat <<EOF | sudo -E XDG_RUNTIME_DIR= podman build -t test-container -f - .
           FROM fedora:36
           RUN echo test
           EOF
