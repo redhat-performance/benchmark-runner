@@ -1,0 +1,14 @@
+name: Podman test
+on:
+  workflow_dispatch:
+
+jobs:
+  a:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Create container
+        run: |
+          cat <<EOF | sudo su -c 'sudo podman XDG_RUNTIME_DIR= build -t test-container -f - .'
+          FROM fedora:36
+          RUN echo test
+          EOF
