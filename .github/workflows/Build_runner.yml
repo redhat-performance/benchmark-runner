@@ -3,14 +3,15 @@
 # This is Test CI Pipeline against Functional environment when merging to main
 name: Build Runner
 
-# on:
-#   workflow_run:
-#     workflows: ["AAA"]
-#     types:
-#       - completed
+#on:
+#  workflow_run:
+#    workflows: ["AAA"]
+#    types:
+#      - completed
 
 on:
-  workflow_dispatch:
+  push:
+    branches: [ main ]
 
 # Ensures that only one deploy task per branch/environment will run at a time.
 concurrency:
@@ -65,11 +66,9 @@ jobs:
 #         done
     - name: ⌛ Upload 🐋 to quay.io
       run: |
-        #version=$(python3 setup.py --version)
-        sudo docker build -t ${{ secrets.PACKAGE_NAME }}:latest .
+        sudo docker build --build-arg VERSION=latest -t ${{ secrets.PACKAGE_NAME }}:latest .
         sudo podman login quay.io -u ${{ secrets.QAUYIO_ROBOT_USER }} -p ${{ secrets.QAUYIO_ROBOT_TOKEN }}
-        #sudo podman push localhost/${{ secrets.PACKAGE_NAME }}:v$version quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:v$version
-        sudo podman push localhost/${{ secrets.PACKAGE_NAME }}:latest quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:latest
+        sudo podman push ${{ secrets.PACKAGE_NAME }}:latest quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:latest
         echo '⌛ Wait 30 sec till image will be updated in quay.io'
         sleep 30
 
