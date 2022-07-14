@@ -66,9 +66,9 @@ jobs:
 #         done
     - name: ⌛ Upload 🐋 to quay.io
       run: |
-        sudo docker build --build-arg VERSION=latest -t ${{ secrets.PACKAGE_NAME }}:latest .
-        sudo podman login quay.io -u ${{ secrets.QAUYIO_ROBOT_USER }} -p ${{ secrets.QAUYIO_ROBOT_TOKEN }}
-        sudo podman push ${{ secrets.PACKAGE_NAME }}:latest quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:latest
+        sudo docker build --build-arg VERSION=latest -t quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:latest .
+        sudo docker login quay.io -u ${{ secrets.QAUYIO_ROBOT_USER }} -p ${{ secrets.QAUYIO_ROBOT_TOKEN }}
+        sudo docker push quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:latest
         echo '⌛ Wait 30 sec till image will be updated in quay.io'
         sleep 30
 
