@@ -97,7 +97,7 @@ class ClusterBusterWorkloads(WorkloadsOperations):
         This method run ClusterBuster workload
         :return:
         """
-        self.__ssh.run(cmd=f'{self.__clusterbuster_path} --run_type={self._run_type} --client-pin-node={self._pin_node1} --server-pin-node={self._pin_node2} --sync-pin-node={self._pin_node2} --basename={self.__namespace} --artifactdir={self.__artifactdir} --analyze={self.__result_report} > {self.__clusterbuster_log}')
+        self.__ssh.run(cmd=f'{self.__clusterbuster_path} --run_type={self._run_type} --client-pin-node={self._pin_node1} --server-pin-node={self._pin_node2} --sync-pin-node={self._pin_node2} --basename={self.__namespace} --artifactdir={self.__artifactdir} --analyze={self.__result_report} > {self.__clusterbuster_log} 2>&1')
 
     @logger_time_stamp
     def run(self):
