@@ -78,41 +78,41 @@ jobs:
         sleep 30
 
 
-  bump_version:
-    name: bump_version
-    needs: [build]
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python 3.9
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.9
-    - name: ⚙ Set START CI TIME
-      run: echo "START_CI=${{ needs.test.outputs.start_time_output }}" >> "$GITHUB_ENV"
-    - name: Install latest benchmark-runner
-      run: |
-        python -m pip install --upgrade pip
-        pip install benchmark-runner
-    - name: ⚙️ Set Kubeconfig
-      env:
-        KUBECONFIG: ${{ secrets.FUNC_KUBECONFIG }}
-        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-      run: |
-          mkdir -p "$RUNNER_PATH/.kube/"
-          echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
-          echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
-    - name: 🎁 Bump Version
-      run: |
-        version=$(python3 setup.py --version)
-        git checkout main
-        pip install bumpversion
-        git config --global user.email ${{ secrets.EMAIL }}
-        git config --global user.name  ${{ secrets.USER_NAME }}
-        git config pull.rebase false  # merge (the default strategy)
-        bumpversion patch
-        # GITHUB_REPOSITORY already taken => GIT_REPOSITORY
-        git commit .bumpversion.cfg setup.py -m "bump version to exist version v$version"
-        git pull https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} main
-        git push https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} main
-        git push https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} --tag
+#   bump_version:
+#     name: bump_version
+#     needs: [build]
+#     runs-on: ubuntu-latest
+#     steps:
+#     - uses: actions/checkout@v2
+#     - name: Set up Python 3.9
+#       uses: actions/setup-python@v2
+#       with:
+#         python-version: 3.9
+#     - name: ⚙ Set START CI TIME
+#       run: echo "START_CI=${{ needs.test.outputs.start_time_output }}" >> "$GITHUB_ENV"
+#     - name: Install latest benchmark-runner
+#       run: |
+#         python -m pip install --upgrade pip
+#         pip install benchmark-runner
+#     - name: ⚙️ Set Kubeconfig
+#       env:
+#         KUBECONFIG: ${{ secrets.FUNC_KUBECONFIG }}
+#         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+#       run: |
+#           mkdir -p "$RUNNER_PATH/.kube/"
+#           echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
+#           echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
+#     - name: 🎁 Bump Version
+#       run: |
+#         version=$(python3 setup.py --version)
+#         git checkout main
+#         pip install bumpversion
+#         git config --global user.email ${{ secrets.EMAIL }}
+#         git config --global user.name  ${{ secrets.USER_NAME }}
+#         git config pull.rebase false  # merge (the default strategy)
+#         bumpversion patch
+#         # GITHUB_REPOSITORY already taken => GIT_REPOSITORY
+#         git commit .bumpversion.cfg setup.py -m "bump version to exist version v$version"
+#         git pull https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} main
+#         git push https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} main
+#         git push https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} --tag
