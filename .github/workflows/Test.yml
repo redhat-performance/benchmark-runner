@@ -4,7 +4,7 @@ on:
 
 jobs:
   bundle:
-    runs-on: mac-latest
+    runs-on: macos-latest
     steps:
       - name: Create container
         run: |
