@@ -66,7 +66,7 @@ jobs:
     - name: ⌛ Upload 🐋 to quay.io
       run: |
         #version=$(python3 setup.py --version)
-        sudo docker build --layers=false -t ${{ secrets.PACKAGE_NAME }}:latest .
+        sudo docker build ${{ secrets.PACKAGE_NAME }}:latest .
         sudo docker login quay.io -u ${{ secrets.QAUYIO_ROBOT_USER }} -p ${{ secrets.QAUYIO_ROBOT_TOKEN }}
         #sudo podman push localhost/${{ secrets.PACKAGE_NAME }}:v$version quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:v$version
         sudo docker push localhost/${{ secrets.PACKAGE_NAME }}:latest quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:latest
