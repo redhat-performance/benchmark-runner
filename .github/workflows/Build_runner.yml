@@ -17,7 +17,7 @@ on:
 concurrency:
   group: functional-environment
   cancel-in-progress: false
-  
+
 jobs:
   build:
     name: build
