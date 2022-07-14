@@ -161,13 +161,14 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
-      - name: ⌛ Upload 🐋 to quay.io
+      - name: ⌛ Build and Upload 🐋 to quay.io
         run: |
           version=$(python3 setup.py --version)
-          sudo podman build --build-arg VERSION=$version --layers=false -t ${{ secrets.PACKAGE_NAME }}:v$version .
-          sudo podman login quay.io -u ${{ secrets.QAUYIO_ROBOT_USER }} -p ${{ secrets.QAUYIO_ROBOT_TOKEN }}
-          sudo podman push localhost/${{ secrets.PACKAGE_NAME }}:v$version quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:v$version
-          sudo podman push localhost/${{ secrets.PACKAGE_NAME }}:v$version quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:latest
+          sudo docker build --build-arg VERSION=$version -t quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:v$version .
+          sudo docker build --build-arg VERSION=latest -t quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:latest .
+          sudo docker login quay.io -u ${{ secrets.QAUYIO_ROBOT_USER }} -p ${{ secrets.QAUYIO_ROBOT_TOKEN }}
+          sudo docker push quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:v$version
+          sudo docker push quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:latest
           echo '⌛ Wait 30 sec till image will be updated in quay.io'
           sleep 30
 

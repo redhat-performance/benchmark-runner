@@ -70,11 +70,11 @@ jobs:
         ssh -t provision "chmod +x /tmp/remove_image.sh;/tmp/./remove_image.sh;rm -f /tmp/remove_image.sh"
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Copy config to provision  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
         scp -r "$RUNNER_PATH/.kube/config" provision:"$CONTAINER_KUBECONFIG_PATH"
-    - name: ⌛ Upload 🐋 to quay.io - latest benchmark-operator
+    - name: ⌛ Build & Upload 🐋 to quay.io - latest benchmark-operator
       run: |
-        sudo podman build --build-arg VERSION=latest --layers=false -t ${{ secrets.PACKAGE_NAME }}:latest .
-        sudo podman login quay.io -u ${{ secrets.QAUYIO_ROBOT_USER }} -p ${{ secrets.QAUYIO_ROBOT_TOKEN }}
-        sudo podman push localhost/${{ secrets.PACKAGE_NAME }}:latest quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:latest
+        sudo docker build --build-arg VERSION=latest -t quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:latest .
+        sudo docker login quay.io -u ${{ secrets.QAUYIO_ROBOT_USER }} -p ${{ secrets.QAUYIO_ROBOT_TOKEN }}
+        sudo docker push quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:latest
   
   workload:
     name: workload
