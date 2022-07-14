@@ -1,0 +1,14 @@
+name: Podman test
+on:
+  workflow_dispatch:
+
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create container
+        run: |
+          cat <<EOF | sudo podman build -t test-container -f - .
+          FROM fedora:36
+          RUN echo test
+          EOF
