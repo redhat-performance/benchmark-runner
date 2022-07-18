@@ -55,7 +55,7 @@ RUN git clone https://github.com/cloud-bulldozer/benchmark-operator /tmp/benchma
 
 # download clusterbuster to /tmp default path && install cluster-buster dependency
 RUN git clone -b v1.0.5-kata-ci https://github.com/RobertKrawitz/OpenShift4-tools /tmp/OpenShift4-tools \
-    && dnf install -y hostname bc
+    && dnf install -y hostname bc procps-ng
 
 # Add main
 COPY benchmark_runner/main/main.py /benchmark_runner/main/main.py
