@@ -67,7 +67,7 @@ class BenchmarkOperatorWorkloadsOperations:
         # set oc login
         self._oc = self.set_login(kubeadmin_password=self._kubeadmin_password)
         # PrometheusSnapshot
-        if self._enable_prometheus_snapshot:
+        if self._enable_prometheus_snapshot == 'True':
             self._snapshot = PrometheusSnapshot(oc=self._oc, artifacts_path=self._run_artifacts_path, verbose=True)
 
     def set_login(self, kubeadmin_password: str = ''):
@@ -376,10 +376,25 @@ class BenchmarkOperatorWorkloadsOperations:
         return tar_run_artifacts_path
 
     @logger_time_stamp
+    def delete_local_artifacts(self):
+        """
+        This method delete local artifacts
+        :return:
+        """
+        workload = self._workload_name
+        tar_run_artifacts_path = self.__make_run_artifacts_tarfile(workload)
+        # remove local run artifacts workload folder
+        # verify that its not empty path
+        if len(self._run_artifacts_path) > 3 and self._run_artifacts_path != '/' and self._run_artifacts_path and tar_run_artifacts_path and os.path.isfile(tar_run_artifacts_path) and self._save_artifacts_local == 'False':
+            # remove run_artifacts_path
+            shutil.rmtree(path=self._run_artifacts_path)
+            # remove tar.gz file
+            os.remove(path=tar_run_artifacts_path)
+
+    @logger_time_stamp
     def upload_run_artifacts_to_s3(self):
         """
         This method uploads log to s3
-        :param workload:
         :return:
         """
         workload = self._workload_name
@@ -393,13 +408,6 @@ class BenchmarkOperatorWorkloadsOperations:
                                  bucket=self._environment_variables_dict.get('bucket', ''),
                                  key=run_artifacts_hierarchy,
                                  upload_file=upload_file)
-        # remove local run artifacts workload folder
-        # verify that its not empty path
-        if len(self._run_artifacts_path) > 3 and self._run_artifacts_path != '/' and self._run_artifacts_path and tar_run_artifacts_path and os.path.isfile(tar_run_artifacts_path) and not self._save_artifacts_local:
-            # remove run_artifacts_path
-            shutil.rmtree(path=self._run_artifacts_path)
-            # remove tar.gz file
-            os.remove(path=tar_run_artifacts_path)
 
     @logger_time_stamp
     def start_prometheus(self):
@@ -407,7 +415,7 @@ class BenchmarkOperatorWorkloadsOperations:
         This method start collection of Prometheus snapshot
         :return:
         """
-        if self._enable_prometheus_snapshot:
+        if self._enable_prometheus_snapshot == 'True':
             try:
                 self._snapshot.prepare_for_snapshot()
             except PrometheusSnapshotError as err:
@@ -421,7 +429,7 @@ class BenchmarkOperatorWorkloadsOperations:
         This method retrieve the Prometheus snapshot
         :return:
         """
-        if self._enable_prometheus_snapshot:
+        if self._enable_prometheus_snapshot == 'True':
             try:
                 self._snapshot.retrieve_snapshot()
             except PrometheusSnapshotError as err:
@@ -470,7 +478,7 @@ class BenchmarkOperatorWorkloadsOperations:
         if self._odf_pvc == 'True':
             self.odf_pvc_verification()
         self._template.generate_yamls()
-        if self._enable_prometheus_snapshot:
+        if self._enable_prometheus_snapshot == 'True':
             self.start_prometheus()
 
     def finalize_workload(self):
@@ -478,8 +486,10 @@ class BenchmarkOperatorWorkloadsOperations:
         This method includes all the finalization of workload
         :return:
         """
-        if self._enable_prometheus_snapshot:
+        if self._enable_prometheus_snapshot == 'True':
             self.end_prometheus()
         if self._endpoint_url:
             self.upload_run_artifacts_to_s3()
+        if self._save_artifacts_local == 'False':
+            self.delete_local_artifacts()
         self.delete_all()
