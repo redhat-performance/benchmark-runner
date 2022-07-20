@@ -37,7 +37,7 @@ def main():
     azure_cluster_start = environment_variables_dict.get('azure_cluster_start', '')
     ci_status = environment_variables_dict.get('ci_status', '')
     install_ocp_version = environment_variables_dict.get('install_ocp_version', '')
-    install_ocp_resources = environment_variables_dict.get('install_ocp_resources', '')
+    install_ocp_resources = environment_variables_dict.get('install_ocp_resources', False)
     run_type = environment_variables_dict.get('run_type', '')
 
     is_benchmark_operator_workload = 'benchmark-operator' in (environment_variables.get_workload_namespace(workload), environment_variables_dict.get("runner_type"))
@@ -167,7 +167,7 @@ def main():
         install_step = environment_variables_dict.get('install_step', '')
         install_ocp(step=install_step)
     # install_ocp_resource
-    elif install_ocp_resources == 'True':
+    elif install_ocp_resources:
         install_resources()
     elif ci_status == 'pass' or ci_status == 'failed':
         update_ci_status()

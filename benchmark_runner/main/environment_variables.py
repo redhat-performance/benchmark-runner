@@ -3,12 +3,38 @@ import os
 import time
 import datetime
 from uuid import uuid4
+from benchmark_runner.main.environment_variables_exceptions import ParseFailed
 
 
 class EnvironmentVariables:
     """
     This class manage environment variable parameters
     """
+    @staticmethod
+    def toBool(arg, defval: bool = None):
+        if isinstance(arg, bool):
+            return arg
+        if isinstance(arg, (int, float)):
+            return arg != 0
+        if isinstance(arg, str):
+            arg = arg.lower()
+            if arg == 'true' or arg == 'yes':
+                return True
+            elif arg == 'false' or arg == 'no':
+                return False
+            try:
+                arg1 = int(arg)
+                return arg1 != 0
+            except Exception:
+                pass
+        if defval is not None:
+            return defval
+        raise ParseFailed(f'Cannot parse {arg} as a boolean value')
+
+    @staticmethod
+    def getBooleanFromEnvironment(var: str, defval: bool):
+        return EnvironmentVariables.toBool(os.environ.get(var), defval)
+
     def __init__(self):
 
         self._environment_variables_dict = {}
@@ -59,7 +85,7 @@ class EnvironmentVariables:
 
         # Workaround for Kata CPU offline problem in 4.9/4.10
         # Set to True to
-        self._environment_variables_dict['kata_cpuoffline_workaround'] = os.environ.get('KATA_CPUOFFLINE_WORKAROUND', '')
+        self._environment_variables_dict['kata_cpuoffline_workaround'] = EnvironmentVariables.getBooleanFromEnvironment('KATA_CPUOFFLINE_WORKAROUND', False)
 
         # Scale in each node
         self._environment_variables_dict['scale'] = os.environ.get('SCALE', '')
@@ -97,16 +123,14 @@ class EnvironmentVariables:
             self._environment_variables_dict['namespace'] = 'benchmark-operator'
 
         # run workload with odf pvc True/False. True=ODF, False=Ephemeral
-        self._environment_variables_dict['odf_pvc'] = os.environ.get('ODF_PVC', 'True')
+        self._environment_variables_dict['odf_pvc'] = EnvironmentVariables.getBooleanFromEnvironment('ODF_PVC', True)
         # Workloads that required ODF
         self._environment_variables_dict['workloads_odf_pvc'] = ['vdbench', 'hammerdb']
         # This parameter get from Test_CI.yml file
         self._environment_variables_dict['build_version'] = os.environ.get('BUILD_VERSION', '1.0.0')
         # collect system metrics True/False - required by benchmark-operator
-        if self._environment_variables_dict['elasticsearch']:
-            self._environment_variables_dict['system_metrics'] = os.environ.get('SYSTEM_METRICS', 'True')
-        else:
-            self._environment_variables_dict['system_metrics'] = os.environ.get('SYSTEM_METRICS', 'False')
+        self._environment_variables_dict['system_metrics'] = EnvironmentVariables.getBooleanFromEnvironment('SYSTEM_METRICS',
+                                                                                            bool(self.environment_variables_dict['elasticsearch']))
         # CI status update once at the end of CI pass/failed
         self._environment_variables_dict['ci_status'] = os.environ.get('CI_STATUS', '')
         # Valid run types
@@ -114,7 +138,7 @@ class EnvironmentVariables:
         # Run type test_ci/func_ci/perf_ci, default test_ci same environment as func_ci
         self._environment_variables_dict['run_type'] = os.environ.get('RUN_TYPE', 'test_ci')
         self._environment_variables_dict['runner_type'] = os.environ.get('RUNNER_TYPE')
-        self._environment_variables_dict['config_from_args'] = os.environ.get('CONFIG_FROM_ARGS')
+        self._environment_variables_dict['config_from_args'] = EnvironmentVariables.getBooleanFromEnvironment('CONFIG_FROM_ARGS', False)
         self._environment_variables_dict['template_in_workload_dir'] = os.environ.get('TEMPLATE_IN_WORKLOAD_DIR')
 
         # Run uuid
@@ -130,9 +154,9 @@ class EnvironmentVariables:
             self._environment_variables_dict['run_artifacts_path'] = os.path.join(self._environment_variables_dict['run_artifacts'], f"{self._environment_variables_dict['workload'].replace('_', '-')}-{self._environment_variables_dict['time_stamp_format']}")
 
         # True/False: default False
-        self._environment_variables_dict['save_artifacts_local'] = os.environ.get('SAVE_ARTIFACTS_LOCAL', 'False')
+        self._environment_variables_dict['save_artifacts_local'] = EnvironmentVariables.getBooleanFromEnvironment('SAVE_ARTIFACTS_LOCAL', False)
         # True/False: default False
-        self._environment_variables_dict['enable_prometheus_snapshot'] = os.environ.get('ENABLE_PROMETHEUS_SNAPSHOT', 'False')
+        self._environment_variables_dict['enable_prometheus_snapshot'] = EnvironmentVariables.getBooleanFromEnvironment('ENABLE_PROMETHEUS_SNAPSHOT', False)
         # end dynamic parameters - configure for local run
         ##################################################################################################
 
@@ -170,8 +194,8 @@ class EnvironmentVariables:
         self._environment_variables_dict['github_repository_short'] = os.environ.get('GITHUB_REPOSITORY_SHORT', '')
 
         # Parameters below related to 'install_resource()'
-        # MANDATORY for OCP resource install: 'True' for install resources
-        self._environment_variables_dict['install_ocp_resources'] = os.environ.get('INSTALL_OCP_RESOURCES', '')
+        # MANDATORY for OCP resource install: True for install resources
+        self._environment_variables_dict['install_ocp_resources'] = EnvironmentVariables.getBooleanFromEnvironment('INSTALL_OCP_RESOURCES', False)
         # cnv version
         self._environment_variables_dict['cnv_version'] = os.environ.get('CNV_VERSION', '')
         # QUAY_USERNAME for nightly build
@@ -228,10 +252,7 @@ class EnvironmentVariables:
         self._environment_variables_dict['benchmark_wrapper_id'] = os.environ.get('BENCHMARK_WRAPPER_ID', '')
 
         # Node Selector functionality
-        if self._environment_variables_dict['pin_node1']:
-            self._environment_variables_dict['pin'] = 'true'
-        else:
-            self._environment_variables_dict['pin'] = 'false'
+        self._environment_variables_dict['pin'] = bool(self._environment_variables_dict['pin_node1'])
         # if pin_node2 not exist, get pin_node1 value
         if self._environment_variables_dict['pin_node1'] and not self._environment_variables_dict['pin_node2']:
             self._environment_variables_dict['pin_node2'] = self._environment_variables_dict['pin_node1']
@@ -248,7 +269,7 @@ class EnvironmentVariables:
         # OpenShift or kubernetes support, OpenShift: oc, kubectl || kubernetes: kubectl
         if self._environment_variables_dict['cluster'] == 'kubernetes':
             self._environment_variables_dict['cli'] = 'kubectl'
-            self._environment_variables_dict['odf_pvc'] = 'False'
+            self._environment_variables_dict['odf_pvc'] = False
             self._environment_variables_dict['enable_prometheus_snapshot'] = None
         else:
             self._environment_variables_dict['cli'] = os.environ.get('CLI', 'oc')

@@ -274,7 +274,7 @@ class OC(SSH):
         if major_version <= 4 and minor_version <= 10:
             prom_token = self.run(f"{self.__cli} -n openshift-monitoring sa get-token prometheus-k8s")
         else:
-            prom_token = self.run(f"{self.__cli} sa new-token -n openshift-monitoring prometheus-k8s")
+            prom_token = self.run(f"{self.__cli} sa new-token -n openshift-monitoring prometheus-k8s 2>/dev/null")
         return prom_token
 
     @logger_time_stamp
