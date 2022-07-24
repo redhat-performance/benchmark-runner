@@ -1,8 +1,8 @@
 ---
-name: Feature request
+name: 🛑 Feature request in benchmark-runner
 about: Suggest an idea for this project
 title: ''
-labels: ''
+labels: enhancement
 assignees: ''
 
 ---
