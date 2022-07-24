@@ -1,5 +1,5 @@
 ---
-name: 🛑 Feature request in benchmark-runner
+name: ⭐ Feature request in benchmark-runner
 about: Suggest an idea for this project
 title: ''
 labels: enhancement
