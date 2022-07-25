@@ -40,7 +40,7 @@ class WorkloadsOperations:
         self._endpoint_url = self._environment_variables_dict.get('endpoint_url', '')
         self._run_artifacts_path = self._environment_variables_dict.get('run_artifacts_path', '')
         self._save_artifacts_local = self._environment_variables_dict.get('save_artifacts_local', '')
-        self._enable_prometheus_snapshot = self._environment_variables_dict.get('enable_prometheus_snapshot', True)
+        self._enable_prometheus_snapshot = self._environment_variables_dict.get('enable_prometheus_snapshot', False)
         self._run_artifacts_url = self._environment_variables_dict.get('run_artifacts_url', '')
         self._pin_node1 = self._environment_variables_dict.get('pin_node1', '')
         self._pin_node2 = self._environment_variables_dict.get('pin_node2', '')
