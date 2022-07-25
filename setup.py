@@ -4,7 +4,7 @@ from os import path
 from setuptools import setup, find_packages
 
 
-__version__ = '1.0.363'
+__version__ = '1.0.365'
 
 
 here = path.abspath(path.dirname(__file__))
@@ -52,7 +52,7 @@ setup(
         'myst-parser==0.17.0',  # readthedocs
         'openshift-client==1.0.14', # clusterbuster, until it uses kubernetes client rather than openshift.
         'pandas',  # required latest
-        'paramiko==2.8.0',
+        'paramiko==2.10.1',
         'prometheus-api-client==0.5.0',   # clusterbuster
         'PyGitHub==1.55',  # update secrets
         'PyYAML==6.0',

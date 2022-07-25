@@ -8,12 +8,9 @@ on:
     - cron: '0 4 * * 0' # run on Sunday at 4 AM UTC/ 0 AM EDT
 
 #on:
-#  workflow_run:
-#    workflows: ["Deploy IPI Func Env Weekly CI1"]
-#    types:
-#      - completed
+#  workflow_dispatch:
 
-#on:
+# on:
 #  push:
 #    branches: [ main ]
 
@@ -68,7 +65,7 @@ jobs:
         # green when failed because retry
         continue-on-error: true
         env:
-          INSTALL_OCP_VERSION: "latest-4.10"
+          INSTALL_OCP_VERSION: "stable-4.10"
           OCP_VERSION_BUILD: "ga"
           IBM_API_KEY: ${{ secrets.IBM_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}

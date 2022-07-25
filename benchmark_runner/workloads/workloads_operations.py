@@ -335,7 +335,7 @@ class WorkloadsOperations:
         if status:
             metadata.update({'run_status': status})
         if self._scale:
-            metadata.update({'scale': int(self._scale)})
+            metadata.update({'scale': int(self._scale)*len(self._scale_node_list)})
             count = 0
             for scale_node in range(len(self._scale_node_list)):
                 for scale_num in range(self._scale):
