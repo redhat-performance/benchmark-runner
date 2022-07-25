@@ -199,3 +199,4 @@ class ElasticSearchOperations:
         :return:
         """
         return self.__es.get(index=index, id=id)
+
