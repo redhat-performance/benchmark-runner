@@ -14,11 +14,11 @@ class GoldenFiles:
 
     def __init__(self):
         self.__file_path = os.path.join(f'{os.path.dirname(os.path.realpath(__file__))}', 'golden_files')
-        environment_variables.environment_variables_dict['system_metrics'] = 'True'
+        environment_variables.environment_variables_dict['system_metrics'] = True
         environment_variables.environment_variables_dict['elasticsearch'] = 'elasticsearch.example.com'
         environment_variables.environment_variables_dict['elasticsearch_port'] = '9999'
         environment_variables.environment_variables_dict['elasticsearch_url'] = 'http://elasticsearch.example.com:gol9999'
-        environment_variables.environment_variables_dict['pin'] = 'True'
+        environment_variables.environment_variables_dict['pin'] = True
         environment_variables.environment_variables_dict['pin_node1'] = 'pin-node-1'
         environment_variables.environment_variables_dict['pin_node2'] = 'pin-node-2'
         environment_variables.environment_variables_dict['prom_token_override'] = 'fake_prom_token'
@@ -59,7 +59,7 @@ class GoldenFiles:
         if os.path.isdir(dest):
             shutil.rmtree(dest)
         os.mkdir(dest)
-        for odf_pvc in 'True', 'False':
+        for odf_pvc in True, False:
             environment_variables.environment_variables_dict['odf_pvc'] = odf_pvc
             for run_type in environment_variables.run_types_list:
                 environment_variables.environment_variables_dict['run_type'] = run_type

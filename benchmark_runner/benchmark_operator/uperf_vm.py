@@ -50,7 +50,7 @@ class UperfVM(BenchmarkOperatorWorkloadsOperations):
             self.__status = self._oc.wait_for_vm_completed(workload=self.__workload_name, vm_name=vm_name)
             self.__status = 'complete' if self.__status else 'failed'
             # system metrics
-            if environment_variables.environment_variables_dict['system_metrics'] == 'True':
+            if environment_variables.environment_variables_dict['system_metrics']:
                 self.system_metrics_collector(workload=self.__workload_name)
             # save run artifacts logs of benchmark-controller-manager and system-metrics
             run_artifacts_url = self._create_run_artifacts(workload=self.__workload_name, pod=False)

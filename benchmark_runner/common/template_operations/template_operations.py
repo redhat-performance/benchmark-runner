@@ -32,7 +32,7 @@ class TemplateOperations:
         Kata shares templates with pod
         """
         if self.__workload_kind == 'kata' or self.__workload_kind == 'pod':
-            if self.__environment_variables_dict.get('kata_cpuoffline_workaround', '') == 'True':
+            if self.__environment_variables_dict.get('kata_cpuoffline_workaround', False):
                 logger.warn('*** WARNING: Enabling Kata CPU offline workaround ***')
             return 'pod'
         elif self.__workload_kind == 'vm':
@@ -123,7 +123,7 @@ class TemplateOperations:
 
         workload_data = yaml.load(render_yaml_file(workload_dir_path, f'{self.__workload_name}_data_template.yaml', template_render_data), Loader=yaml.FullLoader)
 
-        if self.__environment_variables_dict.get("config_from_args") == "True":
+        if self.__environment_variables_dict.get("config_from_args"):
             config = dict([kv.split("=") for kv in sys.argv[1:]])
             workload_data["template_data"]["run_type"]["default"] = config
 
