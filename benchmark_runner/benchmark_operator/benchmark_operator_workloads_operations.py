@@ -40,7 +40,7 @@ class BenchmarkOperatorWorkloadsOperations:
         self._key = self._environment_variables_dict.get('key', '')
         self._endpoint_url = self._environment_variables_dict.get('endpoint_url', '')
         self._save_artifacts_local = self._environment_variables_dict.get('save_artifacts_local', '')
-        self._enable_prometheus_snapshot = self._environment_variables_dict.get('enable_prometheus_snapshot', '')
+        self._enable_prometheus_snapshot = self._environment_variables_dict.get('enable_prometheus_snapshot', False)
         self._kubeadmin_password = self._environment_variables_dict.get('kubeadmin_password', '')
         self._dir_path = f'{os.path.dirname(os.path.realpath(__file__))}'
         self._pin_node_benchmark_operator = self._environment_variables_dict.get('pin_node_benchmark_operator', '')
@@ -67,7 +67,7 @@ class BenchmarkOperatorWorkloadsOperations:
         # set oc login
         self._oc = self.set_login(kubeadmin_password=self._kubeadmin_password)
         # PrometheusSnapshot
-        if self._enable_prometheus_snapshot == 'True':
+        if self._enable_prometheus_snapshot:
             self._snapshot = PrometheusSnapshot(oc=self._oc, artifacts_path=self._run_artifacts_path, verbose=True)
 
     def set_login(self, kubeadmin_password: str = ''):
@@ -350,7 +350,7 @@ class BenchmarkOperatorWorkloadsOperations:
         :return: run artifacts url
         """
         self._create_pod_log(label='benchmark-controller-manager')
-        if environment_variables.environment_variables_dict['system_metrics'] == 'True':
+        if environment_variables.environment_variables_dict['system_metrics']:
             self._create_pod_log(label='system-metrics')
         # for vm call to create_vm_log
         if pod:
@@ -385,7 +385,7 @@ class BenchmarkOperatorWorkloadsOperations:
         tar_run_artifacts_path = self.__make_run_artifacts_tarfile(workload)
         # remove local run artifacts workload folder
         # verify that its not empty path
-        if len(self._run_artifacts_path) > 3 and self._run_artifacts_path != '/' and self._run_artifacts_path and tar_run_artifacts_path and os.path.isfile(tar_run_artifacts_path) and self._save_artifacts_local == 'False':
+        if len(self._run_artifacts_path) > 3 and self._run_artifacts_path != '/' and self._run_artifacts_path and tar_run_artifacts_path and os.path.isfile(tar_run_artifacts_path) and not self._save_artifacts_local:
             # remove run_artifacts_path
             shutil.rmtree(path=self._run_artifacts_path)
             # remove tar.gz file
@@ -415,7 +415,7 @@ class BenchmarkOperatorWorkloadsOperations:
         This method start collection of Prometheus snapshot
         :return:
         """
-        if self._enable_prometheus_snapshot == 'True':
+        if self._enable_prometheus_snapshot:
             try:
                 self._snapshot.prepare_for_snapshot()
             except PrometheusSnapshotError as err:
@@ -429,7 +429,7 @@ class BenchmarkOperatorWorkloadsOperations:
         This method retrieve the Prometheus snapshot
         :return:
         """
-        if self._enable_prometheus_snapshot == 'True':
+        if self._enable_prometheus_snapshot:
             try:
                 self._snapshot.retrieve_snapshot()
             except PrometheusSnapshotError as err:
@@ -475,10 +475,10 @@ class BenchmarkOperatorWorkloadsOperations:
         self.clear_nodes_cache()
         # make deploy benchmark controller manager
         self.make_deploy_benchmark_controller_manager(runner_path=environment_variables.environment_variables_dict['runner_path'])
-        if self._odf_pvc == 'True':
+        if self._odf_pvc:
             self.odf_pvc_verification()
         self._template.generate_yamls()
-        if self._enable_prometheus_snapshot == 'True':
+        if self._enable_prometheus_snapshot:
             self.start_prometheus()
 
     def finalize_workload(self):
@@ -486,10 +486,10 @@ class BenchmarkOperatorWorkloadsOperations:
         This method includes all the finalization of workload
         :return:
         """
-        if self._enable_prometheus_snapshot == 'True':
+        if self._enable_prometheus_snapshot:
             self.end_prometheus()
         if self._endpoint_url:
             self.upload_run_artifacts_to_s3()
-        if self._save_artifacts_local == 'False':
+        if not self._save_artifacts_local:
             self.delete_local_artifacts()
         self.delete_all()

@@ -79,7 +79,7 @@ class ClusterBusterWorkloads(WorkloadsOperations):
             self.end_prometheus()
         if self._endpoint_url:
             self.upload_run_artifacts_to_s3()
-        if self._save_artifacts_local == 'False':
+        if not self._save_artifacts_local:
             self.delete_local_artifacts()
         self.delete_all()
 

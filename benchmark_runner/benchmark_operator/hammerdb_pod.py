@@ -62,7 +62,7 @@ class HammerdbPod(BenchmarkOperatorWorkloadsOperations):
             self.__status = self._oc.wait_for_pod_completed(label='app=hammerdb_workload', workload=self.__workload_name)
             self.__status = 'complete' if self.__status else 'failed'
             # system metrics
-            if environment_variables.environment_variables_dict['system_metrics'] == 'True':
+            if environment_variables.environment_variables_dict['system_metrics']:
                 self.system_metrics_collector(workload=self.__workload_name)
             # save run artifacts logs
             run_artifacts_url = self._create_run_artifacts(labels=[f'{self.__workload_name}-creator', f'{self.__workload_name}-workload'], database=self.__database)

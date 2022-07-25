@@ -29,7 +29,7 @@ class WorkloadsOperations:
         self._workload = self._environment_variables_dict.get('workload', '')
         self._build_version = self._environment_variables_dict.get('build_version', '')
         self._workloads_odf_pvc = list(self._environment_variables_dict.get('workloads_odf_pvc', ''))
-        self._odf_pvc = self._environment_variables_dict.get('odf_pvc', '')
+        self._odf_pvc = self._environment_variables_dict.get('odf_pvc', True)
         self._kubeadmin_password = self._environment_variables_dict.get('kubeadmin_password', '')
         self._run_type = self._environment_variables_dict.get('run_type', '')
         self._trunc_uuid = self._environment_variables_dict.get('trunc_uuid', '')
@@ -40,7 +40,7 @@ class WorkloadsOperations:
         self._endpoint_url = self._environment_variables_dict.get('endpoint_url', '')
         self._run_artifacts_path = self._environment_variables_dict.get('run_artifacts_path', '')
         self._save_artifacts_local = self._environment_variables_dict.get('save_artifacts_local', '')
-        self._enable_prometheus_snapshot = self._environment_variables_dict.get('enable_prometheus_snapshot', '')
+        self._enable_prometheus_snapshot = self._environment_variables_dict.get('enable_prometheus_snapshot', False)
         self._run_artifacts_url = self._environment_variables_dict.get('run_artifacts_url', '')
         self._pin_node1 = self._environment_variables_dict.get('pin_node1', '')
         self._pin_node2 = self._environment_variables_dict.get('pin_node2', '')
@@ -74,7 +74,7 @@ class WorkloadsOperations:
         self._oc = WorkloadsOperations.oc
 
         # PrometheusSnapshot
-        if self._enable_prometheus_snapshot == 'True':
+        if self._enable_prometheus_snapshot:
             self._snapshot = PrometheusSnapshot(oc=self._oc, artifacts_path=self._run_artifacts_path, verbose=True)
 
     def __get_workload_file_name(self, workload):
@@ -111,7 +111,7 @@ class WorkloadsOperations:
         This method start collection of Prometheus snapshot
         :return:
         """
-        if self._enable_prometheus_snapshot == 'True':
+        if self._enable_prometheus_snapshot:
             try:
                 self._snapshot.prepare_for_snapshot()
             except PrometheusSnapshotError as err:
@@ -125,7 +125,7 @@ class WorkloadsOperations:
         This method retrieve the Prometheus snapshot
         :return:
         """
-        if self._enable_prometheus_snapshot == 'True':
+        if self._enable_prometheus_snapshot:
             try:
                 self._snapshot.retrieve_snapshot()
             except PrometheusSnapshotError as err:
@@ -406,10 +406,10 @@ class WorkloadsOperations:
         """
         self.delete_all()
         self.clear_nodes_cache()
-        if self._odf_pvc == 'True':
+        if self._odf_pvc:
             self.odf_pvc_verification()
         self._template.generate_yamls(scale=str(self._scale), scale_nodes=self._scale_node_list)
-        if self._enable_prometheus_snapshot == 'True':
+        if self._enable_prometheus_snapshot:
             self.start_prometheus()
 
     def finalize_workload(self):
@@ -417,10 +417,10 @@ class WorkloadsOperations:
         This method includes all the finalization of workload
         :return:
         """
-        if self._enable_prometheus_snapshot == 'True':
+        if self._enable_prometheus_snapshot:
             self.end_prometheus()
         if self._endpoint_url:
             self.upload_run_artifacts_to_s3()
-        if self._save_artifacts_local == 'False':
+        if not self._save_artifacts_local:
             self.delete_local_artifacts()
         self.delete_all()
