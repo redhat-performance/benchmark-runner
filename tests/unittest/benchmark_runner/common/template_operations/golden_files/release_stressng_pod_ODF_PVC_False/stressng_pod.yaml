@@ -1,0 +1,40 @@
+apiVersion: ripsaw.cloudbulldozer.io/v1alpha1
+kind: Benchmark
+metadata:
+  name: stressng-pod
+  namespace: benchmark-operator
+spec:
+  system_metrics:
+    collection: True
+    prom_url: "https://prometheus-k8s.openshift-monitoring.svc.cluster.local:9091"
+    es_url: "http://elasticsearch.example.com:gol9999"
+    prom_token: "fake_prom_token"
+    metrics_profile: "node-metrics.yml"
+    index_name: system-metrics
+  elasticsearch:
+    url: "http://elasticsearch.example.com:gol9999"
+    index_name: stressng
+  metadata:
+    collection: false
+  workload:
+    name: stressng
+    args:
+      pin: True # enable for nodeSelector
+      pin_node: "pin-node-1"
+      resources: True # enable for resources requests/limits
+      requests_cpu: 10m
+      requests_memory: 10Mi
+      limits_cpu: 4
+      limits_memory: 16Gi
+      # general options
+      runtype: "sequential"
+      timeout: "30"
+      instances: 1
+      # cpu stressor options
+      cpu_stressors: "1"
+      cpu_percentage: "100"
+      # vm stressor option
+      vm_stressors: "1"
+      vm_bytes: "128M"
+      # mem stressor options
+      mem_stressors: "1"

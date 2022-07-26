@@ -35,6 +35,8 @@ class ClusterBusterWorkloads(WorkloadsOperations):
         for workload, clusterbuster_tests in result_report_json_data.items():
             if self._run_type == 'test_ci':
                 index = f'clusterbuster-{workload}-test-ci-results'
+            elif self._run_type == 'release':
+                index = f'clusterbuster-{workload}-release-results'
             else:
                 index = f'clusterbuster-{workload}-results'
             logger.info(f'upload index: {index}')
@@ -100,6 +102,8 @@ class ClusterBusterWorkloads(WorkloadsOperations):
             result_report_json_data['run_artifacts_url'] = os.path.join(self._run_artifacts_url, f'{self._get_run_artifacts_hierarchy(workload_name=self._workload, is_file=True)}-{self._time_stamp_format}.tar.gz')
             if self._run_type == 'test_ci':
                 index = f'clusterbuster-metadata-test-ci-results'
+            elif self._run_type == 'release':
+                index = f'clusterbuster-metadata-release-results'
             else:
                 index = f'clusterbuster-metadata-results'
             logger.info(f'upload index: {index}')
