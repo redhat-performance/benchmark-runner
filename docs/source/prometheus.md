@@ -1,6 +1,36 @@
 
 ## Inspect Prometheus Metrics
 
+For Inspect Prometheus Metrics use @prometheus_metrics decorator.
+
+For using default metrics benchmark_runner.common.prometheus.metrics-default.yaml:
+[This will collect the metric for run() method]
+```
+from benchmark_runner.common.prometheus.prometheus_metrics import prometheus_metrics
+
+@prometheus_metrics
+def run():
+    print('sleep 30 sec')
+    time.sleep(30)
+run()
+```
+
+For using custom metrics file, pass it as argument to decorator:
+[This will collect custom metrics for run() method]
+```
+current_dir = os.path.dirname(os.path.abspath(__file__))
+yaml_full_path = os.path.join(current_dir, 'metrics.yaml')
+
+
+@prometheus_metrics(yaml_full_path=yaml_full_path)
+def run():
+    print('sleep 30 sec')
+    time.sleep(30)
+run()
+```
+
+## Inspect Prometheus Snapshots
+
 The CI jobs store snapshots of the Prometheus database for each run as part of the artifacts.  Within the artifact directory is a Prometheus snapshot directory named:
 
 ```

@@ -1,0 +1,3 @@
+# CPU
+- query: sum(irate(node_cpu_seconds_total[1m])) by (mode,instance) > 0
+  metricName: CPU

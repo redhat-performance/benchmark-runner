@@ -30,3 +30,6 @@ include benchmark_runner/common/ocp_resources/cnv/template/*.sh
 include benchmark_runner/common/ocp_resources/cnv/template/*.yaml
 include benchmark_runner/common/ocp_resources/custom/template/*.sh
 include benchmark_runner/common/ocp_resources/custom/template/*.yaml
+
+# prometheus queries yaml
+include benchmark_runner/common/prometheus/metrics-default.yaml
