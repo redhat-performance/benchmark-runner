@@ -4,7 +4,7 @@ from os import path
 from setuptools import setup, find_packages
 
 
-__version__ = '1.0.370'
+__version__ = '1.0.371'
 
 
 here = path.abspath(path.dirname(__file__))
@@ -50,10 +50,10 @@ setup(
         'elasticsearch_dsl==7.4.0',  # for deep search
         'jinja2==3.0.3',
         'myst-parser==0.17.0',  # readthedocs
-        'openshift-client==1.0.17',  # clusterbuster, until it uses kubernetes client rather than openshift. && prometheus metrics
+        'openshift-client==1.0.17',  # clusterbuster && prometheus metrics
+        'prometheus-api-client==0.5.1',  # clusterbuster && prometheus metrics
         'pandas',  # required latest
         'paramiko==2.10.1',
-        'prometheus-api-client==0.5.0',   # clusterbuster
         'PyGitHub==1.55',  # update secrets
         'PyYAML==6.0',
         'sphinx==4.5.0',  # readthedocs
@@ -61,7 +61,6 @@ setup(
         'tenacity==8.0.1',  # retry decorator
         'typeguard==2.12.1',
         'typing==3.7.4.3',
-        'prometheus-api-client==0.5.1',  # prometheus metrics
         # must add new package inside requirements.txt
     ],
 
