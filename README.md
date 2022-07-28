@@ -52,7 +52,7 @@ _**Table of Contents**_
 
 ## Run workload using Podman or Docker
 
-#### Environment variables description:
+The following options may be passed via command line flags or set in the environment:
 
 **mandatory:** WORKLOAD=$WORKLOAD
 
@@ -92,12 +92,18 @@ Choose one from the following list:
 
 **optional:** REDIS=REDIS [For Vdbench only: redis for scale synchronization]
 
+For example:
+
+```sh
+podman run --rm -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:lateste --workload=$WORKLOAD --kubeadmin-password=$KUBEADMIN_PASSWORD --pin-node-benchmark-operator=$PIN_NODE_BENCHMARK_OPERATOR --pin-node1=$PIN_NODE1 --pin-node2=$PIN_NODE2 --elasticsearch=$ELASTICSEARCH --elasticsearch-port=$ELASTICSEARCH_PORT
+```
+or
 ```sh
 podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:latest
 ```
 SAVE RUN ARTIFACTS LOCAL:
-1. add "-e SAVE_ARTIFACTS_LOCAL='True'"
-2. add "-v /tmp:/tmp"
+1. add `-e SAVE_ARTIFACTS_LOCAL='True'` or `--save-artifacts-local=true`
+2. add `-v /tmp:/tmp`
 3. git clone https://github.com/cloud-bulldozer/benchmark-operator /tmp/benchmark-operator
 
 ### Run vdbench workload in Pod using OpenShift
