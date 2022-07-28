@@ -49,8 +49,7 @@ any template .yaml files.
    ```
 7. Benchmark-runner - add workload Template in [benchmark_runner/common/template_operations/templates](benchmark_runner/common/template_operations/templates)
     1. Create workload directory for example [benchmark_runner/common/template_operations/templates/vdbench](benchmark_runner/common/template_operations/templates/vdbench)
-    2. Create custom_data_template.yaml for example [benchmark_runner/common/template_operations/templates/vdbench/vdbench_data_template.yaml](benchmark_runner/common/template_operations/templates/vdbench/vdbench_data_template.yaml)
-       put here all the data that should be replaced by Jinja in
+    2. Create custom_data_template.yaml for example [benchmark_runner/common/template_operations/templates/vdbench/vdbench_data_template.yaml](benchmark_runner/common/template_operations/templates/vdbench/vdbench_data_template.yaml).  This should include all data that should be replaced by Jinja2 in the internal file below.
     3. Create custom pod template [benchmark_runner/common/template_operations/templates/vdbench/internal_data/vdbench_pod_template.yaml](benchmark_runner/common/template_operations/templates/vdbench/internal_data/vdbench_pod_template.yaml)
 8. Create Workload class [benchmark_runner/workloads/workloads.py](benchmark_runner/workloads/workloads.py)
     1. Add custom workload method, example:
@@ -77,7 +76,14 @@ any template .yaml files.
    ```
 11. Add tests for all new methods you write under `tests/integration`.
 12. Update the golden unit test files as described [above](#add-new-workload-modify-parameters-to-workload-or-change-parameters-for-any-ci-job)
-13. For test and debug workload, need to configure [benchmark_runner/main/environment_variables.py](benchmark_runner/main/environment_variables.py)
+13. For test and debug workload, need to configure [benchmark_runner/main/environment_variables.py](benchmark_runner/main/environment_variables.py).  You may alternatively set these variables in the environment or pass command line options, which in all cases are `--lowercase-option` where the name of the environment variable is lower cased.  For example:
+   ```
+   python3 benchmark_runner/main/main.py --runner-path=/parent/of/benchmark-runner --workload=stressng_pod --kubeadmin-password=password --pin-node-benchmark-operator=worker-0 --pin-node1=worker-1 --pin-node2=worker-2 --elasticsearch=elasticsearch_port --elasticsearch-port=80
+   ```
+   or
+   ```
+	RUNNER_PATH=/parent/of/benchmark-runner WORKLOAD=stressng_pod KUBEADMIN_PASSWORD=password PIN_NODE_BENCHMARK_OPERATOR=worker-0 PIN_NODE1=worker-1 PIN_NODE2=worker-2 ELASTICSEARCH=elasticsearch_port ELASTICSEARCH_PORT=80 python3 benchmark_runner/main/main.py
+   ```
 14. Fill parameters: workload, kubeadmin_password, pin_node_benchmark_operator, pin_node1, pin_node2, elasticsearch, elasticsearch_port
 15. Run [/benchmark_runner/main/main.py](/benchmark_runner/main/main.py)  and verify that the workload run correctly
 16. The workload can be monitored and checked through 'current run' folder inside the run workload flavor (default flavor: 'test_ci')
