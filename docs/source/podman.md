@@ -1,7 +1,7 @@
 
 ## Run workload using Podman or Docker
 
-#### Environment variables description:
+The following options may be passed via command line flags or set in the environment:
 
 **mandatory:** WORKLOAD=$WORKLOAD
 
@@ -9,7 +9,7 @@ Choose one from the following list:
 
 `['stressng_pod', 'stressng_vm', 'stressng_kata','uperf_pod', 'uperf_vm', 'uperf_kata', 'hammerdb_pod_mariadb', 'hammerdb_pod_mssql', 'hammerdb_pod_postgres', 'hammerdb_vm_mariadb', 'hammerdb_vm_mssql', 'hammerdb_vm_postgres', 'hammerdb_kata_mariadb', 'hammerdb_kata_mssql', 'hammerdb_kata_postgres', 'vdbench_pod', 'vdbench_kata', 'vdbench_vm', 'vdbench_pod_scale', 'vdbench_kata_scale', 'vdbench_vm_scale', 'clusterbuster']`
 
-** clusterbuster workloads: cpusoaker, files, fio, uperf. for more details [see](https://github.com/RobertKrawitz/OpenShift4-tools)
+** clusterbuster workloads: cpusoaker, files, fio, uperf.  For more details [see](https://github.com/RobertKrawitz/OpenShift4-tools)
 
 **auto:** NAMESPACE=benchmark-operator [ The default namespace is benchmark-operator ]
 
@@ -41,10 +41,16 @@ Choose one from the following list:
 
 **optional:** REDIS=REDIS [For Vdbench only: redis for scale synchronization]
 
+For example:
+
+```sh
+podman run --rm -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:lateste --workload=$WORKLOAD --kubeadmin-password=$KUBEADMIN_PASSWORD --pin-node-benchmark-operator=$PIN_NODE_BENCHMARK_OPERATOR --pin-node1=$PIN_NODE1 --pin-node2=$PIN_NODE2 --elasticsearch=$ELASTICSEARCH --elasticsearch-port=$ELASTICSEARCH_PORT
+```
+or
 ```sh
 podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:latest
 ```
 SAVE RUN ARTIFACTS LOCAL:
-1. add "-e SAVE_ARTIFACTS_LOCAL='True'"
+1. add `-e SAVE_ARTIFACTS_LOCAL='True'` or `--save-artifacts-local=true`
 2. add "-v /tmp:/tmp"
 3. git clone https://github.com/cloud-bulldozer/benchmark-operator /tmp/benchmark-operator

@@ -119,9 +119,16 @@ any template .yaml files.
    ```
 10. Add tests for all new methods you write under `tests/integration`.
 11. Update the golden unit test files as described [above](#add-new-workload-modify-parameters-to-workload-or-change-parameters-for-any-ci-job)
-12. For test and debug workload, need to configure [benchmark_runner/main/environment_variables.py](benchmark_runner/main/environment_variables.py)
+12. For test and debug workload, need to configure [benchmark_runner/main/environment_variables.py](benchmark_runner/main/environment_variables.py).  You may alternatively set these variables in the environment or pass command line options, which in all cases are `--lowercase-option` where the name of the environment variable is lower cased.  For example:
+   ```
+   python3 benchmark_runner/main/main.py --runner-path=/parent/of/benchmark-runner --workload=stressng_pod --kubeadmin-password=password --pin-node-benchmark-operator=worker-0 --pin-node1=worker-1 --pin-node2=worker-2 --elasticsearch=elasticsearch_port --elasticsearch-port=80
+   ```
+   or
+   ```
+	RUNNER_PATH=/parent/of/benchmark-runner WORKLOAD=stressng_pod KUBEADMIN_PASSWORD=password PIN_NODE_BENCHMARK_OPERATOR=worker-0 PIN_NODE1=worker-1 PIN_NODE2=worker-2 ELASTICSEARCH=elasticsearch_port ELASTICSEARCH_PORT=80 python3 benchmark_runner/main/main.py
+   ```
 13. Fill parameters: workload, kubeadmin_password, pin_node_benchmark_operator, pin_node1, pin_node2, elasticsearch, elasticsearch_port
-14. Run [/benchmark_runner/main/main.py](/benchmark_runner/main/main.py)  and verify that the workload run correctly
+14. Run [/benchmark_runner/main/main.py](/benchmark_runner/main/main.py)  and verify that the workload runs correctly.
 15. The workload can be monitored and checked through 'current run' folder inside the run workload flavor (default flavor: 'test_ci')
 16. Open Kibana url and verify workload index populate with data:
 17. Create the workload index: Kibana -> Hamburger tab -> Stack Management -> Index patterns -> Create index pattern -> workload-results -> timestamp -> Done
