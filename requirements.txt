@@ -8,6 +8,7 @@ elasticsearch_dsl==7.4.0
 jinja2==3.0.3
 myst-parser==0.17.0
 openshift-client==1.0.17
+prometheus-api-client==0.5.1
 pandas
 paramiko==2.10.1
 PyGitHub==1.55
@@ -17,4 +18,4 @@ sphinx_rtd_theme==1.0.0
 tenacity==8.0.1
 typeguard==2.12.1
 typing==3.7.4.3
-prometheus-api-client==0.5.1
+
