@@ -4,9 +4,9 @@ name: Deploy Func Env Nightly CI
 
 on:
   # Run on Nightly
-  schedule:
-    - cron: '0 4 * * 0-5' # run at 4 AM UTC/ 0 AM EDT
-  # Run on weekly after IPI and operator completed
+#   schedule:
+#     - cron: '0 4 * * 0-5' # run at 4 AM UTC/ 0 AM EDT
+#   # Run on weekly after IPI and operator completed
   workflow_run:
     workflows: ["Deploy Operator FUNC Env Weekly CI"]
     types:
