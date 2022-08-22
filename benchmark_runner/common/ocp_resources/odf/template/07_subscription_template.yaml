@@ -7,5 +7,5 @@ spec:
   channel: "stable-{{ odf_version }}"
   installPlanApproval: Manual
   name: odf-operator
-  source: redhat-operators-v49  # <-- Modify the name of the redhat-operators catalogsource to be correct for your cluster
+  source: redhat-operators  # <-- Modify the name of the redhat-operators catalogsource to be correct for your cluster
   sourceNamespace: openshift-marketplace
