@@ -5,8 +5,8 @@ name: Deploy Perf Env Nightly CI
 
 on:
  # Run on Nightly
- schedule:
-   - cron: '0 4 * * 1-6' # run Monday through Saturday at 4 AM UTC/ 0 AM EDT
+#  schedule:
+#    - cron: '0 4 * * 1-6' # run Monday through Saturday at 4 AM UTC/ 0 AM EDT
  # Run on weekly after IPI and operator completed
  workflow_run:
    workflows: ["Deploy Operator Perf Env Weekly CI"]
