@@ -50,7 +50,7 @@ jobs:
           mkdir -p "$RUNNER_PATH/.kube/"
           echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
           echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
-          sudo echo "$FUNC_OCP_HOSTS | sudo tee -a "/etc/hosts"
+          sudo echo "$FUNC_OCP_HOSTS" | sudo tee -a /etc/hosts
     - name: 📃 Unittest and Integration tests with pytest
       env:
         KUBEADMIN_PASSWORD: ${{ secrets.FUNC_KUBEADMIN_PASSWORD }}
