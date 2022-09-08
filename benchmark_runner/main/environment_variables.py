@@ -166,8 +166,6 @@ class EnvironmentVariables:
         self._environment_variables_dict['install_ocp_version'] = EnvironmentVariables.get_env('INSTALL_OCP_VERSION', '')
         # There are 2 steps run_ibm_ocp_ipi_installer/verify_install_complete
         self._environment_variables_dict['install_step'] = EnvironmentVariables.get_env('INSTALL_STEP', '')
-        # dev or ga (/ocp-dev-preview/ or /ocp/ )
-        self._environment_variables_dict['ocp_version_build'] = EnvironmentVariables.get_env('OCP_VERSION_BUILD', '')
         # github repository
         self._environment_variables_dict['github_repository_short'] = EnvironmentVariables.get_env('GITHUB_REPOSITORY_SHORT', '')
 
@@ -203,7 +201,6 @@ class EnvironmentVariables:
         self._environment_variables_dict['provision_private_key_path'] = EnvironmentVariables.get_env(f'{self.__ocp_env_flavor}_PROVISION_PRIVATE_KEY_PATH', '')
         self._environment_variables_dict['container_private_key_path'] = EnvironmentVariables.get_env('CONTAINER_PRIVATE_KEY_PATH', '')
         self._environment_variables_dict['provision_user'] = EnvironmentVariables.get_env(f'{self.__ocp_env_flavor}_PROVISION_USER', '')
-        self._environment_variables_dict['provision_oc_user'] = EnvironmentVariables.get_env(f'{self.__ocp_env_flavor}_PROVISION_OC_USER', '')
         self._environment_variables_dict['provision_port'] = EnvironmentVariables.get_env(f'{self.__ocp_env_flavor}_PROVISION_PORT', '')
         self._environment_variables_dict['provision_kubeadmin_password_path'] = EnvironmentVariables.get_env(f'{self.__ocp_env_flavor}_PROVISION_KUBEADMIN_PASSWORD_PATH', '')
         self._environment_variables_dict['provision_kubeconfig_path'] = EnvironmentVariables.get_env(f'{self.__ocp_env_flavor}_PROVISION_KUBECONFIG_PATH', '')

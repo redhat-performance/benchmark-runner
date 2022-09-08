@@ -172,7 +172,7 @@ class RemoteSsh:
 
     def replace_parameter(self, remote_path, file_name, parameter, value, all_line=False):
         """
-        This method is replace parameter in remote file (sed "s@home/test=.@home/test=8@g" test.txt)
+        This method replaces a parameter in remote file (sed "s@home/test=.@home/test=8@g" test.txt)
         :param remote_path: path to file
         :param file_name: file name
         :param parameter: the parameter
@@ -194,7 +194,7 @@ class RemoteSsh:
             if os.path.splitext(file_name)[1] == '.xml':
                 self.run_command(f'sed -i \'s/{parameter}[^ ]*"/{parameter}{value}/g\' {remote_path}/{file_name}')
             else:
-                self.run_command(f'sed -i \'s/{parameter}[^ ]*/{parameter}{value}/g\' {remote_path}/{file_name}')
+                self.run_command(f'sed -i \'s/{parameter}.*/{parameter} {value}/g\' {remote_path}/{file_name}')
 
     def exist(self, remote_path):
         """

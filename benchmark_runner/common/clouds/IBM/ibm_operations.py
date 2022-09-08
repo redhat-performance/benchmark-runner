@@ -2,7 +2,6 @@
 import time
 from datetime import datetime
 from typeguard import typechecked
-from tenacity import retry, stop_after_attempt
 import ast  # change string list to list
 from enum import Enum
 
@@ -14,6 +13,7 @@ from benchmark_runner.common.oc.oc import OC
 from benchmark_runner.common.github.github_operations import GitHubOperations
 from benchmark_runner.common.clouds.IBM.ibm_exceptions import IBMMachineNotLoad, MissingMasterNodes, MissingWorkerNodes, IBMOCPInstallationFailed
 from benchmark_runner.common.ssh.ssh import SSH
+from benchmark_runner.common.clouds.IBM.assisted_installer_latest_version import OCPVersions
 
 
 class Actions(Enum):
@@ -29,17 +29,18 @@ class IBMOperations:
     """
     This class is responsible for all IBM cloud operations, all commands run on remote provision IBM host
     """
+    LATEST_VERSION = 'latest'
 
     @typechecked
     def __init__(self, user: str):
         self.__environment_variables_dict = environment_variables.environment_variables_dict
         self.__ibm_api_key = self.__environment_variables_dict.get('ibm_api_key', '')
         self.__user = user
-        self.__ibm_oc_user = self.__environment_variables_dict.get('provision_oc_user', '')
         self.__ibm_worker_ids = self.__environment_variables_dict.get('worker_ids', '')
         self.__ocp_env_flavor = self.__environment_variables_dict.get('ocp_env_flavor', '')
         self.__ibm_worker_ids_list = ast.literal_eval(self.__ibm_worker_ids)
         # FUNC or PERF
+        self.__create_pod_ci_cmd = self.__environment_variables_dict.get('create_pod_ci_cmd', '')
         self.__ocp_env_flavor = self.__environment_variables_dict.get('ocp_env_flavor', '')
         self.__provision_kubeadmin_password_path = self.__environment_variables_dict.get('provision_kubeadmin_password_path', '')
         self.__provision_kubeconfig_path = self.__environment_variables_dict.get('provision_kubeconfig_path', '')
@@ -61,6 +62,7 @@ class IBMOperations:
         self.__remote_ssh = RemoteSsh(self.__connection_data)
         self.__github_operations = GitHubOperations()
         self.__ssh = SSH()
+        self.__cli = self.__environment_variables_dict.get('cli', '')
 
     def __get_kubeadmin_password(self):
         """
@@ -121,13 +123,6 @@ class IBMOperations:
             current_wait_time += sleep_time
         raise IBMMachineNotLoad()
 
-    def __restart_pod_ci(self):
-        """
-        This method restart pod ci: elastic, kibana, grafana, nginx and flask - solved connectivity issue after installation
-        :return:
-        """
-        self.__remote_ssh.run_command('podman pod restart pod_ci')
-
     def __wait_for_install_complete(self, sleep_time: int = 600):
         """
         This method wait till ocp install complete
@@ -137,9 +132,9 @@ class IBMOperations:
         current_wait_time = 0
         while current_wait_time <= self.__provision_timeout:
             install_log = self.__remote_ssh.run_command(self.__provision_installer_log)
-            if 'Install complete!' in install_log:
+            if 'failed=0' in install_log:
                 return True
-            elif 'level=error' in install_log:
+            elif 'failed=1' in install_log:
                 return False
             logger.info(f'Waiting till OCP install complete, waiting {int(current_wait_time/60)} minutes')
             # sleep for x seconds
@@ -155,7 +150,7 @@ class IBMOperations:
         """
         return 'ibmcloud logout'
 
-    def __ibm_ipi_install_ocp_cmd(self):
+    def __ibm_install_ocp_cmd(self):
         """
         This method return ibm ipi installer cmd if exist
         :return:
@@ -188,28 +183,72 @@ class IBMOperations:
         """
         self.__remote_ssh.disconnect()
 
+    def __get_latest_version(self):
+        """
+        This method return latest version
+        :return:
+        """
+        ocp_versions = OCPVersions()
+        if self.LATEST_VERSION in self.__install_ocp_version:
+            openshift_version_data = self.__install_ocp_version.split('-')
+            return ocp_versions.get_latest_version(latest_version=openshift_version_data[1])
+        else:
+            openshift_version_data = self.__install_ocp_version.split('.')
+            return ocp_versions.get_latest_version(latest_version=f'{openshift_version_data[0]}.{openshift_version_data[1]}')
+
+    def get_ocp_server_version(self):
+        """
+        This method return ocp server version
+        :return:
+        """
+        return self.__remote_ssh.run_command(command=f"{self.__cli} version -ojson | jq -r '.openshiftVersion'").strip()
+
+    def version_already_installed(self):
+        """
+        This method validate if version is already install
+        :return: True if it already installed, False if it NOT already installed
+        """
+        if self.LATEST_VERSION in self.__install_ocp_version and self.get_ocp_server_version() == self.__get_latest_version():
+            return self.get_ocp_server_version().strip()
+        elif self.__install_ocp_version == self.get_ocp_server_version():
+            return self.__install_ocp_version
+        else:
+            return False
+
+    @logger_time_stamp
+    def restart_pod_ci(self):
+        """
+        This method restart pod ci: elastic, kibana, grafana, nginx and flask - solved connectivity issue after installation
+        :return:
+        """
+        self.__remote_ssh.run_command('podman pod restart pod_ci')
+
     @logger_time_stamp
     def update_ocp_version(self):
         """
         This method update the ocp version on provision machine
         :return:
         """
-        self.__remote_ssh.replace_parameter(remote_path='/ipi-installer/baremetal-deploy/ansible-ipi-install/inventory',
-                                            file_name='hosts',
-                                            parameter='version=',
-                                            value=f'"{self.__install_ocp_version}"')
-        self.__remote_ssh.replace_parameter(remote_path='/ipi-installer/baremetal-deploy/ansible-ipi-install/inventory',
-                                            file_name='hosts',
-                                            parameter='build=',
-                                            value=f'"{self.__ocp_version_build}"')
+        # Get the latest assisted installer version
+        if self.LATEST_VERSION in self.__install_ocp_version:
+            self.__install_ocp_version = self.__get_latest_version()
+        openshift_version_data = self.__install_ocp_version.split('.')
+        self.__remote_ssh.replace_parameter(remote_path='/root/jetlag/ansible/vars',
+                                            file_name='ibmcloud.yml',
+                                            parameter='ocp_release_image:',
+                                            value=f'quay.io\/openshift-release-dev\/ocp-release:{self.__install_ocp_version}-x86_64')
+        self.__remote_ssh.replace_parameter(remote_path='/root/jetlag/ansible/vars',
+                                            file_name='ibmcloud.yml',
+                                            parameter='openshift_version:',
+                                            value=f'"{openshift_version_data[0]}.{openshift_version_data[1]}"')
 
     @logger_time_stamp
-    def run_ibm_ocp_ipi_installer(self):
+    def run_ibm_ocp_installer(self):
         """
-        This method run ocp ipi installer with retry mechanism
+        This method run ocp assisted installer
         :return: True if installation success and raise exception if installation failed
         """
-        logger.info(f'Starting OCP IPI installer, Start time: {datetime.now().strftime(datetime_format)}')
+        logger.info(f'Starting OCP assisted installer, Start time: {datetime.now().strftime(datetime_format)}')
         # update ssh config - must add it and also mount it
         self.__ssh.run(f"echo Host provision >> /{self.__user}/.ssh/config")
         self.__ssh.run(f"echo -e '\t'HostName {self.__provision_ip} >> /{self.__user}/.ssh/config")
@@ -220,8 +259,8 @@ class IBMOperations:
         self.__ssh.run(f"echo -e '\t'ServerAliveCountMax 5 >> /{self.__user}/.ssh/config")
         self.__ssh.run(f"chmod 600 /{self.__user}/.ssh/config")
         # Must add -t otherwise remote ssh of ansible will not end
-        self.__ssh.run(cmd=f"ssh -t provision \"{self.__ibm_login_cmd()};{self.__ibm_ipi_install_ocp_cmd()}\" ")
-        logger.info(f'End OCP IPI installer, End time: {datetime.now().strftime(datetime_format)}')
+        self.__ssh.run(cmd=f"ssh -t provision \"{self.__ibm_login_cmd()};{self.__ibm_install_ocp_cmd()}\" ")
+        logger.info(f'End OCP assisted installer, End time: {datetime.now().strftime(datetime_format)}')
 
     @logger_time_stamp
     def verify_install_complete(self):
@@ -233,7 +272,6 @@ class IBMOperations:
         if not complete:
             raise Exception(f'Installation failed')
         else:
-            self.__restart_pod_ci()
             return True
 
     @logger_time_stamp
