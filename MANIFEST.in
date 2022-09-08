@@ -31,5 +31,8 @@ include benchmark_runner/common/ocp_resources/cnv/template/*.yaml
 include benchmark_runner/common/ocp_resources/custom/template/*.sh
 include benchmark_runner/common/ocp_resources/custom/template/*.yaml
 
+# ocp install (jetlag)
+include benchmark_runner/common/installer/jetlag/run_jetlag.sh
+
 # prometheus queries yaml
 include benchmark_runner/common/prometheus/metrics-default.yaml
