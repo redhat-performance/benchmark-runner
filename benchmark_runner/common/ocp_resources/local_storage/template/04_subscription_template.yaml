@@ -7,5 +7,5 @@ spec:
   channel: "{{ odf_version }}"
   installPlanApproval: Automatic
   name: local-storage-operator
-  source: redhat-operators  # <-- Modify the name of the redhat-operators catalogsource if not default
+  source: redhat-operators-v{{ odf_version | replace(".","") }}  # <-- Modify the name of the redhat-operators catalogsource if not default
   sourceNamespace: openshift-marketplace
