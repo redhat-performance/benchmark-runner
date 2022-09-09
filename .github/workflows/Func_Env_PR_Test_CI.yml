@@ -9,8 +9,8 @@ name: Func Env PR Test CI
 #     branches: [ main ] 
 
 on:
- push:
-   branches: [ main ]
+  pull_request_target:
+    branches: [ main ]
 
 # Ensures that only one deploy task per branch/environment will run at a time. 
 concurrency:
@@ -50,7 +50,7 @@ jobs:
           mkdir -p "$RUNNER_PATH/.kube/"
           echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
           echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
-          sudo echo "$FUNC_OCP_HOSTS" | sudo tee -a "/etc/hosts"
+          sudo tee -a /etc/hosts <<< "$FUNC_OCP_HOSTS" > /dev/null
     - name: 📃 Unittest and Integration tests with pytest
       env:
         KUBEADMIN_PASSWORD: ${{ secrets.FUNC_KUBEADMIN_PASSWORD }}
@@ -111,7 +111,7 @@ jobs:
          mkdir -p "$RUNNER_PATH/.kube/"
          echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
          echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
-         sudo echo "$FUNC_OCP_HOSTS" | sudo tee -a "/etc/hosts"
+         sudo tee -a /etc/hosts <<< "$FUNC_OCP_HOSTS" > /dev/null
    - name: 📃 E2E test
      env:
        WORKLOAD: "stressng_pod"
