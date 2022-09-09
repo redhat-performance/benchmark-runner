@@ -51,15 +51,17 @@ jobs:
           ServerAliveInterval 30
           ServerAliveCountMax 5
         END
-    - name: ⚙ Set Kubeconfig
+    - name: ⚙️ Set Kubeconfig and hosts
       env:
         KUBECONFIG: ${{ secrets.FUNC_KUBECONFIG }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+        FUNC_OCP_HOSTS: ${{ secrets.FUNC_OCP_HOSTS }}
       run: |
         mkdir -p "$RUNNER_PATH/.kube/"
         echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
         echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
-    - name: ⚙ Remove images on provistion and copy config to provision 
+        sudo tee -a /etc/hosts <<< "$FUNC_OCP_HOSTS" > /dev/null
+    - name: ⚙ Remove images on provistion and copy config to provision
       env:
         CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
@@ -120,14 +122,16 @@ jobs:
           ServerAliveInterval 30
           ServerAliveCountMax 5
         END
-    - name: ⚙ Set Kubeconfig
+    - name: ⚙️ Set Kubeconfig and hosts
       env:
         KUBECONFIG: ${{ secrets.FUNC_KUBECONFIG }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+        FUNC_OCP_HOSTS: ${{ secrets.FUNC_OCP_HOSTS }}
       run: |
-          mkdir -p "$RUNNER_PATH/.kube/"
-          echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
-          echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
+        mkdir -p "$RUNNER_PATH/.kube/"
+        echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
+        echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
+        sudo tee -a /etc/hosts <<< "$FUNC_OCP_HOSTS" > /dev/null
     - name: ✔️ Run workload ${{ matrix.workload }}
       env:
         KUBEADMIN_PASSWORD: ${{ secrets.FUNC_KUBEADMIN_PASSWORD }}
@@ -214,14 +218,16 @@ jobs:
           ServerAliveInterval 30
           ServerAliveCountMax 5
         END
-    - name: ⚙ Set Kubeconfig
+    - name: ⚙️ Set Kubeconfig and hosts
       env:
         KUBECONFIG: ${{ secrets.FUNC_KUBECONFIG }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+        FUNC_OCP_HOSTS: ${{ secrets.FUNC_OCP_HOSTS }}
       run: |
-          mkdir -p "$RUNNER_PATH/.kube/"
-          echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
-          echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
+        mkdir -p "$RUNNER_PATH/.kube/"
+        echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
+        echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
+        sudo tee -a /etc/hosts <<< "$FUNC_OCP_HOSTS" > /dev/null
     - name: ✔️ Update status
       env:
         KUBEADMIN_PASSWORD: ${{ secrets.FUNC_KUBEADMIN_PASSWORD }}

@@ -38,14 +38,16 @@ jobs:
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: ⚙️ Set Kubeconfig
+    - name: ⚙️ Set Kubeconfig and hosts
       env:
         KUBECONFIG: ${{ secrets.FUNC_KUBECONFIG }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+        FUNC_OCP_HOSTS: ${{ secrets.FUNC_OCP_HOSTS }}
       run: |
           mkdir -p "$RUNNER_PATH/.kube/"
           echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
           echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
+          sudo tee -a /etc/hosts <<< "$FUNC_OCP_HOSTS" > /dev/null
     - name: 📃 Unittest and Integration tests with pytest
       env:
         KUBEADMIN_PASSWORD: ${{ secrets.FUNC_KUBEADMIN_PASSWORD }}
@@ -209,14 +211,16 @@ jobs:
             ServerAliveInterval 30
             ServerAliveCountMax 5
           END
-      - name: ⚙️ Set Kubeconfig
+      - name: ⚙️ Set Kubeconfig and hosts
         env:
           KUBECONFIG: ${{ secrets.FUNC_KUBECONFIG }}
           RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+          FUNC_OCP_HOSTS: ${{ secrets.FUNC_OCP_HOSTS }}
         run: |
           mkdir -p "$RUNNER_PATH/.kube/"
           echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
           echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
+          sudo tee -a /etc/hosts <<< "$FUNC_OCP_HOSTS" > /dev/null
       - name: ✔️ Update status
         env:
           KUBEADMIN_PASSWORD: ${{ secrets.FUNC_KUBEADMIN_PASSWORD }}
@@ -317,14 +321,16 @@ jobs:
           ServerAliveInterval 30
           ServerAliveCountMax 5
         END
-    - name: ⚙️ Set Kubeconfig
+    - name: ⚙️ Set Kubeconfig and hosts
       env:
         KUBECONFIG: ${{ secrets.FUNC_KUBECONFIG }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+        FUNC_OCP_HOSTS: ${{ secrets.FUNC_OCP_HOSTS }}
       run: |
           mkdir -p "$RUNNER_PATH/.kube/"
           echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
           echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
+          sudo tee -a /etc/hosts <<< "$FUNC_OCP_HOSTS" > /dev/null
     - name: ✔️ E2E tests using latest quay.io
       env:
         KUBEADMIN_PASSWORD: ${{ secrets.FUNC_KUBEADMIN_PASSWORD }}
