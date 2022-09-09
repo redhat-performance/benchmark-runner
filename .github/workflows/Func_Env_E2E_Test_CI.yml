@@ -64,14 +64,16 @@ jobs:
             ServerAliveInterval 30
             ServerAliveCountMax 5
           END
-      - name: ⚙ Set Kubeconfig
+      - name: ⚙️ Set Kubeconfig and hosts
         env:
           KUBECONFIG: ${{ secrets.FUNC_KUBECONFIG }}
           RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+          FUNC_OCP_HOSTS: ${{ secrets.FUNC_OCP_HOSTS }}
         run: |
           mkdir -p "$RUNNER_PATH/.kube/"
           echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
           echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
+          sudo echo "$FUNC_OCP_HOSTS" | sudo tee -a "/etc/hosts"
       - name: ☉ Install ${{ matrix.resource }} Operator 
         env:
           CNV_VERSION: "4.10"
