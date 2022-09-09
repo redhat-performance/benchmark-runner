@@ -8,175 +8,175 @@ on:
     branches: [ main ]
 
 # Ensures that only one deploy task per branch/environment will run at a time.
-concurrency:
-  group: functional-environment
-  cancel-in-progress: false
+# concurrency:
+#   group: functional-environment
+#   cancel-in-progress: false
   
 jobs:
-  test:
-    name: test
-    runs-on: ubuntu-latest
-    outputs:
-       start_time_output: ${{ steps.start_step.outputs.start_time }}
-    steps:
-    - uses: actions/checkout@v2
-    - id: start_step
-      run: echo "::set-output name=start_time::$(printf '%(%s)T' -1)"
-    - name: Set up Python 3.9
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.9
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install flake8 pytest pytest-cov
-        if [[ -f requirements.txt ]]; then pip install -r requirements.txt; fi
-        if [[ -f tests_requirements.txt ]]; then pip install -r tests_requirements.txt; fi
-    - name: Lint with flake8
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: ⚙️ Set Kubeconfig and hosts
-      env:
-        KUBECONFIG: ${{ secrets.FUNC_KUBECONFIG }}
-        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-        FUNC_OCP_HOSTS: ${{ secrets.FUNC_OCP_HOSTS }}
-      run: |
-          mkdir -p "$RUNNER_PATH/.kube/"
-          echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
-          echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
-          sudo tee -a /etc/hosts <<< "$FUNC_OCP_HOSTS" > /dev/null
-    - name: 📃 Unittest and Integration tests with pytest
-      env:
-        KUBEADMIN_PASSWORD: ${{ secrets.FUNC_KUBEADMIN_PASSWORD }}
-        PIN_NODE1: ${{ secrets.FUNC_PIN_NODE1 }}
-        PIN_NODE2: ${{ secrets.FUNC_PIN_NODE2 }}
-        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-        ELASTICSEARCH: ${{ secrets.FUNC_ELASTICSEARCH }}
-        ELASTICSEARCH_PORT: ${{ secrets.FUNC_ELASTICSEARCH_PORT }}
-        ELASTICSEARCH_USER: ${{ secrets.FUNC_ELASTICSEARCH_USER }}
-        ELASTICSEARCH_PASSWORD: ${{ secrets.FUNC_ELASTICSEARCH_PASSWORD }}
-        IBM_REGION_NAME: ${{ secrets.IBM_REGION_NAME }}
-        IBM_ENDPOINT_URL: ${{ secrets.IBM_ENDPOINT_URL }}
-        IBM_ACCESS_KEY_ID: ${{ secrets.IBM_ACCESS_KEY_ID }}
-        IBM_SECRET_ACCESS_KEY: ${{ secrets.IBM_SECRET_ACCESS_KEY }}
-        IBM_BUCKET: ${{ secrets.IBM_BUCKET }}
-        IBM_KEY: ${{ secrets.IBM_KEY }}
-        FUNC_RUN_ARTIFACTS_URL: ${{ secrets.FUNC_RUN_ARTIFACTS_URL }}
-      run: |
-        # Install Dockerfile content for pytest
-        # install oc/kubctl
-        oc_version=4.9.0-0.okd-2022-01-29-035536
-        curl -L https://github.com/openshift/okd/releases/download/${oc_version}/openshift-client-linux-${oc_version}.tar.gz -o $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz
-        tar -xzvf $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz -C $RUNNER_PATH/
-        rm $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz
-        cp $RUNNER_PATH/kubectl /usr/local/bin/kubectl
-        cp $RUNNER_PATH/oc /usr/local/bin/oc
-        rm -rf $RUNNER_PATH/kubectl
-        rm -rf $RUNNER_PATH/oc
-        # clone benchmark-operator
-        git clone https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
-        # run pytest - only unittest, till solved remote connection issue
-        pytest -v tests/unittest/ --cov=benchmark_runner --cov-report=term-missing
-        coverage run -m pytest  -v tests/unittest/
-        sleep 60
-        coverage report -m
-    - name: 🎥 Publish to coveralls.io
-      env:
-        GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
-      run: |
-        pip install coveralls
-        COVERALLS_REPO_TOKEN=${{ secrets.COVERALLS_REPO_TOKEN }} coveralls
+#   test:
+#     name: test
+#     runs-on: ubuntu-latest
+#     outputs:
+#        start_time_output: ${{ steps.start_step.outputs.start_time }}
+#     steps:
+#     - uses: actions/checkout@v2
+#     - id: start_step
+#       run: echo "::set-output name=start_time::$(printf '%(%s)T' -1)"
+#     - name: Set up Python 3.9
+#       uses: actions/setup-python@v2
+#       with:
+#         python-version: 3.9
+#     - name: Install dependencies
+#       run: |
+#         python -m pip install --upgrade pip
+#         pip install flake8 pytest pytest-cov
+#         if [[ -f requirements.txt ]]; then pip install -r requirements.txt; fi
+#         if [[ -f tests_requirements.txt ]]; then pip install -r tests_requirements.txt; fi
+#     - name: Lint with flake8
+#       run: |
+#         # stop the build if there are Python syntax errors or undefined names
+#         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+#         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+#         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+#     - name: ⚙️ Set Kubeconfig and hosts
+#       env:
+#         KUBECONFIG: ${{ secrets.FUNC_KUBECONFIG }}
+#         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+#         FUNC_OCP_HOSTS: ${{ secrets.FUNC_OCP_HOSTS }}
+#       run: |
+#           mkdir -p "$RUNNER_PATH/.kube/"
+#           echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
+#           echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
+#           sudo tee -a /etc/hosts <<< "$FUNC_OCP_HOSTS" > /dev/null
+#     - name: 📃 Unittest and Integration tests with pytest
+#       env:
+#         KUBEADMIN_PASSWORD: ${{ secrets.FUNC_KUBEADMIN_PASSWORD }}
+#         PIN_NODE1: ${{ secrets.FUNC_PIN_NODE1 }}
+#         PIN_NODE2: ${{ secrets.FUNC_PIN_NODE2 }}
+#         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+#         ELASTICSEARCH: ${{ secrets.FUNC_ELASTICSEARCH }}
+#         ELASTICSEARCH_PORT: ${{ secrets.FUNC_ELASTICSEARCH_PORT }}
+#         ELASTICSEARCH_USER: ${{ secrets.FUNC_ELASTICSEARCH_USER }}
+#         ELASTICSEARCH_PASSWORD: ${{ secrets.FUNC_ELASTICSEARCH_PASSWORD }}
+#         IBM_REGION_NAME: ${{ secrets.IBM_REGION_NAME }}
+#         IBM_ENDPOINT_URL: ${{ secrets.IBM_ENDPOINT_URL }}
+#         IBM_ACCESS_KEY_ID: ${{ secrets.IBM_ACCESS_KEY_ID }}
+#         IBM_SECRET_ACCESS_KEY: ${{ secrets.IBM_SECRET_ACCESS_KEY }}
+#         IBM_BUCKET: ${{ secrets.IBM_BUCKET }}
+#         IBM_KEY: ${{ secrets.IBM_KEY }}
+#         FUNC_RUN_ARTIFACTS_URL: ${{ secrets.FUNC_RUN_ARTIFACTS_URL }}
+#       run: |
+#         # Install Dockerfile content for pytest
+#         # install oc/kubctl
+#         oc_version=4.9.0-0.okd-2022-01-29-035536
+#         curl -L https://github.com/openshift/okd/releases/download/${oc_version}/openshift-client-linux-${oc_version}.tar.gz -o $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz
+#         tar -xzvf $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz -C $RUNNER_PATH/
+#         rm $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz
+#         cp $RUNNER_PATH/kubectl /usr/local/bin/kubectl
+#         cp $RUNNER_PATH/oc /usr/local/bin/oc
+#         rm -rf $RUNNER_PATH/kubectl
+#         rm -rf $RUNNER_PATH/oc
+#         # clone benchmark-operator
+#         git clone https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
+#         # run pytest - only unittest, till solved remote connection issue
+#         pytest -v tests/unittest/ --cov=benchmark_runner --cov-report=term-missing
+#         coverage run -m pytest  -v tests/unittest/
+#         sleep 60
+#         coverage report -m
+#     - name: 🎥 Publish to coveralls.io
+#       env:
+#         GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+#       run: |
+#         pip install coveralls
+#         COVERALLS_REPO_TOKEN=${{ secrets.COVERALLS_REPO_TOKEN }} coveralls
 
-  pypi_upload:
-    name: pypi_upload
-    needs: [test]
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python 3.9
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.9
-    - name: 🔨 Build and publish distribution 📦 to PyPI
-      env:
-        TWINE_USERNAME: __token__
-        TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-      run: |
-        python -m pip install --upgrade pip
-        pip install setuptools wheel twine
-        python setup.py sdist bdist_wheel
-        twine upload dist/*
+#   pypi_upload:
+#     name: pypi_upload
+#     needs: [test]
+#     runs-on: ubuntu-latest
+#     steps:
+#     - uses: actions/checkout@v2
+#     - name: Set up Python 3.9
+#       uses: actions/setup-python@v2
+#       with:
+#         python-version: 3.9
+#     - name: 🔨 Build and publish distribution 📦 to PyPI
+#       env:
+#         TWINE_USERNAME: __token__
+#         TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+#       run: |
+#         python -m pip install --upgrade pip
+#         pip install setuptools wheel twine
+#         python setup.py sdist bdist_wheel
+#         twine upload dist/*
 
-  pypi_validate:
-    name: pypi_validate
-    needs: [test, pypi_upload]
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python 3.9
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.9
-    - name: Validate upload to PyPI
-      env:
-        TWINE_USERNAME: __token__
-        TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-      run: |
-        echo '⌛ Wait till package will be updated in PyPI'
-        # Verify and wait till latest benchmark-runner version will be updated in Pypi (timeout 900 seconds)
-        timeout=900
-        sleep_time=30
-        expected_version=$(python3 setup.py --version)
-        pip --no-cache-dir install benchmark-runner --upgrade
-        build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
-        actual_version="$(cut -d'=' -f2 <<<"$build")"
-        current_wait_time=0
-        while [[ $current_wait_time < $timeout ]]; do
-            if [[ "$expected_version" = "$actual_version" ]]; then
-              echo 'benchmark runner version: ' $expected_version 'was updated in Pypi'
-              break;
-            else
-              # sleep for x seconds
-              echo 'wait' "$((current_wait_time+sleep_time))" 'seconds'
-              sleep $sleep_time
-              current_wait_time="$((current_wait_time+sleep_time))"
-              pip --no-cache-dir install benchmark-runner --upgrade
-              build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
-              actual_version="$(cut -d'=' -f2 <<<"$build")"
-              if (( $current_wait_time == $timeout )); then
-              echo "Benchamrk runner lastet version did not update in Pypi after 900 seconds - raise failure"
-              exit 1
-              fi
-            fi
-        done
+#   pypi_validate:
+#     name: pypi_validate
+#     needs: [test, pypi_upload]
+#     runs-on: ubuntu-latest
+#     steps:
+#     - uses: actions/checkout@v2
+#     - name: Set up Python 3.9
+#       uses: actions/setup-python@v2
+#       with:
+#         python-version: 3.9
+#     - name: Validate upload to PyPI
+#       env:
+#         TWINE_USERNAME: __token__
+#         TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+#       run: |
+#         echo '⌛ Wait till package will be updated in PyPI'
+#         # Verify and wait till latest benchmark-runner version will be updated in Pypi (timeout 900 seconds)
+#         timeout=900
+#         sleep_time=30
+#         expected_version=$(python3 setup.py --version)
+#         pip --no-cache-dir install benchmark-runner --upgrade
+#         build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
+#         actual_version="$(cut -d'=' -f2 <<<"$build")"
+#         current_wait_time=0
+#         while [[ $current_wait_time < $timeout ]]; do
+#             if [[ "$expected_version" = "$actual_version" ]]; then
+#               echo 'benchmark runner version: ' $expected_version 'was updated in Pypi'
+#               break;
+#             else
+#               # sleep for x seconds
+#               echo 'wait' "$((current_wait_time+sleep_time))" 'seconds'
+#               sleep $sleep_time
+#               current_wait_time="$((current_wait_time+sleep_time))"
+#               pip --no-cache-dir install benchmark-runner --upgrade
+#               build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
+#               actual_version="$(cut -d'=' -f2 <<<"$build")"
+#               if (( $current_wait_time == $timeout )); then
+#               echo "Benchamrk runner lastet version did not update in Pypi after 900 seconds - raise failure"
+#               exit 1
+#               fi
+#             fi
+#         done
 
-  quay_upload:
-    name: quay_upload
-    needs: [ test, pypi_upload, pypi_validate]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python 3.9
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.9
-      - name: ⌛ Build and Upload 🐋 to quay.io
-        run: |
-          version=$(python3 setup.py --version)
-          sudo docker build --build-arg VERSION=$version -t quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:v$version .
-          sudo docker build --build-arg VERSION=latest -t quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:latest .
-          sudo docker login quay.io -u ${{ secrets.QAUYIO_ROBOT_USER }} -p ${{ secrets.QAUYIO_ROBOT_TOKEN }}
-          sudo docker push quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:v$version
-          sudo docker push quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:latest
-          echo '⌛ Wait 30 sec till image will be updated in quay.io'
-          sleep 30
+#   quay_upload:
+#     name: quay_upload
+#     needs: [ test, pypi_upload, pypi_validate]
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v2
+#       - name: Set up Python 3.9
+#         uses: actions/setup-python@v2
+#         with:
+#           python-version: 3.9
+#       - name: ⌛ Build and Upload 🐋 to quay.io
+#         run: |
+#           version=$(python3 setup.py --version)
+#           sudo docker build --build-arg VERSION=$version -t quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:v$version .
+#           sudo docker build --build-arg VERSION=latest -t quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:latest .
+#           sudo docker login quay.io -u ${{ secrets.QAUYIO_ROBOT_USER }} -p ${{ secrets.QAUYIO_ROBOT_TOKEN }}
+#           sudo docker push quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:v$version
+#           sudo docker push quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:latest
+#           echo '⌛ Wait 30 sec till image will be updated in quay.io'
+#           sleep 30
 
   bump_version:
     name: bump_version
-    needs: [test, pypi_upload, pypi_validate, quay_upload]
+    #needs: [test, pypi_upload, pypi_validate, quay_upload]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -263,7 +263,7 @@ jobs:
           end=$(printf '%(%s)T' -1)
           ci_minutes_time=$(( (end - START_CI) / 60))
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Test update CI status pass >>>>>>>>>>>>>>>>>>>>>>>>>>'
-          ssh -t provision "podman run --rm -e KUBEADMIN_PASSWORD='$KUBEADMIN_PASSWORD' -e PIN_NODE_BENCHMARK_OPERATOR='$PIN_NODE_BENCHMARK_OPERATOR' -e PIN_NODE1='$PIN_NODE1' -e PIN_NODE2='$PIN_NODE2' -e ELASTICSEARCH='$ELASTICSEARCH' -e ELASTICSEARCH_PORT='$ELASTICSEARCH_PORT' -e ELASTICSEARCH_USER='$ELASTICSEARCH_USER' -e ELASTICSEARCH_PASSWORD='$ELASTICSEARCH_PASSWORD' -e BUILD_VERSION='$build_version' -e CI_STATUS='pass' -e CI_MINUTES_TIME='$ci_minutes_time' -e BENCHMARK_OPERATOR_ID='$BENCHMARK_OPERATOR_ID' -e BENCHMARK_WRAPPER_ID='$BENCHMARK_WRAPPER_ID' -e RUN_TYPE='test_ci' -e FUNC_TIMEOUT='2000' -e log_level='INFO' -v '$KUBECONFIG_PATH':'$CONTAINER_KUBECONFIG_PATH' --privileged 'quay.io/ebattat/benchmark-runner:v$build_version'"
+          podman run --rm -e KUBEADMIN_PASSWORD='$KUBEADMIN_PASSWORD' -e PIN_NODE_BENCHMARK_OPERATOR='$PIN_NODE_BENCHMARK_OPERATOR' -e PIN_NODE1='$PIN_NODE1' -e PIN_NODE2='$PIN_NODE2' -e ELASTICSEARCH='$ELASTICSEARCH' -e ELASTICSEARCH_PORT='$ELASTICSEARCH_PORT' -e ELASTICSEARCH_USER='$ELASTICSEARCH_USER' -e ELASTICSEARCH_PASSWORD='$ELASTICSEARCH_PASSWORD' -e BUILD_VERSION='$build_version' -e CI_STATUS='pass' -e CI_MINUTES_TIME='$ci_minutes_time' -e BENCHMARK_OPERATOR_ID='$BENCHMARK_OPERATOR_ID' -e BENCHMARK_WRAPPER_ID='$BENCHMARK_WRAPPER_ID' -e RUN_TYPE='test_ci' -e FUNC_TIMEOUT='2000' -e log_level='INFO' -v '$KUBECONFIG_PATH':'$CONTAINER_KUBECONFIG_PATH' --privileged 'quay.io/ebattat/benchmark-runner:v$build_version'
       - name: 🎁 Bump Version
         run: |
           version=$(python3 setup.py --version)
@@ -279,84 +279,84 @@ jobs:
           git push https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} main
           git push https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} --tag
 
-  e2e:
-    name: e2e
-    needs: [test, pypi_upload, pypi_validate, quay_upload, bump_version]
-    runs-on: ubuntu-latest
-    strategy:
-       # run one job every time
-       max-parallel: 1
-       # continue to next job if failed
-       fail-fast: false
-       matrix: 
-          workload: [ 'stressng_pod', 'vdbench_pod' ]
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python 3.9
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.9
-    - name: Install latest benchmark-runner
-      run: |
-        python -m pip install --upgrade pip
-        pip install benchmark-runner
-    - name: ⚙️ SET SSH key
-      env:
-        FUNC_PROVISION_PRIVATE_KEY: ${{ secrets.FUNC_PROVISION_PRIVATE_KEY }}
-        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-        FUNC_PROVISION_IP: ${{ secrets.FUNC_PROVISION_IP }}
-        FUNC_PROVISION_USER: ${{ secrets.FUNC_PROVISION_USER }}
-      run: |
-        umask 77
-        mkdir -p "$RUNNER_PATH/.ssh/"
-        echo "$FUNC_PROVISION_PRIVATE_KEY" > $RUNNER_PATH/private_key.txt
-        sudo chmod 600 $RUNNER_PATH/private_key.txt
-        echo "FUNC_PROVISION_PRIVATE_KEY_PATH=$RUNNER_PATH/private_key.txt" >> "$GITHUB_ENV"
-        cat >> "$RUNNER_PATH/.ssh/config" <<END
-        Host provision
-          HostName $FUNC_PROVISION_IP
-          User $FUNC_PROVISION_USER
-          IdentityFile $RUNNER_PATH/private_key.txt
-          StrictHostKeyChecking no
-          ServerAliveInterval 30
-          ServerAliveCountMax 5
-        END
-    - name: ⚙️ Set Kubeconfig and hosts
-      env:
-        KUBECONFIG: ${{ secrets.FUNC_KUBECONFIG }}
-        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-        FUNC_OCP_HOSTS: ${{ secrets.FUNC_OCP_HOSTS }}
-      run: |
-          mkdir -p "$RUNNER_PATH/.kube/"
-          echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
-          echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
-          sudo tee -a /etc/hosts <<< "$FUNC_OCP_HOSTS" > /dev/null
-    - name: ✔️ E2E tests using latest quay.io
-      env:
-        KUBEADMIN_PASSWORD: ${{ secrets.FUNC_KUBEADMIN_PASSWORD }}
-        PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.FUNC_PIN_NODE_BENCHMARK_OPERATOR }}
-        PIN_NODE1: ${{ secrets.FUNC_PIN_NODE1 }}
-        PIN_NODE2: ${{ secrets.FUNC_PIN_NODE2 }}
-        ELASTICSEARCH: ${{ secrets.FUNC_ELASTICSEARCH }}
-        ELASTICSEARCH_PORT: ${{ secrets.FUNC_ELASTICSEARCH_PORT }}
-        ELASTICSEARCH_USER: ${{ secrets.FUNC_ELASTICSEARCH_USER }}
-        ELASTICSEARCH_PASSWORD: ${{ secrets.FUNC_ELASTICSEARCH_PASSWORD }}
-        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-        CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
-        IBM_REGION_NAME: ${{ secrets.IBM_REGION_NAME }}
-        IBM_ENDPOINT_URL: ${{ secrets.IBM_ENDPOINT_URL }}
-        IBM_ACCESS_KEY_ID: ${{ secrets.IBM_ACCESS_KEY_ID }}
-        IBM_SECRET_ACCESS_KEY: ${{ secrets.IBM_SECRET_ACCESS_KEY }}
-        IBM_BUCKET: ${{ secrets.IBM_BUCKET }}
-        IBM_KEY: ${{ secrets.IBM_KEY }}
-        FUNC_RUN_ARTIFACTS_URL: ${{ secrets.FUNC_RUN_ARTIFACTS_URL }}
-      run: |
-        build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
-        build_version="$(cut -d'=' -f2 <<<"$build")"
-        echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start E2E workload: ${{ matrix.workload }} >>>>>>>>>>>>>>>>>>>>>>>>>>'
-        scp -r "$RUNNER_PATH/.kube/config" provision:"$CONTAINER_KUBECONFIG_PATH"
-        ssh -t provision "podman run --rm -t -e WORKLOAD='${{ matrix.workload }}' -e KUBEADMIN_PASSWORD='$KUBEADMIN_PASSWORD' -e PIN_NODE_BENCHMARK_OPERATOR='$PIN_NODE_BENCHMARK_OPERATOR' -e PIN_NODE1='$PIN_NODE1' -e PIN_NODE2='$PIN_NODE2' -e ELASTICSEARCH='$ELASTICSEARCH' -e ELASTICSEARCH_PORT='$ELASTICSEARCH_PORT' -e ELASTICSEARCH_USER='$ELASTICSEARCH_USER' -e ELASTICSEARCH_PASSWORD='$ELASTICSEARCH_PASSWORD' -e IBM_REGION_NAME='$IBM_REGION_NAME' -e IBM_ENDPOINT_URL='$IBM_ENDPOINT_URL' -e IBM_ACCESS_KEY_ID='$IBM_ACCESS_KEY_ID' -e IBM_SECRET_ACCESS_KEY='$IBM_SECRET_ACCESS_KEY' -e IBM_BUCKET='$IBM_BUCKET' -e IBM_KEY='$IBM_KEY' -e FUNC_RUN_ARTIFACTS_URL='$FUNC_RUN_ARTIFACTS_URL' -e BUILD_VERSION='$build_version' -e RUN_TYPE='test_ci' -e FUNC_TIMEOUT='2000' -e log_level='INFO' -v '$CONTAINER_KUBECONFIG_PATH':'$CONTAINER_KUBECONFIG_PATH' --privileged 'quay.io/ebattat/benchmark-runner:v$build_version'"
-        ssh -t provision "podman rmi -f 'quay.io/ebattat/benchmark-runner:v$build_version'"
-        echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End E2E workload: ${{ matrix.workload }} >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
+#   e2e:
+#     name: e2e
+#     needs: [test, pypi_upload, pypi_validate, quay_upload, bump_version]
+#     runs-on: ubuntu-latest
+#     strategy:
+#        # run one job every time
+#        max-parallel: 1
+#        # continue to next job if failed
+#        fail-fast: false
+#        matrix: 
+#           workload: [ 'stressng_pod', 'vdbench_pod' ]
+#     steps:
+#     - uses: actions/checkout@v2
+#     - name: Set up Python 3.9
+#       uses: actions/setup-python@v2
+#       with:
+#         python-version: 3.9
+#     - name: Install latest benchmark-runner
+#       run: |
+#         python -m pip install --upgrade pip
+#         pip install benchmark-runner
+#     - name: ⚙️ SET SSH key
+#       env:
+#         FUNC_PROVISION_PRIVATE_KEY: ${{ secrets.FUNC_PROVISION_PRIVATE_KEY }}
+#         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+#         FUNC_PROVISION_IP: ${{ secrets.FUNC_PROVISION_IP }}
+#         FUNC_PROVISION_USER: ${{ secrets.FUNC_PROVISION_USER }}
+#       run: |
+#         umask 77
+#         mkdir -p "$RUNNER_PATH/.ssh/"
+#         echo "$FUNC_PROVISION_PRIVATE_KEY" > $RUNNER_PATH/private_key.txt
+#         sudo chmod 600 $RUNNER_PATH/private_key.txt
+#         echo "FUNC_PROVISION_PRIVATE_KEY_PATH=$RUNNER_PATH/private_key.txt" >> "$GITHUB_ENV"
+#         cat >> "$RUNNER_PATH/.ssh/config" <<END
+#         Host provision
+#           HostName $FUNC_PROVISION_IP
+#           User $FUNC_PROVISION_USER
+#           IdentityFile $RUNNER_PATH/private_key.txt
+#           StrictHostKeyChecking no
+#           ServerAliveInterval 30
+#           ServerAliveCountMax 5
+#         END
+#     - name: ⚙️ Set Kubeconfig and hosts
+#       env:
+#         KUBECONFIG: ${{ secrets.FUNC_KUBECONFIG }}
+#         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+#         FUNC_OCP_HOSTS: ${{ secrets.FUNC_OCP_HOSTS }}
+#       run: |
+#           mkdir -p "$RUNNER_PATH/.kube/"
+#           echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
+#           echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
+#           sudo tee -a /etc/hosts <<< "$FUNC_OCP_HOSTS" > /dev/null
+#     - name: ✔️ E2E tests using latest quay.io
+#       env:
+#         KUBEADMIN_PASSWORD: ${{ secrets.FUNC_KUBEADMIN_PASSWORD }}
+#         PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.FUNC_PIN_NODE_BENCHMARK_OPERATOR }}
+#         PIN_NODE1: ${{ secrets.FUNC_PIN_NODE1 }}
+#         PIN_NODE2: ${{ secrets.FUNC_PIN_NODE2 }}
+#         ELASTICSEARCH: ${{ secrets.FUNC_ELASTICSEARCH }}
+#         ELASTICSEARCH_PORT: ${{ secrets.FUNC_ELASTICSEARCH_PORT }}
+#         ELASTICSEARCH_USER: ${{ secrets.FUNC_ELASTICSEARCH_USER }}
+#         ELASTICSEARCH_PASSWORD: ${{ secrets.FUNC_ELASTICSEARCH_PASSWORD }}
+#         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+#         CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
+#         IBM_REGION_NAME: ${{ secrets.IBM_REGION_NAME }}
+#         IBM_ENDPOINT_URL: ${{ secrets.IBM_ENDPOINT_URL }}
+#         IBM_ACCESS_KEY_ID: ${{ secrets.IBM_ACCESS_KEY_ID }}
+#         IBM_SECRET_ACCESS_KEY: ${{ secrets.IBM_SECRET_ACCESS_KEY }}
+#         IBM_BUCKET: ${{ secrets.IBM_BUCKET }}
+#         IBM_KEY: ${{ secrets.IBM_KEY }}
+#         FUNC_RUN_ARTIFACTS_URL: ${{ secrets.FUNC_RUN_ARTIFACTS_URL }}
+#       run: |
+#         build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
+#         build_version="$(cut -d'=' -f2 <<<"$build")"
+#         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start E2E workload: ${{ matrix.workload }} >>>>>>>>>>>>>>>>>>>>>>>>>>'
+#         scp -r "$RUNNER_PATH/.kube/config" provision:"$CONTAINER_KUBECONFIG_PATH"
+#         ssh -t provision "podman run --rm -t -e WORKLOAD='${{ matrix.workload }}' -e KUBEADMIN_PASSWORD='$KUBEADMIN_PASSWORD' -e PIN_NODE_BENCHMARK_OPERATOR='$PIN_NODE_BENCHMARK_OPERATOR' -e PIN_NODE1='$PIN_NODE1' -e PIN_NODE2='$PIN_NODE2' -e ELASTICSEARCH='$ELASTICSEARCH' -e ELASTICSEARCH_PORT='$ELASTICSEARCH_PORT' -e ELASTICSEARCH_USER='$ELASTICSEARCH_USER' -e ELASTICSEARCH_PASSWORD='$ELASTICSEARCH_PASSWORD' -e IBM_REGION_NAME='$IBM_REGION_NAME' -e IBM_ENDPOINT_URL='$IBM_ENDPOINT_URL' -e IBM_ACCESS_KEY_ID='$IBM_ACCESS_KEY_ID' -e IBM_SECRET_ACCESS_KEY='$IBM_SECRET_ACCESS_KEY' -e IBM_BUCKET='$IBM_BUCKET' -e IBM_KEY='$IBM_KEY' -e FUNC_RUN_ARTIFACTS_URL='$FUNC_RUN_ARTIFACTS_URL' -e BUILD_VERSION='$build_version' -e RUN_TYPE='test_ci' -e FUNC_TIMEOUT='2000' -e log_level='INFO' -v '$CONTAINER_KUBECONFIG_PATH':'$CONTAINER_KUBECONFIG_PATH' --privileged 'quay.io/ebattat/benchmark-runner:v$build_version'"
+#         ssh -t provision "podman rmi -f 'quay.io/ebattat/benchmark-runner:v$build_version'"
+#         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End E2E workload: ${{ matrix.workload }} >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
         
 
