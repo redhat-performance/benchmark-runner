@@ -77,7 +77,7 @@ jobs:
       - name: ☉ Install ${{ matrix.resource }} Operator 
         env:
           CNV_VERSION: "4.11"
-          ODF_VERSION: "4.10"
+          ODF_VERSION: "4.9"
           NUM_ODF_DISK : "1"
           QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
           QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
