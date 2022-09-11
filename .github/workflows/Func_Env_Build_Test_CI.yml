@@ -184,86 +184,10 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
-      - name: ⚙ Set START CI TIME
-        run: echo "START_CI=${{ needs.test.outputs.start_time_output }}" >> "$GITHUB_ENV"
       - name: Install latest benchmark-runner
         run: |
           python -m pip install --upgrade pip
           pip install benchmark-runner wheel
-      - name: ⚙️ SET SSH key
-        env:
-          FUNC_PROVISION_PRIVATE_KEY: ${{ secrets.FUNC_PROVISION_PRIVATE_KEY }}
-          RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-          FUNC_PROVISION_IP: ${{ secrets.FUNC_PROVISION_IP }}
-          FUNC_PROVISION_USER: ${{ secrets.FUNC_PROVISION_USER }}
-        run: |
-          umask 77
-          mkdir -p "$RUNNER_PATH/.ssh/"
-          echo "$FUNC_PROVISION_PRIVATE_KEY" > $RUNNER_PATH/private_key.txt
-          sudo chmod 600 $RUNNER_PATH/private_key.txt
-          echo "FUNC_PROVISION_PRIVATE_KEY_PATH=$RUNNER_PATH/private_key.txt" >> "$GITHUB_ENV"
-          cat >> "$RUNNER_PATH/.ssh/config" <<END
-          Host provision
-            HostName $FUNC_PROVISION_IP
-            User $FUNC_PROVISION_USER
-            IdentityFile $RUNNER_PATH/private_key.txt
-            StrictHostKeyChecking no
-            ServerAliveInterval 30
-            ServerAliveCountMax 5
-          END
-      - name: ⚙️ Set Kubeconfig and hosts
-        env:
-          KUBECONFIG: ${{ secrets.FUNC_KUBECONFIG }}
-          RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-          FUNC_OCP_HOSTS: ${{ secrets.FUNC_OCP_HOSTS }}
-        run: |
-          mkdir -p "$RUNNER_PATH/.kube/"
-          echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
-          echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
-          sudo tee -a /etc/hosts <<< "$FUNC_OCP_HOSTS" > /dev/null
-      - name: ✔️ Update status
-        env:
-          KUBEADMIN_PASSWORD: ${{ secrets.FUNC_KUBEADMIN_PASSWORD }}
-          PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.FUNC_PIN_NODE_BENCHMARK_OPERATOR }}
-          PIN_NODE1: ${{ secrets.FUNC_PIN_NODE1 }}
-          PIN_NODE2: ${{ secrets.FUNC_PIN_NODE2 }}
-          ELASTICSEARCH: ${{ secrets.FUNC_ELASTICSEARCH }}
-          ELASTICSEARCH_PORT: ${{ secrets.FUNC_ELASTICSEARCH_PORT }}
-          ELASTICSEARCH_USER: ${{ secrets.FUNC_ELASTICSEARCH_USER }}
-          ELASTICSEARCH_PASSWORD: ${{ secrets.FUNC_ELASTICSEARCH_PASSWORD }}
-          RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-          CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
-          IBM_REGION_NAME: ${{ secrets.IBM_REGION_NAME }}
-          IBM_ENDPOINT_URL: ${{ secrets.IBM_ENDPOINT_URL }}
-          IBM_ACCESS_KEY_ID: ${{ secrets.IBM_ACCESS_KEY_ID }}
-          IBM_SECRET_ACCESS_KEY: ${{ secrets.IBM_SECRET_ACCESS_KEY }}
-          IBM_BUCKET: ${{ secrets.IBM_BUCKET }}
-          IBM_KEY: ${{ secrets.IBM_KEY }}
-          FUNC_RUN_ARTIFACTS_URL: ${{ secrets.FUNC_RUN_ARTIFACTS_URL }}
-        run: |
-          # get repository last id 'benchmark-operator' already cloned in pyest
-          declare -a repositories=('benchmark-wrapper')
-          for repository in "${repositories[@]}"
-          do
-              git clone "https://github.com/cloud-bulldozer/$repository" "$RUNNER_PATH/$repository"
-              pushd "$RUNNER_PATH/$repository"
-              if [[ $repository == 'benchmark-operator' ]]
-              then
-                  # 'benchmark-operator' already cloned in pyest
-                  echo "BENCHMARK_OPERATOR_ID=$(git rev-parse @)" >> "$GITHUB_ENV"
-                  BENCHMARK_OPERATOR_ID=$(git rev-parse @)
-              else
-                  echo "BENCHMARK_WRAPPER_ID=$(git rev-parse @)" >> "$GITHUB_ENV"
-                  BENCHMARK_WRAPPER_ID=$(git rev-parse @)
-              fi
-              popd
-          done
-          build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
-          build_version="$(cut -d'=' -f2 <<<"$build")"
-          end=$(printf '%(%s)T' -1)
-          ci_minutes_time=$(( (end - START_CI) / 60))
-          echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Test update CI status pass >>>>>>>>>>>>>>>>>>>>>>>>>>'
-          podman run --rm -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e ELASTICSEARCH_USER="$ELASTICSEARCH_USER" -e ELASTICSEARCH_PASSWORD="$ELASTICSEARCH_PASSWORD" -e BUILD_VERSION="$build_version" -e CI_STATUS="pass" -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e RUN_TYPE="test_ci" -e FUNC_TIMEOUT="2000" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
       - name: 🎁 Bump Version
         run: |
           version=$(python3 setup.py --version)
