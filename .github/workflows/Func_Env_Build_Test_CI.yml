@@ -79,8 +79,8 @@ jobs:
         # clone benchmark-operator
         git clone https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
         # run pytest - only unittest, till solved remote connection issue
-        pytest -v tests/unittest/ --cov=benchmark_runner --cov-report=term-missing
-        coverage run -m pytest  -v tests/unittest/
+        pytest --cov=benchmark_runner --cov-report=term-missing
+        coverage run -m pytest
         sleep 60
         coverage report -m
     - name: 🎥 Publish to coveralls.io
