@@ -3,16 +3,16 @@
 # This is a nightly CI Pipeline against Performance environment using IPI installer - run on Monday
 name: Deploy Assisted installer Perf Env Weekly CI
 
-# on:
-#   schedule:
-#     - cron: '0 4 * * 1' # run on Monday at 4 AM UTC/ 0 AM EDT
+on:
+  schedule:
+    - cron: '0 4 * * 1' # run on Monday at 4 AM UTC/ 0 AM EDT
 
 #on:
 #  workflow_dispatch:
 
-on:
- push:
-   branches: [ main ]
+# on:
+#  push:
+#    branches: [ main ]
 
 
 # Ensures that only one deploy task per branch/environment will run at a time.
