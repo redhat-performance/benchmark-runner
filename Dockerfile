@@ -54,7 +54,7 @@ RUN mkdir -p /tmp/run_artifacts
 RUN git clone -b v1.0.1 https://github.com/cloud-bulldozer/benchmark-operator /tmp/benchmark-operator
 
 # download clusterbuster to /tmp default path && install cluster-buster dependency
-RUN git clone -b v1.1.5-kata-ci https://github.com/RobertKrawitz/OpenShift4-tools /tmp/OpenShift4-tools \
+RUN git clone -b v1.1.6-kata-ci https://github.com/RobertKrawitz/OpenShift4-tools /tmp/OpenShift4-tools \
     && dnf install -y hostname bc procps-ng
 
 # Add main
