@@ -153,7 +153,7 @@ jobs:
         FUNC_RUN_ARTIFACTS_URL: ${{ secrets.FUNC_RUN_ARTIFACTS_URL }}
         FUNC_SCALE_NODES: ${{ secrets.FUNC_SCALE_NODES }}
         FUNC_REDIS: ${{ secrets.FUNC_REDIS }}
-        FUNC_TIMEOUT: 2000
+        FUNC_TIMEOUT: 3600
         SCALE: 1
       run: |
         build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')

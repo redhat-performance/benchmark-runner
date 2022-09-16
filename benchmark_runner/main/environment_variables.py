@@ -142,7 +142,7 @@ class EnvironmentVariables:
         # Constant parameters
 
         # Parameters below related to 'azure_cluster_start_stop()'
-        # Azure details
+        # Azure data
         self._environment_variables_dict['azure_cluster_stop'] = EnvironmentVariables.get_env('AZURE_CLUSTER_STOP', '')
         self._environment_variables_dict['azure_cluster_start'] = EnvironmentVariables.get_env('AZURE_CLUSTER_START', '')
         self._environment_variables_dict['azure_clientid'] = EnvironmentVariables.get_env('AZURE_CLIENTID', '')
@@ -152,7 +152,11 @@ class EnvironmentVariables:
         self._environment_variables_dict['azure_resource_group_name'] = EnvironmentVariables.get_env('AZURE_RESOURCE_GROUP_NAME', '')
         self._environment_variables_dict['azure_vm_name'] = EnvironmentVariables.get_env('AZURE_VM_NAME', '')
 
-        # IBM details
+        # CLUSTRBUSTER data
+        self._environment_variables_dict['clusterbuster_workload'] = EnvironmentVariables.get_env('CLUSTERBUSTER_WORKLOAD', '')
+        self._environment_variables_dict['clusterbuster_uuid'] = EnvironmentVariables.get_env('CLUSTERBUSTER_UUID', '')
+
+        # IBM data
         self._environment_variables_dict['region_name'] = EnvironmentVariables.get_env('IBM_REGION_NAME', '')
         # None(default) - must for unittest
         self._environment_variables_dict['endpoint_url'] = EnvironmentVariables.get_env('IBM_ENDPOINT_URL', None)
@@ -188,7 +192,7 @@ class EnvironmentVariables:
         # Parameters below related to 'install_ocp()' and 'install_resource()'
         # Mandatory: OCP environment flavor PERF or FUNC
         self._environment_variables_dict['ocp_env_flavor'] = EnvironmentVariables.get_env('OCP_ENV_FLAVOR', 'FUNC')
-        # IBM details
+        # IBM data
         self._environment_variables_dict['ibm_api_key'] = EnvironmentVariables.get_env('IBM_API_KEY', '')
         # github token
         self._environment_variables_dict['github_token'] = EnvironmentVariables.get_env('GITHUB_TOKEN', '')
