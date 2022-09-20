@@ -10,7 +10,6 @@ on:
     workflows: ["Deploy Assisted installer Func Env Weekly CI"]
     types:
       - completed
-  workflow_dispatch:
 
 #on:
 #  push:
