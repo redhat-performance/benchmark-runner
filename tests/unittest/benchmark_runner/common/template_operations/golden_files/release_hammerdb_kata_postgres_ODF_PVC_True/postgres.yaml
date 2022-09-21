@@ -3,6 +3,21 @@ kind: Namespace
 metadata:
   name: postgres-db
 ---
+#This is a tweak of the restricted scc, to allow fsGroup to be specified in a deployment
+# workaround for kata virtiofsd permission error in ODF 4.10.5
+apiVersion: security.openshift.io/v1
+metadata:
+  name: postgresdbscc
+kind: SecurityContextConstraints
+fsGroup:
+  type: RunAsAny
+runAsUser:
+  type: MustRunAsRange
+seLinuxContext:
+  type: MustRunAs
+users:
+- system:serviceaccount:postgres-db:default
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -35,6 +50,9 @@ spec:
       nodeSelector:
         kubernetes.io/hostname: "pin-node-2"
       runtimeClassName: kata
+      # workaround for kata virtiofsd permission error in ODF 4.10.5
+      securityContext:
+        fsGroup: 0
       terminationGracePeriodSeconds: 10
       containers:
         - name: postgres
