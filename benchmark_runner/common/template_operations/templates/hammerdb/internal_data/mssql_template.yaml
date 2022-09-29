@@ -20,6 +20,47 @@ users:
 - system:serviceaccount:mssql-db:default
 ---
 {%- endif %}
+{%- if storage_type == 'lso' %}
+apiVersion: local.storage.openshift.io/v1
+kind: LocalVolume
+metadata:
+  name: local-disks
+  namespace: openshift-local-storage
+spec:
+  nodeSelector:
+    nodeSelectorTerms:
+    - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - {{ pin_node2 }}
+  storageClassDevices:
+    - storageClassName: local-sc
+      volumeMode: Filesystem
+      fsType: ext4
+      devicePaths:
+        - {{ lso_path }}
+---
+{%- endif %}
+{%- if storage_type == 'lso' or  odf_pvc == True %}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+    name: mssql-persistent-storage
+    namespace: mssql-db
+spec:
+    {%- if storage_type == 'lso' %}
+    storageClassName: local-sc
+    {%- else %}
+    storageClassName: ocs-storagecluster-ceph-rbd
+    {%- endif %}
+    accessModes: [ "ReadWriteOnce" ]
+    volumeMode: Filesystem
+    resources:
+      requests:
+        storage: {{ storage }}
+---
+{%- endif %}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -71,31 +112,18 @@ spec:
             value: "Y"
           - name: MSSQL_SA_PASSWORD
             value: "s3curePasswordString"
-        {%- if odf_pvc == True %}
+        securityContext:
+          allowPrivilegeEscalation: true
+      {%- if storage_type == 'lso' or odf_pvc == True %}
         volumeMounts:
           - name: mssql-persistent-storage
             mountPath: /var/opt/mssql
             readOnly: false
-        securityContext:
-          allowPrivilegeEscalation: true
       volumes:
         - name: mssql-persistent-storage
           persistentVolumeClaim:
             claimName: mssql-persistent-storage
----
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-    name: mssql-persistent-storage
-    namespace: mssql-db
-spec:
-    storageClassName: ocs-storagecluster-ceph-rbd
-    accessModes: [ "ReadWriteOnce" ]
-    volumeMode: Filesystem
-    resources:
-      requests:
-        storage: {{ storage }}
-{%- endif %}
+      {%- endif %}
 ---
 apiVersion: v1
 kind: Service

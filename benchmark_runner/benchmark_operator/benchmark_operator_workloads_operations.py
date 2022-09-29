@@ -32,6 +32,7 @@ class BenchmarkOperatorWorkloadsOperations:
         self._run_type = self._environment_variables_dict.get('run_type', '')
         self._workloads_odf_pvc = list(self._environment_variables_dict.get('workloads_odf_pvc', ''))
         self._odf_pvc = self._environment_variables_dict.get('odf_pvc', '')
+        self._storage_type = self._environment_variables_dict.get('storage_type', '')
         self._system_metrics = self._environment_variables_dict.get('system_metrics', '')
         self._elasticsearch = self._environment_variables_dict.get('elasticsearch', '')
         self._run_artifacts = self._environment_variables_dict.get('run_artifacts', '')
@@ -214,7 +215,8 @@ class BenchmarkOperatorWorkloadsOperations:
                     'ci_date': datetime.datetime.now().strftime(date_format),
                     'pin_node_benchmark_operator': self._pin_node_benchmark_operator,
                     'pin_node1': self._pin_node1,
-                    'pin_node2': self._pin_node2}
+                    'pin_node2': self._pin_node2,
+                    'storage_type': self._storage_type}
         if kind:
             metadata.update({'kind': kind})
         if status:
@@ -451,13 +453,15 @@ class BenchmarkOperatorWorkloadsOperations:
     @logger_time_stamp
     def delete_all(self):
         """
-        This method delete all pod in namespace
+        This method delete all pod or unbound pv in namespace
         :return:
         """
         # make undeploy benchmark controller manager if exist
         self.make_undeploy_benchmark_controller_manager_if_exist(runner_path=environment_variables.environment_variables_dict['runner_path'])
         if 'hammerdb' in self._workload:
             self._oc.delete_namespace(namespace=f"{self._workload.split('_')[2]}-db")
+        if self._storage_type == 'lso':
+            self._oc.delete_available_released_pv()
 
     @logger_time_stamp
     def clear_nodes_cache(self):
@@ -473,10 +477,10 @@ class BenchmarkOperatorWorkloadsOperations:
         """
         self.delete_all()
         self.clear_nodes_cache()
-        # make deploy benchmark controller manager
-        self.make_deploy_benchmark_controller_manager(runner_path=environment_variables.environment_variables_dict['runner_path'])
         if self._odf_pvc:
             self.odf_pvc_verification()
+        # make deploy benchmark controller manager
+        self.make_deploy_benchmark_controller_manager(runner_path=environment_variables.environment_variables_dict['runner_path'])
         self._template.generate_yamls()
         if self._enable_prometheus_snapshot:
             self.start_prometheus()

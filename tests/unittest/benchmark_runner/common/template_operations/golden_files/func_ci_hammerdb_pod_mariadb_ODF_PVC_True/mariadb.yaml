@@ -3,6 +3,19 @@ kind: Namespace
 metadata:
   name: mariadb-db
 ---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+    name: mariadb-persistent-storage
+    namespace: mariadb-db
+spec:
+    storageClassName: ocs-storagecluster-ceph-rbd
+    accessModes: [ "ReadWriteOnce" ]
+    volumeMode: Filesystem
+    resources:
+      requests:
+        storage: 10Gi
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -77,19 +90,6 @@ spec:
         - name: mariadb-persistent-storage
           persistentVolumeClaim:
             claimName: mariadb-persistent-storage
----
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-    name: mariadb-persistent-storage
-    namespace: mariadb-db
-spec:
-    storageClassName: ocs-storagecluster-ceph-rbd
-    accessModes: [ "ReadWriteOnce" ]
-    volumeMode: Filesystem
-    resources:
-      requests:
-        storage: 10Gi
 ---
 apiVersion: v1
 kind: Service
