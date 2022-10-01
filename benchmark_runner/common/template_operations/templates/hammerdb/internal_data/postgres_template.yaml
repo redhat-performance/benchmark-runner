@@ -20,6 +20,47 @@ users:
 - system:serviceaccount:postgres-db:default
 ---
 {%- endif %}
+{%- if storage_type == 'lso' %}
+apiVersion: local.storage.openshift.io/v1
+kind: LocalVolume
+metadata:
+  name: local-disks
+  namespace: openshift-local-storage
+spec:
+  nodeSelector:
+    nodeSelectorTerms:
+    - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - {{ pin_node2 }}
+  storageClassDevices:
+    - storageClassName: local-sc
+      volumeMode: Filesystem
+      fsType: ext4
+      devicePaths:
+        - {{ lso_path }}
+---
+{%- endif %}
+{%- if storage_type == 'lso' or  odf_pvc == True %}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+    name: postgres-persistent-storage
+    namespace: postgres-db
+spec:
+    {%- if storage_type == 'lso' %}
+    storageClassName: local-sc
+    {%- else %}
+    storageClassName: ocs-storagecluster-ceph-rbd
+    {%- endif %}
+    accessModes: [ "ReadWriteOnce" ]
+    volumeMode: Filesystem
+    resources:
+      requests:
+        storage: {{ storage }}
+---
+{%- endif %}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -90,33 +131,20 @@ spec:
             - name: postgres-custom-config
               mountPath: /var/lib/pgsql/data/pg_hba.conf
               subPath: custom.pg_hba.conf #should be the name used in the ConfigMap
-          {%- if odf_pvc == True %}
+          {%- if storage_type == 'lso' or odf_pvc == True %}
             - name: postgres-persistent-storage
               mountPath: /var/lib/pgsql/data
               readOnly: false
-      {%- endif %}
+          {%- endif %}
       volumes:
         - name: postgres-custom-config
           configMap:
             name: postgres-custom-config
-        {%- if odf_pvc == True %}
+        {%- if storage_type == 'lso' or odf_pvc == True %}
         - name: postgres-persistent-storage
           persistentVolumeClaim:
             claimName: postgres-persistent-storage
----
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-    name: postgres-persistent-storage
-    namespace: postgres-db
-spec:
-    storageClassName: ocs-storagecluster-ceph-rbd
-    accessModes: [ "ReadWriteOnce" ]
-    volumeMode: Filesystem
-    resources:
-      requests:
-        storage: {{ storage }}
-{%- endif %}
+        {%- endif %}
 ---
 apiVersion: v1
 kind: Service

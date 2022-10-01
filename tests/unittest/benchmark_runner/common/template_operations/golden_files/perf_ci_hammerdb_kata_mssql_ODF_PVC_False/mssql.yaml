@@ -61,6 +61,8 @@ spec:
             value: "Y"
           - name: MSSQL_SA_PASSWORD
             value: "s3curePasswordString"
+        securityContext:
+          allowPrivilegeEscalation: true
 ---
 apiVersion: v1
 kind: Service

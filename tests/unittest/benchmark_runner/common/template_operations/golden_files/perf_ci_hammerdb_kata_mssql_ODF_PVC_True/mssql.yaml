@@ -18,6 +18,19 @@ seLinuxContext:
 users:
 - system:serviceaccount:mssql-db:default
 ---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+    name: mssql-persistent-storage
+    namespace: mssql-db
+spec:
+    storageClassName: ocs-storagecluster-ceph-rbd
+    accessModes: [ "ReadWriteOnce" ]
+    volumeMode: Filesystem
+    resources:
+      requests:
+        storage: 100Gi
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -61,29 +74,16 @@ spec:
             value: "Y"
           - name: MSSQL_SA_PASSWORD
             value: "s3curePasswordString"
+        securityContext:
+          allowPrivilegeEscalation: true
         volumeMounts:
           - name: mssql-persistent-storage
             mountPath: /var/opt/mssql
             readOnly: false
-        securityContext:
-          allowPrivilegeEscalation: true
       volumes:
         - name: mssql-persistent-storage
           persistentVolumeClaim:
             claimName: mssql-persistent-storage
----
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-    name: mssql-persistent-storage
-    namespace: mssql-db
-spec:
-    storageClassName: ocs-storagecluster-ceph-rbd
-    accessModes: [ "ReadWriteOnce" ]
-    volumeMode: Filesystem
-    resources:
-      requests:
-        storage: 100Gi
 ---
 apiVersion: v1
 kind: Service

@@ -150,6 +150,17 @@ class OC(SSH):
         """
         return self.run(fr""" {self.__cli} get nodes -l node-role.kubernetes.io/worker= -o jsonpath="{{range .items[*]}}{{.metadata.name}}{{'\n'}}{{end}}" """)
 
+    def delete_available_released_pv(self):
+        """
+        This method delete available or released pv because that avoid launching new pv
+        """
+        pv_status_list = self.run(fr"{self.__cli} get pv -ojsonpath={{..status.phase}}").split()
+        for pv_status in pv_status_list:
+            if pv_status == 'Available' or pv_status == 'Released':
+                available_pv = self.run(fr"{self.__cli} get pv -ojsonpath={{.items[{pv_status_list.index(pv_status)}].metadata.name}}")
+                logger.info(f'Delete {pv_status} pv {available_pv}')
+                self.run(fr"{self.__cli} delete pv {available_pv}")
+
     def clear_node_caches(self):
         """
         This method clears the node's buffer cache
