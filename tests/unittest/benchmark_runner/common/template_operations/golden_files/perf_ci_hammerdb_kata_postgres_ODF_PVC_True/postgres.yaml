@@ -18,6 +18,19 @@ seLinuxContext:
 users:
 - system:serviceaccount:postgres-db:default
 ---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+    name: postgres-persistent-storage
+    namespace: postgres-db
+spec:
+    storageClassName: ocs-storagecluster-ceph-rbd
+    accessModes: [ "ReadWriteOnce" ]
+    volumeMode: Filesystem
+    resources:
+      requests:
+        storage: 100Gi
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -90,19 +103,6 @@ spec:
         - name: postgres-persistent-storage
           persistentVolumeClaim:
             claimName: postgres-persistent-storage
----
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-    name: postgres-persistent-storage
-    namespace: postgres-db
-spec:
-    storageClassName: ocs-storagecluster-ceph-rbd
-    accessModes: [ "ReadWriteOnce" ]
-    volumeMode: Filesystem
-    resources:
-      requests:
-        storage: 100Gi
 ---
 apiVersion: v1
 kind: Service

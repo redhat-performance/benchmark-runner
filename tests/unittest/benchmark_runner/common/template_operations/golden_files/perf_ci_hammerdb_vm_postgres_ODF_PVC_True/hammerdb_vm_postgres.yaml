@@ -1,3 +1,4 @@
+
 apiVersion: ripsaw.cloudbulldozer.io/v1alpha1
 kind: Benchmark
 metadata:
@@ -20,7 +21,7 @@ spec:
     name: hammerdb
     args:
       pin: True # enable for nodeSelector
-      pin_node: "pin-node-1"
+      pin_node: "pin-node-2"
       db_type: "pg"
       timed_test: true
       test_type: "tpc-c"
