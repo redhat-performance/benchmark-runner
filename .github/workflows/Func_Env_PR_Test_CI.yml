@@ -4,10 +4,6 @@
 
 name: Func Env PR Test CI
 
-# on:
-#   pull_request_target:
-#     branches: [ main ] 
-
 on:
   pull_request_target:
     branches: [ main ]
