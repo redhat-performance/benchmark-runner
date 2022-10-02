@@ -11,6 +11,7 @@ on:
     workflows: ["Deploy Operator FUNC Env Weekly CI"]
     types:
       - completed
+  workflow_dispatch:
 
 # on:
 #  push:
