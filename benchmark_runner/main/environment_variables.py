@@ -204,35 +204,33 @@ class EnvironmentVariables:
         self._environment_variables_dict['install_resources_list'] = EnvironmentVariables.get_env('INSTALL_RESOURCES_LIST', '')
 
         # Parameters below related to 'install_ocp()' and 'install_resource()'
-        # Mandatory: OCP environment flavor PERF or FUNC
-        self._environment_variables_dict['ocp_env_flavor'] = EnvironmentVariables.get_env('OCP_ENV_FLAVOR', 'FUNC')
+
         # IBM data
         self._environment_variables_dict['ibm_api_key'] = EnvironmentVariables.get_env('IBM_API_KEY', '')
         # github token
         self._environment_variables_dict['github_token'] = EnvironmentVariables.get_env('GITHUB_TOKEN', '')
-        self.__ocp_env_flavor = self._environment_variables_dict['ocp_env_flavor']
-        self._environment_variables_dict['worker_ids'] = EnvironmentVariables.get_env(f'{self.__ocp_env_flavor}_WORKER_IDS', "")
-        self._environment_variables_dict['provision_ip'] = EnvironmentVariables.get_env(f'{self.__ocp_env_flavor}_PROVISION_IP', '')
+        self._environment_variables_dict['worker_ids'] = EnvironmentVariables.get_env(f'WORKER_IDS', "")
+        self._environment_variables_dict['provision_ip'] = EnvironmentVariables.get_env(f'PROVISION_IP', '')
         # Placed on secret only
-        self._environment_variables_dict['provision_private_key'] = EnvironmentVariables.get_env(f'{self.__ocp_env_flavor}_PROVISION_PRIVATE_KEY', '')
+        self._environment_variables_dict['provision_private_key'] = EnvironmentVariables.get_env(f'PROVISION_PRIVATE_KEY', '')
         # For internal private key path
-        self._environment_variables_dict['provision_private_key_path'] = EnvironmentVariables.get_env(f'{self.__ocp_env_flavor}_PROVISION_PRIVATE_KEY_PATH', '')
+        self._environment_variables_dict['provision_private_key_path'] = EnvironmentVariables.get_env(f'PROVISION_PRIVATE_KEY_PATH', '')
         self._environment_variables_dict['container_private_key_path'] = EnvironmentVariables.get_env('CONTAINER_PRIVATE_KEY_PATH', '')
-        self._environment_variables_dict['provision_user'] = EnvironmentVariables.get_env(f'{self.__ocp_env_flavor}_PROVISION_USER', '')
-        self._environment_variables_dict['provision_port'] = EnvironmentVariables.get_env(f'{self.__ocp_env_flavor}_PROVISION_PORT', '')
-        self._environment_variables_dict['provision_kubeadmin_password_path'] = EnvironmentVariables.get_env(f'{self.__ocp_env_flavor}_PROVISION_KUBEADMIN_PASSWORD_PATH', '')
-        self._environment_variables_dict['provision_kubeconfig_path'] = EnvironmentVariables.get_env(f'{self.__ocp_env_flavor}_PROVISION_KUBECONFIG_PATH', '')
+        self._environment_variables_dict['provision_user'] = EnvironmentVariables.get_env(f'PROVISION_USER', '')
+        self._environment_variables_dict['provision_port'] = EnvironmentVariables.get_env(f'PROVISION_PORT', '')
+        self._environment_variables_dict['provision_kubeadmin_password_path'] = EnvironmentVariables.get_env(f'PROVISION_KUBEADMIN_PASSWORD_PATH', '')
+        self._environment_variables_dict['provision_kubeconfig_path'] = EnvironmentVariables.get_env(f'PROVISION_KUBECONFIG_PATH', '')
         self._environment_variables_dict['container_kubeconfig_path'] = EnvironmentVariables.get_env('CONTAINER_KUBECONFIG_PATH', '')
-        self._environment_variables_dict['provision_installer_path'] = EnvironmentVariables.get_env(f'{self.__ocp_env_flavor}_PROVISION_INSTALLER_PATH', '')
-        self._environment_variables_dict['provision_installer_cmd'] = EnvironmentVariables.get_env(f'{self.__ocp_env_flavor}_PROVISION_INSTALLER_CMD', '')
-        self._environment_variables_dict['provision_installer_log'] = EnvironmentVariables.get_env(f'{self.__ocp_env_flavor}_PROVISION_INSTALLER_LOG', '')
+        self._environment_variables_dict['provision_installer_path'] = EnvironmentVariables.get_env(f'PROVISION_INSTALLER_PATH', '')
+        self._environment_variables_dict['provision_installer_cmd'] = EnvironmentVariables.get_env(f'PROVISION_INSTALLER_CMD', '')
+        self._environment_variables_dict['provision_installer_log'] = EnvironmentVariables.get_env(f'PROVISION_INSTALLER_LOG', '')
         # remote ssh timeout - 3 hours for installation time
-        self._environment_variables_dict['provision_timeout'] = EnvironmentVariables.get_env(f'{self.__ocp_env_flavor}_PROVISION_TIMEOUT', '10800')
+        self._environment_variables_dict['provision_timeout'] = EnvironmentVariables.get_env(f'PROVISION_TIMEOUT', '10800')
         # General timeout - 1.5 hours wait for pod/vm/upload data to elasticsearch
-        self._environment_variables_dict['timeout'] = EnvironmentVariables.get_env(f'{self.__ocp_env_flavor}_TIMEOUT', '3600')
+        self._environment_variables_dict['timeout'] = EnvironmentVariables.get_env(f'TIMEOUT', '3600')
 
         # Benchmark runner run artifacts url
-        self._environment_variables_dict['run_artifacts_url'] = EnvironmentVariables.get_env(f'{self.__ocp_env_flavor}_RUN_ARTIFACTS_URL', '')
+        self._environment_variables_dict['run_artifacts_url'] = EnvironmentVariables.get_env(f'RUN_ARTIFACTS_URL', '')
 
         # Parameters below related to 'update_ci_status()' - No need to configure update auto by ci
         # CI run time
