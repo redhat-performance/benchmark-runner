@@ -47,19 +47,19 @@ jobs:
           pip install benchmark-runner
       - name: ⚙️ Set SSH key
         env:
-          FUNC_PROVISION_PRIVATE_KEY: ${{ secrets.FUNC_PROVISION_PRIVATE_KEY }}
+          PROVISION_PRIVATE_KEY: ${{ secrets.FUNC_PROVISION_PRIVATE_KEY }}
           RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-          FUNC_PROVISION_IP: ${{ secrets.FUNC_PROVISION_IP }}
-          FUNC_PROVISION_USER: ${{ secrets.FUNC_PROVISION_USER }}
+          PROVISION_IP: ${{ secrets.FUNC_PROVISION_IP }}
+          PROVISION_USER: ${{ secrets.FUNC_PROVISION_USER }}
         run: |
           mkdir -p "$RUNNER_PATH/.ssh/"
-          echo "$FUNC_PROVISION_PRIVATE_KEY" > $RUNNER_PATH/private_key.txt
+          echo "$PROVISION_PRIVATE_KEY" > $RUNNER_PATH/private_key.txt
           sudo chmod 600 $RUNNER_PATH/private_key.txt
-          echo "FUNC_PROVISION_PRIVATE_KEY_PATH=$RUNNER_PATH/private_key.txt" >> "$GITHUB_ENV"
+          echo "PROVISION_PRIVATE_KEY_PATH=$RUNNER_PATH/private_key.txt" >> "$GITHUB_ENV"
           cat >> "$RUNNER_PATH/.ssh/config" <<END
           Host provision
-            HostName $FUNC_PROVISION_IP
-            User $FUNC_PROVISION_USER
+            HostName $PROVISION_IP
+            User $PROVISION_USER
             IdentityFile $RUNNER_PATH/private_key.txt
             StrictHostKeyChecking no
             ServerAliveInterval 30
@@ -69,12 +69,12 @@ jobs:
         env:
           KUBECONFIG: ${{ secrets.FUNC_KUBECONFIG }}
           RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-          FUNC_OCP_HOSTS: ${{ secrets.FUNC_OCP_HOSTS }}
+          OCP_HOSTS: ${{ secrets.FUNC_OCP_HOSTS }}
         run: |
           mkdir -p "$RUNNER_PATH/.kube/"
           echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
           echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
-          sudo tee -a /etc/hosts <<< "$FUNC_OCP_HOSTS" > /dev/null
+          sudo tee -a /etc/hosts <<< "$OCP_HOSTS" > /dev/null
       - name: ☉ Install ${{ matrix.resource }} Operator
         env:
           CNV_VERSION: "4.10"
@@ -84,11 +84,11 @@ jobs:
           QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
           IBM_API_KEY: ${{ secrets.IBM_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
-          FUNC_WORKER_IDS: ${{ secrets.FUNC_WORKER_IDS }}
-          FUNC_PROVISION_IP: ${{ secrets.FUNC_PROVISION_IP }}
-          FUNC_PROVISION_USER: ${{ secrets.FUNC_PROVISION_USER }}
-          FUNC_PROVISION_OC_USER: ${{ secrets.FUNC_PROVISION_OC_USER }}
-          FUNC_PROVISION_PORT: ${{ secrets.FUNC_PROVISION_PORT }}
+          WORKER_IDS: ${{ secrets.FUNC_WORKER_IDS }}
+          PROVISION_IP: ${{ secrets.FUNC_PROVISION_IP }}
+          PROVISION_USER: ${{ secrets.FUNC_PROVISION_USER }}
+          PROVISION_OC_USER: ${{ secrets.FUNC_PROVISION_OC_USER }}
+          PROVISION_PORT: ${{ secrets.FUNC_PROVISION_PORT }}
           GITHUB_REPOSITORY_SHORT: ${{ secrets.GIT_REPOSITORY_SHORT }}
           CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
           CONTAINER_PRIVATE_KEY_PATH: ${{ secrets.CONTAINER_PRIVATE_KEY_PATH }}
@@ -113,7 +113,7 @@ jobs:
           #   scp -r "$RUNNER_PATH/nightly_cnv_registered.sh" provision:"/tmp/nightly_cnv_registered.sh"
           #   ssh -t provision "chmod +x /tmp/nightly_cnv_registered.sh;/tmp/./nightly_cnv_registered.sh;oc create -f /tmp/cnv_nightly_catlog_source.yaml;rm -f /tmp/nightly_cnv_registered.sh;rm -f /tmp/cnv_nightly_catlog_source.yaml"
           #fi
-          #podman run --rm -e OCP_ENV_FLAVOR="FUNC" -e IBM_API_KEY="$IBM_API_KEY" -e GITHUB_TOKEN="$GITHUB_TOKEN" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e INSTALL_OCP_RESOURCES="True" -e CNV_VERSION="$CNV_VERSION" -e QUAY_USERNAME="$QUAY_USERNAME" -e QUAY_PASSWORD="$QUAY_PASSWORD" -e ODF_VERSION="$ODF_VERSION" -e NUM_ODF_DISK="$NUM_ODF_DISK" -e INSTALL_RESOURCES_LIST="['${{ matrix.resource }}']" -e FUNC_WORKER_IDS="$FUNC_WORKER_IDS" -e FUNC_PROVISION_IP="$FUNC_PROVISION_IP" -e CONTAINER_PRIVATE_KEY_PATH="$CONTAINER_PRIVATE_KEY_PATH" -e FUNC_PROVISION_USER="$FUNC_PROVISION_USER" -e FUNC_PROVISION_OC_USER="$FUNC_PROVISION_OC_USER" -e FUNC_PROVISION_PORT="$FUNC_PROVISION_PORT" -e GITHUB_REPOSITORY_SHORT="$GITHUB_REPOSITORY_SHORT" -e FUNC_PROVISION_TIMEOUT="3600" -e log_level="INFO" -v "$FUNC_PROVISION_PRIVATE_KEY_PATH":"$CONTAINER_PRIVATE_KEY_PATH" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+          #podman run --rm -e IBM_API_KEY="$IBM_API_KEY" -e GITHUB_TOKEN="$GITHUB_TOKEN" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e INSTALL_OCP_RESOURCES="True" -e CNV_VERSION="$CNV_VERSION" -e QUAY_USERNAME="$QUAY_USERNAME" -e QUAY_PASSWORD="$QUAY_PASSWORD" -e ODF_VERSION="$ODF_VERSION" -e NUM_ODF_DISK="$NUM_ODF_DISK" -e INSTALL_RESOURCES_LIST="['${{ matrix.resource }}']" -e WORKER_IDS="$WORKER_IDS" -e PROVISION_IP="$PROVISION_IP" -e CONTAINER_PRIVATE_KEY_PATH="$CONTAINER_PRIVATE_KEY_PATH" -e PROVISION_USER="$PROVISION_USER" -e PROVISION_OC_USER="$PROVISION_OC_USER" -e PROVISION_PORT="$PROVISION_PORT" -e GITHUB_REPOSITORY_SHORT="$GITHUB_REPOSITORY_SHORT" -e PROVISION_TIMEOUT="3600" -e log_level="INFO" -v "$PROVISION_PRIVATE_KEY_PATH":"$CONTAINER_PRIVATE_KEY_PATH" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
           #echo '>>>>>>>>>>>>>>>>>>>>>>>>>>> End ${{ matrix.resource }} installation >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
           #end=$(printf '%(%s)T' -1)
           #echo "INSTALL_OCP_RESOURCE_MINUTES_TIME=$(( (( end - start )) / 60))" >> "$GITHUB_ENV"
@@ -128,11 +128,11 @@ jobs:
           QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
           IBM_API_KEY: ${{ secrets.IBM_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
-          FUNC_WORKER_IDS: ${{ secrets.FUNC_WORKER_IDS }}
-          FUNC_PROVISION_IP: ${{ secrets.FUNC_PROVISION_IP }}
-          FUNC_PROVISION_USER: ${{ secrets.FUNC_PROVISION_USER }}
-          FUNC_PROVISION_OC_USER: ${{ secrets.FUNC_PROVISION_OC_USER }}
-          FUNC_PROVISION_PORT: ${{ secrets.FUNC_PROVISION_PORT }}
+          WORKER_IDS: ${{ secrets.FUNC_WORKER_IDS }}
+          PROVISION_IP: ${{ secrets.FUNC_PROVISION_IP }}
+          PROVISION_USER: ${{ secrets.FUNC_PROVISION_USER }}
+          PROVISION_OC_USER: ${{ secrets.FUNC_PROVISION_OC_USER }}
+          PROVISION_PORT: ${{ secrets.FUNC_PROVISION_PORT }}
           GITHUB_REPOSITORY_SHORT: ${{ secrets.GIT_REPOSITORY_SHORT }}
           CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
           CONTAINER_PRIVATE_KEY_PATH: ${{ secrets.CONTAINER_PRIVATE_KEY_PATH }}
@@ -155,7 +155,7 @@ jobs:
           #scp -r "$RUNNER_PATH/cnv_nightly_catlog_source.yaml" provision:"/tmp/cnv_nightly_catlog_source.yaml"
           #scp -r "$RUNNER_PATH/nightly_cnv_registered.sh" provision:"/tmp/nightly_cnv_registered.sh"
           #ssh -t provision "chmod +x /tmp/nightly_cnv_registered.sh;/tmp/./nightly_cnv_registered.sh;oc create -f /tmp/cnv_nightly_catlog_source.yaml;rm -f /tmp/nightly_cnv_registered.sh;rm -f /tmp/cnv_nightly_catlog_source.yaml"
-          #podman run --rm -e OCP_ENV_FLAVOR="FUNC" -e IBM_API_KEY="$IBM_API_KEY" -e GITHUB_TOKEN="$GITHUB_TOKEN" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e INSTALL_OCP_RESOURCES="True" -e CNV_VERSION="$CNV_VERSION" -e QUAY_USERNAME="$QUAY_USERNAME" -e QUAY_PASSWORD="$QUAY_PASSWORD" -e ODF_VERSION="$ODF_VERSION" -e NUM_ODF_DISK="$NUM_ODF_DISK" -e INSTALL_RESOURCES_LIST="['local_storage', 'odf', 'infra', 'kata', 'cnv', 'custom']" -e FUNC_WORKER_IDS="$FUNC_WORKER_IDS" -e FUNC_PROVISION_IP="$FUNC_PROVISION_IP" -e CONTAINER_PRIVATE_KEY_PATH="$CONTAINER_PRIVATE_KEY_PATH" -e FUNC_PROVISION_USER="$FUNC_PROVISION_USER" -e FUNC_PROVISION_OC_USER="$FUNC_PROVISION_OC_USER" -e FUNC_PROVISION_PORT="$FUNC_PROVISION_PORT" -e GITHUB_REPOSITORY_SHORT="$GITHUB_REPOSITORY_SHORT" -e FUNC_PROVISION_TIMEOUT="3600" -e log_level="INFO" -v "$FUNC_PROVISION_PRIVATE_KEY_PATH":"$CONTAINER_PRIVATE_KEY_PATH" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
+          #podman run --rm -e IBM_API_KEY="$IBM_API_KEY" -e GITHUB_TOKEN="$GITHUB_TOKEN" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e INSTALL_OCP_RESOURCES="True" -e CNV_VERSION="$CNV_VERSION" -e QUAY_USERNAME="$QUAY_USERNAME" -e QUAY_PASSWORD="$QUAY_PASSWORD" -e ODF_VERSION="$ODF_VERSION" -e NUM_ODF_DISK="$NUM_ODF_DISK" -e INSTALL_RESOURCES_LIST="['local_storage', 'odf', 'infra', 'kata', 'cnv', 'custom']" -e WORKER_IDS="$WORKER_IDS" -e PROVISION_IP="$PROVISION_IP" -e CONTAINER_PRIVATE_KEY_PATH="$CONTAINER_PRIVATE_KEY_PATH" -e PROVISION_USER="$PROVISION_USER" -e PROVISION_OC_USER="$PROVISION_OC_USER" -e PROVISION_PORT="$PROVISION_PORT" -e GITHUB_REPOSITORY_SHORT="$GITHUB_REPOSITORY_SHORT" -e PROVISION_TIMEOUT="3600" -e log_level="INFO" -v "$PROVISION_PRIVATE_KEY_PATH":"$CONTAINER_PRIVATE_KEY_PATH" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:v$build_version"
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End OCP Resource Install   >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
           end=$(printf '%(%s)T' -1)
           echo "INSTALL_OCP_RESOURCE_MINUTES_TIME=$(( (( end - start )) / 60))" >> "$GITHUB_ENV"

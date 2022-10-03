@@ -41,12 +41,12 @@ jobs:
       env:
         KUBECONFIG: ${{ secrets.FUNC_KUBECONFIG }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-        FUNC_OCP_HOSTS: ${{ secrets.FUNC_OCP_HOSTS }}
+        OCP_HOSTS: ${{ secrets.FUNC_OCP_HOSTS }}
       run: |
           mkdir -p "$RUNNER_PATH/.kube/"
           echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
           echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
-          sudo tee -a /etc/hosts <<< "$FUNC_OCP_HOSTS" > /dev/null
+          sudo tee -a /etc/hosts <<< "$OCP_HOSTS" > /dev/null
     - name: 📃 Unittest and Integration tests with pytest
       env:
         KUBEADMIN_PASSWORD: ${{ secrets.FUNC_KUBEADMIN_PASSWORD }}
@@ -63,7 +63,7 @@ jobs:
         IBM_SECRET_ACCESS_KEY: ${{ secrets.IBM_SECRET_ACCESS_KEY }}
         IBM_BUCKET: ${{ secrets.IBM_BUCKET }}
         IBM_KEY: ${{ secrets.IBM_KEY }}
-        FUNC_RUN_ARTIFACTS_URL: ${{ secrets.FUNC_RUN_ARTIFACTS_URL }}
+        RUN_ARTIFACTS_URL: ${{ secrets.FUNC_RUN_ARTIFACTS_URL }}
       run: |
         # Install Dockerfile content for pytest
         # install oc/kubctl
@@ -102,12 +102,12 @@ jobs:
      env:
        KUBECONFIG: ${{ secrets.FUNC_KUBECONFIG }}
        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-       FUNC_OCP_HOSTS: ${{ secrets.FUNC_OCP_HOSTS }}
+       OCP_HOSTS: ${{ secrets.FUNC_OCP_HOSTS }}
      run: |
          mkdir -p "$RUNNER_PATH/.kube/"
          echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
          echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
-         sudo tee -a /etc/hosts <<< "$FUNC_OCP_HOSTS" > /dev/null
+         sudo tee -a /etc/hosts <<< "$OCP_HOSTS" > /dev/null
    - name: 📃 E2E test
      env:
        WORKLOAD: "stressng_pod"
