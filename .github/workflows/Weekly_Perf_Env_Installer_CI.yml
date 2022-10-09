@@ -6,6 +6,7 @@ name: Deploy Assisted installer Perf Env Weekly CI
 on:
   schedule:
     - cron: '0 4 * * 1' # run on Monday at 4 AM UTC/ 0 AM EDT
+  workflow_dispatch:
 
 #on:
 #  workflow_dispatch:
