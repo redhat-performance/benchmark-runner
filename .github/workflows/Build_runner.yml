@@ -4,10 +4,11 @@
 name: Build Runner
 
 on:
- workflow_run:
-   workflows: ["AAA"]
-   types:
-     - completed
+  workflow_run:
+    workflows: ["AAA"]
+    types:
+      - completed
+  workflow_dispatch:
 
 # on:
 #   push:
