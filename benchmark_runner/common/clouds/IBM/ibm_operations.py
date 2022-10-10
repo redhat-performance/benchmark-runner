@@ -41,7 +41,6 @@ class IBMOperations:
         self.__ibm_worker_ids_list = ast.literal_eval(self.__ibm_worker_ids)
         # FUNC or PERF
         self.__create_pod_ci_cmd = self.__environment_variables_dict.get('create_pod_ci_cmd', '')
-        self.__ocp_env_flavor = self.__environment_variables_dict.get('ocp_env_flavor', '')
         self.__provision_kubeadmin_password_path = self.__environment_variables_dict.get('provision_kubeadmin_password_path', '')
         self.__provision_kubeconfig_path = self.__environment_variables_dict.get('provision_kubeconfig_path', '')
         self.__provision_installer_path = self.__environment_variables_dict.get('provision_installer_path', '')
