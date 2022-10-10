@@ -63,7 +63,7 @@ jobs:
         # green when failed because retry
         continue-on-error: true
         env:
-          INSTALL_OCP_VERSION: "4.11.7"
+          INSTALL_OCP_VERSION: "latest-4.11"
           IBM_API_KEY: ${{ secrets.IBM_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
           WORKER_IDS: ${{ secrets.FUNC_WORKER_IDS }}
