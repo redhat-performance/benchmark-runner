@@ -25,9 +25,9 @@ jobs:
     name: pypi_upload
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Python 3.9
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: 3.9
     - name: 🔨 Build and publish distribution 📦 to PyPI
@@ -45,9 +45,9 @@ jobs:
     needs: [pypi_upload]
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Python 3.9
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: 3.9
     - name: Validate upload to PyPI
@@ -88,9 +88,9 @@ jobs:
     needs: [ pypi_upload, pypi_validate]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Python 3.9
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: 3.9
       - name: ⌛ Build and Upload 🐋 to quay.io
@@ -109,9 +109,9 @@ jobs:
     needs: [pypi_upload, pypi_validate, quay_upload]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Python 3.9
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: 3.9
       - name: ⚙ Set START CI TIME

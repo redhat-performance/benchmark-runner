@@ -20,11 +20,11 @@ jobs:
     outputs:
        start_time_output: ${{ steps.start_step.outputs.start_time }}
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - id: start_step
       run: echo "::set-output name=start_time::$(printf '%(%s)T' -1)"
     - name: Set up Python 3.9
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: 3.9
     - name: Install dependencies
@@ -96,9 +96,9 @@ jobs:
     needs: [test]
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Python 3.9
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: 3.9
     - name: 🔨 Build and publish distribution 📦 to PyPI
@@ -116,9 +116,9 @@ jobs:
     needs: [test, pypi_upload]
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Python 3.9
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: 3.9
     - name: Validate upload to PyPI
@@ -159,9 +159,9 @@ jobs:
     needs: [ test, pypi_upload, pypi_validate]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Python 3.9
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: 3.9
       - name: ⌛ Build and Upload 🐋 to quay.io
@@ -180,9 +180,9 @@ jobs:
     needs: [test, pypi_upload, pypi_validate, quay_upload]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Python 3.9
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: 3.9
       - name: Install latest benchmark-runner
@@ -216,9 +216,9 @@ jobs:
        matrix: 
           workload: [ 'stressng_pod', 'vdbench_pod' ]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Python 3.9
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: 3.9
     - name: Install latest benchmark-runner
