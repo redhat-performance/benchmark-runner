@@ -29,7 +29,7 @@ jobs:
     outputs:
       start_time_output: ${{ steps.nightly_start_step.outputs.start_time }}
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - id: nightly_start_step
       run: echo "::set-output name=start_time::$(printf '%(%s)T' -1)"
     - name: ⚙️ Set SSH key
@@ -88,9 +88,9 @@ jobs:
        matrix: 
           workload: [ 'uperf_pod', 'uperf_kata', 'uperf_vm', 'hammerdb_pod_mariadb', 'hammerdb_kata_mariadb', 'hammerdb_vm_mariadb', 'hammerdb_pod_postgres', 'hammerdb_kata_postgres', 'hammerdb_vm_postgres', 'hammerdb_pod_postgres_lso', 'hammerdb_kata_postgres_lso', 'hammerdb_vm_postgres_lso', 'hammerdb_pod_mssql', 'hammerdb_kata_mssql', 'hammerdb_vm_mssql', 'vdbench_pod', 'vdbench_kata', 'vdbench_vm', 'clusterbuster']
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Python 3.9
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: 3.9
     - name: Install latest benchmark-runner
@@ -171,9 +171,9 @@ jobs:
     if: always()
     needs: [initialize_nightly, workload]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Python 3.9
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: 3.9
     - name: ⚙ Set START CI TIME
