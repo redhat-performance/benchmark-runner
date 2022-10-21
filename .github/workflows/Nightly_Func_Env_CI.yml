@@ -31,7 +31,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - id: nightly_start_step
-      run: echo "::set-output name=start_time::$(printf '%(%s)T' -1)"
+      run: echo "start_time=$(printf '%(%s)T' -1)" >> $GITHUB_OUTPUT
     - name: ⚙️ Set SSH key
       env:
         PROVISION_PRIVATE_KEY: ${{ secrets.FUNC_PROVISION_PRIVATE_KEY }}
@@ -180,8 +180,8 @@ jobs:
     - id: job_step
       if: always()
       run: |
-          if [[ "${{ job.status }}" == "failure" || "${{ job.status }}" == "cancelled" ]]; then echo "::set-output name=status::${{ job.status }}"; fi
-   
+          if [[ "${{ job.status }}" == "failure" || "${{ job.status }}" == "cancelled" ]]; then echo "status=${{ job.status }}" >> $GITHUB_OUTPUT; fi
+
   finalize_nightly:
     name: finalize nightly
     runs-on: ubuntu-latest
