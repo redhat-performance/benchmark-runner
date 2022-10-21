@@ -117,7 +117,7 @@ jobs:
           end=$(printf '%(%s)T' -1)
           echo "INSTALL_OCP_RESOURCE_MINUTES_TIME=$(( (( end - start )) / 60))" >> "$GITHUB_ENV"
       - id: ocp_install_resource_step
-        run: echo "::set-output name=install_resource_time::$INSTALL_OCP_RESOURCE_MINUTES_TIME"
+        run: echo "install_resource_time=$INSTALL_OCP_RESOURCE_MINUTES_TIME" >> $GITHUB_OUTPUT
       - name: ☉ Rerun OCP Operator Reources install after failure
         env:
           CNV_VERSION: "4.11"
