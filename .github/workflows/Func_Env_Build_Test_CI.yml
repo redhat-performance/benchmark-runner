@@ -87,12 +87,15 @@ jobs:
     name: integration_test
     needs: [unittest]
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ '3.10' ]
     steps:
     - uses: actions/checkout@v3
-    - name: Set up Python 3.10
+    - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
       with:
-        python-version: '3.10'
+        python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -161,12 +164,15 @@ jobs:
     name: pypi_upload
     needs: [unittest, integration_test]
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ '3.10' ]
     steps:
     - uses: actions/checkout@v3
-    - name: Set up Python 3.10
+    - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
       with:
-        python-version: '3.10'
+        python-version: ${{ matrix.python-version }}
     - name: 🔨 Build and publish distribution 📦 to PyPI
       env:
         TWINE_USERNAME: __token__
@@ -181,12 +187,15 @@ jobs:
     name: pypi_validate
     needs: [unittest, integration_test, pypi_upload]
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ '3.10' ]
     steps:
     - uses: actions/checkout@v3
-    - name: Set up Python 3.10
+    - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
       with:
-        python-version: '3.10'
+        python-version: ${{ matrix.python-version }}
     - name: Validate upload to PyPI
       env:
         TWINE_USERNAME: __token__
@@ -224,12 +233,15 @@ jobs:
     name: quay_upload
     needs: [ unittest, integration_test, pypi_upload, pypi_validate]
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ '3.10' ]
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python 3.10
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: ${{ matrix.python-version }}
       - name: ⌛ Build and Upload 🐋 to quay.io
         run: |
           version=$(python3 setup.py --version)
@@ -245,12 +257,15 @@ jobs:
     name: bump_version
     needs: [unittest, integration_test, pypi_upload, pypi_validate, quay_upload]
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ '3.10' ]
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python 3.10
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: ${{ matrix.python-version }}
       - name: Install latest benchmark-runner
         run: |
           python -m pip install --upgrade pip
@@ -281,12 +296,13 @@ jobs:
        fail-fast: false
        matrix:
           workload: [ 'stressng_pod', 'vdbench_pod' ]
+          python-version: [ '3.10' ]
     steps:
     - uses: actions/checkout@v3
-    - name: Set up Python 3.10
+    - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
       with:
-        python-version: '3.10'
+        python-version: ${{ matrix.python-version }}
     - name: Install latest benchmark-runner
       run: |
         python -m pip install --upgrade pip
