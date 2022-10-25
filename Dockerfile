@@ -29,7 +29,7 @@ RUN wget https://www.python.org/ftp/python/${python_full_version}/Python-${pytho
     && rm -rf Python-${python_full_version}.tgz
 
 # install & run benchmark-runner (--no-cache-dir for take always the latest)
-RUN python${python_version}-m pip --no-cache-dir install --upgrade pip && pip --no-cache-dir install benchmark-runner --upgrade
+RUN python${python_version} -m pip --no-cache-dir install --upgrade pip && pip --no-cache-dir install benchmark-runner --upgrade
 
 # install oc/kubectl client tools for OpenShift/Kubernetes
 ARG oc_version=4.11.0-0.okd-2022-10-15-073651
