@@ -143,7 +143,7 @@ class BenchmarkOperatorWorkloadsOperations:
         @return:
         """
         # delete benchmark-operator pod if exist
-        if self._oc._is_pod_exist(pod_name='benchmark-controller-manager'):
+        if self._oc.pod_exists(pod_name='benchmark-controller-manager'):
             logger.info('make undeploy benchmark operator running pod')
             self.make_undeploy_benchmark_controller_manager(runner_path=runner_path)
 

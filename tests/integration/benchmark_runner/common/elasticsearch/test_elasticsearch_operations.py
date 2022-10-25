@@ -28,7 +28,7 @@ def __delete_pod_yamls():
     """
     oc = OC(kubeadmin_password=test_environment_variable.get('kubeadmin_password', ''))
     oc.login()
-    if oc._is_pod_exist(pod_name='stressng-pod-workload', namespace=test_environment_variable.get('namespace', '')):
+    if oc.pod_exists(pod_name='stressng-pod-workload', namespace=test_environment_variable.get('namespace', '')):
         oc.delete_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_pod.yaml'), pod_name='stressng-pod-workload')
     if os.path.isfile(os.path.join(f'{templates_path}', 'stressng_pod.yaml')):
         os.remove(os.path.join(f'{templates_path}', 'stressng_pod.yaml'))

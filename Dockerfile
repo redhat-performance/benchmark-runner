@@ -14,15 +14,25 @@ Run dnf config-manager --set-enabled powertools \
     && dnf install -y @container-tools \
     && dnf install -y jq
 
-# install python 3.9 - take several minutes
-RUN dnf install -y python3.9 \
-    && echo alias python=python3.9 >> ~/.bashrc
+# Prerequisite for Python installation
+ARG python_version=3.10
+ARG python_full_version=3.10.8
+RUN dnf install openssl-devel bzip2-devel wget -y
+
+# Install Python
+RUN wget https://www.python.org/ftp/python/${python_full_version}/Python-${python_full_version}.tgz \
+    && tar -xzf Python-${python_full_version}.tgz \
+    && cd Python-${python_full_version} \
+    && ./configure --enable-optimizations \
+    && make altinstall \
+    && echo alias python=python${python_version} >> ~/.bashrc \
+    && rm -rf Python-${python_full_version}.tgz
 
 # install & run benchmark-runner (--no-cache-dir for take always the latest)
-RUN python3.9 -m pip --no-cache-dir install --upgrade pip && pip --no-cache-dir install benchmark-runner --upgrade
+RUN python${python_version}-m pip --no-cache-dir install --upgrade pip && pip --no-cache-dir install benchmark-runner --upgrade
 
 # install oc/kubectl client tools for OpenShift/Kubernetes
-ARG oc_version=4.10.0-0.okd-2022-04-23-131357
+ARG oc_version=4.11.0-0.okd-2022-10-15-073651
 RUN  curl -L https://github.com/openshift/okd/releases/download/${oc_version}/openshift-client-linux-${oc_version}.tar.gz -o  ~/openshift-client-linux-${oc_version}.tar.gz \
      && tar -xzvf  ~/openshift-client-linux-${oc_version}.tar.gz -C  ~/ \
      && rm -rf ~/openshift-client-linux-${oc_version}.tar.gz \
@@ -60,7 +70,7 @@ RUN git clone -b v1.1.7-kata-ci https://github.com/RobertKrawitz/OpenShift4-tool
 # Add main
 COPY benchmark_runner/main/main.py /benchmark_runner/main/main.py
 
-CMD [ "python3.9", "/benchmark_runner/main/main.py"]
+CMD [ "python${python_version}", "/benchmark_runner/main/main.py"]
 
 # oc: https://www.ibm.com/docs/en/fci/6.5.1?topic=steps-setting-up-installation-server
 # sudo podman build -t quay.io/ebattat/benchmark-runner:latest . --no-cache
