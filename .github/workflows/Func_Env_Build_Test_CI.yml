@@ -14,19 +14,85 @@ concurrency:
   cancel-in-progress: false
   
 jobs:
-  test:
-    name: test
+
+  unittest:
+    # run all python versions, in other jobs run the latest python
+    name: unittest
     runs-on: ubuntu-latest
-    outputs:
-       start_time_output: ${{ steps.start_step.outputs.start_time }}
+    strategy:
+      matrix:
+        python-version: [ '3.6', '3.7', '3.8', '3.9', '3.10' ]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 pytest pytest-cov
+          if [[ -f requirements.txt ]]; then pip install -r requirements.txt; fi
+          if [[ -f tests_requirements.txt ]]; then pip install -r tests_requirements.txt; fi
+      - name: Lint with flake8
+        run: |
+          # stop the build if there are Python syntax errors or undefined names
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+      - name: ⚙️ Set Kubeconfig and hosts
+        env:
+          KUBECONFIG_CONTENTS: ${{ secrets.FUNC_KUBECONFIG }}
+          RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+          OCP_HOSTS: ${{ secrets.FUNC_OCP_HOSTS }}
+        run: |
+          mkdir -p "$RUNNER_PATH/.kube/"
+          echo "$KUBECONFIG_CONTENTS" > "$RUNNER_PATH/.kube/config"
+          echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
+          sudo tee -a /etc/hosts <<< "$OCP_HOSTS" > /dev/null
+      - name: 📃 Unittest with pytest
+        env:
+          KUBEADMIN_PASSWORD: ${{ secrets.FUNC_KUBEADMIN_PASSWORD }}
+          PIN_NODE1: ${{ secrets.FUNC_PIN_NODE1 }}
+          PIN_NODE2: ${{ secrets.FUNC_PIN_NODE2 }}
+          RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+          ELASTICSEARCH: ${{ secrets.FUNC_ELASTICSEARCH }}
+          ELASTICSEARCH_PORT: ${{ secrets.FUNC_ELASTICSEARCH_PORT }}
+          ELASTICSEARCH_USER: ${{ secrets.FUNC_ELASTICSEARCH_USER }}
+          ELASTICSEARCH_PASSWORD: ${{ secrets.FUNC_ELASTICSEARCH_PASSWORD }}
+          IBM_REGION_NAME: ${{ secrets.IBM_REGION_NAME }}
+          IBM_ENDPOINT_URL: ${{ secrets.IBM_ENDPOINT_URL }}
+          IBM_ACCESS_KEY_ID: ${{ secrets.IBM_ACCESS_KEY_ID }}
+          IBM_SECRET_ACCESS_KEY: ${{ secrets.IBM_SECRET_ACCESS_KEY }}
+          IBM_BUCKET: ${{ secrets.IBM_BUCKET }}
+          IBM_KEY: ${{ secrets.IBM_KEY }}
+          RUN_ARTIFACTS_URL: ${{ secrets.FUNC_RUN_ARTIFACTS_URL }}
+        run: |
+          # Install Dockerfile content for pytest
+          # install oc/kubectl
+          oc_version=4.11.0-0.okd-2022-10-15-073651
+          curl -L https://github.com/openshift/okd/releases/download/${oc_version}/openshift-client-linux-${oc_version}.tar.gz -o $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz
+          tar -xzvf $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz -C $RUNNER_PATH/
+          rm $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz
+          cp $RUNNER_PATH/kubectl /usr/local/bin/kubectl
+          cp $RUNNER_PATH/oc /usr/local/bin/oc
+          
+          # clone benchmark-operator v1.0.1
+          git clone -b v1.0.1 https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
+          
+          # run pytest - only unittest
+          pytest -v tests/unittest/
+
+  integration_test:
+    name: integration_test
+    needs: [unittest]
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - id: start_step
-      run: echo "start_time=$(printf '%(%s)T' -1)" >> $GITHUB_OUTPUT
-    - name: Set up Python 3.9
+    - name: Set up Python 3.10
       uses: actions/setup-python@v4
       with:
-        python-version: 3.9
+        python-version: 3.10
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -41,15 +107,15 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: ⚙️ Set Kubeconfig and hosts
       env:
-        KUBECONFIG: ${{ secrets.FUNC_KUBECONFIG }}
+        KUBECONFIG_CONTENTS: ${{ secrets.FUNC_KUBECONFIG }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
         OCP_HOSTS: ${{ secrets.FUNC_OCP_HOSTS }}
       run: |
           mkdir -p "$RUNNER_PATH/.kube/"
-          echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
+          echo "$KUBECONFIG_CONTENTS" > "$RUNNER_PATH/.kube/config"
           echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
           sudo tee -a /etc/hosts <<< "$OCP_HOSTS" > /dev/null
-    - name: 📃 Unittest and Integration tests with pytest
+    - name: 📃 Integration test with pytest
       env:
         KUBEADMIN_PASSWORD: ${{ secrets.FUNC_KUBEADMIN_PASSWORD }}
         PIN_NODE1: ${{ secrets.FUNC_PIN_NODE1 }}
@@ -68,8 +134,8 @@ jobs:
         RUN_ARTIFACTS_URL: ${{ secrets.FUNC_RUN_ARTIFACTS_URL }}
       run: |
         # Install Dockerfile content for pytest
-        # install oc/kubctl
-        oc_version=4.9.0-0.okd-2022-01-29-035536
+        # install oc/kubectl
+        oc_version=4.11.0-0.okd-2022-10-15-073651
         curl -L https://github.com/openshift/okd/releases/download/${oc_version}/openshift-client-linux-${oc_version}.tar.gz -o $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz
         tar -xzvf $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz -C $RUNNER_PATH/
         rm $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz
@@ -79,9 +145,9 @@ jobs:
         rm -rf $RUNNER_PATH/oc
         # clone benchmark-operator
         git clone https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
-        # run pytest - only unittest, till solved remote connection issue
-        pytest -v tests/unittest/ --cov=benchmark_runner --cov-report=term-missing
-        coverage run -m pytest -v tests/unittest/
+        # run pytest
+        pytest -v tests --cov=benchmark_runner --cov-report=term-missing
+        coverage run -m pytest -v tests
         sleep 60
         coverage report -m
     - name: 🎥 Publish to coveralls.io
@@ -93,14 +159,14 @@ jobs:
 
   pypi_upload:
     name: pypi_upload
-    needs: [test]
+    needs: [unittest, integration_test]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - name: Set up Python 3.9
+    - name: Set up Python 3.10
       uses: actions/setup-python@v4
       with:
-        python-version: 3.9
+        python-version: 3.10
     - name: 🔨 Build and publish distribution 📦 to PyPI
       env:
         TWINE_USERNAME: __token__
@@ -113,14 +179,14 @@ jobs:
 
   pypi_validate:
     name: pypi_validate
-    needs: [test, pypi_upload]
+    needs: [unittest, integration_test, pypi_upload]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - name: Set up Python 3.9
+    - name: Set up Python 3.10
       uses: actions/setup-python@v4
       with:
-        python-version: 3.9
+        python-version: 3.10
     - name: Validate upload to PyPI
       env:
         TWINE_USERNAME: __token__
@@ -156,14 +222,14 @@ jobs:
 
   quay_upload:
     name: quay_upload
-    needs: [ test, pypi_upload, pypi_validate]
+    needs: [ unittest, integration_test, pypi_upload, pypi_validate]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python 3.9
+      - name: Set up Python 3.10
         uses: actions/setup-python@v4
         with:
-          python-version: 3.9
+          python-version: 3.10
       - name: ⌛ Build and Upload 🐋 to quay.io
         run: |
           version=$(python3 setup.py --version)
@@ -177,14 +243,14 @@ jobs:
 
   bump_version:
     name: bump_version
-    needs: [test, pypi_upload, pypi_validate, quay_upload]
+    needs: [unittest, integration_test, pypi_upload, pypi_validate, quay_upload]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python 3.9
+      - name: Set up Python 3.10
         uses: actions/setup-python@v4
         with:
-          python-version: 3.9
+          python-version: 3.10
       - name: Install latest benchmark-runner
         run: |
           python -m pip install --upgrade pip
@@ -206,21 +272,21 @@ jobs:
 
   e2e:
     name: e2e
-    needs: [test, pypi_upload, pypi_validate, quay_upload, bump_version]
+    needs: [unittest, integration_test, pypi_upload, pypi_validate, quay_upload, bump_version]
     runs-on: ubuntu-latest
     strategy:
        # run one job every time
        max-parallel: 1
        # continue to next job if failed
        fail-fast: false
-       matrix: 
+       matrix:
           workload: [ 'stressng_pod', 'vdbench_pod' ]
     steps:
     - uses: actions/checkout@v3
-    - name: Set up Python 3.9
+    - name: Set up Python 3.10
       uses: actions/setup-python@v4
       with:
-        python-version: 3.9
+        python-version: 3.10
     - name: Install latest benchmark-runner
       run: |
         python -m pip install --upgrade pip
@@ -248,12 +314,12 @@ jobs:
         END
     - name: ⚙️ Set Kubeconfig and hosts
       env:
-        KUBECONFIG: ${{ secrets.FUNC_KUBECONFIG }}
+        KUBECONFIG_CONTENTS: ${{ secrets.FUNC_KUBECONFIG }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
         OCP_HOSTS: ${{ secrets.FUNC_OCP_HOSTS }}
       run: |
           mkdir -p "$RUNNER_PATH/.kube/"
-          echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
+          echo "$KUBECONFIG_CONTENTS" > "$RUNNER_PATH/.kube/config"
           echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
           sudo tee -a /etc/hosts <<< "$OCP_HOSTS" > /dev/null
     - name: ✔️ E2E tests using latest quay.io
@@ -284,4 +350,3 @@ jobs:
         ssh -t provision "podman rmi -f 'quay.io/ebattat/benchmark-runner:v$build_version'"
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End E2E workload: ${{ matrix.workload }} >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
         
-

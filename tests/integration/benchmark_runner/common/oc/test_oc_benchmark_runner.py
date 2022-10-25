@@ -31,7 +31,7 @@ def __delete_test_objects(workload: str, kind: str):
     workload_name = f'{workload}-{kind}'
     workload_yaml = f'{workload}_{kind}.yaml'
     workload_log = f'{workload}_{kind}.log'
-    if oc._is_pod_exist(pod_name=workload_name, namespace=test_environment_variable['namespace']):
+    if oc.pod_exists(pod_name=workload_name, namespace=test_environment_variable['namespace']):
         oc.delete_pod_sync(yaml=os.path.join(templates_path, workload_yaml), pod_name=workload_name)
     if os.path.isfile(os.path.join(templates_path, workload_yaml)):
         os.remove(os.path.join(templates_path, workload_yaml))
