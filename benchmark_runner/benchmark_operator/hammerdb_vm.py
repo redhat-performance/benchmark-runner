@@ -67,7 +67,7 @@ class HammerdbVM(BenchmarkOperatorWorkloadsOperations):
             raise err
         except Exception as err:
             # save run artifacts logs
-            if self._oc._is_pod_exist(pod_name='benchmark-controller-manager'):
+            if self._oc.pod_exists(pod_name='benchmark-controller-manager'):
                 self._create_pod_log(label='benchmark-controller-manager')
             full_name = f'{self.__workload_name}-{self.__database}'
             run_artifacts_url = os.path.join(self._environment_variables_dict.get('run_artifacts_url', ''), f'{self._get_run_artifacts_hierarchy(workload_name=full_name, is_file=True)}-{self._time_stamp_format}.tar.gz')

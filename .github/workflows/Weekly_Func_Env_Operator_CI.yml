@@ -67,12 +67,12 @@ jobs:
           END
       - name: ⚙️ Set Kubeconfig and hosts
         env:
-          KUBECONFIG: ${{ secrets.FUNC_KUBECONFIG }}
+          KUBECONFIG_CONTENTS: ${{ secrets.FUNC_KUBECONFIG }}
           RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
           OCP_HOSTS: ${{ secrets.FUNC_OCP_HOSTS }}
         run: |
           mkdir -p "$RUNNER_PATH/.kube/"
-          echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
+          echo "$KUBECONFIG_CONTENTS" > "$RUNNER_PATH/.kube/config"
           echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
           sudo tee -a /etc/hosts <<< "$OCP_HOSTS" > /dev/null
       - name: ☉ Install ${{ matrix.resource }} Operator 

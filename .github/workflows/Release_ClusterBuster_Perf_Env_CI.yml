@@ -46,12 +46,12 @@ jobs:
         END
     - name: ⚙️ Set Kubeconfig and hosts
       env:
-        KUBECONFIG: ${{ secrets.PERF_KUBECONFIG }}
+        KUBECONFIG_CONTENTS: ${{ secrets.PERF_KUBECONFIG }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
         OCP_HOSTS: ${{ secrets.PERF_OCP_HOSTS }}
       run: |
         mkdir -p "$RUNNER_PATH/.kube/"
-        echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
+        echo "$KUBECONFIG_CONTENTS" > "$RUNNER_PATH/.kube/config"
         echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
         sudo tee -a /etc/hosts <<< "$OCP_HOSTS" > /dev/null
     - name: ⚙ Remove images on provision and copy config to provision
@@ -111,12 +111,12 @@ jobs:
         END
     - name: ⚙️ Set Kubeconfig and hosts
       env:
-        KUBECONFIG: ${{ secrets.PERF_KUBECONFIG }}
+        KUBECONFIG_CONTENTS: ${{ secrets.PERF_KUBECONFIG }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
         OCP_HOSTS: ${{ secrets.PERF_OCP_HOSTS }}
       run: |
         mkdir -p "$RUNNER_PATH/.kube/"
-        echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
+        echo "$KUBECONFIG_CONTENTS" > "$RUNNER_PATH/.kube/config"
         echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
         sudo tee -a /etc/hosts <<< "$OCP_HOSTS" > /dev/null
     - name: ⚙️ Set UUID
@@ -192,12 +192,12 @@ jobs:
         END
     - name: ⚙️ Set Kubeconfig and hosts
       env:
-        KUBECONFIG: ${{ secrets.PERF_KUBECONFIG }}
+        KUBECONFIG_CONTENTS: ${{ secrets.PERF_KUBECONFIG }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
         OCP_HOSTS: ${{ secrets.PERF_OCP_HOSTS }}
       run: |
         mkdir -p "$RUNNER_PATH/.kube/"
-        echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
+        echo "$KUBECONFIG_CONTENTS" > "$RUNNER_PATH/.kube/config"
         echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
         sudo tee -a /etc/hosts <<< "$OCP_HOSTS" > /dev/null
     - name: ✔️ Update status

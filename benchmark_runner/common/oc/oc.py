@@ -227,8 +227,8 @@ class OC(SSH):
         except Exception as err:
             raise PodNameNotExist(pod_name=pod_name)
 
-    def _is_pod_exist(self, pod_name: str,
-                      namespace: str = environment_variables.environment_variables_dict['namespace']):
+    def pod_exists(self, pod_name: str,
+                   namespace: str = environment_variables.environment_variables_dict['namespace']):
         """
         This method return True if exist or False if not
         :param pod_name:
@@ -241,10 +241,26 @@ class OC(SSH):
         else:
             return False
 
+    def pod_label_exists(self, label_name: str,
+                         namespace: str = environment_variables.environment_variables_dict['namespace']):
+        """
+        This method return True if pod exist or not by label
+        :param label_name:
+        :param namespace:
+        :return:
+        """
+        result = self.run(f"{self.__cli} get -n {namespace} pod -l={label_name} -ojsonpath='{{.items}}'")
+        if result != '[]':
+            return True
+        else:
+            return False
+
     @typechecked
     def _get_vm_name(self, vm_name: str, namespace: str):
         """
         This method return pod name if exist or raise error
+        :param vm_name:
+        :param namespace:
         :return:
         """
         try:
@@ -253,9 +269,11 @@ class OC(SSH):
             raise VMNameNotExist(vm_name=vm_name)
 
     @typechecked
-    def _is_vm_exist(self, vm_name: str, namespace: str):
+    def vm_exists(self, vm_name: str, namespace: str):
         """
         This method return pod name if exist or empty string
+        :param vm_name:
+        :param namespace:
         :return:
         """
         result = self.run(f'{self.__cli} get -n {namespace} vmi -o name | grep {vm_name}')
@@ -403,7 +421,7 @@ class OC(SSH):
         """
         current_wait_time = 0
         while current_wait_time <= timeout:
-            if self._is_pod_exist(pod_name=pod_name, namespace=namespace):
+            if self.pod_exists(pod_name=pod_name, namespace=namespace):
                 return True
             # sleep for x seconds
             time.sleep(OC.SLEEP_TIME)
@@ -424,7 +442,7 @@ class OC(SSH):
         """
         current_wait_time = 0
         while current_wait_time <= timeout:
-            if self._is_vm_exist(vm_name=vm_name, namespace=namespace):
+            if self.vm_exists(vm_name=vm_name, namespace=namespace):
                 return True
             # sleep for x seconds
             time.sleep(OC.SLEEP_TIME)
@@ -445,7 +463,7 @@ class OC(SSH):
         """
         current_wait_time = 0
         while current_wait_time <= timeout:
-            if not self._is_pod_exist(pod_name=pod_name, namespace=namespace):
+            if not self.pod_exists(pod_name=pod_name, namespace=namespace):
                 return True
             # sleep for x seconds
             time.sleep(OC.SLEEP_TIME)
@@ -466,7 +484,7 @@ class OC(SSH):
         """
         current_wait_time = 0
         while current_wait_time <= timeout:
-            if not self._is_vm_exist(vm_name=vm_name, namespace=namespace):
+            if not self.vm_exists(vm_name=vm_name, namespace=namespace):
                 return True
             # sleep for x seconds
             time.sleep(OC.SLEEP_TIME)
@@ -515,7 +533,7 @@ class OC(SSH):
         :param yaml:
         :return:
         """
-        if self._is_pod_exist(pod_name, namespace):
+        if self.pod_exists(pod_name, namespace):
             self._delete_async(yaml)
             return self.wait_for_pod_terminate(pod_name=pod_name, namespace=namespace, timeout=timeout)
         else:
@@ -534,7 +552,7 @@ class OC(SSH):
         :param yaml:
         :return:
         """
-        if self._is_vm_exist(vm_name=vm_name, namespace=namespace):
+        if self.vm_exists(vm_name=vm_name, namespace=namespace):
             self._delete_async(yaml)
             return self.wait_for_vm_terminate(vm_name=vm_name, namespace=namespace, timeout=timeout)
         else:
@@ -700,7 +718,7 @@ class OC(SSH):
         :param timeout:
         :return:
         """
-        if self._is_pod_exist(pod_name, namespace):
+        if self.pod_exists(pod_name, namespace):
             try:
                 if namespace != '':
                     namespace = f'-n {namespace}'
