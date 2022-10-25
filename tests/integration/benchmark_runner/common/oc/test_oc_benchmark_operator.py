@@ -30,7 +30,7 @@ def __delete_test_objects(workload: str, kind: str):
     oc.login()
     workload_name = f'{workload}-{kind}-workload'
     workload_yaml = f'{workload}_{kind}.yaml'
-    if oc._is_pod_exist(pod_name=workload_name, namespace=test_environment_variable['namespace']):
+    if oc.is_pod_exist(pod_name=workload_name, namespace=test_environment_variable['namespace']):
         oc.delete_pod_sync(yaml=os.path.join(templates_path, workload_yaml), pod_name=workload_name)
     if os.path.isfile(os.path.join(templates_path, workload_yaml)):
         os.remove(os.path.join(templates_path, workload_yaml))
@@ -79,7 +79,7 @@ def test_oc_get_pod_name_and_is_pod_exist():
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
     assert oc._get_pod_name(pod_name='benchmark-controller-manager', namespace=test_environment_variable['namespace'])
-    assert oc._is_pod_exist(pod_name='benchmark-controller-manager', namespace=test_environment_variable['namespace'])
+    assert oc.is_pod_exist(pod_name='benchmark-controller-manager', namespace=test_environment_variable['namespace'])
 
 
 def test_yaml_file_not_exist_error():

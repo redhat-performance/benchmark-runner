@@ -227,16 +227,30 @@ class OC(SSH):
         except Exception as err:
             raise PodNameNotExist(pod_name=pod_name)
 
-    def _is_pod_exist(self, pod_name: str,
-                      namespace: str = environment_variables.environment_variables_dict['namespace']):
+    def is_pod_exist(self, pod_name: str,
+                     namespace: str = environment_variables.environment_variables_dict['namespace']):
         """
-        This method return True if exist or False if not
+        This method return True if pod exist or False if not
         :param pod_name:
         :param namespace:
         :return:
         """
         result = self.run(f'{self.__cli} get -n {namespace} pods -o name | grep {pod_name}')
         if pod_name in result:
+            return True
+        else:
+            return False
+
+    def is_pod_exist_by_label(self, label_name: str,
+                     namespace: str = environment_variables.environment_variables_dict['namespace']):
+        """
+        This method return True if pod exist or False if not by label
+        :param label_name:
+        :param namespace:
+        :return:
+        """
+        result = self.run(f"{self.__cli} get -n {namespace} pod -l={label_name} -ojsonpath='{{.items}}'")
+        if result != '[]':
             return True
         else:
             return False
@@ -403,7 +417,7 @@ class OC(SSH):
         """
         current_wait_time = 0
         while current_wait_time <= timeout:
-            if self._is_pod_exist(pod_name=pod_name, namespace=namespace):
+            if self.is_pod_exist(pod_name=pod_name, namespace=namespace):
                 return True
             # sleep for x seconds
             time.sleep(OC.SLEEP_TIME)
@@ -445,7 +459,7 @@ class OC(SSH):
         """
         current_wait_time = 0
         while current_wait_time <= timeout:
-            if not self._is_pod_exist(pod_name=pod_name, namespace=namespace):
+            if not self.is_pod_exist(pod_name=pod_name, namespace=namespace):
                 return True
             # sleep for x seconds
             time.sleep(OC.SLEEP_TIME)
@@ -515,7 +529,7 @@ class OC(SSH):
         :param yaml:
         :return:
         """
-        if self._is_pod_exist(pod_name, namespace):
+        if self.is_pod_exist(pod_name, namespace):
             self._delete_async(yaml)
             return self.wait_for_pod_terminate(pod_name=pod_name, namespace=namespace, timeout=timeout)
         else:
@@ -700,7 +714,7 @@ class OC(SSH):
         :param timeout:
         :return:
         """
-        if self._is_pod_exist(pod_name, namespace):
+        if self.is_pod_exist(pod_name, namespace):
             try:
                 if namespace != '':
                     namespace = f'-n {namespace}'
