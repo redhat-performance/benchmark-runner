@@ -40,7 +40,7 @@ spec:
       keyandthink: "false"
       driver: "timed"
       rampup: 1
-      runtime: 1
+      runtime: 2
       allwarehouse: false
       timeprofile: false
       async_scale: false
