@@ -44,6 +44,7 @@ template_data:
       db_type: mariadb
       db_user: root
       db_server_pod: mariadb-deployment.mariadb-db
+      runtime: 1
     mssql:
       db_image: centos-stream8-mssql2019-container-disk:latest
       db_pass: s3curePasswordString
@@ -51,6 +52,7 @@ template_data:
       db_type: mssql
       db_user: SA
       db_server_pod: mssql-deployment.mssql-db
+      runtime: 1
     postgres:
       db_image: centos-stream8-postgres10-container-disk:latest
       db_pass: postgres
@@ -58,6 +60,7 @@ template_data:
       db_type: pg
       db_user: postgres
       db_server_pod: postgres-deployment.postgres-db
+      runtime: 2
   kind:
     vm:
       run_type:
