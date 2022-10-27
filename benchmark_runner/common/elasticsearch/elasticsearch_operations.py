@@ -68,11 +68,12 @@ class ElasticSearchOperations:
             raise ValueError("Pass an iterable with two items")
         self._hits = self.__elasticsearch_get_index_hits(index=index, uuid=uuid, workload=workload)
 
-    def __elasticsearch_get_index_hits(self, index: str, uuid: str = '', workload: str = '', fast_check: bool = False, id: bool = False):
+    def __elasticsearch_get_index_hits(self, index: str, uuid: str = '', fast_check: bool = False, id: bool = False, es_fetch_min_time:int = None):
         """
         This method search for data per index in last 2 minutes and return the number of docs or zero
         :param index:
         :param workload: need only if there is different timestamp parameter in Elasticsearch
+        :param es_fetch_min_time
         :param id: True to return the doc ids
         :param fast_check: return fast response
         :return:
@@ -84,8 +85,12 @@ class ElasticSearchOperations:
         # https://github.com/elastic/elasticsearch-dsl-py/issues/49
         self.__es.indices.refresh(index=index)
         # timestamp name in Elasticsearch is different
-        search = Search(using=self.__es, index=index).filter('range', timestamp={
-            'gte': f'now-{self.ES_FETCH_MIN_TIME}m', 'lt': 'now'})
+        if es_fetch_min_time:
+            search = Search(using=self.__es, index=index).filter('range', timestamp={
+                'gte': f'now-{es_fetch_min_time}m', 'lt': 'now'})
+        else:
+            search = Search(using=self.__es, index=index).filter('range', timestamp={
+                'gte': f'now-{self.ES_FETCH_MIN_TIME}m', 'lt': 'now'})
         # reduce the search result
         if fast_check:
             search = search[0:self.MIN_SEARCH_RESULTS]
@@ -117,9 +122,10 @@ class ElasticSearchOperations:
 
     @typechecked()
     @logger_time_stamp
-    def verify_elasticsearch_data_uploaded(self, index: str, uuid: str = '', workload: str = '', fast_check: bool = False, timeout: int = None):
+    def verify_elasticsearch_data_uploaded(self, index: str, uuid: str = '', workload: str = '', fast_check: bool = False, timeout: int = None, es_fetch_min_time: int = None):
         """
         The method wait till data upload to elastic search and wait if there is new data, search in last 15 minutes
+        :param es_fetch_min_time:
         :param index:
         :param uuid: the current workload uuid
         :param workload: workload name only if there is a different timestamp parameter name in elasticsearch
@@ -133,10 +139,10 @@ class ElasticSearchOperations:
         # waiting for any hits
         while current_wait_time <= self.__timeout:
             # waiting for new hits
-            new_hits = self.__elasticsearch_get_index_hits(index=index, uuid=uuid, workload=workload, fast_check=fast_check)
+            new_hits = self.__elasticsearch_get_index_hits(index=index, uuid=uuid, fast_check=fast_check, es_fetch_min_time=es_fetch_min_time)
             if current_hits < new_hits:
                 logger.info(f'Data with index: {index} and uuid={uuid} was uploaded to ElasticSearch successfully')
-                return self.__elasticsearch_get_index_hits(index=index, uuid=uuid, workload=workload, id=True, fast_check=fast_check)
+                return self.__elasticsearch_get_index_hits(index=index, uuid=uuid, id=True, fast_check=fast_check, es_fetch_min_time=es_fetch_min_time)
             # sleep for x seconds
             time.sleep(self.SLEEP_TIME)
             current_wait_time += self.SLEEP_TIME

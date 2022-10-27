@@ -86,13 +86,13 @@ jobs:
        # continue to next job if failed
        fail-fast: false
        matrix: 
-          workload: [ 'uperf_pod', 'uperf_kata', 'uperf_vm', 'hammerdb_pod_mariadb', 'hammerdb_kata_mariadb', 'hammerdb_vm_mariadb', 'hammerdb_pod_postgres', 'hammerdb_kata_postgres', 'hammerdb_vm_postgres', 'hammerdb_pod_postgres_lso', 'hammerdb_kata_postgres_lso', 'hammerdb_vm_postgres_lso', 'hammerdb_pod_mssql', 'hammerdb_kata_mssql', 'hammerdb_vm_mssql', 'vdbench_pod', 'vdbench_kata', 'vdbench_vm', 'clusterbuster']
+          workload: [ 'uperf_pod', 'uperf_kata', 'uperf_vm', 'hammerdb_pod_mariadb', 'hammerdb_kata_mariadb', 'hammerdb_vm_mariadb', 'hammerdb_pod_postgres', 'hammerdb_kata_postgres', 'hammerdb_vm_postgres', 'hammerdb_pod_postgres_lso', 'hammerdb_kata_postgres_lso', 'hammerdb_vm_postgres_lso', 'hammerdb_pod_mssql', 'hammerdb_kata_mssql', 'hammerdb_vm_mssql', 'vdbench_pod', 'vdbench_kata', 'vdbench_vm', 'vdbench_pod_scale', 'clusterbuster']
     steps:
     - uses: actions/checkout@v3
-    - name: Set up Python 3.9
+    - name: Set up Python 3.10
       uses: actions/setup-python@v4
       with:
-        python-version: 3.9
+        python-version: '3.10'
     - name: Install latest benchmark-runner
       run: |
         python -m pip install --upgrade pip
@@ -146,18 +146,29 @@ jobs:
         IBM_BUCKET: ${{ secrets.IBM_BUCKET }}
         IBM_KEY: ${{ secrets.IBM_KEY }}
         RUN_ARTIFACTS_URL: ${{ secrets.PERF_RUN_ARTIFACTS_URL }}
+        SCALE_NODES: ${{ secrets.PERF_SCALE_NODES }}
+        REDIS: ${{ secrets.REDIS }}
         LSO_PATH: ${{ secrets.PERF_LSO_PATH }}
         TIMEOUT: 8000
+        SCALE: 2
+        RUN_TYPE: 'perf_ci'
       run: |
         build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
         build_version="$(cut -d'=' -f2 <<<"$build")"
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start E2E workload: ${{ matrix.workload }} >>>>>>>>>>>>>>>>>>>>>>>>>>'
-        # clusterbuster: disable prometheus logs
-        if [[ '${{ matrix.workload }}' == 'clusterbuster' ]]
+        # Run vdbench scale 
+        if [[ '${{ matrix.workload }}' == 'vdbench_pod_scale' || '${{ matrix.workload }}' == 'vdbench_kata_scale' || '${{ matrix.workload }}' == 'vdbench_vm_scale' ]]
         then
-            ssh -t provision "podman run --rm -t -e WORKLOAD='${{ matrix.workload }}' -e KUBEADMIN_PASSWORD='$KUBEADMIN_PASSWORD' -e PIN_NODE_BENCHMARK_OPERATOR='$PIN_NODE_BENCHMARK_OPERATOR' -e PIN_NODE1='$PIN_NODE1' -e PIN_NODE2='$PIN_NODE2' -e ELASTICSEARCH='$ELASTICSEARCH' -e ELASTICSEARCH_PORT='$ELASTICSEARCH_PORT' -e ELASTICSEARCH_USER='$ELASTICSEARCH_USER' -e ELASTICSEARCH_PASSWORD='$ELASTICSEARCH_PASSWORD' -e IBM_REGION_NAME='$IBM_REGION_NAME' -e IBM_ENDPOINT_URL='$IBM_ENDPOINT_URL' -e IBM_ACCESS_KEY_ID='$IBM_ACCESS_KEY_ID' -e IBM_SECRET_ACCESS_KEY='$IBM_SECRET_ACCESS_KEY' -e IBM_BUCKET='$IBM_BUCKET' -e IBM_KEY='$IBM_KEY' -e RUN_ARTIFACTS_URL='$RUN_ARTIFACTS_URL' -e BUILD_VERSION='$build_version' -e RUN_TYPE='perf_ci' -e KATA_CPUOFFLINE_WORKAROUND='True' -e SAVE_ARTIFACTS_LOCAL='True' -e ENABLE_PROMETHEUS_SNAPSHOT='False' -e TIMEOUT='$TIMEOUT' -e log_level='INFO' -v '$CONTAINER_KUBECONFIG_PATH':'$CONTAINER_KUBECONFIG_PATH' -v '/tmp/benchmark-runner-run-artifacts':'/tmp/benchmark-runner-run-artifacts' --privileged 'quay.io/ebattat/benchmark-runner:v$build_version'"
+            workload=$(awk -F_ '{print $1"_"$2}' <<< '${{ matrix.workload }}')
+            # SCALE_NODES is a list, not add ''
+            ssh -t provision "podman run --rm -t -e WORKLOAD='$workload' -e KUBEADMIN_PASSWORD='$KUBEADMIN_PASSWORD' -e SCALE='$SCALE' -e SCALE_NODES=$SCALE_NODES -e REDIS='$REDIS' -e PIN_NODE_BENCHMARK_OPERATOR='$PIN_NODE_BENCHMARK_OPERATOR' -e PIN_NODE1='$PIN_NODE1' -e PIN_NODE2='$PIN_NODE2' -e ELASTICSEARCH='$ELASTICSEARCH' -e ELASTICSEARCH_PORT='$ELASTICSEARCH_PORT' -e ELASTICSEARCH_USER='$ELASTICSEARCH_USER' -e ELASTICSEARCH_PASSWORD='$ELASTICSEARCH_PASSWORD' -e IBM_REGION_NAME='$IBM_REGION_NAME' -e IBM_ENDPOINT_URL='$IBM_ENDPOINT_URL' -e IBM_ACCESS_KEY_ID='$IBM_ACCESS_KEY_ID' -e IBM_SECRET_ACCESS_KEY='$IBM_SECRET_ACCESS_KEY' -e IBM_BUCKET='$IBM_BUCKET' -e IBM_KEY='$IBM_KEY' -e RUN_ARTIFACTS_URL='$RUN_ARTIFACTS_URL' -e BUILD_VERSION='$build_version' -e RUN_TYPE='$RUN_TYPE' -e KATA_CPUOFFLINE_WORKAROUND='True' -e SAVE_ARTIFACTS_LOCAL='False' -e ENABLE_PROMETHEUS_SNAPSHOT='False' -e TIMEOUT='$TIMEOUT' -e log_level='INFO' -v '$CONTAINER_KUBECONFIG_PATH':'$CONTAINER_KUBECONFIG_PATH' --privileged 'quay.io/ebattat/benchmark-runner:latest'"
+        # clusterbuster: disable prometheus logs
+        # clusterbuster: disable prometheus logs
+        elif [[ '${{ matrix.workload }}' == 'clusterbuster' ]]
+        then
+            ssh -t provision "podman run --rm -t -e WORKLOAD='${{ matrix.workload }}' -e KUBEADMIN_PASSWORD='$KUBEADMIN_PASSWORD' -e PIN_NODE_BENCHMARK_OPERATOR='$PIN_NODE_BENCHMARK_OPERATOR' -e PIN_NODE1='$PIN_NODE1' -e PIN_NODE2='$PIN_NODE2' -e ELASTICSEARCH='$ELASTICSEARCH' -e ELASTICSEARCH_PORT='$ELASTICSEARCH_PORT' -e ELASTICSEARCH_USER='$ELASTICSEARCH_USER' -e ELASTICSEARCH_PASSWORD='$ELASTICSEARCH_PASSWORD' -e IBM_REGION_NAME='$IBM_REGION_NAME' -e IBM_ENDPOINT_URL='$IBM_ENDPOINT_URL' -e IBM_ACCESS_KEY_ID='$IBM_ACCESS_KEY_ID' -e IBM_SECRET_ACCESS_KEY='$IBM_SECRET_ACCESS_KEY' -e IBM_BUCKET='$IBM_BUCKET' -e IBM_KEY='$IBM_KEY' -e RUN_ARTIFACTS_URL='$RUN_ARTIFACTS_URL' -e BUILD_VERSION='$build_version' -e RUN_TYPE='$RUN_TYPE' -e KATA_CPUOFFLINE_WORKAROUND='True' -e SAVE_ARTIFACTS_LOCAL='True' -e ENABLE_PROMETHEUS_SNAPSHOT='False' -e TIMEOUT='$TIMEOUT' -e log_level='INFO' -v '$CONTAINER_KUBECONFIG_PATH':'$CONTAINER_KUBECONFIG_PATH' -v '/tmp/benchmark-runner-run-artifacts':'/tmp/benchmark-runner-run-artifacts' --privileged 'quay.io/ebattat/benchmark-runner:v$build_version'"
         else
-            ssh -t provision "podman run --rm -t -e WORKLOAD='${{ matrix.workload }}' -e KUBEADMIN_PASSWORD='$KUBEADMIN_PASSWORD' -e PIN_NODE_BENCHMARK_OPERATOR='$PIN_NODE_BENCHMARK_OPERATOR' -e PIN_NODE1='$PIN_NODE1' -e PIN_NODE2='$PIN_NODE2' -e ELASTICSEARCH='$ELASTICSEARCH' -e ELASTICSEARCH_PORT='$ELASTICSEARCH_PORT' -e ELASTICSEARCH_USER='$ELASTICSEARCH_USER' -e ELASTICSEARCH_PASSWORD='$ELASTICSEARCH_PASSWORD' -e IBM_REGION_NAME='$IBM_REGION_NAME' -e IBM_ENDPOINT_URL='$IBM_ENDPOINT_URL' -e IBM_ACCESS_KEY_ID='$IBM_ACCESS_KEY_ID' -e IBM_SECRET_ACCESS_KEY='$IBM_SECRET_ACCESS_KEY' -e IBM_BUCKET='$IBM_BUCKET' -e IBM_KEY='$IBM_KEY' -e RUN_ARTIFACTS_URL='$RUN_ARTIFACTS_URL' -e BUILD_VERSION='$build_version' -e RUN_TYPE='perf_ci' -e KATA_CPUOFFLINE_WORKAROUND='True' -e SAVE_ARTIFACTS_LOCAL='False' -e ENABLE_PROMETHEUS_SNAPSHOT='True' -e LSO_PATH='$LSO_PATH' -e TIMEOUT='$TIMEOUT' -e log_level='INFO' -v '$CONTAINER_KUBECONFIG_PATH':'$CONTAINER_KUBECONFIG_PATH' --privileged 'quay.io/ebattat/benchmark-runner:v$build_version'"
+            ssh -t provision "podman run --rm -t -e WORKLOAD='${{ matrix.workload }}' -e KUBEADMIN_PASSWORD='$KUBEADMIN_PASSWORD' -e PIN_NODE_BENCHMARK_OPERATOR='$PIN_NODE_BENCHMARK_OPERATOR' -e PIN_NODE1='$PIN_NODE1' -e PIN_NODE2='$PIN_NODE2' -e ELASTICSEARCH='$ELASTICSEARCH' -e ELASTICSEARCH_PORT='$ELASTICSEARCH_PORT' -e ELASTICSEARCH_USER='$ELASTICSEARCH_USER' -e ELASTICSEARCH_PASSWORD='$ELASTICSEARCH_PASSWORD' -e IBM_REGION_NAME='$IBM_REGION_NAME' -e IBM_ENDPOINT_URL='$IBM_ENDPOINT_URL' -e IBM_ACCESS_KEY_ID='$IBM_ACCESS_KEY_ID' -e IBM_SECRET_ACCESS_KEY='$IBM_SECRET_ACCESS_KEY' -e IBM_BUCKET='$IBM_BUCKET' -e IBM_KEY='$IBM_KEY' -e RUN_ARTIFACTS_URL='$RUN_ARTIFACTS_URL' -e BUILD_VERSION='$build_version' -e RUN_TYPE='$RUN_TYPE' -e KATA_CPUOFFLINE_WORKAROUND='True' -e SAVE_ARTIFACTS_LOCAL='False' -e ENABLE_PROMETHEUS_SNAPSHOT='True' -e LSO_PATH='$LSO_PATH' -e TIMEOUT='$TIMEOUT' -e log_level='INFO' -v '$CONTAINER_KUBECONFIG_PATH':'$CONTAINER_KUBECONFIG_PATH' --privileged 'quay.io/ebattat/benchmark-runner:v$build_version'"
         fi
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End E2E workload: ${{ matrix.workload }} >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
     - id: job_step
@@ -171,10 +182,10 @@ jobs:
     needs: [initialize_nightly, workload]
     steps:
     - uses: actions/checkout@v3
-    - name: Set up Python 3.9
+    - name: Set up Python 3.10
       uses: actions/setup-python@v4
       with:
-        python-version: 3.9
+        python-version: '3.10'
     - name: ⚙ Set START CI TIME
       run: echo "START_CI=${{ needs.initialize_nightly.outputs.start_time_output }}" >> "$GITHUB_ENV"
     - name: Install latest benchmark-runner

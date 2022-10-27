@@ -67,7 +67,7 @@ class EnvironmentVariables:
         # Set to True to
         self._environment_variables_dict['kata_cpuoffline_workaround'] = EnvironmentVariables.get_boolean_from_environment('KATA_CPUOFFLINE_WORKAROUND', False)
 
-        # Scale in each node
+        # Scale number in each node: 1,2,3
         self._environment_variables_dict['scale'] = EnvironmentVariables.get_env('SCALE', '')
         # list of nodes per pod/vm, scale number per node, e.g: [ 'master-1', 'master-2' ] - run 1 pod/vm in each node
         self._environment_variables_dict['scale_nodes'] = EnvironmentVariables.get_env('SCALE_NODES', "")
