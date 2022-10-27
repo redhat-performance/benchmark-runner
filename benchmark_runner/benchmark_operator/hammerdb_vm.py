@@ -11,6 +11,8 @@ class HammerdbVM(BenchmarkOperatorWorkloadsOperations):
     """
     This class for hammerdb vm workload
     """
+    ES_FETCH_TIME = 30
+
     def __init__(self):
         """
         All inherit from WorkloadsOperations
@@ -22,6 +24,7 @@ class HammerdbVM(BenchmarkOperatorWorkloadsOperations):
         self.__es_index = ''
         self.__kind = ''
         self.__status = ''
+        self.__es_fetch_min_time = self.ES_FETCH_TIME if self._run_type == 'perf_ci' else None
 
     @logger_time_stamp
     def run(self):
@@ -49,12 +52,12 @@ class HammerdbVM(BenchmarkOperatorWorkloadsOperations):
             self.__status = 'complete' if self.__status else 'failed'
             # system metrics
             if environment_variables.environment_variables_dict['system_metrics']:
-                self.system_metrics_collector(workload=self.__workload_name)
+                self.system_metrics_collector(workload=self.__workload_name, es_fetch_min_time=self.__es_fetch_min_time)
             # save run artifacts logs of benchmark-controller-manager and system-metrics
             run_artifacts_url = self._create_run_artifacts(workload=self.__workload_name, pod=False)
             # verify that data upload to elastic search
             if self._es_host:
-                ids = self._verify_elasticsearch_data_uploaded(index=self.__es_index, uuid=self._oc.get_long_uuid(workload=self.__workload_name))
+                ids = self._verify_elasticsearch_data_uploaded(index=self.__es_index, uuid=self._oc.get_long_uuid(workload=self.__workload_name), es_fetch_min_time=self.__es_fetch_min_time)
                 # update metadata
                 for id in ids:
                     self._update_elasticsearch_index(index=self.__es_index, id=id, kind=self._environment_variables_dict.get('kind', ''), status=self.__status, run_artifacts_url=run_artifacts_url, database=self.__database)

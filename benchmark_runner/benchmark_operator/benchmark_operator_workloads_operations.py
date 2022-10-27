@@ -178,10 +178,11 @@ class BenchmarkOperatorWorkloadsOperations:
         self.make_undeploy_benchmark_controller_manager(runner_path=environment_variables.environment_variables_dict['runner_path'])
 
     @logger_time_stamp
-    def system_metrics_collector(self, workload: str):
+    def system_metrics_collector(self, workload: str, es_fetch_min_time: int = None):
         """
         This method run system metrics collector
         @param workload: the workload
+        @param es_fetch_min_time:
         :return:
         """
         if self._run_type == 'test_ci':
@@ -193,8 +194,12 @@ class BenchmarkOperatorWorkloadsOperations:
         self._oc.wait_for_pod_completed(label='app=system-metrics-collector', workload=workload)
         # verify that data upload to elastic search
         if self._es_host:
-            # workload: system metrics, in case of uperf take timestamp and not uperf_ts
-            self._verify_elasticsearch_data_uploaded(index=es_index, uuid=self._oc.get_long_uuid(workload=workload), workload='system-metrics', fast_check=True)
+            # es_fetch_min_time: if we need to fetch more time
+            if es_fetch_min_time:
+                self._verify_elasticsearch_data_uploaded(index=es_index, uuid=self._oc.get_long_uuid(workload=workload), workload='system-metrics', fast_check=True, es_fetch_min_time=es_fetch_min_time)
+            else:
+                self._verify_elasticsearch_data_uploaded(index=es_index, uuid=self._oc.get_long_uuid(workload=workload), workload='system-metrics', fast_check=True)
+
 
     def __get_metadata(self, kind: str = None, database: str = None, status: str = None, run_artifacts_url: str = None, uuid: str = None) -> dict:
         """
@@ -264,7 +269,7 @@ class BenchmarkOperatorWorkloadsOperations:
         """
         self.__es_operations.upload_to_elasticsearch(index=index, data=self.__get_metadata(kind=kind, database=database, status=status, run_artifacts_url=run_artifacts_url, uuid=uuid))
 
-    def _verify_elasticsearch_data_uploaded(self, index: str, uuid: str, workload: str = '', fast_check: bool = False, timeout: int = None):
+    def _verify_elasticsearch_data_uploaded(self, index: str, uuid: str, workload: str = '', fast_check: bool = False, timeout: int = None, es_fetch_min_time: int = None):
         """
         This method verify that elasticsearch data uploaded
         :param index:
@@ -275,9 +280,9 @@ class BenchmarkOperatorWorkloadsOperations:
         :return: ids
         """
         if workload:
-            return self.__es_operations.verify_elasticsearch_data_uploaded(index=index, uuid=uuid, workload=workload, fast_check=fast_check, timeout=timeout)
+            return self.__es_operations.verify_elasticsearch_data_uploaded(index=index, uuid=uuid, workload=workload, fast_check=fast_check, timeout=timeout, es_fetch_min_time=es_fetch_min_time)
         else:
-            return self.__es_operations.verify_elasticsearch_data_uploaded(index=index, uuid=uuid, workload=self._workload_name, fast_check=fast_check, timeout=timeout)
+            return self.__es_operations.verify_elasticsearch_data_uploaded(index=index, uuid=uuid, workload=self._workload_name, fast_check=fast_check, timeout=timeout, es_fetch_min_time=es_fetch_min_time)
 
     def _upload_workload_to_elasticsearch(self, index: str, kind: str, status: str, result: dict = None):
         """
