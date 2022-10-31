@@ -32,7 +32,7 @@ jobs:
        # continue to next job if failed
        fail-fast: false
        matrix: 
-          resource: [ 'local_storage', 'odf', 'kata', 'cnv', 'infra', 'custom']
+          resource: ['kata', 'local_storage', 'odf', 'cnv', 'infra', 'custom']
     outputs:
       install_resource_time_output: ${{ steps.ocp_install_resource_step.outputs.install_resource_time }}
     steps:
