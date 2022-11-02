@@ -11,7 +11,7 @@ from benchmark_runner.common.oc.oc import OC
 from benchmark_runner.common.template_operations.template_operations import TemplateOperations
 from benchmark_runner.common.elasticsearch.elasticsearch_operations import ElasticSearchOperations
 from benchmark_runner.common.ssh.ssh import SSH
-from benchmark_runner.benchmark_operator.benchmark_operator_exceptions import ODFNonInstalled
+from benchmark_runner.benchmark_operator.benchmark_operator_exceptions import ODFNonInstalled, EmptyLSOPath
 from benchmark_runner.main.environment_variables import environment_variables
 from benchmark_runner.common.clouds.shared.s3.s3_operations import S3Operations
 from benchmark_runner.common.prometheus.prometheus_snapshot import PrometheusSnapshot
@@ -37,6 +37,7 @@ class BenchmarkOperatorWorkloadsOperations:
         self._elasticsearch = self._environment_variables_dict.get('elasticsearch', '')
         self._run_artifacts = self._environment_variables_dict.get('run_artifacts', '')
         self._run_artifacts_path = self._environment_variables_dict.get('run_artifacts_path', '')
+        self._lso_path = self._environment_variables_dict.get('lso_path', '')
         self._date_key = self._environment_variables_dict.get('date_key', '')
         self._key = self._environment_variables_dict.get('key', '')
         self._endpoint_url = self._environment_variables_dict.get('endpoint_url', '')
@@ -456,6 +457,15 @@ class BenchmarkOperatorWorkloadsOperations:
                 raise ODFNonInstalled()
 
     @logger_time_stamp
+    def verify_lso(self):
+        """
+        This method Verifies that lso path exist
+        :return:
+        """
+        if not self._lso_path:
+            raise EmptyLSOPath()
+
+    @logger_time_stamp
     def delete_all(self):
         """
         This method delete all pod or unbound pv in namespace
@@ -484,6 +494,8 @@ class BenchmarkOperatorWorkloadsOperations:
         self.clear_nodes_cache()
         if self._odf_pvc:
             self.odf_pvc_verification()
+        if 'lso' in self._workload:
+            self.verify_lso()
         # make deploy benchmark controller manager
         self.make_deploy_benchmark_controller_manager(runner_path=environment_variables.environment_variables_dict['runner_path'])
         self._template.generate_yamls()
