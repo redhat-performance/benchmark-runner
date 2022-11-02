@@ -14,6 +14,14 @@ class ODFNonInstalled(BenchmarkOperatorError):
         super(ODFNonInstalled, self).__init__(self.message)
 
 
+class EmptyLSOPath(BenchmarkOperatorError):
+    """
+    This class is error that LSO path is empty
+    """
+    def __init__(self):
+        self.message = "LSO path is empty"
+        super(EmptyLSOPath, self).__init__(self.message)
+
 class PrometheusSnapshotFailed(BenchmarkOperatorError):
     """
     Prometheus snapshot failed

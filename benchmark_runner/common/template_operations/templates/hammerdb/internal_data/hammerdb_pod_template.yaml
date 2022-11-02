@@ -46,7 +46,7 @@ spec:
       raiseerror: "false"
       keyandthink: "false"
       driver: "timed"
-      rampup: 1
+      rampup: {{ rampup }}
       runtime: {{ runtime }}
       allwarehouse: false
       timeprofile: false
