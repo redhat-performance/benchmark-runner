@@ -40,12 +40,12 @@ spec:
       db_user: "postgres"
       db_pass: "postgres"
       db_name: "tpcc"
-      transactions: 100000
+      transactions: 200000
       raiseerror: "false"
       keyandthink: "false"
       driver: "timed"
       rampup: 1
-      runtime: 2
+      runtime: 1
       allwarehouse: false
       timeprofile: false
       async_scale: false
