@@ -63,8 +63,6 @@ jobs:
             ServerAliveCountMax 5
           END
       - name: ▶ OCP assisted installer
-        # green when failed because retry
-        continue-on-error: true
         env:
           INSTALL_OCP_VERSION: "latest-4.11"
           IBM_API_KEY: ${{ secrets.IBM_API_KEY }}
