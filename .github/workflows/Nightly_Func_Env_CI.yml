@@ -5,8 +5,8 @@ name: Deploy Func Env Nightly CI
 on:
   # Run on Nightly
   schedule:
-    - cron: '0 4 * * 1-6' # run Monday-Sunday at 4 AM UTC/ 0 AM EDT
-  # Run on weekly after assisted installer and operator completed
+    - cron: '0 4 * * 1-6' # run Monday-Saturday at 4 AM UTC/ 0 AM EDT
+  # Run on Sunday after assisted installer and operator completed
   workflow_run:
     workflows: ["Deploy Operator FUNC Env Weekly CI"]
     types:
