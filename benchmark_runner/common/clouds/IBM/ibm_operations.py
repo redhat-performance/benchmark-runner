@@ -207,7 +207,9 @@ class IBMOperations:
         This method validate if version is already install
         :return: True if it already installed, False if it NOT already installed
         """
-        if self.LATEST_VERSION in self.__install_ocp_version and self.get_ocp_server_version() == self.__get_latest_version():
+        if self.get_ocp_server_version() == 'null':
+            return False
+        elif self.LATEST_VERSION in self.__install_ocp_version and self.get_ocp_server_version() == self.__get_latest_version():
             return self.get_ocp_server_version().strip()
         elif self.__install_ocp_version == self.get_ocp_server_version():
             return self.__install_ocp_version
@@ -259,7 +261,7 @@ class IBMOperations:
         self.__ssh.run(f"chmod 600 /{self.__user}/.ssh/config")
         # Must add -t otherwise remote ssh of ansible will not end
         self.__ssh.run(cmd=f"ssh -t provision \"{self.__ibm_login_cmd()};{self.__ibm_install_ocp_cmd()}\" ")
-        logger.info(f'End OCP assisted installer, End time: {datetime.now().strftime(datetime_format)}')
+        logger.info(f'Assisted installer successfully installed {self.get_ocp_server_version()}, End time: {datetime.now().strftime(datetime_format)}')
 
     @logger_time_stamp
     def verify_install_complete(self):
@@ -336,4 +338,3 @@ class IBMOperations:
         """
         install_log = self.__remote_ssh.run_command(self.__provision_installer_log)
         return install_log.split()[-1].strip('"')
-
