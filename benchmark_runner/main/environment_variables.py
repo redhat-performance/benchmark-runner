@@ -180,11 +180,11 @@ class EnvironmentVariables:
         self._environment_variables_dict['key'] = EnvironmentVariables.get_env('IBM_KEY', '')
 
         # Parameters below related to 'install_ocp()'
-        # MANDATORY for OCP install: install ocp version - insert version to install i.e. 'latest-4.8' : https://mirror.openshift.com/pub/openshift-v4/clients/ocp
+        # MANDATORY for OCP install: assisted installer version i.e. 'latest-4.11' or '4.11.16' : https://mirror.openshift.com/pub/openshift-v4/clients/ocp
         self._environment_variables_dict['install_ocp_version'] = EnvironmentVariables.get_env('INSTALL_OCP_VERSION', '')
-        # There are 2 steps run_ibm_ocp_ipi_installer/verify_install_complete
+        # There are 2 options: run_ibm_ocp_installer/verify_install_complete
         self._environment_variables_dict['install_step'] = EnvironmentVariables.get_env('INSTALL_STEP', '')
-        # github repository
+        # GitHub repository - for credentials updating
         self._environment_variables_dict['github_repository_short'] = EnvironmentVariables.get_env('GITHUB_REPOSITORY_SHORT', '')
 
         # Parameters below related to 'install_resource()'
