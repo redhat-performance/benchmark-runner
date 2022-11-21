@@ -29,7 +29,7 @@ class IBMOperations:
     """
     This class is responsible for all IBM cloud operations, all commands run on remote provision IBM host
     """
-    LATEST_VERSION = 'latest'
+    LATEST = 'latest'
 
     @typechecked
     def __init__(self, user: str):
@@ -182,18 +182,17 @@ class IBMOperations:
         """
         self.__remote_ssh.disconnect()
 
-    def __get_latest_version(self):
+    def __get_installation_version(self):
         """
-        This method return latest version
+        This method return installation version
         :return:
         """
         ocp_versions = OCPVersions()
-        if self.LATEST_VERSION in self.__install_ocp_version:
+        if self.LATEST in self.__install_ocp_version:
             openshift_version_data = self.__install_ocp_version.split('-')
             return ocp_versions.get_latest_version(latest_version=openshift_version_data[1])
         else:
-            openshift_version_data = self.__install_ocp_version.split('.')
-            return ocp_versions.get_latest_version(latest_version=f'{openshift_version_data[0]}.{openshift_version_data[1]}')
+            return self.__install_ocp_version
 
     def get_ocp_server_version(self):
         """
@@ -209,7 +208,7 @@ class IBMOperations:
         """
         if self.get_ocp_server_version() == 'null':
             return False
-        elif self.LATEST_VERSION in self.__install_ocp_version and self.get_ocp_server_version() == self.__get_latest_version():
+        elif self.LATEST in self.__install_ocp_version and self.get_ocp_server_version() == self.__get_installation_version():
             return self.get_ocp_server_version().strip()
         elif self.__install_ocp_version == self.get_ocp_server_version():
             return self.__install_ocp_version
@@ -231,8 +230,8 @@ class IBMOperations:
         :return:
         """
         # Get the latest assisted installer version
-        if self.LATEST_VERSION in self.__install_ocp_version:
-            self.__install_ocp_version = self.__get_latest_version()
+        if self.LATEST in self.__install_ocp_version:
+            self.__install_ocp_version = self.__get_installation_version()
         openshift_version_data = self.__install_ocp_version.split('.')
         self.__remote_ssh.replace_parameter(remote_path='/root/jetlag/ansible/vars',
                                             file_name='ibmcloud.yml',
@@ -261,7 +260,7 @@ class IBMOperations:
         self.__ssh.run(f"chmod 600 /{self.__user}/.ssh/config")
         # Must add -t otherwise remote ssh of ansible will not end
         self.__ssh.run(cmd=f"ssh -t provision \"{self.__ibm_login_cmd()};{self.__ibm_install_ocp_cmd()}\" ")
-        logger.info(f'Assisted installer successfully installed {self.get_ocp_server_version()}, End time: {datetime.now().strftime(datetime_format)}')
+        logger.info(f'OpenShift cluster {self.__get_installation_version()} version is installed successfully, End time: {datetime.now().strftime(datetime_format)}')
 
     @logger_time_stamp
     def verify_install_complete(self):

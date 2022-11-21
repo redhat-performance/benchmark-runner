@@ -21,15 +21,14 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 16,
-  "iteration": 1666790632339,
+  "id": 22,
   "links": [],
   "liveNow": false,
   "panels": [
     {
       "gridPos": {
         "h": 5,
-        "w": 4,
+        "w": 3,
         "x": 0,
         "y": 0
       },
@@ -71,268 +70,20 @@
       "type": "text"
     },
     {
-      "description": "OVN - 09/19",
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "eh85eR3nz"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
-            "fixedColor": "super-light-blue",
-            "mode": "fixed"
+            "mode": "thresholds"
           },
           "custom": {
-            "fillOpacity": 70,
-            "lineWidth": 3
+            "align": "auto",
+            "displayMode": "auto"
           },
-          "mappings": [
-            {
-              "options": {
-                "102": {
-                  "index": 13,
-                  "text": "1.0.2"
-                },
-                "110": {
-                  "index": 14,
-                  "text": "1.1.0"
-                },
-                "120": {
-                  "index": 15,
-                  "text": "1.2.0"
-                },
-                "121": {
-                  "index": 16,
-                  "text": "1.2.1"
-                },
-                "130": {
-                  "index": 45,
-                  "text": "1.3.0"
-                },
-                "483": {
-                  "index": 0,
-                  "text": "4.8.3"
-                },
-                "484": {
-                  "index": 1,
-                  "text": "4.8.4"
-                },
-                "485": {
-                  "index": 2,
-                  "text": "4.8.5"
-                },
-                "486": {
-                  "index": 3,
-                  "text": "4.8.6"
-                },
-                "487": {
-                  "index": 4,
-                  "text": "4.8.7"
-                },
-                "488": {
-                  "index": 5,
-                  "text": "4.8.8"
-                },
-                "4102": {
-                  "index": 33,
-                  "text": "4.10.2"
-                },
-                "4104": {
-                  "index": 34,
-                  "text": "4.10.4"
-                },
-                "4105": {
-                  "index": 35,
-                  "text": "4.10.5"
-                },
-                "4106": {
-                  "index": 36,
-                  "text": "4.10.6"
-                },
-                "4108": {
-                  "index": 37,
-                  "text": "4.10.8"
-                },
-                "4109": {
-                  "index": 38,
-                  "text": "4.10.9"
-                },
-                "4114": {
-                  "index": 54,
-                  "text": "4.11.4"
-                },
-                "4115": {
-                  "index": 53,
-                  "text": "4.11.5"
-                },
-                "4116": {
-                  "index": 52,
-                  "text": "4.11.6"
-                },
-                "4117": {
-                  "index": 51,
-                  "text": "4.11.7"
-                },
-                "4118": {
-                  "index": 50,
-                  "text": "4.11.8"
-                },
-                "4119": {
-                  "index": 49,
-                  "text": "4.11.9"
-                },
-                "4814": {
-                  "index": 6,
-                  "text": "4.8.14"
-                },
-                "4932": {
-                  "index": 8,
-                  "text": "4.9.3-2"
-                },
-                "4947": {
-                  "index": 9,
-                  "text": "4.9.4-7"
-                },
-                "4955": {
-                  "index": 10,
-                  "text": "4.9.5-5"
-                },
-                "4961": {
-                  "index": 11,
-                  "text": "4.9.6-1"
-                },
-                "4972": {
-                  "index": 12,
-                  "text": "4.9.7-2"
-                },
-                "41002": {
-                  "index": 30,
-                  "text": "4.10.0-rc.2"
-                },
-                "41003": {
-                  "index": 31,
-                  "text": "4.10.0-rc.3"
-                },
-                "41007": {
-                  "index": 32,
-                  "text": "4.10.0-rc.7"
-                },
-                "41010": {
-                  "index": 39,
-                  "text": "4.10.10"
-                },
-                "41011": {
-                  "index": 40,
-                  "text": "4.10.11"
-                },
-                "41012": {
-                  "index": 41,
-                  "text": "4.10.12"
-                },
-                "41013": {
-                  "index": 42,
-                  "text": "4.10.13"
-                },
-                "41014": {
-                  "index": 43,
-                  "text": "4.10.14"
-                },
-                "41015": {
-                  "index": 44,
-                  "text": "4.10.15"
-                },
-                "41016": {
-                  "index": 21,
-                  "text": "4.10.1-6"
-                },
-                "41021": {
-                  "index": 28,
-                  "text": "4.10.2-1"
-                },
-                "41023": {
-                  "index": 29,
-                  "text": "4.10.2-3"
-                },
-                "41054": {
-                  "index": 55,
-                  "text": "4.10.5-4"
-                },
-                "41066": {
-                  "index": 48,
-                  "text": "4.10.6-6"
-                },
-                "41113": {
-                  "index": 59,
-                  "text": "4.11.1-3"
-                },
-                "49211": {
-                  "index": 7,
-                  "text": "4.9.2-11"
-                },
-                "410129": {
-                  "index": 22,
-                  "text": "4.10.1-29"
-                },
-                "410136": {
-                  "index": 23,
-                  "text": "4.10.1-36"
-                },
-                "410160": {
-                  "index": 24,
-                  "text": "4.10.1-60"
-                },
-                "410170": {
-                  "index": 25,
-                  "text": "4.10.1-70"
-                },
-                "410197": {
-                  "index": 26,
-                  "text": "4.10.1-97"
-                },
-                "411115": {
-                  "index": 58,
-                  "text": "4.11.1-15"
-                },
-                "411121": {
-                  "index": 57,
-                  "text": "4.11.1-21"
-                },
-                "411135": {
-                  "index": 46,
-                  "text": "4.11.1-35"
-                },
-                "411142": {
-                  "index": 47,
-                  "text": "4.11.1-42"
-                },
-                "4100683": {
-                  "index": 17,
-                  "text": "4.10.0-683"
-                },
-                "4100688": {
-                  "index": 18,
-                  "text": "4.10.0-688"
-                },
-                "4100700": {
-                  "index": 19,
-                  "text": "4.10.0-700"
-                },
-                "4100729": {
-                  "index": 20,
-                  "text": "4.10.0-729"
-                },
-                "4101101": {
-                  "index": 27,
-                  "text": "4.10.1-101"
-                },
-                "4110137": {
-                  "index": 56,
-                  "text": "4.11.0.137"
-                },
-                "4110605": {
-                  "index": 60,
-                  "text": "4.11.06-05"
-                }
-              },
-              "type": "value"
-            }
-          ],
+          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -347,690 +98,114 @@
             ]
           }
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "server_version.buildDate"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 167
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "run_host"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 210
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
-        "h": 6,
+        "h": 8,
         "w": 24,
         "x": 0,
         "y": 5
       },
-      "id": 171,
-      "interval": "1d",
-      "links": [
-        {
-          "targetBlank": true,
-          "title": "OCP version",
-          "url": "https://openshift-release.apps.ci.l2s4.p1.openshiftapps.com/"
-        }
-      ],
+      "id": 142,
       "options": {
-        "alignValue": "right",
-        "legend": {
-          "displayMode": "hidden",
-          "placement": "bottom"
+        "footer": {
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
         },
-        "mergeValues": true,
-        "rowHeight": 0.9,
-        "showValue": "always",
-        "tooltip": {
-          "mode": "single"
-        }
+        "showHeader": true,
+        "sortBy": []
       },
       "pluginVersion": "8.4.0-pre",
       "targets": [
         {
-          "alias": "ocp version",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto"
-              },
-              "type": "date_histogram"
-            }
-          ],
+          "alias": "",
+          "bucketAggs": [],
           "datasource": {
             "type": "elasticsearch",
-            "uid": "mg2W2WD7z"
+            "uid": "eh85eR3nz"
           },
-          "hide": false,
           "metrics": [
             {
-              "field": "ci_minutes_time",
               "id": "1",
               "settings": {
-                "script": "Integer.parseInt(\"0\"+doc['ocp_version.keyword'].value.replace(\".\",\"\").replace(\"r\",\"\").replace(\"c\",\"\").replace(\"f\",\"\").replace(\"-\",\"\"))"
+                "size": "500"
               },
-              "type": "max"
+              "type": "raw_data"
             }
           ],
-          "query": "_exists_:ocp_version",
+          "query": "",
           "refId": "A",
           "timeField": "timestamp"
-        },
-        {
-          "alias": "odf version",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto"
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "datasource": {
-            "type": "elasticsearch",
-            "uid": "mg2W2WD7z"
-          },
-          "hide": false,
-          "metrics": [
-            {
-              "field": "ci_minutes_time",
-              "id": "1",
-              "settings": {
-                "script": "((doc['odf_version.keyword'].size() != 0) ? ((doc['odf_version.keyword'].value.indexOf(\" \") == -1) ? Integer.parseInt(\"0\"+doc['odf_version.keyword'].value.replace(\".\",\"\").replace(\"r\",\"\").replace(\"c\",\"\").replace(\"f\",\"\").replace(\"-\",\"\")) : 0) : 0)"
-              },
-              "type": "max"
-            }
-          ],
-          "query": "_exists_:odf_version",
-          "refId": "E",
-          "timeField": "timestamp"
-        },
-        {
-          "alias": "cnv version",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto"
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "datasource": {
-            "type": "elasticsearch",
-            "uid": "mg2W2WD7z"
-          },
-          "hide": false,
-          "metrics": [
-            {
-              "field": "ci_minutes_time",
-              "id": "1",
-              "settings": {
-                "script": "(doc['cnv_version.keyword'].value.indexOf(\" \") == -1) ? Integer.parseInt(\"0\"+doc['cnv_version.keyword'].value.replace(\".\",\"\").replace(\"r\",\"\").replace(\"c\",\"\").replace(\"f\",\"\").replace(\"-\",\"\")) : 0"
-              },
-              "type": "max"
-            }
-          ],
-          "query": "_exists_:cnv_version",
-          "refId": "C",
-          "timeField": "timestamp"
-        },
-        {
-          "alias": "kata version",
-          "bucketAggs": [
-            {
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto"
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "datasource": {
-            "type": "elasticsearch",
-            "uid": "mg2W2WD7z"
-          },
-          "hide": false,
-          "metrics": [
-            {
-              "field": "ci_minutes_time",
-              "id": "1",
-              "settings": {
-                "script": "(doc['kata_version.keyword'].value.indexOf(\" \") == -1) ? Integer.parseInt(doc['kata_version.keyword'].value.replace(\".\",\"\")) : 0"
-              },
-              "type": "max"
-            }
-          ],
-          "query": "_exists_:kata_version",
-          "refId": "D",
-          "timeField": "timestamp"
         }
       ],
-      "title": "Product Versions",
-      "type": "state-timeline"
-    },
-    {
-      "collapsed": true,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 11
-      },
-      "id": 136,
-      "panels": [
+      "title": "ClusterBuster Metadata",
+      "transformations": [
         {
-          "datasource": {
-            "type": "elasticsearch",
-            "uid": "xQGAtZvnk"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
-              "custom": {
-                "fillOpacity": 70,
-                "lineWidth": 0
-              },
-              "mappings": [],
-              "min": 0,
-              "thresholds": {
-                "mode": "percentage",
-                "steps": [
-                  {
-                    "color": "semi-dark-red"
-                  },
-                  {
-                    "color": "light-orange",
-                    "value": 50
-                  },
-                  {
-                    "color": "super-light-green",
-                    "value": 80
-                  },
-                  {
-                    "color": "dark-green",
-                    "value": 90
-                  },
-                  {
-                    "color": "dark-blue",
-                    "value": 100
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 36,
-            "w": 24,
-            "x": 0,
-            "y": 12
-          },
-          "id": 120,
-          "interval": "1d",
-          "links": [
-            {
-              "title": "artifacts link",
-              "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&viewPanel=128"
-            }
-          ],
+          "id": "organize",
           "options": {
-            "alignValue": "center",
-            "legend": {
-              "displayMode": "list",
-              "placement": "bottom"
+            "excludeByName": {
+              "_id": true,
+              "_index": true,
+              "_type": true,
+              "highlight": true,
+              "sort": true
             },
-            "mergeValues": false,
-            "rowHeight": 0.9,
-            "showValue": "always",
-            "tooltip": {
-              "mode": "single"
-            }
-          },
-          "targets": [
-            {
-              "alias": "{{term db_type.keyword}}  : workers={{term current_worker}} : {{term storage_type.keyword}} : {{term kind.keyword}}",
-              "bucketAggs": [
-                {
-                  "field": "db_type.keyword",
-                  "id": "3",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "asc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "current_worker",
-                  "id": "4",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "asc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "kind.keyword",
-                  "id": "5",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "storage_type.keyword",
-                  "id": "6",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "timestamp",
-                  "id": "2",
-                  "settings": {
-                    "interval": "auto"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "xQGAtZvnk"
-              },
-              "metrics": [
-                {
-                  "field": "tpm",
-                  "id": "1",
-                  "settings": {
-                    "script": "_value/1000"
-                  },
-                  "type": "max"
-                }
-              ],
-              "query": "_exists_:tpm AND db_type:$db_type AND current_worker:$current_worker AND kind:$kind",
-              "refId": "A",
-              "timeField": "timestamp"
-            }
-          ],
-          "title": "HammerDB KTPM (by db type, workers, and pod/vm/kata))",
-          "type": "state-timeline"
+            "indexByName": {
+              "_id": 8,
+              "_index": 9,
+              "_type": 10,
+              "highlight": 11,
+              "kata_version": 1,
+              "openshift_version": 0,
+              "run_host": 3,
+              "run_uuid": 4,
+              "server_version.buildDate": 5,
+              "server_version.compiler": 6,
+              "server_version.gitCommit": 7,
+              "server_version.gitTreeState": 12,
+              "server_version.gitVersion": 13,
+              "server_version.goVersion": 14,
+              "server_version.major": 15,
+              "server_version.minor": 16,
+              "server_version.platform": 17,
+              "sort": 18,
+              "start_time": 19,
+              "status": 2,
+              "timestamp": 20
+            },
+            "renameByName": {}
+          }
         }
       ],
-      "title": "Hammerdb",
-      "type": "row"
-    },
-    {
-      "collapsed": true,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 12
-      },
-      "id": 138,
-      "panels": [
-        {
-          "datasource": {
-            "type": "elasticsearch",
-            "uid": "xNKZdZv7k"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
-              "custom": {
-                "fillOpacity": 70,
-                "lineWidth": 0
-              },
-              "decimals": 1,
-              "mappings": [],
-              "min": 0,
-              "thresholds": {
-                "mode": "percentage",
-                "steps": [
-                  {
-                    "color": "semi-dark-red"
-                  },
-                  {
-                    "color": "light-orange",
-                    "value": 50
-                  },
-                  {
-                    "color": "super-light-green",
-                    "value": 80
-                  },
-                  {
-                    "color": "dark-green",
-                    "value": 90
-                  },
-                  {
-                    "color": "dark-blue",
-                    "value": 100
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 15,
-            "w": 24,
-            "x": 0,
-            "y": 13
-          },
-          "id": 115,
-          "interval": "1d",
-          "links": [
-            {
-              "title": "artifacts link",
-              "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&viewPanel=129"
-            }
-          ],
-          "options": {
-            "alignValue": "center",
-            "legend": {
-              "displayMode": "list",
-              "placement": "bottom"
-            },
-            "mergeValues": false,
-            "rowHeight": 0.9,
-            "showValue": "always",
-            "tooltip": {
-              "mode": "single"
-            }
-          },
-          "targets": [
-            {
-              "alias": "msg size: {{term read_message_size}} :{{term num_threads}}th: {{term kind.keyword}}",
-              "bucketAggs": [
-                {
-                  "field": "read_message_size",
-                  "id": "4",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "asc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "num_threads",
-                  "id": "5",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "asc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "kind.keyword",
-                  "id": "6",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "uperf_ts",
-                  "id": "2",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "xNKZdZv7k"
-              },
-              "metrics": [
-                {
-                  "field": "norm_byte",
-                  "id": "1",
-                  "settings": {
-                    "script": "_value*8/1000000000"
-                  },
-                  "type": "avg"
-                }
-              ],
-              "query": "_exists_:norm_ops AND read_message_size:(64 OR 1024 OR 8192) AND num_threads:(1 OR 8) AND test_type:stream",
-              "refId": "A",
-              "timeField": "uperf_ts"
-            }
-          ],
-          "title": "Uperf Gbits/s",
-          "type": "state-timeline"
-        },
-        {
-          "datasource": {
-            "type": "elasticsearch",
-            "uid": "xNKZdZv7k"
-          },
-          "description": "Lower is better",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
-              "custom": {
-                "fillOpacity": 70,
-                "lineWidth": 0
-              },
-              "decimals": 1,
-              "mappings": [],
-              "max": -1,
-              "thresholds": {
-                "mode": "percentage",
-                "steps": [
-                  {
-                    "color": "dark-blue"
-                  },
-                  {
-                    "color": "dark-green",
-                    "value": 1
-                  },
-                  {
-                    "color": "super-light-green",
-                    "value": 10
-                  },
-                  {
-                    "color": "light-orange",
-                    "value": 20
-                  },
-                  {
-                    "color": "dark-red",
-                    "value": 50
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 15,
-            "w": 24,
-            "x": 0,
-            "y": 28
-          },
-          "id": 116,
-          "interval": "1d",
-          "links": [
-            {
-              "title": "artifacts link",
-              "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&viewPanel=129"
-            }
-          ],
-          "options": {
-            "alignValue": "center",
-            "legend": {
-              "displayMode": "list",
-              "placement": "bottom"
-            },
-            "mergeValues": false,
-            "rowHeight": 0.9,
-            "showValue": "always",
-            "tooltip": {
-              "mode": "single"
-            }
-          },
-          "targets": [
-            {
-              "alias": "msg size: {{term read_message_size}} :{{term num_threads}}th: {{term kind.keyword}}",
-              "bucketAggs": [
-                {
-                  "field": "read_message_size",
-                  "id": "4",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "asc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "num_threads",
-                  "id": "5",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "asc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "kind.keyword",
-                  "id": "6",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "timestamp",
-                  "id": "2",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "xNKZdZv7k"
-              },
-              "metrics": [
-                {
-                  "field": "norm_ltcy",
-                  "id": "1",
-                  "settings": {},
-                  "type": "avg"
-                }
-              ],
-              "query": "_exists_:norm_ltcy AND read_message_size:(64 OR 1024 OR 8192) AND num_threads:(1) AND test_type:rr AND norm_ltcy:<1000",
-              "refId": "A",
-              "timeField": "uperf_ts"
-            },
-            {
-              "alias": "msg size: {{term read_message_size}} :{{term num_threads}}th: {{term kind.keyword}}",
-              "bucketAggs": [
-                {
-                  "field": "read_message_size",
-                  "id": "3",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "asc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "num_threads",
-                  "id": "4",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "asc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "kind.keyword",
-                  "id": "5",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "timestamp",
-                  "id": "2",
-                  "settings": {
-                    "interval": "auto"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "xNKZdZv7k"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "norm_ltcy",
-                  "id": "1",
-                  "settings": {
-                    "script": "_value*8"
-                  },
-                  "type": "avg"
-                }
-              ],
-              "query": "_exists_:norm_ltcy AND read_message_size:(64 OR 1024 OR 8192) AND num_threads:(8) AND test_type:rr AND norm_ltcy:<1000",
-              "refId": "B",
-              "timeField": "uperf_ts"
-            }
-          ],
-          "title": "Uperf latency (usecs)",
-          "transformations": [],
-          "type": "state-timeline"
-        }
-      ],
-      "title": "Uperf",
-      "type": "row"
+      "type": "table"
     },
     {
       "collapsed": true,
@@ -1040,12 +215,12 @@
         "x": 0,
         "y": 13
       },
-      "id": 142,
+      "id": 131,
       "panels": [
         {
           "datasource": {
             "type": "elasticsearch",
-            "uid": "bwnEiMx7k"
+            "uid": "KFPjnBC7k"
           },
           "fieldConfig": {
             "defaults": {
@@ -1062,14 +237,14 @@
                 "mode": "percentage",
                 "steps": [
                   {
-                    "color": "dark-red"
+                    "color": "semi-dark-red"
                   },
                   {
-                    "color": "#EAB839",
+                    "color": "light-orange",
                     "value": 50
                   },
                   {
-                    "color": "light-green",
+                    "color": "super-light-green",
                     "value": 80
                   },
                   {
@@ -1086,19 +261,13 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 25,
+            "h": 72,
             "w": 24,
             "x": 0,
             "y": 14
           },
-          "id": 132,
+          "id": 122,
           "interval": "1d",
-          "links": [
-            {
-              "title": "artifacts link",
-              "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=now-45d&to=now&viewPanel=133"
-            }
-          ],
           "options": {
             "alignValue": "center",
             "legend": {
@@ -1114,33 +283,22 @@
           },
           "targets": [
             {
-              "alias": "{{term Run.keyword}} : {{term Threads}}th : {{term kind.keyword}}",
+              "alias": "",
               "bucketAggs": [
                 {
-                  "field": "Run.keyword",
-                  "id": "2",
+                  "field": "test_description.pods",
+                  "id": "6",
                   "settings": {
                     "min_doc_count": "1",
-                    "order": "desc",
+                    "order": "asc",
                     "orderBy": "_term",
-                    "size": "10"
+                    "size": "0"
                   },
                   "type": "terms"
                 },
                 {
-                  "field": "kind.keyword",
-                  "id": "3",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "Threads",
-                  "id": "4",
+                  "field": "test_description.name.keyword",
+                  "id": "7",
                   "settings": {
                     "min_doc_count": "1",
                     "order": "desc",
@@ -1151,7 +309,7 @@
                 },
                 {
                   "field": "timestamp",
-                  "id": "5",
+                  "id": "4",
                   "settings": {
                     "interval": "auto",
                     "min_doc_count": "0",
@@ -1163,27 +321,30 @@
               ],
               "datasource": {
                 "type": "elasticsearch",
-                "uid": "bwnEiMx7k"
+                "uid": "KFPjnBC7k"
               },
               "metrics": [
                 {
-                  "field": "Rate",
+                  "field": "iterations_sec",
                   "id": "1",
+                  "settings": {
+                    "script": "_value/1000000"
+                  },
                   "type": "avg"
                 }
               ],
-              "query": "!SCALE AND !Run.keyword='fillup'",
+              "query": "*",
               "refId": "A",
               "timeField": "timestamp"
             }
           ],
-          "title": "vdbench (IOPS)",
+          "title": "cluster-buster-cpusoaker (Iteration/Sec)",
           "type": "state-timeline"
         },
         {
           "datasource": {
             "type": "elasticsearch",
-            "uid": "bwnEiMx7k"
+            "uid": "KFPjnBC7k"
           },
           "fieldConfig": {
             "defaults": {
@@ -1200,14 +361,14 @@
                 "mode": "percentage",
                 "steps": [
                   {
-                    "color": "dark-red"
+                    "color": "semi-dark-red"
                   },
                   {
-                    "color": "#EAB839",
+                    "color": "light-orange",
                     "value": 50
                   },
                   {
-                    "color": "light-green",
+                    "color": "super-light-green",
                     "value": 80
                   },
                   {
@@ -1224,19 +385,13 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 25,
+            "h": 78,
             "w": 24,
             "x": 0,
-            "y": 39
+            "y": 86
           },
-          "id": 134,
+          "id": 124,
           "interval": "1d",
-          "links": [
-            {
-              "title": "artifacts link",
-              "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=now-45d&to=now&viewPanel=133"
-            }
-          ],
           "options": {
             "alignValue": "center",
             "legend": {
@@ -1252,33 +407,22 @@
           },
           "targets": [
             {
-              "alias": " {{term Run.keyword}} : {{term Threads}}th : {{term kind.keyword}}",
+              "alias": "",
               "bucketAggs": [
                 {
-                  "field": "Run.keyword",
-                  "id": "2",
+                  "field": "test_description.pods",
+                  "id": "6",
                   "settings": {
                     "min_doc_count": "1",
-                    "order": "desc",
+                    "order": "asc",
                     "orderBy": "_term",
-                    "size": "10"
+                    "size": "0"
                   },
                   "type": "terms"
                 },
                 {
-                  "field": "kind.keyword",
-                  "id": "3",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "Threads",
-                  "id": "4",
+                  "field": "test_description.name.keyword",
+                  "id": "7",
                   "settings": {
                     "min_doc_count": "1",
                     "order": "desc",
@@ -1289,7 +433,7 @@
                 },
                 {
                   "field": "timestamp",
-                  "id": "5",
+                  "id": "4",
                   "settings": {
                     "interval": "auto",
                     "min_doc_count": "0",
@@ -1301,25 +445,152 @@
               ],
               "datasource": {
                 "type": "elasticsearch",
-                "uid": "bwnEiMx7k"
+                "uid": "KFPjnBC7k"
               },
               "metrics": [
                 {
-                  "field": "Resp",
+                  "field": "iterations_cpu_sec",
                   "id": "1",
+                  "settings": {
+                    "script": "_value/1000000"
+                  },
                   "type": "avg"
                 }
               ],
-              "query": "!SCALE AND !Run.keyword='fillup'",
+              "query": "*",
               "refId": "A",
               "timeField": "timestamp"
             }
           ],
-          "title": "vdbench (Latency - Lower better) ",
+          "title": "cluster-buster-cpusoaker (Iteration/CPU Sec)",
+          "type": "state-timeline"
+        },
+        {
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "KFPjnBC7k"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "fillOpacity": 70,
+                "lineWidth": 0
+              },
+              "mappings": [],
+              "min": 0,
+              "thresholds": {
+                "mode": "percentage",
+                "steps": [
+                  {
+                    "color": "semi-dark-red"
+                  },
+                  {
+                    "color": "light-orange",
+                    "value": 50
+                  },
+                  {
+                    "color": "super-light-green",
+                    "value": 80
+                  },
+                  {
+                    "color": "dark-green",
+                    "value": 90
+                  },
+                  {
+                    "color": "dark-blue",
+                    "value": 100
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 77,
+            "w": 24,
+            "x": 0,
+            "y": 164
+          },
+          "id": 123,
+          "interval": "1d",
+          "options": {
+            "alignValue": "center",
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "mergeValues": false,
+            "rowHeight": 0.9,
+            "showValue": "always",
+            "tooltip": {
+              "mode": "single"
+            }
+          },
+          "targets": [
+            {
+              "alias": "",
+              "bucketAggs": [
+                {
+                  "field": "test_description.pods",
+                  "id": "6",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "asc",
+                    "orderBy": "_term",
+                    "size": "0"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "test_description.name.keyword",
+                  "id": "7",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "timestamp",
+                  "id": "4",
+                  "settings": {
+                    "interval": "auto",
+                    "min_doc_count": "0",
+                    "timeZone": "utc",
+                    "trimEdges": "0"
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "datasource": {
+                "type": "elasticsearch",
+                "uid": "KFPjnBC7k"
+              },
+              "metrics": [
+                {
+                  "field": "memory",
+                  "id": "1",
+                  "settings": {
+                    "script": "_value/1000000"
+                  },
+                  "type": "avg"
+                }
+              ],
+              "query": "*",
+              "refId": "A",
+              "timeField": "timestamp"
+            }
+          ],
+          "title": "cluster-buster-cpusoaker (Memory [GB])",
           "type": "state-timeline"
         }
       ],
-      "title": "Vdbench",
+      "title": "ClusterBuster cpusoaker",
       "type": "row"
     },
     {
@@ -1330,12 +601,12 @@
         "x": 0,
         "y": 14
       },
-      "id": 161,
+      "id": 133,
       "panels": [
         {
           "datasource": {
             "type": "elasticsearch",
-            "uid": "bwnEiMx7k"
+            "uid": "6mczEfj7z"
           },
           "fieldConfig": {
             "defaults": {
@@ -1352,14 +623,14 @@
                 "mode": "percentage",
                 "steps": [
                   {
-                    "color": "dark-red"
+                    "color": "semi-dark-red"
                   },
                   {
-                    "color": "#EAB839",
+                    "color": "light-orange",
                     "value": 50
                   },
                   {
-                    "color": "light-green",
+                    "color": "super-light-green",
                     "value": 80
                   },
                   {
@@ -1376,19 +647,13 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 25,
+            "h": 53,
             "w": 24,
             "x": 0,
-            "y": 131
+            "y": 15
           },
-          "id": 162,
+          "id": 126,
           "interval": "1d",
-          "links": [
-            {
-              "title": "artifacts link",
-              "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=1650716591751&to=1654604591751&viewPanel=133"
-            }
-          ],
           "options": {
             "alignValue": "center",
             "legend": {
@@ -1404,205 +669,34 @@
           },
           "targets": [
             {
-              "alias": " {{term Run.keyword}} :{{term kind.keyword}}: {{term Threads}}th: {{term scale}}",
+              "alias": "",
               "bucketAggs": [
                 {
-                  "field": "Run.keyword",
-                  "id": "2",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "kind.keyword",
-                  "id": "3",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "Threads",
-                  "id": "4",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "scale",
+                  "field": "test_description.pods",
                   "id": "6",
                   "settings": {
                     "min_doc_count": "1",
                     "order": "asc",
                     "orderBy": "_term",
-                    "size": "10"
+                    "size": "0"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "test_description.name.keyword",
+                  "id": "7",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "0"
                   },
                   "type": "terms"
                 },
                 {
                   "field": "timestamp",
-                  "id": "5",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "bwnEiMx7k"
-              },
-              "metrics": [
-                {
-                  "field": "Rate",
-                  "id": "1",
-                  "type": "sum"
-                }
-              ],
-              "query": "!Run.keyword='fillup'",
-              "refId": "A",
-              "timeField": "timestamp"
-            }
-          ],
-          "title": "vdbench scale (IOPS)",
-          "type": "state-timeline"
-        },
-        {
-          "datasource": {
-            "type": "elasticsearch",
-            "uid": "bwnEiMx7k"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
-              "custom": {
-                "fillOpacity": 70,
-                "lineWidth": 0
-              },
-              "mappings": [],
-              "min": 0,
-              "thresholds": {
-                "mode": "percentage",
-                "steps": [
-                  {
-                    "color": "dark-red"
-                  },
-                  {
-                    "color": "#EAB839",
-                    "value": 50
-                  },
-                  {
-                    "color": "light-green",
-                    "value": 80
-                  },
-                  {
-                    "color": "dark-green",
-                    "value": 90
-                  },
-                  {
-                    "color": "dark-blue",
-                    "value": 100
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 25,
-            "w": 24,
-            "x": 0,
-            "y": 156
-          },
-          "id": 163,
-          "interval": "1d",
-          "links": [
-            {
-              "title": "artifacts link",
-              "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=1650716591751&to=1654604591751&viewPanel=133"
-            }
-          ],
-          "options": {
-            "alignValue": "center",
-            "legend": {
-              "displayMode": "list",
-              "placement": "bottom"
-            },
-            "mergeValues": false,
-            "rowHeight": 0.9,
-            "showValue": "always",
-            "tooltip": {
-              "mode": "single"
-            }
-          },
-          "targets": [
-            {
-              "alias": " {{term Run.keyword}} :{{term kind.keyword}}: {{term Threads}}th: {{term scale}}",
-              "bucketAggs": [
-                {
-                  "field": "Run.keyword",
-                  "id": "2",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "kind.keyword",
-                  "id": "3",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "Threads",
                   "id": "4",
                   "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "scale",
-                  "id": "6",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "timestamp",
-                  "id": "5",
-                  "settings": {
                     "interval": "auto",
                     "min_doc_count": "0",
                     "timeZone": "utc",
@@ -1613,25 +707,28 @@
               ],
               "datasource": {
                 "type": "elasticsearch",
-                "uid": "bwnEiMx7k"
+                "uid": "6mczEfj7z"
               },
               "metrics": [
                 {
-                  "field": "Resp",
+                  "field": "read.io_throughput",
                   "id": "1",
+                  "settings": {
+                    "script": "_value/1000000"
+                  },
                   "type": "avg"
                 }
               ],
-              "query": "!Run.keyword='fillup'",
+              "query": "*",
               "refId": "A",
               "timeField": "timestamp"
             }
           ],
-          "title": "vdbench scale (Latency - Lower better) ",
+          "title": "cluster-buster-file (Read Throughput)",
           "type": "state-timeline"
         }
       ],
-      "title": "Vdbench scale",
+      "title": "ClusterBuster files",
       "type": "row"
     },
     {
@@ -1642,12 +739,12 @@
         "x": 0,
         "y": 15
       },
-      "id": 148,
+      "id": 136,
       "panels": [
         {
           "datasource": {
             "type": "elasticsearch",
-            "uid": "GOZHNDg4k"
+            "uid": "x9fZPBC7z"
           },
           "fieldConfig": {
             "defaults": {
@@ -1664,10 +761,10 @@
                 "mode": "percentage",
                 "steps": [
                   {
-                    "color": "red"
+                    "color": "semi-dark-red"
                   },
                   {
-                    "color": "#EAB839",
+                    "color": "light-orange",
                     "value": 50
                   },
                   {
@@ -1688,69 +785,55 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 36,
+            "h": 91,
             "w": 24,
             "x": 0,
-            "y": 16
+            "y": 8
           },
-          "id": 152,
+          "id": 134,
           "interval": "1d",
-          "links": [
-            {
-              "title": "artifacts link",
-              "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=now-45d&to=now&viewPanel=150"
-            }
-          ],
           "options": {
-            "alignValue": "left",
+            "alignValue": "center",
             "legend": {
               "displayMode": "list",
               "placement": "bottom"
             },
             "mergeValues": false,
             "rowHeight": 0.9,
-            "showValue": "auto",
+            "showValue": "always",
             "tooltip": {
               "mode": "single"
             }
           },
           "targets": [
             {
-              "alias": "pod: max",
+              "alias": "",
               "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "GOZHNDg4k"
-              },
-              "metrics": [
                 {
                   "field": "test_description.pods",
                   "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='runc'",
-              "refId": "A",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "kata: max",
-              "bucketAggs": [
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "asc",
+                    "orderBy": "_term",
+                    "size": "0"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "test_description.name.keyword",
+                  "id": "7",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "0"
+                  },
+                  "type": "terms"
+                },
                 {
                   "field": "timestamp",
-                  "id": "7",
+                  "id": "4",
                   "settings": {
                     "interval": "auto",
                     "min_doc_count": "0",
@@ -1762,378 +845,116 @@
               ],
               "datasource": {
                 "type": "elasticsearch",
-                "uid": "GOZHNDg4k"
+                "uid": "x9fZPBC7z"
               },
-              "hide": false,
               "metrics": [
+                {
+                  "field": "total.iops",
+                  "id": "1",
+                  "type": "avg"
+                }
+              ],
+              "query": "*",
+              "refId": "A",
+              "timeField": "timestamp"
+            }
+          ],
+          "title": "cluster-buster-fio (IOPS)",
+          "type": "state-timeline"
+        },
+        {
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "x9fZPBC7z"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "fillOpacity": 70,
+                "lineWidth": 0
+              },
+              "mappings": [],
+              "min": 0,
+              "thresholds": {
+                "mode": "percentage",
+                "steps": [
+                  {
+                    "color": "semi-dark-red"
+                  },
+                  {
+                    "color": "light-orange",
+                    "value": 50
+                  },
+                  {
+                    "color": "super-light-green",
+                    "value": 80
+                  },
+                  {
+                    "color": "dark-green",
+                    "value": 90
+                  },
+                  {
+                    "color": "dark-blue",
+                    "value": 100
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 116,
+            "w": 24,
+            "x": 0,
+            "y": 99
+          },
+          "id": 139,
+          "interval": "1d",
+          "options": {
+            "alignValue": "center",
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "mergeValues": false,
+            "rowHeight": 0.9,
+            "showValue": "always",
+            "tooltip": {
+              "mode": "single"
+            }
+          },
+          "targets": [
+            {
+              "alias": "",
+              "bucketAggs": [
                 {
                   "field": "test_description.pods",
                   "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='kata'",
-              "refId": "B",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "pod: Memory per pod (MB)",
-              "bucketAggs": [
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "asc",
+                    "orderBy": "_term",
+                    "size": "0"
+                  },
+                  "type": "terms"
+                },
                 {
-                  "field": "timestamp",
+                  "field": "test_description.name.keyword",
                   "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "GOZHNDg4k"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "memory_per_pod",
-                  "id": "6",
-                  "settings": {
-                    "script": "_value/1000000"
-                  },
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='runc'",
-              "refId": "C",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "kata: Memory per kata  (MB)",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "GOZHNDg4k"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "memory_per_pod",
-                  "id": "6",
-                  "settings": {
-                    "script": "_value/1000000"
-                  },
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='kata'",
-              "refId": "D",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "pod: start per seconds",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "GOZHNDg4k"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "pod_starts_per_second",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='runc'",
-              "refId": "E",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "kata: start per seconds",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "GOZHNDg4k"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "pod_starts_per_second",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='kata'",
-              "refId": "F",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "pod: Iteration cpu sec",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "GOZHNDg4k"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "iterations_cpu_sec",
-                  "id": "6",
-                  "settings": {
-                    "script": "_value/1000000"
-                  },
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='runc'",
-              "refId": "G",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "kata: Iteration cpu sec",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "GOZHNDg4k"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "iterations_cpu_sec",
-                  "id": "6",
-                  "settings": {
-                    "script": "_value/1000000"
-                  },
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='kata'",
-              "refId": "H",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "pod: Iteration sec",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "GOZHNDg4k"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "iterations_sec",
-                  "id": "6",
-                  "settings": {
-                    "script": "_value/1000000"
-                  },
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='runc'",
-              "refId": "I",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "kata: Iteration sec",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "GOZHNDg4k"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "iterations_sec",
-                  "id": "6",
-                  "settings": {
-                    "script": "_value/1000000"
-                  },
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='kata'",
-              "refId": "J",
-              "timeField": "timestamp"
-            }
-          ],
-          "title": "clusterbuster-cpusoaker",
-          "type": "state-timeline"
-        },
-        {
-          "datasource": {
-            "type": "elasticsearch",
-            "uid": "GOZHNDg4k"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
-              "custom": {
-                "fillOpacity": 70,
-                "lineWidth": 0
-              },
-              "mappings": [],
-              "min": 0,
-              "thresholds": {
-                "mode": "percentage",
-                "steps": [
-                  {
-                    "color": "red"
-                  },
-                  {
-                    "color": "#EAB839",
-                    "value": 50
-                  },
-                  {
-                    "color": "super-light-green",
-                    "value": 80
-                  },
-                  {
-                    "color": "dark-green",
-                    "value": 90
-                  },
-                  {
-                    "color": "dark-blue",
-                    "value": 100
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 36,
-            "w": 24,
-            "x": 0,
-            "y": 52
-          },
-          "id": 172,
-          "interval": "1d",
-          "links": [
-            {
-              "title": "artifacts link",
-              "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=now-45d&to=now&viewPanel=150"
-            }
-          ],
-          "options": {
-            "alignValue": "left",
-            "legend": {
-              "displayMode": "list",
-              "placement": "bottom"
-            },
-            "mergeValues": false,
-            "rowHeight": 0.9,
-            "showValue": "auto",
-            "tooltip": {
-              "mode": "single"
-            }
-          },
-          "targets": [
-            {
-              "alias": "Max {{term test_description.runtime.keyword}}",
-              "bucketAggs": [
-                {
-                  "field": "test_description.runtime.keyword",
-                  "id": "8",
                   "settings": {
                     "min_doc_count": "1",
                     "order": "desc",
                     "orderBy": "_term",
-                    "size": "10"
+                    "size": "0"
                   },
                   "type": "terms"
                 },
                 {
                   "field": "timestamp",
-                  "id": "7",
+                  "id": "4",
                   "settings": {
                     "interval": "auto",
                     "min_doc_count": "0",
@@ -2145,937 +966,28 @@
               ],
               "datasource": {
                 "type": "elasticsearch",
-                "uid": "GOZHNDg4k"
+                "uid": "x9fZPBC7z"
               },
               "metrics": [
                 {
-                  "field": "test_description.pods",
-                  "id": "6",
-                  "type": "max"
+                  "field": "total.throughput",
+                  "id": "1",
+                  "settings": {
+                    "script": "_value/1000000"
+                  },
+                  "type": "avg"
                 }
               ],
-              "query": "",
+              "query": "*",
               "refId": "A",
               "timeField": "timestamp"
-            },
-            {
-              "alias": "Memory(GB) {{term test_description.runtime.keyword}}",
-              "bucketAggs": [
-                {
-                  "field": "test_description.runtime.keyword",
-                  "id": "8",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "GOZHNDg4k"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "memory_per_pod",
-                  "id": "6",
-                  "settings": {
-                    "script": "_value/1000000"
-                  },
-                  "type": "max"
-                }
-              ],
-              "query": "",
-              "refId": "C",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "Start time {{term test_description.runtime.keyword}}",
-              "bucketAggs": [
-                {
-                  "field": "test_description.runtime.keyword",
-                  "id": "8",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "GOZHNDg4k"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "pod_starts_per_second",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "",
-              "refId": "E",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "CPU sec {{term test_description.runtime.keyword}}",
-              "bucketAggs": [
-                {
-                  "field": "test_description.runtime.keyword",
-                  "id": "8",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "GOZHNDg4k"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "iterations_cpu_sec",
-                  "id": "6",
-                  "settings": {
-                    "script": "_value/1000000"
-                  },
-                  "type": "max"
-                }
-              ],
-              "query": "",
-              "refId": "G",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "Iteration sec  {{term test_description.runtime.keyword}}",
-              "bucketAggs": [
-                {
-                  "field": "test_description.runtime.keyword",
-                  "id": "8",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "GOZHNDg4k"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "iterations_sec",
-                  "id": "6",
-                  "settings": {
-                    "script": "_value/1000000"
-                  },
-                  "type": "max"
-                }
-              ],
-              "query": "",
-              "refId": "I",
-              "timeField": "timestamp"
             }
           ],
-          "title": "clusterbuster-cpusoaker",
-          "type": "state-timeline"
-        },
-        {
-          "datasource": {
-            "type": "elasticsearch",
-            "uid": "tokwNvgVz"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
-              "custom": {
-                "fillOpacity": 70,
-                "lineWidth": 0
-              },
-              "mappings": [],
-              "min": 0,
-              "thresholds": {
-                "mode": "percentage",
-                "steps": [
-                  {
-                    "color": "red"
-                  },
-                  {
-                    "color": "#EAB839",
-                    "value": 50
-                  },
-                  {
-                    "color": "super-light-green",
-                    "value": 80
-                  },
-                  {
-                    "color": "dark-green",
-                    "value": 90
-                  },
-                  {
-                    "color": "dark-blue",
-                    "value": 100
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 36,
-            "w": 24,
-            "x": 0,
-            "y": 88
-          },
-          "id": 165,
-          "interval": "1d",
-          "links": [
-            {
-              "title": "artifacts link",
-              "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=now-45d&to=now&viewPanel=150"
-            }
-          ],
-          "options": {
-            "alignValue": "left",
-            "legend": {
-              "displayMode": "list",
-              "placement": "bottom"
-            },
-            "mergeValues": false,
-            "rowHeight": 0.9,
-            "showValue": "auto",
-            "tooltip": {
-              "mode": "single"
-            }
-          },
-          "targets": [
-            {
-              "alias": "pod: create: filesize 4096",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "tokwNvgVz"
-              },
-              "metrics": [
-                {
-                  "field": "create.elapsed_time",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='runc' and test_description.filesize:4096",
-              "refId": "A",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "kata: create: filesize 4096",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "tokwNvgVz"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "create.elapsed_time",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='kata' and test_description.filesize:4096",
-              "refId": "B",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "pod: read :  filesize 4096",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "tokwNvgVz"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "read.elapsed_time",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='runc' and test_description.filesize:4096",
-              "refId": "C",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "kata: read:  filesize 4096",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "tokwNvgVz"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "read.elapsed_time",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='kata' and test_description.filesize:4096",
-              "refId": "D",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "pod: remove :  filesize 4096",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "tokwNvgVz"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "remove.elapsed_time",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='runc' and test_description.filesize:4096",
-              "refId": "E",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "kata: remove:  filesize 4096",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "tokwNvgVz"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "remove.elapsed_time",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='kata' and test_description.filesize:4096",
-              "refId": "F",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "pod: create: filesize 262,144",
-              "bucketAggs": [
-                {
-                  "field": "test_description.dirs",
-                  "id": "8",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "tokwNvgVz"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "create.elapsed_time",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='runc' and test_description.filesize:262144",
-              "refId": "G",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "kata: create:  filesize 262,144",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "tokwNvgVz"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "create.elapsed_time",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='kata' and test_description.filesize:262144",
-              "refId": "H",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "pod: read :  filesize 262,144",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "tokwNvgVz"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "read.elapsed_time",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='runc' and test_description.filesize:262144",
-              "refId": "I",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "kata: read :  filesize 262,144",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "tokwNvgVz"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "read.elapsed_time",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='kata' and test_description.filesize:262144",
-              "refId": "J",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "pod: remove :  filesize 262,144",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "tokwNvgVz"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "remove.elapsed_time",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='runc' and test_description.filesize:262144",
-              "refId": "K",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "kata: remove:  filesize 262,144",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "tokwNvgVz"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "remove.elapsed_time",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='kata' and test_description.filesize:262144",
-              "refId": "L",
-              "timeField": "timestamp"
-            }
-          ],
-          "title": "clusterbuster-files: elapsed_time: Direct/ 64 dirs/files",
-          "type": "state-timeline"
-        },
-        {
-          "datasource": {
-            "type": "elasticsearch",
-            "uid": "6biHHDgVz"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
-              "custom": {
-                "fillOpacity": 70,
-                "lineWidth": 0
-              },
-              "mappings": [],
-              "min": 0,
-              "thresholds": {
-                "mode": "percentage",
-                "steps": [
-                  {
-                    "color": "red"
-                  },
-                  {
-                    "color": "#EAB839",
-                    "value": 50
-                  },
-                  {
-                    "color": "super-light-green",
-                    "value": 80
-                  },
-                  {
-                    "color": "dark-green",
-                    "value": 90
-                  },
-                  {
-                    "color": "dark-blue",
-                    "value": 100
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 36,
-            "w": 24,
-            "x": 0,
-            "y": 124
-          },
-          "id": 167,
-          "interval": "1d",
-          "links": [
-            {
-              "title": "artifacts link",
-              "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=now-45d&to=now&viewPanel=150"
-            }
-          ],
-          "options": {
-            "alignValue": "left",
-            "legend": {
-              "displayMode": "list",
-              "placement": "bottom"
-            },
-            "mergeValues": false,
-            "rowHeight": 0.9,
-            "showValue": "auto",
-            "tooltip": {
-              "mode": "single"
-            }
-          },
-          "targets": [
-            {
-              "alias": "runc read",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "6biHHDgVz"
-              },
-              "metrics": [
-                {
-                  "field": "read.iops",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='runc'",
-              "refId": "A",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "kata read",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "6biHHDgVz"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "read.iops",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='kata'",
-              "refId": "B",
-              "timeField": "timestamp"
-            }
-          ],
-          "title": "clusterbuster-fio",
-          "type": "state-timeline"
-        },
-        {
-          "datasource": {
-            "type": "elasticsearch",
-            "uid": "vMOhDvR4k"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
-              "custom": {
-                "fillOpacity": 70,
-                "lineWidth": 0
-              },
-              "mappings": [],
-              "min": 0,
-              "thresholds": {
-                "mode": "percentage",
-                "steps": [
-                  {
-                    "color": "red"
-                  },
-                  {
-                    "color": "#EAB839",
-                    "value": 50
-                  },
-                  {
-                    "color": "super-light-green",
-                    "value": 80
-                  },
-                  {
-                    "color": "dark-green",
-                    "value": 90
-                  },
-                  {
-                    "color": "dark-blue",
-                    "value": 100
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 36,
-            "w": 24,
-            "x": 0,
-            "y": 160
-          },
-          "id": 169,
-          "interval": "1d",
-          "links": [
-            {
-              "title": "artifacts link",
-              "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=now-45d&to=now&viewPanel=150"
-            }
-          ],
-          "options": {
-            "alignValue": "left",
-            "legend": {
-              "displayMode": "list",
-              "placement": "bottom"
-            },
-            "mergeValues": false,
-            "rowHeight": 0.9,
-            "showValue": "auto",
-            "tooltip": {
-              "mode": "single"
-            }
-          },
-          "targets": [
-            {
-              "alias": "runc rate",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "vMOhDvR4k"
-              },
-              "metrics": [
-                {
-                  "field": "rate",
-                  "id": "6",
-                  "settings": {
-                    "script": "_value/1000000"
-                  },
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='runc'",
-              "refId": "A",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "kata rate",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "vMOhDvR4k"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "rate",
-                  "id": "6",
-                  "settings": {
-                    "script": "_value/1000000"
-                  },
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='kata'",
-              "refId": "B",
-              "timeField": "timestamp"
-            }
-          ],
-          "title": "clusterbuster-uperf",
+          "title": "cluster-buster-fio (Throughput)",
           "type": "state-timeline"
         }
       ],
-      "title": "ClusterBuster",
+      "title": "ClusterBuster fio",
       "type": "row"
     },
     {
@@ -3086,14 +998,13 @@
         "x": 0,
         "y": 16
       },
-      "id": 157,
+      "id": 138,
       "panels": [
         {
           "datasource": {
             "type": "elasticsearch",
-            "uid": "KQC9aik4z"
+            "uid": "rqcVPBjnk"
           },
-          "description": "OVN - 09/19",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -3109,10 +1020,10 @@
                 "mode": "percentage",
                 "steps": [
                   {
-                    "color": "red"
+                    "color": "semi-dark-red"
                   },
                   {
-                    "color": "#EAB839",
+                    "color": "light-orange",
                     "value": 50
                   },
                   {
@@ -3133,637 +1044,55 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 36,
+            "h": 53,
             "w": 24,
             "x": 0,
             "y": 17
           },
-          "id": 164,
+          "id": 140,
           "interval": "1d",
-          "links": [
-            {
-              "title": "artifacts link",
-              "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=1659592686997&to=1663480686997&viewPanel=166"
-            }
-          ],
           "options": {
-            "alignValue": "left",
+            "alignValue": "center",
             "legend": {
               "displayMode": "list",
               "placement": "bottom"
             },
             "mergeValues": false,
             "rowHeight": 0.9,
-            "showValue": "auto",
+            "showValue": "always",
             "tooltip": {
               "mode": "single"
             }
           },
           "targets": [
             {
-              "alias": "pod: max",
+              "alias": "",
               "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "KQC9aik4z"
-              },
-              "metrics": [
                 {
                   "field": "test_description.pods",
                   "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='runc'",
-              "refId": "A",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "kata: max",
-              "bucketAggs": [
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "asc",
+                    "orderBy": "_term",
+                    "size": "0"
+                  },
+                  "type": "terms"
+                },
                 {
-                  "field": "timestamp",
+                  "field": "test_description.name.keyword",
                   "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "KQC9aik4z"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "test_description.pods",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='kata'",
-              "refId": "B",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "pod: Memory per pod (MB)",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "KQC9aik4z"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "memory_per_pod",
-                  "id": "6",
-                  "settings": {
-                    "script": "_value/1000000"
-                  },
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='runc'",
-              "refId": "C",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "kata: Memory per kata  (MB)",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "KQC9aik4z"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "memory_per_pod",
-                  "id": "6",
-                  "settings": {
-                    "script": "_value/1000000"
-                  },
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='kata'",
-              "refId": "D",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "pod: start per seconds",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "KQC9aik4z"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "pod_starts_per_second",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='runc'",
-              "refId": "E",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "kata: start per seconds",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "KQC9aik4z"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "pod_starts_per_second",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='kata'",
-              "refId": "F",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "pod: Iteration cpu sec",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "KQC9aik4z"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "iterations_cpu_sec",
-                  "id": "6",
-                  "settings": {
-                    "script": "_value/1000000"
-                  },
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='runc'",
-              "refId": "G",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "kata: Iteration cpu sec",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "KQC9aik4z"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "iterations_cpu_sec",
-                  "id": "6",
-                  "settings": {
-                    "script": "_value/1000000"
-                  },
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='kata'",
-              "refId": "H",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "pod: Iteration sec",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "KQC9aik4z"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "iterations_sec",
-                  "id": "6",
-                  "settings": {
-                    "script": "_value/1000000"
-                  },
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='runc'",
-              "refId": "I",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "kata: Iteration sec",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "KQC9aik4z"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "iterations_sec",
-                  "id": "6",
-                  "settings": {
-                    "script": "_value/1000000"
-                  },
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='kata'",
-              "refId": "J",
-              "timeField": "timestamp"
-            }
-          ],
-          "title": "clusterbuster-cpusoaker [OVN - 09/19]",
-          "type": "state-timeline"
-        },
-        {
-          "datasource": {
-            "type": "elasticsearch",
-            "uid": "owIkBmzVz"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
-              "custom": {
-                "fillOpacity": 70,
-                "lineWidth": 0
-              },
-              "mappings": [],
-              "min": 0,
-              "thresholds": {
-                "mode": "percentage",
-                "steps": [
-                  {
-                    "color": "red"
-                  },
-                  {
-                    "color": "#EAB839",
-                    "value": 50
-                  },
-                  {
-                    "color": "super-light-green",
-                    "value": 80
-                  },
-                  {
-                    "color": "dark-green",
-                    "value": 90
-                  },
-                  {
-                    "color": "dark-blue",
-                    "value": 100
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 36,
-            "w": 24,
-            "x": 0,
-            "y": 53
-          },
-          "id": 153,
-          "interval": "1d",
-          "links": [
-            {
-              "title": "artifacts link",
-              "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=now-45d&to=now&viewPanel=150"
-            }
-          ],
-          "options": {
-            "alignValue": "left",
-            "legend": {
-              "displayMode": "list",
-              "placement": "bottom"
-            },
-            "mergeValues": false,
-            "rowHeight": 0.9,
-            "showValue": "auto",
-            "tooltip": {
-              "mode": "single"
-            }
-          },
-          "targets": [
-            {
-              "alias": "pod: create: filesize 4096",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "owIkBmzVz"
-              },
-              "metrics": [
-                {
-                  "field": "create.elapsed_time",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='runc' and test_description.filesize:4096",
-              "refId": "A",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "kata: create: filesize 4096",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "owIkBmzVz"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "create.elapsed_time",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='kata' and test_description.filesize:4096",
-              "refId": "B",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "pod: read :  filesize 4096",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "owIkBmzVz"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "read.elapsed_time",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='runc' and test_description.filesize:4096",
-              "refId": "C",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "kata: read:  filesize 4096",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "owIkBmzVz"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "read.elapsed_time",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='kata' and test_description.filesize:4096",
-              "refId": "D",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "pod: remove :  filesize 4096",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "owIkBmzVz"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "remove.elapsed_time",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='runc' and test_description.filesize:4096",
-              "refId": "E",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "kata: remove:  filesize 4096",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "owIkBmzVz"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "remove.elapsed_time",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='kata' and test_description.filesize:4096",
-              "refId": "F",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "pod: create: filesize 262,144",
-              "bucketAggs": [
-                {
-                  "field": "test_description.dirs",
-                  "id": "8",
                   "settings": {
                     "min_doc_count": "1",
                     "order": "desc",
                     "orderBy": "_term",
-                    "size": "10"
+                    "size": "0"
                   },
                   "type": "terms"
                 },
                 {
                   "field": "timestamp",
-                  "id": "7",
+                  "id": "4",
                   "settings": {
                     "interval": "auto",
                     "min_doc_count": "0",
@@ -3775,183 +1104,30 @@
               ],
               "datasource": {
                 "type": "elasticsearch",
-                "uid": "owIkBmzVz"
+                "uid": "rqcVPBjnk"
               },
-              "hide": false,
               "metrics": [
                 {
-                  "field": "create.elapsed_time",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='runc' and test_description.filesize:262144",
-              "refId": "G",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "kata: create:  filesize 262,144",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
+                  "field": "ops_sec",
+                  "id": "1",
                   "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
+                    "script": "_value/1000000"
                   },
-                  "type": "date_histogram"
+                  "type": "avg"
                 }
               ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "owIkBmzVz"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "create.elapsed_time",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='kata' and test_description.filesize:262144",
-              "refId": "H",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "pod: read :  filesize 262,144",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "owIkBmzVz"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "read.elapsed_time",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='runc' and test_description.filesize:262144",
-              "refId": "I",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "kata: read :  filesize 262,144",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "owIkBmzVz"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "read.elapsed_time",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='kata' and test_description.filesize:262144",
-              "refId": "J",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "pod: remove :  filesize 262,144",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "owIkBmzVz"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "remove.elapsed_time",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='runc' and test_description.filesize:262144",
-              "refId": "K",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "kata: remove:  filesize 262,144",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "owIkBmzVz"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "remove.elapsed_time",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='kata' and test_description.filesize:262144",
-              "refId": "L",
+              "query": "*",
+              "refId": "A",
               "timeField": "timestamp"
             }
           ],
-          "title": "clusterbuster-files: elapsed_time: Direct/ 64 dirs/files",
+          "title": "cluster-buster-uperf (IOPS)",
           "type": "state-timeline"
         },
         {
           "datasource": {
             "type": "elasticsearch",
-            "uid": "MIqWBmzVz"
+            "uid": "rqcVPBjnk"
           },
           "fieldConfig": {
             "defaults": {
@@ -3968,10 +1144,10 @@
                 "mode": "percentage",
                 "steps": [
                   {
-                    "color": "red"
+                    "color": "semi-dark-red"
                   },
                   {
-                    "color": "#EAB839",
+                    "color": "light-orange",
                     "value": 50
                   },
                   {
@@ -3992,69 +1168,55 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 36,
+            "h": 53,
             "w": 24,
             "x": 0,
-            "y": 89
+            "y": 70
           },
-          "id": 168,
+          "id": 127,
           "interval": "1d",
-          "links": [
-            {
-              "title": "artifacts link",
-              "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=now-45d&to=now&viewPanel=150"
-            }
-          ],
           "options": {
-            "alignValue": "left",
+            "alignValue": "center",
             "legend": {
               "displayMode": "list",
               "placement": "bottom"
             },
             "mergeValues": false,
             "rowHeight": 0.9,
-            "showValue": "auto",
+            "showValue": "always",
             "tooltip": {
               "mode": "single"
             }
           },
           "targets": [
             {
-              "alias": "runc read",
+              "alias": "",
               "bucketAggs": [
                 {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "MIqWBmzVz"
-              },
-              "metrics": [
-                {
-                  "field": "read.iops",
+                  "field": "test_description.pods",
                   "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='runc'",
-              "refId": "A",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "kata read",
-              "bucketAggs": [
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "asc",
+                    "orderBy": "_term",
+                    "size": "0"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "test_description.name.keyword",
+                  "id": "7",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "0"
+                  },
+                  "type": "terms"
+                },
                 {
                   "field": "timestamp",
-                  "id": "7",
+                  "id": "4",
                   "settings": {
                     "interval": "auto",
                     "min_doc_count": "0",
@@ -4066,168 +1228,28 @@
               ],
               "datasource": {
                 "type": "elasticsearch",
-                "uid": "MIqWBmzVz"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "read.iops",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='kata'",
-              "refId": "B",
-              "timeField": "timestamp"
-            }
-          ],
-          "title": "clusterbuster-fio",
-          "type": "state-timeline"
-        },
-        {
-          "datasource": {
-            "type": "elasticsearch",
-            "uid": "SPodBiz4z"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
-              "custom": {
-                "fillOpacity": 70,
-                "lineWidth": 0
-              },
-              "mappings": [],
-              "min": 0,
-              "thresholds": {
-                "mode": "percentage",
-                "steps": [
-                  {
-                    "color": "red"
-                  },
-                  {
-                    "color": "#EAB839",
-                    "value": 50
-                  },
-                  {
-                    "color": "super-light-green",
-                    "value": 80
-                  },
-                  {
-                    "color": "dark-green",
-                    "value": 90
-                  },
-                  {
-                    "color": "dark-blue",
-                    "value": 100
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 36,
-            "w": 24,
-            "x": 0,
-            "y": 125
-          },
-          "id": 170,
-          "interval": "1d",
-          "links": [
-            {
-              "title": "artifacts link",
-              "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=now-45d&to=now&viewPanel=150"
-            }
-          ],
-          "options": {
-            "alignValue": "left",
-            "legend": {
-              "displayMode": "list",
-              "placement": "bottom"
-            },
-            "mergeValues": false,
-            "rowHeight": 0.9,
-            "showValue": "auto",
-            "tooltip": {
-              "mode": "single"
-            }
-          },
-          "targets": [
-            {
-              "alias": "runc rate",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "SPodBiz4z"
+                "uid": "rqcVPBjnk"
               },
               "metrics": [
                 {
                   "field": "rate",
-                  "id": "6",
+                  "id": "1",
                   "settings": {
                     "script": "_value/1000000"
                   },
-                  "type": "max"
+                  "type": "avg"
                 }
               ],
-              "query": "test_description.runtime='runc'",
+              "query": "*",
               "refId": "A",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "kata rate",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "SPodBiz4z"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "rate",
-                  "id": "6",
-                  "settings": {
-                    "script": "_value/1000000"
-                  },
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='kata'",
-              "refId": "B",
               "timeField": "timestamp"
             }
           ],
-          "title": "clusterbuster-uperf",
+          "title": "cluster-buster-uperf (Throughput)",
           "type": "state-timeline"
         }
       ],
-      "title": "Clusterbuster release",
+      "title": "ClusterBuster uperf",
       "type": "row"
     },
     {
@@ -4238,12 +1260,12 @@
         "x": 0,
         "y": 17
       },
-      "id": 125,
+      "id": 129,
       "panels": [
         {
           "datasource": {
             "type": "elasticsearch",
-            "uid": "xQGAtZvnk"
+            "uid": "lDEANWAnz"
           },
           "fieldConfig": {
             "defaults": {
@@ -4251,23 +1273,17 @@
                 "mode": "thresholds"
               },
               "custom": {
-                "align": "auto",
-                "displayMode": "auto"
+                "fillOpacity": 70,
+                "lineWidth": 0
               },
-              "links": [
-                {
-                  "targetBlank": true,
-                  "title": "link",
-                  "url": "${__data.fields[\"run_artifacts_url.keyword\"]}"
-                }
-              ],
               "mappings": [],
               "min": 0,
               "thresholds": {
                 "mode": "percentage",
                 "steps": [
                   {
-                    "color": "semi-dark-red"
+                    "color": "semi-dark-red",
+                    "value": null
                   },
                   {
                     "color": "light-orange",
@@ -4288,852 +1304,36 @@
                 ]
               }
             },
-            "overrides": [
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "ci_date.keyword"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 146
-                  },
-                  {
-                    "id": "displayName",
-                    "value": "Date"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "db_type.keyword"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 137
-                  },
-                  {
-                    "id": "displayName",
-                    "value": "Database"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "current_worker"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 134
-                  },
-                  {
-                    "id": "displayName",
-                    "value": "Thread"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "kind.keyword"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 159
-                  },
-                  {
-                    "id": "displayName",
-                    "value": "Kind"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "run_artifacts_url.keyword"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 1068
-                  },
-                  {
-                    "id": "displayName",
-                    "value": "Artifacts Link"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "storage_type.keyword"
-                },
-                "properties": [
-                  {
-                    "id": "displayName",
-                    "value": "Storage"
-                  }
-                ]
-              }
-            ]
+            "overrides": []
           },
           "gridPos": {
-            "h": 28,
+            "h": 12,
             "w": 24,
             "x": 0,
             "y": 18
           },
-          "id": 128,
+          "id": 120,
           "interval": "1d",
           "options": {
-            "footer": {
-              "fields": "",
-              "reducer": [
-                "sum"
-              ],
-              "show": false
+            "alignValue": "center",
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom"
             },
-            "showHeader": true,
-            "sortBy": []
-          },
-          "pluginVersion": "8.4.0-pre",
-          "targets": [
-            {
-              "alias": "",
-              "bucketAggs": [
-                {
-                  "field": "ci_date.keyword",
-                  "id": "6",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "db_type.keyword",
-                  "id": "3",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "asc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "current_worker",
-                  "id": "4",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "asc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "kind.keyword",
-                  "id": "5",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "storage_type.keyword",
-                  "id": "2",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "run_artifacts_url.keyword",
-                  "id": "7",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "xQGAtZvnk"
-              },
-              "metrics": [
-                {
-                  "field": "tpm",
-                  "id": "1",
-                  "settings": {
-                    "script": "_value/1000"
-                  },
-                  "type": "max"
-                }
-              ],
-              "query": "_exists_:tpm AND db_type:$db_type AND current_worker:$current_worker AND kind:$kind",
-              "refId": "A",
-              "timeField": "timestamp"
+            "mergeValues": false,
+            "rowHeight": 0.9,
+            "showValue": "always",
+            "tooltip": {
+              "mode": "single"
             }
-          ],
-          "title": "HammerDB artifacts",
-          "type": "table"
-        },
-        {
-          "datasource": {
-            "type": "elasticsearch",
-            "uid": "xNKZdZv7k"
           },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
-              "custom": {
-                "align": "auto",
-                "displayMode": "auto"
-              },
-              "decimals": 1,
-              "links": [
-                {
-                  "targetBlank": true,
-                  "title": "link",
-                  "url": "${__data.fields[\"run_artifacts_url.keyword\"]}"
-                }
-              ],
-              "mappings": [],
-              "min": 0,
-              "thresholds": {
-                "mode": "percentage",
-                "steps": [
-                  {
-                    "color": "semi-dark-red"
-                  },
-                  {
-                    "color": "light-orange",
-                    "value": 50
-                  },
-                  {
-                    "color": "super-light-green",
-                    "value": 80
-                  },
-                  {
-                    "color": "dark-green",
-                    "value": 90
-                  },
-                  {
-                    "color": "dark-blue",
-                    "value": 100
-                  }
-                ]
-              }
-            },
-            "overrides": [
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "ci_date.keyword"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 169
-                  },
-                  {
-                    "id": "displayName",
-                    "value": "Date"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "read_message_size"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 167
-                  },
-                  {
-                    "id": "displayName",
-                    "value": "Read Message Size"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "num_threads"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 125
-                  },
-                  {
-                    "id": "displayName",
-                    "value": "Thread"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "kind.keyword"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 114
-                  },
-                  {
-                    "id": "displayName",
-                    "value": "Kind"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "run_artifacts_url.keyword"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 1068
-                  },
-                  {
-                    "id": "displayName",
-                    "value": "Artifacts Link"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Average"
-                },
-                "properties": [
-                  {
-                    "id": "displayName",
-                    "value": "Average Gbits"
-                  }
-                ]
-              }
-            ]
-          },
-          "gridPos": {
-            "h": 15,
-            "w": 24,
-            "x": 0,
-            "y": 46
-          },
-          "id": 129,
-          "interval": "1d",
-          "options": {
-            "footer": {
-              "fields": "",
-              "reducer": [
-                "sum"
-              ],
-              "show": false
-            },
-            "showHeader": true,
-            "sortBy": []
-          },
-          "pluginVersion": "8.4.0-pre",
           "targets": [
             {
-              "alias": "",
+              "alias": " {{term Run.keyword}} :{{term kind.keyword}}",
               "bucketAggs": [
-                {
-                  "field": "ci_date.keyword",
-                  "id": "8",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "5"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "read_message_size",
-                  "id": "4",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "asc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "num_threads",
-                  "id": "5",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "asc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "kind.keyword",
-                  "id": "6",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "run_artifacts_url.keyword",
-                  "id": "7",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "xNKZdZv7k"
-              },
-              "metrics": [
-                {
-                  "field": "norm_byte",
-                  "id": "1",
-                  "settings": {
-                    "script": "_value*8/1000000000"
-                  },
-                  "type": "avg"
-                }
-              ],
-              "query": "_exists_:norm_ops AND read_message_size:(64 OR 1024 OR 8192) AND num_threads:(1 OR 8) AND test_type:stream",
-              "refId": "A",
-              "timeField": "uperf_ts"
-            }
-          ],
-          "title": "Uperf  artifacts",
-          "type": "table"
-        },
-        {
-          "datasource": {
-            "type": "elasticsearch",
-            "uid": "dpwevWDnz"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
-              "custom": {
-                "align": "auto",
-                "displayMode": "auto"
-              },
-              "decimals": 1,
-              "links": [
-                {
-                  "targetBlank": true,
-                  "title": "link",
-                  "url": "${__data.fields[\"run_artifacts_url.keyword\"]}"
-                }
-              ],
-              "mappings": [],
-              "min": 0,
-              "thresholds": {
-                "mode": "percentage",
-                "steps": [
-                  {
-                    "color": "semi-dark-red"
-                  },
-                  {
-                    "color": "light-orange",
-                    "value": 50
-                  },
-                  {
-                    "color": "super-light-green",
-                    "value": 80
-                  },
-                  {
-                    "color": "dark-green",
-                    "value": 90
-                  },
-                  {
-                    "color": "dark-blue",
-                    "value": 100
-                  }
-                ]
-              }
-            },
-            "overrides": [
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "ci_date.keyword"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 226
-                  },
-                  {
-                    "id": "displayName",
-                    "value": "Date"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "kind.keyword"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 331
-                  },
-                  {
-                    "id": "displayName",
-                    "value": "Kind"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "run_artifacts_url.keyword"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 1068
-                  },
-                  {
-                    "id": "displayName",
-                    "value": "Artifacts Link"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Max"
-                },
-                "properties": [
-                  {
-                    "id": "displayName",
-                    "value": "Max Cpu"
-                  }
-                ]
-              }
-            ]
-          },
-          "gridPos": {
-            "h": 5,
-            "w": 24,
-            "x": 0,
-            "y": 61
-          },
-          "id": 126,
-          "interval": "1d",
-          "options": {
-            "footer": {
-              "fields": "",
-              "reducer": [
-                "sum"
-              ],
-              "show": false
-            },
-            "showHeader": true,
-            "sortBy": []
-          },
-          "pluginVersion": "8.4.0-pre",
-          "targets": [
-            {
-              "alias": "",
-              "bucketAggs": [
-                {
-                  "field": "ci_date.keyword",
-                  "id": "6",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "5"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "kind.keyword",
-                  "id": "7",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "5"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "run_artifacts_url.keyword",
-                  "id": "8",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "5"
-                  },
-                  "type": "terms"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "dpwevWDnz"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "cpu",
-                  "id": "1",
-                  "settings": {
-                    "script": "_value/1000000"
-                  },
-                  "type": "max"
-                }
-              ],
-              "query": "",
-              "refId": "B",
-              "timeField": "timestamp"
-            }
-          ],
-          "title": "stressng artifacts",
-          "transformations": [],
-          "type": "table"
-        },
-        {
-          "datasource": {
-            "type": "elasticsearch",
-            "uid": "bwnEiMx7k"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
-              "custom": {
-                "align": "auto",
-                "displayMode": "auto"
-              },
-              "decimals": 1,
-              "links": [
-                {
-                  "targetBlank": true,
-                  "title": "link",
-                  "url": "${__data.fields[\"run_artifacts_url.keyword\"]}"
-                }
-              ],
-              "mappings": [],
-              "min": 0,
-              "thresholds": {
-                "mode": "percentage",
-                "steps": [
-                  {
-                    "color": "semi-dark-red"
-                  },
-                  {
-                    "color": "light-orange",
-                    "value": 50
-                  },
-                  {
-                    "color": "super-light-green",
-                    "value": 80
-                  },
-                  {
-                    "color": "dark-green",
-                    "value": 90
-                  },
-                  {
-                    "color": "dark-blue",
-                    "value": 100
-                  }
-                ]
-              }
-            },
-            "overrides": [
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "ci_date.keyword"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 227
-                  },
-                  {
-                    "id": "displayName",
-                    "value": "Date"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "kind.keyword"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 100
-                  },
-                  {
-                    "id": "displayName",
-                    "value": "Kind"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "run_artifacts_url.keyword"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 1000
-                  },
-                  {
-                    "id": "displayName",
-                    "value": "Artifacts Link"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Average"
-                },
-                "properties": [
-                  {
-                    "id": "displayName",
-                    "value": "Average Rate"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Run.keyword"
-                },
-                "properties": [
-                  {
-                    "id": "displayName",
-                    "value": "Run"
-                  },
-                  {
-                    "id": "custom.width",
-                    "value": 140
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Threads"
-                },
-                "properties": [
-                  {
-                    "id": "displayName",
-                    "value": "Thread"
-                  },
-                  {
-                    "id": "custom.width",
-                    "value": 100
-                  }
-                ]
-              }
-            ]
-          },
-          "gridPos": {
-            "h": 5,
-            "w": 24,
-            "x": 0,
-            "y": 66
-          },
-          "id": 133,
-          "interval": "1d",
-          "options": {
-            "footer": {
-              "fields": "",
-              "reducer": [
-                "sum"
-              ],
-              "show": false
-            },
-            "showHeader": true,
-            "sortBy": [
-              {
-                "desc": true,
-                "displayName": "ci_date.keyword"
-              }
-            ]
-          },
-          "pluginVersion": "8.4.0-pre",
-          "targets": [
-            {
-              "alias": "",
-              "bucketAggs": [
-                {
-                  "field": "ci_date.keyword",
-                  "id": "4",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "5"
-                  },
-                  "type": "terms"
-                },
                 {
                   "field": "Run.keyword",
-                  "id": "5",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "Threads",
-                  "id": "6",
+                  "id": "3",
                   "settings": {
                     "min_doc_count": "1",
                     "order": "desc",
@@ -5144,432 +1344,15 @@
                 },
                 {
                   "field": "kind.keyword",
-                  "id": "7",
+                  "id": "4",
                   "settings": {
                     "min_doc_count": "1",
-                    "order": "desc",
+                    "order": "asc",
                     "orderBy": "_term",
                     "size": "10"
                   },
                   "type": "terms"
                 },
-                {
-                  "field": "run_artifacts_url.keyword",
-                  "id": "8",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "bwnEiMx7k"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "Rate",
-                  "id": "1",
-                  "type": "avg"
-                }
-              ],
-              "query": "!SCALE AND !Run.keyword='fillup'",
-              "refId": "A",
-              "timeField": "timestamp"
-            }
-          ],
-          "title": "vdbench artifacts",
-          "transformations": [],
-          "type": "table"
-        },
-        {
-          "datasource": {
-            "type": "elasticsearch",
-            "uid": "MXoeHvRVk"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
-              "custom": {
-                "align": "auto",
-                "displayMode": "auto"
-              },
-              "links": [
-                {
-                  "targetBlank": true,
-                  "title": "link",
-                  "url": "${__data.fields[\"run_artifacts_url.keyword\"]}"
-                }
-              ],
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green"
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              }
-            },
-            "overrides": [
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "run_artifacts_url"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 1600
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Date"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 227
-                  }
-                ]
-              }
-            ]
-          },
-          "gridPos": {
-            "h": 6,
-            "w": 24,
-            "x": 0,
-            "y": 71
-          },
-          "id": 150,
-          "options": {
-            "footer": {
-              "fields": "",
-              "reducer": [
-                "sum"
-              ],
-              "show": false
-            },
-            "showHeader": true
-          },
-          "pluginVersion": "8.4.0-pre",
-          "targets": [
-            {
-              "alias": "",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "2",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "run_artifacts_url.keyword",
-                  "id": "3",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "MXoeHvRVk"
-              },
-              "metrics": [
-                {
-                  "field": "job_runtime",
-                  "hide": false,
-                  "id": "1",
-                  "type": "avg"
-                }
-              ],
-              "query": "",
-              "refId": "A",
-              "timeField": "timestamp"
-            }
-          ],
-          "title": "clusterbuster artifacts",
-          "transformations": [
-            {
-              "id": "organize",
-              "options": {
-                "excludeByName": {
-                  "Average": true,
-                  "_id": true,
-                  "_index": true,
-                  "_type": true,
-                  "highlight": true,
-                  "job_end": true,
-                  "job_runtime": true,
-                  "job_start": true,
-                  "kata_version": true,
-                  "openshift_version": true,
-                  "result": true,
-                  "run_host": true,
-                  "sort": true,
-                  "uuid": true
-                },
-                "indexByName": {
-                  "_id": 6,
-                  "_index": 7,
-                  "_type": 8,
-                  "highlight": 9,
-                  "job_end": 12,
-                  "job_runtime": 10,
-                  "job_start": 11,
-                  "kata_version": 4,
-                  "openshift_version": 3,
-                  "result": 2,
-                  "run_artifacts_url": 1,
-                  "run_host": 5,
-                  "sort": 13,
-                  "timestamp": 0,
-                  "uuid": 14
-                },
-                "renameByName": {
-                  "Average": "Run time",
-                  "run_artifacts_url": "Artifacts Link",
-                  "run_artifacts_url.keyword": "Artifacts Link",
-                  "timestamp": "Date"
-                }
-              }
-            }
-          ],
-          "type": "table"
-        },
-        {
-          "datasource": {
-            "type": "elasticsearch",
-            "uid": "MOdSfikVk"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
-              "custom": {
-                "align": "auto",
-                "displayMode": "auto"
-              },
-              "links": [
-                {
-                  "targetBlank": true,
-                  "title": "link",
-                  "url": "${__data.fields[\"run_artifacts_url.keyword\"]}"
-                }
-              ],
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green"
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              }
-            },
-            "overrides": [
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "run_artifacts_url"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 1600
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Date"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 227
-                  }
-                ]
-              }
-            ]
-          },
-          "gridPos": {
-            "h": 6,
-            "w": 24,
-            "x": 0,
-            "y": 77
-          },
-          "id": 166,
-          "options": {
-            "footer": {
-              "fields": "",
-              "reducer": [
-                "sum"
-              ],
-              "show": false
-            },
-            "showHeader": true
-          },
-          "pluginVersion": "8.4.0-pre",
-          "targets": [
-            {
-              "alias": "",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "2",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "run_artifacts_url.keyword",
-                  "id": "3",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "MOdSfikVk"
-              },
-              "metrics": [
-                {
-                  "field": "job_runtime",
-                  "hide": false,
-                  "id": "1",
-                  "type": "avg"
-                }
-              ],
-              "query": "",
-              "refId": "A",
-              "timeField": "timestamp"
-            }
-          ],
-          "title": "clusterbuster release artifacts",
-          "transformations": [
-            {
-              "id": "organize",
-              "options": {
-                "excludeByName": {
-                  "Average": true,
-                  "_id": true,
-                  "_index": true,
-                  "_type": true,
-                  "highlight": true,
-                  "job_end": true,
-                  "job_runtime": true,
-                  "job_start": true,
-                  "kata_version": true,
-                  "openshift_version": true,
-                  "result": true,
-                  "run_host": true,
-                  "sort": true,
-                  "uuid": true
-                },
-                "indexByName": {
-                  "_id": 6,
-                  "_index": 7,
-                  "_type": 8,
-                  "highlight": 9,
-                  "job_end": 12,
-                  "job_runtime": 10,
-                  "job_start": 11,
-                  "kata_version": 4,
-                  "openshift_version": 3,
-                  "result": 2,
-                  "run_artifacts_url": 1,
-                  "run_host": 5,
-                  "sort": 13,
-                  "timestamp": 0,
-                  "uuid": 14
-                },
-                "renameByName": {
-                  "Average": "Run time",
-                  "run_artifacts_url": "Artifacts Link",
-                  "run_artifacts_url.keyword": "Artifacts Link",
-                  "timestamp": "Date"
-                }
-              }
-            }
-          ],
-          "type": "table"
-        }
-      ],
-      "title": "Artifacts",
-      "type": "row"
-    },
-    {
-      "collapsed": true,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 18
-      },
-      "id": 146,
-      "panels": [
-        {
-          "gridPos": {
-            "h": 3,
-            "w": 24,
-            "x": 0,
-            "y": 19
-          },
-          "id": 144,
-          "links": [
-            {
-              "targetBlank": true,
-              "title": "Issues",
-              "url": "https://docs.google.com/spreadsheets/d/1vZtg0Gj8IxKPGLWAkB4iD1O59u_WA4ky5P7gGX6xW3M/edit#gid=0"
-            }
-          ],
-          "options": {
-            "content": "Issues link: https://docs.google.com/spreadsheets/d/1vZtg0Gj8IxKPGLWAkB4iD1O59u_WA4ky5P7gGX6xW3M/edit#gid=0",
-            "mode": "markdown"
-          },
-          "pluginVersion": "8.4.0-pre",
-          "targets": [
-            {
-              "alias": "",
-              "bucketAggs": [
                 {
                   "field": "timestamp",
                   "id": "2",
@@ -5581,24 +1364,155 @@
               ],
               "datasource": {
                 "type": "elasticsearch",
-                "uid": "mg2W2WD7z"
+                "uid": "lDEANWAnz"
               },
               "metrics": [
                 {
+                  "field": "Rate",
                   "id": "1",
-                  "type": "count"
+                  "type": "max"
                 }
               ],
-              "query": "",
+              "query": "!SCALE AND !Run.keyword='fillup'",
               "refId": "A",
               "timeField": "timestamp"
             }
           ],
-          "title": "Issues found by regression",
-          "type": "text"
+          "title": "vdbench average IOPS ",
+          "type": "state-timeline"
+        },
+        {
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "lDEANWAnz"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "fillOpacity": 70,
+                "lineWidth": 0
+              },
+              "mappings": [],
+              "min": 0,
+              "thresholds": {
+                "mode": "percentage",
+                "steps": [
+                  {
+                    "color": "semi-dark-red",
+                    "value": null
+                  },
+                  {
+                    "color": "light-orange",
+                    "value": 50
+                  },
+                  {
+                    "color": "super-light-green",
+                    "value": 80
+                  },
+                  {
+                    "color": "dark-green",
+                    "value": 90
+                  },
+                  {
+                    "color": "dark-blue",
+                    "value": 100
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 12,
+            "w": 24,
+            "x": 0,
+            "y": 30
+          },
+          "id": 143,
+          "interval": "1d",
+          "options": {
+            "alignValue": "center",
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "mergeValues": false,
+            "rowHeight": 0.9,
+            "showValue": "always",
+            "tooltip": {
+              "mode": "single"
+            }
+          },
+          "targets": [
+            {
+              "alias": " {{term Run.keyword}} :{{term kind.keyword}}: scale  {{term scale}} ",
+              "bucketAggs": [
+                {
+                  "field": "Run.keyword",
+                  "id": "3",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "kind.keyword",
+                  "id": "4",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "asc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "scale",
+                  "id": "5",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "timestamp",
+                  "id": "2",
+                  "settings": {
+                    "interval": "auto"
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "datasource": {
+                "type": "elasticsearch",
+                "uid": "lDEANWAnz"
+              },
+              "metrics": [
+                {
+                  "field": "Rate",
+                  "id": "1",
+                  "type": "avg"
+                }
+              ],
+              "query": "SCALE AND !Run.keyword='fillup'",
+              "refId": "A",
+              "timeField": "timestamp"
+            }
+          ],
+          "title": "vdbench average IOPS  [SCALE]",
+          "type": "state-timeline"
         }
       ],
-      "title": "Issues",
+      "title": "Vdbench",
       "type": "row"
     }
   ],
@@ -5607,112 +1521,7 @@
   "style": "dark",
   "tags": [],
   "templating": {
-    "list": [
-      {
-        "current": {
-          "selected": false,
-          "text": "4.11.9",
-          "value": "4.11.9"
-        },
-        "definition": "{\"find\":\"terms\",\"field\":\"ocp_version.keyword\"}",
-        "hide": 2,
-        "includeAll": false,
-        "label": "ocp_version",
-        "multi": false,
-        "name": "ocp_version",
-        "options": [],
-        "query": "{\"find\":\"terms\",\"field\":\"ocp_version.keyword\"}",
-        "refresh": 2,
-        "regex": "",
-        "skipUrlSync": false,
-        "sort": 0,
-        "tagValuesQuery": "",
-        "tagsQuery": "",
-        "type": "query",
-        "useTags": false
-      },
-      {
-        "current": {
-          "selected": true,
-          "text": [
-            "All"
-          ],
-          "value": [
-            "$__all"
-          ]
-        },
-        "datasource": {
-          "type": "elasticsearch",
-          "uid": "xQGAtZvnk"
-        },
-        "definition": "{\"find\":\"terms\",\"field\":\"db_type.keyword\"}",
-        "hide": 0,
-        "includeAll": true,
-        "multi": true,
-        "name": "db_type",
-        "options": [],
-        "query": "{\"find\":\"terms\",\"field\":\"db_type.keyword\"}",
-        "refresh": 2,
-        "regex": "",
-        "skipUrlSync": false,
-        "sort": 0,
-        "type": "query"
-      },
-      {
-        "current": {
-          "selected": true,
-          "text": [
-            "All"
-          ],
-          "value": [
-            "$__all"
-          ]
-        },
-        "datasource": {
-          "type": "elasticsearch",
-          "uid": "xQGAtZvnk"
-        },
-        "definition": "{\"find\":\"terms\",\"field\":\"current_worker\"}",
-        "hide": 0,
-        "includeAll": true,
-        "multi": true,
-        "name": "current_worker",
-        "options": [],
-        "query": "{\"find\":\"terms\",\"field\":\"current_worker\"}",
-        "refresh": 2,
-        "regex": "",
-        "skipUrlSync": false,
-        "sort": 0,
-        "type": "query"
-      },
-      {
-        "current": {
-          "selected": true,
-          "text": [
-            "All"
-          ],
-          "value": [
-            "$__all"
-          ]
-        },
-        "datasource": {
-          "type": "elasticsearch",
-          "uid": "xQGAtZvnk"
-        },
-        "definition": "{\"find\":\"terms\",\"field\":\"kind.keyword\"}",
-        "hide": 0,
-        "includeAll": true,
-        "multi": true,
-        "name": "kind",
-        "options": [],
-        "query": "{\"find\":\"terms\",\"field\":\"kind.keyword\"}",
-        "refresh": 2,
-        "regex": "",
-        "skipUrlSync": false,
-        "sort": 0,
-        "type": "query"
-      }
-    ]
+    "list": []
   },
   "time": {
     "from": "now-45d",
@@ -5720,8 +1529,8 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "regression-summary",
-  "uid": "T4775LKnzzmichey",
-  "version": 188,
+  "title": "benchmark-runner-ci-status-report",
+  "uid": "T4775LKnzzmichey2",
+  "version": 30,
   "weekStart": ""
 }
