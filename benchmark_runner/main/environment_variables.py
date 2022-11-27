@@ -25,11 +25,12 @@ class EnvironmentVariables:
             try:
                 with open(env) as f:
                     for line in f.readlines():
-                        key, found , value = line.strip().partition("=")
+                        key, found, value = line.strip().partition("=")
                         if not found:
                             print("ERROR: invalid line in {env}: {line.strip()}")
                             continue
-                        if key in os.environ: continue # prefer env to env file
+                        if key in os.environ:
+                            continue  # prefer env to env file
                         os.environ[key] = value
 
             except FileNotFoundError:
@@ -39,7 +40,7 @@ class EnvironmentVariables:
         # dynamic parameters - configure for local run
         # parameters for running workload
 
-        # This path is github actions runner path (benchmark-operator should be cloned here)
+        # This path is GitHub actions runner path (benchmark-operator should be cloned here)
         self._environment_variables_dict['runner_path'] = EnvironmentVariables.get_env('RUNNER_PATH', '/tmp')
         # This path is for vm/pod/prometheus run artifacts
         self._environment_variables_dict['run_artifacts'] = EnvironmentVariables.get_env('RUN_ARTIFACTS', os.path.join(self._environment_variables_dict['runner_path'], 'benchmark-runner-run-artifacts'))
@@ -84,7 +85,7 @@ class EnvironmentVariables:
                                                          'hammerdb_pod_mssql', 'hammerdb_vm_mssql', 'hammerdb_kata_mssql',
                                                          'hammerdb_pod_mssql_lso', 'hammerdb_vm_mssql_lso', 'hammerdb_kata_mssql_lso',
                                                          'vdbench_pod', 'vdbench_kata', 'vdbench_vm',
-                                                         'clusterbuster']
+                                                         'clusterbuster', 'bootstorm_vm']
         # Workloads namespaces
         self._environment_variables_dict['workload_namespaces'] = {
             'stressng': 'benchmark-operator',
@@ -92,6 +93,7 @@ class EnvironmentVariables:
             'uperf': 'benchmark-operator',
             'vdbench': 'benchmark-runner',
             'clusterbuster': 'clusterbuster',
+            'bootstorm': 'benchmark-runner'
         }
 
         # Update namespace
@@ -208,7 +210,7 @@ class EnvironmentVariables:
         self._environment_variables_dict['ocp_env_flavor'] = EnvironmentVariables.get_env('OCP_ENV_FLAVOR', 'FUNC')
         # IBM data
         self._environment_variables_dict['ibm_api_key'] = EnvironmentVariables.get_env('IBM_API_KEY', '')
-        # github token
+        # GitHub token
         self._environment_variables_dict['github_token'] = EnvironmentVariables.get_env('GITHUB_TOKEN', '')
         self._environment_variables_dict['worker_ids'] = EnvironmentVariables.get_env(f'WORKER_IDS', "")
         self._environment_variables_dict['provision_ip'] = EnvironmentVariables.get_env(f'PROVISION_IP', '')
@@ -225,9 +227,9 @@ class EnvironmentVariables:
         self._environment_variables_dict['provision_installer_path'] = EnvironmentVariables.get_env(f'PROVISION_INSTALLER_PATH', '')
         self._environment_variables_dict['provision_installer_cmd'] = EnvironmentVariables.get_env(f'PROVISION_INSTALLER_CMD', '')
         self._environment_variables_dict['provision_installer_log'] = EnvironmentVariables.get_env(f'PROVISION_INSTALLER_LOG', '')
-        # remote ssh timeout - 3 hours for installation time
+        # timeout 0<=: forever, >0: second (installer)
         self._environment_variables_dict['provision_timeout'] = EnvironmentVariables.get_env(f'PROVISION_TIMEOUT', '10800')
-        # General timeout - 1.5 hours wait for pod/vm/upload data to elasticsearch
+        # timeout 0<=: forever, >0: second
         self._environment_variables_dict['timeout'] = EnvironmentVariables.get_env(f'TIMEOUT', '3600')
 
         # Benchmark runner run artifacts url

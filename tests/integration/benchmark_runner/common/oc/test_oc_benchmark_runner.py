@@ -1,7 +1,5 @@
 
 # Tests that run benchmark-runner workloads
-import os
-import time
 
 import pytest
 from benchmark_runner.common.oc.oc import OC
@@ -64,9 +62,9 @@ def before_after_each_test_fixture():
     print('Test End')
 
 
-def test_benchmark_runner_pod_create_initialized_ready_completed_deleted():
+def test_benchmark_runner_pod_create_initialized_ready_complete_delete():
     """
-    This method test wait for pod create, initialized, ready, completed
+    This method test wait for pod create, initialized, ready, complete, delete
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
@@ -77,9 +75,9 @@ def test_benchmark_runner_pod_create_initialized_ready_completed_deleted():
     assert oc.wait_for_pod_completed(label='app=vdbench', label_uuid=False, job=False, namespace=test_environment_variable['namespace'])
 
 
-def test_benchmark_runner_kata_create_initialized_ready_completed_deleted():
+def test_benchmark_runner_kata_create_initialized_ready_complete_delete():
     """
-    This method test wait for kata create, initialized, ready, completed
+    This method test wait for kata create, initialized, ready, complete, delete
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
@@ -88,24 +86,4 @@ def test_benchmark_runner_kata_create_initialized_ready_completed_deleted():
     assert oc.wait_for_initialized(label='app=vdbench', label_uuid=False, namespace=test_environment_variable['namespace'])
     assert oc.wait_for_ready(label='app=vdbench', label_uuid=False, namespace=test_environment_variable['namespace'])
     assert oc.wait_for_pod_completed(label='app=vdbench', label_uuid=False, job=False, namespace=test_environment_variable['namespace'])
-
-
-# capture vm output - Must run it with 'pytest -s'
-def test_benchmark_runner_vm_create_initialized_ready_completed_deleted():
-    """
-    This method test wait for vm create, initialized, ready, completed
-    :return:
-    """
-    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
-    vm_name = 'vdbench-vm'
-    assert oc.create_vm_sync(yaml=os.path.join(f'{templates_path}', 'vdbench_vm.yaml'), vm_name=vm_name, namespace=test_environment_variable['namespace'], timeout=600)
-    assert oc.wait_for_ready(label='app=vdbench', run_type='vm', label_uuid=False, namespace=test_environment_variable['namespace'],  timeout=600)
-    assert oc.delete_vm_sync(yaml=os.path.join(f'{templates_path}', 'vdbench_vm.yaml'), vm_name=vm_name, namespace=test_environment_variable['namespace'], timeout=600)
-    # Capture section
-    #output_filename = os.path.join(f'{templates_path}', 'vdbench_vm.log')
-    #vm_name = oc.get_vm(label='vdbench', namespace=test_environment_variable['namespace'])
-    #oc.save_vm_log(vm_name=vm_name, output_filename=output_filename, namespace=test_environment_variable['namespace'])
-    #assert oc.wait_for_vm_log_completed(vm_name=vm_name, end_stamp='@@~@@END-WORKLOAD@@~@@', output_filename=output_filename)
-    #assert oc.extract_vm_results(vm_name=vm_name, start_stamp=vm_name, end_stamp='@@~@@END-WORKLOAD@@~@@', output_filename=output_filename)
 

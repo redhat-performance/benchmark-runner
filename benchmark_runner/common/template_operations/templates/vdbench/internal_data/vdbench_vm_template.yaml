@@ -3,16 +3,16 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: {{ namespace }}
+---
 {%- endif %}
 {%- if odf_pvc == True %}
----
-kind: PersistentVolumeClaim
 apiVersion: v1
+kind: PersistentVolumeClaim
 metadata:
-  {% if not scale -%}
-  name: vdbench-pvc-claim
-  {%- else -%}
+  {% if scale -%}
   name: vdbench-pvc-claim-{{ scale }}
+  {%- else -%}
+  name: vdbench-pvc-claim
   {%- endif %}
   namespace: {{ namespace }}
 spec:
@@ -22,24 +22,24 @@ spec:
   resources:
     requests:
       storage: {{ storage }}
-{%- endif %}
 ---
+{%- endif %}
 apiVersion: kubevirt.io/v1
 kind: VirtualMachine
 metadata:
-  {% if not scale -%}
-  name: vdbench-{{ kind }}-{{ trunc_uuid }}
-  {%- else -%}
+  {% if scale -%}
   name: vdbench-{{ kind }}-{{ trunc_uuid }}-{{ scale }}
+  {%- else -%}
+  name: vdbench-{{ kind }}-{{ trunc_uuid }}
   {%- endif %}
   namespace: {{ namespace }}
   labels:
-    {% if not scale -%}
-    app: vdbench-{{ trunc_uuid }}
-    type: vdbench-{{ kind }}-{{ trunc_uuid }}
-    {%- else -%}
+    {% if scale -%}
     app: vdbench-{{ trunc_uuid }}-{{ scale }}
     type: vdbench-{{ kind }}-{{ trunc_uuid }}-{{ scale }}
+    {%- else -%}
+    app: vdbench-{{ trunc_uuid }}
+    type: vdbench-{{ kind }}-{{ trunc_uuid }}
     {%- endif %}
     benchmark-uuid: {{ uuid }}
     benchmark-runner-workload: vdbench
@@ -52,10 +52,10 @@ spec:
     spec:
       {%- if pin_node1 or scale_node %}
       nodeSelector:
-        {% if not scale -%}
-        kubernetes.io/hostname: {{ pin_node1 }}
-        {%- else -%}
+        {% if scale -%}
         kubernetes.io/hostname: {{ scale_node }}
+        {%- else -%}
+        kubernetes.io/hostname: {{ pin_node1 }}
         {%- endif %}
       {%- endif %}
       domain:
@@ -89,14 +89,14 @@ spec:
 {%- if odf_pvc == True %}
         - name: data-volume
           persistentVolumeClaim:
-            {% if not scale -%}
-            claimName: vdbench-pvc-claim
-            {%- else -%}
+            {% if scale -%}
             claimName: vdbench-pvc-claim-{{ scale }}
+            {%- else -%}
+            claimName: vdbench-pvc-claim
             {%- endif %}
 {%- endif %}
         - containerDisk:
-            image: {{ centos_stream8_container_disk }}
+            image: {{ centos_stream_container_disk }}
           name: containerdisk
         - cloudInitNoCloud:
             userData: |-
@@ -127,10 +127,10 @@ spec:
                 - export TIMEOUT={{ timeout }}
                 - export LOGS_DIR={{ LOGS_DIR }}
                 - echo @@~@@START-WORKLOAD@@~@@
-                {% if not scale -%}
-                - podman run --rm -e BLOCK_SIZES="$BLOCK_SIZES" -e IO_OPERATION="$IO_OPERATION" -e IO_THREADS="$IO_THREADS" -e FILES_IO="$FILES_IO" -e IO_RATE="$IO_RATE" -e MIX_PRECENTAGE="$MIX_PRECENTAGE" -e DURATION="$DURATION" -e PAUSE="$PAUSE" -e WARMUP="$WARMUP" -e FILES_SELECTION="$FILES_SELECTION" -e COMPRESSION_RATIO="$COMPRESSION_RATIO" -e RUN_FILLUP="$RUN_FILLUP" -e DIRECTORIES="$DIRECTORIES" -e FILES_PER_DIRECTORY="$FILES_PER_DIRECTORY" -e SIZE_PER_FILE="$SIZE_PER_FILE" -e REDIS_HOST="$REDIS_HOST" -e LOGS_DIR="$LOGS_DIR" -e TIMEOUT="$TIMEOUT" -v "/workload":"/workload" --privileged {{ vdbench_image }} "$WORKLOAD_METHOD"
-                {%- else -%}
+                {% if scale -%}
                 - podman run --rm -e BLOCK_SIZES="$BLOCK_SIZES" -e IO_OPERATION="$IO_OPERATION" -e IO_THREADS="$IO_THREADS" -e FILES_IO="$FILES_IO" -e IO_RATE="$IO_RATE" -e  MIX_PRECENTAGE="$MIX_PRECENTAGE" -e DURATION="$DURATION" -e  PAUSE="$PAUSE" -e WARMUP="$WARMUP" -e FILES_SELECTION="$FILES_SELECTION" -e COMPRESSION_RATIO="$COMPRESSION_RATIO" -e RUN_FILLUP="$RUN_FILLUP" -e DIRECTORIES="$DIRECTORIES" -e FILES_PER_DIRECTORY="$FILES_PER_DIRECTORY" -e SIZE_PER_FILE="$SIZE_PER_FILE" -e REDIS_HOST="$REDIS_HOST" -e LOGS_DIR="$LOGS_DIR" -e TIMEOUT="$TIMEOUT" -v "/workload":"/workload" --privileged {{ vdbench_image }} python3.9 /state_signals_responder.py "$REDIS_HOST" "$WORKLOAD_METHOD" "$TIMEOUT"
+                {%- else -%}
+                - podman run --rm -e BLOCK_SIZES="$BLOCK_SIZES" -e IO_OPERATION="$IO_OPERATION" -e IO_THREADS="$IO_THREADS" -e FILES_IO="$FILES_IO" -e IO_RATE="$IO_RATE" -e MIX_PRECENTAGE="$MIX_PRECENTAGE" -e DURATION="$DURATION" -e PAUSE="$PAUSE" -e WARMUP="$WARMUP" -e FILES_SELECTION="$FILES_SELECTION" -e COMPRESSION_RATIO="$COMPRESSION_RATIO" -e RUN_FILLUP="$RUN_FILLUP" -e DIRECTORIES="$DIRECTORIES" -e FILES_PER_DIRECTORY="$FILES_PER_DIRECTORY" -e SIZE_PER_FILE="$SIZE_PER_FILE" -e REDIS_HOST="$REDIS_HOST" -e LOGS_DIR="$LOGS_DIR" -e TIMEOUT="$TIMEOUT" -v "/workload":"/workload" --privileged {{ vdbench_image }} "$WORKLOAD_METHOD"
                 {%- endif %}
                 - echo @@~@@END-WORKLOAD@@~@@
           name: cloudinitdisk

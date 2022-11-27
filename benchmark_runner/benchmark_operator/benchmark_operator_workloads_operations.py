@@ -8,6 +8,7 @@ from typeguard import typechecked
 
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 from benchmark_runner.common.oc.oc import OC
+from benchmark_runner.common.virtctl.virtctl import Virtctl
 from benchmark_runner.common.template_operations.template_operations import TemplateOperations
 from benchmark_runner.common.elasticsearch.elasticsearch_operations import ElasticSearchOperations
 from benchmark_runner.common.ssh.ssh import SSH
@@ -68,6 +69,7 @@ class BenchmarkOperatorWorkloadsOperations:
         self._template = TemplateOperations(workload=self._workload)
         # set oc login
         self._oc = self.set_login(kubeadmin_password=self._kubeadmin_password)
+        self._virtctl = Virtctl()
         # PrometheusSnapshot
         if self._enable_prometheus_snapshot:
             self._snapshot = PrometheusSnapshot(oc=self._oc, artifacts_path=self._run_artifacts_path, verbose=True)
@@ -201,7 +203,6 @@ class BenchmarkOperatorWorkloadsOperations:
             else:
                 self._verify_elasticsearch_data_uploaded(index=es_index, uuid=self._oc.get_long_uuid(workload=workload), workload='system-metrics', fast_check=True)
 
-
     def __get_metadata(self, kind: str = None, database: str = None, status: str = None, run_artifacts_url: str = None, uuid: str = None) -> dict:
         """
         This method return metadata kind and database argument are optional
@@ -314,7 +315,7 @@ class BenchmarkOperatorWorkloadsOperations:
         vm_name = ''
         for label in labels:
             vm_name = self._oc.get_vm(label=label)
-            self._oc.save_vm_log(vm_name=vm_name)
+            self._virtctl.save_vm_log(vm_name=vm_name)
         return vm_name
 
     def _create_pod_log(self, label: str = '', database: str = '') -> str:

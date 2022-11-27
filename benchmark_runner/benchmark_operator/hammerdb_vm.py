@@ -43,7 +43,7 @@ class HammerdbVM(BenchmarkOperatorWorkloadsOperations):
             environment_variables.environment_variables_dict['kind'] = 'vm'
             self._oc.create_vm_sync(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}_{self.__database}.yaml'), vm_name=f'{self.__workload_name}-workload')
             # hammerdb workload and database
-            self._oc.wait_for_vm_create(vm_name=f'{self.__workload_name}-workload')
+            self._oc.wait_for_vm_creation(vm_name=f'{self.__workload_name}-workload')
             self._oc.wait_for_initialized(label='app=hammerdb_workload', workload=self.__workload_name)
             self._oc.wait_for_ready(label='app=hammerdb_workload', workload=self.__workload_name)
             # Create vm log should be direct after vm is ready

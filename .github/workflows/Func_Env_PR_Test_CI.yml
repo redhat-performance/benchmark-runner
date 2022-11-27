@@ -73,7 +73,7 @@ jobs:
           # Install Dockerfile content for pytest
           # install oc/kubectl
           oc_version=4.11.0-0.okd-2022-10-15-073651
-          curl -L https://github.com/openshift/okd/releases/download/${oc_version}/openshift-client-linux-${oc_version}.tar.gz -o $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz
+          curl -L "https://github.com/openshift/okd/releases/download/${oc_version}/openshift-client-linux-${oc_version}.tar.gz" -o "$RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz"
           tar -xzvf $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz -C $RUNNER_PATH/
           rm $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz
           cp $RUNNER_PATH/kubectl /usr/local/bin/kubectl
@@ -143,12 +143,19 @@ jobs:
         # Install Dockerfile content for pytest
         # install oc/kubectl
         oc_version=4.11.0-0.okd-2022-10-15-073651
-        curl -L https://github.com/openshift/okd/releases/download/${oc_version}/openshift-client-linux-${oc_version}.tar.gz -o $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz
+        curl -L "https://github.com/openshift/okd/releases/download/${oc_version}/openshift-client-linux-${oc_version}.tar.gz" -o "$RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz"
         tar -xzvf $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz -C $RUNNER_PATH/
         rm $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz
         cp $RUNNER_PATH/kubectl /usr/local/bin/kubectl
         cp $RUNNER_PATH/oc /usr/local/bin/oc
-
+        
+        # install virtctl for VNC
+        virtctl_version=0.52.0
+        curl -L "https://github.com/kubevirt/kubevirt/releases/download/v${virtctl_version}/virtctl-v${virtctl_version}-linux-amd64" -o  "$RUNNER_PATH/virtctl"
+        chmod +x $RUNNER_PATH/virtctl 
+        cp $RUNNER_PATH/virtctl /usr/local/bin/virtctl 
+        rm -rf $RUNNER_PATH/virtctl
+        
         # clone benchmark-operator v1.0.1
         git clone -b v1.0.1 https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
 
@@ -202,7 +209,7 @@ jobs:
        # Install Dockerfile content for pytest
        # install oc/kubectl
        oc_version=4.11.0-0.okd-2022-10-15-073651
-       curl -L https://github.com/openshift/okd/releases/download/${oc_version}/openshift-client-linux-${oc_version}.tar.gz -o $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz
+       curl -L "https://github.com/openshift/okd/releases/download/${oc_version}/openshift-client-linux-${oc_version}.tar.gz" -o "$RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz"
        tar -xzvf $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz -C $RUNNER_PATH/
        rm $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz
        cp $RUNNER_PATH/kubectl /usr/local/bin/kubectl

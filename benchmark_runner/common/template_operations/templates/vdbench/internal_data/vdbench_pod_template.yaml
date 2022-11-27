@@ -39,10 +39,10 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  {% if not scale -%}
-  name: vdbench-pod-pvc-claim
-  {%- else -%}
+  {% if scale -%}
   name: vdbench-pod-pvc-claim-{{ scale }}
+  {%- else -%}
+  name: vdbench-pod-pvc-claim
   {%- endif %}
   namespace: {{ namespace }}
 spec:
@@ -57,10 +57,10 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
-  {% if not scale -%}
-  name: vdbench-{{ kind }}-{{ trunc_uuid }}
-  {%- else -%}
+  {% if scale -%}
   name: vdbench-{{ kind }}-{{ trunc_uuid }}-{{ scale }}
+  {%- else -%}
+  name: vdbench-{{ kind }}-{{ trunc_uuid }}
   {%- endif %}
   namespace: {{ namespace }}
   annotations:
@@ -68,12 +68,12 @@ metadata:
     io.katacontainers.config.hypervisor.virtio_fs_extra_args: '["-o","allow_direct_io"]'
     {%- endif %}
   labels:
-    {% if not scale -%}
-    app: vdbench-{{ trunc_uuid }}
-    type: vdbench-{{ kind }}-{{ trunc_uuid }}
-    {%- else -%}
+    {% if scale -%}
     app: vdbench-{{ trunc_uuid }}-{{ scale }}
     type: vdbench-{{ kind }}-{{ trunc_uuid }}-{{ scale }}
+    {%- else -%}
+    app: vdbench-{{ trunc_uuid }}
+    type: vdbench-{{ kind }}-{{ trunc_uuid }}
     {%- endif %}
     benchmark-uuid: {{ uuid }}
     benchmark-runner-workload: vdbench
@@ -91,10 +91,10 @@ spec:
   {%- endif %}
   {%- if pin_node1 or scale_node %}
   nodeSelector:
-    {% if not scale -%}
-    kubernetes.io/hostname: {{ pin_node1 }}
-    {%- else -%}
+    {% if scale -%}
     kubernetes.io/hostname: {{ scale_node }}
+    {%- else -%}
+    kubernetes.io/hostname: {{ pin_node1 }}
     {%- endif %}
   {%- endif %}
   {%- if kind == 'kata' %}
@@ -118,10 +118,10 @@ spec:
       {%- endif %}
       {%- if odf_pvc == True %}
       volumeMounts:
-        {% if not scale -%}
-        - name: vdbench-pod-pvc-claim
-        {%- else -%}
+        {% if scale -%}
         - name: vdbench-pod-pvc-claim-{{ scale }}
+        {%- else -%}
+        - name: vdbench-pod-pvc-claim
         {%- endif %}
           mountPath: "/workload"
       {%- endif %}
@@ -168,10 +168,10 @@ spec:
         - name: TIMEOUT
           value: "{{ timeout }}"
       command: ["/bin/bash"]
-      {% if not scale -%}
-      args: ["-c", "$WORKLOAD_METHOD"]
-      {%- else -%}
+      {% if scale -%}
       args: ["-c", "python3.9 /state_signals_responder.py $REDIS_HOST $WORKLOAD_METHOD $TIMEOUT"]
+      {%- else -%}
+      args: ["-c", "$WORKLOAD_METHOD"]
       {%- endif %}
   restartPolicy: "Never"
   {%- if cluster != "kubernetes" %}
@@ -189,16 +189,15 @@ spec:
   {%- endif %}
   {%- if odf_pvc == True %}
   volumes:
-    {% if not scale -%}
-    - name: vdbench-pod-pvc-claim
-      namespace: {{ namespace }}
-      persistentVolumeClaim:
-        claimName: vdbench-pod-pvc-claim
-    {%- else -%}
+    {% if scale -%}
     - name: vdbench-pod-pvc-claim-{{ scale }}
       namespace: {{ namespace }}
       persistentVolumeClaim:
         claimName: vdbench-pod-pvc-claim-{{ scale }}
+    {%- else -%}
+    - name: vdbench-pod-pvc-claim
+      namespace: {{ namespace }}
+      persistentVolumeClaim:
+        claimName: vdbench-pod-pvc-claim
     {%- endif %}
   {%- endif %}
-
