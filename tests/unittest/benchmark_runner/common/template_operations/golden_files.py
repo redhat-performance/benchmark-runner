@@ -29,7 +29,7 @@ class GoldenFiles:
                                                          'hammerdb_pod_mariadb', 'hammerdb_vm_mariadb', 'hammerdb_kata_mariadb',
                                                          'hammerdb_pod_postgres', 'hammerdb_vm_postgres', 'hammerdb_kata_postgres',
                                                          'hammerdb_pod_mssql', 'hammerdb_vm_mssql', 'hammerdb_kata_mssql',
-                                                         'vdbench_pod', 'vdbench_kata', 'vdbench_vm']
+                                                         'vdbench_pod', 'vdbench_kata', 'vdbench_vm', 'bootstorm_vm']
 
     def __clear_directory_yaml(self, dir):
         if os.path.isdir(dir):

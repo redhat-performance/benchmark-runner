@@ -4,8 +4,8 @@ kind: Namespace
 metadata:
   name: benchmark-runner
 ---
-kind: PersistentVolumeClaim
 apiVersion: v1
+kind: PersistentVolumeClaim
 metadata:
   name: vdbench-pvc-claim
   namespace: benchmark-runner

@@ -82,7 +82,7 @@ class TemplateOperations:
                 **extra_data, **extra_kind_data, **extra_runtype_data, **extra_kind_runtype_data}
 
     @logger_time_stamp
-    def generate_yamls_internal(self, scale: str = None, scale_node: str = None):
+    def generate_yamls_internal(self, scale: str = None, scale_node: str = None, redis: str = None):
         """
         Generate required .yaml files as a dictionary of file names and contents
         :return: Dictionary <filename:contents>
@@ -144,8 +144,10 @@ class TemplateOperations:
                 template = Template(f.read())
             answer[filename] = f"{template.render(render_data)}\n"
             if scale:
-                answer['redis.yaml'] = render_yaml_file(dir_path=os.path.join(self.__dir_path, 'scale'), yaml_file='redis.yaml', environment_variable_dict=self.__environment_variables_dict)
-                answer['state_signals_exporter_pod.yaml'] = render_yaml_file(dir_path=os.path.join(self.__dir_path, 'scale'), yaml_file='state_signals_exporter_pod.yaml', environment_variable_dict=self.__environment_variables_dict)
+                answer['namespace.yaml'] = render_yaml_file(dir_path=os.path.join(self.__dir_path, 'scale'), yaml_file='namespace.yaml', environment_variable_dict=self.__environment_variables_dict)
+                if redis:
+                    answer['redis.yaml'] = render_yaml_file(dir_path=os.path.join(self.__dir_path, 'scale'), yaml_file='redis.yaml', environment_variable_dict=self.__environment_variables_dict)
+                    answer['state_signals_exporter_pod.yaml'] = render_yaml_file(dir_path=os.path.join(self.__dir_path, 'scale'), yaml_file='state_signals_exporter_pod.yaml', environment_variable_dict=self.__environment_variables_dict)
         return answer
 
     @logger_time_stamp
@@ -155,7 +157,7 @@ class TemplateOperations:
                 f.write(data)
 
     @logger_time_stamp
-    def generate_yamls(self, scale: str = '', scale_nodes: list = []):
+    def generate_yamls(self, scale: str = '', scale_nodes: list = [], redis: str = None):
         """
         This method generate workload yaml from template
         :return:
@@ -170,7 +172,7 @@ class TemplateOperations:
                 for scale_node in range(len(scale_nodes)):
                     for scale_num in range(scale):
                         count += 1
-                        p = Process(target=self.generate_files, args=(self.generate_yamls_internal(scale=str(count), scale_node=scale_nodes[scale_node]), ))
+                        p = Process(target=self.generate_files, args=(self.generate_yamls_internal(scale=str(count), scale_node=scale_nodes[scale_node], redis=redis), ))
                         p.start()
                         proc.append(p)
                     for p in proc:

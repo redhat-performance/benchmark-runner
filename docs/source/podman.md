@@ -39,11 +39,11 @@ Choose one from the following list:
 
 **optional:** CLUSTER=$CLUSTER [ set CLUSTER='kubernetes' to run workload on a kubernetes cluster, default 'openshift' ]
 
-**optional:** SCALE=SCALE [For Vdbench only: Scale in each node]
+**optional:scale** SCALE=$SCALE [For Vdbench/Bootstorm: Scale in each node]
 
-**optional:** SCALE_NODES=SCALE_NODES [For Vdbench only: Scale's node]
+**optional:scale** SCALE_NODES=$SCALE_NODES [For Vdbench/Bootstorm: Scale's node]
 
-**optional:** REDIS=REDIS [For Vdbench only: redis for scale synchronization]
+**optional:scale** REDIS=$REDIS [For Vdbench only: redis for scale synchronization]
 
 **optional:** LSO_PATH=$LSO_PATH [LSO_PATH='/dev/sdb/' For hammerdb only: for using Local Storage Operator]
 
