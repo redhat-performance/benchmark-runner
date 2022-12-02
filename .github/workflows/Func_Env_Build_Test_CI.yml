@@ -146,6 +146,14 @@ jobs:
         cp $RUNNER_PATH/oc /usr/local/bin/oc
         rm -rf $RUNNER_PATH/kubectl
         rm -rf $RUNNER_PATH/oc
+        
+         # install virtctl for VNC
+        virtctl_version=0.52.0
+        curl -L "https://github.com/kubevirt/kubevirt/releases/download/v${virtctl_version}/virtctl-v${virtctl_version}-linux-amd64" -o  "$RUNNER_PATH/virtctl"
+        chmod +x $RUNNER_PATH/virtctl 
+        cp $RUNNER_PATH/virtctl /usr/local/bin/virtctl 
+        rm -rf $RUNNER_PATH/virtctl
+        
         # clone benchmark-operator
         git clone https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
         # run pytest
