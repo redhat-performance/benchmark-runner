@@ -71,7 +71,7 @@ jobs:
           # Install Dockerfile content for pytest
           # install oc/kubectl
           oc_version=4.11.0-0.okd-2022-10-15-073651
-          curl -L https://github.com/openshift/okd/releases/download/${oc_version}/openshift-client-linux-${oc_version}.tar.gz -o $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz
+          curl -L "https://github.com/openshift/okd/releases/download/${oc_version}/openshift-client-linux-${oc_version}.tar.gz" -o "$RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz"
           tar -xzvf $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz -C $RUNNER_PATH/
           rm $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz
           cp $RUNNER_PATH/kubectl /usr/local/bin/kubectl
@@ -139,7 +139,7 @@ jobs:
         # Install Dockerfile content for pytest
         # install oc/kubectl
         oc_version=4.11.0-0.okd-2022-10-15-073651
-        curl -L https://github.com/openshift/okd/releases/download/${oc_version}/openshift-client-linux-${oc_version}.tar.gz -o $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz
+        curl -L "https://github.com/openshift/okd/releases/download/${oc_version}/openshift-client-linux-${oc_version}.tar.gz" -o "$RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz"
         tar -xzvf $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz -C $RUNNER_PATH/
         rm $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz
         cp $RUNNER_PATH/kubectl /usr/local/bin/kubectl

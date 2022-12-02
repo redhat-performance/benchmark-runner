@@ -122,13 +122,15 @@ class ElasticSearchOperations:
 
     @typechecked()
     @logger_time_stamp
-    def verify_elasticsearch_data_uploaded(self, index: str, uuid: str = '', workload: str = '', fast_check: bool = False, timeout: int = None, es_fetch_min_time: int = None):
+    def verify_elasticsearch_data_uploaded(self, index: str, uuid: str = '', workload: str = '',
+                                           fast_check: bool = False, timeout: int = None, es_fetch_min_time: int = None):
         """
         The method wait till data upload to elastic search and wait if there is new data, search in last 15 minutes
         :param es_fetch_min_time:
         :param index:
         :param uuid: the current workload uuid
         :param workload: workload name only if there is a different timestamp parameter name in elasticsearch
+        :param timeout:
         :param fast_check: return response on first doc
 
         :return:
@@ -137,7 +139,7 @@ class ElasticSearchOperations:
         current_hits = 0
         self.__timeout = timeout if timeout else self.__timeout
         # waiting for any hits
-        while current_wait_time <= self.__timeout:
+        while self.__timeout <= 0 or current_wait_time <= self.__timeout:
             # waiting for new hits
             new_hits = self.__elasticsearch_get_index_hits(index=index, uuid=uuid, fast_check=fast_check, es_fetch_min_time=es_fetch_min_time)
             if current_hits < new_hits:

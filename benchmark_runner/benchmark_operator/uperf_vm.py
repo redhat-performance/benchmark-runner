@@ -38,11 +38,11 @@ class UperfVM(BenchmarkOperatorWorkloadsOperations):
             environment_variables.environment_variables_dict['kind'] = 'vm'
             self._oc.create_vm_sync(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}.yaml'), vm_name='uperf-server')
             # uperf server
-            self._oc.wait_for_vm_create(vm_name='uperf-server')
+            self._oc.wait_for_vm_creation(vm_name='uperf-server')
             self._oc.wait_for_initialized(label='app=uperf-bench-server-0', workload=self.__workload_name)
             self._oc.wait_for_ready(label='app=uperf-bench-server-0', workload=self.__workload_name)
             # client server
-            self._oc.wait_for_vm_create(vm_name='uperf-client')
+            self._oc.wait_for_vm_creation(vm_name='uperf-client')
             self._oc.wait_for_initialized(label='app=uperf-bench-client', workload=self.__workload_name)
             self._oc.wait_for_ready(label='app=uperf-bench-client', workload=self.__workload_name)
             # Create vm log should be direct after vm is ready

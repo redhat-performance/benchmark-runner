@@ -96,6 +96,13 @@ class VMNotReadyTimeout(OCError):
         super(VMNotReadyTimeout, self).__init__(self.message)
 
 
+class VMStateTimeout(OCError):
+    """This exception indicates timeout for VM state """
+    def __init__(self, vm_name, state):
+        self.message = f'VM: {vm_name} does not reach to start: {state}'
+        super(VMStateTimeout, self).__init__(self.message)
+
+
 class VMNotCompletedTimeout(OCError):
     """This exception return vm completed error"""
     def __init__(self, workload):

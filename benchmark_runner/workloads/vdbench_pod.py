@@ -22,7 +22,7 @@ class VdbenchPod(WorkloadsOperations):
         self.__pod_name = ''
         self.__data_dict = {}
 
-    def __run_pod(self, pod_num: str):
+    def __run_scale(self, pod_num: str):
         """
         This method runs pod in parallel
         """
@@ -82,6 +82,8 @@ class VdbenchPod(WorkloadsOperations):
                     pod_name=self.__pod_name)
             # scale
             else:
+                # create namespace
+                self._oc._create_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'namespace.yaml'))
                 # create redis and state signals
                 sync_pods = {'redis': 'redis', 'state_signals_exporter_pod': 'state-signals-exporter'}
                 for pod, name in sync_pods.items():
@@ -98,7 +100,7 @@ class VdbenchPod(WorkloadsOperations):
                 for scale_node in range(len(self._scale_node_list)):
                     for scale_num in range(scale):
                         count += 1
-                        p = Process(target=self.__run_pod, args=(str(count), ))
+                        p = Process(target=self.__run_scale, args=(str(count),))
                         p.start()
                         proc.append(p)
                 for p in proc:
@@ -111,6 +113,8 @@ class VdbenchPod(WorkloadsOperations):
                     else:
                         pod_name = name
                     self._oc.delete_pod_sync(yaml=os.path.join(f'{self._run_artifacts_path}', f'{pod}.yaml'), pod_name=pod_name)
+                # delete namespace
+                self._oc._delete_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'namespace.yaml'))
         except ElasticSearchDataNotUploaded as err:
             self._oc.delete_pod_sync(
                 yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}.yaml'),

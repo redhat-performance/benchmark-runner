@@ -30,6 +30,7 @@ class IBMOperations:
     This class is responsible for all IBM cloud operations, all commands run on remote provision IBM host
     """
     LATEST = 'latest'
+    SHORT_TIMEOUT = 600
 
     @typechecked
     def __init__(self, user: str):
@@ -107,7 +108,7 @@ class IBMOperations:
         """
         self.__remote_ssh.run_command(command=f'ibmcloud sl hardware {action} {machine_id} -f')
 
-    def __wait_for_active_machine(self, machine_id: str, sleep_time=10, timeout=600):
+    def __wait_for_active_machine(self, machine_id: str, sleep_time=10, timeout=SHORT_TIMEOUT):
         """
         This method wait till machine will be active
         :param machine_id:
@@ -122,14 +123,14 @@ class IBMOperations:
             current_wait_time += sleep_time
         raise IBMMachineNotLoad()
 
-    def __wait_for_install_complete(self, sleep_time: int = 600):
+    def __wait_for_install_complete(self, sleep_time: int = SHORT_TIMEOUT):
         """
         This method wait till ocp install complete
         :param sleep_time:
         :return:
         """
         current_wait_time = 0
-        while current_wait_time <= self.__provision_timeout:
+        while self.__provision_timeout <= 0 or current_wait_time <= self.__provision_timeout:
             install_log = self.__remote_ssh.run_command(self.__provision_installer_log)
             if 'failed=0' in install_log:
                 return True
