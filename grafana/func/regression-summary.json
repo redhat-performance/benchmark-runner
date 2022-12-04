@@ -1,0 +1,1959 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
+        "type": "dashboard"
+      },
+      {
+        "enable": false,
+        "iconColor": "red",
+        "name": "New annotation"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 2,
+  "iteration": 1670182897382,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 9,
+        "y": 0
+      },
+      "id": 4,
+      "links": [
+        {
+          "title": "benchmark-runner",
+          "url": "https://github.com/redhat-performance/benchmark-runner"
+        }
+      ],
+      "options": {
+        "content": "![alt text](https://github.com/redhat-performance/benchmark-runner/blob/main/media/benchmark_runner.png?raw=true \"Tooltip Text\")",
+        "mode": "markdown"
+      },
+      "pluginVersion": "8.4.0-pre",
+      "targets": [
+        {
+          "alias": "",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "auto"
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "metrics": [
+            {
+              "id": "1",
+              "type": "count"
+            }
+          ],
+          "query": "",
+          "refId": "A",
+          "timeField": "timestamp"
+        }
+      ],
+      "title": "benchmark-runner/ benchmark-operator ci status",
+      "type": "text"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "super-light-blue",
+            "mode": "fixed"
+          },
+          "custom": {
+            "fillOpacity": 70,
+            "lineWidth": 0
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 6
+      },
+      "id": 37,
+      "interval": "1d",
+      "options": {
+        "alignValue": "left",
+        "legend": {
+          "displayMode": "hidden",
+          "placement": "bottom"
+        },
+        "mergeValues": true,
+        "rowHeight": 0.9,
+        "showValue": "auto",
+        "tooltip": {
+          "mode": "none"
+        }
+      },
+      "targets": [
+        {
+          "alias": "ocp version",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": "0",
+                "timeZone": "utc",
+                "trimEdges": "0"
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "G6ibSGD7z"
+          },
+          "metrics": [
+            {
+              "field": "ci_minutes_time",
+              "id": "1",
+              "settings": {
+                "script": "Integer.parseInt(\"0\"+doc['ocp_version.keyword'].value.replace(\".\",\"\").replace(\"r\",\"\").replace(\"c\",\"\").replace(\"f\",\"\").replace(\"-\",\"\"))"
+              },
+              "type": "max"
+            }
+          ],
+          "query": "_exists_:ocp_version",
+          "refId": "A",
+          "timeField": "timestamp"
+        },
+        {
+          "alias": "odf_version",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": "0",
+                "timeZone": "utc",
+                "trimEdges": "0"
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "G6ibSGD7z"
+          },
+          "hide": false,
+          "metrics": [
+            {
+              "field": "ci_minutes_time",
+              "id": "1",
+              "settings": {
+                "script": "Integer.parseInt(\"0\"+doc['odf_version.keyword'].value.replace(\".\",\"\").replace(\"r\",\"\").replace(\"c\",\"\").replace(\"f\",\"\").replace(\"-\",\"\"))"
+              },
+              "type": "max"
+            }
+          ],
+          "query": "_exists_:odf_version",
+          "refId": "B",
+          "timeField": "timestamp"
+        },
+        {
+          "alias": "cnv_version",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": "0",
+                "timeZone": "utc",
+                "trimEdges": "0"
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "G6ibSGD7z"
+          },
+          "hide": false,
+          "metrics": [
+            {
+              "field": "ci_minutes_time",
+              "id": "1",
+              "settings": {
+                "script": "(doc['cnv_version.keyword'].value.indexOf(\" \") == -1) ? Integer.parseInt(\"0\"+doc['cnv_version.keyword'].value.replace(\".\",\"\").replace(\"r\",\"\").replace(\"c\",\"\").replace(\"f\",\"\").replace(\"-\",\"\")) : 0"
+              },
+              "type": "max"
+            }
+          ],
+          "query": "_exists_:cnv_version",
+          "refId": "C",
+          "timeField": "timestamp"
+        },
+        {
+          "alias": "kata version",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": "0",
+                "timeZone": "utc",
+                "trimEdges": "0"
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "G6ibSGD7z"
+          },
+          "hide": false,
+          "metrics": [
+            {
+              "field": "ci_minutes_time",
+              "id": "1",
+              "settings": {
+                "script": "(doc['kata_version.keyword'].value.indexOf(\" \") == -1) ? Integer.parseInt(doc['kata_version.keyword'].value.replace(\".\",\"\")) : 0"
+              },
+              "type": "max"
+            }
+          ],
+          "query": "_exists_:kata_version",
+          "refId": "D",
+          "timeField": "timestamp"
+        }
+      ],
+      "title": "Product Versions",
+      "type": "state-timeline"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 14
+      },
+      "id": 18,
+      "panels": [
+        {
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "g5pySGDnz"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "fillOpacity": 70,
+                "lineWidth": 0
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "percentage",
+                "steps": [
+                  {
+                    "color": "dark-green"
+                  },
+                  {
+                    "color": "#EAB839",
+                    "value": 50
+                  },
+                  {
+                    "color": "super-light-green",
+                    "value": 80
+                  },
+                  {
+                    "color": "semi-dark-green",
+                    "value": 90
+                  },
+                  {
+                    "color": "dark-blue",
+                    "value": 100
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 13,
+            "w": 24,
+            "x": 0,
+            "y": 15
+          },
+          "id": 10,
+          "interval": "1d",
+          "links": [
+            {
+              "targetBlank": false,
+              "title": "artifacts urls",
+              "url": "https://grafana-func-chmf5l4sh776bznl5b.ibm.rhperfscale.org/d/tUclnRNnz/benchmark-runner-ci-status-report?orgId=1&from=1663419841154&to=1667311441154&viewPanel=27"
+            }
+          ],
+          "options": {
+            "alignValue": "center",
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "mergeValues": false,
+            "rowHeight": 0.9,
+            "showValue": "always",
+            "tooltip": {
+              "mode": "single"
+            }
+          },
+          "targets": [
+            {
+              "alias": "{{term db_type.keyword}} workers={{term current_worker}} {{term kind.keyword}} {{term storage_type.keyword}}",
+              "bucketAggs": [
+                {
+                  "field": "db_type.keyword",
+                  "id": "3",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "current_worker",
+                  "id": "4",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "asc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "kind.keyword",
+                  "id": "5",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "storage_type.keyword",
+                  "id": "6",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "timestamp",
+                  "id": "2",
+                  "settings": {
+                    "interval": "auto"
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "datasource": {
+                "type": "elasticsearch",
+                "uid": "g5pySGDnz"
+              },
+              "metrics": [
+                {
+                  "field": "tpm",
+                  "id": "1",
+                  "settings": {
+                    "script": "_value/1000"
+                  },
+                  "type": "max"
+                }
+              ],
+              "query": "_exists_:tpm AND db_type:$db_type AND current_worker:$current_worker AND kind:$kind",
+              "refId": "A",
+              "timeField": "timestamp"
+            }
+          ],
+          "title": "Hammerdb (KTPM)",
+          "type": "state-timeline"
+        }
+      ],
+      "title": "Hammerdb",
+      "type": "row"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 15
+      },
+      "id": 20,
+      "panels": [
+        {
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "1YhYIGvnk"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "fillOpacity": 70,
+                "lineWidth": 0
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "percentage",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "#EAB839",
+                    "value": 50
+                  },
+                  {
+                    "color": "light-green",
+                    "value": 80
+                  },
+                  {
+                    "color": "dark-green",
+                    "value": 90
+                  },
+                  {
+                    "color": "dark-blue",
+                    "value": 100
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 18,
+            "w": 24,
+            "x": 0,
+            "y": 8
+          },
+          "id": 12,
+          "interval": "1d",
+          "options": {
+            "alignValue": "center",
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "mergeValues": false,
+            "rowHeight": 0.9,
+            "showValue": "always",
+            "tooltip": {
+              "mode": "single"
+            }
+          },
+          "targets": [
+            {
+              "alias": "msg size: {{term read_message_size}} :{{term num_threads}}th: {{term kind.keyword}}",
+              "bucketAggs": [
+                {
+                  "field": "read_message_size",
+                  "id": "3",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "asc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "num_threads",
+                  "id": "4",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "asc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "kind.keyword",
+                  "id": "5",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "timestamp",
+                  "id": "2",
+                  "settings": {
+                    "interval": "auto"
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "datasource": {
+                "type": "elasticsearch",
+                "uid": "1YhYIGvnk"
+              },
+              "metrics": [
+                {
+                  "field": "norm_byte",
+                  "id": "1",
+                  "settings": {
+                    "script": "_value*8/1000000000"
+                  },
+                  "type": "avg"
+                }
+              ],
+              "query": "",
+              "refId": "A",
+              "timeField": "uperf_ts"
+            }
+          ],
+          "title": "Uperf Gbits/s",
+          "type": "state-timeline"
+        },
+        {
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "1YhYIGvnk"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "fillOpacity": 70,
+                "lineWidth": 0
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "percentage",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "dark-green",
+                    "value": 1
+                  },
+                  {
+                    "color": "light-green",
+                    "value": 10
+                  },
+                  {
+                    "color": "orange",
+                    "value": 20
+                  },
+                  {
+                    "color": "dark-red",
+                    "value": 50
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 18,
+            "w": 24,
+            "x": 0,
+            "y": 26
+          },
+          "id": 25,
+          "interval": "1d",
+          "maxDataPoints": 1840,
+          "options": {
+            "alignValue": "center",
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "mergeValues": false,
+            "rowHeight": 0.9,
+            "showValue": "always",
+            "tooltip": {
+              "mode": "single"
+            }
+          },
+          "targets": [
+            {
+              "alias": "msg size: {{term read_message_size}} :{{term num_threads}}th: {{term kind.keyword}}",
+              "bucketAggs": [
+                {
+                  "field": "read_message_size",
+                  "id": "3",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "asc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "num_threads",
+                  "id": "4",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "asc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "kind.keyword",
+                  "id": "5",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "timestamp",
+                  "id": "2",
+                  "settings": {
+                    "interval": "auto"
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "datasource": {
+                "type": "elasticsearch",
+                "uid": "1YhYIGvnk"
+              },
+              "metrics": [
+                {
+                  "field": "norm_ltcy",
+                  "id": "1",
+                  "settings": {},
+                  "type": "avg"
+                }
+              ],
+              "query": "",
+              "refId": "A",
+              "timeField": "uperf_ts"
+            }
+          ],
+          "title": "Uperf latency (usecs)",
+          "type": "state-timeline"
+        }
+      ],
+      "title": "Uperf",
+      "type": "row"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 16
+      },
+      "id": 22,
+      "panels": [
+        {
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "KFPjnBC7k"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "fillOpacity": 70,
+                "lineWidth": 0
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "percentage",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "#EAB839",
+                    "value": 50
+                  },
+                  {
+                    "color": "light-green",
+                    "value": 80
+                  },
+                  {
+                    "color": "dark-green",
+                    "value": 90
+                  },
+                  {
+                    "color": "dark-blue",
+                    "value": 100
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 11,
+            "w": 24,
+            "x": 0,
+            "y": 17
+          },
+          "id": 16,
+          "interval": "1d",
+          "options": {
+            "alignValue": "center",
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "mergeValues": false,
+            "rowHeight": 0.9,
+            "showValue": "always",
+            "tooltip": {
+              "mode": "single"
+            }
+          },
+          "targets": [
+            {
+              "alias": "Max {{term test_description.runtime.keyword}}",
+              "bucketAggs": [
+                {
+                  "field": "test_description.runtime.keyword",
+                  "id": "3",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "asc",
+                    "orderBy": "_term",
+                    "size": "0"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "timestamp",
+                  "id": "2",
+                  "settings": {
+                    "interval": "auto"
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "datasource": {
+                "type": "elasticsearch",
+                "uid": "KFPjnBC7k"
+              },
+              "metrics": [
+                {
+                  "field": "test_description.pods",
+                  "id": "1",
+                  "type": "max"
+                }
+              ],
+              "query": "",
+              "refId": "A",
+              "timeField": "timestamp"
+            },
+            {
+              "alias": "Memory (MB) Max {{term test_description.runtime.keyword}}",
+              "bucketAggs": [
+                {
+                  "field": "test_description.runtime.keyword",
+                  "id": "3",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "asc",
+                    "orderBy": "_term",
+                    "size": "0"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "timestamp",
+                  "id": "2",
+                  "settings": {
+                    "interval": "auto"
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "datasource": {
+                "type": "elasticsearch",
+                "uid": "KFPjnBC7k"
+              },
+              "hide": false,
+              "metrics": [
+                {
+                  "field": "memory_per_pod",
+                  "id": "4",
+                  "settings": {
+                    "script": "_value/1000000"
+                  },
+                  "type": "max"
+                }
+              ],
+              "query": "",
+              "refId": "B",
+              "timeField": "timestamp"
+            },
+            {
+              "alias": "Start time(sec):  {{term test_description.runtime.keyword}}",
+              "bucketAggs": [
+                {
+                  "field": "test_description.runtime.keyword",
+                  "id": "3",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "asc",
+                    "orderBy": "_term",
+                    "size": "0"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "timestamp",
+                  "id": "2",
+                  "settings": {
+                    "interval": "auto"
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "datasource": {
+                "type": "elasticsearch",
+                "uid": "KFPjnBC7k"
+              },
+              "hide": false,
+              "metrics": [
+                {
+                  "field": "pod_starts_per_second",
+                  "id": "4",
+                  "settings": {
+                    "script": "_value"
+                  },
+                  "type": "max"
+                }
+              ],
+              "query": "",
+              "refId": "C",
+              "timeField": "timestamp"
+            },
+            {
+              "alias": "Iteration cpu sec:  {{term test_description.runtime.keyword}}",
+              "bucketAggs": [
+                {
+                  "field": "test_description.runtime.keyword",
+                  "id": "3",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "asc",
+                    "orderBy": "_term",
+                    "size": "0"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "timestamp",
+                  "id": "2",
+                  "settings": {
+                    "interval": "auto"
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "datasource": {
+                "type": "elasticsearch",
+                "uid": "KFPjnBC7k"
+              },
+              "hide": false,
+              "metrics": [
+                {
+                  "field": "iterations_cpu_sec",
+                  "id": "4",
+                  "settings": {
+                    "script": "_value/1000000"
+                  },
+                  "type": "max"
+                }
+              ],
+              "query": "",
+              "refId": "D",
+              "timeField": "timestamp"
+            },
+            {
+              "alias": "Iteration sec:  {{term test_description.runtime.keyword}}",
+              "bucketAggs": [
+                {
+                  "field": "test_description.runtime.keyword",
+                  "id": "3",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "asc",
+                    "orderBy": "_term",
+                    "size": "0"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "timestamp",
+                  "id": "2",
+                  "settings": {
+                    "interval": "auto"
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "datasource": {
+                "type": "elasticsearch",
+                "uid": "KFPjnBC7k"
+              },
+              "hide": false,
+              "metrics": [
+                {
+                  "field": "iterations_sec",
+                  "id": "4",
+                  "settings": {
+                    "script": "_value/1000000"
+                  },
+                  "type": "max"
+                }
+              ],
+              "query": "",
+              "refId": "E",
+              "timeField": "timestamp"
+            }
+          ],
+          "title": "Clusterbuster: cpusoaker",
+          "type": "state-timeline"
+        }
+      ],
+      "title": "ClusterBuster",
+      "type": "row"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 17
+      },
+      "id": 24,
+      "panels": [
+        {
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "lDEANWAnz"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "fillOpacity": 70,
+                "lineWidth": 0
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "percentage",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "#EAB839",
+                    "value": 50
+                  },
+                  {
+                    "color": "light-green",
+                    "value": 80
+                  },
+                  {
+                    "color": "dark-green",
+                    "value": 90
+                  },
+                  {
+                    "color": "dark-blue",
+                    "value": 100
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 14,
+            "w": 24,
+            "x": 0,
+            "y": 18
+          },
+          "id": 14,
+          "interval": "1d",
+          "options": {
+            "alignValue": "center",
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "mergeValues": false,
+            "rowHeight": 0.9,
+            "showValue": "always",
+            "tooltip": {
+              "mode": "single"
+            }
+          },
+          "targets": [
+            {
+              "alias": " run:{{term Run.keyword}} :1 {{term kind.keyword}}: {{term Threads}}th",
+              "bucketAggs": [
+                {
+                  "field": "Run.keyword",
+                  "id": "3",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "kind.keyword",
+                  "id": "4",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "Threads",
+                  "id": "5",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "timestamp",
+                  "id": "2",
+                  "settings": {
+                    "interval": "auto"
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "datasource": {
+                "type": "elasticsearch",
+                "uid": "lDEANWAnz"
+              },
+              "metrics": [
+                {
+                  "field": "Rate",
+                  "id": "1",
+                  "type": "avg"
+                }
+              ],
+              "query": "!SCALE AND !Run.keyword='fillup'",
+              "refId": "A",
+              "timeField": "timestamp"
+            },
+            {
+              "alias": " run:{{term Run.keyword}} :{{term scale}} {{term kind.keyword}}s: {{term Threads}}th",
+              "bucketAggs": [
+                {
+                  "field": "Run.keyword",
+                  "id": "3",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "kind.keyword",
+                  "id": "4",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "Threads",
+                  "id": "5",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "scale",
+                  "id": "6",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "timestamp",
+                  "id": "2",
+                  "settings": {
+                    "interval": "auto"
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "datasource": {
+                "type": "elasticsearch",
+                "uid": "lDEANWAnz"
+              },
+              "hide": false,
+              "metrics": [
+                {
+                  "field": "Rate",
+                  "id": "1",
+                  "type": "avg"
+                }
+              ],
+              "query": "SCALE AND !Run.keyword='fillup'",
+              "refId": "B",
+              "timeField": "timestamp"
+            }
+          ],
+          "title": "Vdbench  (IOPS)",
+          "type": "state-timeline"
+        }
+      ],
+      "title": "Vdbench",
+      "type": "row"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 18
+      },
+      "id": 31,
+      "panels": [
+        {
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "wDmp9bO4k"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "min": 1,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 19
+          },
+          "id": 41,
+          "interval": "1d",
+          "options": {
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "max"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true
+          },
+          "pluginVersion": "8.4.0-pre",
+          "targets": [
+            {
+              "alias": "VM#",
+              "bucketAggs": [
+                {
+                  "field": "scale",
+                  "id": "3",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "asc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "timestamp",
+                  "id": "2",
+                  "settings": {
+                    "interval": "auto"
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "datasource": {
+                "type": "elasticsearch",
+                "uid": "wDmp9bO4k"
+              },
+              "metrics": [
+                {
+                  "id": "1",
+                  "type": "count"
+                }
+              ],
+              "query": "",
+              "refId": "A",
+              "timeField": "timestamp"
+            }
+          ],
+          "title": "#VMs",
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "wDmp9bO4k"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "fillOpacity": 70,
+                "lineWidth": 0
+              },
+              "decimals": 1,
+              "mappings": [],
+              "min": 0,
+              "thresholds": {
+                "mode": "percentage",
+                "steps": [
+                  {
+                    "color": "dark-red"
+                  },
+                  {
+                    "color": "semi-dark-orange",
+                    "value": 50
+                  },
+                  {
+                    "color": "super-light-green",
+                    "value": 80
+                  },
+                  {
+                    "color": "dark-green",
+                    "value": 90
+                  },
+                  {
+                    "color": "dark-blue",
+                    "value": 100
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 27
+          },
+          "id": 39,
+          "interval": "1d",
+          "options": {
+            "alignValue": "center",
+            "legend": {
+              "displayMode": "hidden",
+              "placement": "bottom"
+            },
+            "mergeValues": false,
+            "rowHeight": 0.9,
+            "showValue": "always",
+            "tooltip": {
+              "mode": "single"
+            }
+          },
+          "targets": [
+            {
+              "alias": "{{scale}} vms",
+              "bucketAggs": [
+                {
+                  "field": "scale",
+                  "id": "3",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "timestamp",
+                  "id": "2",
+                  "settings": {
+                    "interval": "auto"
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "datasource": {
+                "type": "elasticsearch",
+                "uid": "wDmp9bO4k"
+              },
+              "hide": false,
+              "metrics": [
+                {
+                  "field": "bootstorm_time",
+                  "id": "1",
+                  "settings": {
+                    "script": "_value/1000"
+                  },
+                  "type": "avg"
+                }
+              ],
+              "query": "scale:3",
+              "refId": "A",
+              "timeField": "timestamp"
+            },
+            {
+              "alias": "1 vms {{term node.keyword}}",
+              "bucketAggs": [
+                {
+                  "field": "scale",
+                  "id": "3",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "node.keyword",
+                  "id": "4",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "asc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "timestamp",
+                  "id": "2",
+                  "settings": {
+                    "interval": "auto"
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "datasource": {
+                "type": "elasticsearch",
+                "uid": "wDmp9bO4k"
+              },
+              "hide": false,
+              "metrics": [
+                {
+                  "field": "bootstorm_time",
+                  "id": "1",
+                  "settings": {
+                    "script": "_value/1000"
+                  },
+                  "type": "avg"
+                }
+              ],
+              "query": "scale:3",
+              "refId": "B",
+              "timeField": "timestamp"
+            },
+            {
+              "alias": "{{scale}} vms",
+              "bucketAggs": [
+                {
+                  "field": "scale",
+                  "id": "3",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "timestamp",
+                  "id": "2",
+                  "settings": {
+                    "interval": "auto"
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "datasource": {
+                "type": "elasticsearch",
+                "uid": "wDmp9bO4k"
+              },
+              "hide": false,
+              "metrics": [
+                {
+                  "field": "bootstorm_time",
+                  "id": "1",
+                  "settings": {
+                    "script": "_value/1000"
+                  },
+                  "type": "avg"
+                }
+              ],
+              "query": "scale:30",
+              "refId": "C",
+              "timeField": "timestamp"
+            },
+            {
+              "alias": "30 vms {{term node.keyword}}",
+              "bucketAggs": [
+                {
+                  "field": "scale",
+                  "id": "3",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "node.keyword",
+                  "id": "4",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "asc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "timestamp",
+                  "id": "2",
+                  "settings": {
+                    "interval": "auto"
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "datasource": {
+                "type": "elasticsearch",
+                "uid": "wDmp9bO4k"
+              },
+              "hide": false,
+              "metrics": [
+                {
+                  "field": "bootstorm_time",
+                  "id": "1",
+                  "settings": {
+                    "script": "_value/1000"
+                  },
+                  "type": "avg"
+                }
+              ],
+              "query": "scale:30",
+              "refId": "D",
+              "timeField": "timestamp"
+            },
+            {
+              "alias": "{{scale}} vms",
+              "bucketAggs": [
+                {
+                  "field": "scale",
+                  "id": "3",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "timestamp",
+                  "id": "2",
+                  "settings": {
+                    "interval": "auto"
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "datasource": {
+                "type": "elasticsearch",
+                "uid": "wDmp9bO4k"
+              },
+              "hide": false,
+              "metrics": [
+                {
+                  "field": "bootstorm_time",
+                  "id": "1",
+                  "settings": {
+                    "script": "_value/1000"
+                  },
+                  "type": "avg"
+                }
+              ],
+              "query": "scale:90",
+              "refId": "E",
+              "timeField": "timestamp"
+            },
+            {
+              "alias": "10 vms {{term node.keyword}}",
+              "bucketAggs": [
+                {
+                  "field": "scale",
+                  "id": "3",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "node.keyword",
+                  "id": "4",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "asc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "timestamp",
+                  "id": "2",
+                  "settings": {
+                    "interval": "auto"
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "datasource": {
+                "type": "elasticsearch",
+                "uid": "wDmp9bO4k"
+              },
+              "hide": false,
+              "metrics": [
+                {
+                  "field": "bootstorm_time",
+                  "id": "1",
+                  "settings": {
+                    "script": "_value/1000"
+                  },
+                  "type": "avg"
+                }
+              ],
+              "query": "scale:90",
+              "refId": "F",
+              "timeField": "timestamp"
+            }
+          ],
+          "title": "Bootstorm(sec)",
+          "type": "state-timeline"
+        }
+      ],
+      "title": "Bootstorm",
+      "type": "row"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 19
+      },
+      "id": 29,
+      "panels": [
+        {
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "g5pySGDnz"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "align": "auto",
+                "displayMode": "auto"
+              },
+              "links": [
+                {
+                  "title": "link",
+                  "url": "${__data.fields[\"run_artifacts_url.keyword\"]}"
+                }
+              ],
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 12
+          },
+          "id": 27,
+          "options": {
+            "footer": {
+              "fields": "",
+              "reducer": [
+                "sum"
+              ],
+              "show": false
+            },
+            "showHeader": true
+          },
+          "pluginVersion": "8.4.0-pre",
+          "targets": [
+            {
+              "alias": "",
+              "bucketAggs": [
+                {
+                  "field": "ci_date.keyword",
+                  "id": "3",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "db_type.keyword",
+                  "id": "4",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "current_worker",
+                  "id": "5",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "kind.keyword",
+                  "id": "6",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "storage_type.keyword",
+                  "id": "7",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "run_artifacts_url.keyword",
+                  "id": "8",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                }
+              ],
+              "datasource": {
+                "type": "elasticsearch",
+                "uid": "g5pySGDnz"
+              },
+              "metrics": [
+                {
+                  "field": "tpm",
+                  "id": "1",
+                  "settings": {
+                    "script": "_value/1000"
+                  },
+                  "type": "max"
+                }
+              ],
+              "query": "_exists_:tpm AND db_type:$db_type AND current_worker:$current_worker AND kind:$kind",
+              "refId": "A",
+              "timeField": "timestamp"
+            }
+          ],
+          "title": "Artifacts",
+          "transformations": [
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {},
+                "indexByName": {},
+                "renameByName": {
+                  "Max": "TPM",
+                  "ci_date.keyword": "Date",
+                  "current_worker": "Threads",
+                  "db_type.keyword": "Database",
+                  "kind.keyword": "Kind",
+                  "run_artifacts_url.keyword": "Artifacts url",
+                  "storage_type.keyword": "Storage"
+                }
+              }
+            }
+          ],
+          "type": "table"
+        }
+      ],
+      "title": "Run artifacts",
+      "type": "row"
+    }
+  ],
+  "refresh": false,
+  "schemaVersion": 34,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "selected": false,
+          "text": "4.11.10",
+          "value": "4.11.10"
+        },
+        "definition": "{\"find\":\"terms\",\"field\":\"ocp_version.keyword\"}",
+        "hide": 2,
+        "includeAll": false,
+        "label": "ocp_version",
+        "multi": false,
+        "name": "ocp_version",
+        "options": [],
+        "query": "{\"find\":\"terms\",\"field\":\"ocp_version.keyword\"}",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "elasticsearch",
+          "uid": "g5pySGDnz"
+        },
+        "definition": "{\"find\":\"terms\",\"field\":\"db_type.keyword\"}",
+        "hide": 0,
+        "includeAll": true,
+        "multi": true,
+        "name": "db_type",
+        "options": [],
+        "query": "{\"find\":\"terms\",\"field\":\"db_type.keyword\"}",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "elasticsearch",
+          "uid": "g5pySGDnz"
+        },
+        "definition": "{\"find\":\"terms\",\"field\":\"current_worker\"}",
+        "hide": 0,
+        "includeAll": true,
+        "multi": true,
+        "name": "current_worker",
+        "options": [],
+        "query": "{\"find\":\"terms\",\"field\":\"current_worker\"}",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "elasticsearch",
+          "uid": "g5pySGDnz"
+        },
+        "definition": "{\"find\":\"terms\",\"field\":\"kind.keyword\"}",
+        "hide": 0,
+        "includeAll": true,
+        "multi": true,
+        "name": "kind",
+        "options": [],
+        "query": "{\"find\":\"terms\",\"field\":\"kind.keyword\"}",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-45d",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "regression-summery",
+  "uid": "tUclnRNnz",
+  "version": 54,
+  "weekStart": ""
+}

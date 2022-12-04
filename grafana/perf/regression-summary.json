@@ -22,7 +22,7 @@
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
   "id": 16,
-  "iteration": 1666790632339,
+  "iteration": 1670182844311,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -158,23 +158,23 @@
                   "text": "4.11.4"
                 },
                 "4115": {
-                  "index": 53,
+                  "index": 55,
                   "text": "4.11.5"
                 },
                 "4116": {
-                  "index": 52,
+                  "index": 56,
                   "text": "4.11.6"
                 },
                 "4117": {
-                  "index": 51,
+                  "index": 57,
                   "text": "4.11.7"
                 },
                 "4118": {
-                  "index": 50,
+                  "index": 58,
                   "text": "4.11.8"
                 },
                 "4119": {
-                  "index": 49,
+                  "index": 59,
                   "text": "4.11.9"
                 },
                 "4814": {
@@ -250,16 +250,32 @@
                   "text": "4.10.2-3"
                 },
                 "41054": {
-                  "index": 55,
+                  "index": 49,
                   "text": "4.10.5-4"
                 },
                 "41066": {
                   "index": 48,
                   "text": "4.10.6-6"
                 },
+                "41110": {
+                  "index": 60,
+                  "text": "4.11.10"
+                },
+                "41111": {
+                  "index": 61,
+                  "text": "4.11.11"
+                },
+                "41112": {
+                  "index": 62,
+                  "text": "4.11.12"
+                },
                 "41113": {
-                  "index": 59,
-                  "text": "4.11.1-3"
+                  "index": 63,
+                  "text": "4.11.13"
+                },
+                "41114": {
+                  "index": 64,
+                  "text": "4.11.14"
                 },
                 "49211": {
                   "index": 7,
@@ -286,11 +302,11 @@
                   "text": "4.10.1-97"
                 },
                 "411115": {
-                  "index": 58,
+                  "index": 52,
                   "text": "4.11.1-15"
                 },
                 "411121": {
-                  "index": 57,
+                  "index": 51,
                   "text": "4.11.1-21"
                 },
                 "411135": {
@@ -322,11 +338,11 @@
                   "text": "4.10.1-101"
                 },
                 "4110137": {
-                  "index": 56,
+                  "index": 50,
                   "text": "4.11.0.137"
                 },
                 "4110605": {
-                  "index": 60,
+                  "index": 53,
                   "text": "4.11.06-05"
                 }
               },
@@ -380,7 +396,7 @@
       "pluginVersion": "8.4.0-pre",
       "targets": [
         {
-          "alias": "ocp version",
+          "alias": "ocp",
           "bucketAggs": [
             {
               "field": "timestamp",
@@ -411,7 +427,7 @@
           "timeField": "timestamp"
         },
         {
-          "alias": "odf version",
+          "alias": "odf",
           "bucketAggs": [
             {
               "field": "timestamp",
@@ -442,7 +458,7 @@
           "timeField": "timestamp"
         },
         {
-          "alias": "cnv version",
+          "alias": "cnv nightly",
           "bucketAggs": [
             {
               "field": "timestamp",
@@ -473,7 +489,7 @@
           "timeField": "timestamp"
         },
         {
-          "alias": "kata version",
+          "alias": "kata",
           "bucketAggs": [
             {
               "field": "timestamp",
@@ -589,7 +605,7 @@
           },
           "targets": [
             {
-              "alias": "{{term db_type.keyword}}  : workers={{term current_worker}} : {{term storage_type.keyword}} : {{term kind.keyword}}",
+              "alias": "{{term db_type.keyword}}  : {{term current_worker}} workers : {{term storage_type.keyword}} : {{term kind.keyword}}",
               "bucketAggs": [
                 {
                   "field": "db_type.keyword",
@@ -663,7 +679,7 @@
               "timeField": "timestamp"
             }
           ],
-          "title": "HammerDB KTPM (by db type, workers, and pod/vm/kata))",
+          "title": "HammerDB KTPM ",
           "type": "state-timeline"
         }
       ],
@@ -789,7 +805,7 @@
                   "type": "terms"
                 },
                 {
-                  "field": "uperf_ts",
+                  "field": "timestamp",
                   "id": "2",
                   "settings": {
                     "interval": "auto",
@@ -1114,7 +1130,7 @@
           },
           "targets": [
             {
-              "alias": "{{term Run.keyword}} : {{term Threads}}th : {{term kind.keyword}}",
+              "alias": "{{term Run.keyword}} : {{term Threads}}th : 1 {{term kind.keyword}}",
               "bucketAggs": [
                 {
                   "field": "Run.keyword",
@@ -1174,6 +1190,81 @@
               ],
               "query": "!SCALE AND !Run.keyword='fillup'",
               "refId": "A",
+              "timeField": "timestamp"
+            },
+            {
+              "alias": "{{term Run.keyword}} : {{term Threads}}th :{{term scale}} {{term kind.keyword}}s",
+              "bucketAggs": [
+                {
+                  "field": "Run.keyword",
+                  "id": "2",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "kind.keyword",
+                  "id": "3",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "Threads",
+                  "id": "4",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "scale",
+                  "id": "6",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "timestamp",
+                  "id": "5",
+                  "settings": {
+                    "interval": "auto",
+                    "min_doc_count": "0",
+                    "timeZone": "utc",
+                    "trimEdges": "0"
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "datasource": {
+                "type": "elasticsearch",
+                "uid": "bwnEiMx7k"
+              },
+              "hide": false,
+              "metrics": [
+                {
+                  "field": "Rate",
+                  "id": "1",
+                  "type": "avg"
+                }
+              ],
+              "query": "SCALE AND !Run.keyword='fillup'",
+              "refId": "B",
               "timeField": "timestamp"
             }
           ],
@@ -1252,7 +1343,7 @@
           },
           "targets": [
             {
-              "alias": " {{term Run.keyword}} : {{term Threads}}th : {{term kind.keyword}}",
+              "alias": " {{term Run.keyword}} : {{term Threads}}th : 1 {{term kind.keyword}}",
               "bucketAggs": [
                 {
                   "field": "Run.keyword",
@@ -1313,6 +1404,81 @@
               "query": "!SCALE AND !Run.keyword='fillup'",
               "refId": "A",
               "timeField": "timestamp"
+            },
+            {
+              "alias": " {{term Run.keyword}} : {{term Threads}}th : {{term scale}} {{term kind.keyword}}s",
+              "bucketAggs": [
+                {
+                  "field": "Run.keyword",
+                  "id": "2",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "kind.keyword",
+                  "id": "3",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "Threads",
+                  "id": "4",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "scale",
+                  "id": "6",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "timestamp",
+                  "id": "5",
+                  "settings": {
+                    "interval": "auto",
+                    "min_doc_count": "0",
+                    "timeZone": "utc",
+                    "trimEdges": "0"
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "datasource": {
+                "type": "elasticsearch",
+                "uid": "bwnEiMx7k"
+              },
+              "hide": false,
+              "metrics": [
+                {
+                  "field": "Resp",
+                  "id": "1",
+                  "type": "avg"
+                }
+              ],
+              "query": "SCALE AND !Run.keyword='fillup'",
+              "refId": "B",
+              "timeField": "timestamp"
             }
           ],
           "title": "vdbench (Latency - Lower better) ",
@@ -1329,318 +1495,6 @@
         "w": 24,
         "x": 0,
         "y": 14
-      },
-      "id": 161,
-      "panels": [
-        {
-          "datasource": {
-            "type": "elasticsearch",
-            "uid": "bwnEiMx7k"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
-              "custom": {
-                "fillOpacity": 70,
-                "lineWidth": 0
-              },
-              "mappings": [],
-              "min": 0,
-              "thresholds": {
-                "mode": "percentage",
-                "steps": [
-                  {
-                    "color": "dark-red"
-                  },
-                  {
-                    "color": "#EAB839",
-                    "value": 50
-                  },
-                  {
-                    "color": "light-green",
-                    "value": 80
-                  },
-                  {
-                    "color": "dark-green",
-                    "value": 90
-                  },
-                  {
-                    "color": "dark-blue",
-                    "value": 100
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 25,
-            "w": 24,
-            "x": 0,
-            "y": 131
-          },
-          "id": 162,
-          "interval": "1d",
-          "links": [
-            {
-              "title": "artifacts link",
-              "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=1650716591751&to=1654604591751&viewPanel=133"
-            }
-          ],
-          "options": {
-            "alignValue": "center",
-            "legend": {
-              "displayMode": "list",
-              "placement": "bottom"
-            },
-            "mergeValues": false,
-            "rowHeight": 0.9,
-            "showValue": "always",
-            "tooltip": {
-              "mode": "single"
-            }
-          },
-          "targets": [
-            {
-              "alias": " {{term Run.keyword}} :{{term kind.keyword}}: {{term Threads}}th: {{term scale}}",
-              "bucketAggs": [
-                {
-                  "field": "Run.keyword",
-                  "id": "2",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "kind.keyword",
-                  "id": "3",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "Threads",
-                  "id": "4",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "scale",
-                  "id": "6",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "asc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "timestamp",
-                  "id": "5",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "bwnEiMx7k"
-              },
-              "metrics": [
-                {
-                  "field": "Rate",
-                  "id": "1",
-                  "type": "sum"
-                }
-              ],
-              "query": "!Run.keyword='fillup'",
-              "refId": "A",
-              "timeField": "timestamp"
-            }
-          ],
-          "title": "vdbench scale (IOPS)",
-          "type": "state-timeline"
-        },
-        {
-          "datasource": {
-            "type": "elasticsearch",
-            "uid": "bwnEiMx7k"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
-              "custom": {
-                "fillOpacity": 70,
-                "lineWidth": 0
-              },
-              "mappings": [],
-              "min": 0,
-              "thresholds": {
-                "mode": "percentage",
-                "steps": [
-                  {
-                    "color": "dark-red"
-                  },
-                  {
-                    "color": "#EAB839",
-                    "value": 50
-                  },
-                  {
-                    "color": "light-green",
-                    "value": 80
-                  },
-                  {
-                    "color": "dark-green",
-                    "value": 90
-                  },
-                  {
-                    "color": "dark-blue",
-                    "value": 100
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 25,
-            "w": 24,
-            "x": 0,
-            "y": 156
-          },
-          "id": 163,
-          "interval": "1d",
-          "links": [
-            {
-              "title": "artifacts link",
-              "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=1650716591751&to=1654604591751&viewPanel=133"
-            }
-          ],
-          "options": {
-            "alignValue": "center",
-            "legend": {
-              "displayMode": "list",
-              "placement": "bottom"
-            },
-            "mergeValues": false,
-            "rowHeight": 0.9,
-            "showValue": "always",
-            "tooltip": {
-              "mode": "single"
-            }
-          },
-          "targets": [
-            {
-              "alias": " {{term Run.keyword}} :{{term kind.keyword}}: {{term Threads}}th: {{term scale}}",
-              "bucketAggs": [
-                {
-                  "field": "Run.keyword",
-                  "id": "2",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "kind.keyword",
-                  "id": "3",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "Threads",
-                  "id": "4",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "scale",
-                  "id": "6",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "timestamp",
-                  "id": "5",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "bwnEiMx7k"
-              },
-              "metrics": [
-                {
-                  "field": "Resp",
-                  "id": "1",
-                  "type": "avg"
-                }
-              ],
-              "query": "!Run.keyword='fillup'",
-              "refId": "A",
-              "timeField": "timestamp"
-            }
-          ],
-          "title": "vdbench scale (Latency - Lower better) ",
-          "type": "state-timeline"
-        }
-      ],
-      "title": "Vdbench scale",
-      "type": "row"
-    },
-    {
-      "collapsed": true,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 15
       },
       "id": 148,
       "panels": [
@@ -1667,7 +1521,15 @@
                     "color": "red"
                   },
                   {
-                    "color": "#EAB839",
+                    "color": "dark-blue",
+                    "value": 0
+                  },
+                  {
+                    "color": "semi-dark-orange",
+                    "value": 1
+                  },
+                  {
+                    "color": "super-light-orange",
                     "value": 50
                   },
                   {
@@ -1691,411 +1553,9 @@
             "h": 36,
             "w": 24,
             "x": 0,
-            "y": 16
+            "y": 15
           },
-          "id": 152,
-          "interval": "1d",
-          "links": [
-            {
-              "title": "artifacts link",
-              "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=now-45d&to=now&viewPanel=150"
-            }
-          ],
-          "options": {
-            "alignValue": "left",
-            "legend": {
-              "displayMode": "list",
-              "placement": "bottom"
-            },
-            "mergeValues": false,
-            "rowHeight": 0.9,
-            "showValue": "auto",
-            "tooltip": {
-              "mode": "single"
-            }
-          },
-          "targets": [
-            {
-              "alias": "pod: max",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "GOZHNDg4k"
-              },
-              "metrics": [
-                {
-                  "field": "test_description.pods",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='runc'",
-              "refId": "A",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "kata: max",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "GOZHNDg4k"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "test_description.pods",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='kata'",
-              "refId": "B",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "pod: Memory per pod (MB)",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "GOZHNDg4k"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "memory_per_pod",
-                  "id": "6",
-                  "settings": {
-                    "script": "_value/1000000"
-                  },
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='runc'",
-              "refId": "C",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "kata: Memory per kata  (MB)",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "GOZHNDg4k"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "memory_per_pod",
-                  "id": "6",
-                  "settings": {
-                    "script": "_value/1000000"
-                  },
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='kata'",
-              "refId": "D",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "pod: start per seconds",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "GOZHNDg4k"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "pod_starts_per_second",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='runc'",
-              "refId": "E",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "kata: start per seconds",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "GOZHNDg4k"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "pod_starts_per_second",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='kata'",
-              "refId": "F",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "pod: Iteration cpu sec",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "GOZHNDg4k"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "iterations_cpu_sec",
-                  "id": "6",
-                  "settings": {
-                    "script": "_value/1000000"
-                  },
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='runc'",
-              "refId": "G",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "kata: Iteration cpu sec",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "GOZHNDg4k"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "iterations_cpu_sec",
-                  "id": "6",
-                  "settings": {
-                    "script": "_value/1000000"
-                  },
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='kata'",
-              "refId": "H",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "pod: Iteration sec",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "GOZHNDg4k"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "iterations_sec",
-                  "id": "6",
-                  "settings": {
-                    "script": "_value/1000000"
-                  },
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='runc'",
-              "refId": "I",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "kata: Iteration sec",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "GOZHNDg4k"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "iterations_sec",
-                  "id": "6",
-                  "settings": {
-                    "script": "_value/1000000"
-                  },
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='kata'",
-              "refId": "J",
-              "timeField": "timestamp"
-            }
-          ],
-          "title": "clusterbuster-cpusoaker",
-          "type": "state-timeline"
-        },
-        {
-          "datasource": {
-            "type": "elasticsearch",
-            "uid": "GOZHNDg4k"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
-              "custom": {
-                "fillOpacity": 70,
-                "lineWidth": 0
-              },
-              "mappings": [],
-              "min": 0,
-              "thresholds": {
-                "mode": "percentage",
-                "steps": [
-                  {
-                    "color": "red"
-                  },
-                  {
-                    "color": "#EAB839",
-                    "value": 50
-                  },
-                  {
-                    "color": "super-light-green",
-                    "value": 80
-                  },
-                  {
-                    "color": "dark-green",
-                    "value": 90
-                  },
-                  {
-                    "color": "dark-blue",
-                    "value": 100
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 36,
-            "w": 24,
-            "x": 0,
-            "y": 52
-          },
-          "id": 172,
+          "id": 173,
           "interval": "1d",
           "links": [
             {
@@ -2159,7 +1619,91 @@
               "timeField": "timestamp"
             },
             {
-              "alias": "Memory(GB) {{term test_description.runtime.keyword}}",
+              "alias": "First start (sec) {{term test_description.runtime.keyword}}",
+              "bucketAggs": [
+                {
+                  "field": "test_description.runtime.keyword",
+                  "id": "8",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "timestamp",
+                  "id": "7",
+                  "settings": {
+                    "interval": "auto",
+                    "min_doc_count": "0",
+                    "timeZone": "utc",
+                    "trimEdges": "0"
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "datasource": {
+                "type": "elasticsearch",
+                "uid": "GOZHNDg4k"
+              },
+              "hide": false,
+              "metrics": [
+                {
+                  "field": "first_pod_start",
+                  "id": "6",
+                  "type": "max"
+                }
+              ],
+              "query": "",
+              "refId": "B",
+              "timeField": "timestamp"
+            },
+            {
+              "alias": "Last start (sec) {{term test_description.runtime.keyword}}",
+              "bucketAggs": [
+                {
+                  "field": "test_description.runtime.keyword",
+                  "id": "8",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "timestamp",
+                  "id": "7",
+                  "settings": {
+                    "interval": "auto",
+                    "min_doc_count": "0",
+                    "timeZone": "utc",
+                    "trimEdges": "0"
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "datasource": {
+                "type": "elasticsearch",
+                "uid": "GOZHNDg4k"
+              },
+              "hide": false,
+              "metrics": [
+                {
+                  "field": "last_pod_start",
+                  "id": "6",
+                  "type": "max"
+                }
+              ],
+              "query": "",
+              "refId": "C",
+              "timeField": "timestamp"
+            },
+            {
+              "alias": "Memory (GB) {{term test_description.runtime.keyword}}",
               "bucketAggs": [
                 {
                   "field": "test_description.runtime.keyword",
@@ -2200,53 +1744,11 @@
                 }
               ],
               "query": "",
-              "refId": "C",
+              "refId": "D",
               "timeField": "timestamp"
             },
             {
-              "alias": "Start time {{term test_description.runtime.keyword}}",
-              "bucketAggs": [
-                {
-                  "field": "test_description.runtime.keyword",
-                  "id": "8",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "GOZHNDg4k"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "pod_starts_per_second",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "",
-              "refId": "E",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "CPU sec {{term test_description.runtime.keyword}}",
+              "alias": "CPU Iterations/sec {{term test_description.runtime.keyword}}",
               "bucketAggs": [
                 {
                   "field": "test_description.runtime.keyword",
@@ -2287,11 +1789,224 @@
                 }
               ],
               "query": "",
-              "refId": "G",
+              "refId": "E",
               "timeField": "timestamp"
+            }
+          ],
+          "title": "Cpusoaker",
+          "transformations": [
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "Diff Max ( runc - kata)",
+                "binary": {
+                  "left": "Max runc",
+                  "operator": "-",
+                  "reducer": "sum",
+                  "right": "Max kata"
+                },
+                "mode": "reduceRow",
+                "reduce": {
+                  "include": [
+                    "Max kata",
+                    "Max runc"
+                  ],
+                  "reducer": "range"
+                }
+              }
             },
             {
-              "alias": "Iteration sec  {{term test_description.runtime.keyword}}",
+              "id": "calculateField",
+              "options": {
+                "alias": "Diff First( kata - runc)",
+                "mode": "reduceRow",
+                "reduce": {
+                  "include": [
+                    "First start (sec) runc",
+                    "First start (sec) kata"
+                  ],
+                  "reducer": "diff"
+                }
+              }
+            },
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "Ratio Last( kata/ runc)",
+                "binary": {
+                  "left": "Last start (sec) kata",
+                  "operator": "/",
+                  "reducer": "sum",
+                  "right": "Last start (sec) runc"
+                },
+                "mode": "binary",
+                "reduce": {
+                  "include": [
+                    "Last start (sec) runc",
+                    "Last start (sec) kata"
+                  ],
+                  "reducer": "diff"
+                }
+              }
+            },
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "Diff Memory( kata - runc)",
+                "binary": {
+                  "left": "Memory (GB) runc",
+                  "operator": "-",
+                  "reducer": "sum",
+                  "right": "Memory (GB) kata"
+                },
+                "mode": "reduceRow",
+                "reduce": {
+                  "include": [
+                    "Memory (GB) runc",
+                    "Memory (GB) kata"
+                  ],
+                  "reducer": "diff"
+                }
+              }
+            },
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "Diff CPU( kata / runc)",
+                "binary": {
+                  "left": "CPU Iterations/sec kata",
+                  "operator": "/",
+                  "reducer": "sum",
+                  "right": "CPU Iterations/sec runc"
+                },
+                "mode": "binary",
+                "reduce": {
+                  "include": [
+                    "CPU Iterations/sec runc",
+                    "CPU Iterations/sec kata"
+                  ],
+                  "reducer": "diff"
+                }
+              }
+            },
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {},
+                "indexByName": {
+                  "CPU Iterations/sec kata": 14,
+                  "CPU Iterations/sec runc": 13,
+                  "Diff CPU( kata - runc)": 15,
+                  "Diff First( kata - runc)": 6,
+                  "Diff Max ( runc - kata)": 3,
+                  "Diff Memory( kata - runc)": 12,
+                  "First start (sec) kata": 5,
+                  "First start (sec) runc": 4,
+                  "Last start (sec) kata": 8,
+                  "Last start (sec) runc": 7,
+                  "Max kata": 2,
+                  "Max runc": 1,
+                  "Memory (GB) kata": 11,
+                  "Memory (GB) runc": 10,
+                  "Ratio Last( kata/ runc)": 9,
+                  "Time": 0
+                },
+                "renameByName": {}
+              }
+            },
+            {
+              "id": "convertFieldType",
+              "options": {
+                "conversions": [
+                  {
+                    "destinationType": "number",
+                    "targetField": "Ratio Last( kata/ runc)"
+                  },
+                  {
+                    "destinationType": "number",
+                    "targetField": "Diff CPU( kata / runc)"
+                  }
+                ],
+                "fields": {}
+              }
+            }
+          ],
+          "type": "state-timeline"
+        },
+        {
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "tokwNvgVz"
+          },
+          "description": "Lower is better",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "fillOpacity": 70,
+                "lineWidth": 0
+              },
+              "mappings": [],
+              "min": 0,
+              "thresholds": {
+                "mode": "percentage",
+                "steps": [
+                  {
+                    "color": "red"
+                  },
+                  {
+                    "color": "#EAB839",
+                    "value": 50
+                  },
+                  {
+                    "color": "super-light-green",
+                    "value": 80
+                  },
+                  {
+                    "color": "dark-green",
+                    "value": 90
+                  },
+                  {
+                    "color": "dark-blue",
+                    "value": 100
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 36,
+            "w": 24,
+            "x": 0,
+            "y": 51
+          },
+          "id": 165,
+          "interval": "1d",
+          "links": [
+            {
+              "title": "artifacts link",
+              "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=now-45d&to=now&viewPanel=150"
+            }
+          ],
+          "options": {
+            "alignValue": "left",
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "mergeValues": false,
+            "rowHeight": 0.9,
+            "showValue": "auto",
+            "tooltip": {
+              "mode": "single"
+            }
+          },
+          "targets": [
+            {
+              "alias": "create: 4096: {{term test_description.runtime.keyword}}",
               "bucketAggs": [
                 {
                   "field": "test_description.runtime.keyword",
@@ -2318,115 +2033,6 @@
               ],
               "datasource": {
                 "type": "elasticsearch",
-                "uid": "GOZHNDg4k"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "iterations_sec",
-                  "id": "6",
-                  "settings": {
-                    "script": "_value/1000000"
-                  },
-                  "type": "max"
-                }
-              ],
-              "query": "",
-              "refId": "I",
-              "timeField": "timestamp"
-            }
-          ],
-          "title": "clusterbuster-cpusoaker",
-          "type": "state-timeline"
-        },
-        {
-          "datasource": {
-            "type": "elasticsearch",
-            "uid": "tokwNvgVz"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
-              "custom": {
-                "fillOpacity": 70,
-                "lineWidth": 0
-              },
-              "mappings": [],
-              "min": 0,
-              "thresholds": {
-                "mode": "percentage",
-                "steps": [
-                  {
-                    "color": "red"
-                  },
-                  {
-                    "color": "#EAB839",
-                    "value": 50
-                  },
-                  {
-                    "color": "super-light-green",
-                    "value": 80
-                  },
-                  {
-                    "color": "dark-green",
-                    "value": 90
-                  },
-                  {
-                    "color": "dark-blue",
-                    "value": 100
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 36,
-            "w": 24,
-            "x": 0,
-            "y": 88
-          },
-          "id": 165,
-          "interval": "1d",
-          "links": [
-            {
-              "title": "artifacts link",
-              "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=now-45d&to=now&viewPanel=150"
-            }
-          ],
-          "options": {
-            "alignValue": "left",
-            "legend": {
-              "displayMode": "list",
-              "placement": "bottom"
-            },
-            "mergeValues": false,
-            "rowHeight": 0.9,
-            "showValue": "auto",
-            "tooltip": {
-              "mode": "single"
-            }
-          },
-          "targets": [
-            {
-              "alias": "pod: create: filesize 4096",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
                 "uid": "tokwNvgVz"
               },
               "metrics": [
@@ -2436,170 +2042,15 @@
                   "type": "max"
                 }
               ],
-              "query": "test_description.runtime='runc' and test_description.filesize:4096",
+              "query": "test_description.filesize:4096",
               "refId": "A",
               "timeField": "timestamp"
             },
             {
-              "alias": "kata: create: filesize 4096",
+              "alias": "create: 262,144:  {{term test_description.runtime.keyword}}",
               "bucketAggs": [
                 {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "tokwNvgVz"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "create.elapsed_time",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='kata' and test_description.filesize:4096",
-              "refId": "B",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "pod: read :  filesize 4096",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "tokwNvgVz"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "read.elapsed_time",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='runc' and test_description.filesize:4096",
-              "refId": "C",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "kata: read:  filesize 4096",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "tokwNvgVz"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "read.elapsed_time",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='kata' and test_description.filesize:4096",
-              "refId": "D",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "pod: remove :  filesize 4096",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "tokwNvgVz"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "remove.elapsed_time",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='runc' and test_description.filesize:4096",
-              "refId": "E",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "kata: remove:  filesize 4096",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "tokwNvgVz"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "remove.elapsed_time",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='kata' and test_description.filesize:4096",
-              "refId": "F",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "pod: create: filesize 262,144",
-              "bucketAggs": [
-                {
-                  "field": "test_description.dirs",
+                  "field": "test_description.runtime.keyword",
                   "id": "8",
                   "settings": {
                     "min_doc_count": "1",
@@ -2633,44 +2084,24 @@
                   "type": "max"
                 }
               ],
-              "query": "test_description.runtime='runc' and test_description.filesize:262144",
+              "query": "test_description.filesize:262144",
               "refId": "G",
               "timeField": "timestamp"
             },
             {
-              "alias": "kata: create:  filesize 262,144",
+              "alias": "read : 4096: {{term test_description.runtime.keyword}}",
               "bucketAggs": [
                 {
-                  "field": "timestamp",
-                  "id": "7",
+                  "field": "test_description.runtime.keyword",
+                  "id": "8",
                   "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
                   },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "tokwNvgVz"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "create.elapsed_time",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='kata' and test_description.filesize:262144",
-              "refId": "H",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "pod: read :  filesize 262,144",
-              "bucketAggs": [
+                  "type": "terms"
+                },
                 {
                   "field": "timestamp",
                   "id": "7",
@@ -2695,44 +2126,66 @@
                   "type": "max"
                 }
               ],
-              "query": "test_description.runtime='runc' and test_description.filesize:262144",
+              "query": "test_description.filesize:4096",
+              "refId": "C",
+              "timeField": "timestamp"
+            },
+            {
+              "alias": "read : 262,144: {{term test_description.runtime.keyword}}",
+              "bucketAggs": [
+                {
+                  "field": "test_description.runtime.keyword",
+                  "id": "8",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "timestamp",
+                  "id": "7",
+                  "settings": {
+                    "interval": "auto",
+                    "min_doc_count": "0",
+                    "timeZone": "utc",
+                    "trimEdges": "0"
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "datasource": {
+                "type": "elasticsearch",
+                "uid": "tokwNvgVz"
+              },
+              "hide": false,
+              "metrics": [
+                {
+                  "field": "read.elapsed_time",
+                  "id": "6",
+                  "type": "max"
+                }
+              ],
+              "query": "test_description.filesize:262144",
               "refId": "I",
               "timeField": "timestamp"
             },
             {
-              "alias": "kata: read :  filesize 262,144",
+              "alias": "remove : 4096: {{term test_description.runtime.keyword}}",
               "bucketAggs": [
                 {
-                  "field": "timestamp",
-                  "id": "7",
+                  "field": "test_description.runtime.keyword",
+                  "id": "8",
                   "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
                   },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "tokwNvgVz"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "read.elapsed_time",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='kata' and test_description.filesize:262144",
-              "refId": "J",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "pod: remove :  filesize 262,144",
-              "bucketAggs": [
+                  "type": "terms"
+                },
                 {
                   "field": "timestamp",
                   "id": "7",
@@ -2757,43 +2210,212 @@
                   "type": "max"
                 }
               ],
-              "query": "test_description.runtime='runc' and test_description.filesize:262144",
+              "query": "test_description.filesize:4096",
+              "refId": "E",
+              "timeField": "timestamp"
+            },
+            {
+              "alias": "remove : 262,144: {{term test_description.runtime.keyword}}",
+              "bucketAggs": [
+                {
+                  "field": "test_description.runtime.keyword",
+                  "id": "8",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "timestamp",
+                  "id": "7",
+                  "settings": {
+                    "interval": "auto",
+                    "min_doc_count": "0",
+                    "timeZone": "utc",
+                    "trimEdges": "0"
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "datasource": {
+                "type": "elasticsearch",
+                "uid": "tokwNvgVz"
+              },
+              "hide": false,
+              "metrics": [
+                {
+                  "field": "remove.elapsed_time",
+                  "id": "6",
+                  "type": "max"
+                }
+              ],
+              "query": "test_description.filesize:262144",
               "refId": "K",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "kata: remove:  filesize 262,144",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "tokwNvgVz"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "remove.elapsed_time",
-                  "id": "6",
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='kata' and test_description.filesize:262144",
-              "refId": "L",
               "timeField": "timestamp"
             }
           ],
-          "title": "clusterbuster-files: elapsed_time: Direct/ 64 dirs/files",
+          "title": "Files (sec)",
+          "transformations": [
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "create 4096 kata/runc",
+                "binary": {
+                  "left": "create: 4096: kata",
+                  "operator": "/",
+                  "reducer": "sum",
+                  "right": "create: 4096: runc"
+                },
+                "mode": "binary",
+                "reduce": {
+                  "reducer": "sum"
+                }
+              }
+            },
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "create 262,144 kata/runc",
+                "binary": {
+                  "left": "create: 262,144:  kata",
+                  "operator": "/",
+                  "reducer": "sum",
+                  "right": "create: 262,144:  runc"
+                },
+                "mode": "binary",
+                "reduce": {
+                  "reducer": "sum"
+                }
+              }
+            },
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "read 4096 kata/runc",
+                "binary": {
+                  "left": "read : 4096: kata",
+                  "operator": "/",
+                  "reducer": "sum",
+                  "right": "read : 4096: runc"
+                },
+                "mode": "binary",
+                "reduce": {
+                  "reducer": "sum"
+                }
+              }
+            },
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "read 262,144  kata/runc",
+                "binary": {
+                  "left": "read : 262,144: kata",
+                  "operator": "/",
+                  "reducer": "sum",
+                  "right": "read : 262,144: runc"
+                },
+                "mode": "binary",
+                "reduce": {
+                  "reducer": "sum"
+                }
+              }
+            },
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "remove 4096  kata/runc",
+                "binary": {
+                  "left": "remove : 4096: kata",
+                  "operator": "/",
+                  "reducer": "sum",
+                  "right": "remove : 4096: runc"
+                },
+                "mode": "binary",
+                "reduce": {
+                  "reducer": "sum"
+                }
+              }
+            },
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "remove 262,144 kata/runc",
+                "binary": {
+                  "left": "remove : 262,144: kata",
+                  "operator": "/",
+                  "reducer": "sum",
+                  "right": "remove : 262,144: runc"
+                },
+                "mode": "binary",
+                "reduce": {
+                  "reducer": "sum"
+                }
+              }
+            },
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {},
+                "indexByName": {
+                  "Time": 0,
+                  "create 262,144 kata/runc": 6,
+                  "create 4096 kata/runc": 3,
+                  "create: 262,144:  kata": 5,
+                  "create: 262,144:  runc": 4,
+                  "create: 4096: kata": 2,
+                  "create: 4096: runc": 1,
+                  "read 262,144  kata/runc": 12,
+                  "read 4096 kata/runc": 9,
+                  "read : 262,144: kata": 11,
+                  "read : 262,144: runc": 10,
+                  "read : 4096: kata": 8,
+                  "read : 4096: runc": 7,
+                  "remove 262,144 kata/runc": 18,
+                  "remove 4096  kata/runc": 15,
+                  "remove : 262,144: kata": 17,
+                  "remove : 262,144: runc": 16,
+                  "remove : 4096: kata": 14,
+                  "remove : 4096: runc": 13
+                },
+                "renameByName": {}
+              }
+            },
+            {
+              "id": "convertFieldType",
+              "options": {
+                "conversions": [
+                  {
+                    "destinationType": "number",
+                    "targetField": "create 4096 kata/runc"
+                  },
+                  {
+                    "destinationType": "number",
+                    "targetField": "create 262,144 kata/runc"
+                  },
+                  {
+                    "destinationType": "number",
+                    "targetField": "read 4096 kata/runc"
+                  },
+                  {
+                    "destinationType": "number",
+                    "targetField": "read 262,144  kata/runc"
+                  },
+                  {
+                    "destinationType": "number",
+                    "targetField": "remove 4096  kata/runc"
+                  },
+                  {
+                    "destinationType": "number",
+                    "targetField": "remove 262,144 kata/runc"
+                  }
+                ],
+                "fields": {}
+              }
+            }
+          ],
           "type": "state-timeline"
         },
         {
@@ -2801,6 +2423,7 @@
             "type": "elasticsearch",
             "uid": "6biHHDgVz"
           },
+          "description": "Higher is better",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -2843,7 +2466,7 @@
             "h": 36,
             "w": 24,
             "x": 0,
-            "y": 124
+            "y": 87
           },
           "id": 167,
           "interval": "1d",
@@ -2854,22 +2477,33 @@
             }
           ],
           "options": {
-            "alignValue": "left",
+            "alignValue": "center",
             "legend": {
               "displayMode": "list",
               "placement": "bottom"
             },
             "mergeValues": false,
             "rowHeight": 0.9,
-            "showValue": "auto",
+            "showValue": "always",
             "tooltip": {
               "mode": "single"
             }
           },
           "targets": [
             {
-              "alias": "runc read",
+              "alias": "read.iops: {{term test_description.runtime.keyword}}",
               "bucketAggs": [
+                {
+                  "field": "test_description.runtime.keyword",
+                  "id": "8",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
                 {
                   "field": "timestamp",
                   "id": "7",
@@ -2890,16 +2524,30 @@
                 {
                   "field": "read.iops",
                   "id": "6",
+                  "settings": {
+                    "script": "_value/1000"
+                  },
                   "type": "max"
                 }
               ],
-              "query": "test_description.runtime='runc'",
+              "query": "",
               "refId": "A",
               "timeField": "timestamp"
             },
             {
-              "alias": "kata read",
+              "alias": "write.iops: {{term test_description.runtime.keyword}}",
               "bucketAggs": [
+                {
+                  "field": "test_description.runtime.keyword",
+                  "id": "8",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
                 {
                   "field": "timestamp",
                   "id": "7",
@@ -2919,17 +2567,366 @@
               "hide": false,
               "metrics": [
                 {
-                  "field": "read.iops",
+                  "field": "write.iops",
                   "id": "6",
+                  "settings": {
+                    "script": "_value/1000"
+                  },
                   "type": "max"
                 }
               ],
-              "query": "test_description.runtime='kata'",
+              "query": "",
               "refId": "B",
+              "timeField": "timestamp"
+            },
+            {
+              "alias": "total.iops: {{term test_description.runtime.keyword}}",
+              "bucketAggs": [
+                {
+                  "field": "test_description.runtime.keyword",
+                  "id": "8",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "timestamp",
+                  "id": "7",
+                  "settings": {
+                    "interval": "auto",
+                    "min_doc_count": "0",
+                    "timeZone": "utc",
+                    "trimEdges": "0"
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "datasource": {
+                "type": "elasticsearch",
+                "uid": "6biHHDgVz"
+              },
+              "hide": false,
+              "metrics": [
+                {
+                  "field": "total.iops",
+                  "id": "6",
+                  "settings": {
+                    "script": "_value/1000"
+                  },
+                  "type": "max"
+                }
+              ],
+              "query": "",
+              "refId": "C",
+              "timeField": "timestamp"
+            },
+            {
+              "alias": "read.throughput: {{term test_description.runtime.keyword}}",
+              "bucketAggs": [
+                {
+                  "field": "test_description.runtime.keyword",
+                  "id": "8",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "timestamp",
+                  "id": "7",
+                  "settings": {
+                    "interval": "auto",
+                    "min_doc_count": "0",
+                    "timeZone": "utc",
+                    "trimEdges": "0"
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "datasource": {
+                "type": "elasticsearch",
+                "uid": "6biHHDgVz"
+              },
+              "hide": false,
+              "metrics": [
+                {
+                  "field": "read.throughput",
+                  "id": "6",
+                  "settings": {
+                    "script": "_value/1000000"
+                  },
+                  "type": "max"
+                }
+              ],
+              "query": "",
+              "refId": "D",
+              "timeField": "timestamp"
+            },
+            {
+              "alias": "write.throughput: {{term test_description.runtime.keyword}}",
+              "bucketAggs": [
+                {
+                  "field": "test_description.runtime.keyword",
+                  "id": "8",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "timestamp",
+                  "id": "7",
+                  "settings": {
+                    "interval": "auto",
+                    "min_doc_count": "0",
+                    "timeZone": "utc",
+                    "trimEdges": "0"
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "datasource": {
+                "type": "elasticsearch",
+                "uid": "6biHHDgVz"
+              },
+              "hide": false,
+              "metrics": [
+                {
+                  "field": "write.throughput",
+                  "id": "6",
+                  "settings": {
+                    "script": "_value/1000000"
+                  },
+                  "type": "max"
+                }
+              ],
+              "query": "",
+              "refId": "E",
+              "timeField": "timestamp"
+            },
+            {
+              "alias": "total.throughput: {{term test_description.runtime.keyword}}",
+              "bucketAggs": [
+                {
+                  "field": "test_description.runtime.keyword",
+                  "id": "8",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "timestamp",
+                  "id": "7",
+                  "settings": {
+                    "interval": "auto",
+                    "min_doc_count": "0",
+                    "timeZone": "utc",
+                    "trimEdges": "0"
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "datasource": {
+                "type": "elasticsearch",
+                "uid": "6biHHDgVz"
+              },
+              "hide": false,
+              "metrics": [
+                {
+                  "field": "total.throughput",
+                  "id": "6",
+                  "settings": {
+                    "script": "_value/1000000"
+                  },
+                  "type": "max"
+                }
+              ],
+              "query": "",
+              "refId": "F",
               "timeField": "timestamp"
             }
           ],
-          "title": "clusterbuster-fio",
+          "title": "FIO (IOPS/Throughtput)",
+          "transformations": [
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "read.iops kata/runc",
+                "binary": {
+                  "left": "read.iops: kata",
+                  "operator": "/",
+                  "reducer": "sum",
+                  "right": "read.iops: runc"
+                },
+                "mode": "binary",
+                "reduce": {
+                  "include": [
+                    "read.iops: runc",
+                    "read.iops: kata"
+                  ],
+                  "reducer": "diffperc"
+                }
+              }
+            },
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "write.iops kata/runc",
+                "binary": {
+                  "left": "write.iops: kata",
+                  "operator": "/",
+                  "reducer": "sum",
+                  "right": "write.iops: runc"
+                },
+                "mode": "binary",
+                "reduce": {
+                  "include": [
+                    "write.iops: runc",
+                    "write.iops: kata"
+                  ],
+                  "reducer": "sum"
+                }
+              }
+            },
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "total.iops  kata/runc",
+                "binary": {
+                  "left": "total.iops: kata",
+                  "operator": "/",
+                  "reducer": "sum",
+                  "right": "total.iops: runc"
+                },
+                "mode": "binary",
+                "reduce": {
+                  "reducer": "sum"
+                }
+              }
+            },
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "read.throughput  kata/runc",
+                "binary": {
+                  "left": "read.throughput: kata",
+                  "operator": "/",
+                  "reducer": "sum",
+                  "right": "read.throughput: runc"
+                },
+                "mode": "binary",
+                "reduce": {
+                  "reducer": "sum"
+                }
+              }
+            },
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "write.throughput kata/runc",
+                "binary": {
+                  "left": "write.throughput: kata",
+                  "operator": "/",
+                  "reducer": "sum",
+                  "right": "write.throughput: runc"
+                },
+                "mode": "binary",
+                "reduce": {
+                  "reducer": "sum"
+                }
+              }
+            },
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "total.throughput kata/runc",
+                "binary": {
+                  "left": "total.throughput: kata",
+                  "operator": "/",
+                  "reducer": "sum",
+                  "right": "total.throughput: runc"
+                },
+                "mode": "binary",
+                "reduce": {
+                  "reducer": "sum"
+                }
+              }
+            },
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {},
+                "indexByName": {
+                  "Time": 0,
+                  "read.iops kata/runc": 3,
+                  "read.iops: kata": 2,
+                  "read.iops: runc": 1,
+                  "read.throughput  kata/runc": 12,
+                  "read.throughput: kata": 11,
+                  "read.throughput: runc": 10,
+                  "total.iops  kata/runc": 9,
+                  "total.iops: kata": 8,
+                  "total.iops: runc": 7,
+                  "total.throughput kata/runc": 18,
+                  "total.throughput: kata": 17,
+                  "total.throughput: runc": 16,
+                  "write.iops kata/runc": 6,
+                  "write.iops: kata": 5,
+                  "write.iops: runc": 4,
+                  "write.throughput kata/runc": 15,
+                  "write.throughput: kata": 14,
+                  "write.throughput: runc": 13
+                },
+                "renameByName": {}
+              }
+            },
+            {
+              "id": "convertFieldType",
+              "options": {
+                "conversions": [
+                  {
+                    "destinationType": "number",
+                    "targetField": "read.iops kata/runc"
+                  },
+                  {
+                    "destinationType": "number",
+                    "targetField": "write.iops kata/runc"
+                  },
+                  {
+                    "destinationType": "number",
+                    "targetField": "total.iops  kata/runc"
+                  },
+                  {
+                    "destinationType": "number",
+                    "targetField": "read.throughput  kata/runc"
+                  },
+                  {
+                    "destinationType": "number",
+                    "targetField": "write.throughput kata/runc"
+                  },
+                  {
+                    "destinationType": "number",
+                    "targetField": "total.throughput kata/runc"
+                  }
+                ],
+                "fields": {}
+              }
+            }
+          ],
           "type": "state-timeline"
         },
         {
@@ -2937,6 +2934,7 @@
             "type": "elasticsearch",
             "uid": "vMOhDvR4k"
           },
+          "description": "Lower is better",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -2952,26 +2950,27 @@
                 "mode": "percentage",
                 "steps": [
                   {
-                    "color": "red"
-                  },
-                  {
-                    "color": "#EAB839",
-                    "value": 50
-                  },
-                  {
-                    "color": "super-light-green",
-                    "value": 80
+                    "color": "dark-blue"
                   },
                   {
                     "color": "dark-green",
-                    "value": 90
+                    "value": 1
                   },
                   {
-                    "color": "dark-blue",
-                    "value": 100
+                    "color": "light-green",
+                    "value": 10
+                  },
+                  {
+                    "color": "orange",
+                    "value": 20
+                  },
+                  {
+                    "color": "red",
+                    "value": 50
                   }
                 ]
-              }
+              },
+              "unit": "short"
             },
             "overrides": []
           },
@@ -2979,7 +2978,7 @@
             "h": 36,
             "w": 24,
             "x": 0,
-            "y": 160
+            "y": 123
           },
           "id": 169,
           "interval": "1d",
@@ -3004,8 +3003,30 @@
           },
           "targets": [
             {
-              "alias": "runc rate",
+              "alias": "rate: {{term test_description.msgsize}}: {{term test_description.runtime.keyword}}",
               "bucketAggs": [
+                {
+                  "field": "test_description.msgsize",
+                  "id": "8",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "asc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "test_description.runtime.keyword",
+                  "id": "9",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
                 {
                   "field": "timestamp",
                   "id": "7",
@@ -3024,54 +3045,344 @@
               },
               "metrics": [
                 {
-                  "field": "rate",
+                  "field": "max_time_op",
                   "id": "6",
-                  "settings": {
-                    "script": "_value/1000000"
-                  },
+                  "settings": {},
                   "type": "max"
                 }
               ],
-              "query": "test_description.runtime='runc'",
+              "query": "",
               "refId": "A",
-              "timeField": "timestamp"
-            },
-            {
-              "alias": "kata rate",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "7",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": "0",
-                    "timeZone": "utc",
-                    "trimEdges": "0"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "vMOhDvR4k"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "rate",
-                  "id": "6",
-                  "settings": {
-                    "script": "_value/1000000"
-                  },
-                  "type": "max"
-                }
-              ],
-              "query": "test_description.runtime='kata'",
-              "refId": "B",
               "timeField": "timestamp"
             }
           ],
-          "title": "clusterbuster-uperf",
+          "title": "Uperf (Latency)",
+          "transformations": [
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "rate:64 kata/runc",
+                "binary": {
+                  "left": "rate: 64: kata",
+                  "operator": "/",
+                  "reducer": "sum",
+                  "right": "rate: 64: runc"
+                },
+                "mode": "binary",
+                "reduce": {
+                  "include": [
+                    "rate: 64: runc",
+                    "rate: 64: kata"
+                  ],
+                  "reducer": "sum"
+                },
+                "replaceFields": false
+              }
+            },
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "rate:1024 kata/runc",
+                "binary": {
+                  "left": "rate: 1024: kata",
+                  "operator": "/",
+                  "reducer": "sum",
+                  "right": "rate: 1024: runc"
+                },
+                "mode": "binary",
+                "reduce": {
+                  "include": [
+                    "rate: 1024: runc",
+                    "rate: 1024: kata"
+                  ],
+                  "reducer": "sum"
+                }
+              }
+            },
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "rate:8192 kata/runc",
+                "binary": {
+                  "left": "rate: 8192: kata",
+                  "operator": "/",
+                  "reducer": "sum",
+                  "right": "rate: 8192: runc"
+                },
+                "mode": "binary",
+                "reduce": {
+                  "reducer": "sum"
+                }
+              }
+            },
+            {
+              "id": "convertFieldType",
+              "options": {
+                "conversions": [
+                  {
+                    "destinationType": "number",
+                    "targetField": "rate:64 kata/runc"
+                  },
+                  {
+                    "destinationType": "number",
+                    "targetField": "rate:1024 kata/runc"
+                  },
+                  {
+                    "destinationType": "number",
+                    "targetField": "rate:8192 kata/runc"
+                  }
+                ],
+                "fields": {}
+              }
+            },
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {},
+                "indexByName": {
+                  "Time": 0,
+                  "rate: 1024: kata": 5,
+                  "rate: 1024: runc": 4,
+                  "rate: 64: kata": 2,
+                  "rate: 64: runc": 1,
+                  "rate: 8192: kata": 8,
+                  "rate: 8192: runc": 7,
+                  "rate:1024 kata/runc": 6,
+                  "rate:64 kata/runc": 3,
+                  "rate:8192 kata/runc": 9
+                },
+                "renameByName": {}
+              }
+            }
+          ],
+          "type": "state-timeline"
+        },
+        {
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "vMOhDvR4k"
+          },
+          "description": "Higher is better",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "fillOpacity": 70,
+                "lineWidth": 0
+              },
+              "mappings": [],
+              "min": 0,
+              "thresholds": {
+                "mode": "percentage",
+                "steps": [
+                  {
+                    "color": "red"
+                  },
+                  {
+                    "color": "#EAB839",
+                    "value": 50
+                  },
+                  {
+                    "color": "super-light-green",
+                    "value": 80
+                  },
+                  {
+                    "color": "dark-green",
+                    "value": 90
+                  },
+                  {
+                    "color": "dark-blue",
+                    "value": 100
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 36,
+            "w": 24,
+            "x": 0,
+            "y": 159
+          },
+          "id": 174,
+          "interval": "1d",
+          "links": [
+            {
+              "title": "artifacts link",
+              "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=now-45d&to=now&viewPanel=150"
+            }
+          ],
+          "options": {
+            "alignValue": "left",
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "mergeValues": false,
+            "rowHeight": 0.9,
+            "showValue": "auto",
+            "tooltip": {
+              "mode": "single"
+            }
+          },
+          "targets": [
+            {
+              "alias": "rate: {{term test_description.msgsize}}: {{term test_description.runtime.keyword}}",
+              "bucketAggs": [
+                {
+                  "field": "test_description.msgsize",
+                  "id": "8",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "asc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "test_description.runtime.keyword",
+                  "id": "9",
+                  "settings": {
+                    "min_doc_count": "1",
+                    "order": "desc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "timestamp",
+                  "id": "7",
+                  "settings": {
+                    "interval": "auto",
+                    "min_doc_count": "0",
+                    "timeZone": "utc",
+                    "trimEdges": "0"
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "datasource": {
+                "type": "elasticsearch",
+                "uid": "vMOhDvR4k"
+              },
+              "metrics": [
+                {
+                  "field": "rate",
+                  "id": "6",
+                  "settings": {
+                    "script": "_value/1000000"
+                  },
+                  "type": "max"
+                }
+              ],
+              "query": "",
+              "refId": "A",
+              "timeField": "timestamp"
+            }
+          ],
+          "title": "Uperf (Throughput)",
+          "transformations": [
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "rate: 64 kata/runc",
+                "binary": {
+                  "left": "rate: 64: kata",
+                  "operator": "/",
+                  "reducer": "sum",
+                  "right": "rate: 64: runc"
+                },
+                "mode": "binary",
+                "reduce": {
+                  "include": [
+                    "rate: 64: runc",
+                    "rate: 64: kata"
+                  ],
+                  "reducer": "sum"
+                }
+              }
+            },
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "rate: 1024: kata/runc",
+                "binary": {
+                  "left": "rate: 1024: kata",
+                  "operator": "/",
+                  "reducer": "sum",
+                  "right": "rate: 1024: runc"
+                },
+                "mode": "binary",
+                "reduce": {
+                  "reducer": "sum"
+                }
+              }
+            },
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "rate:8192: kata/runc",
+                "binary": {
+                  "left": "rate: 8192: kata",
+                  "operator": "/",
+                  "reducer": "sum",
+                  "right": "rate: 8192: runc"
+                },
+                "mode": "binary",
+                "reduce": {
+                  "include": [
+                    "rate: 8192: runc",
+                    "rate: 8192: kata"
+                  ],
+                  "reducer": "sum"
+                }
+              }
+            },
+            {
+              "id": "convertFieldType",
+              "options": {
+                "conversions": [
+                  {
+                    "destinationType": "number",
+                    "targetField": "rate: 64 kata/runc"
+                  },
+                  {
+                    "destinationType": "number",
+                    "targetField": "rate: 1024: kata/runc"
+                  },
+                  {
+                    "destinationType": "number",
+                    "targetField": "rate:8192: kata/runc"
+                  }
+                ],
+                "fields": {}
+              }
+            },
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {},
+                "indexByName": {
+                  "Time": 0,
+                  "rate: 1024: kata": 5,
+                  "rate: 1024: kata/runc": 6,
+                  "rate: 1024: runc": 4,
+                  "rate: 64 kata/runc": 3,
+                  "rate: 64: kata": 2,
+                  "rate: 64: runc": 1,
+                  "rate: 8192: kata": 8,
+                  "rate: 8192: runc": 7,
+                  "rate:8192: kata/runc": 9
+                },
+                "renameByName": {}
+              }
+            }
+          ],
           "type": "state-timeline"
         }
       ],
@@ -3084,7 +3395,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 16
+        "y": 15
       },
       "id": 157,
       "panels": [
@@ -3136,7 +3447,7 @@
             "h": 36,
             "w": 24,
             "x": 0,
-            "y": 17
+            "y": 16
           },
           "id": 164,
           "interval": "1d",
@@ -3538,7 +3849,7 @@
             "h": 36,
             "w": 24,
             "x": 0,
-            "y": 53
+            "y": 52
           },
           "id": 153,
           "interval": "1d",
@@ -3995,7 +4306,7 @@
             "h": 36,
             "w": 24,
             "x": 0,
-            "y": 89
+            "y": 88
           },
           "id": 168,
           "interval": "1d",
@@ -4131,7 +4442,7 @@
             "h": 36,
             "w": 24,
             "x": 0,
-            "y": 125
+            "y": 124
           },
           "id": 170,
           "interval": "1d",
@@ -4236,7 +4547,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 17
+        "y": 16
       },
       "id": 125,
       "panels": [
@@ -4387,7 +4698,7 @@
             "h": 28,
             "w": 24,
             "x": 0,
-            "y": 18
+            "y": 17
           },
           "id": 128,
           "interval": "1d",
@@ -4644,7 +4955,7 @@
             "h": 15,
             "w": 24,
             "x": 0,
-            "y": 46
+            "y": 45
           },
           "id": 129,
           "interval": "1d",
@@ -4858,7 +5169,7 @@
             "h": 5,
             "w": 24,
             "x": 0,
-            "y": 61
+            "y": 60
           },
           "id": 126,
           "interval": "1d",
@@ -5084,7 +5395,7 @@
             "h": 5,
             "w": 24,
             "x": 0,
-            "y": 66
+            "y": 65
           },
           "id": 133,
           "interval": "1d",
@@ -5252,7 +5563,7 @@
             "h": 6,
             "w": 24,
             "x": 0,
-            "y": 71
+            "y": 70
           },
           "id": 150,
           "options": {
@@ -5425,7 +5736,7 @@
             "h": 6,
             "w": 24,
             "x": 0,
-            "y": 77
+            "y": 76
           },
           "id": 166,
           "options": {
@@ -5542,7 +5853,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 18
+        "y": 17
       },
       "id": 146,
       "panels": [
@@ -5611,8 +5922,8 @@
       {
         "current": {
           "selected": false,
-          "text": "4.11.9",
-          "value": "4.11.9"
+          "text": "4.11.13",
+          "value": "4.11.13"
         },
         "definition": "{\"find\":\"terms\",\"field\":\"ocp_version.keyword\"}",
         "hide": 2,
@@ -5722,6 +6033,6 @@
   "timezone": "",
   "title": "regression-summary",
   "uid": "T4775LKnzzmichey",
-  "version": 188,
+  "version": 225,
   "weekStart": ""
 }
