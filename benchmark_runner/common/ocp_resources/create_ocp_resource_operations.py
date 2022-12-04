@@ -45,8 +45,9 @@ class CreateOCPResourceOperations:
             :param resource: name of resource to create
             :return:
             """
+            timeout = int(environment_variables.environment_variables_dict['timeout'])
             current_wait_time = 0
-            while current_wait_time < int(environment_variables.environment_variables_dict['timeout']):
+            while timeout <= 0 or current_wait_time < timeout:
                 self.__oc._create_async(yaml_file)
                 # We cannot wait for a condition here, because the
                 # create_async may simply not work even if it returns success.
@@ -70,7 +71,7 @@ class CreateOCPResourceOperations:
         :return: True if met the result
         """
         current_wait_time = 0
-        while current_wait_time <= timeout:
+        while timeout <= 0 or current_wait_time <= timeout:
             # Count openshift-storage/ pv
             if count_openshift_storage:
                 if int(self.__oc.run(verify_cmd)) == self.__oc.get_num_active_nodes() * int(environment_variables.environment_variables_dict['num_odf_disk']):

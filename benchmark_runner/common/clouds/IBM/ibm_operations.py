@@ -29,7 +29,8 @@ class IBMOperations:
     """
     This class is responsible for all IBM cloud operations, all commands run on remote provision IBM host
     """
-    LATEST_VERSION = 'latest'
+    LATEST = 'latest'
+    SHORT_TIMEOUT = 600
 
     @typechecked
     def __init__(self, user: str):
@@ -107,7 +108,7 @@ class IBMOperations:
         """
         self.__remote_ssh.run_command(command=f'ibmcloud sl hardware {action} {machine_id} -f')
 
-    def __wait_for_active_machine(self, machine_id: str, sleep_time=10, timeout=600):
+    def __wait_for_active_machine(self, machine_id: str, sleep_time=10, timeout=SHORT_TIMEOUT):
         """
         This method wait till machine will be active
         :param machine_id:
@@ -122,14 +123,14 @@ class IBMOperations:
             current_wait_time += sleep_time
         raise IBMMachineNotLoad()
 
-    def __wait_for_install_complete(self, sleep_time: int = 600):
+    def __wait_for_install_complete(self, sleep_time: int = SHORT_TIMEOUT):
         """
         This method wait till ocp install complete
         :param sleep_time:
         :return:
         """
         current_wait_time = 0
-        while current_wait_time <= self.__provision_timeout:
+        while self.__provision_timeout <= 0 or current_wait_time <= self.__provision_timeout:
             install_log = self.__remote_ssh.run_command(self.__provision_installer_log)
             if 'failed=0' in install_log:
                 return True
@@ -182,18 +183,17 @@ class IBMOperations:
         """
         self.__remote_ssh.disconnect()
 
-    def __get_latest_version(self):
+    def __get_installation_version(self):
         """
-        This method return latest version
+        This method return installation version
         :return:
         """
         ocp_versions = OCPVersions()
-        if self.LATEST_VERSION in self.__install_ocp_version:
+        if self.LATEST in self.__install_ocp_version:
             openshift_version_data = self.__install_ocp_version.split('-')
             return ocp_versions.get_latest_version(latest_version=openshift_version_data[1])
         else:
-            openshift_version_data = self.__install_ocp_version.split('.')
-            return ocp_versions.get_latest_version(latest_version=f'{openshift_version_data[0]}.{openshift_version_data[1]}')
+            return self.__install_ocp_version
 
     def get_ocp_server_version(self):
         """
@@ -207,7 +207,9 @@ class IBMOperations:
         This method validate if version is already install
         :return: True if it already installed, False if it NOT already installed
         """
-        if self.LATEST_VERSION in self.__install_ocp_version and self.get_ocp_server_version() == self.__get_latest_version():
+        if self.get_ocp_server_version() == 'null':
+            return False
+        elif self.LATEST in self.__install_ocp_version and self.get_ocp_server_version() == self.__get_installation_version():
             return self.get_ocp_server_version().strip()
         elif self.__install_ocp_version == self.get_ocp_server_version():
             return self.__install_ocp_version
@@ -229,8 +231,8 @@ class IBMOperations:
         :return:
         """
         # Get the latest assisted installer version
-        if self.LATEST_VERSION in self.__install_ocp_version:
-            self.__install_ocp_version = self.__get_latest_version()
+        if self.LATEST in self.__install_ocp_version:
+            self.__install_ocp_version = self.__get_installation_version()
         openshift_version_data = self.__install_ocp_version.split('.')
         self.__remote_ssh.replace_parameter(remote_path='/root/jetlag/ansible/vars',
                                             file_name='ibmcloud.yml',
@@ -259,7 +261,7 @@ class IBMOperations:
         self.__ssh.run(f"chmod 600 /{self.__user}/.ssh/config")
         # Must add -t otherwise remote ssh of ansible will not end
         self.__ssh.run(cmd=f"ssh -t provision \"{self.__ibm_login_cmd()};{self.__ibm_install_ocp_cmd()}\" ")
-        logger.info(f'End OCP assisted installer, End time: {datetime.now().strftime(datetime_format)}')
+        logger.info(f'OpenShift cluster {self.__get_installation_version()} version is installed successfully, End time: {datetime.now().strftime(datetime_format)}')
 
     @logger_time_stamp
     def verify_install_complete(self):
@@ -336,4 +338,3 @@ class IBMOperations:
         """
         install_log = self.__remote_ssh.run_command(self.__provision_installer_log)
         return install_log.split()[-1].strip('"')
-

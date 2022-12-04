@@ -1,0 +1,70 @@
+{%- if not scale %}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ namespace }}
+---
+{%- endif %}
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  {% if scale -%}
+  name: bootstorm-{{ kind }}-{{ trunc_uuid }}-{{ scale }}
+  {%- else -%}
+  name: bootstorm-{{ kind }}-{{ trunc_uuid }}
+  {%- endif %}
+  namespace: {{ namespace }}
+  labels:
+    {% if scale -%}
+    app: bootstorm-{{ trunc_uuid }}-{{ scale }}
+    type: bootstorm-{{ kind }}-{{ trunc_uuid }}-{{ scale }}
+    {%- else -%}
+    app: bootstorm-{{ trunc_uuid }}
+    type: bootstorm-{{ kind }}-{{ trunc_uuid }}
+    {%- endif %}
+    benchmark-uuid: {{uuid }}
+    benchmark-runner-workload: bootstorm
+spec:
+  running: false
+  template:
+    metadata:
+     labels:
+        kubevirt.io/vm: bootstorm
+    spec:
+      {%- if pin_node1 or scale_node %}
+      nodeSelector:
+        {% if scale -%}
+        kubernetes.io/hostname: {{ scale_node }}
+        {%- else -%}
+        kubernetes.io/hostname: {{ pin_node1 }}
+        {%- endif %}
+      {%- endif %}
+      domain:
+        cpu:
+          sockets: {{ sockets }}
+          cores: 1
+          threads: 1
+        devices:
+          disks:
+          - disk:
+              bus: virtio
+            name: containerdisk
+          - disk:
+              bus: virtio
+            name: cloudinitdisk
+        resources:
+          requests:
+            memory: {{ requests_memory }}
+          limits:
+            memory: {{ limits_memory }}
+      terminationGracePeriodSeconds: 0
+      volumes:
+      - containerDisk:
+          image: {{ fedora_container_disk }}
+        name: containerdisk
+      - cloudInitNoCloud:
+          userData: |-
+            #cloud-config
+            password: fedora
+            chpasswd: { expire: False }
+        name: cloudinitdisk

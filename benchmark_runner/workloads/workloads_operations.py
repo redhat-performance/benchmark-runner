@@ -1,14 +1,16 @@
 
 import ast
 import os
+import time
 import datetime
 import tarfile
 import shutil
 from csv import DictReader
 
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp
-from benchmark_runner.workloads.workloads_exceptions import ODFNonInstalled
+from benchmark_runner.workloads.workloads_exceptions import ODFNonInstalled, MissingScaleNodes, MissingRedis
 from benchmark_runner.common.oc.oc import OC
+from benchmark_runner.common.virtctl.virtctl import Virtctl
 from benchmark_runner.common.elasticsearch.elasticsearch_operations import ElasticSearchOperations
 from benchmark_runner.main.environment_variables import environment_variables
 from benchmark_runner.common.clouds.shared.s3.s3_operations import S3Operations
@@ -20,6 +22,7 @@ from benchmark_runner.common.clouds.IBM.ibm_operations import IBMOperations
 
 class WorkloadsOperations:
     oc = None
+    MILLISECONDS = 1000
     """
     This class run workloads
     """
@@ -50,9 +53,15 @@ class WorkloadsOperations:
         self._es_password = self._environment_variables_dict.get('elasticsearch_password', '')
         self._es_url_protocol = self._environment_variables_dict['elasticsearch_url_protocol']
         self._scale = self._environment_variables_dict.get('scale', '')
+        self._redis = self._environment_variables_dict.get('redis', '')
         if self._scale:
             self._scale = int(self._scale)
             self._scale_nodes = self._environment_variables_dict.get('scale_nodes', '')
+            self._redis = self._environment_variables_dict.get('redis', '')
+            if not self._scale_nodes:
+                raise MissingScaleNodes()
+            if not self._redis and 'vdbench' in self._workload:
+                raise MissingRedis()
             self._scale_node_list = ast.literal_eval(self._scale_nodes)
         else:
             self._scale_node_list = []
@@ -72,20 +81,23 @@ class WorkloadsOperations:
         if WorkloadsOperations.oc is None:
             WorkloadsOperations.oc = self.set_login(kubeadmin_password=self._kubeadmin_password)
         self._oc = WorkloadsOperations.oc
+        self._virtctl = Virtctl()
 
         # PrometheusSnapshot
         if self._enable_prometheus_snapshot:
             self._snapshot = PrometheusSnapshot(oc=self._oc, artifacts_path=self._run_artifacts_path, verbose=True)
 
+        self.bootstorm_start_time = {}
+
     def __get_workload_file_name(self, workload):
-            """
-            This method returns workload name
-            :return:
-            """
-            if self._scale:
-                return f'{workload}-scale-{self._time_stamp_format}'
-            else:
-                return f'{workload}-{self._time_stamp_format}'
+        """
+        This method returns workload name
+        :return:
+        """
+        if self._scale:
+            return f'{workload}-scale-{self._time_stamp_format}'
+        else:
+            return f'{workload}-{self._time_stamp_format}'
 
     def set_login(self, kubeadmin_password: str = ''):
         """
@@ -153,7 +165,7 @@ class WorkloadsOperations:
         vm_name = ''
         for label in labels:
             vm_name = self._oc.get_vm(label=label)
-            self._oc.save_vm_log(vm_name=vm_name)
+            self._virtctl.save_vm_log(vm_name=vm_name)
         return vm_name
 
     def _create_pod_log(self, pod: str = ''):
@@ -337,6 +349,8 @@ class WorkloadsOperations:
         if self._scale:
             metadata.update({'scale': int(self._scale)*len(self._scale_node_list)})
             count = 0
+        if 'bootstorm' in self._workload:
+            metadata.update({'vm_os_version': 'fedora36'})
             for scale_node in range(len(self._scale_node_list)):
                 for scale_num in range(self._scale):
                     count += 1
@@ -393,6 +407,34 @@ class WorkloadsOperations:
         self._es_operations.upload_to_elasticsearch(index=es_index, data=metadata)
 
     @logger_time_stamp
+    def set_bootstorm_vm_start_time(self, vm_name: str = ''):
+        """
+        This method captures boot start time for specified VM
+        @return:
+        """
+        self.bootstorm_start_time[vm_name] = time.time()
+
+    @logger_time_stamp
+    def get_bootstorm_vm_elapse_time(self, vm_name: str):
+        """
+        This method returns boot elapse time for specified VM in milliseconds
+        @return: Dictionary with vm_name, node and its boot elapse time
+        """
+        vm_bootstorm_time = {}
+
+        self._virtctl.expose_vm(vm_name=vm_name)
+        # wait till vm login
+        vm_node = self._oc.get_vm_node(vm_name=vm_name)
+        node_ip = self._oc.get_nodes_addresses()[vm_node]
+        vm_node_port = self._oc.get_exposed_vm_port(vm_name=vm_name)
+        if self._oc.wait_for_vm_login(vm_name=vm_name, node_ip=node_ip, vm_node_port=vm_node_port):
+            vm_bootstorm_time['vm_name'] = vm_name
+            vm_bootstorm_time['node'] = vm_node
+            delta = time.time() - self.bootstorm_start_time[vm_name]
+            vm_bootstorm_time['bootstorm_time'] = round(delta, 3) * self.MILLISECONDS
+        return vm_bootstorm_time
+
+    @logger_time_stamp
     def clear_nodes_cache(self):
         """
         This method clear nodes cache
@@ -408,7 +450,7 @@ class WorkloadsOperations:
         self.clear_nodes_cache()
         if self._odf_pvc:
             self.odf_pvc_verification()
-        self._template.generate_yamls(scale=str(self._scale), scale_nodes=self._scale_node_list)
+        self._template.generate_yamls(scale=str(self._scale), scale_nodes=self._scale_node_list, redis=self._redis)
         if self._enable_prometheus_snapshot:
             self.start_prometheus()
 

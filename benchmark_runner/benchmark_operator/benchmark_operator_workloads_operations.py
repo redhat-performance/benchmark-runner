@@ -8,10 +8,11 @@ from typeguard import typechecked
 
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 from benchmark_runner.common.oc.oc import OC
+from benchmark_runner.common.virtctl.virtctl import Virtctl
 from benchmark_runner.common.template_operations.template_operations import TemplateOperations
 from benchmark_runner.common.elasticsearch.elasticsearch_operations import ElasticSearchOperations
 from benchmark_runner.common.ssh.ssh import SSH
-from benchmark_runner.benchmark_operator.benchmark_operator_exceptions import ODFNonInstalled
+from benchmark_runner.benchmark_operator.benchmark_operator_exceptions import ODFNonInstalled, EmptyLSOPath
 from benchmark_runner.main.environment_variables import environment_variables
 from benchmark_runner.common.clouds.shared.s3.s3_operations import S3Operations
 from benchmark_runner.common.prometheus.prometheus_snapshot import PrometheusSnapshot
@@ -37,6 +38,7 @@ class BenchmarkOperatorWorkloadsOperations:
         self._elasticsearch = self._environment_variables_dict.get('elasticsearch', '')
         self._run_artifacts = self._environment_variables_dict.get('run_artifacts', '')
         self._run_artifacts_path = self._environment_variables_dict.get('run_artifacts_path', '')
+        self._lso_path = self._environment_variables_dict.get('lso_path', '')
         self._date_key = self._environment_variables_dict.get('date_key', '')
         self._key = self._environment_variables_dict.get('key', '')
         self._endpoint_url = self._environment_variables_dict.get('endpoint_url', '')
@@ -67,6 +69,7 @@ class BenchmarkOperatorWorkloadsOperations:
         self._template = TemplateOperations(workload=self._workload)
         # set oc login
         self._oc = self.set_login(kubeadmin_password=self._kubeadmin_password)
+        self._virtctl = Virtctl()
         # PrometheusSnapshot
         if self._enable_prometheus_snapshot:
             self._snapshot = PrometheusSnapshot(oc=self._oc, artifacts_path=self._run_artifacts_path, verbose=True)
@@ -200,7 +203,6 @@ class BenchmarkOperatorWorkloadsOperations:
             else:
                 self._verify_elasticsearch_data_uploaded(index=es_index, uuid=self._oc.get_long_uuid(workload=workload), workload='system-metrics', fast_check=True)
 
-
     def __get_metadata(self, kind: str = None, database: str = None, status: str = None, run_artifacts_url: str = None, uuid: str = None) -> dict:
         """
         This method return metadata kind and database argument are optional
@@ -313,7 +315,7 @@ class BenchmarkOperatorWorkloadsOperations:
         vm_name = ''
         for label in labels:
             vm_name = self._oc.get_vm(label=label)
-            self._oc.save_vm_log(vm_name=vm_name)
+            self._virtctl.save_vm_log(vm_name=vm_name)
         return vm_name
 
     def _create_pod_log(self, label: str = '', database: str = '') -> str:
@@ -456,6 +458,15 @@ class BenchmarkOperatorWorkloadsOperations:
                 raise ODFNonInstalled()
 
     @logger_time_stamp
+    def verify_lso(self):
+        """
+        This method Verifies that lso path exist
+        :return:
+        """
+        if not self._lso_path:
+            raise EmptyLSOPath()
+
+    @logger_time_stamp
     def delete_all(self):
         """
         This method delete all pod or unbound pv in namespace
@@ -484,6 +495,8 @@ class BenchmarkOperatorWorkloadsOperations:
         self.clear_nodes_cache()
         if self._odf_pvc:
             self.odf_pvc_verification()
+        if 'lso' in self._workload:
+            self.verify_lso()
         # make deploy benchmark controller manager
         self.make_deploy_benchmark_controller_manager(runner_path=environment_variables.environment_variables_dict['runner_path'])
         self._template.generate_yamls()

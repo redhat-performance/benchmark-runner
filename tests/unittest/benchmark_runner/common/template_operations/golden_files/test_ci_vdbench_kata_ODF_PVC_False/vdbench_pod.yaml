@@ -91,4 +91,3 @@ spec:
       storageClassName: ocs-storagecluster-ceph-rbd
     source:
       blank: {}
-

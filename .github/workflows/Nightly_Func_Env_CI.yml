@@ -5,8 +5,8 @@ name: Deploy Func Env Nightly CI
 on:
   # Run on Nightly
   schedule:
-    - cron: '0 4 * * 1-6' # run Monday-Sunday at 4 AM UTC/ 0 AM EDT
-  # Run on weekly after assisted installer and operator completed
+    - cron: '0 4 * * 1-6' # run Monday-Saturday at 4 AM UTC/ 0 AM EDT
+  # Run on Sunday after assisted installer and operator completed
   workflow_run:
     workflows: ["Deploy Operator FUNC Env Weekly CI"]
     types:
@@ -91,7 +91,31 @@ jobs:
        # continue to next job if failed
        fail-fast: false
        matrix: 
-          workload: [ 'uperf_pod', 'uperf_kata', 'uperf_vm', 'hammerdb_pod_mariadb', 'hammerdb_kata_mariadb',  'hammerdb_vm_mariadb', 'hammerdb_pod_postgres', 'hammerdb_kata_postgres', 'hammerdb_vm_postgres', 'hammerdb_pod_postgres_lso', 'hammerdb_kata_postgres_lso', 'hammerdb_vm_postgres_lso', 'hammerdb_pod_mssql', 'hammerdb_kata_mssql', 'hammerdb_vm_mssql', 'vdbench_pod', 'vdbench_kata', 'vdbench_vm', 'vdbench_pod_scale', 'vdbench_kata_scale', 'vdbench_vm_scale', 'clusterbuster']
+          workload:
+              - 'uperf_pod'
+              - 'uperf_kata'
+              - 'uperf_vm'
+              - 'hammerdb_pod_mariadb'
+              - 'hammerdb_kata_mariadb'
+              - 'hammerdb_vm_mariadb'
+              - 'hammerdb_pod_postgres'
+              - 'hammerdb_kata_postgres'
+              - 'hammerdb_vm_postgres'
+              - 'hammerdb_pod_postgres_lso'
+              - 'hammerdb_kata_postgres_lso'
+              - 'hammerdb_vm_postgres_lso'
+              - 'hammerdb_pod_mssql'
+              - 'hammerdb_kata_mssql'
+              - 'hammerdb_vm_mssql'
+              - 'vdbench_pod'
+              - 'vdbench_kata'
+              - 'vdbench_vm'
+              - 'vdbench_pod_scale'
+              - 'vdbench_kata_scale'
+              - 'vdbench_vm_scale'
+              - 'clusterbuster'
+              - 'bootstorm_vm'
+              - 'bootstorm_vm_scale'
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python 3.10
@@ -155,25 +179,31 @@ jobs:
         SCALE_NODES: ${{ secrets.FUNC_SCALE_NODES }}
         REDIS: ${{ secrets.REDIS }}
         LSO_PATH: ${{ secrets.FUNC_LSO_PATH }}
-        TIMEOUT: 3600
         SCALE: 1
+        TIMEOUT: 3600
         RUN_TYPE: 'func_ci'
       run: |
         build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
         build_version="$(cut -d'=' -f2 <<<"$build")"
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start E2E workload: ${{ matrix.workload }} >>>>>>>>>>>>>>>>>>>>>>>>>>'
         scp -r "$RUNNER_PATH/.kube/config" provision:"$CONTAINER_KUBECONFIG_PATH"
-        # Run vdbench scale 
-        if [[ '${{ matrix.workload }}' == 'vdbench_pod_scale' || '${{ matrix.workload }}' == 'vdbench_kata_scale' || '${{ matrix.workload }}' == 'vdbench_vm_scale' ]]
+        # Run vdbench/bootstorm scale 
+        if [[ '${{ matrix.workload }}' == 'vdbench_pod_scale' || '${{ matrix.workload }}' == 'vdbench_kata_scale' || '${{ matrix.workload }}' == 'vdbench_vm_scale' || '${{ matrix.workload }}' == 'bootstorm_vm_scale'  ]]
         then
+            # bootstorm_vm_scale: no need redis for synchronization
+            if [[ '${{ matrix.workload }}' == 'bootstorm_vm_scale' ]]
+            then
+              REDIS=''
+            fi
             workload=$(awk -F_ '{print $1"_"$2}' <<< '${{ matrix.workload }}')
             # SCALE_NODES is a list, not add ''
             ssh -t provision "podman run --rm -t -e WORKLOAD='$workload' -e KUBEADMIN_PASSWORD='$KUBEADMIN_PASSWORD' -e SCALE='$SCALE' -e SCALE_NODES=$SCALE_NODES -e REDIS='$REDIS' -e PIN_NODE_BENCHMARK_OPERATOR='$PIN_NODE_BENCHMARK_OPERATOR' -e PIN_NODE1='$PIN_NODE1' -e PIN_NODE2='$PIN_NODE2' -e ELASTICSEARCH='$ELASTICSEARCH' -e ELASTICSEARCH_PORT='$ELASTICSEARCH_PORT' -e ELASTICSEARCH_USER='$ELASTICSEARCH_USER' -e ELASTICSEARCH_PASSWORD='$ELASTICSEARCH_PASSWORD' -e IBM_REGION_NAME='$IBM_REGION_NAME' -e IBM_ENDPOINT_URL='$IBM_ENDPOINT_URL' -e IBM_ACCESS_KEY_ID='$IBM_ACCESS_KEY_ID' -e IBM_SECRET_ACCESS_KEY='$IBM_SECRET_ACCESS_KEY' -e IBM_BUCKET='$IBM_BUCKET' -e IBM_KEY='$IBM_KEY' -e RUN_ARTIFACTS_URL='$RUN_ARTIFACTS_URL' -e BUILD_VERSION='$build_version' -e RUN_TYPE='$RUN_TYPE' -e KATA_CPUOFFLINE_WORKAROUND='True' -e SAVE_ARTIFACTS_LOCAL='False' -e ENABLE_PROMETHEUS_SNAPSHOT='False' -e TIMEOUT='$TIMEOUT' -e log_level='INFO' -v '$CONTAINER_KUBECONFIG_PATH':'$CONTAINER_KUBECONFIG_PATH' --privileged 'quay.io/ebattat/benchmark-runner:latest'"
-        # clusterbuster: disable prometheus logs
-        elif [[ '${{ matrix.workload }}' == 'clusterbuster' ]]
-        then
-            ssh -t provision "podman run --rm -t -e WORKLOAD='${{ matrix.workload }}' -e KUBEADMIN_PASSWORD='$KUBEADMIN_PASSWORD' -e PIN_NODE_BENCHMARK_OPERATOR='$PIN_NODE_BENCHMARK_OPERATOR' -e PIN_NODE1='$PIN_NODE1' -e PIN_NODE2='$PIN_NODE2' -e ELASTICSEARCH='$ELASTICSEARCH' -e ELASTICSEARCH_PORT='$ELASTICSEARCH_PORT' -e ELASTICSEARCH_USER='$ELASTICSEARCH_USER' -e ELASTICSEARCH_PASSWORD='$ELASTICSEARCH_PASSWORD' -e IBM_REGION_NAME='$IBM_REGION_NAME' -e IBM_ENDPOINT_URL='$IBM_ENDPOINT_URL' -e IBM_ACCESS_KEY_ID='$IBM_ACCESS_KEY_ID' -e IBM_SECRET_ACCESS_KEY='$IBM_SECRET_ACCESS_KEY' -e IBM_BUCKET='$IBM_BUCKET' -e IBM_KEY='$IBM_KEY' -e RUN_ARTIFACTS_URL='$RUN_ARTIFACTS_URL' -e BUILD_VERSION='$build_version' -e RUN_TYPE='$RUN_TYPE' -e KATA_CPUOFFLINE_WORKAROUND='True' -e SAVE_ARTIFACTS_LOCAL='False' -e ENABLE_PROMETHEUS_SNAPSHOT='False' -e TIMEOUT='$TIMEOUT' -e log_level='INFO' -v '$CONTAINER_KUBECONFIG_PATH':'$CONTAINER_KUBECONFIG_PATH' --privileged 'quay.io/ebattat/benchmark-runner:latest'"
         else
+            if [[ '${{ matrix.workload }}' == 'clusterbuster' ]]
+            then
+              # clusterbuster: disable prometheus logs
+              ENABLE_PROMETHEUS_SNAPSHOT='False'
+            fi
             ssh -t provision "podman run --rm -t -e WORKLOAD='${{ matrix.workload }}' -e KUBEADMIN_PASSWORD='$KUBEADMIN_PASSWORD' -e PIN_NODE_BENCHMARK_OPERATOR='$PIN_NODE_BENCHMARK_OPERATOR' -e PIN_NODE1='$PIN_NODE1' -e PIN_NODE2='$PIN_NODE2' -e ELASTICSEARCH='$ELASTICSEARCH' -e ELASTICSEARCH_PORT='$ELASTICSEARCH_PORT' -e ELASTICSEARCH_USER='$ELASTICSEARCH_USER' -e ELASTICSEARCH_PASSWORD='$ELASTICSEARCH_PASSWORD' -e IBM_REGION_NAME='$IBM_REGION_NAME' -e IBM_ENDPOINT_URL='$IBM_ENDPOINT_URL' -e IBM_ACCESS_KEY_ID='$IBM_ACCESS_KEY_ID' -e IBM_SECRET_ACCESS_KEY='$IBM_SECRET_ACCESS_KEY' -e IBM_BUCKET='$IBM_BUCKET' -e IBM_KEY='$IBM_KEY' -e RUN_ARTIFACTS_URL='$RUN_ARTIFACTS_URL' -e BUILD_VERSION='$build_version' -e RUN_TYPE='$RUN_TYPE' -e KATA_CPUOFFLINE_WORKAROUND='True' -e SAVE_ARTIFACTS_LOCAL='False' -e ENABLE_PROMETHEUS_SNAPSHOT='False' -e LSO_PATH='$LSO_PATH' -e TIMEOUT='$TIMEOUT' -e log_level='INFO' -v '$CONTAINER_KUBECONFIG_PATH':'$CONTAINER_KUBECONFIG_PATH' --privileged 'quay.io/ebattat/benchmark-runner:latest'"
         fi
         ssh -t provision "podman rmi -f 'quay.io/ebattat/benchmark-runner:latest'"
