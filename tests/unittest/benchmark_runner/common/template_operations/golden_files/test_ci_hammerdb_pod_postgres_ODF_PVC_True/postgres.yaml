@@ -28,6 +28,8 @@ data:
     local   all             all                                     trust
     # IPv4 local connections:
     host    all             all             all            trust
+  custom.perf.conf: |
+    autovacuum = 'off'
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -74,6 +76,9 @@ spec:
             - name: postgres-custom-config
               mountPath: /var/lib/pgsql/data/pg_hba.conf
               subPath: custom.pg_hba.conf #should be the name used in the ConfigMap
+            - name: postgres-custom-config
+              mountPath: /opt/app-root/src/postgresql-cfg/perf.conf
+              subPath: custom.perf.conf #should be the name used in the ConfigMap
             - name: postgres-persistent-storage
               mountPath: /var/lib/pgsql/data
               readOnly: false
