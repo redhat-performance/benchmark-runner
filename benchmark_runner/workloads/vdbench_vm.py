@@ -1,5 +1,6 @@
 
 import os
+import time
 from multiprocessing import Process
 
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
@@ -23,20 +24,27 @@ class VdbenchVM(WorkloadsOperations):
         self.__status = ''
         self.__pod_name = ''
         self.__vm_name = ''
+        self.__scale = ''
         self.__data_dict = {}
 
-    def __run_scale(self, vm_num: str):
+    def __create_vm_scale(self, vm_num: str):
+        """
+        This method create vm in parallel
+        """
+        self._oc._create_async(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}_{vm_num}.yaml'))
+        self._oc.wait_for_vm_create(vm_name=f'{self.__vm_name}-{vm_num}')
+
+    def __run_vm_scale(self, vm_num: str):
         """
         This method run vm in parallel
         """
-        self._oc.create_vm_sync(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}_{vm_num}.yaml'), vm_name=self.__vm_name)
         self._oc.wait_for_ready(label=f'app=vdbench-{self._trunc_uuid}-{vm_num}', run_type='vm', label_uuid=False)
         # Create vm log should be direct after vm is ready
         self.__vm_name = self._create_vm_log(labels=[f'{self.__workload_name}-{self._trunc_uuid}-{vm_num}'])
         self.__status = self._oc.wait_for_vm_log_completed(vm_name=self.__vm_name, end_stamp=self.END_STAMP)
         self.__status = 'complete' if self.__status else 'failed'
         # save run artifacts logs
-        result_list = self._create_vm_run_artifacts(vm_name=self.__vm_name, start_stamp=self.START_STAMP, end_stamp=self.END_STAMP)
+        result_list = self._create_vm_run_artifacts(vm_name=f'{self.__workload_name}-{self._trunc_uuid}-{vm_num}', start_stamp=self.START_STAMP, end_stamp=self.END_STAMP)
         if self._es_host:
             # upload several run results
             for result in result_list:
@@ -46,6 +54,12 @@ class VdbenchVM(WorkloadsOperations):
         self._oc.delete_vm_sync(
             yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}_{vm_num}.yaml'),
             vm_name=f'{self.__vm_name}-{vm_num}')
+
+    def __delete_vm_scale(self, vm_num: str):
+        """
+        This method delete vm in parallel
+        """
+        self._oc._delete_async(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}_{vm_num}.yaml'))
 
     @logger_time_stamp
     def run(self):
@@ -83,6 +97,7 @@ class VdbenchVM(WorkloadsOperations):
                     vm_name=self.__vm_name)
             # scale
             else:
+                self.__scale = int(self._scale)
                 # create namespace
                 self._oc._create_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'namespace.yaml'))
                 # create redis and state signals
@@ -95,17 +110,21 @@ class VdbenchVM(WorkloadsOperations):
                     self._oc.create_pod_sync(yaml=os.path.join(f'{self._run_artifacts_path}', f'{pod}.yaml'), pod_name=pod_name)
                     self._oc.wait_for_initialized(label=f'app={name}', label_uuid=False)
                     self._oc.wait_for_ready(label=f'app={name}', label_uuid=False)
-                proc = []
-                scale = int(self._scale)
-                count = 0
-                for scale_node in range(len(self._scale_node_list)):
-                    for scale_num in range(scale):
-                        count += 1
-                        p = Process(target=self.__run_scale, args=(str(count),))
-                        p.start()
-                        proc.append(p)
-                for p in proc:
-                    p.join()
+                # prepare scale run
+                bulks = tuple(self.split_run_bulks(iterable=range(self._scale * len(self._scale_node_list)), limit=self._threads_limit))
+                # create, run and delete vms
+                for target in (self.__create_vm_scale, self.__run_vm_scale, self.__delete_vm_scale):
+                    proc = []
+                    for bulk in bulks:
+                        for vm_num in bulk:
+                            p = Process(target=target, args=(str(vm_num),))
+                            p.start()
+                            proc.append(p)
+                        for p in proc:
+                            p.join()
+                        # sleep between bulks
+                        time.sleep(self._bulk_sleep_time)
+                        proc = []
                 self._create_scale_logs()
                 # delete redis and state signals
                 for pod, name in sync_pods.items():
