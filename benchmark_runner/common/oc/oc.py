@@ -196,6 +196,7 @@ class OC(SSH):
         return count_nodes
 
     @typechecked
+    @logger_time_stamp
     def _create_async(self, yaml: str, is_check: bool = False):
         """
         This method create yaml in async
@@ -208,6 +209,7 @@ class OC(SSH):
             raise YAMLNotExist(yaml)
 
     @typechecked
+    @logger_time_stamp
     def _delete_async(self, yaml: str):
         """
         This method delete yaml in async
@@ -740,9 +742,9 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def wait_for_vm_creation(self, vm_name: str,
-                             namespace: str = environment_variables.environment_variables_dict['namespace'],
-                             timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
+    def wait_for_vm_create(self, vm_name: str,
+                           namespace: str = environment_variables.environment_variables_dict['namespace'],
+                           timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
         """
         This method is wait till vm name is creating or throw exception after timeout
         :param vm_name:
@@ -772,7 +774,7 @@ class OC(SSH):
         :return:
         """
         self._create_async(yaml)
-        return self.wait_for_vm_creation(vm_name=vm_name, namespace=namespace, timeout=timeout)
+        return self.wait_for_vm_create(vm_name=vm_name, namespace=namespace, timeout=timeout)
 
     @typechecked
     @logger_time_stamp

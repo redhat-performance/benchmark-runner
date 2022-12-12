@@ -1,5 +1,6 @@
 
 import os
+import time
 import yaml
 import sys
 import benchmark_runner
@@ -21,11 +22,22 @@ class TemplateOperations:
     def __initialize_dependent_variables__(self):
         self.__run_type = self.__environment_variables_dict.get('run_type', '')
         self.__run_artifacts_path = self.__environment_variables_dict.get('run_artifacts_path', '')
+        self.__bulk_sleep_time = self.__environment_variables_dict.get('bulk_sleep_time', '')
         self.__dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'templates'))
         if self.__run_type == 'test_ci':
             self.__environment_variables_dict['es_suffix'] = '-test-ci'
         else:
             self.__environment_variables_dict['es_suffix'] = ''
+
+    @logger_time_stamp
+    def __split_run_bulks(self, iterable: range, limit: int = 1):
+        """
+        This method splits run into bulk depends on threads limit
+        @return: run bulks
+        """
+        length = len(iterable)
+        for ndx in range(0, length, limit):
+            yield iterable[ndx:min(ndx + limit, length)]
 
     def __get_workload_template_kind(self):
         """
@@ -88,7 +100,8 @@ class TemplateOperations:
         :return: Dictionary <filename:contents>
         """
         # This really belongs in __init__, but some of the tests rely on
-        # being able to create this without an actual workload.
+        # being able to create this without an actual workload
+        answer = {}
         self.__workload_name = self.__workload.split('_')[0]
         self.__workload_kind = self.__workload.split('_')[1]
         self.__workload_extra_name = '_'.join(self.__workload.split('_')[2:3])
@@ -129,7 +142,6 @@ class TemplateOperations:
 
         render_data = self.__build_template_data(template_render_data, workload_data)
 
-        answer = {}
         out_files = [{'name': self.__standard_output_file, 'template': self.__standard_template_file}]
         if 'files' in workload_data:
             out_files.extend(workload_data['files'])
@@ -148,38 +160,35 @@ class TemplateOperations:
                 if redis:
                     answer['redis.yaml'] = render_yaml_file(dir_path=os.path.join(self.__dir_path, 'scale'), yaml_file='redis.yaml', environment_variable_dict=self.__environment_variables_dict)
                     answer['state_signals_exporter_pod.yaml'] = render_yaml_file(dir_path=os.path.join(self.__dir_path, 'scale'), yaml_file='state_signals_exporter_pod.yaml', environment_variable_dict=self.__environment_variables_dict)
-        return answer
-
-    @logger_time_stamp
-    def generate_files(self, data_files: dict):
-        for filename, data in data_files.items():
+        for filename, data in answer.items():
             with open(os.path.join(self.__run_artifacts_path, filename), 'w') as f:
                 f.write(data)
 
     @logger_time_stamp
-    def generate_yamls(self, scale: str = '', scale_nodes: list = [], redis: str = None):
+    def generate_yamls(self, scale: str = '', scale_nodes: list = [], redis: str = None, thread_limit: int = None):
         """
         This method generate workload yaml from template
         :return:
         """
         if not scale:
-            self.generate_files(self.generate_yamls_internal())
+            self.generate_yamls_internal()
         else:
             proc = []
             scale = int(scale)
+            bulks = tuple(self.__split_run_bulks(iterable=range(scale * len(scale_nodes)), limit=thread_limit))
             if scale_nodes:
-                count = 0
-                for scale_node in range(len(scale_nodes)):
-                    for scale_num in range(scale):
-                        count += 1
-                        p = Process(target=self.generate_files, args=(self.generate_yamls_internal(scale=str(count), scale_node=scale_nodes[scale_node], redis=redis), ))
+                for bulk in bulks:
+                    for num in bulk:
+                        p = Process(target=self.generate_yamls_internal, args=(str(num), scale_nodes[int(num/scale)], redis,))
                         p.start()
                         proc.append(p)
                     for p in proc:
                         p.join()
+                    # sleep between bulks
+                    time.sleep(self.__bulk_sleep_time)
             else:
                 for scale_num in range(scale):
-                    self.generate_files(self.generate_yamls_internal(scale=str(scale_num+1)))
+                    self.generate_yamls_internal(scale=str(scale_num))
 
     # The following routines are for testing purposes,
     # in particular to allow a known environment to be set up for golden file testing

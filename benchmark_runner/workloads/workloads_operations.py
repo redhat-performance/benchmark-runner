@@ -54,6 +54,7 @@ class WorkloadsOperations:
         self._es_url_protocol = self._environment_variables_dict['elasticsearch_url_protocol']
         self._scale = self._environment_variables_dict.get('scale', '')
         self._redis = self._environment_variables_dict.get('redis', '')
+        self._threads_limit = self._environment_variables_dict.get('threads_limit', '')
         if self._scale:
             self._scale = int(self._scale)
             self._scale_nodes = self._environment_variables_dict.get('scale_nodes', '')
@@ -63,6 +64,11 @@ class WorkloadsOperations:
             if not self._redis and 'vdbench' in self._workload:
                 raise MissingRedis()
             self._scale_node_list = ast.literal_eval(self._scale_nodes)
+            if self._threads_limit:
+                self._threads_limit = int(self._threads_limit)
+            else:
+                self._threads_limit = self._scale * len(self._scale_node_list)
+            self._bulk_sleep_time = self._environment_variables_dict.get('bulk_sleep_time', '')
         else:
             self._scale_node_list = []
         self._timeout = int(self._environment_variables_dict.get('timeout', ''))
@@ -348,13 +354,8 @@ class WorkloadsOperations:
             metadata.update({'run_status': status})
         if self._scale:
             metadata.update({'scale': int(self._scale)*len(self._scale_node_list)})
-            count = 0
         if 'bootstorm' in self._workload:
             metadata.update({'vm_os_version': 'fedora36'})
-            for scale_node in range(len(self._scale_node_list)):
-                for scale_num in range(self._scale):
-                    count += 1
-                    metadata.update({f'scale-{kind}--node-{count}': self._scale_node_list[scale_node]})
         if result:
             metadata.update(result)
 
@@ -435,6 +436,16 @@ class WorkloadsOperations:
         return vm_bootstorm_time
 
     @logger_time_stamp
+    def split_run_bulks(self, iterable: range, limit: int = 1):
+        """
+        This method splits run into bulk depends on threads limit
+        @return: run bulks
+        """
+        length = len(iterable)
+        for ndx in range(0, length, limit):
+            yield iterable[ndx:min(ndx + limit, length)]
+
+    @logger_time_stamp
     def clear_nodes_cache(self):
         """
         This method clear nodes cache
@@ -450,7 +461,7 @@ class WorkloadsOperations:
         self.clear_nodes_cache()
         if self._odf_pvc:
             self.odf_pvc_verification()
-        self._template.generate_yamls(scale=str(self._scale), scale_nodes=self._scale_node_list, redis=self._redis)
+        self._template.generate_yamls(scale=str(self._scale), scale_nodes=self._scale_node_list, redis=self._redis, thread_limit=self._threads_limit)
         if self._enable_prometheus_snapshot:
             self.start_prometheus()
 
