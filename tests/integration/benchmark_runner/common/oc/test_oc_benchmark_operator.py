@@ -204,7 +204,7 @@ def test_wait_for_vm_created():
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
     oc._create_async(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'))
-    assert oc.wait_for_vm_creation(vm_name='stressng-vm-workload')
+    assert oc.wait_for_vm_create(vm_name='stressng-vm-workload')
 
 
 def test_vm_create_initialized_ready_completed_system_metrics_deleted():
