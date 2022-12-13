@@ -61,7 +61,7 @@ jobs:
           END
       - name: ▶ OCP assisted installer
         env:
-          INSTALL_OCP_VERSION: "latest-4.11"
+          INSTALL_OCP_VERSION: "4.11.19"
           IBM_API_KEY: ${{ secrets.IBM_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
           WORKER_IDS: ${{ secrets.FUNC_WORKER_IDS }}
