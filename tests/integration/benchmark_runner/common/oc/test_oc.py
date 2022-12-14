@@ -11,12 +11,32 @@ from benchmark_runner.common.prometheus.prometheus_snapshot import PrometheusSna
 
 def test_oc_get_ocp_server_version():
     """
-    This method get ocp server version
+    This method gets ocp server version
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
-    print(oc.get_ocp_server_version())
+    assert oc.get_ocp_server_version()
+
+
+def test_get_ocp_major_version():
+    """
+    This method gets ocp major version
+    :return:
+    """
+    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
+    oc.login()
+    assert oc.get_ocp_major_version()
+
+
+def test_get_ocp_minor_version():
+    """
+    This method gets ocp minor version
+    :return:
+    """
+    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
+    oc.login()
+    assert oc.get_ocp_minor_version()
 
 
 def test_oc_get_kata_version():
