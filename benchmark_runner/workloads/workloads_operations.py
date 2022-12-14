@@ -68,7 +68,7 @@ class WorkloadsOperations:
                 self._threads_limit = int(self._threads_limit)
             else:
                 self._threads_limit = self._scale * len(self._scale_node_list)
-            self._bulk_sleep_time = self._environment_variables_dict.get('bulk_sleep_time', '')
+            self._bulk_sleep_time = int(self._environment_variables_dict.get('bulk_sleep_time', ''))
         else:
             self._scale_node_list = []
         self._timeout = int(self._environment_variables_dict.get('timeout', ''))

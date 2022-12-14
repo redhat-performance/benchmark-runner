@@ -22,7 +22,7 @@ class TemplateOperations:
     def __initialize_dependent_variables__(self):
         self.__run_type = self.__environment_variables_dict.get('run_type', '')
         self.__run_artifacts_path = self.__environment_variables_dict.get('run_artifacts_path', '')
-        self.__bulk_sleep_time = self.__environment_variables_dict.get('bulk_sleep_time', '')
+        self.__bulk_sleep_time = int(self.__environment_variables_dict.get('bulk_sleep_time', ''))
         self.__dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'templates'))
         if self.__run_type == 'test_ci':
             self.__environment_variables_dict['es_suffix'] = '-test-ci'
