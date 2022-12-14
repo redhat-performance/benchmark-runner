@@ -276,15 +276,27 @@ class OC(SSH):
             f"{self.__cli} -n {environment_variables.environment_variables_dict['namespace']} get benchmark/{workload} -o jsonpath={{.status.uuid}}")
         return long_uuid
 
+    def get_ocp_major_version(self):
+        """
+        This method returns ocp major version
+        @return:
+        """
+        return int(self.get_ocp_server_version().split('.')[0])
+
+    def get_ocp_minor_version(self):
+        """
+        This method returns ocp minor version
+        @return:
+        """
+        return int(self.get_ocp_server_version().split('.')[1])
+
     def get_prom_token(self):
         """
         This method return prometheus token
         :return:
         """
-        major_version = int(self.get_ocp_server_version().split('.')[0])
-        minor_version = int(self.get_ocp_server_version().split('.')[1])
         # OCP 4.10 and below
-        if major_version <= 4 and minor_version <= 10:
+        if self.get_ocp_major_version() <= 4 and self.get_ocp_minor_version() <= 10:
             prom_token = self.run(f"{self.__cli} -n openshift-monitoring sa get-token prometheus-k8s")
         else:
             prom_token = self.run(f"{self.__cli} sa new-token -n openshift-monitoring prometheus-k8s 2>/dev/null")
