@@ -32,14 +32,20 @@ class BootstormVM(WorkloadsOperations):
         self._oc._create_async(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}_{vm_num}.yaml'))
         self._oc.wait_for_vm_status(vm_name=f'bootstorm-vm-{self._trunc_uuid}-{vm_num}', status=VMStatus.Stopped)
 
-    def __run_vm_scale(self, vm_num: str):
+    def __start_vm_scale(self, vm_num: str):
         """
-        This method start VMs in parallel and wait for login to be enabled
+        This method starts VMs in parallel
         """
         vm_name = f'bootstorm-vm-{self._trunc_uuid}-{vm_num}'
         self.set_bootstorm_vm_start_time(vm_name=f'bootstorm-vm-{self._trunc_uuid}-{vm_num}')
         self._virtctl.start_vm_async(vm_name=f'bootstorm-vm-{self._trunc_uuid}-{vm_num}')
         self._virtctl.wait_for_vm_status(vm_name=vm_name, status=VMStatus.Running)
+
+    def __wait_login_vm_scale(self, vm_num: str):
+        """
+        This method waits for login to be enabled
+        """
+        vm_name = f'bootstorm-vm-{self._trunc_uuid}-{vm_num}'
         self.__data_dict = self.get_bootstorm_vm_elapse_time(vm_name=vm_name)
         self.__status = 'complete' if self.__data_dict else 'failed'
         # upload to elasticsearch
@@ -94,7 +100,7 @@ class BootstormVM(WorkloadsOperations):
                 # create run bulks
                 bulks = tuple(self.split_run_bulks(iterable=range(self._scale * len(self._scale_node_list)), limit=self._threads_limit))
                 # create, run and delete vms
-                for target in (self.__create_vm_scale, self.__run_vm_scale, self.__delete_vm_scale):
+                for target in (self.__create_vm_scale, self.__start_vm_scale, self.__wait_login_vm_scale, self.__delete_vm_scale):
                     proc = []
                     for bulk in bulks:
                         for vm_num in bulk:
