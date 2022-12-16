@@ -197,10 +197,11 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def _create_async(self, yaml: str, is_check: bool = False):
+    def create_async(self, yaml: str, is_check: bool = False):
         """
         This method create yaml in async
         :param yaml:
+        @param is_check:
         :return:
         """
         if os.path.isfile(yaml):
@@ -210,7 +211,7 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def _delete_async(self, yaml: str):
+    def delete_async(self, yaml: str):
         """
         This method delete yaml in async
         :param yaml:
@@ -415,7 +416,7 @@ class OC(SSH):
         :param yaml:
         :return:
         """
-        self._create_async(yaml)
+        self.create_async(yaml)
         return self.wait_for_pod_create(pod_name=pod_name, namespace=namespace, timeout=timeout)
 
     @typechecked
@@ -432,7 +433,7 @@ class OC(SSH):
         :return:
         """
         if self.pod_exists(pod_name, namespace):
-            self._delete_async(yaml)
+            self.delete_async(yaml)
             return self.wait_for_pod_terminate(pod_name=pod_name, namespace=namespace, timeout=timeout)
         else:
             return False
@@ -785,7 +786,7 @@ class OC(SSH):
         :param yaml:
         :return:
         """
-        self._create_async(yaml)
+        self.create_async(yaml)
         return self.wait_for_vm_create(vm_name=vm_name, namespace=namespace, timeout=timeout)
 
     @typechecked
@@ -802,7 +803,7 @@ class OC(SSH):
         :return: return False if vm does not exist
         """
         if self.vm_exists(vm_name=vm_name, namespace=namespace):
-            self._delete_async(yaml)
+            self.delete_async(yaml)
             return self.wait_for_vm_terminate(vm_name=vm_name, namespace=namespace, timeout=timeout)
         else:
             return False

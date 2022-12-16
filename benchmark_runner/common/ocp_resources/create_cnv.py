@@ -35,7 +35,7 @@ class CreateCNV(CreateOCPResourceOperations):
             if resource.endswith('.sh'):
                 self.__oc.run(cmd=f'chmod +x {os.path.join(self.__path, resource)}; {self.__path}/./{resource}')
             else:
-                self.__oc._create_async(yaml=os.path.join(self.__path, resource))
+                self.__oc.create_async(yaml=os.path.join(self.__path, resource))
                 if '01_operator.yaml' in resource:
                     # wait till get the patch
                     self.wait_for_ocp_resource_create(resource=resource,

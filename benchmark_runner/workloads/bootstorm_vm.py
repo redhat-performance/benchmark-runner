@@ -29,7 +29,7 @@ class BootstormVM(WorkloadsOperations):
         """
         This method creates VMs in parallel
         """
-        self._oc._create_async(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}_{vm_num}.yaml'))
+        self._oc.create_async(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}_{vm_num}.yaml'))
         self._oc.wait_for_vm_status(vm_name=f'bootstorm-vm-{self._trunc_uuid}-{vm_num}', status=VMStatus.Stopped)
 
     def __run_vm_scale(self, vm_num: str):
@@ -53,7 +53,7 @@ class BootstormVM(WorkloadsOperations):
         """
         This method deletes VMs in parallel
         """
-        self._oc._delete_async(
+        self._oc.delete_async(
             yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}_{vm_num}.yaml'))
 
     @logger_time_stamp
@@ -73,7 +73,7 @@ class BootstormVM(WorkloadsOperations):
             self.__kind = 'vm'
             self._environment_variables_dict['kind'] = 'vm'
             if not self._scale:
-                self._oc._create_async(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}.yaml'))
+                self._oc.create_async(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}.yaml'))
                 self._oc.wait_for_vm_status(vm_name=f'bootstorm-vm-{self._trunc_uuid}', status=VMStatus.Stopped)
                 self.set_bootstorm_vm_start_time(vm_name=self.__vm_name)
                 self._virtctl.start_vm_sync(vm_name=self.__vm_name)
@@ -90,7 +90,7 @@ class BootstormVM(WorkloadsOperations):
             # scale
             else:
                 # create namespace
-                self._oc._create_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'namespace.yaml'))
+                self._oc.create_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'namespace.yaml'))
                 # create run bulks
                 bulks = tuple(self.split_run_bulks(iterable=range(self._scale * len(self._scale_node_list)), limit=self._threads_limit))
                 # create, run and delete vms
@@ -107,7 +107,7 @@ class BootstormVM(WorkloadsOperations):
                         time.sleep(self._bulk_sleep_time)
                         proc = []
                 # delete namespace
-                self._oc._delete_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'namespace.yaml'))
+                self._oc.delete_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'namespace.yaml'))
         except ElasticSearchDataNotUploaded as err:
             self._oc.delete_vm_sync(
                 yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}.yaml'),

@@ -31,7 +31,7 @@ def test_create_async_pod_yaml_not_exist():
     """
     oc = OC()
     with pytest.raises(YAMLNotExist) as err:
-        oc._create_async(yaml=f'stressng1.yaml')
+        oc.create_async(yaml=f'stressng1.yaml')
 
 
 def dummy_long_uuid(cls, *args, **kwargs):
