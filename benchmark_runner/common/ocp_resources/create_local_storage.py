@@ -29,11 +29,11 @@ class CreateLocalStorage(CreateOCPResourceOperations):
                 if self.__oc.get_ocp_major_version() <= 4 and self.__oc.get_ocp_minor_version() <= 10:
                     self.__oc.create_async(yaml=os.path.join(self.__path, resource))
             # run in ocp<=4.10
-            elif '041_subscription.yaml' in resource:
+            elif '04_1_subscription.yaml' in resource:
                 if self.__oc.get_ocp_major_version() <= 4 and self.__oc.get_ocp_minor_version() <= 10:
                     self.__oc.create_async(yaml=os.path.join(self.__path, resource))
             # run in ocp>=4.11
-            elif '042_subscription.yaml' in resource:
+            elif '04_2_subscription.yaml' in resource:
                 if self.__oc.get_ocp_major_version() >= 4 and self.__oc.get_ocp_minor_version() >= 11:
                     self.__oc.create_async(yaml=os.path.join(self.__path, resource))
             else:

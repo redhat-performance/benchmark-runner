@@ -35,7 +35,20 @@ class CreateODF(CreateOCPResourceOperations):
                 else:
                     self.__oc.run(cmd=f'chmod +x {os.path.join(self.__path, resource)}; {self.__path}/./{resource}')
             else:  # yaml
-                self.__oc.create_async(yaml=os.path.join(self.__path, resource))
+                # run in ocp<=4.10
+                if '07_1_subscription' in resource:
+                    if self.__oc.get_ocp_major_version() <= 4 and self.__oc.get_ocp_minor_version() <= 10:
+                        self.__oc.create_async(yaml=os.path.join(self.__path, resource))
+                    else:
+                        break
+                # run in ocp=>4.11
+                elif '07_2_subscription' in resource:
+                    if self.__oc.get_ocp_major_version() >= 4 and self.__oc.get_ocp_minor_version() >= 11:
+                        self.__oc.create_async(yaml=os.path.join(self.__path, resource))
+                    else:
+                        break
+                else:
+                    self.__oc.create_async(yaml=os.path.join(self.__path, resource))
                 if '04_local_volume_set.yaml' in resource:
                     # openshift local storage
                     self.wait_for_ocp_resource_create(resource='odf',
@@ -48,7 +61,7 @@ class CreateODF(CreateOCPResourceOperations):
                     self.wait_for_ocp_resource_create(resource='odf',
                                                       verify_cmd=r"""oc get pv -o jsonpath="{range .items[*]}{.metadata.name}{'\n'}{end}" | grep local | wc -l""",
                                                       count_openshift_storage=True)
-                if '07_subscription.yaml' in resource:
+                if 'subscription.yaml' in resource:
                     # wait till get the patch
                     self.wait_for_ocp_resource_create(resource=resource,
                                                       verify_cmd="oc get InstallPlan -n openshift-storage -ojsonpath={.items[0].metadata.name}",
