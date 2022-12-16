@@ -27,7 +27,7 @@ class VdbenchPod(WorkloadsOperations):
         """
         This method create pod in parallel
         """
-        self._oc._create_async(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}_{pod_num}.yaml'))
+        self._oc.create_async(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}_{pod_num}.yaml'))
         self._oc.wait_for_pod_create(pod_name=f'{self.__pod_name}-{pod_num}')
 
     def __run_pod_scale(self, pod_num: str):
@@ -51,7 +51,7 @@ class VdbenchPod(WorkloadsOperations):
         """
         This method create pod in parallel
         """
-        self._oc._delete_async(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}_{pod_num}.yaml'))
+        self._oc.delete_async(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}_{pod_num}.yaml'))
 
     @logger_time_stamp
     def run(self):
@@ -94,7 +94,7 @@ class VdbenchPod(WorkloadsOperations):
             else:
                 self.__scale = int(self._scale)
                 # create namespace
-                self._oc._create_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'namespace.yaml'))
+                self._oc.create_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'namespace.yaml'))
                 # create redis and state signals
                 sync_pods = {'redis': 'redis', 'state_signals_exporter_pod': 'state-signals-exporter'}
                 for pod, name in sync_pods.items():
@@ -129,7 +129,7 @@ class VdbenchPod(WorkloadsOperations):
                         pod_name = name
                     self._oc.delete_pod_sync(yaml=os.path.join(f'{self._run_artifacts_path}', f'{pod}.yaml'), pod_name=pod_name)
                 # delete namespace
-                self._oc._delete_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'namespace.yaml'))
+                self._oc.delete_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'namespace.yaml'))
         except ElasticSearchDataNotUploaded as err:
             self._oc.delete_pod_sync(
                 yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}.yaml'),
