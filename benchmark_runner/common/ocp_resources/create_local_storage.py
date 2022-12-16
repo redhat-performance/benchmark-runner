@@ -26,18 +26,18 @@ class CreateLocalStorage(CreateOCPResourceOperations):
             logger.info(f'run {resource}')
             # run in ocp<=4.10
             if '03_catalog_source.yaml' in resource:
-                if self._oc.get_ocp_major_version() <= 4 and self._oc.get_ocp_minor_version() <= 10:
-                    self.__oc._create_async(yaml=os.path.join(self.__path, resource))
+                if self.__oc.get_ocp_major_version() <= 4 and self.__oc.get_ocp_minor_version() <= 10:
+                    self.__oc.create_async(yaml=os.path.join(self.__path, resource))
             # run in ocp<=4.10
             elif '041_subscription.yaml' in resource:
-                if self._oc.get_ocp_major_version() <= 4 and self._oc.get_ocp_minor_version() <= 10:
-                    self.__oc._create_async(yaml=os.path.join(self.__path, resource))
+                if self.__oc.get_ocp_major_version() <= 4 and self.__oc.get_ocp_minor_version() <= 10:
+                    self.__oc.create_async(yaml=os.path.join(self.__path, resource))
             # run in ocp>=4.11
             elif '042_subscription.yaml' in resource:
-                if self._oc.get_ocp_major_version() >= 4 and self._oc.get_ocp_minor_version() >= 11:
-                    self.__oc._create_async(yaml=os.path.join(self.__path, resource))
+                if self.__oc.get_ocp_major_version() >= 4 and self.__oc.get_ocp_minor_version() >= 11:
+                    self.__oc.create_async(yaml=os.path.join(self.__path, resource))
             else:
-                    self.__oc._create_async(yaml=os.path.join(self.__path, resource))
+                    self.__oc.create_async(yaml=os.path.join(self.__path, resource))
 
         # verify once after create all resource files
         self.wait_for_ocp_resource_create(resource='local_storage',

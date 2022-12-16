@@ -188,7 +188,7 @@ def test_oc_get_vm_name_and_is_vm_exist():
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
-    oc._create_async(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'))
+    oc.create_async(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'))
     # wait 60 sec till vm will be created
     time.sleep(60)
     assert oc._get_vm_name(vm_name='stressng-vm-workload', namespace=test_environment_variable['namespace'])
@@ -203,7 +203,7 @@ def test_wait_for_vm_created():
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
-    oc._create_async(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'))
+    oc.create_async(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'))
     assert oc.wait_for_vm_create(vm_name='stressng-vm-workload')
 
 

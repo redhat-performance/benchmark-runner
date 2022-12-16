@@ -32,7 +32,7 @@ class CreateKata(CreateOCPResourceOperations):
         timeout = int(environment_variables.environment_variables_dict['timeout'])
         current_wait_time = 0
         while timeout <= 0 or current_wait_time < timeout:
-            self.__oc._create_async(yaml_file)
+            self.__oc.create_async(yaml_file)
             # We cannot wait for a condition here, because the
             # create_async may simply not work even if it returns success.
             time.sleep(OC.SLEEP_TIME)
@@ -51,7 +51,7 @@ class CreateKata(CreateOCPResourceOperations):
             logger.info(f'run {resource}')
             if '01_operator.yaml' == resource:
                 # Wait for kataconfig CRD to exist
-                self.__oc._create_async(os.path.join(self.__path, resource))
+                self.__oc.create_async(os.path.join(self.__path, resource))
                 self.wait_for_ocp_resource_create(resource='kata',
                                                   verify_cmd='if oc get crd kataconfigs.kataconfiguration.openshift.io >/dev/null 2>&1 ; then echo succeeded ; fi',
                                                   status='succeeded')
