@@ -40,13 +40,13 @@ class CreateODF(CreateOCPResourceOperations):
                     if self.__oc.get_ocp_major_version() <= 4 and self.__oc.get_ocp_minor_version() <= 10:
                         self.__oc.create_async(yaml=os.path.join(self.__path, resource))
                     else:
-                        break
+                        continue
                 # run in ocp=>4.11
                 elif '07_2_subscription' in resource:
                     if self.__oc.get_ocp_major_version() >= 4 and self.__oc.get_ocp_minor_version() >= 11:
                         self.__oc.create_async(yaml=os.path.join(self.__path, resource))
                     else:
-                        break
+                        continue
                 else:
                     self.__oc.create_async(yaml=os.path.join(self.__path, resource))
                 if '04_local_volume_set.yaml' in resource:
