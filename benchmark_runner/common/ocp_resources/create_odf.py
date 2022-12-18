@@ -8,7 +8,7 @@ from benchmark_runner.common.ocp_resources.create_ocp_resource_operations import
 
 class CreateODF(CreateOCPResourceOperations):
     """
-    This class is create OCP resources
+    This class is created ODF operator
     """
     def __init__(self, oc: OC, path: str, resource_list: list, ibm_blk_disk_name: list):
         super().__init__(oc)
@@ -35,15 +35,15 @@ class CreateODF(CreateOCPResourceOperations):
                 else:
                     self.__oc.run(cmd=f'chmod +x {os.path.join(self.__path, resource)}; {self.__path}/./{resource}')
             else:  # yaml
-                # run in ocp<=4.10
+                # run in ODF<=4.10
                 if '07_1_subscription' in resource:
-                    if self.__oc.get_ocp_major_version() <= 4 and self.__oc.get_ocp_minor_version() <= 10:
+                    if self._odf_major_version <= 4 and self._odf_minor_version <= 10:
                         self.__oc.create_async(yaml=os.path.join(self.__path, resource))
                     else:
                         continue
-                # run in ocp=>4.11
+                # run in ODF=>4.11
                 elif '07_2_subscription' in resource:
-                    if self.__oc.get_ocp_major_version() >= 4 and self.__oc.get_ocp_minor_version() >= 11:
+                    if self._odf_major_version >= 4 and self._odf_minor_version >= 11:
                         self.__oc.create_async(yaml=os.path.join(self.__path, resource))
                     else:
                         continue

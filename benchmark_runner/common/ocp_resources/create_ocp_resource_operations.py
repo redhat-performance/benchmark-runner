@@ -14,6 +14,10 @@ class CreateOCPResourceOperations:
     """
     def __init__(self, oc: OC):
         self._environment_variables_dict = environment_variables.environment_variables_dict
+        self._odf_version = environment_variables.environment_variables_dict.get('odf_version', '')
+        if self._odf_version:
+            self._odf_major_version = int(self._odf_version.split('.')[0])
+            self._odf_minor_version = int(self._odf_version.split('.')[1])
         self.__oc = oc
 
     @staticmethod
