@@ -8,7 +8,7 @@ from benchmark_runner.common.ocp_resources.create_ocp_resource_operations import
 
 class CreateCNV(CreateOCPResourceOperations):
     """
-    This class is create CNV nightly build operator
+    This class is created CNV nightly build operator
     """
     def __init__(self, oc: OC, path: str, resource_list: list):
         super().__init__(oc)

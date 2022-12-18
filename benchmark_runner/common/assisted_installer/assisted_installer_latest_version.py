@@ -7,7 +7,7 @@ from urllib.error import URLError, HTTPError
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 
 
-class OCPVersions:
+class AssistedInstallerVersions:
     """
     This class get the latest assisted installer version from https://openshift-release.apps.ci.l2s4.p1.openshiftapps.com/graph
     """
@@ -44,27 +44,35 @@ class OCPVersions:
     def get_latest_version(self, latest_version: str):
         """
         This method get the latest version from json data
-        :param latest_version:
+        :param latest_version: 4.XX or 4.XX.0-rc
         :return:
         """
         release_list = []
         release_candidate_list = []
         release_version = ''  # Version=4.X.X
         release_candidate_version = ''  # Version=4.X.0-rc.X
-
+        latest_version = latest_version.split('.')
         for version in self.__get_versions()['nodes']:
             version_data = str(version['version']).split('.')
-            if latest_version == f'{version_data[self.IND_MAJOR]}.{version_data[self.IND_MINOR]}':
+            if f"{latest_version[self.IND_MAJOR]}.{latest_version[self.IND_MINOR]}" == f'{version_data[self.IND_MAJOR]}.{version_data[self.IND_MINOR]}':
                 # Release version=4.X.X
                 if len(version_data) == self.IND_PATCH + 1:
                     release_version = f'{version_data[self.IND_MAJOR]}.{version_data[self.IND_MINOR]}'
                     release_list.append(int(version_data[self.IND_PATCH]))
                 # Release candidate version=4.X.0-rc.X and skip 4.X.X-0.nightly-2022-09-06-225330
                 if len(version_data) == self.IND_BUILD + 1 and len(version_data[self.IND_BUILD]) <= 2:
-                    release_candidate_version = '.'.join([version_data[self.IND_MAJOR], version_data[self.IND_MINOR], version_data[self.IND_PATCH]])
-                    release_candidate_list.append(int(version_data[self.IND_BUILD]))
+                    # Specific Release candidate version=4.X.0-rc
+                    if len(latest_version) == self.IND_BUILD:
+                        if latest_version[self.IND_PATCH] == version_data[self.IND_PATCH]:
+                            release_candidate_version = '.'.join([version_data[self.IND_MAJOR], version_data[self.IND_MINOR], version_data[self.IND_PATCH]])
+                            release_candidate_list.append(int(version_data[self.IND_BUILD]))
+                    else:
+                        release_candidate_version = '.'.join(
+                            [version_data[self.IND_MAJOR], version_data[self.IND_MINOR], version_data[self.IND_PATCH]])
+                        release_candidate_list.append(int(version_data[self.IND_BUILD]))
 
-        if release_list:
+        # Priority to release version
+        if release_list and len(latest_version) == self.IND_PATCH:
             return f'{release_version}.{max(release_list)}'.strip()
         elif release_candidate_list:
             return f'{release_candidate_version}.{max(release_candidate_list)}'.strip()

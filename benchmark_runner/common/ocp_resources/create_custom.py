@@ -8,7 +8,7 @@ from benchmark_runner.common.ocp_resources.create_ocp_resource_operations import
 
 class CreateCustom(CreateOCPResourceOperations):
     """
-    This class is create OCP resources
+    This class is created Custom resource
     """
     def __init__(self, oc: OC, path: str, resource_list: list):
         super().__init__(oc)

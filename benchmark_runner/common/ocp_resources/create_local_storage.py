@@ -8,7 +8,7 @@ from benchmark_runner.common.ocp_resources.create_ocp_resource_operations import
 
 class CreateLocalStorage(CreateOCPResourceOperations):
     """
-    This class is create OCP resources
+    This class is created Local Storage operator
     """
     def __init__(self, oc: OC, path: str, resource_list: list):
         super().__init__(oc)
@@ -24,20 +24,20 @@ class CreateLocalStorage(CreateOCPResourceOperations):
         """
         for resource in self.__resource_list:
             logger.info(f'run {resource}')
-            # run in ocp<=4.10
+            # run in ODF<=4.10
             if '03_catalog_source.yaml' in resource:
-                if self.__oc.get_ocp_major_version() <= 4 and self.__oc.get_ocp_minor_version() <= 10:
+                if self._odf_major_version <= 4 and self._odf_minor_version <= 10:
                     self.__oc.create_async(yaml=os.path.join(self.__path, resource))
-            # run in ocp<=4.10
+            # run in ODF<=4.10
             elif '04_1_subscription.yaml' in resource:
-                if self.__oc.get_ocp_major_version() <= 4 and self.__oc.get_ocp_minor_version() <= 10:
+                if self._odf_major_version <= 4 and self._odf_minor_version <= 10:
                     self.__oc.create_async(yaml=os.path.join(self.__path, resource))
-            # run in ocp>=4.11
+            # run in ODF>=4.11
             elif '04_2_subscription.yaml' in resource:
-                if self.__oc.get_ocp_major_version() >= 4 and self.__oc.get_ocp_minor_version() >= 11:
+                if self._odf_major_version >= 4 and self._odf_minor_version >= 11:
                     self.__oc.create_async(yaml=os.path.join(self.__path, resource))
             else:
-                    self.__oc.create_async(yaml=os.path.join(self.__path, resource))
+                self.__oc.create_async(yaml=os.path.join(self.__path, resource))
 
         # verify once after create all resource files
         self.wait_for_ocp_resource_create(resource='local_storage',
