@@ -12,7 +12,7 @@ from benchmark_runner.main.environment_variables import environment_variables
 
 class CreateKata(CreateOCPResourceOperations):
     """
-    This class is create OCP resources
+    This class is created Kata operator
     """
     def __init__(self, oc: OC, path: str, resource_list: list):
         super().__init__(oc)

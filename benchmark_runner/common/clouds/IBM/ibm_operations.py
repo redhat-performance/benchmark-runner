@@ -13,7 +13,7 @@ from benchmark_runner.common.oc.oc import OC
 from benchmark_runner.common.github.github_operations import GitHubOperations
 from benchmark_runner.common.clouds.IBM.ibm_exceptions import IBMMachineNotLoad, MissingMasterNodes, MissingWorkerNodes, IBMOCPInstallationFailed
 from benchmark_runner.common.ssh.ssh import SSH
-from benchmark_runner.common.clouds.IBM.assisted_installer_latest_version import OCPVersions
+from benchmark_runner.common.assisted_installer.assisted_installer_latest_version import AssistedInstallerVersions
 
 
 class Actions(Enum):
@@ -188,10 +188,10 @@ class IBMOperations:
         This method return installation version
         :return:
         """
-        ocp_versions = OCPVersions()
+        assisted_installer_versions = AssistedInstallerVersions()
         if self.LATEST in self.__install_ocp_version:
             openshift_version_data = self.__install_ocp_version.split('-')
-            return ocp_versions.get_latest_version(latest_version=openshift_version_data[1])
+            return assisted_installer_versions.get_latest_version(latest_version=openshift_version_data[1])
         else:
             return self.__install_ocp_version
 
