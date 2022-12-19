@@ -159,6 +159,8 @@ class TemplateOperations:
                 answer['namespace.yaml'] = render_yaml_file(dir_path=os.path.join(self.__dir_path, 'scale'), yaml_file='namespace.yaml', environment_variable_dict=self.__environment_variables_dict)
                 if redis:
                     answer['redis.yaml'] = render_yaml_file(dir_path=os.path.join(self.__dir_path, 'scale'), yaml_file='redis.yaml', environment_variable_dict=self.__environment_variables_dict)
+                    # update scale number
+                    self.__environment_variables_dict['scale'] = int(scale) + 1
                     answer['state_signals_exporter_pod.yaml'] = render_yaml_file(dir_path=os.path.join(self.__dir_path, 'scale'), yaml_file='state_signals_exporter_pod.yaml', environment_variable_dict=self.__environment_variables_dict)
         for filename, data in answer.items():
             with open(os.path.join(self.__run_artifacts_path, filename), 'w') as f:
