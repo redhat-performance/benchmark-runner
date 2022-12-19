@@ -124,7 +124,7 @@ class TemplateOperations:
             'workload_extra_name': self.__workload_extra_name,
             'standard_output_file': self.__standard_output_file,
             'standard_template_file': self.__standard_template_file,
-            'scale': scale,
+            'scale': int(scale)+1,
             'scale_node': scale_node
             }
         self.__environment_variables_dict = {**self.__environment_variables_dict, **template_render_data}
