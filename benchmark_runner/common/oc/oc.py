@@ -54,8 +54,7 @@ class OC(SSH):
         This method return odf version
         :return:
         """
-        return self.run(f"{self.__cli} get csv -n openshift-storage "
-                        f"-ojsonpath='{{.items[0].spec.labels.full_version}}'")
+        return self.run(f"{self.__cli} get csv -n openshift-storage -ojsonpath='{{.items[0].spec.labels.full_version}}'")
 
     def get_kata_version(self):
         """
@@ -680,7 +679,6 @@ class OC(SSH):
     def get_exposed_vm_port(self, vm_name: str, namespace: str = environment_variables.environment_variables_dict['namespace']):
         """
         The method get exposed vm port
-        @param vm_name:
         @param vm_name:
         @return:
         """

@@ -24,20 +24,7 @@ class CreateLocalStorage(CreateOCPResourceOperations):
         """
         for resource in self.__resource_list:
             logger.info(f'run {resource}')
-            # run in ODF<=4.10
-            if '03_catalog_source.yaml' in resource:
-                if self._odf_major_version <= 4 and self._odf_minor_version <= 10:
-                    self.__oc.create_async(yaml=os.path.join(self.__path, resource))
-            # run in ODF<=4.10
-            elif '04_1_subscription.yaml' in resource:
-                if self._odf_major_version <= 4 and self._odf_minor_version <= 10:
-                    self.__oc.create_async(yaml=os.path.join(self.__path, resource))
-            # run in ODF>=4.11
-            elif '04_2_subscription.yaml' in resource:
-                if self._odf_major_version >= 4 and self._odf_minor_version >= 11:
-                    self.__oc.create_async(yaml=os.path.join(self.__path, resource))
-            else:
-                self.__oc.create_async(yaml=os.path.join(self.__path, resource))
+            self.__oc.create_async(yaml=os.path.join(self.__path, resource))
 
         # verify once after create all resource files
         self.wait_for_ocp_resource_create(resource='local_storage',
