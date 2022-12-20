@@ -52,9 +52,9 @@ spec:
        threads: 1
        image: quay.io/kubevirt/fedora-container-disk-images:34
        limits:
-         memory: 16Gi
+         memory: 8Gi
        requests:
-         memory: 10Mi
+         memory: 8Gi
        network:
          front_end: masquerade
          multiqueue:
@@ -70,9 +70,9 @@ spec:
        threads: 1
        image: quay.io/kubevirt/fedora-container-disk-images:34
        limits:
-         memory: 16Gi
+         memory: 8Gi
        requests:
-         memory: 10Mi
+         memory: 8Gi
        network:
          front_end: masquerade
          multiqueue:

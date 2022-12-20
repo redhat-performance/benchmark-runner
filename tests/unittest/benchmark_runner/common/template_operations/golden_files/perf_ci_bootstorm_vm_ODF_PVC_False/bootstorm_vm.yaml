@@ -38,13 +38,13 @@ spec:
             name: cloudinitdisk
         resources:
           requests:
-            memory: 10Mi
+            memory: 500Mi
           limits:
-            memory: 1Gi
+            memory: 500Mi
       terminationGracePeriodSeconds: 0
       volumes:
       - containerDisk:
-          image: quay.io/ebattat/fedora36-container-disk:latest
+          image: quay.io/ebattat/fedora37-container-disk:latest
         name: containerdisk
       - cloudInitNoCloud:
           userData: |-
