@@ -50,8 +50,8 @@ template_data:
         default:
           sockets: 1
           cores: 4
-          limits_memory: 16Gi
-          requests_memory: 10Mi
+          limits_memory: 8Gi
+          requests_memory: 500Mi
           net_queues: 4
     default:
       run_type:
