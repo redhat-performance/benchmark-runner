@@ -54,8 +54,7 @@ class OC(SSH):
         This method return odf version
         :return:
         """
-        return self.run(f"{self.__cli} get csv -n openshift-storage "
-                        f"-ojsonpath='{{.items[0].spec.labels.full_version}}'")
+        return self.run(f"{self.__cli} get csv -n openshift-storage -ojsonpath='{{.items[0].spec.labels.full_version}}'")
 
     def get_kata_version(self):
         """
