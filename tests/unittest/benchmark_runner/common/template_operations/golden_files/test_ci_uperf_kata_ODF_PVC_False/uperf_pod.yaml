@@ -23,17 +23,17 @@ spec:
       client_resources:
         requests:
           cpu: 10m
-          memory: 10Mi
+          memory: 8Gi
         limits:
           cpu: 4
-          memory: 16Gi
+          memory: 8Gi
       server_resources:
         requests:
           cpu: 10m
-          memory: 10Mi
+          memory: 8Gi
         limits:
           cpu: 4
-          memory: 16Gi
+          memory: 8Gi
       pin: True
       pin_server: "pin-node-1"
       pin_client: "pin-node-2"
