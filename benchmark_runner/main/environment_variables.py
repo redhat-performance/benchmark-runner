@@ -124,9 +124,8 @@ class EnvironmentVariables:
         self._environment_variables_dict['workloads_odf_pvc'] = ['vdbench', 'hammerdb']
         # This parameter get from Test_CI.yml file
         self._environment_variables_dict['build_version'] = EnvironmentVariables.get_env('BUILD_VERSION', '1.0.0')
-        # collect system metrics True/False - required by benchmark-operator
-        self._environment_variables_dict['system_metrics'] = EnvironmentVariables.get_boolean_from_environment('SYSTEM_METRICS',
-                                                                                                               bool(self.environment_variables_dict['elasticsearch']))
+        # collect system metrics True/False - required by benchmark-operator: @todo disable in OCP4.12.0-rc.5 - pod not create
+        self._environment_variables_dict['system_metrics'] = EnvironmentVariables.get_boolean_from_environment('SYSTEM_METRICS', False)
         # CI status update once at the end of CI pass/failed
         self._environment_variables_dict['ci_status'] = EnvironmentVariables.get_env('CI_STATUS', '')
         # Valid run types
