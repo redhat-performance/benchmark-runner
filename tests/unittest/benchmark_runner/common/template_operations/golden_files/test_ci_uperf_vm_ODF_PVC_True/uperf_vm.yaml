@@ -54,7 +54,7 @@ spec:
        limits:
          memory: 8Gi
        requests:
-         memory: 500Mi
+         memory: 8Gi
        network:
          front_end: masquerade
          multiqueue:
@@ -72,7 +72,7 @@ spec:
        limits:
          memory: 8Gi
        requests:
-         memory: 500Mi
+         memory: 8Gi
        network:
          front_end: masquerade
          multiqueue:
