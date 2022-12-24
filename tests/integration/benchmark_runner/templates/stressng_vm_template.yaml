@@ -36,14 +36,14 @@ spec:
       kind: vm
       client_vm:
         dedicatedcpuplacement: false
-        sockets: 1
-        cores: 2
+        sockets: 4
+        cores: 1
         threads: 1
         image: quay.io/kubevirt/fedora-container-disk-images:34
         limits:
           memory: 16Gi
         requests:
-          memory: 10Mi
+          memory: 16Gi
         network:
           front_end: masquerade
           multiqueue:
