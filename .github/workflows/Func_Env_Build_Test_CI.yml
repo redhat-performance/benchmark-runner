@@ -77,8 +77,8 @@ jobs:
           cp $RUNNER_PATH/kubectl /usr/local/bin/kubectl
           cp $RUNNER_PATH/oc /usr/local/bin/oc
           
-          # clone benchmark-operator v1.0.1
-          git clone -b v1.0.1 https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
+          # clone benchmark-operator v1.0.2
+          git clone -b v1.0.2 https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
           
           # run pytest - only unittest
           pytest -v tests/unittest/
@@ -155,7 +155,7 @@ jobs:
         rm -rf $RUNNER_PATH/virtctl
         
         # clone benchmark-operator
-        git clone https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
+        git clone -b v1.0.2 https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
         # run pytest
         pytest -v tests --cov=benchmark_runner --cov-report=term-missing
         coverage run -m pytest -v tests
