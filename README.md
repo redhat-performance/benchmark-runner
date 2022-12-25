@@ -109,7 +109,7 @@ podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD 
 SAVE RUN ARTIFACTS LOCAL:
 1. add `-e SAVE_ARTIFACTS_LOCAL='True'` or `--save-artifacts-local=true`
 2. add `-v /tmp:/tmp`
-3. git clone https://github.com/cloud-bulldozer/benchmark-operator /tmp/benchmark-operator
+3. git clone -b v1.0.2 https://github.com/cloud-bulldozer/benchmark-operator /tmp/benchmark-operator
 
 ### Run vdbench workload in Pod using OpenShift
 ![](media/benchmark-runner-demo.gif)
