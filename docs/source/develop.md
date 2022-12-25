@@ -209,7 +209,7 @@ virtual environment:
         1. Need to configure all mandatory parameters in [benchmark_runner/main/environment_variables.py](benchmark_runner/main/environment_variables.py)
             1. `workloads` = e.g. stressng_pod
             2. `runner_path` = path to local cloned benchmark-operator (e.g. /home/user/)
-                1. git clone https://github.com/cloud-bulldozer/benchmark-operator  (inside 'runner_path')
+                1. git clone -b v1.0.2 https://github.com/cloud-bulldozer/benchmark-operator  (inside 'runner_path')
             3. `kubeadmin_password`
             4. `pin_node_benchmark_operator` - benchmark-operator node selector
             5. `pin_node1` - workload first node selector
@@ -221,7 +221,7 @@ virtual environment:
     2. Run workload through integration/unittest tests [using pytest]
         1. Need to configure all mandatory parameters [tests/integration/benchmark_runner/test_environment_variables.py](tests/integration/benchmark_runner/test_environment_variables.py)
             1. `runner_path` = path to local cloned benchmark-operator (e.g. /home/user/)
-                1. git clone https://github.com/cloud-bulldozer/benchmark-operator (inside 'runner_path')
+                1. git clone -b v1.0.2 https://github.com/cloud-bulldozer/benchmark-operator (inside 'runner_path')
             2. `kubeadmin_password`
             3. `pin_node1` - workload first node selector
             4. `elasticsearch` - elasticsearch url without http prefix
