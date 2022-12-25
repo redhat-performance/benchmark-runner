@@ -73,4 +73,4 @@ template_data:
           sockets: 1
           cores: 4
           vm_limits_memory: 16Gi
-          vm_requests_memory: 500Mi
+          vm_requests_memory: 16Gi
