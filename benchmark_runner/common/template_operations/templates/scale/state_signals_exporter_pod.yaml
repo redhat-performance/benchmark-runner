@@ -31,7 +31,7 @@ spec:
         - name: REDIS_HOST
           value: "{{ redis }}"
         - name: SCALE_NUM
-          value: "{{ scale }}"
+          value: "{{ scale_num }}"
         - name: TIMEOUT
           value: "{{ timeout }}"
       command: ["/bin/bash"]
