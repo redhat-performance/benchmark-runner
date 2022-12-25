@@ -680,7 +680,6 @@ class OC(SSH):
         """
         The method get exposed vm port
         @param vm_name:
-        @param vm_name:
         @return:
         """
         namespace = f'-n {namespace}' if namespace else ''

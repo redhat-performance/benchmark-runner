@@ -94,12 +94,15 @@ class TemplateOperations:
                 **extra_data, **extra_kind_data, **extra_runtype_data, **extra_kind_runtype_data}
 
     @logger_time_stamp
-    def generate_yamls_internal(self, scale: str = None, scale_node: str = None, redis: str = None):
+    def __generate_yamls_internal(self, scale: str = None, scale_num: str = None, scale_node: str = None, redis: str = None):
         """
         Generate required .yaml files as a dictionary of file names and contents
-        :return: Dictionary <filename:contents>
+        @param scale: current scale 0,1,2
+        @param scale_num: the scale number
+        @param scale_node: the scale node
+        @param redis: redis
         """
-        # This really belongs in __init__, but some of the tests rely on
+        # This really belongs in __init__, but some tests rely on
         # being able to create this without an actual workload
         answer = {}
         self.__workload_name = self.__workload.split('_')[0]
@@ -125,6 +128,7 @@ class TemplateOperations:
             'standard_output_file': self.__standard_output_file,
             'standard_template_file': self.__standard_template_file,
             'scale': scale,
+            'scale_num': scale_num,
             'scale_node': scale_node
             }
         self.__environment_variables_dict = {**self.__environment_variables_dict, **template_render_data}
@@ -159,8 +163,6 @@ class TemplateOperations:
                 answer['namespace.yaml'] = render_yaml_file(dir_path=os.path.join(self.__dir_path, 'scale'), yaml_file='namespace.yaml', environment_variable_dict=self.__environment_variables_dict)
                 if redis:
                     answer['redis.yaml'] = render_yaml_file(dir_path=os.path.join(self.__dir_path, 'scale'), yaml_file='redis.yaml', environment_variable_dict=self.__environment_variables_dict)
-                    # update scale number
-                    self.__environment_variables_dict['scale'] = int(scale) + 1
                     answer['state_signals_exporter_pod.yaml'] = render_yaml_file(dir_path=os.path.join(self.__dir_path, 'scale'), yaml_file='state_signals_exporter_pod.yaml', environment_variable_dict=self.__environment_variables_dict)
         for filename, data in answer.items():
             with open(os.path.join(self.__run_artifacts_path, filename), 'w') as f:
@@ -173,7 +175,7 @@ class TemplateOperations:
         :return:
         """
         if not scale:
-            self.generate_yamls_internal()
+            self.__generate_yamls_internal()
         else:
             proc = []
             scale = int(scale)
@@ -181,7 +183,7 @@ class TemplateOperations:
             if scale_nodes:
                 for bulk in bulks:
                     for num in bulk:
-                        p = Process(target=self.generate_yamls_internal, args=(str(num), scale_nodes[int(num/scale)], redis,))
+                        p = Process(target=self.__generate_yamls_internal, args=(str(num), str(scale * len(scale_nodes)), scale_nodes[int(num / scale)], redis,))
                         p.start()
                         proc.append(p)
                     for p in proc:
@@ -190,7 +192,7 @@ class TemplateOperations:
                     time.sleep(self.__bulk_sleep_time)
             else:
                 for scale_num in range(scale):
-                    self.generate_yamls_internal(scale=str(scale_num))
+                    self.__generate_yamls_internal(scale=str(scale_num))
 
     # The following routines are for testing purposes,
     # in particular to allow a known environment to be set up for golden file testing
