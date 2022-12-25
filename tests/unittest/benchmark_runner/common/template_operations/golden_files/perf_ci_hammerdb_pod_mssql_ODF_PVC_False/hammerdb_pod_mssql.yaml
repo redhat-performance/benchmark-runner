@@ -23,7 +23,7 @@ spec:
       pin_node: "pin-node-1"
       resources: True # enable for resources requests/limits
       requests_cpu: 10m
-      requests_memory: 10Mi
+      requests_memory: 16Gi
       limits_cpu: 16
       limits_memory: 16Gi
       db_type: "mssql"
