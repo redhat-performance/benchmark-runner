@@ -35,20 +35,7 @@ class CreateODF(CreateOCPResourceOperations):
                 else:
                     self.__oc.run(cmd=f'chmod +x {os.path.join(self.__path, resource)}; {self.__path}/./{resource}')
             else:  # yaml
-                # run in ODF<=4.10
-                if '07_1_subscription' in resource:
-                    if self._odf_major_version <= 4 and self._odf_minor_version <= 10:
-                        self.__oc.create_async(yaml=os.path.join(self.__path, resource))
-                    else:
-                        continue
-                # run in ODF=>4.11
-                elif '07_2_subscription' in resource:
-                    if self._odf_major_version >= 4 and self._odf_minor_version >= 11:
-                        self.__oc.create_async(yaml=os.path.join(self.__path, resource))
-                    else:
-                        continue
-                else:
-                    self.__oc.create_async(yaml=os.path.join(self.__path, resource))
+                self.__oc.create_async(yaml=os.path.join(self.__path, resource))
                 if '04_local_volume_set.yaml' in resource:
                     # openshift local storage
                     self.wait_for_ocp_resource_create(resource='odf',
@@ -61,7 +48,7 @@ class CreateODF(CreateOCPResourceOperations):
                     self.wait_for_ocp_resource_create(resource='odf',
                                                       verify_cmd=r"""oc get pv -o jsonpath="{range .items[*]}{.metadata.name}{'\n'}{end}" | grep local | wc -l""",
                                                       count_openshift_storage=True)
-                if 'subscription.yaml' in resource:
+                if '07_subscription.yaml' in resource:
                     # wait till get the patch
                     self.wait_for_ocp_resource_create(resource=resource,
                                                       verify_cmd="oc get InstallPlan -n openshift-storage -ojsonpath={.items[0].metadata.name}",

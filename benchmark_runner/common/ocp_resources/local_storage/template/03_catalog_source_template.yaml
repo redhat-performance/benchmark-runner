@@ -6,9 +6,8 @@ metadata:
 spec:
   displayName: Red Hat Operators v{{ odf_version | replace(".","") }}
   image: registry.redhat.io/redhat/redhat-operator-index:v{{ odf_version }}
-  priority: -100
   publisher: Red Hat
   sourceType: grpc
   updateStrategy:
     registryPoll:
-      interval: 10m0s
+      interval: 30m0s
