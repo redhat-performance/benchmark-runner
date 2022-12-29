@@ -77,8 +77,8 @@ jobs:
           sudo tee -a /etc/hosts <<< "$OCP_HOSTS" > /dev/null
       - name: ☉ install ${{ matrix.resource }} Operator 
         env:
-          CNV_VERSION: "4.11"
-          ODF_VERSION: "4.10"
+          CNV_VERSION: "4.12"
+          ODF_VERSION: "4.11"
           NUM_ODF_DISK : "4"
           QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
           QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
@@ -120,8 +120,8 @@ jobs:
         run: echo "install_resource_time=$INSTALL_OCP_RESOURCE_MINUTES_TIME" >> $GITHUB_OUTPUT
       - name: ☉ Rerun OCP Operator Resources install after failure
         env:
-          CNV_VERSION: "4.11"
-          ODF_VERSION: "4.10"
+          CNV_VERSION: "4.12"
+          ODF_VERSION: "4.11"
           NUM_ODF_DISK: "4"
           QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
           QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}

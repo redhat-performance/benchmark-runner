@@ -84,7 +84,7 @@ jobs:
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>> OCP end step: ${{ matrix.step }}   >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
       - name: ▶ Rerun OCP assisted install after failure
         env:
-          INSTALL_OCP_VERSION: "latest-4.11"
+          INSTALL_OCP_VERSION: "latest-4.12.0-rc"
           IBM_API_KEY: ${{ secrets.IBM_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
           WORKER_IDS: ${{ secrets.FUNC_WORKER_IDS }}
