@@ -120,7 +120,7 @@ jobs:
         run: echo "install_resource_time=$INSTALL_OCP_RESOURCE_MINUTES_TIME" >> $GITHUB_OUTPUT
       - name: ☉ Rerun OCP Operator Reources install after failure
         env:
-          CNV_VERSION: "4.11"
+          CNV_VERSION: "4.12"
           ODF_VERSION: "4.11"
           NUM_ODF_DISK: "1"
           QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
