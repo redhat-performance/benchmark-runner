@@ -38,9 +38,9 @@ spec:
             name: cloudinitdisk
         resources:
           requests:
-            memory: 500Mi
+            memory: 200Mi
           limits:
-            memory: 500Mi
+            memory: 200Mi
       terminationGracePeriodSeconds: 0
       volumes:
       - containerDisk:
