@@ -6,7 +6,7 @@ from typeguard import typechecked
 
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 from benchmark_runner.common.oc.oc_exceptions import PodNotCreateTimeout, PodNotInitializedTimeout, PodNotReadyTimeout, \
-    PodNotCompletedTimeout, PodTerminateTimeout, PodNameNotExist, LoginFailed, VMNotCreateTimeout, VMTerminateTimeout, \
+    PodNotCompletedTimeout, PodTerminateTimeout, PodNameNotExist, LoginFailed, VMNotCreateTimeout, VMDeleteTimeout, \
     YAMLNotExist, VMNameNotExist, VMNotInitializedTimeout, VMNotReadyTimeout, VMStateTimeout, VMNotCompletedTimeout, ExecFailed, PodFailed
 from benchmark_runner.common.ssh.ssh import SSH
 from benchmark_runner.main.environment_variables import environment_variables
@@ -802,9 +802,18 @@ class OC(SSH):
         """
         if self.vm_exists(vm_name=vm_name, namespace=namespace):
             self.delete_async(yaml)
-            return self.wait_for_vm_terminate(vm_name=vm_name, namespace=namespace, timeout=timeout)
+            return self.wait_for_vm_delete(vm_name=vm_name, namespace=namespace, timeout=timeout)
         else:
             return False
+
+    @logger_time_stamp
+    def delete_all_vms(self, namespace: str = environment_variables.environment_variables_dict['namespace']):
+        """
+        This method delete all vms
+        :return:
+        """
+        namespace = f'-n {namespace}' if namespace else ''
+        self.run(f"{self.__cli} delete vm --all --grace-period 0 {namespace}")
 
     @logger_time_stamp
     def wait_for_vm_completed(self, workload: str = '', vm_name: str = '',
@@ -830,11 +839,11 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def wait_for_vm_terminate(self, vm_name: str,
-                              namespace: str = environment_variables.environment_variables_dict['namespace'],
-                              timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
+    def wait_for_vm_delete(self, vm_name: str,
+                           namespace: str = environment_variables.environment_variables_dict['namespace'],
+                           timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
         """
-        This method waits for specified VM to terminate; raise VMTerminateTimeout if it does not terminate within the specified timeout
+        This method waits till VM delete; raise VMTerminateTimeout if it does not delete within the specified timeout
         :param vm_name:
         :param namespace:
         :param timeout:
@@ -847,7 +856,7 @@ class OC(SSH):
             # sleep for x seconds
             time.sleep(OC.SLEEP_TIME)
             current_wait_time += OC.SLEEP_TIME
-        raise VMTerminateTimeout(vm_name)
+        raise VMDeleteTimeout(vm_name)
 
     @logger_time_stamp
     def wait_for_vm_log_completed(self, vm_name: str = '', end_stamp: str = '', output_filename: str = '',
