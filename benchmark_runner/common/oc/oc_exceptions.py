@@ -61,11 +61,11 @@ class VMNotCreateTimeout(OCError):
         super(VMNotCreateTimeout, self).__init__(self.message)
 
 
-class VMTerminateTimeout(OCError):
-    """This exception return pod terminate timeout error"""
-    def __init__(self, pod_name):
-        self.message = f'VM name: {pod_name} is not terminated'
-        super(VMTerminateTimeout, self).__init__(self.message)
+class VMDeleteTimeout(OCError):
+    """This exception return vm delete timeout error"""
+    def __init__(self, vm_name):
+        self.message = f'VM name: {vm_name} is not deleted'
+        super(VMDeleteTimeout, self).__init__(self.message)
 
 
 class VMNameNotExist(OCError):
