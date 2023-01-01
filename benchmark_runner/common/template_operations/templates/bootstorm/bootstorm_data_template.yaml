@@ -8,11 +8,11 @@ template_data:
     fedora_container_disk: quay.io/ebattat/fedora37-container-disk:latest
   run_type:
     perf_ci:
-      limits_memory: 200Mi
-      requests_memory: 200Mi
+      limits_memory: 180Mi
+      requests_memory: 180Mi
     default:
-      limits_memory: 200Mi
-      requests_memory: 200Mi
+      limits_memory: 180Mi
+      requests_memory: 180Mi
   kind:
     vm:
       run_type:
