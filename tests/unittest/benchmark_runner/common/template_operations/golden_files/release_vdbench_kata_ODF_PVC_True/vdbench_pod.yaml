@@ -23,7 +23,7 @@ metadata:
   name: vdbench-kata-deadbeef
   namespace: benchmark-runner
   annotations:
-    io.katacontainers.config.hypervisor.virtio_fs_extra_args: '["-o","allow_direct_io"]'
+    io.katacontainers.config.hypervisor.virtio_fs_extra_args: '["-o","allow_direct_io","--thread-pool-size=16"]'
   labels:
     app: vdbench-deadbeef
     type: vdbench-kata-deadbeef

@@ -65,7 +65,11 @@ metadata:
   namespace: {{ namespace }}
   annotations:
     {%- if kind == 'kata' %}
+    {% if VIRTIOFSD_THREADS -%}
+    io.katacontainers.config.hypervisor.virtio_fs_extra_args: '["-o","allow_direct_io","--thread-pool-size={{ VIRTIOFSD_THREADS }}"]'
+    {%- else -%}
     io.katacontainers.config.hypervisor.virtio_fs_extra_args: '["-o","allow_direct_io"]'
+    {%- endif -%}
     {%- endif %}
   labels:
     {% if scale -%}
