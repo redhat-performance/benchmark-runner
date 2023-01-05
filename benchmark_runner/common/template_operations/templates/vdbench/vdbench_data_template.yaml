@@ -48,6 +48,7 @@ template_data:
       BLOCK_SIZES: 64,oltp1
       IO_OPERATION: write,oltp1
       IO_THREADS: 16,3
+      VIRTIOFSD_THREADS: 16
       FILES_IO: random,oltp1
       IO_RATE: max,max
       # used for mixed workload 0-100
