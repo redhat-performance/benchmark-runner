@@ -44,7 +44,7 @@ spec:
           memory: 4Gi
         limits:
           cpu: 2
-          memory: 32Gi
+          memory: 64Gi
       volumeMounts:
         - name: vdbench-pod-pvc-claim
           mountPath: "/workload"
