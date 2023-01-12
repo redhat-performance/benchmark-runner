@@ -66,7 +66,18 @@ def test_oc_get_odf_version():
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
-    oc.get_odf_version()
+    assert oc.get_odf_version()
+
+
+def test_oc_get_odf_disk_count():
+    """
+    This method gets odf disk count
+    :return:
+    """
+    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
+    oc.login()
+    odf_disk_count = oc.get_odf_disk_count()
+    assert (odf_disk_count is None or odf_disk_count > 0)
 
 
 def test_oc_get_master_nodes():
