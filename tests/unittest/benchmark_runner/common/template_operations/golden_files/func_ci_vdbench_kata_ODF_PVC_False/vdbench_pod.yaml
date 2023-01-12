@@ -34,7 +34,6 @@ spec:
           memory: 4Gi
         limits:
           cpu: 2
-          memory: 4Gi
       env:
         - name: BLOCK_SIZES
           value: "64,oltp1"
