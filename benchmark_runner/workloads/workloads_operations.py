@@ -347,7 +347,8 @@ class WorkloadsOperations:
                     'ci_date': datetime.datetime.now().strftime(date_format),
                     'uuid': self._uuid,
                     'pin_node1': self._pin_node1,
-                    'pin_node2': self._pin_node2}
+                    'pin_node2': self._pin_node2,
+                    'odf_disk_count': self._oc.get_odf_disk_count()}
         if kind:
             metadata.update({'kind': kind})
         if status:
@@ -382,13 +383,14 @@ class WorkloadsOperations:
         self._es_operations.verify_elasticsearch_data_uploaded(index=index, uuid=uuid)
 
     @logger_time_stamp
-    def update_ci_status(self, status: str, ci_minutes_time: int, benchmark_operator_id: str, benchmark_wrapper_id: str, ocp_install_minutes_time: int = 0, ocp_resource_install_minutes_time: int = 0):
+    def update_ci_status(self, status: str, ci_minutes_time: int, benchmark_runner_id: str, benchmark_operator_id: str, benchmark_wrapper_id: str, ocp_install_minutes_time: int = 0, ocp_resource_install_minutes_time: int = 0):
         """
         This method update ci status Pass/Failed
         :param status: Pass/Failed
         :param ci_minutes_time: ci time in minutes
-        :param benchmark_wrapper_id: benchmark_wrapper last repository commit id
+        :param benchmark_runner_id: benchmark_runner last repository commit id
         :param benchmark_operator_id: benchmark_operator last repository commit id
+        :param benchmark_wrapper_id: benchmark_wrapper last repository commit id
         :param ocp_install_minutes_time: ocp install minutes time, default 0 because ocp install run once a week
         :param ocp_resource_install_minutes_time: ocp install minutes time, default 0 because ocp install run once a week
         :return:
@@ -404,7 +406,7 @@ class WorkloadsOperations:
             ibm_operations.ibm_connect()
             ocp_install_minutes_time = ibm_operations.get_ocp_install_time()
             ibm_operations.ibm_disconnect()
-        metadata.update({'status': status, 'status#': status_dict[status], 'ci_minutes_time': ci_minutes_time, 'benchmark_operator_id': benchmark_operator_id, 'benchmark_wrapper_id': benchmark_wrapper_id, 'ocp_install_minutes_time': ocp_install_minutes_time, 'ocp_resource_install_minutes_time': ocp_resource_install_minutes_time})
+        metadata.update({'status': status, 'status#': status_dict[status], 'ci_minutes_time': ci_minutes_time, 'benchmark_runner_id': benchmark_runner_id, 'benchmark_operator_id': benchmark_operator_id, 'benchmark_wrapper_id': benchmark_wrapper_id, 'ocp_install_minutes_time': ocp_install_minutes_time, 'ocp_resource_install_minutes_time': ocp_resource_install_minutes_time})
         self._es_operations.upload_to_elasticsearch(index=es_index, data=metadata)
 
     @logger_time_stamp
