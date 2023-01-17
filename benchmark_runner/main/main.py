@@ -125,10 +125,12 @@ def update_ci_status():
     :return:
     """
     ci_minutes_time = environment_variables_dict.get('ci_minutes_time', '')
+    benchmark_runner_id = environment_variables_dict.get('benchmark_runner_id', '')
     benchmark_operator_id = environment_variables_dict.get('benchmark_operator_id', '')
     benchmark_wrapper_id = environment_variables_dict.get('benchmark_wrapper_id', '')
     benchmark_runner = Workloads()
     benchmark_runner.update_ci_status(status=ci_status, ci_minutes_time=int(ci_minutes_time),
+                                      benchmark_runner_id=benchmark_runner_id,
                                       benchmark_operator_id=benchmark_operator_id,
                                       benchmark_wrapper_id=benchmark_wrapper_id)
 

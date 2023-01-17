@@ -243,6 +243,8 @@ class EnvironmentVariables:
         self._environment_variables_dict['ci_minutes_time'] = EnvironmentVariables.get_env('CI_MINUTES_TIME', 0)
         # Get this parameter from install resource process
         self._environment_variables_dict['ocp_resource_install_minutes_time'] = EnvironmentVariables.get_env('OCP_RESOURCE_INSTALL_MINUTES_TIME', 0)
+        # benchmark-runner last commit id
+        self._environment_variables_dict['benchmark_runner_id'] = EnvironmentVariables.get_env('BENCHMARK_RUNNER_ID', '')
         # benchmark-operator last commit id
         self._environment_variables_dict['benchmark_operator_id'] = EnvironmentVariables.get_env('BENCHMARK_OPERATOR_ID', '')
         # benchmark-wrapper last commit id

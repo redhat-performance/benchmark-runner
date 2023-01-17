@@ -131,6 +131,14 @@ class OC(SSH):
             return True
         return False
 
+    def get_odf_disk_count(self):
+        """
+        This method returns odf disk count
+        :return:
+        """
+        if self.is_odf_installed():
+            return int(self.run(f"{self.__cli} get --no-headers pod -n openshift-storage | grep osd | grep -cv prepare"))
+
     def is_kata_installed(self):
         """
         This method check if kata operator is installed
