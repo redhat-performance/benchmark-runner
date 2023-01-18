@@ -49,6 +49,18 @@ class BootstormVM(WorkloadsOperations):
             # verify that data upload to elastic search according to unique uuid
             self._verify_elasticsearch_data_uploaded(index=self.__es_index, uuid=self._uuid)
 
+    def __stop_vm_scale(self, vm_num: str):
+        """
+        This method stops VMs async in parallel
+        """
+        self._virtctl.stop_vm_async(vm_name=f'bootstorm-vm-{self._trunc_uuid}-{vm_num}')
+
+    def __wait_for_stop_vm_scale(self, vm_num: str):
+        """
+        This method waits for VMs stop in parallel
+        """
+        self._virtctl.wait_for_vm_status(vm_name=f'bootstorm-vm-{self._trunc_uuid}-{vm_num}')
+
     def __delete_vm_scale(self, vm_num: str):
         """
         This method deletes VMs async in parallel
@@ -100,7 +112,7 @@ class BootstormVM(WorkloadsOperations):
                 # create run bulks
                 bulks = tuple(self.split_run_bulks(iterable=range(self._scale * len(self._scale_node_list)), limit=self._threads_limit))
                 # create, run and delete vms
-                for target in (self.__create_vm_scale, self.__run_vm_scale, self.__delete_vm_scale, self.__wait_for_delete_vm_scale):
+                for target in (self.__create_vm_scale, self.__run_vm_scale, self.__stop_vm_scale, self.__wait_for_stop_vm_scale, self.__delete_vm_scale, self.__wait_for_delete_vm_scale):
                     proc = []
                     for bulk in bulks:
                         for vm_num in bulk:
