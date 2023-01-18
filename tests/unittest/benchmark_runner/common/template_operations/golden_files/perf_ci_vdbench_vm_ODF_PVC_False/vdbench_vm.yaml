@@ -49,7 +49,7 @@ spec:
           limits:
             cpu: 2
             memory: 4Gi
-      terminationGracePeriodSeconds: 0
+      terminationGracePeriodSeconds: 180
       volumes:
         - containerDisk:
             image: quay.io/ebattat/centos-stream8-container-disk:latest
