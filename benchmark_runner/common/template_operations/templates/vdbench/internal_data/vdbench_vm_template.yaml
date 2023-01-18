@@ -84,7 +84,7 @@ spec:
           limits:
             cpu: {{ limits_cpu }}
             memory: {{ requests_memory }}
-      terminationGracePeriodSeconds: 0
+      terminationGracePeriodSeconds: 180
       volumes:
 {%- if odf_pvc == True %}
         - name: data-volume
