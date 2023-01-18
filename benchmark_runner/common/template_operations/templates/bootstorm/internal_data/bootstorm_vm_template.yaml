@@ -57,7 +57,7 @@ spec:
             memory: {{ requests_memory }}
           limits:
             memory: {{ limits_memory }}
-      terminationGracePeriodSeconds: 0
+      terminationGracePeriodSeconds: 180
       volumes:
       - containerDisk:
           image: {{ fedora_container_disk }}

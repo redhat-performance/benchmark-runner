@@ -62,7 +62,7 @@ spec:
           limits:
             cpu: 2
             memory: 4Gi
-      terminationGracePeriodSeconds: 0
+      terminationGracePeriodSeconds: 180
       volumes:
         - name: data-volume
           persistentVolumeClaim:
