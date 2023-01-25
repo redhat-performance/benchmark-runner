@@ -1,8 +1,8 @@
 # This workflow will install Python dependencies, run tests and lint with a single version of Python
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
-# This is Test PR CI Pipeline against Functional environment when pushing a PR
+# This is Test PR CI Pipeline against Performance environment when pushing a PR
 
-name: Func Env PR Test CI
+name: Perf Env PR Test CI
 
 on:
   pull_request_target:
@@ -11,7 +11,7 @@ on:
 
 # Ensures that only one deploy task per branch/environment will run at a time. 
 concurrency:
-  group: functional-environment
+  group: performance-environment
   cancel-in-progress: false
   
 jobs:
@@ -44,9 +44,9 @@ jobs:
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
       - name: ⚙️ Set Kubeconfig and hosts
         env:
-          KUBECONFIG_CONTENTS: ${{ secrets.FUNC_KUBECONFIG }}
+          KUBECONFIG_CONTENTS: ${{ secrets.PERF_KUBECONFIG }}
           RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-          OCP_HOSTS: ${{ secrets.FUNC_OCP_HOSTS }}
+          OCP_HOSTS: ${{ secrets.PERF_OCP_HOSTS }}
         run: |
           mkdir -p "$RUNNER_PATH/.kube/"
           echo "$KUBECONFIG_CONTENTS" > "$RUNNER_PATH/.kube/config"
@@ -54,21 +54,21 @@ jobs:
           sudo tee -a /etc/hosts <<< "$OCP_HOSTS" > /dev/null
       - name: 📃 Unittest with pytest
         env:
-          KUBEADMIN_PASSWORD: ${{ secrets.FUNC_KUBEADMIN_PASSWORD }}
-          PIN_NODE1: ${{ secrets.FUNC_PIN_NODE1 }}
-          PIN_NODE2: ${{ secrets.FUNC_PIN_NODE2 }}
+          KUBEADMIN_PASSWORD: ${{ secrets.PERF_KUBEADMIN_PASSWORD }}
+          PIN_NODE1: ${{ secrets.PERF_PIN_NODE1 }}
+          PIN_NODE2: ${{ secrets.PERF_PIN_NODE2 }}
           RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-          ELASTICSEARCH: ${{ secrets.FUNC_ELASTICSEARCH }}
-          ELASTICSEARCH_PORT: ${{ secrets.FUNC_ELASTICSEARCH_PORT }}
-          ELASTICSEARCH_USER: ${{ secrets.FUNC_ELASTICSEARCH_USER }}
-          ELASTICSEARCH_PASSWORD: ${{ secrets.FUNC_ELASTICSEARCH_PASSWORD }}
+          ELASTICSEARCH: ${{ secrets.PERF_ELASTICSEARCH }}
+          ELASTICSEARCH_PORT: ${{ secrets.PERF_ELASTICSEARCH_PORT }}
+          ELASTICSEARCH_USER: ${{ secrets.PERF_ELASTICSEARCH_USER }}
+          ELASTICSEARCH_PASSWORD: ${{ secrets.PERF_ELASTICSEARCH_PASSWORD }}
           IBM_REGION_NAME: ${{ secrets.IBM_REGION_NAME }}
           IBM_ENDPOINT_URL: ${{ secrets.IBM_ENDPOINT_URL }}
           IBM_ACCESS_KEY_ID: ${{ secrets.IBM_ACCESS_KEY_ID }}
           IBM_SECRET_ACCESS_KEY: ${{ secrets.IBM_SECRET_ACCESS_KEY }}
           IBM_BUCKET: ${{ secrets.IBM_BUCKET }}
           IBM_KEY: ${{ secrets.IBM_KEY }}
-          RUN_ARTIFACTS_URL: ${{ secrets.FUNC_RUN_ARTIFACTS_URL }}
+          RUN_ARTIFACTS_URL: ${{ secrets.PERF_RUN_ARTIFACTS_URL }}
         run: |
           # Install Dockerfile content for pytest
           # install oc/kubectl
@@ -114,9 +114,9 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: ⚙️ Set Kubeconfig and hosts
       env:
-        KUBECONFIG_CONTENTS: ${{ secrets.FUNC_KUBECONFIG }}
+        KUBECONFIG_CONTENTS: ${{ secrets.PERF_KUBECONFIG }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-        OCP_HOSTS: ${{ secrets.FUNC_OCP_HOSTS }}
+        OCP_HOSTS: ${{ secrets.PERF_OCP_HOSTS }}
       run: |
           mkdir -p "$RUNNER_PATH/.kube/"
           echo "$KUBECONFIG_CONTENTS" > "$RUNNER_PATH/.kube/config"
@@ -124,21 +124,21 @@ jobs:
           sudo tee -a /etc/hosts <<< "$OCP_HOSTS" > /dev/null
     - name: 📃 Integration test with pytest
       env:
-        KUBEADMIN_PASSWORD: ${{ secrets.FUNC_KUBEADMIN_PASSWORD }}
-        PIN_NODE1: ${{ secrets.FUNC_PIN_NODE1 }}
-        PIN_NODE2: ${{ secrets.FUNC_PIN_NODE2 }}
+        KUBEADMIN_PASSWORD: ${{ secrets.PERF_KUBEADMIN_PASSWORD }}
+        PIN_NODE1: ${{ secrets.PERF_PIN_NODE1 }}
+        PIN_NODE2: ${{ secrets.PERF_PIN_NODE2 }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-        ELASTICSEARCH: ${{ secrets.FUNC_ELASTICSEARCH }}
-        ELASTICSEARCH_PORT: ${{ secrets.FUNC_ELASTICSEARCH_PORT }}
-        ELASTICSEARCH_USER: ${{ secrets.FUNC_ELASTICSEARCH_USER }}
-        ELASTICSEARCH_PASSWORD: ${{ secrets.FUNC_ELASTICSEARCH_PASSWORD }}
+        ELASTICSEARCH: ${{ secrets.PERF_ELASTICSEARCH }}
+        ELASTICSEARCH_PORT: ${{ secrets.PERF_ELASTICSEARCH_PORT }}
+        ELASTICSEARCH_USER: ${{ secrets.PERF_ELASTICSEARCH_USER }}
+        ELASTICSEARCH_PASSWORD: ${{ secrets.PERF_ELASTICSEARCH_PASSWORD }}
         IBM_REGION_NAME: ${{ secrets.IBM_REGION_NAME }}
         IBM_ENDPOINT_URL: ${{ secrets.IBM_ENDPOINT_URL }}
         IBM_ACCESS_KEY_ID: ${{ secrets.IBM_ACCESS_KEY_ID }}
         IBM_SECRET_ACCESS_KEY: ${{ secrets.IBM_SECRET_ACCESS_KEY }}
         IBM_BUCKET: ${{ secrets.IBM_BUCKET }}
         IBM_KEY: ${{ secrets.IBM_KEY }}
-        RUN_ARTIFACTS_URL: ${{ secrets.FUNC_RUN_ARTIFACTS_URL }}
+        RUN_ARTIFACTS_URL: ${{ secrets.PERF_RUN_ARTIFACTS_URL }}
       run: |
         # Install Dockerfile content for pytest
         # install oc/kubectl
@@ -185,9 +185,9 @@ jobs:
        if [[ -f tests_requirements.txt ]]; then pip install -r tests_requirements.txt; fi
    - name: ⚙️ Set Kubeconfig and hosts
      env:
-       KUBECONFIG_CONTENTS: ${{ secrets.FUNC_KUBECONFIG }}
+       KUBECONFIG_CONTENTS: ${{ secrets.PERF_KUBECONFIG }}
        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-       OCP_HOSTS: ${{ secrets.FUNC_OCP_HOSTS }}
+       OCP_HOSTS: ${{ secrets.PERF_OCP_HOSTS }}
      run: |
          mkdir -p "$RUNNER_PATH/.kube/"
          echo "$KUBECONFIG_CONTENTS" > "$RUNNER_PATH/.kube/config"
@@ -196,15 +196,15 @@ jobs:
    - name: 📃 E2E test
      env:
        WORKLOAD: "stressng_pod"
-       KUBEADMIN_PASSWORD: ${{ secrets.FUNC_KUBEADMIN_PASSWORD }}
-       PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.FUNC_PIN_NODE_BENCHMARK_OPERATOR }}
-       PIN_NODE1: ${{ secrets.FUNC_PIN_NODE1 }}
-       PIN_NODE2: ${{ secrets.FUNC_PIN_NODE2 }}
+       KUBEADMIN_PASSWORD: ${{ secrets.PERF_KUBEADMIN_PASSWORD }}
+       PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.PERF_PIN_NODE_BENCHMARK_OPERATOR }}
+       PIN_NODE1: ${{ secrets.PERF_PIN_NODE1 }}
+       PIN_NODE2: ${{ secrets.PERF_PIN_NODE2 }}
        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-       ELASTICSEARCH: ${{ secrets.FUNC_ELASTICSEARCH }}
-       ELASTICSEARCH_PORT: ${{ secrets.FUNC_ELASTICSEARCH_PORT }}
-       ELASTICSEARCH_USER: ${{ secrets.FUNC_ELASTICSEARCH_USER }}
-       ELASTICSEARCH_PASSWORD: ${{ secrets.FUNC_ELASTICSEARCH_PASSWORD }}
+       ELASTICSEARCH: ${{ secrets.PERF_ELASTICSEARCH }}
+       ELASTICSEARCH_PORT: ${{ secrets.PERF_ELASTICSEARCH_PORT }}
+       ELASTICSEARCH_USER: ${{ secrets.PERF_ELASTICSEARCH_USER }}
+       ELASTICSEARCH_PASSWORD: ${{ secrets.PERF_ELASTICSEARCH_PASSWORD }}
      run: |
        # Install Dockerfile content for pytest
        # install oc/kubectl

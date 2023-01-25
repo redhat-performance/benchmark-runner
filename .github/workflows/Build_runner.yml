@@ -1,6 +1,6 @@
 # This workflow will install Python dependencies, run tests and lint with a single version of Python
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
-# This is Test CI Pipeline against Functional environment when merging to main
+# This is Test CI Pipeline against Performance environment when merging to main
 name: Build Runner
 
 on:
@@ -16,7 +16,7 @@ on:
 
 # Ensures that only one deploy task per branch/environment will run at a time.
 concurrency:
-  group: functional-environment
+  group: performance-environment
   cancel-in-progress: false
   
 jobs:
@@ -122,7 +122,7 @@ jobs:
           pip install benchmark-runner
       - name: ⚙️ Set Kubeconfig
         env:
-          KUBECONFIG: ${{ secrets.FUNC_KUBECONFIG }}
+          KUBECONFIG: ${{ secrets.PERF_KUBECONFIG }}
           RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
         run: |
           mkdir -p "$RUNNER_PATH/.kube/"
