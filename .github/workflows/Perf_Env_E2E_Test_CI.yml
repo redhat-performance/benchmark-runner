@@ -1,15 +1,15 @@
 # This workflow will install Python dependencies, run tests and lint with a single version of Python
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
-# This is Test PR CI Pipeline against Functional environment when pushing a PR
+# This is Test PR CI Pipeline against Performance environment when pushing a PR
  
-name: Func Env E2E Test CI
+name: Perf Env E2E Test CI
 
 on:
   workflow_dispatch:
 
 # on:
 #   workflow_run:
-#     workflows: ["ADeploy IPI FUNC Env Weekly"]
+#     workflows: ["ADeploy IPI PERF Env Weekly"]
 #     types:
 #       - completed
 
@@ -19,7 +19,7 @@ on:
 
 # Ensures that only one deploy task per branch/environment will run at a time.
 concurrency:
-  group: functional-environment
+  group: performance-environment
   cancel-in-progress: false
 
 jobs:
@@ -48,10 +48,10 @@ jobs:
           pip install benchmark-runner
       - name: ⚙️ Set SSH key
         env:
-          PROVISION_PRIVATE_KEY: ${{ secrets.FUNC_PROVISION_PRIVATE_KEY }}
+          PROVISION_PRIVATE_KEY: ${{ secrets.PERF_PROVISION_PRIVATE_KEY }}
           RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-          PROVISION_IP: ${{ secrets.FUNC_PROVISION_IP }}
-          PROVISION_USER: ${{ secrets.FUNC_PROVISION_USER }}
+          PROVISION_IP: ${{ secrets.PERF_PROVISION_IP }}
+          PROVISION_USER: ${{ secrets.PERF_PROVISION_USER }}
         run: |
           mkdir -p "$RUNNER_PATH/.ssh/"
           echo "$PROVISION_PRIVATE_KEY" > $RUNNER_PATH/private_key.txt
@@ -68,9 +68,9 @@ jobs:
           END
       - name: ⚙️ Set Kubeconfig and hosts
         env:
-          KUBECONFIG_CONTENTS: ${{ secrets.FUNC_KUBECONFIG }}
+          KUBECONFIG_CONTENTS: ${{ secrets.PERF_KUBECONFIG }}
           RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-          OCP_HOSTS: ${{ secrets.FUNC_OCP_HOSTS }}
+          OCP_HOSTS: ${{ secrets.PERF_OCP_HOSTS }}
         run: |
           mkdir -p "$RUNNER_PATH/.kube/"
           echo "$KUBECONFIG_CONTENTS" > "$RUNNER_PATH/.kube/config"
@@ -85,15 +85,15 @@ jobs:
           QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
           IBM_API_KEY: ${{ secrets.IBM_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
-          WORKER_IDS: ${{ secrets.FUNC_WORKER_IDS }}
-          PROVISION_IP: ${{ secrets.FUNC_PROVISION_IP }}
-          PROVISION_USER: ${{ secrets.FUNC_PROVISION_USER }}
-          PROVISION_OC_USER: ${{ secrets.FUNC_PROVISION_OC_USER }}
-          PROVISION_PORT: ${{ secrets.FUNC_PROVISION_PORT }}
+          WORKER_IDS: ${{ secrets.PERF_WORKER_IDS }}
+          PROVISION_IP: ${{ secrets.PERF_PROVISION_IP }}
+          PROVISION_USER: ${{ secrets.PERF_PROVISION_USER }}
+          PROVISION_OC_USER: ${{ secrets.PERF_PROVISION_OC_USER }}
+          PROVISION_PORT: ${{ secrets.PERF_PROVISION_PORT }}
           GITHUB_REPOSITORY_SHORT: ${{ secrets.GIT_REPOSITORY_SHORT }}
           CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
           CONTAINER_PRIVATE_KEY_PATH: ${{ secrets.CONTAINER_PRIVATE_KEY_PATH }}
-          KUBEADMIN_PASSWORD: ${{ secrets.FUNC_KUBEADMIN_PASSWORD }}
+          KUBEADMIN_PASSWORD: ${{ secrets.PERF_KUBEADMIN_PASSWORD }}
           RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
           CNV_NIGHTLY_REGISTERED: ${{ secrets.CNV_NIGHTLY_REGISTERED }}
           CNV_NIGHTLY_CATALOG_SOURCE: ${{ secrets.CNV_NIGHTLY_CATALOG_SOURCE }}
@@ -129,15 +129,15 @@ jobs:
           QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
           IBM_API_KEY: ${{ secrets.IBM_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
-          WORKER_IDS: ${{ secrets.FUNC_WORKER_IDS }}
-          PROVISION_IP: ${{ secrets.FUNC_PROVISION_IP }}
-          PROVISION_USER: ${{ secrets.FUNC_PROVISION_USER }}
-          PROVISION_OC_USER: ${{ secrets.FUNC_PROVISION_OC_USER }}
-          PROVISION_PORT: ${{ secrets.FUNC_PROVISION_PORT }}
+          WORKER_IDS: ${{ secrets.PERF_WORKER_IDS }}
+          PROVISION_IP: ${{ secrets.PERF_PROVISION_IP }}
+          PROVISION_USER: ${{ secrets.PERF_PROVISION_USER }}
+          PROVISION_OC_USER: ${{ secrets.PERF_PROVISION_OC_USER }}
+          PROVISION_PORT: ${{ secrets.PERF_PROVISION_PORT }}
           GITHUB_REPOSITORY_SHORT: ${{ secrets.GIT_REPOSITORY_SHORT }}
           CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
           CONTAINER_PRIVATE_KEY_PATH: ${{ secrets.CONTAINER_PRIVATE_KEY_PATH }}
-          KUBEADMIN_PASSWORD: ${{ secrets.FUNC_KUBEADMIN_PASSWORD }}
+          KUBEADMIN_PASSWORD: ${{ secrets.PERF_KUBEADMIN_PASSWORD }}
           RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
           CNV_NIGHTLY_REGISTERED: ${{ secrets.CNV_NIGHTLY_REGISTERED }}
           CNV_NIGHTLY_CATALOG_SOURCE: ${{ secrets.CNV_NIGHTLY_CATALOG_SOURCE }}

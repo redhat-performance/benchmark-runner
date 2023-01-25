@@ -6,10 +6,10 @@ name: Deploy Operator Func Env Weekly CI
 # Only trigger, when the build workflow succeeded
 
 on:
-  workflow_run:
-    workflows: ["Deploy Assisted installer Func Env Weekly CI"]
-    types:
-      - completed
+#  workflow_run:
+#    workflows: ["Deploy Assisted installer Func Env Weekly CI"]
+#    types:
+#      - completed
   workflow_dispatch:
 
 #on:
