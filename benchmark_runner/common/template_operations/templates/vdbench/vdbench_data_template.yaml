@@ -41,12 +41,9 @@ template_data:
       # size in MB
       SIZE_PER_FILE: 10
       limits_cpu: 2
-      # Don't use memory limits.  Kata does not currently work well
-      # with memory limits in I/O-intensive workloads due to incorrect
-      # computation of VM size
-      # limits_memory: 64Gi
+      limits_memory: 4Gi
       requests_cpu: 2
-      # requests_memory: 4Gi
+      requests_memory: 4Gi
       storage: 64Gi
     default:
       BLOCK_SIZES: 64,oltp1
@@ -78,21 +75,14 @@ template_data:
       # size in MB
       SIZE_PER_FILE: 5
       limits_cpu: 2
-      # Don't use memory limits.  Kata does not currently work well
-      # with memory limits in I/O-intensive workloads due to incorrect
-      # computation of VM size
-      # limits_memory: 4Gi
+      limits_memory: 4Gi
       requests_cpu: 10m
-      # requests_memory: 4Gi
+      requests_memory: 4Gi
       storage: 10Gi
   kind:
     vm:
       run_type:
         perf_ci:
-          limits_memory: 4Gi
-          requests_memory: 4Gi
           sockets: 2
         default:
-          limits_memory: 4Gi
-          requests_memory: 4Gi
           sockets: 2

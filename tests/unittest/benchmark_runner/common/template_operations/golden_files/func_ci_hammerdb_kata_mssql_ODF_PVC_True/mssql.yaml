@@ -63,8 +63,10 @@ spec:
         resources:
           requests:
             cpu: 10m
+            memory: 16Gi
           limits:
             cpu: 4
+            memory: 16Gi
         env:
           - name: MSSQL_PID
             value: "Enterprise"

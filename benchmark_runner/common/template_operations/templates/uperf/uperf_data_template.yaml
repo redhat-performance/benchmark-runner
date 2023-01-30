@@ -57,17 +57,11 @@ template_data:
       run_type:
         perf_ci:
           limits_cpu: 8
-          # Don't use memory limits.  Kata does not currently work well
-          # with memory limits in I/O-intensive workloads due to incorrect
-          # computation of VM size
-          # limits_memory: 8Gi
+          limits_memory: 8Gi
           requests_cpu: 8
-          # requests_memory: 8Gi
+          requests_memory: 8Gi
         default:
           limits_cpu: 4
-          # Don't use memory limits.  Kata does not currently work well
-          # with memory limits in I/O-intensive workloads due to incorrect
-          # computation of VM size
-          # limits_memory: 8Gi
+          limits_memory: 8Gi
           requests_cpu: 10m
-          # requests_memory: 8Gi
+          requests_memory: 8Gi

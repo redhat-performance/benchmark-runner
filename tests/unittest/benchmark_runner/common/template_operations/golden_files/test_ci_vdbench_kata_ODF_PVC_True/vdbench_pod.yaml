@@ -43,8 +43,10 @@ spec:
       resources:
         requests:
           cpu: 10m
+          memory: 4Gi
         limits:
           cpu: 2
+          memory: 4Gi
       volumeMounts:
         - name: vdbench-pod-pvc-claim
           mountPath: "/workload"

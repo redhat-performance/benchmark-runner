@@ -65,8 +65,10 @@ spec:
         resources:
           requests:
             cpu: 32
+            memory: 32Gi
           limits:
             cpu: 32
+            memory: 32Gi
         env:
            - name: MYSQL_USER
              value: "test"
