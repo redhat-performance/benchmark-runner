@@ -44,10 +44,8 @@ spec:
         resources:
           requests:
             cpu: 32
-            memory: 32Gi
           limits:
             cpu: 32
-            memory: 32Gi
         env:
           - name: MSSQL_PID
             value: "Enterprise"

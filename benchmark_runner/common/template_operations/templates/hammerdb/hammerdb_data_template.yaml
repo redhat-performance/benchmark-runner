@@ -18,26 +18,32 @@ template_data:
       db_num_workers: 32
       db_warehouses: 96
       storage: 100Gi
+      # Don't use memory limits.  Kata does not currently work well
+      # with memory limits in I/O-intensive workloads due to incorrect
+      # computation of VM size
       database_limits_cpu: 32
-      database_limits_memory: 32Gi
+      # database_limits_memory: 32Gi
       database_requests_cpu: 32
-      database_requests_memory: 32Gi
+      # database_requests_memory: 32Gi
       limits_cpu: 16
-      limits_memory: 16Gi
+      # limits_memory: 16Gi
       requests_cpu: 10m
-      requests_memory: 16Gi
+      # requests_memory: 16Gi
     default:
       db_num_workers: 2
       db_warehouses: 2
       storage: 10Gi
       database_limits_cpu: 4
-      database_limits_memory: 16Gi
+      # Don't use memory limits.  Kata does not currently work well
+      # with memory limits in I/O-intensive workloads due to incorrect
+      # computation of VM size
+      # database_limits_memory: 16Gi
       database_requests_cpu: 10m
-      database_requests_memory: 16Gi
+      # database_requests_memory: 16Gi
       limits_cpu: 4
-      limits_memory: 16Gi
+      # limits_memory: 16Gi
       requests_cpu: 10m
-      requests_memory: 16Gi
+      # requests_memory: 16Gi
   extra:
     mariadb:
       db_image: centos-stream8-mariadb103-container-disk:latest
@@ -67,10 +73,16 @@ template_data:
         perf_ci:
           sockets: 32
           cores: 1
+          database_limits_memory: 32Gi
+          database_requests_memory: 32Gi
+          limits_memory: 16Gi
+          requests_memory: 16Gi
           vm_limits_memory: 32Gi
           vm_requests_memory: 32Gi
         default:
           sockets: 1
           cores: 4
+          limits_memory: 16Gi
+          requests_memory: 16Gi
           vm_limits_memory: 16Gi
           vm_requests_memory: 16Gi

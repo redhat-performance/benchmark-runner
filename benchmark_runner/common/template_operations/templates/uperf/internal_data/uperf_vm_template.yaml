@@ -54,10 +54,14 @@ spec:
        cores: {{ cores }}
        threads: 1
        image: quay.io/kubevirt/fedora-container-disk-images:34
+       {%- if limits_memory %}
        limits:
          memory: {{ limits_memory }}
+       {%- endif %}
+       {%- if requests_memory %}
        requests:
          memory: {{ requests_memory }}
+       {%- endif %}
        network:
          front_end: masquerade
          multiqueue:
@@ -72,10 +76,14 @@ spec:
        cores: {{ cores }}
        threads: 1
        image: quay.io/kubevirt/fedora-container-disk-images:34
+       {%- if limits_memory %}
        limits:
          memory: {{ limits_memory }}
+       {%- endif %}
+       {%- if requests_memory %}
        requests:
          memory: {{ requests_memory }}
+       {%- endif %}
        network:
          front_end: masquerade
          multiqueue:

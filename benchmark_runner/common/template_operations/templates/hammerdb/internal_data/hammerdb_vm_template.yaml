@@ -100,10 +100,14 @@ spec:
         cores: {{ cores }}
         threads: 1
         image: quay.io/cloud-bulldozer/{{ db_image }}
+        {%- if limits_memory %}
         limits:
           memory: {{ vm_limits_memory }}
+        {%- endif %}
+        {%- if requests_memory %}
         requests:
           memory: {{ vm_requests_memory }}
+        {%- endif %}
         network:
           front_end: masquerade
           multiqueue:
