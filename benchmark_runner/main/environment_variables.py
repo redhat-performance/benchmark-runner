@@ -72,7 +72,7 @@ class EnvironmentVariables:
         self._environment_variables_dict['scale'] = EnvironmentVariables.get_env('SCALE', '')
         # list of nodes per pod/vm, scale number per node, e.g: [ 'master-1', 'master-2' ] - run 1 pod/vm in each node
         self._environment_variables_dict['scale_nodes'] = EnvironmentVariables.get_env('SCALE_NODES', "")
-        self._environment_variables_dict['bulk_sleep_time'] = EnvironmentVariables.get_env('BULK_SLEEP_TIME', '3')
+        self._environment_variables_dict['bulk_sleep_time'] = EnvironmentVariables.get_env('BULK_SLEEP_TIME', '30')
         # CPU processors = threads limit
         self._environment_variables_dict['threads_limit'] = EnvironmentVariables.get_env('THREADS_LIMIT', '')
         # redis for synchronization
