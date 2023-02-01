@@ -188,7 +188,7 @@ jobs:
             if [[ '${{ matrix.workload }}' == 'bootstorm_vm_scale' ]]
             then
               REDIS=''
-              SCALE=200
+              SCALE=100
               THREADS_LIMIT=20
             fi
             workload=$(awk -F_ '{print $1"_"$2}' <<< '${{ matrix.workload }}')
