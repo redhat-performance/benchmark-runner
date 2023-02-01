@@ -97,26 +97,14 @@ spec:
         ports:
         - containerPort: 1433
         resources:
-          {%- if database_requests_cpu or database_requests_memory %}
           requests:
-            {%- if database_requests_cpu %}
             cpu: {{ database_requests_cpu }}
-            {%- endif %}
-            {%- if database_requests_memory %}
             memory: {{ database_requests_memory }}
-            {%- endif %}
-          {%- endif %}
-          {%- if database_limits_cpu or database_limits_memory %}
           limits:
           {%- if kind != 'kata' or kata_cpuoffline_workaround != True %}
-            {%- if database_limits_cpu %}
             cpu: {{ database_limits_cpu }}
             {%- endif %}
-            {%- endif %}
-            {%- if database_limits_memory %}
             memory: {{ database_limits_memory }}
-            {%- endif %}
-          {%- endif %}
         env:
           - name: MSSQL_PID
             value: "Enterprise"

@@ -26,18 +26,10 @@ spec:
       pin: {{ pin }} # enable for nodeSelector
       pin_node: "{{ pin_node1 }}"
       resources: {{ resources }} # enable for resources requests/limits
-      {%- if requests_cpu %}
       requests_cpu: {{ requests_cpu }}
-      {%- endif %}
-      {%- if requests_memory %}
       requests_memory: {{ requests_memory }}
-      {%- endif %}
-      {%- if limits_cpu %}
       limits_cpu: {{ limits_cpu }}
-      {%- endif %}
-      {%- if limits_memory %}
       limits_memory: {{ limits_memory }}
-      {%- endif %}
       db_type: "{{ db_type }}"
       timed_test: true
       test_type: "tpc-c"

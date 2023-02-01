@@ -20,46 +20,20 @@ spec:
   workload:
     name: uperf
     args:
-      {%- if requests_cpu or requests_memory or limits_cpu or limits_memory %}
       client_resources:
-        {%- if requests_cpu or requests_memory %}
         requests:
-          {%- if requests_cpu %}
           cpu: {{ requests_cpu }}
-          {%- endif %}
-          {%- if requests_memory %}
           memory: {{ requests_memory }}
-          {%- endif %}
-        {%- endif %}
-        {%- if limits_cpu or limits_memory %}
         limits:
-          {%- if limits_cpu %}
           cpu: {{ limits_cpu }}
-          {%- endif %}
-          {%- if limits_memory %}
           memory: {{ limits_memory }}
-          {%- endif %}
-        {%- endif %}
       server_resources:
-        {%- if requests_cpu or requests_memory %}
         requests:
-          {%- if requests_cpu %}
           cpu: {{ requests_cpu }}
-          {%- endif %}
-          {%- if requests_memory %}
           memory: {{ requests_memory }}
-          {%- endif %}
-        {%- endif %}
-        {%- if limits_cpu or limits_memory %}
         limits:
-          {%- if limits_cpu %}
           cpu: {{ limits_cpu }}
-          {%- endif %}
-          {%- if limits_memory %}
           memory: {{ limits_memory }}
-          {%- endif %}
-        {%- endif %}
-      {%- endif %}
       pin: {{ pin }}
       pin_server: "{{ pin_server }}"
       pin_client: "{{ pin_client }}"
