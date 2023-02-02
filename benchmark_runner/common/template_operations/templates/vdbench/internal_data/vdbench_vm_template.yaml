@@ -83,7 +83,7 @@ spec:
             memory: {{ requests_memory }}
           limits:
             cpu: {{ limits_cpu }}
-            memory: {{ requests_memory }}
+            memory: {{ limits_memory }}
       terminationGracePeriodSeconds: 180
       volumes:
 {%- if odf_pvc == True %}

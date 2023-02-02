@@ -41,7 +41,7 @@ template_data:
       # size in MB
       SIZE_PER_FILE: 10
       limits_cpu: 2
-      limits_memory: 64Gi
+      limits_memory: 4Gi
       requests_cpu: 2
       requests_memory: 4Gi
       storage: 64Gi

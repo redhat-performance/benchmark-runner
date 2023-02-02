@@ -71,6 +71,6 @@ class CreateKata(CreateOCPResourceOperations):
                 completed_nodes_count = self.__oc.run(cmd="oc get kataconfig -ojsonpath='{.items[0].status.installationStatus.completed.completed_nodes_count}'")
                 if total_nodes_count != completed_nodes_count:
                     raise KataInstallationFailed(f'not all nodes installed successfully total {total_nodes_count} != completed {completed_nodes_count}')
-            elif '03_ocp48_patch.sh' == resource:
+            elif resource.endswith('.sh'):
                 self.__oc.run(cmd=f'chmod +x {os.path.join(self.__path, resource)}; {os.path.join(self.__path, resource)}')
         return True
