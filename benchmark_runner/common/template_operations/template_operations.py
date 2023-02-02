@@ -6,7 +6,7 @@ import sys
 import benchmark_runner
 from multiprocessing import Process
 
-from jinja2 import Template
+from jinja2 import Template, TemplateSyntaxError
 from benchmark_runner.common.template_operations.render_yaml_from_template import render_yaml_file
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 from benchmark_runner.main.environment_variables import environment_variables
@@ -156,8 +156,11 @@ class TemplateOperations:
             else:
                 file_components = os.path.splitext(filename)
                 template_file = f'{file_components[0]}_template{file_components[1]}'
-            with open(os.path.join(workload_dir_path, 'internal_data', template_file)) as f:
-                template = Template(f.read())
+            try:
+                with open(os.path.join(workload_dir_path, 'internal_data', template_file)) as f:
+                    template = Template(f.read())
+            except TemplateSyntaxError as err:
+                raise SyntaxError(f"Error while rendering {template_file}: {err}")
             answer[filename] = f"{template.render(render_data)}\n"
             if scale:
                 answer['namespace.yaml'] = render_yaml_file(dir_path=os.path.join(self.__dir_path, 'scale'), yaml_file='namespace.yaml', environment_variable_dict=self.__environment_variables_dict)

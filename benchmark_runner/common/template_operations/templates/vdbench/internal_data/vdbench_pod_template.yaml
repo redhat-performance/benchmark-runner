@@ -114,9 +114,7 @@ spec:
           memory: {{ requests_memory }}
         limits:
           cpu: {{ limits_cpu }}
-{%- if not kind == 'kata' %}
           memory: {{ limits_memory }}
-{%- endif %}
       {%- if cluster == "kubernetes" %}
       volumeMounts:
         - name: vdbench-pod-vol
