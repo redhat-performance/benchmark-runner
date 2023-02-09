@@ -4,7 +4,7 @@ from os import path
 from setuptools import setup, find_packages
 
 
-__version__ = '1.0.439'
+__version__ = '1.0.440'
 
 
 here = path.abspath(path.dirname(__file__))
@@ -45,7 +45,7 @@ setup(
         'azure==4.0.0',
         'boto3==1.26.1',  # s3
         'botocore==1.29.1',  # s3
-        'cryptography==36.0.2',  # Remove once https://github.com/paramiko/paramiko/issues/2038 gets fixed.
+        'cryptography==39.0.1',  # Remove once https://github.com/paramiko/paramiko/issues/2038 gets fixed.
         'elasticsearch==7.16.1',
         'elasticsearch_dsl==7.4.0',  # for deep search
         'jinja2==3.0.3',
