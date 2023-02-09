@@ -89,11 +89,10 @@ class WorkloadsOperations:
         self._oc = WorkloadsOperations.oc
         self._virtctl = Virtctl()
 
-        # PrometheusSnapshot
+        # Prometheus Snapshot
         if self._enable_prometheus_snapshot:
             self._snapshot = PrometheusSnapshot(oc=self._oc, artifacts_path=self._run_artifacts_path, verbose=True)
-
-        self.bootstorm_start_time = {}
+        self._prometheus_snap_interval = self._environment_variables_dict.get('prometheus_snap_interval', '')
 
     def __get_workload_file_name(self, workload):
         """
@@ -356,7 +355,7 @@ class WorkloadsOperations:
         if self._scale:
             metadata.update({'scale': int(self._scale)*len(self._scale_node_list)})
         if 'bootstorm' in self._workload:
-            metadata.update({'vm_os_version': 'fedora36'})
+            metadata.update({'vm_os_version': 'fedora37'})
         if result:
             metadata.update(result)
 
@@ -410,34 +409,6 @@ class WorkloadsOperations:
         self._es_operations.upload_to_elasticsearch(index=es_index, data=metadata)
 
     @logger_time_stamp
-    def set_bootstorm_vm_start_time(self, vm_name: str = ''):
-        """
-        This method captures boot start time for specified VM
-        @return:
-        """
-        self.bootstorm_start_time[vm_name] = time.time()
-
-    @logger_time_stamp
-    def get_bootstorm_vm_elapse_time(self, vm_name: str):
-        """
-        This method returns boot elapse time for specified VM in milliseconds
-        @return: Dictionary with vm_name, node and its boot elapse time
-        """
-        vm_bootstorm_time = {}
-
-        self._virtctl.expose_vm(vm_name=vm_name)
-        # wait till vm login
-        vm_node = self._oc.get_vm_node(vm_name=vm_name)
-        node_ip = self._oc.get_nodes_addresses()[vm_node]
-        vm_node_port = self._oc.get_exposed_vm_port(vm_name=vm_name)
-        if self._oc.wait_for_vm_login(vm_name=vm_name, node_ip=node_ip, vm_node_port=vm_node_port):
-            vm_bootstorm_time['vm_name'] = vm_name
-            vm_bootstorm_time['node'] = vm_node
-            delta = time.time() - self.bootstorm_start_time[vm_name]
-            vm_bootstorm_time['bootstorm_time'] = round(delta, 3) * self.MILLISECONDS
-        return vm_bootstorm_time
-
-    @logger_time_stamp
     def split_run_bulks(self, iterable: range, limit: int = 1):
         """
         This method splits run into bulk depends on threads limit
@@ -446,6 +417,30 @@ class WorkloadsOperations:
         length = len(iterable)
         for ndx in range(0, length, limit):
             yield iterable[ndx:min(ndx + limit, length)]
+
+    @staticmethod
+    @logger_time_stamp
+    def parse_prometheus_metrics(data):
+        """
+        This method parse prometheus metrics and return summary result
+        @return:
+        """
+        result_dict = {}
+        for query, data_list in data.items():
+            if 'containerCPU-benchmark-runner' in query:
+                suffix = 'CPU'
+            elif 'containerMemory-benchmark-runner' in query:
+                suffix = 'Memory'
+            total = 0
+            max = 0
+            for item in data_list:
+                for val in item['values']:
+                    if float(val[1]) > max:
+                        max = round(float(val[1]), 3)
+                total = total + max
+                result_dict[f"{item['metric']['node']}_{suffix}"] = max
+                result_dict[f'total_{suffix}'] = total
+        return result_dict
 
     @logger_time_stamp
     def clear_nodes_cache(self):

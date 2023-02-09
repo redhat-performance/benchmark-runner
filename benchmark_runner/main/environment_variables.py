@@ -78,6 +78,9 @@ class EnvironmentVariables:
         # redis for synchronization
         self._environment_variables_dict['redis'] = EnvironmentVariables.get_env('REDIS', '')
 
+        # prometheus snap interval
+        self._environment_variables_dict['prometheus_snap_interval'] = EnvironmentVariables.get_env('PROMETHEUS_SNAP_INTERVAL', '30')
+
         # default parameter - change only if needed
         # Parameters below related to 'run_workload()'
         self._environment_variables_dict['workloads'] = ['stressng_pod', 'stressng_vm', 'stressng_kata',
