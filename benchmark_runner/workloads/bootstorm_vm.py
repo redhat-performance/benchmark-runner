@@ -7,6 +7,7 @@ from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, 
 from benchmark_runner.common.elasticsearch.elasticsearch_exceptions import ElasticSearchDataNotUploaded
 from benchmark_runner.workloads.workloads_operations import WorkloadsOperations
 from benchmark_runner.common.oc.oc import VMStatus
+from benchmark_runner.common.prometheus.prometheus_metrics_operations import PrometheusMetricsOperation
 
 
 class BootstormVM(WorkloadsOperations):
@@ -23,7 +24,36 @@ class BootstormVM(WorkloadsOperations):
         self.__pod_name = ''
         self.__vm_name = ''
         self.__data_dict = {}
-        self.bootstorm_start_time = {}
+        self.__bootstorm_start_time = {}
+        self.__prometheus_metrics_operation = PrometheusMetricsOperation()
+
+    @logger_time_stamp
+    def __set_bootstorm_vm_start_time(self, vm_name: str = ''):
+        """
+        This method captures boot start time for specified VM
+        @return:
+        """
+        self.__bootstorm_start_time[vm_name] = time.time()
+
+    @logger_time_stamp
+    def __get_bootstorm_vm_elapse_time(self, vm_name: str):
+        """
+        This method returns boot elapse time for specified VM in milliseconds
+        @return: Dictionary with vm_name, node and its boot elapse time
+        """
+        vm_bootstorm_time = {}
+
+        self._virtctl.expose_vm(vm_name=vm_name)
+        # wait till vm login
+        vm_node = self._oc.get_vm_node(vm_name=vm_name)
+        node_ip = self._oc.get_nodes_addresses()[vm_node]
+        vm_node_port = self._oc.get_exposed_vm_port(vm_name=vm_name)
+        if self._oc.wait_for_vm_login(vm_name=vm_name, node_ip=node_ip, vm_node_port=vm_node_port):
+            vm_bootstorm_time['vm_name'] = vm_name
+            vm_bootstorm_time['node'] = vm_node
+            delta = time.time() - self.__bootstorm_start_time[vm_name]
+            vm_bootstorm_time['bootstorm_time'] = round(delta, 3) * self.MILLISECONDS
+        return vm_bootstorm_time
 
     def __create_vm_scale(self, vm_num: str):
         """
@@ -37,11 +67,15 @@ class BootstormVM(WorkloadsOperations):
         This method start VMs in parallel and wait for login to be enabled
         """
         vm_name = f'bootstorm-vm-{self._trunc_uuid}-{vm_num}'
-        self.set_bootstorm_vm_start_time(vm_name=f'bootstorm-vm-{self._trunc_uuid}-{vm_num}')
+        self.__set_bootstorm_vm_start_time(vm_name=f'bootstorm-vm-{self._trunc_uuid}-{vm_num}')
         self._virtctl.start_vm_async(vm_name=f'bootstorm-vm-{self._trunc_uuid}-{vm_num}')
         self._virtctl.wait_for_vm_status(vm_name=vm_name, status=VMStatus.Running)
-        self.__data_dict = self.get_bootstorm_vm_elapse_time(vm_name=vm_name)
+        self.__data_dict = self.__get_bootstorm_vm_elapse_time(vm_name=vm_name)
         self.__status = 'complete' if self.__data_dict else 'failed'
+        self.__prometheus_metrics_operation.finalize_prometheus()
+        metric_results = self.__prometheus_metrics_operation.run_prometheus_queries()
+        prometheus_result = self.parse_prometheus_metrics(data=metric_results)
+        self.__data_dict.update(prometheus_result)
         # upload to elasticsearch
         if self._es_host:
             self._upload_to_elasticsearch(index=self.__es_index, kind=self.__kind, status=self.__status,
@@ -81,6 +115,7 @@ class BootstormVM(WorkloadsOperations):
         :return:
         """
         try:
+            self.__prometheus_metrics_operation.init_prometheus()
             self.__name = self._workload
             if self._run_type == 'test_ci':
                 self.__es_index = 'bootstorm-test-ci-results'
@@ -93,10 +128,14 @@ class BootstormVM(WorkloadsOperations):
             if not self._scale:
                 self._oc.create_async(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}.yaml'))
                 self._oc.wait_for_vm_status(vm_name=f'bootstorm-vm-{self._trunc_uuid}', status=VMStatus.Stopped)
-                self.set_bootstorm_vm_start_time(vm_name=self.__vm_name)
+                self.__set_bootstorm_vm_start_time(vm_name=self.__vm_name)
                 self._virtctl.start_vm_sync(vm_name=self.__vm_name)
-                self.__data_dict = self.get_bootstorm_vm_elapse_time(vm_name=self.__vm_name)
+                self.__data_dict = self.__get_bootstorm_vm_elapse_time(vm_name=self.__vm_name)
                 self.__status = 'complete' if self.__data_dict else 'failed'
+                self.__prometheus_metrics_operation.finalize_prometheus()
+                metric_results = self.__prometheus_metrics_operation.run_prometheus_queries()
+                prometheus_result = self.parse_prometheus_metrics(data=metric_results)
+                self.__data_dict.update(prometheus_result)
                 if self._es_host:
                     # upload several run results
                     self._upload_to_elasticsearch(index=self.__es_index, kind=self.__kind, status=self.__status, result=self.__data_dict)

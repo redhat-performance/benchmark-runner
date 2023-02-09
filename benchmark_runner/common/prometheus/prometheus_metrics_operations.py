@@ -75,7 +75,7 @@ class PrometheusMetricsOperation(WorkloadsOperations):
                 with openshift.project('openshift-monitoring'):
                     result = openshift.selector('pod/prometheus-k8s-0').object().execute(['date', '+%s.%N'],
                                                                                          container_name='prometheus')
-                    return datetime.datetime.utcfromtimestamp(float(result.out()))
+                    return datetime.datetime.fromtimestamp(float(result.out()))
             except Exception as err:
                 if retries <= 0:
                     raise f'Unable to retrieve date: {err}'
@@ -137,7 +137,10 @@ class PrometheusMetricsOperation(WorkloadsOperations):
                 continue
             try:
                 if 'instant' not in metric or metric['instant'] is not True:
-                    metric_result = self.__prometheus.custom_query_range(metric['query'], start_time=self.__metrics_start_time, end_time=self.__metrics_end_time, step='30')
+                    metric_result = self.__prometheus.custom_query_range(metric['query'],
+                                                                         start_time=self.__metrics_start_time,
+                                                                         end_time=self.__metrics_end_time,
+                                                                         step=self._prometheus_snap_interval)
                 else:
                     metric_result = (self.__prometheus.custom_query(metric['query']))
                 self.__metric_results[metric['metricName']] = metric_result
@@ -152,10 +155,9 @@ class PrometheusMetricsOperation(WorkloadsOperations):
         :return: 
         """
         pass
-        # if self._es_host and self._es_port:
-        #     for query, results in self.__metric_results.items():
-        #         pass
-        #         self._es_operations.upload_to_elasticsearch(index=query, data=results)
-        # else:
-        #     raise Exception('Missing ElasticSearch data')
+        if self._es_host and self._es_port:
+            for query, results in self.__metric_results.items():
+                print(query, results)
+        else:
+            raise Exception('Missing ElasticSearch data')
         
