@@ -16,7 +16,7 @@ Run dnf config-manager --set-enabled powertools \
 
 # Prerequisite for Python installation
 ARG python_full_version=3.10.8
-RUN dnf install openssl-devel bzip2-devel wget -y
+RUN dnf install openssl-devel bzip2-devel wget libffi-devel -y
 
 # Install Python
 RUN wget https://www.python.org/ftp/python/${python_full_version}/Python-${python_full_version}.tgz \
