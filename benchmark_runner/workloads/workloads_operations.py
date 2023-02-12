@@ -225,7 +225,7 @@ class WorkloadsOperations:
         """
         This method create pod run artifacts
         :param pod_name: pod name
-        :return: run results dict
+        :return: run results list of dicts
         """
         result_list = []
         pod_log_file = self._create_pod_log(pod=pod_name)

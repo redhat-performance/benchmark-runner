@@ -6,6 +6,7 @@ from multiprocessing import Process
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 from benchmark_runner.common.elasticsearch.elasticsearch_exceptions import ElasticSearchDataNotUploaded
 from benchmark_runner.workloads.workloads_operations import WorkloadsOperations
+from benchmark_runner.common.prometheus.prometheus_metrics_operations import PrometheusMetricsOperation
 
 
 class VdbenchPod(WorkloadsOperations):
@@ -22,6 +23,7 @@ class VdbenchPod(WorkloadsOperations):
         self.__pod_name = ''
         self.__scale = ''
         self.__data_dict = {}
+        self.__prometheus_metrics_operation = PrometheusMetricsOperation()
 
     def __create_pod_scale(self, pod_num: str):
         """
@@ -38,11 +40,15 @@ class VdbenchPod(WorkloadsOperations):
         self._oc.wait_for_ready(label=f'app=vdbench-{self._trunc_uuid}-{pod_num}', label_uuid=False)
         self.__status = self._oc.wait_for_pod_completed(label=f'app=vdbench-{self._trunc_uuid}-{pod_num}', label_uuid=False, job=False)
         self.__status = 'complete' if self.__status else 'failed'
+        self.__prometheus_metrics_operation.finalize_prometheus()
+        metric_results = self.__prometheus_metrics_operation.run_prometheus_queries()
+        prometheus_result = self.parse_prometheus_metrics(data=metric_results)
         # save run artifacts logs
         result_list = self._create_pod_run_artifacts(pod_name=f'{self.__pod_name}-{pod_num}')
         if self._es_host:
             # upload several run results
             for result in result_list:
+                result.update(prometheus_result)
                 self._upload_to_elasticsearch(index=self.__es_index, kind=self.__kind, status=self.__status, result=result)
             # verify that data upload to elastic search according to unique uuid
             self._verify_elasticsearch_data_uploaded(index=self.__es_index, uuid=self._uuid)
@@ -60,6 +66,7 @@ class VdbenchPod(WorkloadsOperations):
         :return:
         """
         try:
+            self.__prometheus_metrics_operation.init_prometheus()
             if 'kata' in self._workload:
                 self.__kind = 'kata'
                 self.__name = self._workload.replace('kata', 'pod')
@@ -79,11 +86,15 @@ class VdbenchPod(WorkloadsOperations):
                 self._oc.wait_for_ready(label=f'app=vdbench-{self._trunc_uuid}', label_uuid=False)
                 self.__status = self._oc.wait_for_pod_completed(label=f'app=vdbench-{self._trunc_uuid}', label_uuid=False, job=False)
                 self.__status = 'complete' if self.__status else 'failed'
+                self.__prometheus_metrics_operation.finalize_prometheus()
+                metric_results = self.__prometheus_metrics_operation.run_prometheus_queries()
+                prometheus_result = self.parse_prometheus_metrics(data=metric_results)
                 # save run artifacts logs
                 result_list = self._create_pod_run_artifacts(pod_name=self.__pod_name)
                 if self._es_host:
                     # upload several run results
                     for result in result_list:
+                        result.update(prometheus_result)
                         self._upload_to_elasticsearch(index=self.__es_index, kind=self.__kind, status=self.__status, result=result)
                     # verify that data upload to elastic search according to unique uuid
                     self._verify_elasticsearch_data_uploaded(index=self.__es_index, uuid=self._uuid)

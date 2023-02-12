@@ -6,6 +6,7 @@ from multiprocessing import Process
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 from benchmark_runner.common.elasticsearch.elasticsearch_exceptions import ElasticSearchDataNotUploaded
 from benchmark_runner.workloads.workloads_operations import WorkloadsOperations
+from benchmark_runner.common.prometheus.prometheus_metrics_operations import PrometheusMetricsOperation
 
 
 class VdbenchVM(WorkloadsOperations):
@@ -26,6 +27,7 @@ class VdbenchVM(WorkloadsOperations):
         self.__vm_name = ''
         self.__scale = ''
         self.__data_dict = {}
+        self.__prometheus_metrics_operation = PrometheusMetricsOperation()
 
     def __create_vm_scale(self, vm_num: str):
         """
@@ -43,11 +45,15 @@ class VdbenchVM(WorkloadsOperations):
         self.__vm_name = self._create_vm_log(labels=[f'{self.__workload_name}-{self._trunc_uuid}-{vm_num}'])
         self.__status = self._oc.wait_for_vm_log_completed(vm_name=self.__vm_name, end_stamp=self.END_STAMP)
         self.__status = 'complete' if self.__status else 'failed'
+        self.__prometheus_metrics_operation.finalize_prometheus()
+        metric_results = self.__prometheus_metrics_operation.run_prometheus_queries()
+        prometheus_result = self.parse_prometheus_metrics(data=metric_results)
         # save run artifacts logs
         result_list = self._create_vm_run_artifacts(vm_name=f'{self.__workload_name}-{self._trunc_uuid}-{vm_num}', start_stamp=self.START_STAMP, end_stamp=self.END_STAMP)
         if self._es_host:
             # upload several run results
             for result in result_list:
+                result.update(prometheus_result)
                 self._upload_to_elasticsearch(index=self.__es_index, kind=self.__kind, status=self.__status, result=result)
             # verify that data upload to elastic search according to unique uuid
             self._verify_elasticsearch_data_uploaded(index=self.__es_index, uuid=self._uuid)
@@ -68,6 +74,7 @@ class VdbenchVM(WorkloadsOperations):
         :return:
         """
         try:
+            self.__prometheus_metrics_operation.init_prometheus()
             self.__name = self._workload
             if self._run_type == 'test_ci':
                 self.__es_index = 'vdbench-test-ci-results'
@@ -86,9 +93,13 @@ class VdbenchVM(WorkloadsOperations):
                 self.__status = 'complete' if self.__status else 'failed'
                 # save run artifacts logs
                 result_list = self._create_vm_run_artifacts(vm_name=self.__vm_name, start_stamp=self.START_STAMP, end_stamp=self.END_STAMP)
+                self.__prometheus_metrics_operation.finalize_prometheus()
+                metric_results = self.__prometheus_metrics_operation.run_prometheus_queries()
+                prometheus_result = self.parse_prometheus_metrics(data=metric_results)
                 if self._es_host:
                     # upload several run results
                     for result in result_list:
+                        result.update(prometheus_result)
                         self._upload_to_elasticsearch(index=self.__es_index, kind=self.__kind, status=self.__status, result=result)
                     # verify that data upload to elastic search according to unique uuid
                     self._verify_elasticsearch_data_uploaded(index=self.__es_index, uuid=self._uuid)
