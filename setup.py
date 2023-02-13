@@ -45,7 +45,7 @@ setup(
         'azure==4.0.0',
         'boto3==1.26.1',  # s3
         'botocore==1.29.1',  # s3
-        'cryptography==39.0.1',  # Remove once https://github.com/paramiko/paramiko/issues/2038 gets fixed.
+        'cryptography==39.0.1',  # for paramiko
         'elasticsearch==7.16.1',
         'elasticsearch_dsl==7.4.0',  # for deep search
         'jinja2==3.0.3',
@@ -53,7 +53,7 @@ setup(
         'openshift-client==1.0.17',  # clusterbuster && prometheus metrics
         'prometheus-api-client==0.5.1',  # clusterbuster && prometheus metrics
         'pandas',  # required latest
-        'paramiko==2.10.1',
+        'paramiko==3.0.0',
         'PyGitHub==1.55',  # update secrets
         'PyYAML==6.0',
         'sphinx==4.5.0',  # readthedocs
