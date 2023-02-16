@@ -46,7 +46,8 @@ spec:
           memory: 4Gi
         limits:
           cpu: 2
-          memory: 4Gi
+          # Remove memory limit for Kata pods due to
+          # https://github.com/kata-containers/kata-containers/issues/6129
       volumeMounts:
         - name: vdbench-pod-pvc-claim
           mountPath: "/workload"
