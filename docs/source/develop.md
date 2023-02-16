@@ -6,7 +6,7 @@ _**Table of Contents**_
 <!-- TOC -->
 - [Benchmark-runner: How to?](#benchmark-runner-how-to)
     - [Add any new Python code](#add-any-new-python-code)
-    - [Update workload, modify parameters to workload, or change parameters for any CI job](#add-new-workload-modify-parameters-to-workload-or-change-parameters-for-any-ci-job)
+    - [Run Benchmark runner from terminal](#run-benchmark-runner-from-terminal)
     - [Add new benchmark operator workload to benchmark runner](#add-new-benchmark-operator-workload-to-benchmark-runner)
     - [Add workload to grafana dashboard](#add-workload-to-grafana-dashboard)
         - [Data template](#data-template)
@@ -35,6 +35,10 @@ ls: cannot access 'tests/unittest/benchmark_runner/common/template_operations/__
 ```
 
 you need to create an empty file by that name and `git add` it.
+
+## Run Benchmark runner from terminal
+
+PYTHONPATH=. python benchmark_runner/main/main.py
 
 ## Add new workload, modify parameters to workload, or change parameters for any CI job
 
