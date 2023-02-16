@@ -114,7 +114,12 @@ spec:
           memory: {{ requests_memory }}
         limits:
           cpu: {{ limits_cpu }}
+          {%- if kind != 'kata' %}
           memory: {{ limits_memory }}
+          {%- else %}
+          # Remove memory limit for Kata pods due to
+          # https://github.com/kata-containers/kata-containers/issues/6129
+          {%- endif %}
       {%- if cluster == "kubernetes" %}
       volumeMounts:
         - name: vdbench-pod-vol

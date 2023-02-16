@@ -34,7 +34,8 @@ spec:
           memory: 4Gi
         limits:
           cpu: 2
-          memory: 4Gi
+          # Remove memory limit for Kata pods due to
+          # https://github.com/kata-containers/kata-containers/issues/6129
       env:
         - name: BLOCK_SIZES
           value: "64,oltp1"
