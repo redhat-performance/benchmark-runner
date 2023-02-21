@@ -1,16 +1,17 @@
 # Nightly CI https://github.com/marketplace/actions/deploy-nightly
-# This is a nightly CI Pipeline against Functional environment
+# This is a nightly CI Pipeline against Performance environment
+# GitHub Actions is limited 6 hours for each job
 name: Deploy Func Env Nightly CI
 
 on:
   # Run on Nightly
 #  schedule:
-#    - cron: '0 4 * * 1-6' # run Monday-Saturday at 4 AM UTC/ 0 AM EDT
-#  # Run on Sunday after assisted installer and operator completed
-#  workflow_run:
-#    workflows: ["Deploy Operator FUNC Env Weekly CI"]
-#    types:
-#      - completed
+#    - cron: '0 4 * * 2' # run Tuesday at 4 AM UTC/ 0 AM EDT
+  # Run on Monday after assisted installer and operator completed
+  workflow_run:
+    workflows: ["Deploy Operator Func Env Weekly CI"]
+    types:
+    - completed
   workflow_dispatch:
 
 # on:
@@ -19,12 +20,11 @@ on:
 
 # Ensures that only one deploy task per branch/environment will run at a time.
 concurrency:
-  group: functional-environment
-  cancel-in-progress: false
+  group: performance-environment
 
 jobs:
   initialize_nightly:
-    name: initialize func nightly
+    name: initialize perf nightly
     runs-on: ubuntu-latest
     outputs:
       start_time_output: ${{ steps.nightly_start_step.outputs.start_time }}
@@ -34,10 +34,10 @@ jobs:
       run: echo "start_time=$(printf '%(%s)T' -1)" >> $GITHUB_OUTPUT
     - name: ⚙️ Set SSH key
       env:
-        PROVISION_PRIVATE_KEY: ${{ secrets.FUNC_PROVISION_PRIVATE_KEY }}
+        PROVISION_PRIVATE_KEY: ${{ secrets.PERF_PROVISION_PRIVATE_KEY }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-        PROVISION_IP: ${{ secrets.FUNC_PROVISION_IP }}
-        PROVISION_USER: ${{ secrets.FUNC_PROVISION_USER }}
+        PROVISION_IP: ${{ secrets.PERF_PROVISION_IP }}
+        PROVISION_USER: ${{ secrets.PERF_PROVISION_USER }}
       run: |
         mkdir -p "$RUNNER_PATH/.ssh/"
         echo "$PROVISION_PRIVATE_KEY" > $RUNNER_PATH/private_key.txt
@@ -54,15 +54,15 @@ jobs:
         END
     - name: ⚙️ Set Kubeconfig and hosts
       env:
-        KUBECONFIG_CONTENTS: ${{ secrets.FUNC_KUBECONFIG }}
+        KUBECONFIG_CONTENTS: ${{ secrets.PERF_KUBECONFIG }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-        OCP_HOSTS: ${{ secrets.FUNC_OCP_HOSTS }}
+        OCP_HOSTS: ${{ secrets.PERF_OCP_HOSTS }}
       run: |
         mkdir -p "$RUNNER_PATH/.kube/"
         echo "$KUBECONFIG_CONTENTS" > "$RUNNER_PATH/.kube/config"
         echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
         sudo tee -a /etc/hosts <<< "$OCP_HOSTS" > /dev/null
-    - name: ⚙ Remove images on provistion and copy config to provision
+    - name: ⚙ Remove images on provision and copy config to provision
       env:
         CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
@@ -73,19 +73,19 @@ jobs:
         ssh -t provision "chmod +x /tmp/remove_image.sh;/tmp/./remove_image.sh;rm -f /tmp/remove_image.sh"
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Copy config to provision  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
         scp -r "$RUNNER_PATH/.kube/config" provision:"$CONTAINER_KUBECONFIG_PATH"
-  
+
   workload:
     name: workload
     runs-on: ubuntu-latest
     outputs:
       job_status: ${{ steps.job_step.outputs.status }}
-    needs: initialize_nightly     
+    needs: initialize_nightly
     strategy:
        # run one job every time
        max-parallel: 1
        # continue to next job if failed
        fail-fast: false
-       matrix: 
+       matrix:
           workload:
               - 'uperf_pod'
               - 'uperf_kata'
@@ -109,7 +109,6 @@ jobs:
               - 'vdbench_kata_scale'
               - 'vdbench_vm_scale'
               - 'clusterbuster'
-              - 'bootstorm_vm'
               - 'bootstorm_vm_scale'
     steps:
     - uses: actions/checkout@v3
@@ -121,14 +120,13 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install benchmark-runner
-    - name: ⚙️ SET SSH key
+    - name: ⚙️ Set SSH key
       env:
-        PROVISION_PRIVATE_KEY: ${{ secrets.FUNC_PROVISION_PRIVATE_KEY }}
+        PROVISION_PRIVATE_KEY: ${{ secrets.PERF_PROVISION_PRIVATE_KEY }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-        PROVISION_IP: ${{ secrets.FUNC_PROVISION_IP }}
-        PROVISION_USER: ${{ secrets.FUNC_PROVISION_USER }}
+        PROVISION_IP: ${{ secrets.PERF_PROVISION_IP }}
+        PROVISION_USER: ${{ secrets.PERF_PROVISION_USER }}
       run: |
-        umask 77
         mkdir -p "$RUNNER_PATH/.ssh/"
         echo "$PROVISION_PRIVATE_KEY" > $RUNNER_PATH/private_key.txt
         sudo chmod 600 $RUNNER_PATH/private_key.txt
@@ -144,9 +142,9 @@ jobs:
         END
     - name: ⚙️ Set Kubeconfig and hosts
       env:
-        KUBECONFIG_CONTENTS: ${{ secrets.FUNC_KUBECONFIG }}
+        KUBECONFIG_CONTENTS: ${{ secrets.PERF_KUBECONFIG }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-        OCP_HOSTS: ${{ secrets.FUNC_OCP_HOSTS }}
+        OCP_HOSTS: ${{ secrets.PERF_OCP_HOSTS }}
       run: |
         mkdir -p "$RUNNER_PATH/.kube/"
         echo "$KUBECONFIG_CONTENTS" > "$RUNNER_PATH/.kube/config"
@@ -154,14 +152,14 @@ jobs:
         sudo tee -a /etc/hosts <<< "$OCP_HOSTS" > /dev/null
     - name: ✔️ Run workload ${{ matrix.workload }}
       env:
-        KUBEADMIN_PASSWORD: ${{ secrets.FUNC_KUBEADMIN_PASSWORD }}
-        PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.FUNC_PIN_NODE_BENCHMARK_OPERATOR }}
-        PIN_NODE1: ${{ secrets.FUNC_PIN_NODE1 }}
-        PIN_NODE2: ${{ secrets.FUNC_PIN_NODE2 }}
-        ELASTICSEARCH: ${{ secrets.FUNC_ELASTICSEARCH }}
-        ELASTICSEARCH_PORT: ${{ secrets.FUNC_ELASTICSEARCH_PORT }}
-        ELASTICSEARCH_USER: ${{ secrets.FUNC_ELASTICSEARCH_USER }}
-        ELASTICSEARCH_PASSWORD: ${{ secrets.FUNC_ELASTICSEARCH_PASSWORD }}
+        KUBEADMIN_PASSWORD: ${{ secrets.PERF_KUBEADMIN_PASSWORD }}
+        PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.PERF_PIN_NODE_BENCHMARK_OPERATOR }}
+        PIN_NODE1: ${{ secrets.PERF_PIN_NODE1 }}
+        PIN_NODE2: ${{ secrets.PERF_PIN_NODE2 }}
+        ELASTICSEARCH: ${{ secrets.PERF_ELASTICSEARCH }}
+        ELASTICSEARCH_PORT: ${{ secrets.PERF_ELASTICSEARCH_PORT }}
+        ELASTICSEARCH_USER: ${{ secrets.PERF_ELASTICSEARCH_USER }}
+        ELASTICSEARCH_PASSWORD: ${{ secrets.PERF_ELASTICSEARCH_PASSWORD }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
         CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
         IBM_REGION_NAME: ${{ secrets.IBM_REGION_NAME }}
@@ -170,14 +168,14 @@ jobs:
         IBM_SECRET_ACCESS_KEY: ${{ secrets.IBM_SECRET_ACCESS_KEY }}
         IBM_BUCKET: ${{ secrets.IBM_BUCKET }}
         IBM_KEY: ${{ secrets.IBM_KEY }}
-        RUN_ARTIFACTS_URL: ${{ secrets.FUNC_RUN_ARTIFACTS_URL }}
-        SCALE_NODES: ${{ secrets.FUNC_SCALE_NODES }}
+        RUN_ARTIFACTS_URL: ${{ secrets.PERF_RUN_ARTIFACTS_URL }}
+        SCALE_NODES: ${{ secrets.PERF_SCALE_NODES }}
         REDIS: ${{ secrets.REDIS }}
-        LSO_PATH: ${{ secrets.FUNC_LSO_PATH }}
-        SCALE: 1
-        TIMEOUT: 3600
-        RUN_TYPE: 'func_ci'
-        ENABLE_PROMETHEUS_SNAPSHOT: 'False'
+        LSO_PATH: ${{ secrets.PERF_LSO_PATH }}
+        TIMEOUT: 8000
+        SCALE: 2
+        RUN_TYPE: 'test_ci'
+        ENABLE_PROMETHEUS_SNAPSHOT: 'True'
       run: |
         build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
         build_version="$(cut -d'=' -f2 <<<"$build")"
@@ -186,14 +184,16 @@ jobs:
         # SCALE: Run vdbench/ bootstorm
         if [[ '${{ matrix.workload }}' == 'vdbench_pod_scale' || '${{ matrix.workload }}' == 'vdbench_kata_scale' || '${{ matrix.workload }}' == 'vdbench_vm_scale' || '${{ matrix.workload }}' == 'bootstorm_vm_scale'  ]]
         then
-            # bootstorm_vm_scale: no need redis for synchronization
+            # bootstorm_vm_scale: no need redis for synchronization but need SCALE and THREADS_LIMIT
             if [[ '${{ matrix.workload }}' == 'bootstorm_vm_scale' ]]
             then
               REDIS=''
+              SCALE=100
+              THREADS_LIMIT=20
             fi
             workload=$(awk -F_ '{print $1"_"$2}' <<< '${{ matrix.workload }}')
             # SCALE_NODES is a list, not add ''
-            ssh -t provision "podman run --rm -t -e WORKLOAD='$workload' -e KUBEADMIN_PASSWORD='$KUBEADMIN_PASSWORD' -e SCALE='$SCALE' -e SCALE_NODES=$SCALE_NODES -e REDIS='$REDIS' -e PIN_NODE_BENCHMARK_OPERATOR='$PIN_NODE_BENCHMARK_OPERATOR' -e PIN_NODE1='$PIN_NODE1' -e PIN_NODE2='$PIN_NODE2' -e ELASTICSEARCH='$ELASTICSEARCH' -e ELASTICSEARCH_PORT='$ELASTICSEARCH_PORT' -e ELASTICSEARCH_USER='$ELASTICSEARCH_USER' -e ELASTICSEARCH_PASSWORD='$ELASTICSEARCH_PASSWORD' -e IBM_REGION_NAME='$IBM_REGION_NAME' -e IBM_ENDPOINT_URL='$IBM_ENDPOINT_URL' -e IBM_ACCESS_KEY_ID='$IBM_ACCESS_KEY_ID' -e IBM_SECRET_ACCESS_KEY='$IBM_SECRET_ACCESS_KEY' -e IBM_BUCKET='$IBM_BUCKET' -e IBM_KEY='$IBM_KEY' -e RUN_ARTIFACTS_URL='$RUN_ARTIFACTS_URL' -e BUILD_VERSION='$build_version' -e RUN_TYPE='$RUN_TYPE' -e KATA_CPUOFFLINE_WORKAROUND='True' -e SAVE_ARTIFACTS_LOCAL='False' -e ENABLE_PROMETHEUS_SNAPSHOT='$ENABLE_PROMETHEUS_SNAPSHOT' -e TIMEOUT='$TIMEOUT' -e log_level='INFO' -v '$CONTAINER_KUBECONFIG_PATH':'$CONTAINER_KUBECONFIG_PATH' --privileged 'quay.io/ebattat/benchmark-runner:latest'"
+            ssh -t provision "podman run --rm -t -e WORKLOAD='$workload' -e KUBEADMIN_PASSWORD='$KUBEADMIN_PASSWORD' -e SCALE='$SCALE' -e SCALE_NODES=$SCALE_NODES -e REDIS='$REDIS' -e PIN_NODE_BENCHMARK_OPERATOR='$PIN_NODE_BENCHMARK_OPERATOR' -e PIN_NODE1='$PIN_NODE1' -e PIN_NODE2='$PIN_NODE2' -e ELASTICSEARCH='$ELASTICSEARCH' -e ELASTICSEARCH_PORT='$ELASTICSEARCH_PORT' -e ELASTICSEARCH_USER='$ELASTICSEARCH_USER' -e ELASTICSEARCH_PASSWORD='$ELASTICSEARCH_PASSWORD' -e IBM_REGION_NAME='$IBM_REGION_NAME' -e IBM_ENDPOINT_URL='$IBM_ENDPOINT_URL' -e IBM_ACCESS_KEY_ID='$IBM_ACCESS_KEY_ID' -e IBM_SECRET_ACCESS_KEY='$IBM_SECRET_ACCESS_KEY' -e IBM_BUCKET='$IBM_BUCKET' -e IBM_KEY='$IBM_KEY' -e RUN_ARTIFACTS_URL='$RUN_ARTIFACTS_URL' -e BUILD_VERSION='$build_version' -e RUN_TYPE='$RUN_TYPE' -e KATA_CPUOFFLINE_WORKAROUND='True' -e SAVE_ARTIFACTS_LOCAL='False' -e ENABLE_PROMETHEUS_SNAPSHOT='$ENABLE_PROMETHEUS_SNAPSHOT' -e THREADS_LIMIT='$THREADS_LIMIT' -e TIMEOUT='$TIMEOUT' -e log_level='INFO' -v '$CONTAINER_KUBECONFIG_PATH':'$CONTAINER_KUBECONFIG_PATH' --privileged 'quay.io/ebattat/benchmark-runner:latest'"
         else
             if [[ '${{ matrix.workload }}' == 'clusterbuster' ]]
             then
@@ -208,12 +208,11 @@ jobs:
       if: always()
       run: |
           if [[ "${{ job.status }}" == "failure" || "${{ job.status }}" == "cancelled" ]]; then echo "status=${{ job.status }}" >> $GITHUB_OUTPUT; fi
-
   finalize_nightly:
     name: finalize nightly
     runs-on: ubuntu-latest
     if: always()
-    needs: [initialize_nightly, workload]      
+    needs: [initialize_nightly, workload]
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python 3.10
@@ -226,14 +225,13 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install benchmark-runner
-    - name: ⚙️ SET SSH key
+    - name: ⚙️ Set SSH key
       env:
-        PROVISION_PRIVATE_KEY: ${{ secrets.FUNC_PROVISION_PRIVATE_KEY }}
+        PROVISION_PRIVATE_KEY: ${{ secrets.PERF_PROVISION_PRIVATE_KEY }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-        PROVISION_IP: ${{ secrets.FUNC_PROVISION_IP }}
-        PROVISION_USER: ${{ secrets.FUNC_PROVISION_USER }}
+        PROVISION_IP: ${{ secrets.PERF_PROVISION_IP }}
+        PROVISION_USER: ${{ secrets.PERF_PROVISION_USER }}
       run: |
-        umask 77
         mkdir -p "$RUNNER_PATH/.ssh/"
         echo "$PROVISION_PRIVATE_KEY" > $RUNNER_PATH/private_key.txt
         sudo chmod 600 $RUNNER_PATH/private_key.txt
@@ -249,9 +247,9 @@ jobs:
         END
     - name: ⚙️ Set Kubeconfig and hosts
       env:
-        KUBECONFIG_CONTENTS: ${{ secrets.FUNC_KUBECONFIG }}
+        KUBECONFIG_CONTENTS: ${{ secrets.PERF_KUBECONFIG }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-        OCP_HOSTS: ${{ secrets.FUNC_OCP_HOSTS }}
+        OCP_HOSTS: ${{ secrets.PERF_OCP_HOSTS }}
       run: |
         mkdir -p "$RUNNER_PATH/.kube/"
         echo "$KUBECONFIG_CONTENTS" > "$RUNNER_PATH/.kube/config"
@@ -259,23 +257,17 @@ jobs:
         sudo tee -a /etc/hosts <<< "$OCP_HOSTS" > /dev/null
     - name: ✔️ Update status
       env:
-        KUBEADMIN_PASSWORD: ${{ secrets.FUNC_KUBEADMIN_PASSWORD }}
-        PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.FUNC_PIN_NODE_BENCHMARK_OPERATOR }}
-        PIN_NODE1: ${{ secrets.FUNC_PIN_NODE1 }}
-        PIN_NODE2: ${{ secrets.FUNC_PIN_NODE2 }}
-        ELASTICSEARCH: ${{ secrets.FUNC_ELASTICSEARCH }}
-        ELASTICSEARCH_PORT: ${{ secrets.FUNC_ELASTICSEARCH_PORT }}
-        ELASTICSEARCH_USER: ${{ secrets.FUNC_ELASTICSEARCH_USER }}
-        ELASTICSEARCH_PASSWORD: ${{ secrets.FUNC_ELASTICSEARCH_PASSWORD }}
+        KUBEADMIN_PASSWORD: ${{ secrets.PERF_KUBEADMIN_PASSWORD }}
+        PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.PERF_PIN_NODE_BENCHMARK_OPERATOR }}
+        PIN_NODE1: ${{ secrets.PERF_PIN_NODE1 }}
+        PIN_NODE2: ${{ secrets.PERF_PIN_NODE2 }}
+        ELASTICSEARCH: ${{ secrets.PERF_ELASTICSEARCH }}
+        ELASTICSEARCH_PORT: ${{ secrets.PERF_ELASTICSEARCH_PORT }}
+        ELASTICSEARCH_USER: ${{ secrets.PERF_ELASTICSEARCH_USER }}
+        ELASTICSEARCH_PASSWORD: ${{ secrets.PERF_ELASTICSEARCH_PASSWORD }}
         RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
         CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
-        IBM_REGION_NAME: ${{ secrets.IBM_REGION_NAME }}
-        IBM_ENDPOINT_URL: ${{ secrets.IBM_ENDPOINT_URL }}
-        IBM_ACCESS_KEY_ID: ${{ secrets.IBM_ACCESS_KEY_ID }}
-        IBM_SECRET_ACCESS_KEY: ${{ secrets.IBM_SECRET_ACCESS_KEY }}
-        IBM_BUCKET: ${{ secrets.IBM_BUCKET }}
-        IBM_KEY: ${{ secrets.IBM_KEY }}
-        RUN_ARTIFACTS_URL: ${{ secrets.RUN_ARTIFACTS_URL }}
+        RUN_TYPE: 'test_ci'
       run: |
         # get repository last id
         declare -a repositories=('redhat-performance/benchmark-runner' 'cloud-bulldozer/benchmark-operator' 'cloud-bulldozer/benchmark-wrapper')
@@ -308,7 +300,7 @@ jobs:
         # Check for workload failure or success => return pass/failed
         if [[ "${{needs.workload.outputs.job_status}}" == "failure" || "${{needs.workload.outputs.job_status}}" == "cancelled" ]]; then status="failed"; else status="pass"; fi
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Update CI status $status >>>>>>>>>>>>>>>>>>>>>>>>>>'
-        podman run --rm -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e ELASTICSEARCH_USER="$ELASTICSEARCH_USER" -e ELASTICSEARCH_PASSWORD="$ELASTICSEARCH_PASSWORD" -e BUILD_VERSION="$build_version" -e CI_STATUS="$status" -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_RUNNER_ID="$BENCHMARK_RUNNER_ID" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e RUN_TYPE="func_ci" -e TIMEOUT="2000" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:latest"
+        podman run --rm -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e PIN_NODE_BENCHMARK_OPERATOR="$PIN_NODE_BENCHMARK_OPERATOR" -e PIN_NODE1="$PIN_NODE1" -e PIN_NODE2="$PIN_NODE2" -e ELASTICSEARCH="$ELASTICSEARCH" -e ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT" -e ELASTICSEARCH_USER="$ELASTICSEARCH_USER" -e ELASTICSEARCH_PASSWORD="$ELASTICSEARCH_PASSWORD" -e BUILD_VERSION="$build_version" -e CI_STATUS="$status" -e CI_MINUTES_TIME="$ci_minutes_time" -e BENCHMARK_RUNNER_ID="$BENCHMARK_RUNNER_ID" -e BENCHMARK_OPERATOR_ID="$BENCHMARK_OPERATOR_ID" -e BENCHMARK_WRAPPER_ID="$BENCHMARK_WRAPPER_ID" -e RUN_TYPE="$RUN_TYPE" -e TIMEOUT="3600" -e log_level="INFO" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:latest"
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Remove image on provision >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
         echo "if [[ \"\$(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)\" != \"\" ]]; then sudo podman rmi -f \$(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null); fi" > "$RUNNER_PATH/remove_image.sh"
         scp -r "$RUNNER_PATH/remove_image.sh" provision:"/tmp/remove_image.sh"

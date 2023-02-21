@@ -38,7 +38,9 @@ you need to create an empty file by that name and `git add` it.
 
 ## Run Benchmark runner from terminal
 
+```
 PYTHONPATH=. python benchmark_runner/main/main.py
+```
 
 ## Add new workload, modify parameters to workload, or change parameters for any CI job
 
