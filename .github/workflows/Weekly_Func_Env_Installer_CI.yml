@@ -1,21 +1,24 @@
 # Nightly CI https://github.com/marketplace/actions/deploy-nightly
 # https://crontab.guru/
-# This is a nightly CI Pipeline against Performance environment using Assisted installer - run on Sunday
+# This is a nightly CI Pipeline against Performance environment using Assisted Installer - run on Friday
 name: Deploy Assisted installer Func Env Weekly CI
 
 on:
 #  schedule:
-#    - cron: '0 4 * * 0' # run on Sunday at 4 AM UTC/ 0 AM EDT
+#    - cron: '0 4 * * 5' # run on Friday at 4 AM UTC/ 0 AM EDT
   workflow_dispatch:
 
+#on:
+#  workflow_dispatch:
 
 # on:
-#   push:
-#     branches: [ main ]
+#  push:
+#    branches: [ main ]
+
 
 # Ensures that only one deploy task per branch/environment will run at a time.
 concurrency:
-  group: functional-environment
+  group: performance-environment
   cancel-in-progress: false
 
 jobs:
@@ -27,7 +30,7 @@ jobs:
        max-parallel: 1
        # continue to next job if failed
        fail-fast: false
-       matrix: 
+       matrix:
           step: [ 'run_ibm_ocp_installer', 'verify_install_complete' ]
     steps:
       - uses: actions/checkout@v3
@@ -41,10 +44,10 @@ jobs:
           pip install benchmark-runner
       - name: ⚙️ SET SSH key
         env:
-          PROVISION_PRIVATE_KEY: ${{ secrets.FUNC_PROVISION_PRIVATE_KEY }}
+          PROVISION_PRIVATE_KEY: ${{ secrets.PERF_PROVISION_PRIVATE_KEY }}
           RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-          PROVISION_IP: ${{ secrets.FUNC_PROVISION_IP }}
-          PROVISION_USER: ${{ secrets.FUNC_PROVISION_USER }}
+          PROVISION_IP: ${{ secrets.PERF_PROVISION_IP }}
+          PROVISION_USER: ${{ secrets.PERF_PROVISION_USER }}
         run: |
           mkdir -p "$RUNNER_PATH/.ssh/"
           echo "$PROVISION_PRIVATE_KEY" > $RUNNER_PATH/private_key.txt
@@ -64,15 +67,15 @@ jobs:
           INSTALL_OCP_VERSION: "latest-4.12"
           IBM_API_KEY: ${{ secrets.IBM_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
-          WORKER_IDS: ${{ secrets.FUNC_WORKER_IDS }}
-          PROVISION_IP: ${{ secrets.FUNC_PROVISION_IP }}
-          PROVISION_USER: ${{ secrets.FUNC_PROVISION_USER }}
-          PROVISION_PORT: ${{ secrets.FUNC_PROVISION_PORT }}
-          PROVISION_KUBEADMIN_PASSWORD_PATH: ${{ secrets.FUNC_PROVISION_KUBEADMIN_PASSWORD_PATH }}
-          PROVISION_KUBECONFIG_PATH: ${{ secrets.FUNC_PROVISION_KUBECONFIG_PATH }}
-          PROVISION_INSTALLER_PATH: ${{ secrets.FUNC_PROVISION_INSTALLER_PATH }}
-          PROVISION_INSTALLER_CMD: ${{ secrets.FUNC_PROVISION_INSTALLER_CMD }}
-          PROVISION_INSTALLER_LOG: ${{ secrets.FUNC_PROVISION_INSTALLER_LOG }}
+          WORKER_IDS: ${{ secrets.PERF_WORKER_IDS }}
+          PROVISION_IP: ${{ secrets.PERF_PROVISION_IP }}
+          PROVISION_USER: ${{ secrets.PERF_PROVISION_USER }}
+          PROVISION_PORT: ${{ secrets.PERF_PROVISION_PORT }}
+          PROVISION_KUBEADMIN_PASSWORD_PATH: ${{ secrets.PERF_PROVISION_KUBEADMIN_PASSWORD_PATH }}
+          PROVISION_KUBECONFIG_PATH: ${{ secrets.PERF_PROVISION_KUBECONFIG_PATH }}
+          PROVISION_INSTALLER_PATH: ${{ secrets.PERF_PROVISION_INSTALLER_PATH }}
+          PROVISION_INSTALLER_CMD: ${{ secrets.PERF_PROVISION_INSTALLER_CMD }}
+          PROVISION_INSTALLER_LOG: ${{ secrets.PERF_PROVISION_INSTALLER_LOG }}
           GITHUB_REPOSITORY_SHORT: ${{ secrets.GIT_REPOSITORY_SHORT }}
           CONTAINER_PRIVATE_KEY_PATH: ${{ secrets.CONTAINER_PRIVATE_KEY_PATH }}
           RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
@@ -80,22 +83,22 @@ jobs:
           build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
           build_version="$(cut -d'=' -f2 <<<"$build")"
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>> OCP start step: ${{ matrix.step }} >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
-          podman run --rm -e OCP_ENV_FLAVOR="FUNC" -e IBM_API_KEY="$IBM_API_KEY" -e GITHUB_TOKEN="$GITHUB_TOKEN" -e INSTALL_OCP_VERSION="$INSTALL_OCP_VERSION" -e INSTALL_STEP="${{ matrix.step }}" -e WORKER_IDS="$WORKER_IDS" -e PROVISION_IP="$PROVISION_IP" -e CONTAINER_PRIVATE_KEY_PATH="$CONTAINER_PRIVATE_KEY_PATH" -e CONTAINER_PRIVATE_KEY_PATH="$CONTAINER_PRIVATE_KEY_PATH" -e PROVISION_USER="$PROVISION_USER" -e PROVISION_PORT="$PROVISION_PORT" -e PROVISION_KUBEADMIN_PASSWORD_PATH="$PROVISION_KUBEADMIN_PASSWORD_PATH" -e PROVISION_KUBECONFIG_PATH="$PROVISION_KUBECONFIG_PATH" -e PROVISION_INSTALLER_PATH="$PROVISION_INSTALLER_PATH" -e PROVISION_INSTALLER_CMD="$PROVISION_INSTALLER_CMD" -e PROVISION_INSTALLER_LOG="$PROVISION_INSTALLER_LOG" -e GITHUB_REPOSITORY_SHORT="$GITHUB_REPOSITORY_SHORT" -e PROVISION_TIMEOUT="3600" -e log_level="INFO" -v "$PROVISION_PRIVATE_KEY_PATH":"$CONTAINER_PRIVATE_KEY_PATH" -v "/$RUNNER_PATH/.ssh/config":"/$PROVISION_USER/.ssh/config" --privileged "quay.io/ebattat/benchmark-runner:latest"
+          podman run --rm -e OCP_ENV_FLAVOR="PERF" -e IBM_API_KEY="$IBM_API_KEY" -e GITHUB_TOKEN="$GITHUB_TOKEN" -e INSTALL_OCP_VERSION="$INSTALL_OCP_VERSION" -e INSTALL_STEP="${{ matrix.step }}" -e WORKER_IDS="$WORKER_IDS" -e PROVISION_IP="$PROVISION_IP" -e CONTAINER_PRIVATE_KEY_PATH="$CONTAINER_PRIVATE_KEY_PATH" -e CONTAINER_PRIVATE_KEY_PATH="$CONTAINER_PRIVATE_KEY_PATH" -e PROVISION_USER="$PROVISION_USER" -e PROVISION_PORT="$PROVISION_PORT" -e PROVISION_KUBEADMIN_PASSWORD_PATH="$PROVISION_KUBEADMIN_PASSWORD_PATH" -e PROVISION_KUBECONFIG_PATH="$PROVISION_KUBECONFIG_PATH" -e PROVISION_INSTALLER_PATH="$PROVISION_INSTALLER_PATH" -e PROVISION_INSTALLER_CMD="$PROVISION_INSTALLER_CMD" -e PROVISION_INSTALLER_LOG="$PROVISION_INSTALLER_LOG" -e GITHUB_REPOSITORY_SHORT="$GITHUB_REPOSITORY_SHORT" -e PROVISION_TIMEOUT="3600" -e log_level="INFO" -v "$PROVISION_PRIVATE_KEY_PATH":"$CONTAINER_PRIVATE_KEY_PATH" -v "/$RUNNER_PATH/.ssh/config":"/$PROVISION_USER/.ssh/config" --privileged "quay.io/ebattat/benchmark-runner:latest"
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>> OCP end step: ${{ matrix.step }}   >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
       - name: ▶ Rerun OCP assisted install after failure
         env:
           INSTALL_OCP_VERSION: "latest-4.12"
           IBM_API_KEY: ${{ secrets.IBM_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
-          WORKER_IDS: ${{ secrets.FUNC_WORKER_IDS }}
-          PROVISION_IP: ${{ secrets.FUNC_PROVISION_IP }}
-          PROVISION_USER: ${{ secrets.FUNC_PROVISION_USER }}
-          PROVISION_PORT: ${{ secrets.FUNC_PROVISION_PORT }}
-          PROVISION_KUBEADMIN_PASSWORD_PATH: ${{ secrets.FUNC_PROVISION_KUBEADMIN_PASSWORD_PATH }}
-          PROVISION_KUBECONFIG_PATH: ${{ secrets.FUNC_PROVISION_KUBECONFIG_PATH }}
-          PROVISION_INSTALLER_PATH: ${{ secrets.FUNC_PROVISION_INSTALLER_PATH }}
-          PROVISION_INSTALLER_CMD: ${{ secrets.FUNC_PROVISION_INSTALLER_CMD }}
-          PROVISION_INSTALLER_LOG: ${{ secrets.FUNC_PROVISION_INSTALLER_LOG }}
+          WORKER_IDS: ${{ secrets.PERF_WORKER_IDS }}
+          PROVISION_IP: ${{ secrets.PERF_PROVISION_IP }}
+          PROVISION_USER: ${{ secrets.PERF_PROVISION_USER }}
+          PROVISION_PORT: ${{ secrets.PERF_PROVISION_PORT }}
+          PROVISION_KUBEADMIN_PASSWORD_PATH: ${{ secrets.PERF_PROVISION_KUBEADMIN_PASSWORD_PATH }}
+          PROVISION_KUBECONFIG_PATH: ${{ secrets.PERF_PROVISION_KUBECONFIG_PATH }}
+          PROVISION_INSTALLER_PATH: ${{ secrets.PERF_PROVISION_INSTALLER_PATH }}
+          PROVISION_INSTALLER_CMD: ${{ secrets.PERF_PROVISION_INSTALLER_CMD }}
+          PROVISION_INSTALLER_LOG: ${{ secrets.PERF_PROVISION_INSTALLER_LOG }}
           GITHUB_REPOSITORY_SHORT: ${{ secrets.GIT_REPOSITORY_SHORT }}
           CONTAINER_PRIVATE_KEY_PATH: ${{ secrets.CONTAINER_PRIVATE_KEY_PATH }}
           RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
@@ -104,8 +107,8 @@ jobs:
           build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
           build_version="$(cut -d'=' -f2 <<<"$build")"
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>> OCP start step: run_ibm_ocp_ipi_installer >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
-          podman run --rm -e OCP_ENV_FLAVOR="FUNC" -e IBM_API_KEY="$IBM_API_KEY" -e GITHUB_TOKEN="$GITHUB_TOKEN" -e INSTALL_OCP_VERSION="$INSTALL_OCP_VERSION" -e INSTALL_STEP="run_ibm_ocp_ipi_installer" -e WORKER_IDS="$WORKER_IDS" -e PROVISION_IP="$PROVISION_IP" -e CONTAINER_PRIVATE_KEY_PATH="$CONTAINER_PRIVATE_KEY_PATH" -e CONTAINER_PRIVATE_KEY_PATH="$CONTAINER_PRIVATE_KEY_PATH" -e PROVISION_USER="$PROVISION_USER" -e PROVISION_PORT="$PROVISION_PORT" -e PROVISION_KUBEADMIN_PASSWORD_PATH="$PROVISION_KUBEADMIN_PASSWORD_PATH" -e PROVISION_KUBECONFIG_PATH="$PROVISION_KUBECONFIG_PATH" -e PROVISION_INSTALLER_PATH="$PROVISION_INSTALLER_PATH" -e PROVISION_INSTALLER_CMD="$PROVISION_INSTALLER_CMD" -e PROVISION_INSTALLER_LOG="$PROVISION_INSTALLER_LOG" -e GITHUB_REPOSITORY_SHORT="$GITHUB_REPOSITORY_SHORT" -e PROVISION_TIMEOUT="3600" -e log_level="INFO" -v "$PROVISION_PRIVATE_KEY_PATH":"$CONTAINER_PRIVATE_KEY_PATH" -v "/$RUNNER_PATH/.ssh/config":"/$PROVISION_USER/.ssh/config" --privileged "quay.io/ebattat/benchmark-runner:latest"
+          podman run --rm -e OCP_ENV_FLAVOR="PERF" -e IBM_API_KEY="$IBM_API_KEY" -e GITHUB_TOKEN="$GITHUB_TOKEN" -e INSTALL_OCP_VERSION="$INSTALL_OCP_VERSION" -e INSTALL_STEP="run_ibm_ocp_ipi_installer" -e WORKER_IDS="$WORKER_IDS" -e PROVISION_IP="$PROVISION_IP" -e CONTAINER_PRIVATE_KEY_PATH="$CONTAINER_PRIVATE_KEY_PATH" -e CONTAINER_PRIVATE_KEY_PATH="$CONTAINER_PRIVATE_KEY_PATH" -e PROVISION_USER="$PROVISION_USER" -e PROVISION_PORT="$PROVISION_PORT" -e PROVISION_KUBEADMIN_PASSWORD_PATH="$PROVISION_KUBEADMIN_PASSWORD_PATH" -e PROVISION_KUBECONFIG_PATH="$PROVISION_KUBECONFIG_PATH" -e PROVISION_INSTALLER_PATH="$PROVISION_INSTALLER_PATH" -e PROVISION_INSTALLER_CMD="$PROVISION_INSTALLER_CMD" -e PROVISION_INSTALLER_LOG="$PROVISION_INSTALLER_LOG" -e GITHUB_REPOSITORY_SHORT="$GITHUB_REPOSITORY_SHORT" -e PROVISION_TIMEOUT="3600" -e log_level="INFO" -v "$PROVISION_PRIVATE_KEY_PATH":"$CONTAINER_PRIVATE_KEY_PATH" -v "/$RUNNER_PATH/.ssh/config":"/$PROVISION_USER/.ssh/config" --privileged "quay.io/ebattat/benchmark-runner:latest"
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>> OCP end step: run_ibm_ocp_ipi_installer  >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>> OCP start step: verify_install_complete >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
-          podman run --rm -e OCP_ENV_FLAVOR="FUNC" -e IBM_API_KEY="$IBM_API_KEY" -e GITHUB_TOKEN="$GITHUB_TOKEN" -e INSTALL_OCP_VERSION="$INSTALL_OCP_VERSION" -e INSTALL_STEP="verify_install_complete" -e WORKER_IDS="$WORKER_IDS" -e PROVISION_IP="$PROVISION_IP" -e CONTAINER_PRIVATE_KEY_PATH="$CONTAINER_PRIVATE_KEY_PATH" -e CONTAINER_PRIVATE_KEY_PATH="$CONTAINER_PRIVATE_KEY_PATH" -e PROVISION_USER="$PROVISION_USER" -e PROVISION_PORT="$PROVISION_PORT" -e PROVISION_KUBEADMIN_PASSWORD_PATH="$PROVISION_KUBEADMIN_PASSWORD_PATH" -e PROVISION_KUBECONFIG_PATH="$PROVISION_KUBECONFIG_PATH" -e PROVISION_INSTALLER_PATH="$PROVISION_INSTALLER_PATH" -e PROVISION_INSTALLER_CMD="$PROVISION_INSTALLER_CMD" -e PROVISION_INSTALLER_LOG="$PROVISION_INSTALLER_LOG" -e GITHUB_REPOSITORY_SHORT="$GITHUB_REPOSITORY_SHORT" -e PROVISION_TIMEOUT="3600" -e log_level="INFO" -v "$PROVISION_PRIVATE_KEY_PATH":"$CONTAINER_PRIVATE_KEY_PATH" --privileged "quay.io/ebattat/benchmark-runner:latest"
+          podman run --rm -e OCP_ENV_FLAVOR="PERF" -e IBM_API_KEY="$IBM_API_KEY" -e GITHUB_TOKEN="$GITHUB_TOKEN" -e INSTALL_OCP_VERSION="$INSTALL_OCP_VERSION" -e INSTALL_STEP="verify_install_complete" -e WORKER_IDS="$WORKER_IDS" -e PROVISION_IP="$PROVISION_IP" -e CONTAINER_PRIVATE_KEY_PATH="$CONTAINER_PRIVATE_KEY_PATH" -e CONTAINER_PRIVATE_KEY_PATH="$CONTAINER_PRIVATE_KEY_PATH" -e PROVISION_USER="$PROVISION_USER" -e PROVISION_PORT="$PROVISION_PORT" -e PROVISION_KUBEADMIN_PASSWORD_PATH="$PROVISION_KUBEADMIN_PASSWORD_PATH" -e PROVISION_KUBECONFIG_PATH="$PROVISION_KUBECONFIG_PATH" -e PROVISION_INSTALLER_PATH="$PROVISION_INSTALLER_PATH" -e PROVISION_INSTALLER_CMD="$PROVISION_INSTALLER_CMD" -e PROVISION_INSTALLER_LOG="$PROVISION_INSTALLER_LOG" -e GITHUB_REPOSITORY_SHORT="$GITHUB_REPOSITORY_SHORT" -e PROVISION_TIMEOUT="3600" -e log_level="INFO" -v "$PROVISION_PRIVATE_KEY_PATH":"$CONTAINER_PRIVATE_KEY_PATH" --privileged "quay.io/ebattat/benchmark-runner:latest"
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>> OCP end step: verify_install_complete >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
