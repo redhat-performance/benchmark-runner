@@ -71,6 +71,7 @@ class BootstormVM(WorkloadsOperations):
         self._virtctl.start_vm_async(vm_name=f'bootstorm-vm-{self._trunc_uuid}-{vm_num}')
         self._virtctl.wait_for_vm_status(vm_name=vm_name, status=VMStatus.Running)
         self.__data_dict = self.__get_bootstorm_vm_elapse_time(vm_name=vm_name)
+        self.__data_dict['run_artifacts_url'] = os.path.join(self._run_artifacts_url, f'{self._get_run_artifacts_hierarchy(workload_name=self.__workload_name, is_file=True)}-{self._time_stamp_format}.tar.gz')
         self.__status = 'complete' if self.__data_dict else 'failed'
         self.__prometheus_metrics_operation.finalize_prometheus()
         metric_results = self.__prometheus_metrics_operation.run_prometheus_queries()
@@ -131,6 +132,7 @@ class BootstormVM(WorkloadsOperations):
                 self.__set_bootstorm_vm_start_time(vm_name=self.__vm_name)
                 self._virtctl.start_vm_sync(vm_name=self.__vm_name)
                 self.__data_dict = self.__get_bootstorm_vm_elapse_time(vm_name=self.__vm_name)
+                self.__data_dict['run_artifacts_url'] = os.path.join(self._run_artifacts_url, f'{self._get_run_artifacts_hierarchy(workload_name=self.__workload_name, is_file=True)}-{self._time_stamp_format}.tar.gz')
                 self.__status = 'complete' if self.__data_dict else 'failed'
                 self.__prometheus_metrics_operation.finalize_prometheus()
                 metric_results = self.__prometheus_metrics_operation.run_prometheus_queries()
