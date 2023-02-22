@@ -23,6 +23,8 @@ from benchmark_runner.common.clouds.IBM.ibm_operations import IBMOperations
 class WorkloadsOperations:
     oc = None
     MILLISECONDS = 1000
+    REPEAT_TIMES = 3
+    SLEEP_TIME = 3
     """
     This class run workloads
     """
@@ -447,6 +449,9 @@ class WorkloadsOperations:
         """
         This method clear nodes cache
         """
+        for i in range(self.REPEAT_TIMES-1):
+            self._oc.clear_node_caches()
+            time.sleep(self.SLEEP_TIME)
         self._oc.clear_node_caches()
 
     def initialize_workload(self):
