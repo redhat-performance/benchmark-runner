@@ -190,8 +190,8 @@ class IBMOperations:
         assisted_installer_versions = AssistedInstallerVersions()
         if self.LATEST in self.__install_ocp_version:
             openshift_version_data = self.__install_ocp_version.split('-')
-            # release candidate version
-            if 'rc' in self.__install_ocp_version:
+            # release candidate or engineering candidate or feature candidate version
+            if '-rc' in self.__install_ocp_version or '-ec' in self.__install_ocp_version or '-fc' in self.__install_ocp_version:
                 return assisted_installer_versions.get_latest_version(latest_version=f'{openshift_version_data[1]}-{openshift_version_data[2]}')
             # release version
             else:
