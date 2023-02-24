@@ -183,7 +183,7 @@ def main():
         ibm_operations = IBMOperations(user=provision_user)
         ibm_operations.ibm_connect()
         install_step = environment_variables_dict.get('install_step', '')
-        if not ibm_operations.version_already_installed() and install_step == 'run_ibm_ocp_installer':
+        if install_step == 'run_ibm_ocp_installer':
             install_ocp(ibm_operations=ibm_operations, step=install_step)
         elif install_step == 'verify_install_complete':
             install_ocp(ibm_operations=ibm_operations, step=install_step)
