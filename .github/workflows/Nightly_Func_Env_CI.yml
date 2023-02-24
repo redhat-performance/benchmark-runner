@@ -175,7 +175,7 @@ jobs:
         TIMEOUT: 8000
         SCALE: 2
         RUN_TYPE: 'test_ci'
-        ENABLE_PROMETHEUS_SNAPSHOT: 'True'
+        ENABLE_PROMETHEUS_SNAPSHOT: 'False'
       run: |
         build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
         build_version="$(cut -d'=' -f2 <<<"$build")"
