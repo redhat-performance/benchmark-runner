@@ -32,7 +32,7 @@ def __get_test_environment_variable():
     test_environment_variable['namespace'] = EnvironmentVariables.get_env('NAMESPACE', 'benchmark-operator')
     # run Hammerdb workload with ocs pvc
     test_environment_variable['ocs_pvc'] = EnvironmentVariables.get_boolean_from_environment('OCS_PVC', True)
-    test_environment_variable['system_metrics'] = EnvironmentVariables.get_boolean_from_environment('SYSTEM_METRICS', True)
+    test_environment_variable['system_metrics'] = EnvironmentVariables.get_boolean_from_environment('SYSTEM_METRICS', False)
     # Azure details
     test_environment_variable['azure_cluster_stop'] = EnvironmentVariables.get_env('AZURE_CLUSTER_STOP', '')
     test_environment_variable['azure_cluster_start'] = EnvironmentVariables.get_env('AZURE_CLUSTER_START', '')
