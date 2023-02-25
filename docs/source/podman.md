@@ -21,7 +21,7 @@ Choose one from the following list:
 
 **auto:** EXTRACT_PROMETHEUS_SNAPSHOT=True [ True=extract Prometheus snapshot into artifacts, false=don't, default True ]
 
-**auto:** SYSTEM_METRICS=True [ True=collect metric, False=not collect metrics, default True ]
+**auto:** SYSTEM_METRICS=False [ True=collect metric, False=not collect metrics, default False ]
 
 **auto:** RUNNER_PATH=/tmp [ The default work space is /tmp ]
 
