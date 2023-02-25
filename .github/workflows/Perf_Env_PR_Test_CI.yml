@@ -72,7 +72,7 @@ jobs:
         run: |
           # Install Dockerfile content for pytest
           # install oc/kubectl
-          oc_version=4.11.0-0.okd-2022-10-15-073651
+          oc_version=4.12.0-0.okd-2023-02-18-033438
           curl -L "https://github.com/openshift/okd/releases/download/${oc_version}/openshift-client-linux-${oc_version}.tar.gz" -o "$RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz"
           tar -xzvf $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz -C $RUNNER_PATH/
           rm $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz
@@ -142,7 +142,7 @@ jobs:
       run: |
         # Install Dockerfile content for pytest
         # install oc/kubectl
-        oc_version=4.11.0-0.okd-2022-10-15-073651
+        oc_version=4.12.0-0.okd-2023-02-18-033438
         curl -L "https://github.com/openshift/okd/releases/download/${oc_version}/openshift-client-linux-${oc_version}.tar.gz" -o "$RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz"
         tar -xzvf $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz -C $RUNNER_PATH/
         rm $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz
@@ -208,7 +208,7 @@ jobs:
      run: |
        # Install Dockerfile content for pytest
        # install oc/kubectl
-       oc_version=4.11.0-0.okd-2022-10-15-073651
+       oc_version=4.12.0-0.okd-2023-02-18-033438
        curl -L "https://github.com/openshift/okd/releases/download/${oc_version}/openshift-client-linux-${oc_version}.tar.gz" -o "$RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz"
        tar -xzvf $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz -C $RUNNER_PATH/
        rm $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz
