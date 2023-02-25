@@ -142,10 +142,11 @@ def test_wait_for_pod_create_initialized_ready_completed_system_metrics_deleted(
     assert oc.wait_for_ready(label='app=stressng_workload', workload=workload)
     assert oc.wait_for_pod_completed(label='app=stressng_workload', workload=workload)
     # system-metrics
-    assert oc.wait_for_pod_create(pod_name='system-metrics-collector')
-    assert oc.wait_for_initialized(label='app=system-metrics-collector', workload=workload)
-    assert oc.wait_for_pod_completed(label='app=system-metrics-collector', workload=workload)
-    assert oc.delete_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_pod.yaml'), pod_name='stressng-pod-workload')
+    if test_environment_variable['system_metrics']:
+        assert oc.wait_for_pod_create(pod_name='system-metrics-collector')
+        assert oc.wait_for_initialized(label='app=system-metrics-collector', workload=workload)
+        assert oc.wait_for_pod_completed(label='app=system-metrics-collector', workload=workload)
+        assert oc.delete_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_pod.yaml'), pod_name='stressng-pod-workload')
 
 
 def test_wait_for_kata_create_initialized_ready_completed_system_metrics_deleted():
@@ -161,10 +162,11 @@ def test_wait_for_kata_create_initialized_ready_completed_system_metrics_deleted
     assert oc.wait_for_ready(label='app=stressng_workload', workload=workload)
     assert oc.wait_for_pod_completed(label='app=stressng_workload', workload=workload)
     # system-metrics
-    assert oc.wait_for_pod_create(pod_name='system-metrics-collector')
-    assert oc.wait_for_initialized(label='app=system-metrics-collector', workload=workload)
-    assert oc.wait_for_pod_completed(label='app=system-metrics-collector', workload=workload)
-    assert oc.delete_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_kata.yaml'), pod_name='stressng-kata-workload')
+    if test_environment_variable['system_metrics']:
+        assert oc.wait_for_pod_create(pod_name='system-metrics-collector')
+        assert oc.wait_for_initialized(label='app=system-metrics-collector', workload=workload)
+        assert oc.wait_for_pod_completed(label='app=system-metrics-collector', workload=workload)
+        assert oc.delete_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_kata.yaml'), pod_name='stressng-kata-workload')
 
 ###################################################### VM Tests ##################################################
 
