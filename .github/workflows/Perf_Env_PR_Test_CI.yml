@@ -167,8 +167,13 @@ jobs:
    needs: [unittest, integration_test]
    runs-on: ubuntu-latest
    strategy:
+      # run one job every time
+      max-parallel: 1
+      # continue to next job if failed
+      fail-fast: false
       matrix:
-        python-version: [ '3.10' ]
+         workload: [ 'stressng_pod', 'vdbench_pod' ]
+         python-version: [ '3.10' ]
    steps:
    - uses: actions/checkout@v3
      with:
@@ -193,9 +198,9 @@ jobs:
          echo "$KUBECONFIG_CONTENTS" > "$RUNNER_PATH/.kube/config"
          echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
          sudo tee -a /etc/hosts <<< "$OCP_HOSTS" > /dev/null
-   - name: 📃 E2E test
+   - name: 📃 E2E tests
      env:
-       WORKLOAD: "stressng_pod"
+       WORKLOAD: '${{ matrix.workload }}'
        KUBEADMIN_PASSWORD: ${{ secrets.PERF_KUBEADMIN_PASSWORD }}
        PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.PERF_PIN_NODE_BENCHMARK_OPERATOR }}
        PIN_NODE1: ${{ secrets.PERF_PIN_NODE1 }}
@@ -206,7 +211,6 @@ jobs:
        ELASTICSEARCH_USER: ${{ secrets.PERF_ELASTICSEARCH_USER }}
        ELASTICSEARCH_PASSWORD: ${{ secrets.PERF_ELASTICSEARCH_PASSWORD }}
      run: |
-       # Install Dockerfile content for pytest
        # install oc/kubectl
        oc_version=4.12.0-0.okd-2023-02-18-033438
        curl -L "https://github.com/openshift/okd/releases/download/${oc_version}/openshift-client-linux-${oc_version}.tar.gz" -o "$RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz"
