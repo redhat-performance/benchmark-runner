@@ -37,7 +37,7 @@ def __delete_pod_yamls():
 @pytest.fixture(scope="session", autouse=True)
 def before_after_all_tests_fixture():
     """
-    This method is create benchmark operator pod once for ALL tests
+    This method is created benchmark operator pod once for ALL tests
     :return:
     """
     print('Deploy benchmark-operator pod')
