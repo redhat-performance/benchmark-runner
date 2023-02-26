@@ -83,6 +83,14 @@ metadata:
     benchmark-runner-workload: vdbench
 spec:
   {%- if cluster != "kubernetes" %}
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
   selector:
     matchLabels:
       app: vdbench
