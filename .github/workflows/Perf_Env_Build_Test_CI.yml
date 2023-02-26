@@ -303,7 +303,7 @@ jobs:
        # continue to next job if failed
        fail-fast: false
        matrix:
-          workload: [ 'stressng_pod', 'vdbench_pod' ]
+          workload: [ 'hammerdb_pod_postgres', 'vdbench_pod' ]
           python-version: [ '3.10' ]
     steps:
     - uses: actions/checkout@v3
