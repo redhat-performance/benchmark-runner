@@ -30,6 +30,14 @@ metadata:
     benchmark-uuid: deadbeef-0123-3210-cdef-01234567890abcdef
     benchmark-runner-workload: vdbench
 spec:
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
   selector:
     matchLabels:
       app: vdbench
