@@ -27,6 +27,14 @@ metadata:
     benchmark-uuid: fcbe60cd-3278-422a-a2ce-3bbe433538d6
     benchmark-runner-workload: vdbench
 spec:
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
   selector:
     matchLabels:
       app: vdbench

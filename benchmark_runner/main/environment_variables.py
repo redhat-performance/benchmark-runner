@@ -65,7 +65,6 @@ class EnvironmentVariables:
         self._environment_variables_dict['elasticsearch_url_protocol'] = EnvironmentVariables.get_env('ELASTICSEARCH_URL_PROTOCOL', 'http')
 
         # Workaround for Kata CPU offline problem in 4.9/4.10
-        # Set to True to
         self._environment_variables_dict['kata_cpuoffline_workaround'] = EnvironmentVariables.get_boolean_from_environment('KATA_CPUOFFLINE_WORKAROUND', False)
 
         # Scale Per Node
