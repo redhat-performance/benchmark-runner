@@ -174,6 +174,7 @@ jobs:
         LSO_PATH: ${{ secrets.PERF_LSO_PATH }}
         TIMEOUT: 8000
         SCALE: 2
+        THREADS_LIMIT: 20
         RUN_TYPE: 'perf_ci'
         ENABLE_PROMETHEUS_SNAPSHOT: 'True'
       run: |
@@ -187,9 +188,7 @@ jobs:
             # bootstorm_vm_scale: no need redis for synchronization but need SCALE and THREADS_LIMIT
             if [[ '${{ matrix.workload }}' == 'bootstorm_vm_scale' ]]
             then
-              REDIS=''
               SCALE=100
-              THREADS_LIMIT=20
             fi
             workload=$(awk -F_ '{print $1"_"$2}' <<< '${{ matrix.workload }}')
             # SCALE_NODES is a list, not add ''
