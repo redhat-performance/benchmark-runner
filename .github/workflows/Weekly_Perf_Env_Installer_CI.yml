@@ -64,7 +64,7 @@ jobs:
           END
       - name: ▶ OCP assisted installer
         env:
-          INSTALL_OCP_VERSION: "latest-4.12"
+          INSTALL_OCP_VERSION: "latest-4.13.0-ec"
           OC_CLIENT_VERSION: "4.12.0-0.okd-2023-02-18-033438"
           IBM_API_KEY: ${{ secrets.IBM_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
@@ -88,7 +88,7 @@ jobs:
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>> OCP end step: ${{ matrix.step }}   >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
       - name: ▶ Rerun OCP assisted install after failure
         env:
-          INSTALL_OCP_VERSION: "latest-4.12"
+          INSTALL_OCP_VERSION: "latest-4.13.0-ec"
           OC_CLIENT_VERSION: "4.12.0-0.okd-2023-02-18-033438"
           IBM_API_KEY: ${{ secrets.IBM_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
