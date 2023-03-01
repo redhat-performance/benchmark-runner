@@ -1,6 +1,7 @@
 
 import os
 import datetime
+from benchmark_runner.main.environment_variables import EnvironmentVariables
 
 
 def __get_test_environment_variable():
@@ -11,16 +12,16 @@ def __get_test_environment_variable():
 
     ##################################################################################################
     # dynamic parameters - configure for local run
-    test_environment_variable['runner_path'] = os.environ.get('RUNNER_PATH', '/tmp')
-    test_environment_variable['kubeadmin_password'] = os.environ.get('KUBEADMIN_PASSWORD', 'q4VNC-yNjBv-iyZMS-oaR2a')
+    test_environment_variable['runner_path'] = EnvironmentVariables.get_env('RUNNER_PATH', '/tmp')
+    test_environment_variable['kubeadmin_password'] = EnvironmentVariables.get_env('KUBEADMIN_PASSWORD', '')
     # Node Selector
-    test_environment_variable['pin_node1'] = os.environ.get('PIN_NODE1', 'worker-0')
+    test_environment_variable['pin_node1'] = EnvironmentVariables.get_env('PIN_NODE1', '')
     # ElasticSearch
-    test_environment_variable['elasticsearch'] = os.environ.get('ELASTICSEARCH', 'elastic-perf-chmf5l4sh664bznl3a.ibm.rhperfscale.org')
-    test_environment_variable['elasticsearch_port'] = os.environ.get('ELASTICSEARCH_PORT', '80')
-    test_environment_variable['elasticsearch_user'] = os.environ.get('ELASTICSEARCH_USER', 'admin')
-    test_environment_variable['elasticsearch_password'] = os.environ.get('ELASTICSEARCH_PASSWORD', 'JTkEj-jqXsh-y227y-s6zJG')
-    test_environment_variable['timeout'] = int(os.environ.get('TIMEOUT', '2000'))
+    test_environment_variable['elasticsearch'] = EnvironmentVariables.get_env('ELASTICSEARCH', '')
+    test_environment_variable['elasticsearch_port'] = EnvironmentVariables.get_env('ELASTICSEARCH_PORT', '')
+    test_environment_variable['elasticsearch_user'] = EnvironmentVariables.get_env('ELASTICSEARCH_USER', '')
+    test_environment_variable['elasticsearch_password'] = EnvironmentVariables.get_env('ELASTICSEARCH_PASSWORD', '')
+    test_environment_variable['timeout'] = int(EnvironmentVariables.get_env('TIMEOUT', '2000'))
 
     # end dynamic parameters - configure for local run
     ##################################################################################################
@@ -28,38 +29,34 @@ def __get_test_environment_variable():
     # ** DO NOT CHANGE THE PARAMETERS BELOW **
     # Constant parameters
 
-    test_environment_variable['namespace'] = os.environ.get('NAMESPACE', 'benchmark-operator')
+    test_environment_variable['namespace'] = EnvironmentVariables.get_env('NAMESPACE', 'benchmark-operator')
     # run Hammerdb workload with ocs pvc
-    test_environment_variable['ocs_pvc'] = os.environ.get('OCS_PVC', True)
-    # system_metrics: True or False
-    test_environment_variable['system_metrics'] = os.environ.get('SYSTEM_METRICS', False)
+    test_environment_variable['ocs_pvc'] = EnvironmentVariables.get_boolean_from_environment('OCS_PVC', True)
+    test_environment_variable['system_metrics'] = EnvironmentVariables.get_boolean_from_environment('SYSTEM_METRICS', False)
     # Azure details
-    test_environment_variable['azure_cluster_stop'] = os.environ.get('AZURE_CLUSTER_STOP', '')
-    test_environment_variable['azure_cluster_start'] = os.environ.get('AZURE_CLUSTER_START', '')
-    test_environment_variable['azure_clientid'] = os.environ.get('AZURE_CLIENTID', '')
-    test_environment_variable['azure_secret'] = os.environ.get('AZURE_SECRET', '')
-    test_environment_variable['azure_tenantid'] = os.environ.get('AZURE_TENANTID', '')
-    test_environment_variable['azure_subscriptionid'] = os.environ.get('AZURE_SUBSCRIPTIONID', '')
-    test_environment_variable['azure_resource_group_name'] = os.environ.get('AZURE_RESOURCE_GROUP_NAME', '')
-    test_environment_variable['azure_vm_name'] = os.environ.get('AZURE_VM_NAME', '')
+    test_environment_variable['azure_cluster_stop'] = EnvironmentVariables.get_env('AZURE_CLUSTER_STOP', '')
+    test_environment_variable['azure_cluster_start'] = EnvironmentVariables.get_env('AZURE_CLUSTER_START', '')
+    test_environment_variable['azure_clientid'] = EnvironmentVariables.get_env('AZURE_CLIENTID', '')
+    test_environment_variable['azure_secret'] = EnvironmentVariables.get_env('AZURE_SECRET', '')
+    test_environment_variable['azure_tenantid'] = EnvironmentVariables.get_env('AZURE_TENANTID', '')
+    test_environment_variable['azure_subscriptionid'] = EnvironmentVariables.get_env('AZURE_SUBSCRIPTIONID', '')
+    test_environment_variable['azure_resource_group_name'] = EnvironmentVariables.get_env('AZURE_RESOURCE_GROUP_NAME', '')
+    test_environment_variable['azure_vm_name'] = EnvironmentVariables.get_env('AZURE_VM_NAME', '')
 
     # IBM details
-    test_environment_variable['region_name'] = os.environ.get('IBM_REGION_NAME', 'us-south')
-    test_environment_variable['endpoint_url'] = os.environ.get('IBM_ENDPOINT_URL', 'https://s3.us-south.cloud-object-storage.appdomain.cloud')
-    test_environment_variable['access_key_id'] = os.environ.get('IBM_ACCESS_KEY_ID', 'b423001ef7e64675a721c4636efab823')
-    test_environment_variable['secret_access_key'] = os.environ.get('IBM_SECRET_ACCESS_KEY', 'd810c54141b3187a54a8bac0899e287271b09a86b2445308')
-    test_environment_variable['bucket'] = os.environ.get('IBM_BUCKET', 'benchmark-runner')
-    test_environment_variable['key'] = os.environ.get('IBM_KEY', 'run-artifacts')
+    test_environment_variable['region_name'] = EnvironmentVariables.get_env('IBM_REGION_NAME', '')
+    test_environment_variable['endpoint_url'] = EnvironmentVariables.get_env('IBM_ENDPOINT_URL', None)
+    test_environment_variable['access_key_id'] = EnvironmentVariables.get_env('IBM_ACCESS_KEY_ID', '')
+    test_environment_variable['secret_access_key'] = EnvironmentVariables.get_env('IBM_SECRET_ACCESS_KEY', '')
+    test_environment_variable['bucket'] = EnvironmentVariables.get_env('IBM_BUCKET', '')
+    test_environment_variable['key'] = EnvironmentVariables.get_env('IBM_KEY', '')
     # IBM S3
-    test_environment_variable['key'] = os.environ.get('KEY', 'run-artifacts')
-    test_environment_variable['run_type'] = os.environ.get('RUN_TYPE', 'test-ci')
+    test_environment_variable['key'] = EnvironmentVariables.get_env('KEY', 'run-artifacts')
+    test_environment_variable['run_type'] = EnvironmentVariables.get_env('RUN_TYPE', 'test-ci')
     test_environment_variable['date_key'] = datetime.datetime.now().strftime("%Y/%m/%d")
 
     # update node_selector
-    if test_environment_variable['pin_node1']:
-        test_environment_variable['pin'] = 'true'
-    else:
-        test_environment_variable['pin'] = 'false'
+    test_environment_variable['pin'] = bool(test_environment_variable['pin_node1'])
 
     # ElasticSearch url
     if test_environment_variable.get('elasticsearch_password', ''):
