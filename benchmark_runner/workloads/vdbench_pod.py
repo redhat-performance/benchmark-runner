@@ -80,6 +80,9 @@ class VdbenchPod(WorkloadsOperations):
             else:
                 self.__es_index = 'vdbench-results'
             self._environment_variables_dict['kind'] = self.__kind
+            # create namespace
+            self._oc.create_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'namespace.yaml'))
+            self._oc.apply_security_privileged()
             if not self._scale:
                 self._oc.create_pod_sync(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}.yaml'), pod_name=self.__pod_name)
                 self._oc.wait_for_initialized(label=f'app=vdbench-{self._trunc_uuid}', label_uuid=False)
@@ -139,8 +142,8 @@ class VdbenchPod(WorkloadsOperations):
                     else:
                         pod_name = name
                     self._oc.delete_pod_sync(yaml=os.path.join(f'{self._run_artifacts_path}', f'{pod}.yaml'), pod_name=pod_name)
-                # delete namespace
-                self._oc.delete_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'namespace.yaml'))
+            # delete namespace
+            self._oc.delete_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'namespace.yaml'))
         except ElasticSearchDataNotUploaded as err:
             self._oc.delete_pod_sync(
                 yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}.yaml'),

@@ -204,6 +204,17 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
+    def apply_security_privileged(self, namespace: str = environment_variables.environment_variables_dict['namespace']):
+        """
+        This method apply security privileged for namespace
+        @param namespace:
+        @return:
+        """
+        return self.run(f"{self.__cli} create serviceaccount -n {namespace} {namespace}; "
+                        f"{self.__cli} adm policy add-scc-to-user -n {namespace} privileged -z {namespace}")
+
+    @typechecked
+    @logger_time_stamp
     def create_async(self, yaml: str, is_check: bool = False):
         """
         This method create yaml in async
