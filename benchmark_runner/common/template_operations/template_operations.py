@@ -162,6 +162,9 @@ class TemplateOperations:
             except TemplateSyntaxError as err:
                 raise SyntaxError(f"Error while rendering {template_file}: {err}")
             answer[filename] = f"{template.render(render_data)}\n"
+            # namespace
+            if os.path.isfile(os.path.join(workload_dir_path, 'internal_data', f'namespace_template.yaml')):
+                answer['namespace.yaml'] = render_yaml_file(dir_path=os.path.join(workload_dir_path, 'internal_data'), yaml_file='namespace_template.yaml', environment_variable_dict=self.__environment_variables_dict)
             if scale:
                 answer['namespace.yaml'] = render_yaml_file(dir_path=os.path.join(self.__dir_path, 'scale'), yaml_file='namespace.yaml', environment_variable_dict=self.__environment_variables_dict)
                 if redis:
