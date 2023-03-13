@@ -1,9 +1,4 @@
 
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: benchmark-runner
----
 apiVersion: kubevirt.io/v1
 kind: VirtualMachine
 metadata:

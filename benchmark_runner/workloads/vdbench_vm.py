@@ -84,6 +84,8 @@ class VdbenchVM(WorkloadsOperations):
             self.__vm_name = f'{self.__workload_name}-{self._trunc_uuid}'
             self.__kind = 'vm'
             self._environment_variables_dict['kind'] = 'vm'
+            # create namespace
+            self._oc.create_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'namespace.yaml'))
             if not self._scale:
                 self._oc.create_vm_sync(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}.yaml'), vm_name=self.__vm_name)
                 self._oc.wait_for_ready(label=f'app=vdbench-{self._trunc_uuid}', run_type='vm', label_uuid=False)
@@ -109,8 +111,6 @@ class VdbenchVM(WorkloadsOperations):
             # scale
             else:
                 self.__scale = int(self._scale)
-                # create namespace
-                self._oc.create_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'namespace.yaml'))
                 # create redis and state signals
                 sync_pods = {'redis': 'redis', 'state_signals_exporter_pod': 'state-signals-exporter'}
                 for pod, name in sync_pods.items():
@@ -144,8 +144,8 @@ class VdbenchVM(WorkloadsOperations):
                     else:
                         pod_name = name
                     self._oc.delete_pod_sync(yaml=os.path.join(f'{self._run_artifacts_path}', f'{pod}.yaml'), pod_name=pod_name)
-                # delete namespace
-                self._oc.delete_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'namespace.yaml'))
+            # delete namespace
+            self._oc.delete_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'namespace.yaml'))
         except ElasticSearchDataNotUploaded as err:
             self._oc.delete_vm_sync(
                 yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}.yaml'),

@@ -126,6 +126,8 @@ class BootstormVM(WorkloadsOperations):
             self.__vm_name = f'{self.__workload_name}-{self._trunc_uuid}'
             self.__kind = 'vm'
             self._environment_variables_dict['kind'] = 'vm'
+            # create namespace
+            self._oc.create_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'namespace.yaml'))
             if not self._scale:
                 self._oc.create_async(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}.yaml'))
                 self._oc.wait_for_vm_status(vm_name=f'bootstorm-vm-{self._trunc_uuid}', status=VMStatus.Stopped)
@@ -148,8 +150,6 @@ class BootstormVM(WorkloadsOperations):
                     vm_name=self.__vm_name)
             # scale
             else:
-                # create namespace
-                self._oc.create_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'namespace.yaml'))
                 # create run bulks
                 bulks = tuple(self.split_run_bulks(iterable=range(self._scale * len(self._scale_node_list)), limit=self._threads_limit))
                 # create, run and delete vms
@@ -165,8 +165,8 @@ class BootstormVM(WorkloadsOperations):
                         # sleep between bulks
                         time.sleep(self._bulk_sleep_time)
                         proc = []
-                # delete namespace
-                self._oc.delete_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'namespace.yaml'))
+            # delete namespace
+            self._oc.delete_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'namespace.yaml'))
         except ElasticSearchDataNotUploaded as err:
             self._oc.delete_vm_sync(
                 yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}.yaml'),
