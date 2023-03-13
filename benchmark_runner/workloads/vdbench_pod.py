@@ -107,8 +107,6 @@ class VdbenchPod(WorkloadsOperations):
             # scale
             else:
                 self.__scale = int(self._scale)
-                # create namespace
-                self._oc.create_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'namespace.yaml'))
                 # create redis and state signals
                 sync_pods = {'redis': 'redis', 'state_signals_exporter_pod': 'state-signals-exporter'}
                 for pod, name in sync_pods.items():
