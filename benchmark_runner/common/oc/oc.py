@@ -7,7 +7,7 @@ from typeguard import typechecked
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 from benchmark_runner.common.oc.oc_exceptions import PodNotCreateTimeout, PodNotInitializedTimeout, PodNotReadyTimeout, \
     PodNotCompletedTimeout, PodTerminateTimeout, PodNameNotExist, LoginFailed, VMNotCreateTimeout, VMDeleteTimeout, \
-    YAMLNotExist, VMNameNotExist, VMNotInitializedTimeout, VMNotReadyTimeout, VMStateTimeout, VMNotCompletedTimeout, ExecFailed, PodFailed
+    YAMLNotExist, VMNameNotExist, VMNotInitializedTimeout, VMNotReadyTimeout, VMStateTimeout, VMNotCompletedTimeout, ExecFailed, PodFailed, DVStatusTimeout
 from benchmark_runner.common.ssh.ssh import SSH
 from benchmark_runner.main.environment_variables import environment_variables
 
@@ -130,6 +130,37 @@ class OC(SSH):
         if 'Succeeded' in self.run(verify_cmd):
             return True
         return False
+
+    def check_dv_status(self,
+                        status: str,
+                        namespace: str = environment_variables.environment_variables_dict['namespace']):
+        """
+        This method check dv status
+        :return:
+        """
+        namespace = f'-n {namespace}' if namespace else ''
+        verify_cmd = f"{self.__cli} get dv {namespace} -ojsonpath='{{.items[].status.phase}}'"
+        if status in self.run(verify_cmd):
+            return True
+        return False
+
+    @typechecked
+    @logger_time_stamp
+    def wait_for_dv_status(self,
+                           status: str = 'Succeeded',
+                           timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
+        """
+        This method wait for methods status
+        @return: True/ False if reach to status
+        """
+        current_wait_time = 0
+        while timeout <= 0 or current_wait_time <= timeout:
+            if self.check_dv_status(status=status):
+                return True
+            # sleep for x seconds
+            time.sleep(OC.SLEEP_TIME)
+            current_wait_time += OC.SLEEP_TIME
+        raise DVStatusTimeout(status=status)
 
     def get_odf_disk_count(self):
         """

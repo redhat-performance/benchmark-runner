@@ -133,9 +133,7 @@ class TemplateOperations:
             }
         self.__environment_variables_dict = {**self.__environment_variables_dict, **template_render_data}
         common_data = yaml.load(render_yaml_file(dir_path=self.__dir_path, yaml_file='common.yaml', environment_variable_dict=self.__environment_variables_dict), Loader=yaml.FullLoader)['common_data']
-        if scale:
-            render_yaml_file(dir_path=os.path.join(self.__dir_path, 'scale'), yaml_file='redis.yaml', environment_variable_dict=self.__environment_variables_dict)
-            render_yaml_file(dir_path=os.path.join(self.__dir_path, 'scale'), yaml_file='state_signals_exporter_pod.yaml', environment_variable_dict=self.__environment_variables_dict)
+
         template_render_data = {**self.__environment_variables_dict, **common_data}
 
         workload_data = yaml.load(render_yaml_file(workload_dir_path, f'{self.__workload_name}_data_template.yaml', template_render_data), Loader=yaml.FullLoader)
@@ -163,13 +161,15 @@ class TemplateOperations:
                 raise SyntaxError(f"Error while rendering {template_file}: {err}")
             answer[filename] = f"{template.render(render_data)}\n"
             # namespace
-            if os.path.isfile(os.path.join(workload_dir_path, 'internal_data', f'namespace_template.yaml')):
-                answer['namespace.yaml'] = render_yaml_file(dir_path=os.path.join(workload_dir_path, 'internal_data'), yaml_file='namespace_template.yaml', environment_variable_dict=self.__environment_variables_dict)
-            if scale:
-                answer['namespace.yaml'] = render_yaml_file(dir_path=os.path.join(self.__dir_path, 'scale'), yaml_file='namespace.yaml', environment_variable_dict=self.__environment_variables_dict)
-                if redis:
-                    answer['redis.yaml'] = render_yaml_file(dir_path=os.path.join(self.__dir_path, 'scale'), yaml_file='redis.yaml', environment_variable_dict=self.__environment_variables_dict)
-                    answer['state_signals_exporter_pod.yaml'] = render_yaml_file(dir_path=os.path.join(self.__dir_path, 'scale'), yaml_file='state_signals_exporter_pod.yaml', environment_variable_dict=self.__environment_variables_dict)
+            if os.path.isfile(os.path.join(self.__dir_path, f'namespace_template.yaml')):
+                answer['namespace.yaml'] = render_yaml_file(dir_path=self.__dir_path, yaml_file='namespace_template.yaml', environment_variable_dict=self.__environment_variables_dict)
+            # windows workload
+            if 'windows' in self.__workload_name:
+                answer['windows_dv.yaml'] = render_yaml_file(dir_path=os.path.join(workload_dir_path, 'internal_data'), yaml_file='windows_dv_template.yaml', environment_variable_dict=render_data)
+            # vdbench scale
+            if scale and redis and 'vdbench' in self.__workload_name:
+                    answer['redis.yaml'] = render_yaml_file(dir_path=os.path.join(self.__dir_path, 'scale'), yaml_file='redis_template.yaml', environment_variable_dict=self.__environment_variables_dict)
+                    answer['state_signals_exporter_pod.yaml'] = render_yaml_file(dir_path=os.path.join(self.__dir_path, 'scale'), yaml_file='state_signals_exporter_pod_template.yaml', environment_variable_dict=self.__environment_variables_dict)
         for filename, data in answer.items():
             with open(os.path.join(self.__run_artifacts_path, filename), 'w') as f:
                 f.write(data)
