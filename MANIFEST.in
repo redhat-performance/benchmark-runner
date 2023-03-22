@@ -1,7 +1,7 @@
 # Add yamls files to benchmark-runner package
 
 # common templates
-include benchmark_runner/common/template_operations/templates/common.yaml
+include benchmark_runner/common/template_operations/templates/*.yaml
 
 # benchmark operator templates
 include benchmark_runner/common/template_operations/templates
@@ -18,6 +18,8 @@ include benchmark_runner/common/template_operations/templates/vdbench/*.yaml
 include benchmark_runner/common/template_operations/templates/vdbench/internal_data/*.yaml
 include benchmark_runner/common/template_operations/templates/bootstorm/*.yaml
 include benchmark_runner/common/template_operations/templates/bootstorm/internal_data/*.yaml
+include benchmark_runner/common/template_operations/templates/windows/*.yaml
+include benchmark_runner/common/template_operations/templates/windows/internal_data/*.yaml
 
 # ocp resource
 include benchmark_runner/common/ocp_resources/local_storage/template/*.sh
