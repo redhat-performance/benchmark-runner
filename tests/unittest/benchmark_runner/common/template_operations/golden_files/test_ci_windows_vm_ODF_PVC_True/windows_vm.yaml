@@ -68,6 +68,8 @@ spec:
             cpu: 1
             memory: 2G
           limits:
+            cpu: 1
+            memory: 2G
       networks:
       - name: nic-0
         pod: {}

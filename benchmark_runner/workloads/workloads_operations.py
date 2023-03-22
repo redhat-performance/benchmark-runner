@@ -359,7 +359,7 @@ class WorkloadsOperations:
         if 'bootstorm' in self._workload:
             metadata.update({'vm_os_version': 'fedora37'})
         if 'windows' in self._workload:
-            metadata.update({'vm_os_version': 'win_10'})
+            metadata.update({'vm_os_version': 'windows_server_2019'})
         if result:
             metadata.update(result)
 
