@@ -1,0 +1,132 @@
+apiVersion: kubevirt.io/v1alpha3
+kind: VirtualMachine
+metadata:
+  {% if scale -%}
+  name: windows-{{ kind }}-{{ trunc_uuid }}-{{ scale }}
+  labels:
+    kubevirt.io/vm: windows-{{ kind }}-{{ trunc_uuid }}-{{ scale }}
+  {%- else -%}
+  name:  windows-{{ kind }}-{{ trunc_uuid }}
+  labels:
+    kubevirt.io/vm: windows-{{ kind }}-{{ trunc_uuid }}
+  {%- endif %}
+  namespace: {{ namespace }}
+spec:
+  running: false
+  template:
+    metadata:
+      labels:
+        {% if scale -%}
+        kubevirt.io/vm: windows-{{ kind }}-{{ trunc_uuid }}-{{ scale }}
+        {%- else -%}
+        kubevirt.io/vm: windows-{{ kind }}-{{ trunc_uuid }}
+        {%- endif %}
+    spec:
+      {%- if pin_node1 or scale_node %}
+      nodeSelector:
+        {% if scale -%}
+        kubernetes.io/hostname: {{ scale_node }}
+        {%- else -%}
+        kubernetes.io/hostname: {{ pin_node1 }}
+        {%- endif %}
+      {%- endif %}
+      terminationGracePeriodSeconds: 0
+      evictionStrategy: LiveMigrate
+      domain:
+        clock:
+          timer:
+            hpet:
+              present: false
+            hyperv: {}
+            pit:
+              tickPolicy: delay
+            rtc:
+              tickPolicy: catchup
+          utc: {}
+        cpu:
+          cores: 1
+          model: host-passthrough
+          sockets: {{ sockets }}
+          threads: 1
+        devices:
+          blockMultiQueue: false
+          disks:
+          - disk:
+              bus: virtio
+            {% if scale -%}
+            name: windows-{{ kind }}-root-disk-{{ trunc_uuid }}-{{ scale }}
+            {%- else -%}
+            name: windows-{{ kind }}-root-disk-{{ trunc_uuid }}
+            {%- endif %}
+            dedicatedIOThread: false
+          interfaces:
+          - masquerade: {}
+            model: virtio
+            name: nic-0
+        features:
+          acpi: {}
+          apic: {}
+          hyperv:
+            evmcs: {}
+            frequencies: {}
+            ipi: {}
+            reenlightenment: {}
+            tlbflush: {}
+            relaxed: {}
+            reset: {}
+            runtime: {}
+            spinlocks:
+              spinlocks: 8191
+            synic: {}
+            synictimer: {}
+            vapic: {}
+            vpindex: {}
+        machine:
+          type: q35
+        resources:
+          requests:
+            cpu: {{ requests_cpu }}
+            memory: {{ requests_memory }}
+          limits:
+      networks:
+      - name: nic-0
+        pod: {}
+      volumes:
+      - dataVolume:
+          {% if scale -%}
+          name: windows-{{ kind }}-root-disk-{{ trunc_uuid }}-{{ scale }}
+          {%- else -%}
+          name: windows-{{ kind }}-root-disk-{{ trunc_uuid }}
+          {%- endif %}
+        {% if scale -%}
+        name: windows-{{ kind }}-root-disk-{{ trunc_uuid }}-{{ scale }}
+        {%- else -%}
+        name: windows-{{ kind }}-root-disk-{{ trunc_uuid }}
+        {%- endif %}
+  dataVolumeTemplates:
+  - metadata:
+      annotations:
+        descheduler.alpha.kubernetes.io/evict: "true"
+        {% if scale -%}
+        kubevirt.io/provisionOnNode: {{ scale_node }}
+        {%- else -%}
+        kubevirt.io/provisionOnNode: {{ pin_node1 }}
+        {%- endif %}
+      {% if scale -%}
+      name: windows-{{ kind }}-root-disk-{{ trunc_uuid }}-{{ scale }}
+      {%- else -%}
+      name: windows-{{ kind }}-root-disk-{{ trunc_uuid }}
+      {%- endif %}
+    spec:
+      pvc:
+        accessModes:
+        - ReadWriteMany
+        resources:
+          requests:
+            storage: {{ storage }}
+        volumeMode: Block
+        storageClassName: ocs-storagecluster-ceph-rbd
+      source:
+        pvc:
+          namespace: {{ namespace }}
+          name: windows-clone-dv

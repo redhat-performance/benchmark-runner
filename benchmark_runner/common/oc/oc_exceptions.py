@@ -122,3 +122,10 @@ class PodFailed(OCError):
     def __init__(self, pod):
         self.message = f'pod {pod} failed'
         super(PodFailed, self).__init__(self.message)
+
+
+class DVStatusTimeout(OCError):
+    """This exception return dv status timeout error"""
+    def __init__(self, status):
+        self.message = f'DV status {status} timeout'
+        super(DVStatusTimeout, self).__init__(self.message)

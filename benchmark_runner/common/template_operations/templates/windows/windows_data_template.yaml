@@ -1,0 +1,19 @@
+metadata:
+  name: windows
+template_data:
+  shared:
+    pin_node: {{ pin_node1 }}
+    odf_pvc: {{ odf_pvc }}
+    uuid: {{ uuid }}
+    url: {{ windows_url }}
+  run_type:
+    perf_ci:
+      requests_memory: 2G
+      requests_cpu: 1
+      sockets: 1
+      storage: 40Gi
+    default:
+      requests_memory: 2G
+      requests_cpu: 1
+      sockets: 1
+      storage: 40Gi

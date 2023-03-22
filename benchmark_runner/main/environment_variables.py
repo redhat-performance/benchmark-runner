@@ -80,6 +80,9 @@ class EnvironmentVariables:
         # prometheus snap interval
         self._environment_variables_dict['prometheus_snap_interval'] = EnvironmentVariables.get_env('PROMETHEUS_SNAP_INTERVAL', '30')
 
+        # windows url
+        self._environment_variables_dict['windows_url'] = EnvironmentVariables.get_env('WINDOWS_URL', '')
+
         # default parameter - change only if needed
         # Parameters below related to 'run_workload()'
         self._environment_variables_dict['workloads'] = ['stressng_pod', 'stressng_vm', 'stressng_kata',
@@ -91,7 +94,7 @@ class EnvironmentVariables:
                                                          'hammerdb_pod_mssql', 'hammerdb_vm_mssql', 'hammerdb_kata_mssql',
                                                          'hammerdb_pod_mssql_lso', 'hammerdb_vm_mssql_lso', 'hammerdb_kata_mssql_lso',
                                                          'vdbench_pod', 'vdbench_kata', 'vdbench_vm',
-                                                         'clusterbuster', 'bootstorm_vm']
+                                                         'clusterbuster', 'bootstorm_vm', 'windows_vm']
         # Workloads namespaces
         self._environment_variables_dict['workload_namespaces'] = {
             'stressng': 'benchmark-operator',
@@ -99,7 +102,8 @@ class EnvironmentVariables:
             'uperf': 'benchmark-operator',
             'vdbench': 'benchmark-runner',
             'clusterbuster': 'clusterbuster',
-            'bootstorm': 'benchmark-runner'
+            'bootstorm': 'benchmark-runner',
+            'windows': 'benchmark-runner'
         }
 
         # Update namespace
