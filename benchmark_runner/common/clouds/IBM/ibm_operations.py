@@ -327,7 +327,7 @@ class IBMOperations:
     @logger_time_stamp
     def update_ocp_github_credentials(self):
         """
-        This method update github secrets kubeconfig and kubeadmin_password
+        This method update GitHub secrets kubeconfig and kubeadmin_password
         :return:
         """
         self.__github_operations.create_secret(secret_name=f'{self.__ocp_env_flavor}_KUBECONFIG', unencrypted_value=self.__get_kubeconfig())
