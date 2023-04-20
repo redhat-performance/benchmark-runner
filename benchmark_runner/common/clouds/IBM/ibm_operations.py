@@ -313,16 +313,15 @@ class IBMOperations:
     @staticmethod
     @logger_time_stamp
     @typechecked
-    def install_ocp_resources(resources: list, ibm_blk_disk_name: list = []):
+    def install_ocp_resources(resources: list):
         """
         This method install OCP resources 'cnv', 'local_storage', 'odf'
-        :param ibm_blk_disk_name: ibm blk disk name
         :param resources:
         :return:
         """
         create_ocp_resource = CreateOCPResource()
         for resource in resources:
-            create_ocp_resource.create_resource(resource=resource, ibm_blk_disk_name=ibm_blk_disk_name)
+            create_ocp_resource.create_resource(resource=resource)
 
     @logger_time_stamp
     def update_ocp_github_credentials(self):

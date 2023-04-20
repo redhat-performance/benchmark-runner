@@ -10,12 +10,12 @@ class CreateODF(CreateOCPResourceOperations):
     """
     This class is created ODF operator
     """
-    def __init__(self, oc: OC, path: str, resource_list: list, ibm_blk_disk_name: list):
+    def __init__(self, oc: OC, path: str, resource_list: list, worker_disk_ids: list):
         super().__init__(oc)
         self.__oc = oc
         self.__path = path
         self.__resource_list = resource_list
-        self.__ibm_blk_disk_name = ibm_blk_disk_name
+        self.__worker_disk_ids = worker_disk_ids
 
     @logger_time_stamp
     def create_odf(self):
@@ -28,10 +28,14 @@ class CreateODF(CreateOCPResourceOperations):
             if resource.endswith('.sh'):
                 # build sgdisks path dynamically
                 if '01_sgdisks.sh' == resource:
-                    sgdisk_list = ''
-                    for disk_name in self.__ibm_blk_disk_name:
-                        sgdisk_list += f'sgdisk --zap-all /dev/{disk_name};'
-                    self.__oc.run(cmd=f'chmod +x {os.path.join(self.__path, resource)}; {self.__path}/./{resource} "{sgdisk_list}"')
+                    node_sgdisk = ''
+                    result_dict = {}
+                    for node, disk_ids in self.__worker_disk_ids.items():
+                        for disk_id in disk_ids:
+                            node_sgdisk += f'sgdisk --zap-all /dev/disk/by-id/{disk_id};'
+                        result_dict[node] = node_sgdisk
+                        node_sgdisk = ''
+                    self.__oc.run(cmd=f'chmod +x {os.path.join(self.__path, resource)}; {self.__path}/./{resource} "{list(result_dict.keys())[0]}" "{list(result_dict.values())[0]}" "{list(result_dict.keys())[1]}" "{list(result_dict.values())[1]}" "{list(result_dict.keys())[2]}" "{list(result_dict.values())[2]}"')
                 else:
                     self.__oc.run(cmd=f'chmod +x {os.path.join(self.__path, resource)}; {self.__path}/./{resource}')
             else:  # yaml

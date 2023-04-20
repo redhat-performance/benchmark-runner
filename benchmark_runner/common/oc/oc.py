@@ -1,5 +1,6 @@
 
 import os
+import ast
 import time
 from enum import Enum
 from typeguard import typechecked
@@ -34,6 +35,9 @@ class OC(SSH):
         self._run_artifacts = self.__environment_variables_dict.get('run_artifacts_path', '')
         self.__elasticsearch_url = self.__environment_variables_dict.get('elasticsearch_url', '')
         self.__cli = self.__environment_variables_dict.get('cli', '')
+        self.__worker_disk_ids = self.__environment_variables_dict.get('worker_disk_ids', '')
+        if self.__worker_disk_ids:
+            self.__worker_disk_ids = ast.literal_eval(self.__worker_disk_ids)
 
     def get_ocp_server_version(self):
         """
@@ -55,6 +59,33 @@ class OC(SSH):
         :return:
         """
         return self.run(f"{self.__cli} get csv -n openshift-storage -ojsonpath='{{.items[0].spec.labels.full_version}}'")
+
+    def get_pv_disk_ids(self):
+        """
+        This method return list of pv disk ids
+        """
+        result = self.run(f"{self.__cli} get pv -o jsonpath={{.items[*].metadata.annotations.'storage\.openshift\.com/device-id'}}")
+        return result.split()
+
+    def get_worker_disk_ids(self):
+        """
+        The method return worker disk ids
+        """
+        workers_disk_ids = []
+        if self.__worker_disk_ids:
+            for node, disk_ids in self.__worker_disk_ids.items():
+                for disk_id in disk_ids:
+                    workers_disk_ids.append(disk_id)
+        return workers_disk_ids
+
+    def get_free_disk_id(self):
+        """
+        This method return free disk (workers_all_disk_ids - workers_odf_pv_disk_ids)
+        """
+        workers_disk_ids = self.get_worker_disk_ids()
+        workers_pv_disk_ids = self.get_pv_disk_ids()
+        if workers_disk_ids:
+            return list(set(workers_disk_ids) - set(workers_pv_disk_ids))
 
     def get_kata_version(self):
         """
@@ -199,9 +230,9 @@ class OC(SSH):
         This method delete available or released pv because that avoid launching new pv
         """
         pv_status_list = self.run(fr"{self.__cli} get pv -ojsonpath={{..status.phase}}").split()
-        for pv_status in pv_status_list:
+        for ind, pv_status in enumerate(pv_status_list):
             if pv_status == 'Available' or pv_status == 'Released':
-                available_pv = self.run(fr"{self.__cli} get pv -ojsonpath={{.items[{pv_status_list.index(pv_status)}].metadata.name}}")
+                available_pv = self.run(fr"{self.__cli} get pv -ojsonpath={{.items[{ind}].metadata.name}}")
                 logger.info(f'Delete {pv_status} pv {available_pv}')
                 self.run(fr"{self.__cli} delete pv {available_pv}")
 

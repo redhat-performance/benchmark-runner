@@ -39,7 +39,7 @@ spec:
       volumeMode: Filesystem
       fsType: ext4
       devicePaths:
-        - {{ lso_path }}
+        - /dev/disk/by-id/{{ lso_disk_id }}
 ---
 {%- endif %}
 {%- if storage_type == 'lso' or  odf_pvc == True %}

@@ -26,6 +26,8 @@ This framework support the following embedded workloads:
 * [vdbench](https://wiki.lustre.org/VDBench/): running vdbench workload in Pod, Kata or VM with [Configuration](benchmark_runner/common/template_operations/templates/vdbench)
 * [bootstorm](https://en.wiktionary.org/wiki/boot_storm): calculate VMs boot load time [Configuration](benchmark_runner/common/template_operations/templates/bootstorm)
 
+** For hammerdb mssql must run once [permission](https://github.com/redhat-performance/benchmark-runner/blob/main/benchmark_runner/common/ocp_resources/custom/template/02_mssql_patch_template.sh)
+
 Benchmark-runner grafana dashboard example:
 ![](media/grafana.png)
 
@@ -95,7 +97,9 @@ Choose one from the following list:
 
 **optional:scale** REDIS=$REDIS [For Vdbench only: redis for scale synchronization]
 
-**optional:** LSO_PATH=$LSO_PATH [LSO_PATH='/dev/sdb/' For hammerdb only: for using Local Storage Operator]
+**optional:** LSO_DISK_ID=$LSO_DISK_ID [LSO_DISK_ID='scsi-<replace_this_with_your_actual_disk_id>' For using Local Storage Operator in hammerdb]
+
+**optional:** WORKER_DISK_IDS=$WORKER_DISK_IDS [WORKER_DISK_IDS For ODF/LSO workloads hammerdb/vdbench]
 
 For example:
 

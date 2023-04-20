@@ -17,7 +17,7 @@ spec:
       volumeMode: Block
       fsType: ext4
       devicePaths:
-        - {{ lso_path }}
+        - /dev/disk/by-id/{{ lso_disk_id }}
 ---
 {%- endif %}
 apiVersion: ripsaw.cloudbulldozer.io/v1alpha1

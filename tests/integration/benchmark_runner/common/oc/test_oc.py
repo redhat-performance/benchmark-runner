@@ -1,9 +1,10 @@
-
 # Tests that are not required benchmark-operator pod
 
 import time
 import tempfile
 import tarfile
+import mock
+
 from benchmark_runner.common.oc.oc import OC
 from tests.integration.benchmark_runner.test_environment_variables import *
 from benchmark_runner.common.prometheus.prometheus_snapshot import PrometheusSnapshot
@@ -67,6 +68,36 @@ def test_oc_get_odf_version():
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
     assert oc.get_odf_version()
+
+
+def test_oc_get_pv_disk_ids():
+    """
+    This method test get pv disk ids
+    :return:
+    """
+    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
+    oc.login()
+    assert len(oc.get_pv_disk_ids()) > 1
+    assert oc.get_pv_disk_ids()
+
+
+def mock_get_worker_disk_ids(*args, **kwargs):
+    """
+    This method mock method class get_worker_disk_ids
+    """
+    return ['scsi-3600062b33333333333333333333333333']
+
+
+def test_oc_get_free_disk_id():
+    """
+    This method test get free disk id
+    :return:
+    """
+    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
+    oc.login()
+    with mock.patch.object(OC, 'get_worker_disk_ids', new=mock_get_worker_disk_ids):
+        assert len(oc.get_free_disk_id()) == 1
+        assert oc.get_free_disk_id()
 
 
 def test_oc_get_odf_disk_count():
@@ -175,7 +206,8 @@ def test_oc_exec():
     test_message = "I am here"
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
-    answer = oc.exec(pod_name="prometheus-k8s-0", namespace="openshift-monitoring", container='prometheus', command=f'echo "{test_message}"')
+    answer = oc.exec(pod_name="prometheus-k8s-0", namespace="openshift-monitoring", container='prometheus',
+                     command=f'echo "{test_message}"')
     assert answer == test_message
 
 
