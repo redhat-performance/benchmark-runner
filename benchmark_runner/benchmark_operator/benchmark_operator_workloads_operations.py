@@ -38,7 +38,6 @@ class BenchmarkOperatorWorkloadsOperations:
         self._elasticsearch = self._environment_variables_dict.get('elasticsearch', '')
         self._run_artifacts = self._environment_variables_dict.get('run_artifacts', '')
         self._run_artifacts_path = self._environment_variables_dict.get('run_artifacts_path', '')
-        self._lso_path = self._environment_variables_dict.get('lso_path', '')
         self._date_key = self._environment_variables_dict.get('date_key', '')
         self._key = self._environment_variables_dict.get('key', '')
         self._endpoint_url = self._environment_variables_dict.get('endpoint_url', '')
@@ -73,6 +72,13 @@ class BenchmarkOperatorWorkloadsOperations:
         # PrometheusSnapshot
         if self._enable_prometheus_snapshot:
             self._snapshot = PrometheusSnapshot(oc=self._oc, artifacts_path=self._run_artifacts_path, verbose=True)
+        # update lso_disk_id
+        self._lso_disk_id = self._oc.get_free_disk_id()
+        if self._lso_disk_id:
+            # Choose first list item
+            self._environment_variables_dict['lso_disk_id'] = self._lso_disk_id[0]
+        else:
+            self._lso_disk_id = self._environment_variables_dict.get('lso_disk_id', '')
 
     def set_login(self, kubeadmin_password: str = ''):
         """
@@ -463,7 +469,7 @@ class BenchmarkOperatorWorkloadsOperations:
         This method Verifies that lso path exist
         :return:
         """
-        if not self._lso_path:
+        if not self._lso_disk_id:
             raise EmptyLSOPath()
 
     @logger_time_stamp

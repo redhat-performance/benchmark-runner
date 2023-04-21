@@ -117,7 +117,7 @@ class EnvironmentVariables:
             # TBD if this is not set
             self._environment_variables_dict['namespace'] = 'benchmark-operator'
 
-        # run workload with odf pvc True/False. True=ODF, False=Ephemeral
+        # run workload with odf pvc True/False. True=ODF(default), False=Ephemeral
         self._environment_variables_dict['odf_pvc'] = EnvironmentVariables.get_boolean_from_environment('ODF_PVC', True)
         if base_workload == 'hammerdb':
             if len(self._environment_variables_dict['workload'].split('_')) == self.HAMMERDB_LSO_LEN:
@@ -126,8 +126,9 @@ class EnvironmentVariables:
                 self._environment_variables_dict['storage_type'] = 'odf'
             else:
                 self._environment_variables_dict['storage_type'] = 'ephemeral'
-        # LSO Disk path
-        self._environment_variables_dict['lso_path'] = EnvironmentVariables.get_env('LSO_PATH', '')
+
+        # LSO Disk id - auto-detect when located on worker-2
+        self._environment_variables_dict['lso_disk_id'] = EnvironmentVariables.get_env('LSO_DISK_ID', '')
         # Workloads that required ODF
         self._environment_variables_dict['workloads_odf_pvc'] = ['vdbench', 'hammerdb']
         # This parameter get from Test_CI.yml file
@@ -209,8 +210,9 @@ class EnvironmentVariables:
         self._environment_variables_dict['quay_password'] = EnvironmentVariables.get_env('QUAY_PASSWORD', '')
         # odf version
         self._environment_variables_dict['odf_version'] = EnvironmentVariables.get_env('ODF_VERSION', '')
-        # number fo odf disk from ['sdb', 'sdc', 'sdd', 'sde']
-        self._environment_variables_dict['num_odf_disk'] = EnvironmentVariables.get_env('NUM_ODF_DISK', 1)
+        # number of odf disk for discovery
+        self._environment_variables_dict['num_odf_disk'] = EnvironmentVariables.get_env('NUM_ODF_DISK', 4)
+        self._environment_variables_dict['worker_disk_ids'] = EnvironmentVariables.get_env('WORKER_DISK_IDS', "")
         # install resources list
         self._environment_variables_dict['install_resources_list'] = EnvironmentVariables.get_env('INSTALL_RESOURCES_LIST', '')
 

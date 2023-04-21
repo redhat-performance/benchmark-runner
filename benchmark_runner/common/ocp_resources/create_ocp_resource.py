@@ -1,4 +1,4 @@
-
+import ast
 import os
 from jinja2 import Template
 
@@ -22,6 +22,9 @@ class CreateOCPResource:
         self.__oc = OC(kubeadmin_password=self.__environment_variables_dict.get('kubeadmin_password', ''))
         self.__oc.login()
         self.__oc.populate_additional_template_variables(self.__environment_variables_dict)
+        self.__worker_disk_ids = self.__environment_variables_dict.get('worker_disk_ids', '')
+        if self.__worker_disk_ids:
+            self.__worker_disk_ids = ast.literal_eval(self.__worker_disk_ids)
 
     @staticmethod
     def __get_yaml_files(path: str, extensions: list = ['.yaml', '.sh']):
@@ -61,10 +64,9 @@ class CreateOCPResource:
         resource_file_list = sorted(resource_file_list, key=lambda x: os.path.splitext(x)[0])
         return resource_file_list
 
-    def create_resource(self, resource: str, ibm_blk_disk_name: list = []):
+    def create_resource(self, resource: str):
         """
         This method create resource with verification
-        :param ibm_blk_disk_name: ibm blk name list
         :param resource:
         :return:
         """
@@ -75,7 +77,7 @@ class CreateOCPResource:
             self.__create_local_storage = CreateLocalStorage(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files)
             self.__create_local_storage.create_local_storage()
         elif 'odf' == resource:
-            self.__create_odf = CreateODF(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files, ibm_blk_disk_name=ibm_blk_disk_name)
+            self.__create_odf = CreateODF(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files, worker_disk_ids=self.__worker_disk_ids)
             self.__create_odf.create_odf()
         elif 'kata' == resource:
             self.__create_kata = CreateKata(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files)

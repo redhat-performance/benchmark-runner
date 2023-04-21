@@ -113,7 +113,7 @@ def install_resources():
     oc = ibm_operations.oc_login()
     ibm_operations.verify_cluster_is_up(oc)
     # ibm_blk_disk_name for odf install
-    ibm_operations.install_ocp_resources(resources=resources, ibm_blk_disk_name=ibm_operations.get_ibm_disks_blk_name())
+    ibm_operations.install_ocp_resources(resources=resources)
     ibm_operations.ibm_disconnect()
     logger.info(f'End IBM OCP resources installation')
 
