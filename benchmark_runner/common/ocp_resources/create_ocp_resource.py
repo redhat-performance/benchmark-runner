@@ -24,6 +24,7 @@ class CreateOCPResource:
         self.__oc.populate_additional_template_variables(self.__environment_variables_dict)
         self.__worker_disk_ids = self.__environment_variables_dict.get('worker_disk_ids', '')
         if self.__worker_disk_ids:
+            self.__worker_disk_ids = self.__worker_disk_ids.replace('"','')
             self.__worker_disk_ids = ast.literal_eval(self.__worker_disk_ids)
 
     @staticmethod
