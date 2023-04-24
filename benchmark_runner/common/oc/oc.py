@@ -984,15 +984,15 @@ class OC(SSH):
             output_filename = os.path.join(self._run_artifacts, vm_name)
         results_list = []
         with open(output_filename) as infile:
-            copy = False
+            # VM logs results start
+            start = False
             for line in infile:
-                if start_stamp in line:
-                    copy = True
+                if start_stamp in line or 'podman' in line and not start:
+                    start = True
                     continue
                 elif end_stamp in line:
-                    copy = False
-                    continue
-                elif copy:
+                    return results_list
+                elif start:
                     # Filter 'cloud-init' and CSV lines only
                     if 'cloud-init' in line and ',' in line:
                         if vm_name in line:
