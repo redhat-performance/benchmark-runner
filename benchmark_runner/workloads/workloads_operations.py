@@ -474,6 +474,7 @@ class WorkloadsOperations:
         This method includes all the finalization of workload
         :return:
         """
+        self._oc.collect_events()
         if self._enable_prometheus_snapshot:
             self.end_prometheus()
         if self._endpoint_url:
