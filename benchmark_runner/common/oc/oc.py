@@ -280,7 +280,7 @@ class OC(SSH):
     def create_async(self, yaml: str, is_check: bool = False):
         """
         This method create yaml in async
-        :param yaml:
+        @param yaml:
         @param is_check:
         :return:
         """
@@ -383,6 +383,15 @@ class OC(SSH):
             prom_token = self.run(f"{self.__cli} sa new-token -n openshift-monitoring prometheus-k8s 2>/dev/null")
         return prom_token
 
+    def collect_events(self):
+        """
+        This method collect event logs
+        :return: output_filename
+        """
+        output_filename = os.path.join(self._run_artifacts, f'events.logs')
+        self.run(f"{self.__cli} get events -A > '{output_filename}' ")
+        return output_filename
+
     @logger_time_stamp
     def login(self):
         """
@@ -425,12 +434,23 @@ class OC(SSH):
         """
         output_filename = os.path.join(self._run_artifacts, pod_name)
         if database:
-            self.run(f"{self.__cli} logs -n '{database}-db' {pod_name} > {output_filename} ")
+            self.run(f"{self.__cli} logs -n '{database}-db' {pod_name} > '{output_filename}' ")
         # manager logs of benchmark-controller-manager
         elif 'benchmark-controller-manager' in pod_name:
-            self.run(f"{self.__cli} logs -n {environment_variables.environment_variables_dict['namespace']} {pod_name} manager > {output_filename} ")
+            self.run(f"{self.__cli} logs -n {environment_variables.environment_variables_dict['namespace']} {pod_name} manager > '{output_filename}' ")
         else:
-            self.run(f"{self.__cli} logs -n {environment_variables.environment_variables_dict['namespace']} {pod_name} > {output_filename} ")
+            self.run(f"{self.__cli} logs -n {environment_variables.environment_variables_dict['namespace']} {pod_name} > '{output_filename}' ")
+        return output_filename
+
+    def describe_pod(self, pod_name: str, namespace: str = ''):
+        """
+        This method describe pod into log
+        :param pod_name: pod name with uuid
+        :param namespace: namespace
+        :return: output_filename
+        """
+        output_filename = os.path.join(self._run_artifacts, f'describe-{pod_name}')
+        self.run(f"{self.__cli} describe pod -n {namespace} {pod_name} > '{output_filename}' ")
         return output_filename
 
     @logger_time_stamp
@@ -456,10 +476,12 @@ class OC(SSH):
         current_wait_time = 0
         while timeout <= 0 or current_wait_time <= timeout:
             if self.pod_exists(pod_name=pod_name, namespace=namespace):
+                self.describe_pod(pod_name=pod_name, namespace=namespace)
                 return True
             # sleep for x seconds
             time.sleep(OC.SLEEP_TIME)
             current_wait_time += OC.SLEEP_TIME
+        self.describe_pod(pod_name=pod_name, namespace=namespace)
         raise PodNotCreateTimeout(pod_name)
 
     @typechecked
@@ -692,6 +714,17 @@ class OC(SSH):
         except Exception as err:
             raise PodNotCompletedTimeout(workload=workload)
 
+    def describe_vmi(self, vm_name: str, namespace: str):
+        """
+        This method describe vmi into log
+        :param vm_name: vm name with uuid
+        :param namespace: namespace
+        :return: output_filename
+        """
+        output_filename = os.path.join(self._run_artifacts, f'describe-{vm_name}')
+        self.run(f"{self.__cli} describe vmi -n {namespace} {vm_name} > '{output_filename}' ")
+        return output_filename
+
     @typechecked
     def _get_vm_name(self, vm_name: str, namespace: str = environment_variables.environment_variables_dict['namespace']):
         """
@@ -847,10 +880,12 @@ class OC(SSH):
         current_wait_time = 0
         while timeout <= 0 or current_wait_time <= timeout:
             if self.vm_exists(vm_name=vm_name, namespace=namespace):
+                self.describe_vmi(vm_name=vm_name, namespace=namespace)
                 return True
             # sleep for x seconds
             time.sleep(OC.SLEEP_TIME)
             current_wait_time += OC.SLEEP_TIME
+        self.describe_vmi(vm_name=vm_name, namespace=namespace)
         raise VMNotCreateTimeout(vm_name)
 
     @typechecked
