@@ -87,12 +87,22 @@ class OC(SSH):
         if workers_disk_ids:
             return list(set(workers_disk_ids) - set(workers_pv_disk_ids))
 
-    def get_kata_version(self):
+    def get_kata_operator_version(self):
         """
-        This method returns kata version
+        This method returns kata operator version
         :return:
         """
         return self.run(f"{self.__cli} get csv -n openshift-sandboxed-containers-operator $({self.__cli} get csv -n openshift-sandboxed-containers-operator --no-headers | awk '{{ print $1; }}') -ojsonpath='{{.spec.version}}'")
+
+    @typechecked
+    def get_kata_rpm_version(self, node: str):
+        """
+        This method returns sandboxed containers (kata) rpm version
+        @param: node
+        :return:
+        """
+        kata_rpm_version = self.run(f"{self.__cli} debug node/{node} -- chroot /host rpm -q --queryformat='%{{VERSION}}-%{{RELEASE}}' kata-containers 2>/dev/null")
+        return '.'.join(kata_rpm_version.split('.')[:3])
 
     def _get_kata_default_channel(self):
         """

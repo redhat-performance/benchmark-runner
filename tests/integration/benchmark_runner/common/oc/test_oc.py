@@ -40,14 +40,25 @@ def test_get_ocp_minor_version():
     assert oc.get_ocp_minor_version()
 
 
-def test_oc_get_kata_version():
+def test_oc_get_kata_operator_version():
     """
-    This method gets the sandboxed containers (kata) version
+    This method gets the sandboxed containers (kata) operator version
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
-    assert oc.get_kata_version()
+    assert oc.get_kata_operator_version()
+
+
+def test_oc_get_kata_rpm_version():
+    """
+    This method gets the sandboxed containers (kata) rpm version
+    :return:
+    """
+    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
+    oc.login()
+    assert oc.get_kata_rpm_version(node=test_environment_variable['pin_node1'])
+    assert len(oc.get_kata_rpm_version(node=test_environment_variable['pin_node1']).split('.')) == 3
 
 
 def test_oc_get_cnv_version():
