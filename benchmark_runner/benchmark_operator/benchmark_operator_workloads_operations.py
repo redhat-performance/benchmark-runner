@@ -221,7 +221,8 @@ class BenchmarkOperatorWorkloadsOperations:
         date_format = '%Y_%m_%d'
         metadata = {'ocp_version': self._oc.get_ocp_server_version(),
                     'cnv_version': self._oc.get_cnv_version(),
-                    'kata_version': self._oc.get_kata_version(),
+                    'kata_version': self._oc.get_kata_operator_version(),
+                    'kata_rpm_version': self._oc.get_kata_rpm_version(node=self._pin_node1),
                     'odf_version': self._oc.get_odf_version(),
                     'runner_version': self._runner_version,
                     'version': int(self._runner_version.split('.')[-1]),
