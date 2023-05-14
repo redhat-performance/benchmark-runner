@@ -14,7 +14,7 @@ from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, 
 
 class ElasticSearchOperations:
     """
-    This class contains elastic search operations
+    This class contains elasticsearch operations
     """
 
     # sleep time between checks is 10 sec
@@ -70,9 +70,8 @@ class ElasticSearchOperations:
 
     def __elasticsearch_get_index_hits(self, index: str, uuid: str = '', fast_check: bool = False, id: bool = False, es_fetch_min_time:int = None):
         """
-        This method search for data per index in last 2 minutes and return the number of docs or zero
+        This method searches for data per index in last 2 minutes and return the number of docs or zero
         :param index:
-        :param workload: need only if there is different timestamp parameter in Elasticsearch
         :param es_fetch_min_time
         :param id: True to return the doc ids
         :param fast_check: return fast response
@@ -125,7 +124,7 @@ class ElasticSearchOperations:
     def verify_elasticsearch_data_uploaded(self, index: str, uuid: str = '', workload: str = '',
                                            fast_check: bool = False, timeout: int = None, es_fetch_min_time: int = None):
         """
-        The method wait till data upload to elastic search and wait if there is new data, search in last 15 minutes
+        The method waits till data uploads to elasticsearch and waits if there is new data, search in last 15 minutes
         :param es_fetch_min_time:
         :param index:
         :param uuid: the current workload uuid
@@ -155,56 +154,166 @@ class ElasticSearchOperations:
             raise ElasticSearchDataNotUploaded
 
     @typechecked()
-    def upload_to_elasticsearch(self, index: str, data: dict, doc_type: str = '_doc', es_add_items: dict = None):
+    def upload_to_elasticsearch(self, index: str, data: dict, doc_type: str = '_doc', es_add_items: dict = None, **kwargs):
         """
-        This method is upload json data into elasticsearch
+        This method uploads json data into elasticsearch
         :param index: index name to be stored in elasticsearch
-        :param data: data must me in dictionary i.e. {'key': 'value'}
+        :param data: data must be in dictionary i.e. {'key': 'value'}
         :param doc_type:
         :param es_add_items:
         :return:
         """
-        # read json to dict
-        json_path = ""
+        if index and data:
+            # Add items
+            if es_add_items:
+                data.update(es_add_items)
 
-        # Add items
-        if es_add_items:
-            for key, value in es_add_items.items():
-                data[key] = value
+            # utcnow - solve timestamp issue
+            data['timestamp'] = datetime.utcnow()  # datetime.now()
 
-        # utcnow - solve timestamp issue
-        data['timestamp'] = datetime.utcnow()  # datetime.now()
-
-        # Upload data to elastic search server
-        try:
-            if isinstance(data, dict):  # JSON Object
-                self.__es.index(index=index, doc_type=doc_type, document=data)
-            else:  # JSON Array
-                for record in data:
-                    self.__es.index(index=index, doc_type=doc_type, document=record)
-            return True
-        except Exception as err:
-            raise err
+            # Uploads data to elasticsearch server
+            try:
+                if isinstance(data, dict):  # JSON Object
+                    self.__es.index(index=index, doc_type=doc_type, document=data, **kwargs)
+                else:  # JSON Array
+                    for record in data:
+                        self.__es.index(index=index, doc_type=doc_type, document=record, **kwargs)
+                return True
+            except Exception as err:
+                raise err
+        else:
+            raise Exception('Empty parameters: index/ data')
 
     @typechecked()
+    @logger_time_stamp
     def update_elasticsearch_index(self, index: str, id: str, metadata: dict = ''):
         """
-        This method update existing index
+        This method updates existing index with specific id
         :param index: index name
-        :param id: The specific index id
+        :param id: The specific id
         :param metadata: The metadata for enrich that existing index according to id
         :return:
         """
-        self.__es.update(index=index, id=id, body={"doc": metadata})
+        if index and id and metadata:
+            self.__es.update(index=index, id=id, body={"doc": metadata})
+        else:
+            raise Exception('Empty parameters: index/ id/ metadata')
 
     @typechecked()
     @logger_time_stamp
     def get_elasticsearch_index_by_id(self, index: str, id: str):
         """
-        This method return elastic search index data by id
+        This method returns elasticsearch index data by id
         :param index: index name
         :param id: The specific index id
         :return:
         """
-        return self.__es.get(index=index, id=id)
+        if index and id:
+            return self.__es.get(index=index, id=id)
+        else:
+            raise Exception('Empty parameters: index/ id')
 
+    @typechecked()
+    @logger_time_stamp
+    def delete_elasticsearch_index_by_id(self, index: str, id: str):
+        """
+        This method deletes elasticsearch index data by id
+        :param index: index name
+        :param id: The specific index id
+        :return:
+        """
+        if index and id:
+            return self.__es.delete(index=index, id=id)
+        else:
+            raise Exception('Empty parameters: index/ id')
+
+    @typechecked()
+    @logger_time_stamp
+    def get_query_data_between_dates(self, start_datetime: datetime, end_datetime: datetime):
+        """
+        This method returns the query for fetching data between dates
+        @param start_datetime:
+        @param end_datetime:
+        @return:
+        """
+        if start_datetime and end_datetime:
+            if end_datetime < start_datetime:
+                start_datetime = end_datetime
+            query = {
+                    "bool": {
+                        "filter": {
+                            "range": {
+                                "timestamp": {
+                                    "format": "yyyy-MM-dd HH:mm:ss"
+                                }
+                            }
+                        }
+                    }
+            }
+            query['bool']['filter']['range']['timestamp']['lte'] = str(end_datetime.replace(microsecond=0))
+            query['bool']['filter']['range']['timestamp']['gte'] = str(start_datetime.replace(microsecond=0))
+            return query
+        else:
+            raise Exception('Empty parameters: start_datetime/ end_datetime')
+
+    @typechecked()
+    @logger_time_stamp
+    def get_index_ids_between_dates(self, index: str, start_datetime: datetime = None, end_datetime: datetime = None):
+        """
+        This method returns list of index ids between dates
+        @param index:
+        @param start_datetime:
+        @param end_datetime:
+        @return: list of ids
+        """
+        number_of_documents = 100
+        scroll_duration = '1h'
+        if index and start_datetime and end_datetime:
+            es_data = []
+            query = self.get_query_data_between_dates(start_datetime, end_datetime)
+            response = self.__es.search(index=index, query=query, size=number_of_documents, scroll=scroll_duration)
+            scroll_id = response.get('_scroll_id')
+            if response.get('hits').get('hits'):
+                es_data.extend(response.get('hits').get('hits'))
+            while scroll_id:
+                response = self.__es.scroll(scroll_id=scroll_id, scroll="1h")
+                if len(response.get('hits').get('hits')) > 0:
+                    es_data.extend(response.get('hits').get('hits'))
+                else:
+                    break
+            ids = [hit["_id"] for hit in es_data]
+            return ids
+        else:
+            raise Exception('Empty parameters: index/ start_datetime/ end_datetime')
+
+    @typechecked()
+    @logger_time_stamp
+    def delete_index_ids_between_dates(self, index: str, start_datetime: datetime = None,
+                                       end_datetime: datetime = None):
+        """
+        This method deletes index ids between dates
+        @param index:
+        @param start_datetime:
+        @param end_datetime:
+        @return:
+        """
+        if index and start_datetime and end_datetime:
+            ids = self.get_index_ids_between_dates(index=index, start_datetime=start_datetime, end_datetime=end_datetime)
+            for id in ids:
+                self.delete_elasticsearch_index_by_id(index=index, id=id)
+        else:
+            raise Exception('Empty parameters: index/ start_datetime/ end_datetime')
+
+    @logger_time_stamp
+    def get_all_result_index(self):
+        """
+        This method returns sorted elasticsearch indexes that contains results
+        @return:
+        """
+        index_results = []
+        # Fetch all indices
+        indices = self.__es.cat.indices(format="json")
+        for index in indices:
+            if 'results' in index['index']:
+                index_results.append(index['index'])
+        return sorted(index_results)
