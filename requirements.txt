@@ -5,6 +5,7 @@ botocore==1.29.1
 cryptography==39.0.1
 elasticsearch==7.16.1
 elasticsearch_dsl==7.4.0
+ipywidgets==8.0.6
 jinja2==3.0.3
 myst-parser==0.17.0
 openshift-client==1.0.17
@@ -16,6 +17,7 @@ PyYAML==6.0
 sphinx==4.5.0
 sphinx_rtd_theme==1.0.0
 tenacity==8.0.1
+tqdm==4.65.0
 typeguard==2.12.1
 typing==3.7.4.3
 

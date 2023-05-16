@@ -41,3 +41,7 @@ include benchmark_runner/common/assisted_installer/jetlag/run_jetlag.sh
 # prometheus queries yaml
 include benchmark_runner/common/prometheus/metrics-default.yaml
 include benchmark_runner/common/prometheus/metrics-examples.yaml
+
+# Jupyterlab templates
+include jupyterlab/templates/logs_analyzer/*.ipynb
+include jupyterlab/templates/elasticsearch_operations/*.ipynb
