@@ -41,7 +41,7 @@ setup(
     packages=find_packages(include=['benchmark_runner', 'benchmark_runner.*']),
 
     install_requires=[
-        'attrs==21.4.0', # readthedocs
+        'attrs==21.4.0',  # readthedocs
         'azure==4.0.0',
         'boto3==1.26.1',  # s3
         'botocore==1.29.1',  # s3
