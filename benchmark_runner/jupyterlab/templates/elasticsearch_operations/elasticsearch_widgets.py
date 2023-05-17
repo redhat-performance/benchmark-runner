@@ -1,6 +1,6 @@
 import ipywidgets as widgets
 from datetime import datetime, time
-from IPython.display import HTML, display
+from IPython.display import display
 from benchmark_runner.common.elasticsearch.elasticsearch_operations import ElasticSearchOperations
 
 
@@ -12,7 +12,32 @@ class ElasticSearchWidgets:
     DEFAULT_TIME = 0
 
     def __init__(self, elasticsearch: ElasticSearchOperations):
+        # Need elasticsearch object to get indexes
         self.__elasticsearch = elasticsearch
+
+    @staticmethod
+    def get_start_datetime():
+        """
+        This method return changes global start_datetime
+        @return:
+        """
+        return start_datetime
+
+    @staticmethod
+    def get_end_datetime():
+        """
+        This method return changes global end_datetime
+        @return:
+        """
+        return end_datetime
+
+    @staticmethod
+    def get_elastic_index():
+        """
+        This method return changes global elastic_index
+        @return:
+        """
+        return elastic_index
 
     def index_dropdown(self):
         """
@@ -22,7 +47,7 @@ class ElasticSearchWidgets:
         dropdown = widgets.Dropdown(
             options=self.__elasticsearch.get_all_result_index(),
             value=self.__elasticsearch.get_all_result_index()[0],
-            description='Choose index & time:',
+            description='Choose INDEX & DATES:',
             style={'description_width': 'initial'},
             layout=widgets.Layout(width='500px')
         )
@@ -41,15 +66,12 @@ class ElasticSearchWidgets:
         datetime widget
         @return:
         """
+        start_datetime = None
+        end_datetime = None
         start_date_picker = widgets.DatePicker(description='Start Date')
         end_date_picker = widgets.DatePicker(description='End Date')
         start_time_picker = widgets.TimePicker(description='Start Time', value=time(hour=self.DEFAULT_TIME, minute=self.DEFAULT_TIME, second=self.DEFAULT_TIME))
         end_time_picker = widgets.TimePicker(description='End Time', value=time(hour=self.DEFAULT_TIME, minute=self.DEFAULT_TIME, second=self.DEFAULT_TIME))
-
-        display(start_date_picker)
-        display(start_time_picker)
-        display(end_date_picker)
-        display(end_time_picker)
 
         def on_value_change(change):
             global start_datetime
@@ -65,4 +87,8 @@ class ElasticSearchWidgets:
         end_date_picker.observe(on_value_change, names='value')
         start_time_picker.observe(on_value_change, names='value')
         end_time_picker.observe(on_value_change, names='value')
-        return start_datetime, end_datetime
+
+        display(start_date_picker)
+        display(start_time_picker)
+        display(end_date_picker)
+        display(end_time_picker)
