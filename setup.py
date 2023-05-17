@@ -48,6 +48,7 @@ setup(
         'cryptography==39.0.1',  # for paramiko
         'elasticsearch==7.16.1',
         'elasticsearch_dsl==7.4.0',  # for deep search
+        'ipywidgets==8.0.6',  # for jupyterlab widgets
         'jinja2==3.0.3',
         'myst-parser==0.17.0',  # readthedocs
         'openshift-client==1.0.17',  # clusterbuster && prometheus metrics
@@ -59,6 +60,7 @@ setup(
         'sphinx==4.5.0',  # readthedocs
         'sphinx-rtd-theme==1.0.0',  # readthedocs
         'tenacity==8.0.1',  # retry decorator
+        'tqdm==4.65.0',  # for jupyterlab download file
         'typeguard==2.12.1',
         'typing==3.7.4.3',
         # must add new package inside requirements.txt
