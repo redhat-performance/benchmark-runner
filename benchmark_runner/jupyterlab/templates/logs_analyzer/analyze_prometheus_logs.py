@@ -65,7 +65,7 @@ class AnalyzePrometheusLogs:
         progress = widgets.IntProgress(description='Downloading', min=0, max=size)
         display(progress)
 
-        with open(f"{self.__logs_dir}/{self.__filename}", 'wb') as f:
+        with open(os.path.join(self.__logs_dir, self.__filename), 'wb') as f:
             with tqdm.wrapattr(f, "write", total=size) as fileobj:
                 for chunk in response.iter_content(chunk_size=self.CHUNK_SIZE):
                     if chunk:
