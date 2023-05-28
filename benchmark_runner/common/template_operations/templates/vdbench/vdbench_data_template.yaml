@@ -7,7 +7,6 @@ template_data:
     uuid: {{ uuid }}
     vdbench_image: quay.io/ebattat/centos-stream8-vdbench5.04.07-pod:v1.0.13
     centos_stream_container_disk: quay.io/ebattat/centos-stream8-container-disk:latest
-    VIRTIOFSD_THREADS: 16
   run_type:
     perf_ci:
       BLOCK_SIZES: oltp1,oltp2,oltphw,odss2,odss128,4_cache,64_cache,4,64,4_cache,64_cache,4,64

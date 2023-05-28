@@ -142,6 +142,21 @@ class OC(SSH):
         """
         return self._get_kata_default_channel_field('currentCSVDesc.annotations."operatorframework.io/suggested-namespace"')
 
+    def set_kata_threads_pool(self, thread_pool_size: str):
+        """
+        This methods sets kata thread-pool-size in every worker node
+        @param thread_pool_size:
+        @return:
+        """
+        self.run(fr"""{self.__cli} get nodes -l node-role.kubernetes.io/worker= -o jsonpath="{{range .items[*]}}{{.metadata.name}}{{'\\n'}}{{end}}" |  xargs -I{{}} oc debug node/{{}} -- chroot /host sh -c "mkdir -p /etc/kata-containers; cp /usr/share/kata-containers/defaults/configuration.toml /etc/kata-containers/; sed -i 's/thread-pool-size=1/thread-pool-size={thread_pool_size}/' /etc/kata-containers/configuration.toml" """)
+
+    def delete_kata_threads_pool(self):
+        """
+        This methods deletes kata thread-pool-size from every worker node
+        @return:
+        """
+        self.run(fr"""{self.__cli} get nodes -l node-role.kubernetes.io/worker= -o jsonpath="{{range .items[*]}}{{.metadata.name}}{{'\\n'}}{{end}}" |  xargs -I{{}} oc debug node/{{}} -- chroot /host sh -c "rm -f /etc/kata-containers/configuration.toml" """)
+
     @typechecked
     def populate_additional_template_variables(self, env: dict):
         """
