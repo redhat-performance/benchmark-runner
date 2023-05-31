@@ -66,6 +66,8 @@ class EnvironmentVariables:
 
         # Workaround for Kata CPU offline problem in 4.9/4.10
         self._environment_variables_dict['kata_cpuoffline_workaround'] = EnvironmentVariables.get_boolean_from_environment('KATA_CPUOFFLINE_WORKAROUND', False)
+        # Kata thread-pool-size, default 16
+        self._environment_variables_dict['kata_thread_pool_size'] = EnvironmentVariables.get_boolean_from_environment('KATA_THREAD_POOL_SIZE', '16')
 
         # Scale Per Node
         self._environment_variables_dict['scale'] = EnvironmentVariables.get_env('SCALE', '')

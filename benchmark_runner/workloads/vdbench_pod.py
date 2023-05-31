@@ -83,6 +83,8 @@ class VdbenchPod(WorkloadsOperations):
             # create namespace
             self._oc.create_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'namespace.yaml'))
             self._oc.apply_security_privileged()
+            if self.__kind == 'kata':
+                self._oc.set_kata_threads_pool(thread_pool_size=self._kata_thread_pool_size)
             if not self._scale:
                 self._oc.create_pod_sync(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}.yaml'), pod_name=self.__pod_name)
                 self._oc.wait_for_initialized(label=f'app=vdbench-{self._trunc_uuid}', label_uuid=False)
@@ -142,6 +144,8 @@ class VdbenchPod(WorkloadsOperations):
                     self._oc.delete_pod_sync(yaml=os.path.join(f'{self._run_artifacts_path}', f'{pod}.yaml'), pod_name=pod_name)
             # delete namespace
             self._oc.delete_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'namespace.yaml'))
+            if self.__kind == 'kata':
+                self._oc.delete_kata_threads_pool()
         except ElasticSearchDataNotUploaded as err:
             self._oc.delete_pod_sync(
                 yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}.yaml'),
