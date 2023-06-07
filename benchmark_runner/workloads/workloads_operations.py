@@ -176,14 +176,14 @@ class WorkloadsOperations:
             self._virtctl.save_vm_log(vm_name=vm_name)
         return vm_name
 
-    def _create_pod_log(self, pod: str = ''):
+    def _create_pod_log(self, pod: str = '', type: str = ''):
         """
         This method create pod log per workload
         :param pod: pod name
         :return: save_pod_log file
         """
         pod_name = self._oc.get_pod(label=pod)
-        return self._oc.save_pod_log(pod_name=pod_name)
+        return self._oc.save_pod_log(pod_name=pod_name, type=type)
 
     def _get_run_artifacts_hierarchy(self, workload_name: str = '', is_file: bool = False):
         """
@@ -221,17 +221,18 @@ class WorkloadsOperations:
         The method create scale logs
         :return:
         """
-        self._create_pod_log(pod='state-signals-exporter')
-        self._create_pod_log(pod='redis-master')
+        self._create_pod_log(pod='state-signals-exporter', type='.log')
+        self._create_pod_log(pod='redis-master', type='.log')
 
-    def _create_pod_run_artifacts(self, pod_name: str):
+    def _create_pod_run_artifacts(self, pod_name: str, log_type: str):
         """
         This method create pod run artifacts
         :param pod_name: pod name
+        :param log_type: logs type extension
         :return: run results list of dicts
         """
         result_list = []
-        pod_log_file = self._create_pod_log(pod=pod_name)
+        pod_log_file = self._create_pod_log(pod=pod_name, type=log_type)
         workload_name = self._environment_variables_dict.get('workload', '').replace('_', '-')
         # csv to dictionary
         the_reader = DictReader(open(pod_log_file, 'r'))
@@ -248,12 +249,13 @@ class WorkloadsOperations:
             result_list.append(dict(line_dict))
         return result_list
 
-    def _create_vm_run_artifacts(self, vm_name: str, start_stamp: str, end_stamp: str):
+    def _create_vm_run_artifacts(self, vm_name: str, start_stamp: str, end_stamp: str, log_type: str):
         """
         This method create vm run artifacts
         :param vm_name: vm name
         :param start_stamp: start stamp
         :param end_stamp: end stamp
+        :param log_type: logs type extension
         :return: run results dict
         """
         result_list = []
@@ -261,10 +263,10 @@ class WorkloadsOperations:
         workload_name = self._environment_variables_dict.get('workload', '').replace('_', '-')
         # save scale pod logs
         if self._scale:
-            self._create_pod_log(pod='state-signals-exporter')
-            self._create_pod_log(pod='redis-master')
+            self._create_pod_log(pod='state-signals-exporter', type='.log')
+            self._create_pod_log(pod='redis-master', type='.log')
         # insert results to csv
-        csv_result_file = os.path.join(self._run_artifacts_path, f'{vm_name}_result.csv')
+        csv_result_file = os.path.join(self._run_artifacts_path, f'{vm_name}{log_type}')
         with open(csv_result_file, 'w') as out:
             for row in results_list:
                 if row:
