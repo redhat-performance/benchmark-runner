@@ -315,7 +315,7 @@ class IBMOperations:
     @typechecked
     def install_ocp_resources(resources: list):
         """
-        This method install OCP resources 'cnv', 'local_storage', 'odf'
+        This method install OCP resources 'cnv', 'lso', 'odf'
         :param resources:
         :return:
         """

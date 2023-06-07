@@ -47,7 +47,7 @@ Choose one from the following list:
 
 **optional:scale** REDIS=$REDIS [For Vdbench only: redis for scale synchronization]
 
-**optional:** LSO_DISK_ID=$LSO_DISK_ID [LSO_DISK_ID='scsi-<replace_this_with_your_actual_disk_id>' For using Local Storage Operator in hammerdb]
+**optional:** LSO_DISK_ID=$LSO_DISK_ID [LSO_DISK_ID='scsi-<replace_this_with_your_actual_disk_id>' For using LSO Operator in hammerdb]
 
 **optional:** WORKER_DISK_IDS=$WORKER_DISK_IDS [WORKER_DISK_IDS For ODF/LSO workloads hammerdb/vdbench]
 

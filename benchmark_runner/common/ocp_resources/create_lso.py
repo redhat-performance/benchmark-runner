@@ -6,7 +6,7 @@ from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, 
 from benchmark_runner.common.ocp_resources.create_ocp_resource_operations import CreateOCPResourceOperations
 
 
-class CreateLocalStorage(CreateOCPResourceOperations):
+class CreateLSO(CreateOCPResourceOperations):
     """
     This class is created Local Storage operator
     """
@@ -17,7 +17,7 @@ class CreateLocalStorage(CreateOCPResourceOperations):
         self.__resource_list = resource_list
 
     @logger_time_stamp
-    def create_local_storage(self):
+    def create_lso(self):
         """
         This method create local storage
         :return:
@@ -27,7 +27,7 @@ class CreateLocalStorage(CreateOCPResourceOperations):
             self.__oc.create_async(yaml=os.path.join(self.__path, resource))
 
         # verify once after create all resource files
-        self.wait_for_ocp_resource_create(resource='local_storage',
+        self.wait_for_ocp_resource_create(resource='lso',
                                           verify_cmd="oc -n openshift-local-storage wait deployment/local-storage-operator --for=condition=Available",
                                           status='deployment.apps/local-storage-operator condition met')
         return True

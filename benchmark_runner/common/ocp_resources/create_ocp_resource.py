@@ -4,7 +4,7 @@ from jinja2 import Template
 
 from benchmark_runner.common.oc.oc import OC
 from benchmark_runner.main.environment_variables import environment_variables
-from benchmark_runner.common.ocp_resources.create_local_storage import CreateLocalStorage
+from benchmark_runner.common.ocp_resources.create_lso import CreateLSO
 from benchmark_runner.common.ocp_resources.create_odf import CreateODF
 from benchmark_runner.common.ocp_resources.create_kata import CreateKata
 from benchmark_runner.common.ocp_resources.create_cnv import CreateCNV
@@ -75,9 +75,9 @@ class CreateOCPResource:
         # remove resource files
         self.remove_resource_files(path=os.path.join(self.__dir_path, resource))
         resource_files = self.get_sorted_resources(resource=resource)
-        if 'local_storage' == resource:
-            self.__create_local_storage = CreateLocalStorage(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files)
-            self.__create_local_storage.create_local_storage()
+        if 'lso' == resource:
+            self.__create_lso = CreateLSO(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files)
+            self.__create_lso.create_lso()
         elif 'odf' == resource:
             self.__create_odf = CreateODF(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files, worker_disk_ids=self.__worker_disk_ids)
             self.__create_odf.create_odf()
