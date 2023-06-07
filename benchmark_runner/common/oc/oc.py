@@ -85,7 +85,17 @@ class OC(SSH):
         workers_disk_ids = self.get_worker_disk_ids()
         workers_pv_disk_ids = self.get_pv_disk_ids()
         if workers_disk_ids:
-            return list(set(workers_disk_ids) - set(workers_pv_disk_ids))
+            result = list(set(workers_disk_ids) - set(workers_pv_disk_ids))
+            if result:
+                return result
+            # check for available pv
+            else:
+                pv_status_list = self.run(fr"{self.__cli} get pv -ojsonpath={{..status.phase}}").split()
+                for ind, pv_status in enumerate(pv_status_list):
+                    if pv_status == 'Available':
+                        available_pv = self.run(fr"{self.__cli} get pv -ojsonpath={{.items[{ind}].metadata.name}}")
+                        # return available pv device id
+                        return self.run(fr"{self.__cli} get pv {available_pv} -ojsonpath={{.metadata.annotations.'storage\.openshift\.com\/device-id'}}")
 
     def get_kata_operator_version(self):
         """
