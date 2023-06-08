@@ -44,7 +44,7 @@ class VdbenchPod(WorkloadsOperations):
         metric_results = self.__prometheus_metrics_operation.run_prometheus_queries()
         prometheus_result = self.parse_prometheus_metrics(data=metric_results)
         # save run artifacts logs
-        result_list = self._create_pod_run_artifacts(pod_name=f'{self.__pod_name}-{pod_num}')
+        result_list = self._create_pod_run_artifacts(pod_name=f'{self.__pod_name}-{pod_num}', log_type='.csv')
         if self._es_host:
             # upload several run results
             for result in result_list:
@@ -95,7 +95,7 @@ class VdbenchPod(WorkloadsOperations):
                 metric_results = self.__prometheus_metrics_operation.run_prometheus_queries()
                 prometheus_result = self.parse_prometheus_metrics(data=metric_results)
                 # save run artifacts logs
-                result_list = self._create_pod_run_artifacts(pod_name=self.__pod_name)
+                result_list = self._create_pod_run_artifacts(pod_name=self.__pod_name, log_type='.csv')
                 if self._es_host:
                     # upload several run results
                     for result in result_list:
