@@ -417,10 +417,10 @@ class OC(SSH):
 
     def collect_events(self):
         """
-        This method collect event logs
+        This method collects event log
         :return: output_filename
         """
-        output_filename = os.path.join(self._run_artifacts, f'events.logs')
+        output_filename = os.path.join(self._run_artifacts, f'events.log')
         self.run(f"{self.__cli} get events -A > '{output_filename}' ")
         return output_filename
 
@@ -457,14 +457,18 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def save_pod_log(self, pod_name: str, database: str = ''):
+    def save_pod_log(self, pod_name: str, database: str = '', log_type: str = ''):
         """
         This method save pod log in log_path
         :param pod_name: pod name with uuid
         :param database: database
+        :param log_type: log type extension
         :return: output_filename
         """
-        output_filename = os.path.join(self._run_artifacts, pod_name)
+        if log_type:
+            output_filename = os.path.join(self._run_artifacts, f'{pod_name}{log_type}')
+        else:
+            output_filename = os.path.join(self._run_artifacts, pod_name)
         if database:
             self.run(f"{self.__cli} logs -n '{database}-db' {pod_name} > '{output_filename}' ")
         # manager logs of benchmark-controller-manager
