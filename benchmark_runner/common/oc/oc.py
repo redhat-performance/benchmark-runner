@@ -78,6 +78,13 @@ class OC(SSH):
                     workers_disk_ids.append(disk_id)
         return workers_disk_ids
 
+    def remove_lso_path(self):
+        """
+        The method removes lso path on each node
+        @return:
+        """
+        self.run(fr"""{self.__cli} get nodes -l node-role.kubernetes.io/worker= -o jsonpath="{{range .items[*]}}{{.metadata.name}}{{'\\n'}}{{end}}" |  xargs -I{{}} oc debug node/{{}} -- chroot /host sh -c "rm -rf /mnt/local-storage/local-sc" """)
+
     def get_free_disk_id(self):
         """
         This method return free disk (workers_all_disk_ids - workers_odf_pv_disk_ids)
@@ -450,16 +457,16 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def save_pod_log(self, pod_name: str, database: str = '', type: str = ''):
+    def save_pod_log(self, pod_name: str, database: str = '', log_type: str = ''):
         """
         This method save pod log in log_path
         :param pod_name: pod name with uuid
         :param database: database
-        :param type: type [.csv]
+        :param log_type: log extension type [.csv]
         :return: output_filename
         """
-        if type:
-            output_filename = os.path.join(self._run_artifacts, f'{pod_name}{type}')
+        if log_type:
+            output_filename = os.path.join(self._run_artifacts, f'{pod_name}{log_type}')
         else:
             output_filename = os.path.join(self._run_artifacts, pod_name)
         if database:

@@ -49,7 +49,7 @@ class VdbenchVM(WorkloadsOperations):
         metric_results = self.__prometheus_metrics_operation.run_prometheus_queries()
         prometheus_result = self.parse_prometheus_metrics(data=metric_results)
         # save run artifacts logs
-        result_list = self._create_vm_run_artifacts(vm_name=f'{self.__workload_name}-{self._trunc_uuid}-{vm_num}', start_stamp=self.START_STAMP, end_stamp=self.END_STAMP, logs_type='.csv')
+        result_list = self._create_vm_run_artifacts(vm_name=f'{self.__workload_name}-{self._trunc_uuid}-{vm_num}', start_stamp=self.START_STAMP, end_stamp=self.END_STAMP, log_type='.csv')
         if self._es_host:
             # upload several run results
             for result in result_list:
