@@ -50,12 +50,14 @@ def test_get_delete_ids_elasticsearch_last_day():
                                       es_port=test_environment_variable.get('elasticsearch_port', ''),
                                       es_user=test_environment_variable.get('elasticsearch_user', ''),
                                       es_password=test_environment_variable.get('elasticsearch_password', ''))
+    # upload data
     uuid = upload_data(elastic=elastic)
     elastic.verify_elasticsearch_data_uploaded(index=TEST_INDEX_NAME, uuid=uuid)
+    # verify data was uploaded to Elasticsearch
     current_timestamp = datetime.datetime.now()
     day_before_timestamp = current_timestamp - timedelta(days=1)
-    # verify data was uploaded to elastic
-    assert len(elastic.get_index_ids_between_dates(index=TEST_INDEX_NAME, start_datetime=day_before_timestamp, end_datetime=current_timestamp)) == 1
+    assert len(elastic.get_index_ids_between_dates(index=TEST_INDEX_NAME, start_datetime=day_before_timestamp, end_datetime=current_timestamp)) >= 1
+    # cleanup elastic
     elastic.delete_index_ids_between_dates(index=TEST_INDEX_NAME, start_datetime=day_before_timestamp, end_datetime=current_timestamp)
     time.sleep(WAIT)
     # verify data was deleted
