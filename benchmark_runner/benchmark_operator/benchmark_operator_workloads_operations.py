@@ -485,6 +485,7 @@ class BenchmarkOperatorWorkloadsOperations:
             self._oc.delete_namespace(namespace=f"{self._workload.split('_')[2]}-db")
         if self._storage_type == 'lso':
             self._oc.delete_available_released_pv()
+            self._oc.remove_lso_path()
 
     @logger_time_stamp
     def clear_nodes_cache(self):

@@ -78,6 +78,13 @@ class OC(SSH):
                     workers_disk_ids.append(disk_id)
         return workers_disk_ids
 
+    def remove_lso_path(self):
+        """
+        The method removes lso path on each node
+        @return:
+        """
+        self.run(fr"""{self.__cli} get nodes -l node-role.kubernetes.io/worker= -o jsonpath="{{range .items[*]}}{{.metadata.name}}{{'\\n'}}{{end}}" |  xargs -I{{}} oc debug node/{{}} -- chroot /host sh -c "rm -rf /mnt/local-storage/local-sc" """)
+
     def get_free_disk_id(self):
         """
         This method return free disk (workers_all_disk_ids - workers_odf_pv_disk_ids)
