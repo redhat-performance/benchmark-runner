@@ -65,7 +65,7 @@ jobs:
       - name: ▶ OCP assisted installer
         env:
           INSTALL_OCP_VERSION: "latest-4.13"
-          OC_CLIENT_VERSION: "4.12.0-0.okd-2023-02-18-033438"
+          OC_CLIENT_VERSION: "4.13.0-0.okd-2023-06-04-080300"
           IBM_API_KEY: ${{ secrets.IBM_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
           WORKER_IDS: ${{ secrets.PERF_WORKER_IDS }}
@@ -89,7 +89,7 @@ jobs:
       - name: ▶ Rerun OCP assisted install after failure
         env:
           INSTALL_OCP_VERSION: "latest-4.13"
-          OC_CLIENT_VERSION: "4.12.0-0.okd-2023-02-18-033438"
+          OC_CLIENT_VERSION: "4.13.0-0.okd-2023-06-04-080300"
           IBM_API_KEY: ${{ secrets.IBM_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
           WORKER_IDS: ${{ secrets.PERF_WORKER_IDS }}
