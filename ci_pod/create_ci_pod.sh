@@ -16,6 +16,9 @@ JUPYTERLAB_VERSION=""
 MAINTAINER=""
 USER=""
 TOKEN=""
+# Jupyterlab: oc/virtctl version
+OC_VERSION=""
+VIRTCTL_VERSION=""
 
 # MUST replace MANUALLY in nginx/ibm_conf.conf
 JUPYTERLAB_URL=""
@@ -26,7 +29,9 @@ ELASTICSEARCH_URL=""
 INTERNAL_URL=""
 
 CI_POD_PATH=""
+CI_LOGS_PATH=""
 
+mkdir -p /tmp/"$CI_LOGS_PATH"
 mkdir -p "$CI_POD_PATH"/elastic/
 mkdir -p "$CI_POD_PATH"/grafana/
 mkdir -p "$CI_POD_PATH"/windows/
@@ -37,7 +42,6 @@ chmod 775 -R "$CI_POD_PATH"/elastic/
 chmod 775 -R "$CI_POD_PATH"/grafana/
 chmod 775 -R "$CI_POD_PATH"/windows/
 chmod 775 -R "$CI_POD_PATH"/jupyterLab/
-
 
 cd "$CI_POD_PATH"/ci_pod
 podman pod create --name ci_pod -p 80:80 -p "$POD_CI_IP":443:443
@@ -51,8 +55,8 @@ cd "$CI_POD_PATH"/ci_pod/nginx
 podman build -t proxyci --build-arg USER="$USER" --build-arg TOKEN="$TOKEN" .
 podman run -d --pod ci_pod --name cntproxy localhost/proxyci
 cd "$CI_POD_PATH"/ci_pod/jupyterlab
-podman build -t jupyterlab --build-arg JUPYTERLAB_VERSION="$JUPYTERLAB_VERSION" --build-arg MAINTAINER="$MAINTAINER" .
-podman run --name jupyterlab --pod ci_pod -d --privileged -e JUPYTER_TOKEN="$TOKEN" -v "$CI_POD_PATH"/jupyterLab:/notebooks localhost/jupyterlab
+podman build -t jupyterlab --build-arg JUPYTERLAB_VERSION="$JUPYTERLAB_VERSION" --build-arg MAINTAINER="$MAINTAINER" --build-arg OC_VERSION="$OC_VERSION" --build-arg VIRTCTL_VERSION="$VIRTCTL_VERSION" .
+podman run --name jupyterlab --pod ci_pod -d --privileged -e JUPYTER_TOKEN="$TOKEN" -v "$CI_POD_PATH"/jupyterLab:/notebooks -v "$HOME"/.kube:"$HOME"/.kube localhost/jupyterlab
 
 # share windows image
 podman run -d --name win-nginx -v "$CI_POD_PATH"/windows:/usr/share/nginx/html:ro -p "$BASTION_IP":8083:80 docker.io/library/nginx:latest
