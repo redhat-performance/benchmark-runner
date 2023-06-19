@@ -43,5 +43,9 @@ include benchmark_runner/common/prometheus/metrics-default.yaml
 include benchmark_runner/common/prometheus/metrics-examples.yaml
 
 # Jupyterlab templates
+include benchmark_runner/jupyterlab/templates/analyze_perfci_cluster/*.ipynb
 include benchmark_runner/jupyterlab/templates/analyze_prometheus_logs/*.ipynb
+include benchmark_runner/jupyterlab/templates/analyze_workloads/analyze_hammerdb_logs/*.ipynb
+include benchmark_runner/jupyterlab/templates/analyze_workloads/analyze_uperf_logs/*.ipynb
+include benchmark_runner/jupyterlab/templates/analyze_workloads/analyze_vdbench_logs/*.ipynb
 include benchmark_runner/jupyterlab/templates/elasticsearch_operations/*.ipynb
