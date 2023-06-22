@@ -20,4 +20,3 @@ tenacity==8.0.1
 tqdm==4.65.0
 typeguard==2.12.1
 typing==3.7.4.3
-

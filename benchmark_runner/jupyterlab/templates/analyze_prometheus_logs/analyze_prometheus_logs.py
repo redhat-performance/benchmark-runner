@@ -1,10 +1,7 @@
 import os
 
-# Progress bar
+# Run command
 import subprocess
-import requests
-import ipywidgets as widgets
-from tqdm.auto import tqdm
 
 # Open grafana url
 from IPython.display import HTML, display
@@ -15,8 +12,13 @@ from datetime import datetime
 
 # logging
 import logging
+
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
+from typeguard import typechecked
+
+# log operations
+from benchmark_runner.jupyterlab.templates.logs_operations.logs_operations import LogsOperations
 
 
 class AnalyzePrometheusLogs:
@@ -25,76 +27,32 @@ class AnalyzePrometheusLogs:
     """
     TIMEOUT = 30
     SLEEP = 3
-    CHUNK_SIZE = 8192
 
     def __init__(self, s3_logs_url: str):
-        self.__s3_logs_url = s3_logs_url
-        self.__logs_dir = os.path.join(os.path.join(os.getcwd(), 'logs'))
-        self.__filename = self.__s3_logs_url.split('/')[-1]
-        self.__log_dir_path = os.path.join(self.__logs_dir, self.__filename)
-
-    def cleanup(self):
-        """
-        This method cleans up existing logs and Prometheus images
-        @return:
-        """
-        # Delete Prometheus container
-        os.system('podman rmi -f docker.io/prom/prometheus;')
-        # delete logs dir if exist
-        if os.path.exists(self.__logs_dir):
-            os.system(f"rm -rf {self.__logs_dir}")
-
-    def download_s3_logs(self, username: str, password: str):
-        """
-        This method downloads s3 logs
-        @param username:
-        @param password:
-        @return:
-        """
-        if not os.path.exists(self.__logs_dir):
-            os.mkdir(self.__logs_dir)
-
-        # create a session with the credentials
-        session = requests.Session()
-        session.auth = (username, password)
-
-        # download with progress bar
-        response = session.get(self.__s3_logs_url, stream=True)
-        size = int(response.headers.get('Content-Length', 0))
-
-        progress = widgets.IntProgress(description='Downloading', min=0, max=size)
-        display(progress)
-
-        with open(os.path.join(self.__logs_dir, self.__filename), 'wb') as f:
-            with tqdm.wrapattr(f, "write", total=size) as fileobj:
-                for chunk in response.iter_content(chunk_size=self.CHUNK_SIZE):
-                    if chunk:
-                        fileobj.write(chunk)
-                        progress.value += len(chunk)
-
-        logger.info('Download complete!')
+        self.logs_operations = LogsOperations(s3_logs_url=s3_logs_url)
 
     def untar_and_chmod_prometheus_logs(self):
         """
-        This method untars and sets the chmod for Prometheus logs, and returns the path to the 'promdb' directory
-        @return:
+        This method untars and sets the chmod for prometheus logs directory, and returns the path to the prometheus logs directory
+        @return: prometheus_logs path
         """
-        logger.info(f'untar download file {self.__log_dir_path}')
-        os.system(f"tar -xvf {self.__log_dir_path} -C {self.__logs_dir}")
-
-        promdb_file = [f for f in os.listdir(self.__log_dir_path.split('.')[0]) if f.startswith('promdb')]
-
-        logger.info(f"untar prometheus file: {os.path.join(self.__logs_dir, self.__filename.split('.')[0], promdb_file[0])}")
-        os.system(f"tar -xvf {os.path.join(self.__logs_dir, self.__filename.split('.')[0], promdb_file[0])} -C {os.path.join(self.__logs_dir, self.__filename.split('.')[0])}")
-
-        promdb_file = [f for f in os.listdir(self.__log_dir_path.split('.')[0]) if f.startswith('promdb') and not f.endswith('tar')]
-        promdb_dir_path = f"{os.path.join(self.__logs_dir, self.__filename.split('.')[0], promdb_file[0])}"
+        self.logs_operations.untar_and_chmod_logs()
+        promdb_file = [f for f in os.listdir(self.logs_operations.log_dir_path.split('.')[0]) if f.startswith('promdb')]
+        logger.info(
+            f"untar prometheus file: {os.path.join(self.logs_operations.logs_dir, self.logs_operations.filename.split('.')[0], promdb_file[0])}")
+        os.system(
+            f"tar -xvf {os.path.join(self.logs_operations.logs_dir, self.logs_operations.filename.split('.')[0], promdb_file[0])} -C {os.path.join(self.logs_operations.logs_dir, self.logs_operations.filename.split('.')[0])}")
+        promdb_file = [f for f in os.listdir(self.logs_operations.log_dir_path.split('.')[0]) if
+                       f.startswith('promdb') and not f.endswith('tar')]
+        promdb_dir_path = f"{os.path.join(self.logs_operations.logs_dir, self.logs_operations.filename.split('.')[0], promdb_file[0])}"
 
         logger.info(f'chmod {promdb_dir_path}')
         os.system(f"chmod -R g-s,a+rw {promdb_dir_path}")
         return promdb_dir_path
 
-    def run_container(self, image_name, command):
+    @staticmethod
+    @typechecked
+    def run_container(image_name: str, command: str):
         """
         This method runs the container and waits until it finishes running
         @param image_name:
@@ -106,21 +64,23 @@ class AnalyzePrometheusLogs:
         process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         current_wait_time = 0
-        while current_wait_time <= self.TIMEOUT:
+        while current_wait_time <= AnalyzePrometheusLogs.TIMEOUT:
             output = process.stdout.readline()
             if output == b'' and process.poll() is not None:
-                time.sleep(self.SLEEP)
+                time.sleep(AnalyzePrometheusLogs.SLEEP)
                 break
             if output:
                 logger.info(output.strip())
-            time.sleep(self.SLEEP)
-            current_wait_time += self.SLEEP
+            time.sleep(AnalyzePrometheusLogs.SLEEP)
+            current_wait_time += AnalyzePrometheusLogs.SLEEP
 
         return_code = process.poll()
         logger.info(f"Container exited with return code {return_code}")
         return return_code
 
-    def open_grafana_dashboard(self, promdb_dir_path: str, grafana_dashboard_url: str):
+    @staticmethod
+    @typechecked
+    def open_grafana_dashboard(promdb_dir_path: str, grafana_dashboard_url: str):
         """
         This method opens the Grafana dashboard that is mounted to promdb
         @param promdb_dir_path:
@@ -137,5 +97,4 @@ class AnalyzePrometheusLogs:
         logger.info(f"Grafana direct link:: {grafana_url}")
         js_code = f"window.open('{grafana_url}')"
         html_code = f"<script>{js_code}</script>"
-        if self.__s3_logs_url:
-            display(HTML(html_code))
+        display(HTML(html_code))
