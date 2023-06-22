@@ -22,7 +22,7 @@
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
   "id": 16,
-  "iteration": 1685454293596,
+  "iteration": 1687460598233,
   "links": [
     {
       "asDropdown": false,
@@ -212,7 +212,7 @@
                   "text": "1.3.0"
                 },
                 "131": {
-                  "index": 113,
+                  "index": 120,
                   "text": "1.3.1"
                 },
                 "132": {
@@ -222,6 +222,10 @@
                 "133": {
                   "index": 77,
                   "text": "1.3.3"
+                },
+                "140": {
+                  "index": 121,
+                  "text": "1.4.0"
                 },
                 "483": {
                   "index": 0,
@@ -252,7 +256,7 @@
                   "text": "3.0.2-5"
                 },
                 "3026": {
-                  "index": 114,
+                  "index": 122,
                   "text": "3.0.2-6"
                 },
                 "4102": {
@@ -326,6 +330,18 @@
                 "4131": {
                   "index": 109,
                   "text": "4.13.1"
+                },
+                "4132": {
+                  "index": 110,
+                  "text": "4.13.2"
+                },
+                "4133": {
+                  "index": 111,
+                  "text": "4.13.3"
+                },
+                "4134": {
+                  "index": 112,
+                  "text": "4.13.4"
                 },
                 "4814": {
                   "index": 6,
@@ -455,6 +471,10 @@
                   "index": 85,
                   "text": "4.12.2-4"
                 },
+                "41244": {
+                  "index": 125,
+                  "text": "4.12.4-4"
+                },
                 "41304": {
                   "index": 102,
                   "text": "4.13.0-rc.4"
@@ -536,7 +556,7 @@
                   "text": "4.12.1-40"
                 },
                 "412317": {
-                  "index": 116,
+                  "index": 124,
                   "text": "4.12.3-17"
                 },
                 "413014": {
@@ -544,8 +564,12 @@
                   "text": "4.13.0-ec.4"
                 },
                 "413118": {
-                  "index": 111,
+                  "index": 114,
                   "text": "4.13.1-18"
+                },
+                "413140": {
+                  "index": 115,
+                  "text": "4.13.1-40"
                 },
                 "4100683": {
                   "index": 17,
@@ -582,6 +606,18 @@
                 "4120781": {
                   "index": 72,
                   "text": "4.12.0-781"
+                },
+                "4131154": {
+                  "index": 116,
+                  "text": "4.13.1-154"
+                },
+                "4131206": {
+                  "index": 117,
+                  "text": "4.13.1-206"
+                },
+                "4131214": {
+                  "index": 118,
+                  "text": "4.13.1-214"
                 },
                 "41301586": {
                   "index": 88,
@@ -640,11 +676,11 @@
                   "text": "4.13.0-ec.3"
                 },
                 "CNV": {
-                  "index": 110,
+                  "index": 113,
                   "text": "CNV"
                 },
                 "KATA": {
-                  "index": 112,
+                  "index": 119,
                   "text": "KATA"
                 },
                 "OCP": {
@@ -652,7 +688,7 @@
                   "text": "OCP"
                 },
                 "ODF": {
-                  "index": 115,
+                  "index": 123,
                   "text": "ODF"
                 },
                 "Product Versions": {
@@ -732,7 +768,7 @@
               "type": "max"
             }
           ],
-          "query": "_exists_:ocp_version",
+          "query": "_exists_:ocp_version AND ocp_version:$ocp_version",
           "refId": "A",
           "timeField": "timestamp"
         },
@@ -763,7 +799,7 @@
               "type": "max"
             }
           ],
-          "query": "_exists_:cnv_version",
+          "query": "_exists_:cnv_version AND ocp_version:$ocp_version",
           "refId": "C",
           "timeField": "timestamp"
         },
@@ -794,7 +830,7 @@
               "type": "max"
             }
           ],
-          "query": "_exists_:kata_version",
+          "query": "_exists_:kata_version AND ocp_version:$ocp_version",
           "refId": "D",
           "timeField": "timestamp"
         },
@@ -825,7 +861,7 @@
               "type": "max"
             }
           ],
-          "query": "_exists_:kata_rpm_version",
+          "query": "_exists_:kata_rpm_version AND ocp_version:$ocp_version",
           "refId": "F",
           "timeField": "timestamp"
         },
@@ -856,7 +892,7 @@
               "type": "max"
             }
           ],
-          "query": "_exists_:odf_version",
+          "query": "_exists_:odf_version AND ocp_version:$ocp_version",
           "refId": "E",
           "timeField": "timestamp"
         },
@@ -885,7 +921,7 @@
               "type": "max"
             }
           ],
-          "query": "",
+          "query": "ocp_version:$ocp_version",
           "refId": "B",
           "timeField": "timestamp"
         }
@@ -1055,7 +1091,7 @@
                   "type": "max"
                 }
               ],
-              "query": "_exists_:tpm AND db_type:$db_type AND current_worker:$current_worker AND kind:$kind",
+              "query": "_exists_:tpm AND db_type:$db_type AND current_worker:$current_worker AND kind:$kind AND ocp_version:$ocp_version",
               "refId": "A",
               "timeField": "timestamp"
             }
@@ -1126,7 +1162,7 @@
             "h": 15,
             "w": 24,
             "x": 0,
-            "y": 52
+            "y": 14
           },
           "id": 116,
           "interval": "1d",
@@ -1134,7 +1170,7 @@
             {
               "targetBlank": true,
               "title": "artifacts link",
-              "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&editPanel=129"
+              "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&viewPanel=129"
             }
           ],
           "options": {
@@ -1211,7 +1247,7 @@
                   "type": "avg"
                 }
               ],
-              "query": "_exists_:norm_ltcy AND read_message_size:(64 OR 1024 OR 8192) AND num_threads:(1) AND test_type:rr AND norm_ltcy:<1000 AND kind:$kind",
+              "query": "_exists_:norm_ltcy AND read_message_size:(64 OR 1024 OR 8192) AND num_threads:(1) AND test_type:rr AND norm_ltcy:<1000 AND kind:$kind  AND ocp_version:$ocp_version",
               "refId": "A",
               "timeField": "timestamp"
             },
@@ -1275,7 +1311,7 @@
                   "type": "avg"
                 }
               ],
-              "query": "_exists_:norm_ltcy AND read_message_size:(64 OR 1024 OR 8192) AND num_threads:(8) AND test_type:rr AND norm_ltcy:<1000 AND kind:$kind",
+              "query": "_exists_:norm_ltcy AND read_message_size:(64 OR 1024 OR 8192) AND num_threads:(8) AND test_type:rr AND norm_ltcy:<1000 AND kind:$kind  AND ocp_version:$ocp_version",
               "refId": "B",
               "timeField": "timestamp"
             }
@@ -1332,7 +1368,7 @@
             "h": 15,
             "w": 24,
             "x": 0,
-            "y": 67
+            "y": 29
           },
           "id": 115,
           "interval": "1d",
@@ -1418,7 +1454,7 @@
                   "type": "avg"
                 }
               ],
-              "query": "_exists_:norm_ops AND read_message_size:(64 OR 1024 OR 8192) AND num_threads:(1 OR 8) AND test_type:stream AND kind:$kind",
+              "query": "_exists_:norm_ops AND read_message_size:(64 OR 1024 OR 8192) AND num_threads:(1 OR 8) AND test_type:stream AND kind:$kind  AND ocp_version:$ocp_version",
               "refId": "A",
               "timeField": "timestamp"
             }
@@ -1487,7 +1523,7 @@
             "h": 48,
             "w": 24,
             "x": 0,
-            "y": 83
+            "y": 15
           },
           "id": 132,
           "interval": "1d",
@@ -1495,11 +1531,11 @@
             {
               "targetBlank": true,
               "title": "artifacts link",
-              "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&editPanel=133&from=now-45d&to=now"
+              "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=133"
             },
             {
               "title": "scale  log link",
-              "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&editPanel=195&from=now-45d&to=now"
+              "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=195"
             }
           ],
           "options": {
@@ -1575,7 +1611,7 @@
                   "type": "avg"
                 }
               ],
-              "query": "!SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type",
+              "query": "!SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type AND ocp_version:$ocp_version",
               "refId": "A",
               "timeField": "timestamp"
             },
@@ -1620,7 +1656,7 @@
                   "type": "max"
                 }
               ],
-              "query": "!SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type",
+              "query": "!SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type AND ocp_version:$ocp_version",
               "refId": "B",
               "timeField": "timestamp"
             },
@@ -1662,7 +1698,7 @@
                   "type": "max"
                 }
               ],
-              "query": "!SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type",
+              "query": "!SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type AND ocp_version:$ocp_version",
               "refId": "C",
               "timeField": "timestamp"
             },
@@ -1737,7 +1773,7 @@
                   "type": "avg"
                 }
               ],
-              "query": "SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type",
+              "query": "SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type AND ocp_version:$ocp_version",
               "refId": "D",
               "timeField": "timestamp"
             },
@@ -1782,7 +1818,7 @@
                   "type": "max"
                 }
               ],
-              "query": "SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type",
+              "query": "SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type AND ocp_version:$ocp_version",
               "refId": "E",
               "timeField": "timestamp"
             },
@@ -1825,7 +1861,7 @@
                   "type": "max"
                 }
               ],
-              "query": "SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type",
+              "query": "SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type AND ocp_version:$ocp_version",
               "refId": "F",
               "timeField": "timestamp"
             }
@@ -1882,7 +1918,7 @@
             "h": 50,
             "w": 24,
             "x": 0,
-            "y": 131
+            "y": 63
           },
           "id": 134,
           "interval": "1d",
@@ -1966,7 +2002,7 @@
                   "type": "avg"
                 }
               ],
-              "query": "!SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type",
+              "query": "!SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type AND ocp_version:$ocp_version",
               "refId": "A",
               "timeField": "timestamp"
             },
@@ -2011,7 +2047,7 @@
                   "type": "max"
                 }
               ],
-              "query": "!SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type",
+              "query": "!SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type AND ocp_version:$ocp_version",
               "refId": "B",
               "timeField": "timestamp"
             },
@@ -2054,7 +2090,7 @@
                   "type": "max"
                 }
               ],
-              "query": "!SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type",
+              "query": "!SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type AND ocp_version:$ocp_version",
               "refId": "D",
               "timeField": "timestamp"
             },
@@ -2129,7 +2165,7 @@
                   "type": "avg"
                 }
               ],
-              "query": "SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type",
+              "query": "SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type AND ocp_version:$ocp_version",
               "refId": "C",
               "timeField": "timestamp"
             },
@@ -2174,7 +2210,7 @@
                   "type": "max"
                 }
               ],
-              "query": "SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type",
+              "query": "SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type AND ocp_version:$ocp_version",
               "refId": "E",
               "timeField": "timestamp"
             },
@@ -2217,7 +2253,7 @@
                   "type": "max"
                 }
               ],
-              "query": "SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type",
+              "query": "SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type AND ocp_version:$ocp_version",
               "refId": "F",
               "timeField": "timestamp"
             }
@@ -5740,7 +5776,7 @@
             "h": 19,
             "w": 24,
             "x": 0,
-            "y": 406
+            "y": 187
           },
           "id": 178,
           "interval": "1d",
@@ -5748,7 +5784,7 @@
             {
               "targetBlank": true,
               "title": "artifacts link",
-              "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&editPanel=190"
+              "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=now-45d&to=now&viewPanel=190"
             }
           ],
           "options": {
@@ -5803,7 +5839,7 @@
                   "type": "min"
                 }
               ],
-              "query": "scale:300",
+              "query": "scale:300 AND ocp_version:$ocp_version",
               "refId": "A",
               "timeField": "timestamp"
             },
@@ -5845,7 +5881,7 @@
                   "type": "max"
                 }
               ],
-              "query": "scale:300",
+              "query": "scale:300 AND ocp_version:$ocp_version",
               "refId": "B",
               "timeField": "timestamp"
             },
@@ -5894,12 +5930,12 @@
                   "type": "percentiles"
                 }
               ],
-              "query": "scale:300",
+              "query": "scale:300 AND ocp_version:$ocp_version",
               "refId": "C",
               "timeField": "timestamp"
             },
             {
-              "alias": "100 vms {{term node.keyword}}",
+              "alias": "AVG. 100 vms {{term node.keyword}}",
               "bucketAggs": [
                 {
                   "field": "scale",
@@ -5947,7 +5983,7 @@
                   "type": "avg"
                 }
               ],
-              "query": "scale:300",
+              "query": "scale:300 AND ocp_version:$ocp_version",
               "refId": "D",
               "timeField": "timestamp"
             },
@@ -5989,7 +6025,7 @@
                   "type": "max"
                 }
               ],
-              "query": "scale:300",
+              "query": "scale:300 AND ocp_version:$ocp_version",
               "refId": "F",
               "timeField": "timestamp"
             },
@@ -6031,7 +6067,7 @@
                   "type": "max"
                 }
               ],
-              "query": "scale:300",
+              "query": "scale:300 AND ocp_version:$ocp_version",
               "refId": "E",
               "timeField": "timestamp"
             },
@@ -6073,7 +6109,7 @@
                   "type": "max"
                 }
               ],
-              "query": "scale:300",
+              "query": "scale:300 AND ocp_version:$ocp_version",
               "refId": "G",
               "timeField": "timestamp"
             },
@@ -6115,7 +6151,7 @@
                   "type": "max"
                 }
               ],
-              "query": "scale:300",
+              "query": "scale:300 AND ocp_version:$ocp_version",
               "refId": "H",
               "timeField": "timestamp"
             },
@@ -6155,7 +6191,7 @@
                   "type": "max"
                 }
               ],
-              "query": "scale:300",
+              "query": "scale:300 AND ocp_version:$ocp_version",
               "refId": "I",
               "timeField": "timestamp"
             },
@@ -6195,7 +6231,7 @@
                   "type": "max"
                 }
               ],
-              "query": "scale:300",
+              "query": "scale:300 AND ocp_version:$ocp_version",
               "refId": "J",
               "timeField": "timestamp"
             },
@@ -6235,7 +6271,7 @@
                   "type": "max"
                 }
               ],
-              "query": "scale:300",
+              "query": "scale:300 AND ocp_version:$ocp_version",
               "refId": "K",
               "timeField": "timestamp"
             },
@@ -6275,7 +6311,7 @@
                   "type": "max"
                 }
               ],
-              "query": "scale:300",
+              "query": "scale:300 AND ocp_version:$ocp_version",
               "refId": "L",
               "timeField": "timestamp"
             },
@@ -6313,7 +6349,7 @@
                   "type": "count"
                 }
               ],
-              "query": "scale:300",
+              "query": "scale:300 AND ocp_version:$ocp_version",
               "refId": "M",
               "timeField": "timestamp"
             }
@@ -6382,7 +6418,7 @@
             "h": 19,
             "w": 24,
             "x": 0,
-            "y": 425
+            "y": 206
           },
           "id": 193,
           "interval": "1d",
@@ -6390,7 +6426,7 @@
             {
               "targetBlank": true,
               "title": "artifacts link",
-              "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=now-45d&to=now&viewPanel=194"
+              "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=194"
             }
           ],
           "options": {
@@ -6445,7 +6481,7 @@
                   "type": "min"
                 }
               ],
-              "query": "scale:120",
+              "query": "scale:120 AND ocp_version:$ocp_version",
               "refId": "A",
               "timeField": "timestamp"
             },
@@ -6487,7 +6523,7 @@
                   "type": "max"
                 }
               ],
-              "query": "scale:120",
+              "query": "scale:120 AND ocp_version:$ocp_version",
               "refId": "B",
               "timeField": "timestamp"
             },
@@ -6536,12 +6572,12 @@
                   "type": "percentiles"
                 }
               ],
-              "query": "scale:120",
+              "query": "scale:120 AND ocp_version:$ocp_version",
               "refId": "C",
               "timeField": "timestamp"
             },
             {
-              "alias": "40 vms {{term node.keyword}}",
+              "alias": "AVG. 40 vms {{term node.keyword}}",
               "bucketAggs": [
                 {
                   "field": "scale",
@@ -6589,7 +6625,7 @@
                   "type": "avg"
                 }
               ],
-              "query": "scale:120",
+              "query": "scale:120 AND ocp_version:$ocp_version",
               "refId": "D",
               "timeField": "timestamp"
             },
@@ -6631,7 +6667,7 @@
                   "type": "max"
                 }
               ],
-              "query": "scale:120",
+              "query": "scale:120 AND ocp_version:$ocp_version",
               "refId": "F",
               "timeField": "timestamp"
             },
@@ -6673,7 +6709,7 @@
                   "type": "max"
                 }
               ],
-              "query": "scale:120",
+              "query": "scale:120 AND ocp_version:$ocp_version",
               "refId": "E",
               "timeField": "timestamp"
             },
@@ -6715,7 +6751,7 @@
                   "type": "max"
                 }
               ],
-              "query": "scale:120",
+              "query": "scale:120 AND ocp_version:$ocp_version",
               "refId": "G",
               "timeField": "timestamp"
             },
@@ -6757,7 +6793,7 @@
                   "type": "max"
                 }
               ],
-              "query": "scale:120",
+              "query": "scale:120 AND ocp_version:$ocp_version",
               "refId": "H",
               "timeField": "timestamp"
             },
@@ -6797,7 +6833,7 @@
                   "type": "max"
                 }
               ],
-              "query": "scale:120",
+              "query": "scale:120 AND ocp_version:$ocp_version",
               "refId": "I",
               "timeField": "timestamp"
             },
@@ -6837,7 +6873,7 @@
                   "type": "max"
                 }
               ],
-              "query": "scale:120",
+              "query": "scale:120 AND ocp_version:$ocp_version",
               "refId": "J",
               "timeField": "timestamp"
             },
@@ -6877,7 +6913,7 @@
                   "type": "max"
                 }
               ],
-              "query": "scale:120",
+              "query": "scale:120 AND ocp_version:$ocp_version",
               "refId": "K",
               "timeField": "timestamp"
             },
@@ -6917,7 +6953,7 @@
                   "type": "max"
                 }
               ],
-              "query": "scale:120",
+              "query": "scale:120 AND ocp_version:$ocp_version",
               "refId": "L",
               "timeField": "timestamp"
             },
@@ -6955,7 +6991,7 @@
                   "type": "count"
                 }
               ],
-              "query": "scale:120",
+              "query": "scale:120 AND ocp_version:$ocp_version",
               "refId": "M",
               "timeField": "timestamp"
             }
@@ -6968,7 +7004,7 @@
       "type": "row"
     },
     {
-      "collapsed": true,
+      "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -6976,1908 +7012,1922 @@
         "y": 21
       },
       "id": 125,
-      "panels": [
+      "panels": [],
+      "title": "Artifacts",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "xQGAtZvnk"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          },
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "link",
+              "url": "${__data.fields[\"run_artifacts_url.keyword\"]}"
+            }
+          ],
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "semi-dark-red",
+                "value": null
+              },
+              {
+                "color": "light-orange",
+                "value": 50
+              },
+              {
+                "color": "super-light-green",
+                "value": 80
+              },
+              {
+                "color": "dark-green",
+                "value": 90
+              },
+              {
+                "color": "dark-blue",
+                "value": 100
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ci_date.keyword"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 146
+              },
+              {
+                "id": "displayName",
+                "value": "Date"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "db_type.keyword"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 137
+              },
+              {
+                "id": "displayName",
+                "value": "Database"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "current_worker"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 134
+              },
+              {
+                "id": "displayName",
+                "value": "Thread"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "kind.keyword"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 159
+              },
+              {
+                "id": "displayName",
+                "value": "Kind"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "run_artifacts_url.keyword"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 1068
+              },
+              {
+                "id": "displayName",
+                "value": "Artifacts Link"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "storage_type.keyword"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Storage"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 28,
+        "w": 24,
+        "x": 0,
+        "y": 22
+      },
+      "id": 128,
+      "interval": "1d",
+      "options": {
+        "footer": {
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": []
+      },
+      "pluginVersion": "8.4.0-pre",
+      "targets": [
         {
+          "alias": "",
+          "bucketAggs": [
+            {
+              "field": "ci_date.keyword",
+              "id": "6",
+              "settings": {
+                "min_doc_count": "1",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            },
+            {
+              "field": "db_type.keyword",
+              "id": "3",
+              "settings": {
+                "min_doc_count": "1",
+                "order": "asc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            },
+            {
+              "field": "current_worker",
+              "id": "4",
+              "settings": {
+                "min_doc_count": "1",
+                "order": "asc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            },
+            {
+              "field": "kind.keyword",
+              "id": "5",
+              "settings": {
+                "min_doc_count": "1",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            },
+            {
+              "field": "storage_type.keyword",
+              "id": "2",
+              "settings": {
+                "min_doc_count": "1",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            },
+            {
+              "field": "run_artifacts_url.keyword",
+              "id": "7",
+              "settings": {
+                "min_doc_count": "1",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            }
+          ],
           "datasource": {
             "type": "elasticsearch",
             "uid": "xQGAtZvnk"
           },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "thresholds"
+          "metrics": [
+            {
+              "field": "tpm",
+              "id": "1",
+              "settings": {
+                "script": "_value/1000"
               },
-              "custom": {
-                "align": "auto",
-                "displayMode": "auto"
+              "type": "max"
+            }
+          ],
+          "query": "_exists_:tpm AND db_type:$db_type AND current_worker:$current_worker AND kind:$kind",
+          "refId": "A",
+          "timeField": "timestamp"
+        }
+      ],
+      "title": "HammerDB artifacts",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "xNKZdZv7k"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          },
+          "decimals": 1,
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "link",
+              "url": "${__data.fields[\"run_artifacts_url.keyword\"]}"
+            }
+          ],
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "semi-dark-red",
+                "value": null
               },
-              "links": [
-                {
-                  "targetBlank": true,
-                  "title": "link",
-                  "url": "${__data.fields[\"run_artifacts_url.keyword\"]}"
-                }
-              ],
-              "mappings": [],
-              "min": 0,
-              "thresholds": {
-                "mode": "percentage",
-                "steps": [
-                  {
-                    "color": "semi-dark-red"
-                  },
-                  {
-                    "color": "light-orange",
-                    "value": 50
-                  },
-                  {
-                    "color": "super-light-green",
-                    "value": 80
-                  },
-                  {
-                    "color": "dark-green",
-                    "value": 90
-                  },
-                  {
-                    "color": "dark-blue",
-                    "value": 100
-                  }
-                ]
+              {
+                "color": "light-orange",
+                "value": 50
+              },
+              {
+                "color": "super-light-green",
+                "value": 80
+              },
+              {
+                "color": "dark-green",
+                "value": 90
+              },
+              {
+                "color": "dark-blue",
+                "value": 100
               }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ci_date.keyword"
             },
-            "overrides": [
+            "properties": [
               {
-                "matcher": {
-                  "id": "byName",
-                  "options": "ci_date.keyword"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 146
-                  },
-                  {
-                    "id": "displayName",
-                    "value": "Date"
-                  }
-                ]
+                "id": "custom.width",
+                "value": 169
               },
               {
-                "matcher": {
-                  "id": "byName",
-                  "options": "db_type.keyword"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 137
-                  },
-                  {
-                    "id": "displayName",
-                    "value": "Database"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "current_worker"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 134
-                  },
-                  {
-                    "id": "displayName",
-                    "value": "Thread"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "kind.keyword"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 159
-                  },
-                  {
-                    "id": "displayName",
-                    "value": "Kind"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "run_artifacts_url.keyword"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 1068
-                  },
-                  {
-                    "id": "displayName",
-                    "value": "Artifacts Link"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "storage_type.keyword"
-                },
-                "properties": [
-                  {
-                    "id": "displayName",
-                    "value": "Storage"
-                  }
-                ]
+                "id": "displayName",
+                "value": "Date"
               }
             ]
           },
-          "gridPos": {
-            "h": 28,
-            "w": 24,
-            "x": 0,
-            "y": 22
-          },
-          "id": 128,
-          "interval": "1d",
-          "options": {
-            "footer": {
-              "fields": "",
-              "reducer": [
-                "sum"
-              ],
-              "show": false
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "read_message_size"
             },
-            "showHeader": true,
-            "sortBy": []
-          },
-          "pluginVersion": "8.4.0-pre",
-          "targets": [
-            {
-              "alias": "",
-              "bucketAggs": [
-                {
-                  "field": "ci_date.keyword",
-                  "id": "6",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "db_type.keyword",
-                  "id": "3",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "asc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "current_worker",
-                  "id": "4",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "asc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "kind.keyword",
-                  "id": "5",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "storage_type.keyword",
-                  "id": "2",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "run_artifacts_url.keyword",
-                  "id": "7",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "xQGAtZvnk"
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 167
               },
-              "metrics": [
-                {
-                  "field": "tpm",
-                  "id": "1",
-                  "settings": {
-                    "script": "_value/1000"
-                  },
-                  "type": "max"
-                }
-              ],
-              "query": "_exists_:tpm AND db_type:$db_type AND current_worker:$current_worker AND kind:$kind",
-              "refId": "A",
-              "timeField": "timestamp"
+              {
+                "id": "displayName",
+                "value": "Read Message Size"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "num_threads"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 125
+              },
+              {
+                "id": "displayName",
+                "value": "Thread"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "kind.keyword"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 114
+              },
+              {
+                "id": "displayName",
+                "value": "Kind"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "run_artifacts_url.keyword"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 1068
+              },
+              {
+                "id": "displayName",
+                "value": "Artifacts Link"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Average"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Average Gbits"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 15,
+        "w": 24,
+        "x": 0,
+        "y": 50
+      },
+      "id": 129,
+      "interval": "1d",
+      "options": {
+        "footer": {
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": []
+      },
+      "pluginVersion": "8.4.0-pre",
+      "targets": [
+        {
+          "alias": "",
+          "bucketAggs": [
+            {
+              "field": "ci_date.keyword",
+              "id": "8",
+              "settings": {
+                "min_doc_count": "1",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "5"
+              },
+              "type": "terms"
+            },
+            {
+              "field": "read_message_size",
+              "id": "4",
+              "settings": {
+                "min_doc_count": "1",
+                "order": "asc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            },
+            {
+              "field": "num_threads",
+              "id": "5",
+              "settings": {
+                "min_doc_count": "1",
+                "order": "asc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            },
+            {
+              "field": "kind.keyword",
+              "id": "6",
+              "settings": {
+                "min_doc_count": "1",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            },
+            {
+              "field": "run_artifacts_url.keyword",
+              "id": "7",
+              "settings": {
+                "min_doc_count": "1",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
             }
           ],
-          "title": "HammerDB artifacts",
-          "type": "table"
-        },
-        {
           "datasource": {
             "type": "elasticsearch",
             "uid": "xNKZdZv7k"
           },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "thresholds"
+          "metrics": [
+            {
+              "field": "norm_byte",
+              "id": "1",
+              "settings": {
+                "script": "_value*8/1000000000"
               },
-              "custom": {
-                "align": "auto",
-                "displayMode": "auto"
+              "type": "avg"
+            }
+          ],
+          "query": "_exists_:norm_ops AND read_message_size:(64 OR 1024 OR 8192) AND num_threads:(1 OR 8) AND test_type:stream",
+          "refId": "A",
+          "timeField": "uperf_ts"
+        }
+      ],
+      "title": "Uperf  artifacts",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "bwnEiMx7k"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          },
+          "decimals": 1,
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "link",
+              "url": "${__data.fields[\"run_artifacts_url.keyword\"]}"
+            }
+          ],
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "semi-dark-red",
+                "value": null
               },
-              "decimals": 1,
-              "links": [
-                {
-                  "targetBlank": true,
-                  "title": "link",
-                  "url": "${__data.fields[\"run_artifacts_url.keyword\"]}"
-                }
-              ],
-              "mappings": [],
-              "min": 0,
-              "thresholds": {
-                "mode": "percentage",
-                "steps": [
-                  {
-                    "color": "semi-dark-red"
-                  },
-                  {
-                    "color": "light-orange",
-                    "value": 50
-                  },
-                  {
-                    "color": "super-light-green",
-                    "value": 80
-                  },
-                  {
-                    "color": "dark-green",
-                    "value": 90
-                  },
-                  {
-                    "color": "dark-blue",
-                    "value": 100
-                  }
-                ]
+              {
+                "color": "light-orange",
+                "value": 50
+              },
+              {
+                "color": "super-light-green",
+                "value": 80
+              },
+              {
+                "color": "dark-green",
+                "value": 90
+              },
+              {
+                "color": "dark-blue",
+                "value": 100
               }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ci_date.keyword"
             },
-            "overrides": [
+            "properties": [
               {
-                "matcher": {
-                  "id": "byName",
-                  "options": "ci_date.keyword"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 169
-                  },
-                  {
-                    "id": "displayName",
-                    "value": "Date"
-                  }
-                ]
+                "id": "custom.width",
+                "value": 227
               },
               {
-                "matcher": {
-                  "id": "byName",
-                  "options": "read_message_size"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 167
-                  },
-                  {
-                    "id": "displayName",
-                    "value": "Read Message Size"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "num_threads"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 125
-                  },
-                  {
-                    "id": "displayName",
-                    "value": "Thread"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "kind.keyword"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 114
-                  },
-                  {
-                    "id": "displayName",
-                    "value": "Kind"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "run_artifacts_url.keyword"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 1068
-                  },
-                  {
-                    "id": "displayName",
-                    "value": "Artifacts Link"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Average"
-                },
-                "properties": [
-                  {
-                    "id": "displayName",
-                    "value": "Average Gbits"
-                  }
-                ]
+                "id": "displayName",
+                "value": "Date"
               }
             ]
           },
-          "gridPos": {
-            "h": 15,
-            "w": 24,
-            "x": 0,
-            "y": 50
-          },
-          "id": 129,
-          "interval": "1d",
-          "options": {
-            "footer": {
-              "fields": "",
-              "reducer": [
-                "sum"
-              ],
-              "show": false
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "kind.keyword"
             },
-            "showHeader": true,
-            "sortBy": []
-          },
-          "pluginVersion": "8.4.0-pre",
-          "targets": [
-            {
-              "alias": "",
-              "bucketAggs": [
-                {
-                  "field": "ci_date.keyword",
-                  "id": "8",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "5"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "read_message_size",
-                  "id": "4",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "asc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "num_threads",
-                  "id": "5",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "asc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "kind.keyword",
-                  "id": "6",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "run_artifacts_url.keyword",
-                  "id": "7",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "xNKZdZv7k"
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 100
               },
-              "metrics": [
-                {
-                  "field": "norm_byte",
-                  "id": "1",
-                  "settings": {
-                    "script": "_value*8/1000000000"
-                  },
-                  "type": "avg"
-                }
-              ],
-              "query": "_exists_:norm_ops AND read_message_size:(64 OR 1024 OR 8192) AND num_threads:(1 OR 8) AND test_type:stream",
-              "refId": "A",
-              "timeField": "uperf_ts"
+              {
+                "id": "displayName",
+                "value": "Kind"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "run_artifacts_url.keyword"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 1000
+              },
+              {
+                "id": "displayName",
+                "value": "Artifacts Link"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Average"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Average Rate"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Run.keyword"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Run"
+              },
+              {
+                "id": "custom.width",
+                "value": 140
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Threads"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Thread"
+              },
+              {
+                "id": "custom.width",
+                "value": 100
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Artifacts Link"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 1521
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 65
+      },
+      "id": 133,
+      "interval": "1d",
+      "options": {
+        "footer": {
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": []
+      },
+      "pluginVersion": "8.4.0-pre",
+      "targets": [
+        {
+          "alias": "",
+          "bucketAggs": [
+            {
+              "field": "ci_date.keyword",
+              "id": "4",
+              "settings": {
+                "min_doc_count": "1",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "5"
+              },
+              "type": "terms"
+            },
+            {
+              "field": "kind.keyword",
+              "id": "7",
+              "settings": {
+                "min_doc_count": "1",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            },
+            {
+              "field": "run_artifacts_url.keyword",
+              "id": "8",
+              "settings": {
+                "min_doc_count": "1",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
             }
           ],
-          "title": "Uperf  artifacts",
-          "type": "table"
-        },
-        {
           "datasource": {
             "type": "elasticsearch",
             "uid": "bwnEiMx7k"
           },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
-              "custom": {
-                "align": "auto",
-                "displayMode": "auto"
-              },
-              "decimals": 1,
-              "links": [
-                {
-                  "targetBlank": true,
-                  "title": "link",
-                  "url": "${__data.fields[\"run_artifacts_url.keyword\"]}"
-                }
-              ],
-              "mappings": [],
-              "min": 0,
-              "thresholds": {
-                "mode": "percentage",
-                "steps": [
-                  {
-                    "color": "semi-dark-red"
-                  },
-                  {
-                    "color": "light-orange",
-                    "value": 50
-                  },
-                  {
-                    "color": "super-light-green",
-                    "value": 80
-                  },
-                  {
-                    "color": "dark-green",
-                    "value": 90
-                  },
-                  {
-                    "color": "dark-blue",
-                    "value": 100
-                  }
-                ]
-              }
-            },
-            "overrides": [
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "ci_date.keyword"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 227
-                  },
-                  {
-                    "id": "displayName",
-                    "value": "Date"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "kind.keyword"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 100
-                  },
-                  {
-                    "id": "displayName",
-                    "value": "Kind"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "run_artifacts_url.keyword"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 1000
-                  },
-                  {
-                    "id": "displayName",
-                    "value": "Artifacts Link"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Average"
-                },
-                "properties": [
-                  {
-                    "id": "displayName",
-                    "value": "Average Rate"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Run.keyword"
-                },
-                "properties": [
-                  {
-                    "id": "displayName",
-                    "value": "Run"
-                  },
-                  {
-                    "id": "custom.width",
-                    "value": 140
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Threads"
-                },
-                "properties": [
-                  {
-                    "id": "displayName",
-                    "value": "Thread"
-                  },
-                  {
-                    "id": "custom.width",
-                    "value": 100
-                  }
-                ]
-              }
-            ]
-          },
-          "gridPos": {
-            "h": 5,
-            "w": 24,
-            "x": 0,
-            "y": 65
-          },
-          "id": 133,
-          "interval": "1d",
-          "options": {
-            "footer": {
-              "fields": "",
-              "reducer": [
-                "sum"
-              ],
-              "show": false
-            },
-            "showHeader": true,
-            "sortBy": [
-              {
-                "desc": true,
-                "displayName": "ci_date.keyword"
-              }
-            ]
-          },
-          "pluginVersion": "8.4.0-pre",
-          "targets": [
+          "hide": false,
+          "metrics": [
             {
-              "alias": "",
-              "bucketAggs": [
-                {
-                  "field": "ci_date.keyword",
-                  "id": "4",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "5"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "kind.keyword",
-                  "id": "7",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "run_artifacts_url.keyword",
-                  "id": "8",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "bwnEiMx7k"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "Rate",
-                  "id": "1",
-                  "type": "avg"
-                }
-              ],
-              "query": "!SCALE AND !Run.keyword='fillup'",
-              "refId": "A",
-              "timeField": "timestamp"
+              "field": "Rate",
+              "id": "1",
+              "type": "avg"
             }
           ],
-          "title": "vdbench artifacts",
-          "transformations": [
-            {
-              "id": "organize",
-              "options": {
-                "excludeByName": {
-                  "Average": true
-                },
-                "indexByName": {},
-                "renameByName": {}
-              }
-            }
-          ],
-          "type": "table"
-        },
+          "query": "!SCALE AND !Run.keyword='fillup'",
+          "refId": "A",
+          "timeField": "timestamp"
+        }
+      ],
+      "title": "vdbench artifacts",
+      "transformations": [
         {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Average": true
+            },
+            "indexByName": {},
+            "renameByName": {}
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "bwnEiMx7k"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          },
+          "decimals": 1,
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "link",
+              "url": "${__data.fields[\"run_artifacts_url.keyword\"]}"
+            }
+          ],
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "semi-dark-red",
+                "value": null
+              },
+              {
+                "color": "light-orange",
+                "value": 50
+              },
+              {
+                "color": "super-light-green",
+                "value": 80
+              },
+              {
+                "color": "dark-green",
+                "value": 90
+              },
+              {
+                "color": "dark-blue",
+                "value": 100
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ci_date.keyword"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 227
+              },
+              {
+                "id": "displayName",
+                "value": "Date"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "kind.keyword"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 100
+              },
+              {
+                "id": "displayName",
+                "value": "Kind"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "run_artifacts_url.keyword"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 1000
+              },
+              {
+                "id": "displayName",
+                "value": "Artifacts Link"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Average"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Average Rate"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Run.keyword"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Run"
+              },
+              {
+                "id": "custom.width",
+                "value": 140
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Threads"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Thread"
+              },
+              {
+                "id": "custom.width",
+                "value": 100
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 75
+      },
+      "id": 195,
+      "interval": "1d",
+      "options": {
+        "footer": {
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "ci_date.keyword"
+          }
+        ]
+      },
+      "pluginVersion": "8.4.0-pre",
+      "targets": [
+        {
+          "alias": "",
+          "bucketAggs": [
+            {
+              "field": "ci_date.keyword",
+              "id": "4",
+              "settings": {
+                "min_doc_count": "1",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "5"
+              },
+              "type": "terms"
+            },
+            {
+              "field": "Run.keyword",
+              "id": "5",
+              "settings": {
+                "min_doc_count": "1",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            },
+            {
+              "field": "Threads",
+              "id": "6",
+              "settings": {
+                "min_doc_count": "1",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            },
+            {
+              "field": "kind.keyword",
+              "id": "7",
+              "settings": {
+                "min_doc_count": "1",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            },
+            {
+              "field": "scale",
+              "id": "8",
+              "settings": {
+                "min_doc_count": "1",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            },
+            {
+              "field": "run_artifacts_url.keyword",
+              "id": "9",
+              "settings": {
+                "min_doc_count": "1",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            }
+          ],
           "datasource": {
             "type": "elasticsearch",
             "uid": "bwnEiMx7k"
           },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
-              "custom": {
-                "align": "auto",
-                "displayMode": "auto"
-              },
-              "decimals": 1,
-              "links": [
-                {
-                  "targetBlank": true,
-                  "title": "link",
-                  "url": "${__data.fields[\"run_artifacts_url.keyword\"]}"
-                }
-              ],
-              "mappings": [],
-              "min": 0,
-              "thresholds": {
-                "mode": "percentage",
-                "steps": [
-                  {
-                    "color": "semi-dark-red"
-                  },
-                  {
-                    "color": "light-orange",
-                    "value": 50
-                  },
-                  {
-                    "color": "super-light-green",
-                    "value": 80
-                  },
-                  {
-                    "color": "dark-green",
-                    "value": 90
-                  },
-                  {
-                    "color": "dark-blue",
-                    "value": 100
-                  }
-                ]
-              }
-            },
-            "overrides": [
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "ci_date.keyword"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 227
-                  },
-                  {
-                    "id": "displayName",
-                    "value": "Date"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "kind.keyword"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 100
-                  },
-                  {
-                    "id": "displayName",
-                    "value": "Kind"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "run_artifacts_url.keyword"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 1000
-                  },
-                  {
-                    "id": "displayName",
-                    "value": "Artifacts Link"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Average"
-                },
-                "properties": [
-                  {
-                    "id": "displayName",
-                    "value": "Average Rate"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Run.keyword"
-                },
-                "properties": [
-                  {
-                    "id": "displayName",
-                    "value": "Run"
-                  },
-                  {
-                    "id": "custom.width",
-                    "value": 140
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Threads"
-                },
-                "properties": [
-                  {
-                    "id": "displayName",
-                    "value": "Thread"
-                  },
-                  {
-                    "id": "custom.width",
-                    "value": 100
-                  }
-                ]
-              }
-            ]
-          },
-          "gridPos": {
-            "h": 5,
-            "w": 24,
-            "x": 0,
-            "y": 70
-          },
-          "id": 195,
-          "interval": "1d",
-          "options": {
-            "footer": {
-              "fields": "",
-              "reducer": [
-                "sum"
-              ],
-              "show": false
-            },
-            "showHeader": true,
-            "sortBy": [
-              {
-                "desc": true,
-                "displayName": "ci_date.keyword"
-              }
-            ]
-          },
-          "pluginVersion": "8.4.0-pre",
-          "targets": [
+          "hide": false,
+          "metrics": [
             {
-              "alias": "",
-              "bucketAggs": [
-                {
-                  "field": "ci_date.keyword",
-                  "id": "4",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "5"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "Run.keyword",
-                  "id": "5",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "Threads",
-                  "id": "6",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "kind.keyword",
-                  "id": "7",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "scale",
-                  "id": "8",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "run_artifacts_url.keyword",
-                  "id": "9",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "bwnEiMx7k"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "Rate",
-                  "id": "1",
-                  "type": "avg"
-                }
-              ],
-              "query": "!Run.keyword='fillup'",
-              "refId": "A",
-              "timeField": "timestamp"
+              "field": "Rate",
+              "id": "1",
+              "type": "avg"
             }
           ],
-          "title": "vdbench scale artifacts",
-          "transformations": [],
-          "type": "table"
+          "query": "!Run.keyword='fillup'",
+          "refId": "A",
+          "timeField": "timestamp"
+        }
+      ],
+      "title": "vdbench scale artifacts",
+      "transformations": [],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "Q_P_eBb4z"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          },
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "link",
+              "url": "${__data.fields[\"run_artifacts_url.keyword\"]}"
+            }
+          ],
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
         },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "run_artifacts_url"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 1600
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Date"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 227
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 24,
+        "x": 0,
+        "y": 85
+      },
+      "id": 150,
+      "options": {
+        "footer": {
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "8.4.0-pre",
+      "targets": [
         {
+          "alias": "",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "min_doc_count": "1",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            },
+            {
+              "field": "run_artifacts_url.keyword",
+              "id": "3",
+              "settings": {
+                "min_doc_count": "1",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            }
+          ],
           "datasource": {
             "type": "elasticsearch",
             "uid": "Q_P_eBb4z"
           },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
-              "custom": {
-                "align": "auto",
-                "displayMode": "auto"
-              },
-              "links": [
-                {
-                  "targetBlank": true,
-                  "title": "link",
-                  "url": "${__data.fields[\"run_artifacts_url.keyword\"]}"
-                }
-              ],
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green"
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              }
+          "metrics": [
+            {
+              "field": "job_runtime",
+              "hide": false,
+              "id": "1",
+              "type": "avg"
+            }
+          ],
+          "query": "",
+          "refId": "A",
+          "timeField": "timestamp"
+        }
+      ],
+      "title": "clusterbuster artifacts",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Average": true,
+              "_id": true,
+              "_index": true,
+              "_type": true,
+              "highlight": true,
+              "job_end": true,
+              "job_runtime": true,
+              "job_start": true,
+              "kata_version": true,
+              "openshift_version": true,
+              "result": true,
+              "run_host": true,
+              "sort": true,
+              "uuid": true
             },
-            "overrides": [
+            "indexByName": {
+              "_id": 6,
+              "_index": 7,
+              "_type": 8,
+              "highlight": 9,
+              "job_end": 12,
+              "job_runtime": 10,
+              "job_start": 11,
+              "kata_version": 4,
+              "openshift_version": 3,
+              "result": 2,
+              "run_artifacts_url": 1,
+              "run_host": 5,
+              "sort": 13,
+              "timestamp": 0,
+              "uuid": 14
+            },
+            "renameByName": {
+              "Average": "Run time",
+              "run_artifacts_url": "Artifacts Link",
+              "run_artifacts_url.keyword": "Artifacts Link",
+              "timestamp": "Date"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "MOdSfikVk"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          },
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "link",
+              "url": "${__data.fields[\"run_artifacts_url.keyword\"]}"
+            }
+          ],
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
               {
-                "matcher": {
-                  "id": "byName",
-                  "options": "run_artifacts_url"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 1600
-                  }
-                ]
+                "color": "green",
+                "value": null
               },
               {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Date"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 227
-                  }
-                ]
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "run_artifacts_url"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 1600
               }
             ]
           },
-          "gridPos": {
-            "h": 6,
-            "w": 24,
-            "x": 0,
-            "y": 75
-          },
-          "id": 150,
-          "options": {
-            "footer": {
-              "fields": "",
-              "reducer": [
-                "sum"
-              ],
-              "show": false
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Date"
             },
-            "showHeader": true
-          },
-          "pluginVersion": "8.4.0-pre",
-          "targets": [
-            {
-              "alias": "",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "2",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "run_artifacts_url.keyword",
-                  "id": "3",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "Q_P_eBb4z"
-              },
-              "metrics": [
-                {
-                  "field": "job_runtime",
-                  "hide": false,
-                  "id": "1",
-                  "type": "avg"
-                }
-              ],
-              "query": "",
-              "refId": "A",
-              "timeField": "timestamp"
-            }
-          ],
-          "title": "clusterbuster artifacts",
-          "transformations": [
-            {
-              "id": "organize",
-              "options": {
-                "excludeByName": {
-                  "Average": true,
-                  "_id": true,
-                  "_index": true,
-                  "_type": true,
-                  "highlight": true,
-                  "job_end": true,
-                  "job_runtime": true,
-                  "job_start": true,
-                  "kata_version": true,
-                  "openshift_version": true,
-                  "result": true,
-                  "run_host": true,
-                  "sort": true,
-                  "uuid": true
-                },
-                "indexByName": {
-                  "_id": 6,
-                  "_index": 7,
-                  "_type": 8,
-                  "highlight": 9,
-                  "job_end": 12,
-                  "job_runtime": 10,
-                  "job_start": 11,
-                  "kata_version": 4,
-                  "openshift_version": 3,
-                  "result": 2,
-                  "run_artifacts_url": 1,
-                  "run_host": 5,
-                  "sort": 13,
-                  "timestamp": 0,
-                  "uuid": 14
-                },
-                "renameByName": {
-                  "Average": "Run time",
-                  "run_artifacts_url": "Artifacts Link",
-                  "run_artifacts_url.keyword": "Artifacts Link",
-                  "timestamp": "Date"
-                }
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 227
               }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 24,
+        "x": 0,
+        "y": 91
+      },
+      "id": 166,
+      "options": {
+        "footer": {
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "8.4.0-pre",
+      "targets": [
+        {
+          "alias": "",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "min_doc_count": "1",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            },
+            {
+              "field": "run_artifacts_url.keyword",
+              "id": "3",
+              "settings": {
+                "min_doc_count": "1",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
             }
           ],
-          "type": "table"
-        },
-        {
           "datasource": {
             "type": "elasticsearch",
             "uid": "MOdSfikVk"
           },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
-              "custom": {
-                "align": "auto",
-                "displayMode": "auto"
-              },
-              "links": [
-                {
-                  "targetBlank": true,
-                  "title": "link",
-                  "url": "${__data.fields[\"run_artifacts_url.keyword\"]}"
-                }
-              ],
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green"
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              }
+          "metrics": [
+            {
+              "field": "job_runtime",
+              "hide": false,
+              "id": "1",
+              "type": "avg"
+            }
+          ],
+          "query": "",
+          "refId": "A",
+          "timeField": "timestamp"
+        }
+      ],
+      "title": "clusterbuster release artifacts",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Average": true,
+              "_id": true,
+              "_index": true,
+              "_type": true,
+              "highlight": true,
+              "job_end": true,
+              "job_runtime": true,
+              "job_start": true,
+              "kata_version": true,
+              "openshift_version": true,
+              "result": true,
+              "run_host": true,
+              "sort": true,
+              "uuid": true
             },
-            "overrides": [
+            "indexByName": {
+              "_id": 6,
+              "_index": 7,
+              "_type": 8,
+              "highlight": 9,
+              "job_end": 12,
+              "job_runtime": 10,
+              "job_start": 11,
+              "kata_version": 4,
+              "openshift_version": 3,
+              "result": 2,
+              "run_artifacts_url": 1,
+              "run_host": 5,
+              "sort": 13,
+              "timestamp": 0,
+              "uuid": 14
+            },
+            "renameByName": {
+              "Average": "Run time",
+              "run_artifacts_url": "Artifacts Link",
+              "run_artifacts_url.keyword": "Artifacts Link",
+              "timestamp": "Date"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "NjON9tc4z"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          },
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "link",
+              "url": "${__data.fields[\"run_artifacts_url.keyword\"]}"
+            }
+          ],
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
               {
-                "matcher": {
-                  "id": "byName",
-                  "options": "run_artifacts_url"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 1600
-                  }
-                ]
+                "color": "semi-dark-red",
+                "value": null
               },
               {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Date"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 227
-                  }
-                ]
+                "color": "light-orange",
+                "value": 50
+              },
+              {
+                "color": "super-light-green",
+                "value": 80
+              },
+              {
+                "color": "dark-green",
+                "value": 90
+              },
+              {
+                "color": "dark-blue",
+                "value": 100
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ci_date.keyword"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 227
+              },
+              {
+                "id": "displayName",
+                "value": "Date"
               }
             ]
           },
-          "gridPos": {
-            "h": 6,
-            "w": 24,
-            "x": 0,
-            "y": 81
-          },
-          "id": 166,
-          "options": {
-            "footer": {
-              "fields": "",
-              "reducer": [
-                "sum"
-              ],
-              "show": false
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "kind.keyword"
             },
-            "showHeader": true
-          },
-          "pluginVersion": "8.4.0-pre",
-          "targets": [
-            {
-              "alias": "",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "2",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "run_artifacts_url.keyword",
-                  "id": "3",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "MOdSfikVk"
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 100
               },
-              "metrics": [
-                {
-                  "field": "job_runtime",
-                  "hide": false,
-                  "id": "1",
-                  "type": "avg"
-                }
-              ],
-              "query": "",
-              "refId": "A",
-              "timeField": "timestamp"
-            }
-          ],
-          "title": "clusterbuster release artifacts",
-          "transformations": [
-            {
-              "id": "organize",
-              "options": {
-                "excludeByName": {
-                  "Average": true,
-                  "_id": true,
-                  "_index": true,
-                  "_type": true,
-                  "highlight": true,
-                  "job_end": true,
-                  "job_runtime": true,
-                  "job_start": true,
-                  "kata_version": true,
-                  "openshift_version": true,
-                  "result": true,
-                  "run_host": true,
-                  "sort": true,
-                  "uuid": true
-                },
-                "indexByName": {
-                  "_id": 6,
-                  "_index": 7,
-                  "_type": 8,
-                  "highlight": 9,
-                  "job_end": 12,
-                  "job_runtime": 10,
-                  "job_start": 11,
-                  "kata_version": 4,
-                  "openshift_version": 3,
-                  "result": 2,
-                  "run_artifacts_url": 1,
-                  "run_host": 5,
-                  "sort": 13,
-                  "timestamp": 0,
-                  "uuid": 14
-                },
-                "renameByName": {
-                  "Average": "Run time",
-                  "run_artifacts_url": "Artifacts Link",
-                  "run_artifacts_url.keyword": "Artifacts Link",
-                  "timestamp": "Date"
-                }
+              {
+                "id": "displayName",
+                "value": "Kind"
               }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "run_artifacts_url.keyword"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 1000
+              },
+              {
+                "id": "displayName",
+                "value": "Artifacts Link"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Average"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Average Rate"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Run.keyword"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Run"
+              },
+              {
+                "id": "custom.width",
+                "value": 140
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Threads"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Thread"
+              },
+              {
+                "id": "custom.width",
+                "value": 100
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 24,
+        "x": 0,
+        "y": 97
+      },
+      "id": 190,
+      "interval": "1d",
+      "options": {
+        "footer": {
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "ci_date.keyword"
+          }
+        ]
+      },
+      "pluginVersion": "8.4.0-pre",
+      "targets": [
+        {
+          "alias": "",
+          "bucketAggs": [
+            {
+              "field": "ci_date.keyword",
+              "id": "8",
+              "settings": {
+                "min_doc_count": "1",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            },
+            {
+              "field": "kind.keyword",
+              "id": "9",
+              "settings": {
+                "min_doc_count": "1",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            },
+            {
+              "field": "scale",
+              "id": "10",
+              "settings": {
+                "min_doc_count": "1",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            },
+            {
+              "field": "run_artifacts_url.keyword",
+              "id": "11",
+              "settings": {
+                "min_doc_count": "1",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
             }
           ],
-          "type": "table"
-        },
-        {
           "datasource": {
             "type": "elasticsearch",
             "uid": "NjON9tc4z"
           },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
-              "custom": {
-                "align": "auto",
-                "displayMode": "auto"
-              },
-              "links": [
-                {
-                  "targetBlank": true,
-                  "title": "link",
-                  "url": "${__data.fields[\"run_artifacts_url.keyword\"]}"
-                }
-              ],
-              "mappings": [],
-              "min": 0,
-              "thresholds": {
-                "mode": "percentage",
-                "steps": [
-                  {
-                    "color": "semi-dark-red"
-                  },
-                  {
-                    "color": "light-orange",
-                    "value": 50
-                  },
-                  {
-                    "color": "super-light-green",
-                    "value": 80
-                  },
-                  {
-                    "color": "dark-green",
-                    "value": 90
-                  },
-                  {
-                    "color": "dark-blue",
-                    "value": 100
-                  }
-                ]
-              }
-            },
-            "overrides": [
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "ci_date.keyword"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 227
-                  },
-                  {
-                    "id": "displayName",
-                    "value": "Date"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "kind.keyword"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 100
-                  },
-                  {
-                    "id": "displayName",
-                    "value": "Kind"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "run_artifacts_url.keyword"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 1000
-                  },
-                  {
-                    "id": "displayName",
-                    "value": "Artifacts Link"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Average"
-                },
-                "properties": [
-                  {
-                    "id": "displayName",
-                    "value": "Average Rate"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Run.keyword"
-                },
-                "properties": [
-                  {
-                    "id": "displayName",
-                    "value": "Run"
-                  },
-                  {
-                    "id": "custom.width",
-                    "value": 140
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Threads"
-                },
-                "properties": [
-                  {
-                    "id": "displayName",
-                    "value": "Thread"
-                  },
-                  {
-                    "id": "custom.width",
-                    "value": 100
-                  }
-                ]
-              }
-            ]
-          },
-          "gridPos": {
-            "h": 5,
-            "w": 24,
-            "x": 0,
-            "y": 87
-          },
-          "id": 190,
-          "interval": "1d",
-          "options": {
-            "footer": {
-              "fields": "",
-              "reducer": [
-                "sum"
-              ],
-              "show": false
-            },
-            "showHeader": true,
-            "sortBy": [
-              {
-                "desc": true,
-                "displayName": "ci_date.keyword"
-              }
-            ]
-          },
-          "pluginVersion": "8.4.0-pre",
-          "targets": [
+          "hide": false,
+          "metrics": [
             {
-              "alias": "",
-              "bucketAggs": [
-                {
-                  "field": "ci_date.keyword",
-                  "id": "8",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "kind.keyword",
-                  "id": "9",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "scale",
-                  "id": "10",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "run_artifacts_url.keyword",
-                  "id": "11",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "NjON9tc4z"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "Rate",
-                  "id": "1",
-                  "type": "avg"
-                }
-              ],
-              "query": "scale:300",
-              "refId": "A",
-              "timeField": "timestamp"
+              "field": "Rate",
+              "id": "1",
+              "type": "avg"
             }
           ],
-          "title": "bootstorm artifacts",
-          "transformations": [
-            {
-              "id": "organize",
-              "options": {
-                "excludeByName": {
-                  "Average": true
-                },
-                "indexByName": {},
-                "renameByName": {}
-              }
-            }
-          ],
-          "type": "table"
-        },
+          "query": "scale:300",
+          "refId": "A",
+          "timeField": "timestamp"
+        }
+      ],
+      "title": "bootstorm artifacts",
+      "transformations": [
         {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Average": true
+            },
+            "indexByName": {},
+            "renameByName": {}
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "racoSgf4z"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          },
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "link",
+              "url": "${__data.fields[\"run_artifacts_url.keyword\"]}"
+            }
+          ],
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "semi-dark-red",
+                "value": null
+              },
+              {
+                "color": "light-orange",
+                "value": 50
+              },
+              {
+                "color": "super-light-green",
+                "value": 80
+              },
+              {
+                "color": "dark-green",
+                "value": 90
+              },
+              {
+                "color": "dark-blue",
+                "value": 100
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ci_date.keyword"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 227
+              },
+              {
+                "id": "displayName",
+                "value": "Date"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "kind.keyword"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 100
+              },
+              {
+                "id": "displayName",
+                "value": "Kind"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "run_artifacts_url.keyword"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 1000
+              },
+              {
+                "id": "displayName",
+                "value": "Artifacts Link"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Average"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Average Rate"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Run.keyword"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Run"
+              },
+              {
+                "id": "custom.width",
+                "value": 140
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Threads"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Thread"
+              },
+              {
+                "id": "custom.width",
+                "value": 100
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 24,
+        "x": 0,
+        "y": 102
+      },
+      "id": 194,
+      "interval": "1d",
+      "options": {
+        "footer": {
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "ci_date.keyword"
+          }
+        ]
+      },
+      "pluginVersion": "8.4.0-pre",
+      "targets": [
+        {
+          "alias": "",
+          "bucketAggs": [
+            {
+              "field": "ci_date.keyword",
+              "id": "8",
+              "settings": {
+                "min_doc_count": "1",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            },
+            {
+              "field": "kind.keyword",
+              "id": "9",
+              "settings": {
+                "min_doc_count": "1",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            },
+            {
+              "field": "scale",
+              "id": "10",
+              "settings": {
+                "min_doc_count": "1",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            },
+            {
+              "field": "run_artifacts_url.keyword",
+              "id": "11",
+              "settings": {
+                "min_doc_count": "1",
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            }
+          ],
           "datasource": {
             "type": "elasticsearch",
             "uid": "racoSgf4z"
           },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
-              "custom": {
-                "align": "auto",
-                "displayMode": "auto"
-              },
-              "links": [
-                {
-                  "targetBlank": true,
-                  "title": "link",
-                  "url": "${__data.fields[\"run_artifacts_url.keyword\"]}"
-                }
-              ],
-              "mappings": [],
-              "min": 0,
-              "thresholds": {
-                "mode": "percentage",
-                "steps": [
-                  {
-                    "color": "semi-dark-red"
-                  },
-                  {
-                    "color": "light-orange",
-                    "value": 50
-                  },
-                  {
-                    "color": "super-light-green",
-                    "value": 80
-                  },
-                  {
-                    "color": "dark-green",
-                    "value": 90
-                  },
-                  {
-                    "color": "dark-blue",
-                    "value": 100
-                  }
-                ]
-              }
-            },
-            "overrides": [
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "ci_date.keyword"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 227
-                  },
-                  {
-                    "id": "displayName",
-                    "value": "Date"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "kind.keyword"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 100
-                  },
-                  {
-                    "id": "displayName",
-                    "value": "Kind"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "run_artifacts_url.keyword"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 1000
-                  },
-                  {
-                    "id": "displayName",
-                    "value": "Artifacts Link"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Average"
-                },
-                "properties": [
-                  {
-                    "id": "displayName",
-                    "value": "Average Rate"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Run.keyword"
-                },
-                "properties": [
-                  {
-                    "id": "displayName",
-                    "value": "Run"
-                  },
-                  {
-                    "id": "custom.width",
-                    "value": 140
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Threads"
-                },
-                "properties": [
-                  {
-                    "id": "displayName",
-                    "value": "Thread"
-                  },
-                  {
-                    "id": "custom.width",
-                    "value": 100
-                  }
-                ]
-              }
-            ]
-          },
-          "gridPos": {
-            "h": 5,
-            "w": 24,
-            "x": 0,
-            "y": 92
-          },
-          "id": 194,
-          "interval": "1d",
-          "options": {
-            "footer": {
-              "fields": "",
-              "reducer": [
-                "sum"
-              ],
-              "show": false
-            },
-            "showHeader": true,
-            "sortBy": [
-              {
-                "desc": true,
-                "displayName": "ci_date.keyword"
-              }
-            ]
-          },
-          "pluginVersion": "8.4.0-pre",
-          "targets": [
+          "hide": false,
+          "metrics": [
             {
-              "alias": "",
-              "bucketAggs": [
-                {
-                  "field": "ci_date.keyword",
-                  "id": "8",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "kind.keyword",
-                  "id": "9",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "scale",
-                  "id": "10",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                },
-                {
-                  "field": "run_artifacts_url.keyword",
-                  "id": "11",
-                  "settings": {
-                    "min_doc_count": "1",
-                    "order": "desc",
-                    "orderBy": "_term",
-                    "size": "10"
-                  },
-                  "type": "terms"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "racoSgf4z"
-              },
-              "hide": false,
-              "metrics": [
-                {
-                  "field": "Rate",
-                  "id": "1",
-                  "type": "avg"
-                }
-              ],
-              "query": "scale:120",
-              "refId": "A",
-              "timeField": "timestamp"
+              "field": "Rate",
+              "id": "1",
+              "type": "avg"
             }
           ],
-          "title": "Windows artifacts",
-          "transformations": [
-            {
-              "id": "organize",
-              "options": {
-                "excludeByName": {
-                  "Average": true
-                },
-                "indexByName": {},
-                "renameByName": {}
-              }
-            }
-          ],
-          "type": "table"
-        },
-        {
-          "description": "",
-          "gridPos": {
-            "h": 4,
-            "w": 5,
-            "x": 19,
-            "y": 97
-          },
-          "id": 189,
-          "links": [
-            {
-              "targetBlank": true,
-              "title": "PerfCI",
-              "url": "https://github.com/redhat-performance/benchmark-runner/actions"
-            }
-          ],
-          "options": {
-            "content": "![Cloud Governance](https://github.com/redhat-performance/benchmark-runner/blob/main/media/benchmark_runner.png?raw=true \"Tooltip Text\")\n",
-            "mode": "markdown"
-          },
-          "pluginVersion": "8.4.0-pre",
-          "targets": [
-            {
-              "alias": "",
-              "bucketAggs": [
-                {
-                  "field": "timestamp",
-                  "id": "2",
-                  "settings": {
-                    "interval": "auto"
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "mg2W2WD7z"
-              },
-              "metrics": [
-                {
-                  "id": "1",
-                  "type": "count"
-                }
-              ],
-              "query": "",
-              "refId": "A",
-              "timeField": "timestamp"
-            }
-          ],
-          "transparent": true,
-          "type": "text"
+          "query": "scale:120",
+          "refId": "A",
+          "timeField": "timestamp"
         }
       ],
-      "title": "Artifacts",
-      "type": "row"
+      "title": "Windows artifacts",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Average": true
+            },
+            "indexByName": {},
+            "renameByName": {}
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "description": "",
+      "gridPos": {
+        "h": 4,
+        "w": 5,
+        "x": 19,
+        "y": 107
+      },
+      "id": 189,
+      "links": [
+        {
+          "targetBlank": true,
+          "title": "PerfCI",
+          "url": "https://github.com/redhat-performance/benchmark-runner/actions"
+        }
+      ],
+      "options": {
+        "content": "![Cloud Governance](https://github.com/redhat-performance/benchmark-runner/blob/main/media/benchmark_runner.png?raw=true \"Tooltip Text\")\n",
+        "mode": "markdown"
+      },
+      "pluginVersion": "8.4.0-pre",
+      "targets": [
+        {
+          "alias": "",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "auto"
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "mg2W2WD7z"
+          },
+          "metrics": [
+            {
+              "id": "1",
+              "type": "count"
+            }
+          ],
+          "query": "",
+          "refId": "A",
+          "timeField": "timestamp"
+        }
+      ],
+      "transparent": true,
+      "type": "text"
     }
   ],
   "refresh": "",
@@ -8887,27 +8937,28 @@
   "templating": {
     "list": [
       {
+        "allValue": "",
         "current": {
-          "selected": false,
-          "text": "4.13.0-rc.4",
-          "value": "4.13.0-rc.4"
+          "selected": true,
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
         },
         "definition": "{\"find\":\"terms\",\"field\":\"ocp_version.keyword\"}",
-        "hide": 2,
-        "includeAll": false,
-        "label": "ocp_version",
-        "multi": false,
+        "hide": 0,
+        "includeAll": true,
+        "multi": true,
         "name": "ocp_version",
         "options": [],
         "query": "{\"find\":\"terms\",\"field\":\"ocp_version.keyword\"}",
         "refresh": 2,
         "regex": "",
         "skipUrlSync": false,
-        "sort": 0,
-        "tagValuesQuery": "",
-        "tagsQuery": "",
-        "type": "query",
-        "useTags": false
+        "sort": 6,
+        "type": "query"
       },
       {
         "current": {
@@ -9028,6 +9079,6 @@
   "timezone": "",
   "title": "PerfCI-Regression-Summary",
   "uid": "T4775LKnzzmichey",
-  "version": 395,
+  "version": 416,
   "weekStart": ""
 }
