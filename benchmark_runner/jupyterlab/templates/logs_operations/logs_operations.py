@@ -81,11 +81,9 @@ class LogsOperations:
         logger.info(f'untar download file {self.log_dir_filename}')
         os.system(f"tar -xvf {self.log_dir_filename} -C {self.logs_dir}")
 
-    @typechecked
-    def get_workload_dir(self, workload: str):
+    def get_workload_dir(self):
         """
         This method returns workload directory
-        @param workload:
         @return:
         """
         workload__directory = [folder for folder in os.listdir(self.logs_dir) if folder.startswith(self.filename.replace('.tar.gz','')) and not '.tar.gz' in folder]

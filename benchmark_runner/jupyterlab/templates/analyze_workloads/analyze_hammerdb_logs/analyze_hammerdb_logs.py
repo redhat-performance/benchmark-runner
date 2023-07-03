@@ -1,26 +1,24 @@
-import csv
-import os
-import pandas as pd
 
-# display df
-from IPython.display import display
+import os
+from typeguard import typechecked
 
 # display bokeh
 from bokeh.plotting import figure, show
 from bokeh.io import output_notebook, output_file
 from bokeh.models import HoverTool, Label, ColumnDataSource, LabelSet, Circle, NumeralTickFormatter
 
-from typeguard import typechecked
 
 from benchmark_runner.jupyterlab.templates.logs_operations.logs_operations import LogsOperations
+from benchmark_runner.jupyterlab.templates.analyze_workloads.visualize_workload_operations import VisualizeWorkloadOperations
 
 
-class AnalyzeHammerdbLogs:
+class AnalyzeHammerdbLogs(VisualizeWorkloadOperations):
     """
     This class analyzes Hammerdb logs
     """
 
     def __init__(self, s3_logs_url: str):
+        super().__init__()
         self.__workload = 'hammerdb'
         self.s3_logs_url = s3_logs_url
         self.__logs_operations = LogsOperations(s3_logs_url=self.s3_logs_url)
@@ -30,7 +28,7 @@ class AnalyzeHammerdbLogs:
         This method returns hammerdb log file
         @return: hammerdb log file
         """
-        workload_dir = self.__logs_operations.get_workload_dir(workload=self.__workload)
+        workload_dir = self.__logs_operations.get_workload_dir()
         workload_files = [file for file in os.listdir(workload_dir) if file.startswith(self.__workload)]
         # Iterate over all files in the directory
         for file_name in workload_files:
@@ -104,99 +102,14 @@ class AnalyzeHammerdbLogs:
         output_notebook()
         show(p)
 
-    @staticmethod
-    def compare_results(result1: dict, result2: dict, legend_label1: str, legend_label2: str, database: str):
+    def compare_results(self, result1: dict, result2: dict, legend_label1: str, legend_label2: str, database: str):
         """
         This method compare between 2 hammerdb results
-        @param result1: hammerdb thread results in dictionary
-        @param result2: hammerdb thread results in dictionary
-        @param legend_label1: first bar legend
-        @param legend_label2: second bar legend
+        @param result1:
+        @param result2:
+        @param legend_label1:
+        @param legend_label2:
         @param database: PostgreSQL, Mariadb, MSSQL
         @return:
         """
-        # Convert values to integers
-        values1 = [int(value) for value in result1.values()]
-        values2 = [int(value) for value in result2.values()]
-
-        threads = list(result1.keys())
-
-        width = 0.3
-        x = [i for i in range(len(threads))]
-        offset = 0.1  # Adjust the offset for x-axis shift
-        x_middle = [i + width / 2 + offset for i in x]  # Adjust x-coordinates for centering and shift
-
-        p = figure(title=f"{database} KTPM [ KTransactions Per Minutes ]", x_range=threads,
-                   y_axis_label="Latency (sec)", width=1200, height=600)
-        p.xaxis.axis_label = "Threads"  # Add x-axis title
-        p.yaxis.axis_label = "KTPM"  # Add y-axis title
-
-        r1 = p.vbar(x=x_middle, top=values2, width=width,
-                    line_color='white', fill_color='green', alpha=0.8,
-                    legend_label=legend_label2, name=legend_label2)
-
-        r2 = p.vbar(x=[i + width for i in x_middle], top=values1, width=width,
-                    line_color='white', fill_color='blue', alpha=0.8,
-                    legend_label=legend_label1, name=legend_label1)
-
-        p.xgrid.grid_line_color = None
-        p.legend.location = "top_right"
-        p.legend.title = "Versions"
-
-        p.x_range.range_padding = 0.1  # Adjust the padding between bars
-
-        tooltips_1 = [("Version", legend_label2), ("KTPM", "@top{0,}")]
-        tooltips_2 = [("Version", legend_label1), ("KTPM", "@top{0,}")]
-
-        hover_1 = HoverTool(renderers=[r1], tooltips=tooltips_1)
-        hover_2 = HoverTool(renderers=[r2], tooltips=tooltips_2)
-
-        p.add_tools(hover_1, hover_2)  # Add the HoverTools to the figure
-
-        # Add y-values on top of each bar
-        for i, value in enumerate(values2):
-            label = Label(x=x_middle[i], y=value, text=f"{value:,}", text_font_size="10pt", text_color="black",
-                          text_baseline="bottom", text_align="center")
-            p.add_layout(label)
-
-        for i, value in enumerate(values1):
-            label = Label(x=x_middle[i] + width, y=value, text=f"{value:,}", text_font_size="10pt", text_color="black",
-                          text_baseline="bottom", text_align="center")
-            p.add_layout(label)
-
-        p.yaxis.formatter = NumeralTickFormatter(format="0,")  # Format y-axis tick labels with commas
-
-        # Percentage line
-
-        # Calculate the percentage difference between result1 and result2
-        percentage_diff = [(v1 - v2) / v2 * 100 if v2 != 0 else 0 for v1, v2 in zip(values1, values2)]
-        percentage_diff = [round(diff, 2) for diff in percentage_diff]  # Round to 2 decimal places
-
-        # Calculate the x-coordinates for the dots
-        x_middle = [i + width / 2 + offset for i in x]
-
-        # Calculate the maximum value from result1 and result2 dictionaries
-        min_value = min(min(values1), min(values2))
-
-        # Calculate the y-coordinate for the dots
-        y_middle = [max(values1[i], values2[i]) + min_value for i in range(len(threads))]
-
-        # Add dots for each number on the line
-        dot_source = ColumnDataSource(data=dict(x=x_middle, y=y_middle, values=percentage_diff))
-        dot_glyph = Circle(x='x', y='y', size=6, line_color='red', fill_color='white')
-        p.add_glyph(dot_source, dot_glyph)
-
-        # Add lines showing the percentage difference
-        line_source = ColumnDataSource(data=dict(x=x_middle, y=y_middle, values=percentage_diff))
-        line_glyph = p.line(x='x', y='y', source=line_source, line_width=2, line_color="orange")
-
-        # Add labels for percentage difference
-        for i, diff in enumerate(percentage_diff):
-            x_pos = x_middle[i]
-            y_pos = y_middle[i] + 0.1  # Adjust the y-coordinate to move the labels above the line
-            label = Label(x=x_pos, y=y_pos, text=f"{diff}%", text_font_size="10pt", text_color="orange",
-                          text_baseline="bottom", text_align='center')
-            p.add_layout(label)
-        # Display the graph
-        output_notebook()
-        show(p)
+        self.compare_run_results(result1=result1, result2=result2, legend_label1=legend_label1, legend_label2=legend_label2, title=f'{database} KTPM [ KTransactions Per Minutes ]', x_axis_label = 'Threads', y_axis_label= 'KTPM')
