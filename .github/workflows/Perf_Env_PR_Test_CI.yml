@@ -6,7 +6,7 @@ name: Perf Env PR Test CI
 
 on:
   pull_request_target:
-    types: [labeled, opened]
+    types: [labeled, opened, synchronize]
     branches: [ main ]
   workflow_dispatch:
 
