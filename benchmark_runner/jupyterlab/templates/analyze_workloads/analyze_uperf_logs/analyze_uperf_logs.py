@@ -106,7 +106,7 @@ class AnalyzeUperfLogs(VisualizeWorkloadOperations):
 
     def compare_results(self, result1: dict, result2: dict, legend_label1: str, legend_label2: str, block_size: str):
         """
-        This method compare between 2 hammerdb results
+        This method compare between 2 uperf results
         @param result1:
         @param result2:
         @param legend_label1:

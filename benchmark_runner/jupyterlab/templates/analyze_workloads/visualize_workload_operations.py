@@ -42,7 +42,6 @@ class VisualizeWorkloadOperations:
         y_axis_label = workload_data.get('y_axis_label')
 
         # Convert values to integers
-        # Convert values to integers
         values1 = [float(value) for value in result1.values()]
         values2 = [float(value) for value in result2.values()]
 
@@ -81,12 +80,12 @@ class VisualizeWorkloadOperations:
 
         # Add y-values on top of each bar
         for i, value in enumerate(values1):
-            label = Label(x=x_middle[i], y=value, text=f'{value:,.2f}', text_font_size='10pt', text_color='black',
+            label = Label(x=x_middle[i], y=value, text=f'{value:,.2f}', text_font_size='8pt', text_color='black',
                           text_baseline='bottom', text_align='center')
             p.add_layout(label)
 
         for i, value in enumerate(values2):
-            label = Label(x=x_middle[i] + width, y=value, text=f'{value:,.2f}', text_font_size='10pt',
+            label = Label(x=x_middle[i] + width, y=value, text=f'{value:,.2f}', text_font_size='8pt',
                           text_color='black',
                           text_baseline='bottom', text_align='center')
             p.add_layout(label)
@@ -96,7 +95,11 @@ class VisualizeWorkloadOperations:
         # Percentage line
 
         # Calculate the percentage difference between result1 and result2
-        percentage_diff = [(v1 - v2) / v2 * 100 if v2 != 0 else 0 for v1, v2 in zip(values1, values2)]
+        # latency: Lower is better
+        if 'latency'.upper() in [key.upper().upper() for key in result1.keys()]:
+            percentage_diff = [(v1 - v2) / v2 * 100 if v2 != 0 else 0 for v1, v2 in zip(values1, values2)]
+        else:  # Other: Higher is better
+            percentage_diff = [(v2 - v1) / v1 * 100 if v1 != 0 else 0 for v1, v2 in zip(values1, values2)]
         percentage_diff = [round(diff, 2) for diff in percentage_diff]  # Round to 2 decimal places
 
         # Calculate the x-coordinates for the dots
