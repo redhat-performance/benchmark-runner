@@ -1,26 +1,24 @@
-import csv
-import os
-import pandas as pd
 
-# display df
-from IPython.display import display
+import os
+from typeguard import typechecked
 
 # display bokeh
 from bokeh.plotting import figure, show
 from bokeh.io import output_notebook, output_file
-from bokeh.models import HoverTool, NumeralTickFormatter
+from bokeh.models import HoverTool, Label, ColumnDataSource, LabelSet, Circle, NumeralTickFormatter
 
-from typeguard import typechecked
 
 from benchmark_runner.jupyterlab.templates.logs_operations.logs_operations import LogsOperations
+from benchmark_runner.jupyterlab.templates.analyze_workloads.visualize_workload_operations import VisualizeWorkloadOperations
 
 
-class AnalyzeHammerdbLogs:
+class AnalyzeHammerdbLogs(VisualizeWorkloadOperations):
     """
     This class analyzes Hammerdb logs
     """
 
     def __init__(self, s3_logs_url: str):
+        super().__init__()
         self.__workload = 'hammerdb'
         self.s3_logs_url = s3_logs_url
         self.__logs_operations = LogsOperations(s3_logs_url=self.s3_logs_url)
@@ -30,7 +28,7 @@ class AnalyzeHammerdbLogs:
         This method returns hammerdb log file
         @return: hammerdb log file
         """
-        workload_dir = self.__logs_operations.get_workload_dir(workload=self.__workload)
+        workload_dir = self.__logs_operations.get_workload_dir()
         workload_files = [file for file in os.listdir(workload_dir) if file.startswith(self.__workload)]
         # Iterate over all files in the directory
         for file_name in workload_files:
@@ -103,3 +101,15 @@ class AnalyzeHammerdbLogs:
         # Display the plot in the notebook
         output_notebook()
         show(p)
+
+    def compare_results(self, result1: dict, result2: dict, legend_label1: str, legend_label2: str, database: str):
+        """
+        This method compare between 2 hammerdb results
+        @param result1:
+        @param result2:
+        @param legend_label1:
+        @param legend_label2:
+        @param database: PostgreSQL, Mariadb, MSSQL
+        @return:
+        """
+        self.compare_run_results(result1=result1, result2=result2, legend_label1=legend_label1, legend_label2=legend_label2, title=f'{database} KTPM [ KTransactions Per Minutes ]', x_axis_label = 'Threads', y_axis_label= 'KTPM')
