@@ -1,6 +1,5 @@
-import os
 
-# Run command
+import os
 import subprocess
 
 # Open grafana url
@@ -12,7 +11,6 @@ from datetime import datetime
 
 # logging
 import logging
-
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 from typeguard import typechecked
@@ -37,12 +35,12 @@ class AnalyzePrometheusLogs:
         @return: prometheus_logs path
         """
         self.logs_operations.untar_and_chmod_logs()
-        promdb_file = [f for f in os.listdir(self.logs_operations.log_dir_path.split('.')[0]) if f.startswith('promdb')]
+        promdb_file = [f for f in os.listdir(self.logs_operations.log_dir_filename.split('.')[0]) if f.startswith('promdb')]
         logger.info(
             f"untar prometheus file: {os.path.join(self.logs_operations.logs_dir, self.logs_operations.filename.split('.')[0], promdb_file[0])}")
         os.system(
             f"tar -xvf {os.path.join(self.logs_operations.logs_dir, self.logs_operations.filename.split('.')[0], promdb_file[0])} -C {os.path.join(self.logs_operations.logs_dir, self.logs_operations.filename.split('.')[0])}")
-        promdb_file = [f for f in os.listdir(self.logs_operations.log_dir_path.split('.')[0]) if
+        promdb_file = [f for f in os.listdir(self.logs_operations.log_dir_filename.split('.')[0]) if
                        f.startswith('promdb') and not f.endswith('tar')]
         promdb_dir_path = f"{os.path.join(self.logs_operations.logs_dir, self.logs_operations.filename.split('.')[0], promdb_file[0])}"
 

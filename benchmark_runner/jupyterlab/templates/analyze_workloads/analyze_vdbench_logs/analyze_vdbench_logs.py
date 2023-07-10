@@ -64,7 +64,7 @@ class AnalyzeVdbenchLogs(VisualizeWorkloadOperations):
         for csv_file in csv_files:
             # Read the CSV file
             df = pd.read_csv(csv_file)
-            df = df[df["Run"] != "fillup"]
+            df = df[df['Run'] != 'fillup']
             print(f"display file: {csv_file.split('/')[-1]}")
             display(df)
 
@@ -88,14 +88,14 @@ class AnalyzeVdbenchLogs(VisualizeWorkloadOperations):
             y = y[::-1]
 
             # Create a Bokeh figure
-            p = figure(title=csv_file.split('/')[-1], y_range=x, x_axis_label="Latency (sec)",  width=VisualizeWorkloadOperations.WIDTH, height=VisualizeWorkloadOperations.HEIGHT)
+            p = figure(title=csv_file.split('/')[-1], y_range=x, x_axis_label='Latency (sec)',  width=VisualizeWorkloadOperations.WIDTH, height=VisualizeWorkloadOperations.HEIGHT)
 
             # Add a horizontal bar glyph to the figure with legend_label
             bars = p.hbar(y=x, right=y, height=0.5, legend_label=metric)
 
             # Add labels to the bars
             labels = [f"{val:,.2f}" for val in y]
-            p.text(x=y, y=x, text=labels, text_baseline="middle", text_align="left", text_font_size='10pt')
+            p.text(x=y, y=x, text=labels, text_baseline='middle', text_align='left', text_font_size='10pt')
 
             # Add hover tool with x-axis and y-axis values
             hover = HoverTool(tooltips=[('Run', '@y'), (metric, '@right{0,0.00}')], renderers=[bars])
@@ -148,7 +148,7 @@ class AnalyzeVdbenchLogs(VisualizeWorkloadOperations):
 
             # Add labels to the bars
             labels = [f"{val:,.2f}" for val in y]
-            p.text(x=x, y=y, text=labels, text_baseline="bottom", text_align="center", text_font_size='10pt')
+            p.text(x=x, y=y, text=labels, text_baseline='bottom', text_align='center', text_font_size='10pt')
 
             # Add hover tool with x-axis and y-axis values
             hover = HoverTool(tooltips=[('Run', '@x'), (metric, '@top{0,0.00}')], renderers=[bars])
@@ -158,7 +158,7 @@ class AnalyzeVdbenchLogs(VisualizeWorkloadOperations):
             p.yaxis.formatter = NumeralTickFormatter(format='0,0')
 
             # Customize the x-axis tick labels
-            p.xaxis.major_label_orientation = "vertical"
+            p.xaxis.major_label_orientation = 'vertical'
             p.xaxis.major_label_orientation = 45  # Rotate the labels by 45 degrees
 
             # Customize the legend
@@ -220,14 +220,14 @@ class AnalyzeVdbenchLogs(VisualizeWorkloadOperations):
         df2 = pd.read_csv(csv_log_files2[0])
 
         # Filter the DataFrame to include only the desired rows
-        columns = ["oltp1", "oltp2", "oltphw", "odss2", "odss128", "4kb_read_16threads", "64kb_read_4threads",
-                   "4kb_write_16threads", "64kb_write_4threads"]
-        df1 = df1[df1["Run"].isin(columns)]
-        df2 = df2[df2["Run"].isin(columns)]
+        columns = ['oltp1', 'oltp2', 'oltphw', 'odss2', 'odss128', '4kb_read_16threads', '64kb_read_4threads',
+                   '4kb_write_16threads', '64kb_write_4threads']
+        df1 = df1[df1['Run'].isin(columns)]
+        df2 = df2[df2['Run'].isin(columns)]
 
         # Set the index to the "Run" column
-        df1.set_index("Run", inplace=True)
-        df2.set_index("Run", inplace=True)
+        df1.set_index('Run', inplace=True)
+        df2.set_index('Run', inplace=True)
 
         # Convert the DataFrame to a dictionary Rate/Resp
         result1 = df1[metric_key].to_dict()
@@ -246,11 +246,12 @@ class AnalyzeVdbenchLogs(VisualizeWorkloadOperations):
         x2_shifted = [x + 0.5 for x in x1]
 
         # Create a Bokeh figure
-        p = figure(title=f"Vdbench {title}", x_range=keys, y_axis_label="Latency (sec)",  width=VisualizeWorkloadOperations.WIDTH, height=VisualizeWorkloadOperations.HEIGHT)
+        p = figure(title=f'Vdbench {title}', x_range=keys, y_axis_label='Latency (sec)',  width=VisualizeWorkloadOperations.WIDTH, height=VisualizeWorkloadOperations.HEIGHT)
 
         # Adjust the y-axis range
         p.y_range.start = 0
         p.y_range.end = max(max(result1.values()), max(result2.values())) * 2
+        p.yaxis.formatter = NumeralTickFormatter(format='0,')  # Format y-axis tick labels with commas
 
         # Add vertical bars for data1
         r1 = p.vbar(x=x2_shifted, top=values1, width=0.4, color='green', legend_label=legend_label1)
@@ -264,27 +265,27 @@ class AnalyzeVdbenchLogs(VisualizeWorkloadOperations):
 
         # Customize the x-axis tick labels
         p.xaxis.major_label_orientation = 45  # Rotate the labels by 45 degrees
-        p.xaxis.axis_label = "Applications"  # Add x-axis title
-        p.xaxis.major_label_text_font_size = "12pt"  # Increase the label font size
+        p.xaxis.axis_label = 'Applications'  # Add x-axis title
+        p.xaxis.major_label_text_font_size = '12pt'  # Increase the label font size
 
         # Add tooltips for data1 bars
-        hover1 = HoverTool(renderers=[r1], tooltips=[(legend_label1, "@top{0.00}")])
+        hover1 = HoverTool(renderers=[r1], tooltips=[(legend_label1, '@top{0,0.00}')])
         p.add_tools(hover1)
 
         # Add tooltips for data2 bars
-        hover2 = HoverTool(renderers=[r2], tooltips=[(legend_label2, "@top{0.00}")])
+        hover2 = HoverTool(renderers=[r2], tooltips=[(legend_label2, '@top{0,0.00}')])
         p.add_tools(hover2)
 
         # Add labels for result1 bars
         for i, value in enumerate(values2):
-            label = Label(x=x1_shifted[i], y=value, text=f"{value:.2f}", text_font_size="10pt", text_color="black",
-                          text_baseline="bottom", text_align="center")
+            label = Label(x=x1_shifted[i], y=value, text=f'{value:,.2f}', text_font_size='8pt', text_color='black',
+                          text_baseline='bottom', text_align='center')
             p.add_layout(label)
 
         # Add labels for result2 bars
         for i, value in enumerate(values1):
-            label = Label(x=x2_shifted[i], y=value, text=f"{value:.2f}", text_font_size="10pt", text_color="black",
-                          text_baseline="bottom", text_align="center")
+            label = Label(x=x2_shifted[i], y=value, text=f'{value:,.2f}', text_font_size='8pt', text_color='black',
+                          text_baseline='bottom', text_align='center')
             p.add_layout(label)
 
         # Calculate the maximum value from result1 and result2 dictionaries
@@ -307,21 +308,20 @@ class AnalyzeVdbenchLogs(VisualizeWorkloadOperations):
         for i, diff in enumerate(percentage_diff):
             x_pos = x_middle[i]
             y_pos = y_middle[i] + 0.1  # Adjust the y-coordinate to move the labels above the line
-            color = "red" if diff < 0 else "green"  # Set label and dot color based on the sign of the difference
-            label = Label(x=x_pos, y=y_pos, text=f"{diff}%", text_font_size="14pt", text_color=color,
-                          text_baseline="bottom", text_align='center')
+            color = "red" if diff < 0 else 'green'  # Set label and dot color based on the sign of the difference
+            label = Label(x=x_pos, y=y_pos, text=f'{diff}%', text_font_size='14pt', text_color=color,
+                          text_baseline='bottom', text_align='center')
             p.add_layout(label)
 
             # Adjust the y-coordinate to place the dots below the labels
             dot_y = y_pos - 0.1
 
             # Change dot color based on the sign of the difference
-            dot_color = "red" if diff < 0 else "green"
+            dot_color = 'red' if diff < 0 else 'green'
             dot_source = ColumnDataSource(data=dict(x=[x_middle[i]], y=[dot_y], color=[dot_color]))
             p.circle(x='x', y='y', size=8, fill_color='color', line_color='color', source=dot_source)
 
         # Display the graph
-        output_notebook()
         show(p)
 
     def compare_latency(self, csv_log_files1: str, csv_log_files2: str, legend_label1: str, legend_label2: str,
