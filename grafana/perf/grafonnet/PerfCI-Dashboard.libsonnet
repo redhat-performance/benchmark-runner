@@ -140,7 +140,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
     ]),
 
     ////////////////////////////////////////////
-    g.panel.text.new('placeholder')
+    g.panel.text.new('')
       + g.panel.text.panelOptions.withDescription("")
 
       + g.panel.text.gridPos.withH(6)
@@ -2185,12 +2185,518 @@ g.dashboard.new('PerfCI-Regression-Summary')
                   ],
                   "reducer": "range"
                 }
-              })
+                }),
+              stateTimeline.transformation.withId('calculateField')
+                + stateTimeline.transformation.withOptions({
+                "alias": "Diff CPU( kata / runc)",
+                "binary": {
+                  "left": "CPU Iterations/sec kata",
+                  "operator": "/",
+                  "reducer": "sum",
+                  "right": "CPU Iterations/sec runc"
+                },
+                "mode": "binary",
+                "reduce": {
+                  "include": [
+                    "CPU Iterations/sec runc",
+                    "CPU Iterations/sec kata"
+                  ],
+                  "reducer": "diff"
+                }
+                }),
+              stateTimeline.transformation.withId('organize')
+                + stateTimeline.transformation.withOptions({
+                "excludeByName": {
+                  "CPU Iterations/sec clusterbuster-ci": true,
+                  "Diff Max ( runc - kata)": true,
+                  "Max clusterbuster-ci": true
+                },
+                "indexByName": {
+                  "CPU Iterations/sec clusterbuster-ci": 5,
+                  "CPU Iterations/sec kata": 3,
+                  "CPU Iterations/sec runc": 2,
+                  "Diff CPU( kata / runc)": 6,
+                  "Diff Max ( runc - kata)": 1,
+                  "Max clusterbuster-ci": 4,
+                  "Max kata": 8,
+                  "Max runc": 7,
+                  "Time": 0
+                },
+                "renameByName": {}
+                }),
+              stateTimeline.transformation.withId('convertFieldType')
+                + stateTimeline.transformation.withOptions({
+                "conversions": [
+                  {
+                    "destinationType": "number",
+                    "targetField": "Ratio Last( kata/ runc)"
+                  },
+                  {
+                    "destinationType": "number",
+                    "targetField": "Diff CPU( kata / runc)"
+                  }
+                ],
+                "fields": {}
+              }),
+              
+
+
+
 
 
           
+            ]),
+          
+
+            ////////////////////////////////
+
+            g.panel.stateTimeline.new('')
+            + stateTimeline.queryOptions.withDatasource('Elasticsearch-clusterbuster-cpusoaker-results')
+            + g.panel.stateTimeline.withDescription('Lower is better')
+
+            + stateTimeline.standardOptions.color.withMode('thresholds')
+            + stateTimeline.fieldConfig.defaults.custom.withFillOpacity(70)
+            + stateTimeline.fieldConfig.defaults.custom.withLineWidth(0)
+            
+            + stateTimeline.fieldConfig.defaults.withDecimals(1)
+            + stateTimeline.fieldConfig.defaults.withMappings([])
+            + stateTimeline.standardOptions.withMax(-1)
+            + stateTimeline.fieldConfig.defaults.thresholds.withMode('percentage')
+            + stateTimeline.fieldConfig.defaults.thresholds.withSteps([
+              stateTimeline.thresholdStep.withColor('dark-blue'),
+
+              stateTimeline.thresholdStep.withColor('dark-green')
+              + stateTimeline.thresholdStep.withValue(1),
+
+              stateTimeline.thresholdStep.withColor('super-light-green')
+              + stateTimeline.thresholdStep.withValue(10),
+
+              stateTimeline.thresholdStep.withColor('semi-dark-orange')
+              + stateTimeline.thresholdStep.withValue(20),
+
+              stateTimeline.thresholdStep.withColor('dark-red')
+              + stateTimeline.thresholdStep.withValue(50)
+
             ])
+            + stateTimeline.fieldConfig.withOverrides([])
+
+            + stateTimeline.gridPos.withH(3)
+            + stateTimeline.gridPos.withW(24)
+            + stateTimeline.gridPos.withX(0)
+            + stateTimeline.gridPos.withY(192)
+
+            + stateTimeline.withId(191)
+            + stateTimeline.withInterval('1d')
+
+            + stateTimeline.panelOptions.withLinks([
+              stateTimeline.link.withTitle('artifacts link')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=now-45d&to=now&viewPanel=150')
+
+            ])
+
+            + stateTimeline.options.withAlignValue('left')
+            + stateTimeline.options.legend.withDisplayMode('list')
+            + stateTimeline.options.legend.withPlacement('bottom')
+            + stateTimeline.options.withMergeValues(value = false)
+            + stateTimeline.options.withRowHeight(value = 0.7)
+            + stateTimeline.options.withShowValue('auto')
+            + stateTimeline.options.tooltip.withMode('single')
+
+            + g.panel.stateTimeline.withTargets([
+              elasticsearch.withAlias('Max {{term test_description.runtime.keyword}}')
+    
+              + elasticsearch.withBucketAggs([
+                
+                elasticsearch.bucketAggs.Terms.withField('test_description.runtime.keyword')
+                + elasticsearch.bucketAggs.Terms.withId('8')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
+                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
+                + elasticsearch.bucketAggs.Terms.withType('terms'),
+
+                elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
+                + elasticsearch.bucketAggs.DateHistogram.withId('7')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('0')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone('utc')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges('0')
+                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+
+      
+              ])
+    
+              + elasticsearch.withMetrics([
+                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('test_description.pods')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('6')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max')
+
+              ])
+
+              +elasticsearch.withQuery("")
+              +elasticsearch.withRefId('A')
+              +elasticsearch.withTimeField('timestamp'),
+
+
+              //////
+
+            ])
+            + stateTimeline.withTransformations([
+              stateTimeline.transformation.withId('calculateField')
+                + stateTimeline.transformation.withOptions({
+                "alias": "Diff Max ( runc - kata)",
+                "binary": {
+                  "left": "Max runc",
+                  "operator": "-",
+                  "reducer": "sum",
+                  "right": "Max kata"
+                },
+                "mode": "reduceRow",
+                "reduce": {
+                  "include": [
+                    "Max kata",
+                    "Max runc"
+                  ],
+                  "reducer": "range"
+                }
+                }),
+              stateTimeline.transformation.withId('calculateField')
+                + stateTimeline.transformation.withOptions({
+                "alias": "Diff CPU( kata / runc)",
+                "binary": {
+                  "left": "CPU Iterations/sec kata",
+                  "operator": "/",
+                  "reducer": "sum",
+                  "right": "CPU Iterations/sec runc"
+                },
+                "mode": "binary",
+                "reduce": {
+                  "include": [
+                    "CPU Iterations/sec runc",
+                    "CPU Iterations/sec kata"
+                  ],
+                  "reducer": "diff"
+                }
+                }),
+              stateTimeline.transformation.withId('organize')
+                + stateTimeline.transformation.withOptions({
+                "excludeByName": {
+                  "CPU Iterations/sec clusterbuster-ci": true,
+                  "Diff Max ( runc - kata)": false,
+                  "Max clusterbuster-ci": true,
+                  "Max kata": true,
+                  "Max runc": true,
+                  "Time": false
+                },
+                "indexByName": {
+                  "CPU Iterations/sec kata": 14,
+                  "CPU Iterations/sec runc": 13,
+                  "Diff CPU( kata - runc)": 15,
+                  "Diff First( kata - runc)": 6,
+                  "Diff Max ( runc - kata)": 3,
+                  "Diff Memory( kata - runc)": 12,
+                  "First start (sec) kata": 5,
+                  "First start (sec) runc": 4,
+                  "Last start (sec) kata": 8,
+                  "Last start (sec) runc": 7,
+                  "Max kata": 2,
+                  "Max runc": 1,
+                  "Memory (GB) kata": 11,
+                  "Memory (GB) runc": 10,
+                  "Ratio Last( kata/ runc)": 9,
+                  "Time": 0
+                },
+                "renameByName": {}
+              }),
+              stateTimeline.transformation.withId('convertFieldType')
+                + stateTimeline.transformation.withOptions({
+                "conversions": [
+                  {
+                    "destinationType": "number",
+                    "targetField": "Ratio Last( kata/ runc)"
+                  },
+                  {
+                    "destinationType": "number",
+                    "targetField": "Diff CPU( kata / runc)"
+                  }
+                ],
+                "fields": {}
+              }),
+              
+
+
+
+
+
           
+            ]),
+
+            ////////////////////////////////
+
+            g.panel.stateTimeline.new('')
+            + stateTimeline.queryOptions.withDatasource('Elasticsearch-clusterbuster-cpusoaker-results')
+            + g.panel.stateTimeline.withDescription('Lower is better')
+
+            + stateTimeline.standardOptions.color.withMode('thresholds')
+            + stateTimeline.fieldConfig.defaults.custom.withFillOpacity(70)
+            + stateTimeline.fieldConfig.defaults.custom.withLineWidth(0)
+            
+            + stateTimeline.fieldConfig.defaults.withMappings([])
+            + stateTimeline.standardOptions.withMax(-1)
+            + stateTimeline.fieldConfig.defaults.thresholds.withMode('percentage')
+            + stateTimeline.fieldConfig.defaults.thresholds.withSteps([
+              stateTimeline.thresholdStep.withColor('dark-blue'),
+
+              stateTimeline.thresholdStep.withColor('dark-green')
+              + stateTimeline.thresholdStep.withValue(1),
+
+              stateTimeline.thresholdStep.withColor('super-light-green')
+              + stateTimeline.thresholdStep.withValue(10),
+
+              stateTimeline.thresholdStep.withColor('light-red')
+              + stateTimeline.thresholdStep.withValue(20),
+
+              stateTimeline.thresholdStep.withColor('dark-red')
+              + stateTimeline.thresholdStep.withValue(50)
+
+            ])
+            + stateTimeline.fieldConfig.withOverrides([])
+
+            + stateTimeline.gridPos.withH(10)
+            + stateTimeline.gridPos.withW(24)
+            + stateTimeline.gridPos.withX(0)
+            + stateTimeline.gridPos.withY(195)
+
+            + stateTimeline.withId(185)
+            + stateTimeline.withInterval('1d')
+
+            + stateTimeline.panelOptions.withLinks([
+              stateTimeline.link.withTitle('artifacts link')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=now-45d&to=now&viewPanel=150')
+
+            ])
+
+            + stateTimeline.options.withAlignValue('left')
+            + stateTimeline.options.legend.withDisplayMode('list')
+            + stateTimeline.options.legend.withPlacement('bottom')
+            + stateTimeline.options.withMergeValues(value = false)
+            + stateTimeline.options.withRowHeight(value = 0.9)
+            + stateTimeline.options.withShowValue('auto')
+            + stateTimeline.options.tooltip.withMode('single')
+
+            + g.panel.stateTimeline.withTargets([
+              elasticsearch.withAlias('First start (sec) {{term test_description.runtime.keyword}}')
+    
+              + elasticsearch.withBucketAggs([
+                
+                elasticsearch.bucketAggs.Terms.withField('test_description.runtime.keyword')
+                + elasticsearch.bucketAggs.Terms.withId('8')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
+                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
+                + elasticsearch.bucketAggs.Terms.withType('terms'),
+
+                elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
+                + elasticsearch.bucketAggs.DateHistogram.withId('7')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('0')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone('utc')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges('0')
+                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+
+      
+              ])
+    
+              + elasticsearch.withMetrics([
+                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('first_pod_start')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('6')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max')
+
+              ])
+
+              +elasticsearch.withQuery("")
+              +elasticsearch.withRefId('A')
+              +elasticsearch.withTimeField('timestamp'),
+
+
+              ////////
+
+              elasticsearch.withAlias('Last start (sec) {{term test_description.runtime.keyword}}')
+    
+              + elasticsearch.withBucketAggs([
+                
+                elasticsearch.bucketAggs.Terms.withField('test_description.runtime.keyword')
+                + elasticsearch.bucketAggs.Terms.withId('8')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
+                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
+                + elasticsearch.bucketAggs.Terms.withType('terms'),
+
+                elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
+                + elasticsearch.bucketAggs.DateHistogram.withId('7')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('0')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone('utc')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges('0')
+                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+
+      
+              ])
+    
+              + elasticsearch.withMetrics([
+                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('last_pod_start')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('6')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max')
+
+              ])
+
+              +elasticsearch.withQuery("")
+              +elasticsearch.withRefId('B')
+              +elasticsearch.withTimeField('timestamp'),
+
+
+              ///////
+
+              elasticsearch.withAlias('Memory (MB) {{term test_description.runtime.keyword}}')
+    
+              + elasticsearch.withBucketAggs([
+                
+                elasticsearch.bucketAggs.Terms.withField('test_description.runtime.keyword')
+                + elasticsearch.bucketAggs.Terms.withId('8')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
+                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
+                + elasticsearch.bucketAggs.Terms.withType('terms'),
+
+                elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
+                + elasticsearch.bucketAggs.DateHistogram.withId('7')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('0')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone('utc')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges('0')
+                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+
+      
+              ])
+    
+              + elasticsearch.withMetrics([
+                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('memory_per_pod')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('6')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.settings.withScript('_value/1000000')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max')
+
+              ])
+
+              +elasticsearch.withQuery("")
+              +elasticsearch.withRefId('C')
+              +elasticsearch.withTimeField('timestamp'),
+
+
+
+
+
+              //////
+
+            ])
+            + stateTimeline.withTransformations([
+              stateTimeline.transformation.withId('calculateField')
+                + stateTimeline.transformation.withOptions({
+                "alias": "Diff First( kata - runc)",
+                "mode": "reduceRow",
+                "reduce": {
+                  "include": [
+                    "First start (sec) runc",
+                    "First start (sec) kata"
+                  ],
+                  "reducer": "diff"
+                },
+                "replaceFields": false
+              }),
+              stateTimeline.transformation.withId('calculateField')
+                + stateTimeline.transformation.withOptions({
+                "alias": "Ratio Last( kata/ runc)",
+                "binary": {
+                  "left": "Last start (sec) kata",
+                  "operator": "/",
+                  "reducer": "sum",
+                  "right": "Last start (sec) runc"
+                },
+                "mode": "binary",
+                "reduce": {
+                  "include": [
+                    "Last start (sec) runc",
+                    "Last start (sec) kata"
+                  ],
+                  "reducer": "diff"
+                }
+              }),
+              stateTimeline.transformation.withId('calculateField')
+                + stateTimeline.transformation.withOptions({
+                "alias": "Diff Memory( kata - runc)",
+                "binary": {
+                  "left": "Memory (GB) runc",
+                  "operator": "-",
+                  "reducer": "sum",
+                  "right": "Memory (GB) kata"
+                },
+                "mode": "reduceRow",
+                "reduce": {
+                  "include": [
+                    "Memory (MB) runc",
+                    "Memory (MB) kata"
+                  ],
+                  "reducer": "diff"
+                }
+              }),
+              stateTimeline.transformation.withId('organize')
+                + stateTimeline.transformation.withOptions({
+                "excludeByName": {
+                  "First start (sec) clusterbuster-ci": true,
+                  "Last start (sec) clusterbuster-ci": true,
+                  "Memory (MB) clusterbuster-ci": true
+                },
+                "indexByName": {
+                  "Diff First( kata - runc)": 3,
+                  "Diff Memory( kata - runc)": 11,
+                  "First start (sec) clusterbuster-ci": 7,
+                  "First start (sec) kata": 2,
+                  "First start (sec) runc": 1,
+                  "Last start (sec) clusterbuster-ci": 8,
+                  "Last start (sec) kata": 5,
+                  "Last start (sec) runc": 4,
+                  "Memory (MB) clusterbuster-ci": 12,
+                  "Memory (MB) kata": 10,
+                  "Memory (MB) runc": 9,
+                  "Ratio Last( kata/ runc)": 6,
+                  "Time": 0
+                },
+                "renameByName": {}
+              }),
+              stateTimeline.transformation.withId('convertFieldType')
+                + stateTimeline.transformation.withOptions({
+                "conversions": [
+                  {
+                    "destinationType": "number",
+                    "targetField": "Ratio Last( kata/ runc)"
+                  },
+                  {
+                    "destinationType": "number",
+                    "targetField": "Diff CPU( kata / runc)"
+                  }
+                ],
+                "fields": {}
+              }),
+              
+
+
+
+
+
+          
+            ]),
 
 
 
@@ -2205,6 +2711,927 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
 
       ///////////////////////////////
+
+      g.panel.row.new("Clusterbuster - FIO")
+       + g.panel.row.withCollapsed(value=true)
+
+        + g.panel.row.gridPos.withH(1)
+        + g.panel.row.gridPos.withW(24)
+        + g.panel.row.gridPos.withX(0)
+        + g.panel.row.gridPos.withY(16)
+        
+        + g.panel.row.withId(148)
+
+        + g.panel.row.withPanels([
+        
+          g.panel.stateTimeline.new('FIO (IOPS/Throughtput)')
+            + stateTimeline.queryOptions.withDatasource('Elasticsearch-clusterbuster-fio-results')
+            + g.panel.stateTimeline.withDescription('Higher is better')
+
+            + stateTimeline.standardOptions.color.withMode('thresholds')
+            + stateTimeline.fieldConfig.defaults.custom.withFillOpacity(70)
+            + stateTimeline.fieldConfig.defaults.custom.withLineWidth(0)
+
+            + stateTimeline.fieldConfig.defaults.withMappings([])
+            + stateTimeline.standardOptions.withMin(0)
+            + stateTimeline.fieldConfig.defaults.thresholds.withMode('percentage')
+            + stateTimeline.fieldConfig.defaults.thresholds.withSteps([
+              stateTimeline.thresholdStep.withColor('red'),
+
+              stateTimeline.thresholdStep.withColor('semi-dark-orange')
+              + stateTimeline.thresholdStep.withValue(50),
+
+              stateTimeline.thresholdStep.withColor('super-light-green')
+              + stateTimeline.thresholdStep.withValue(80),
+
+              stateTimeline.thresholdStep.withColor('dark-green')
+              + stateTimeline.thresholdStep.withValue(90),
+
+              stateTimeline.thresholdStep.withColor('dark-blue')
+              + stateTimeline.thresholdStep.withValue(100)
+
+            ])
+            + stateTimeline.fieldConfig.withOverrides([])
+
+            + stateTimeline.gridPos.withH(15)
+            + stateTimeline.gridPos.withW(24)
+            + stateTimeline.gridPos.withX(0)
+            + stateTimeline.gridPos.withY(183)
+
+            + stateTimeline.withId(167)
+            + stateTimeline.withInterval('1d')
+
+            + stateTimeline.panelOptions.withLinks([
+              stateTimeline.link.withTitle('artifacts link')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=now-45d&to=now&viewPanel=150')
+
+            ])
+            + stateTimeline.options.withAlignValue('left')
+            + stateTimeline.options.legend.withDisplayMode('list')
+            + stateTimeline.options.legend.withPlacement('bottom')
+            + stateTimeline.options.withMergeValues(value = false)
+            + stateTimeline.options.withRowHeight(value = 0.9)
+            + stateTimeline.options.withShowValue('auto')
+            + stateTimeline.options.tooltip.withMode('single')
+
+            + g.panel.stateTimeline.withTargets([
+               elasticsearch.withAlias('read.iops: {{term test_description.runtime.keyword}}')
+    
+              + elasticsearch.withBucketAggs([
+                
+                 elasticsearch.bucketAggs.Terms.withField('test_description.runtime.keyword')
+                + elasticsearch.bucketAggs.Terms.withId('8')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
+                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
+                + elasticsearch.bucketAggs.Terms.withType('terms'),
+      
+                elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
+                + elasticsearch.bucketAggs.DateHistogram.withId('7')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('0')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone('utc')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges('0')
+                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+
+      
+              ])
+    
+              + elasticsearch.withMetrics([
+                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('read.iops')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('6')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max')
+
+              ])
+
+              +elasticsearch.withQuery('')
+              +elasticsearch.withRefId('A')
+              +elasticsearch.withTimeField('timestamp'),
+
+
+              //////
+
+
+              elasticsearch.withAlias('write.iops: {{term test_description.runtime.keyword}}')
+    
+              + elasticsearch.withBucketAggs([
+                
+                 elasticsearch.bucketAggs.Terms.withField('test_description.runtime.keyword')
+                + elasticsearch.bucketAggs.Terms.withId('8')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
+                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
+                + elasticsearch.bucketAggs.Terms.withType('terms'),
+      
+                elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
+                + elasticsearch.bucketAggs.DateHistogram.withId('7')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('0')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone('utc')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges('0')
+                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+
+      
+              ])
+    
+              + elasticsearch.withMetrics([
+                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('write.iops')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('6')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.settings.withScript('_value/1000')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max')
+
+              ])
+
+              +elasticsearch.withQuery('')
+              +elasticsearch.withRefId('B')
+              +elasticsearch.withTimeField('timestamp'),
+
+
+              //////
+
+
+              elasticsearch.withAlias('total.iops: {{term test_description.runtime.keyword}}')
+    
+              + elasticsearch.withBucketAggs([
+                
+                 elasticsearch.bucketAggs.Terms.withField('test_description.runtime.keyword')
+                + elasticsearch.bucketAggs.Terms.withId('8')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
+                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
+                + elasticsearch.bucketAggs.Terms.withType('terms'),
+      
+                elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
+                + elasticsearch.bucketAggs.DateHistogram.withId('7')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('0')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone('utc')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges('0')
+                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+
+      
+              ])
+              + elasticsearch.withHide(false)
+              + elasticsearch.withMetrics([
+                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('total.iops')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('6')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.settings.withScript('_value/1000')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max')
+
+              ])
+
+              +elasticsearch.withQuery('')
+              +elasticsearch.withRefId('C')
+              +elasticsearch.withTimeField('timestamp'),
+
+
+              //////
+
+              elasticsearch.withAlias('read.throughput: {{term test_description.runtime.keyword}}')
+    
+              + elasticsearch.withBucketAggs([
+                
+                 elasticsearch.bucketAggs.Terms.withField('test_description.runtime.keyword')
+                + elasticsearch.bucketAggs.Terms.withId('8')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
+                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
+                + elasticsearch.bucketAggs.Terms.withType('terms'),
+      
+                elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
+                + elasticsearch.bucketAggs.DateHistogram.withId('7')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('0')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone('utc')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges('0')
+                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+
+      
+              ])
+              + elasticsearch.withHide(false)
+              + elasticsearch.withMetrics([
+                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('read.throughput')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('6')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.settings.withScript('_value/1000000')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max')
+
+              ])
+
+              +elasticsearch.withQuery('')
+              +elasticsearch.withRefId('D')
+              +elasticsearch.withTimeField('timestamp'),
+
+
+              //////
+
+              elasticsearch.withAlias('write.throughput: {{term test_description.runtime.keyword}}')
+    
+              + elasticsearch.withBucketAggs([
+                
+                 elasticsearch.bucketAggs.Terms.withField('test_description.runtime.keyword')
+                + elasticsearch.bucketAggs.Terms.withId('8')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
+                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
+                + elasticsearch.bucketAggs.Terms.withType('terms'),
+      
+                elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
+                + elasticsearch.bucketAggs.DateHistogram.withId('7')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('0')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone('utc')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges('0')
+                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+
+      
+              ])
+              + elasticsearch.withHide(false)
+              + elasticsearch.withMetrics([
+                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('write.throughput')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('6')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.settings.withScript('_value/1000000')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max')
+
+              ])
+
+              +elasticsearch.withQuery('')
+              +elasticsearch.withRefId('E')
+              +elasticsearch.withTimeField('timestamp'),
+
+
+              //////
+
+
+              elasticsearch.withAlias('total.throughput: {{term test_description.runtime.keyword}}')
+    
+              + elasticsearch.withBucketAggs([
+                
+                 elasticsearch.bucketAggs.Terms.withField('test_description.runtime.keyword')
+                + elasticsearch.bucketAggs.Terms.withId('8')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
+                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
+                + elasticsearch.bucketAggs.Terms.withType('terms'),
+      
+                elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
+                + elasticsearch.bucketAggs.DateHistogram.withId('7')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('0')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone('utc')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges('0')
+                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+
+      
+              ])
+              + elasticsearch.withHide(false)
+              + elasticsearch.withMetrics([
+                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('total.throughput')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('6')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.settings.withScript('_value/1000000')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max')
+
+              ])
+
+              +elasticsearch.withQuery('')
+              +elasticsearch.withRefId('F')
+              +elasticsearch.withTimeField('timestamp')
+              
+            ])
+
+            + stateTimeline.withTransformations([
+              stateTimeline.transformation.withId('calculateField')
+                + stateTimeline.transformation.withOptions({
+                "alias": "read.iops kata/runc",
+                "binary": {
+                  "left": "read.iops: kata",
+                  "operator": "/",
+                  "reducer": "sum",
+                  "right": "read.iops: runc"
+                },
+                "mode": "binary",
+                "reduce": {
+                  "include": [
+                    "read.iops: runc",
+                    "read.iops: kata"
+                  ],
+                  "reducer": "diffperc"
+                }
+              }),
+              stateTimeline.transformation.withId('calculateField')
+                + stateTimeline.transformation.withOptions({
+                "alias": "write.iops kata/runc",
+                "binary": {
+                  "left": "write.iops: kata",
+                  "operator": "/",
+                  "reducer": "sum",
+                  "right": "write.iops: runc"
+                },
+                "mode": "binary",
+                "reduce": {
+                  "include": [
+                    "write.iops: runc",
+                    "write.iops: kata"
+                  ],
+                  "reducer": "sum"
+                }
+              }),
+              stateTimeline.transformation.withId('calculateField')
+                + stateTimeline.transformation.withOptions({
+                "alias": "total.iops  kata/runc",
+                "binary": {
+                  "left": "total.iops: kata",
+                  "operator": "/",
+                  "reducer": "sum",
+                  "right": "total.iops: runc"
+                },
+                "mode": "binary",
+                "reduce": {
+                  "reducer": "sum"
+                }
+              }),
+              stateTimeline.transformation.withId('calculateField')
+                + stateTimeline.transformation.withOptions({
+                "alias": "read.throughput  kata/runc",
+                "binary": {
+                  "left": "read.throughput: kata",
+                  "operator": "/",
+                  "reducer": "sum",
+                  "right": "read.throughput: runc"
+                },
+                "mode": "binary",
+                "reduce": {
+                  "reducer": "sum"
+                }
+              }),
+              stateTimeline.transformation.withId('calculateField')
+                + stateTimeline.transformation.withOptions({
+                "alias": "write.throughput kata/runc",
+                "binary": {
+                  "left": "write.throughput: kata",
+                  "operator": "/",
+                  "reducer": "sum",
+                  "right": "write.throughput: runc"
+                },
+                "mode": "binary",
+                "reduce": {
+                  "reducer": "sum"
+                }
+              }),
+              stateTimeline.transformation.withId('calculateField')
+                + stateTimeline.transformation.withOptions({
+                "alias": "total.throughput kata/runc",
+                "binary": {
+                  "left": "total.throughput: kata",
+                  "operator": "/",
+                  "reducer": "sum",
+                  "right": "total.throughput: runc"
+                },
+                "mode": "binary",
+                "reduce": {
+                  "reducer": "sum"
+                }
+              }),
+              stateTimeline.transformation.withId('organize')
+                + stateTimeline.transformation.withOptions({
+                "excludeByName": {
+                  "read.iops: clusterbuster-ci": true,
+                  "read.throughput: clusterbuster-ci": true,
+                  "total.iops: clusterbuster-ci": true,
+                  "total.throughput: clusterbuster-ci": true,
+                  "write.iops: clusterbuster-ci": true,
+                  "write.throughput: clusterbuster-ci": true
+                },
+                "indexByName": {
+                  "Time": 0,
+                  "read.iops kata/runc": 3,
+                  "read.iops: kata": 2,
+                  "read.iops: runc": 1,
+                  "read.throughput  kata/runc": 12,
+                  "read.throughput: kata": 11,
+                  "read.throughput: runc": 10,
+                  "total.iops  kata/runc": 9,
+                  "total.iops: kata": 8,
+                  "total.iops: runc": 7,
+                  "total.throughput kata/runc": 18,
+                  "total.throughput: kata": 17,
+                  "total.throughput: runc": 16,
+                  "write.iops kata/runc": 6,
+                  "write.iops: kata": 5,
+                  "write.iops: runc": 4,
+                  "write.throughput kata/runc": 15,
+                  "write.throughput: kata": 14,
+                  "write.throughput: runc": 13
+                },
+                "renameByName": {}
+              }),
+              stateTimeline.transformation.withId('convertFieldType')
+                + stateTimeline.transformation.withOptions({
+                "conversions": [
+                  {
+                    "destinationType": "number",
+                    "targetField": "read.iops kata/runc"
+                  },
+                  {
+                    "destinationType": "number",
+                    "targetField": "write.iops kata/runc"
+                  },
+                  {
+                    "destinationType": "number",
+                    "targetField": "total.iops  kata/runc"
+                  },
+                  {
+                    "destinationType": "number",
+                    "targetField": "read.throughput  kata/runc"
+                  },
+                  {
+                    "destinationType": "number",
+                    "targetField": "write.throughput kata/runc"
+                  },
+                  {
+                    "destinationType": "number",
+                    "targetField": "total.throughput kata/runc"
+                  }
+                ],
+                "fields": {}
+              }),
+              
+
+
+
+
+
+          
+            ]),
+            
+
+
+
+        ]),
+
+
+      ///////////////////////////////
+
+
+
+      g.panel.row.new("Clusterbuster - Files")
+       + g.panel.row.withCollapsed(value=true)
+
+        + g.panel.row.gridPos.withH(1)
+        + g.panel.row.gridPos.withW(24)
+        + g.panel.row.gridPos.withX(0)
+        + g.panel.row.gridPos.withY(17)
+        
+        + g.panel.row.withId(182)
+
+        + g.panel.row.withPanels([
+        
+          g.panel.stateTimeline.new('Files (sec)')
+            + stateTimeline.queryOptions.withDatasource('Elasticsearch-clusterbuster-files-results')
+            + g.panel.stateTimeline.withDescription('Lower is better')
+
+            + stateTimeline.standardOptions.color.withMode('thresholds')
+            + stateTimeline.fieldConfig.defaults.custom.withFillOpacity(70)
+            + stateTimeline.fieldConfig.defaults.custom.withLineWidth(0)
+
+            + stateTimeline.fieldConfig.defaults.withDecimals(2)
+            + stateTimeline.fieldConfig.defaults.withMappings([])
+            + stateTimeline.standardOptions.withMax(-1)
+            + stateTimeline.fieldConfig.defaults.thresholds.withMode('percentage')
+            + stateTimeline.fieldConfig.defaults.thresholds.withSteps([
+              stateTimeline.thresholdStep.withColor('dark-blue'),
+
+              stateTimeline.thresholdStep.withColor('dark-green')
+              + stateTimeline.thresholdStep.withValue(1),
+
+              stateTimeline.thresholdStep.withColor('super-light-green')
+              + stateTimeline.thresholdStep.withValue(10),
+
+              stateTimeline.thresholdStep.withColor('semi-dark-orange')
+              + stateTimeline.thresholdStep.withValue(20),
+
+              stateTimeline.thresholdStep.withColor('dark-red')
+              + stateTimeline.thresholdStep.withValue(50)
+
+            ])
+            + stateTimeline.fieldConfig.withOverrides([])
+
+            + stateTimeline.gridPos.withH(16)
+            + stateTimeline.gridPos.withW(24)
+            + stateTimeline.gridPos.withX(0)
+            + stateTimeline.gridPos.withY(184)
+
+            + stateTimeline.withId(165)
+            + stateTimeline.withInterval('1d')
+
+            + stateTimeline.panelOptions.withLinks([
+              stateTimeline.link.withTitle('artifacts link')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=now-45d&to=now&viewPanel=150')
+
+            ])
+            + stateTimeline.options.withAlignValue('left')
+            + stateTimeline.options.legend.withDisplayMode('list')
+            + stateTimeline.options.legend.withPlacement('bottom')
+            + stateTimeline.options.withMergeValues(value = false)
+            + stateTimeline.options.withRowHeight(value = 0.9)
+            + stateTimeline.options.withShowValue('auto')
+            + stateTimeline.options.tooltip.withMode('single')
+
+            + g.panel.stateTimeline.withTargets([
+               elasticsearch.withAlias('create: 4096: {{term test_description.runtime.keyword}}')
+    
+              + elasticsearch.withBucketAggs([
+                
+                 elasticsearch.bucketAggs.Terms.withField('test_description.runtime.keyword')
+                + elasticsearch.bucketAggs.Terms.withId('8')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
+                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
+                + elasticsearch.bucketAggs.Terms.withType('terms'),
+      
+                elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
+                + elasticsearch.bucketAggs.DateHistogram.withId('7')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('0')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone('utc')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges('0')
+                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+
+      
+              ])
+    
+              + elasticsearch.withMetrics([
+                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('create.elapsed_time')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('6')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max')
+
+              ])
+
+              +elasticsearch.withQuery('test_description.filesize:4096')
+              +elasticsearch.withRefId('A')
+              +elasticsearch.withTimeField('timestamp'),
+
+
+              //////
+
+
+              elasticsearch.withAlias('create: 262,144:  {{term test_description.runtime.keyword}}')
+    
+              + elasticsearch.withBucketAggs([
+                
+                 elasticsearch.bucketAggs.Terms.withField('test_description.runtime.keyword')
+                + elasticsearch.bucketAggs.Terms.withId('8')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
+                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
+                + elasticsearch.bucketAggs.Terms.withType('terms'),
+      
+                elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
+                + elasticsearch.bucketAggs.DateHistogram.withId('7')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('0')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone('utc')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges('0')
+                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+
+      
+              ])
+    
+              + elasticsearch.withMetrics([
+                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('create.elapsed_time')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('6')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max')
+
+              ])
+
+              +elasticsearch.withQuery('test_description.filesize:262144')
+              +elasticsearch.withRefId('G')
+              +elasticsearch.withTimeField('timestamp'),
+
+
+              //////
+
+
+              elasticsearch.withAlias('read : 4096: {{term test_description.runtime.keyword}}')
+    
+              + elasticsearch.withBucketAggs([
+                
+                 elasticsearch.bucketAggs.Terms.withField('test_description.runtime.keyword')
+                + elasticsearch.bucketAggs.Terms.withId('8')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
+                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
+                + elasticsearch.bucketAggs.Terms.withType('terms'),
+      
+                elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
+                + elasticsearch.bucketAggs.DateHistogram.withId('7')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('0')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone('utc')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges('0')
+                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+
+      
+              ])
+              + elasticsearch.withHide(false)
+              + elasticsearch.withMetrics([
+                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('read.elapsed_time')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('6')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max')
+
+              ])
+
+              +elasticsearch.withQuery('test_description.filesize:4096')
+              +elasticsearch.withRefId('C')
+              +elasticsearch.withTimeField('timestamp'),
+
+
+              //////
+
+              elasticsearch.withAlias('read : 262,144: {{term test_description.runtime.keyword}}')
+    
+              + elasticsearch.withBucketAggs([
+                
+                 elasticsearch.bucketAggs.Terms.withField('test_description.runtime.keyword')
+                + elasticsearch.bucketAggs.Terms.withId('8')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
+                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
+                + elasticsearch.bucketAggs.Terms.withType('terms'),
+      
+                elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
+                + elasticsearch.bucketAggs.DateHistogram.withId('7')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('0')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone('utc')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges('0')
+                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+
+      
+              ])
+              + elasticsearch.withHide(false)
+              + elasticsearch.withMetrics([
+                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('read.elapsed_time')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('6')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max')
+
+              ])
+
+              +elasticsearch.withQuery('test_description.filesize:262144')
+              +elasticsearch.withRefId('I')
+              +elasticsearch.withTimeField('timestamp'),
+
+
+              //////
+
+              elasticsearch.withAlias('remove : 4096: {{term test_description.runtime.keyword}}')
+    
+              + elasticsearch.withBucketAggs([
+                
+                 elasticsearch.bucketAggs.Terms.withField('test_description.runtime.keyword')
+                + elasticsearch.bucketAggs.Terms.withId('8')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
+                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
+                + elasticsearch.bucketAggs.Terms.withType('terms'),
+      
+                elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
+                + elasticsearch.bucketAggs.DateHistogram.withId('7')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('0')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone('utc')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges('0')
+                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+
+      
+              ])
+              + elasticsearch.withHide(false)
+              + elasticsearch.withMetrics([
+                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('remove.elapsed_time')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('6')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max')
+
+              ])
+
+              +elasticsearch.withQuery('test_description.filesize:4096')
+              +elasticsearch.withRefId('E')
+              +elasticsearch.withTimeField('timestamp'),
+
+
+              //////
+
+
+              elasticsearch.withAlias('remove : 262,144: {{term test_description.runtime.keyword}}')
+    
+              + elasticsearch.withBucketAggs([
+                
+                 elasticsearch.bucketAggs.Terms.withField('test_description.runtime.keyword')
+                + elasticsearch.bucketAggs.Terms.withId('8')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
+                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
+                + elasticsearch.bucketAggs.Terms.withType('terms'),
+      
+                elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
+                + elasticsearch.bucketAggs.DateHistogram.withId('7')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('0')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone('utc')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges('0')
+                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+
+      
+              ])
+              + elasticsearch.withHide(false)
+              + elasticsearch.withMetrics([
+                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('remove.elapsed_time')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('6')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max')
+
+              ])
+
+              +elasticsearch.withQuery('test_description.filesize:262144')
+              +elasticsearch.withRefId('K')
+              +elasticsearch.withTimeField('timestamp')
+              
+            ])
+
+            + stateTimeline.withTransformations([
+              stateTimeline.transformation.withId('calculateField')
+                + stateTimeline.transformation.withOptions({
+                "alias": "create 4096 kata/runc",
+                "binary": {
+                  "left": "create: 4096: kata",
+                  "operator": "/",
+                  "reducer": "sum",
+                  "right": "create: 4096: runc"
+                },
+                "mode": "binary",
+                "reduce": {
+                  "reducer": "sum"
+                }
+              }),
+              stateTimeline.transformation.withId('calculateField')
+                + stateTimeline.transformation.withOptions({
+                "alias": "create 262,144 kata/runc",
+                "binary": {
+                  "left": "create: 262,144:  kata",
+                  "operator": "/",
+                  "reducer": "sum",
+                  "right": "create: 262,144:  runc"
+                },
+                "mode": "binary",
+                "reduce": {
+                  "reducer": "sum"
+                }
+              }),
+              stateTimeline.transformation.withId('calculateField')
+                + stateTimeline.transformation.withOptions({
+                "alias": "read 4096 kata/runc",
+                "binary": {
+                  "left": "read : 4096: kata",
+                  "operator": "/",
+                  "reducer": "sum",
+                  "right": "read : 4096: runc"
+                },
+                "mode": "binary",
+                "reduce": {
+                  "reducer": "sum"
+                }
+              }),
+              stateTimeline.transformation.withId('calculateField')
+                + stateTimeline.transformation.withOptions({
+                "alias": "read 262,144  kata/runc",
+                "binary": {
+                  "left": "read : 262,144: kata",
+                  "operator": "/",
+                  "reducer": "sum",
+                  "right": "read : 262,144: runc"
+                },
+                "mode": "binary",
+                "reduce": {
+                  "reducer": "sum"
+                }
+              }),
+              stateTimeline.transformation.withId('calculateField')
+                + stateTimeline.transformation.withOptions({
+                "alias": "remove 4096  kata/runc",
+                "binary": {
+                  "left": "remove : 4096: kata",
+                  "operator": "/",
+                  "reducer": "sum",
+                  "right": "remove : 4096: runc"
+                },
+                "mode": "binary",
+                "reduce": {
+                  "reducer": "sum"
+                }
+              }),
+              stateTimeline.transformation.withId('calculateField')
+                + stateTimeline.transformation.withOptions({
+                "alias": "remove 262,144 kata/runc",
+                "binary": {
+                  "left": "remove : 262,144: kata",
+                  "operator": "/",
+                  "reducer": "sum",
+                  "right": "remove : 262,144: runc"
+                },
+                "mode": "binary",
+                "reduce": {
+                  "reducer": "sum"
+                }
+              }),
+              stateTimeline.transformation.withId('organize')
+                + stateTimeline.transformation.withOptions({
+                "excludeByName": {
+                  "create: 262,144:  clusterbuster-ci": true,
+                  "create: 4096: clusterbuster-ci": true,
+                  "read : 262,144: clusterbuster-ci": true,
+                  "read : 4096: clusterbuster-ci": true,
+                  "remove : 262,144: clusterbuster-ci": true,
+                  "remove : 4096: clusterbuster-ci": true
+                },
+                "indexByName": {
+                  "Time": 0,
+                  "create 262,144 kata/runc": 6,
+                  "create 4096 kata/runc": 3,
+                  "create: 262,144:  kata": 5,
+                  "create: 262,144:  runc": 4,
+                  "create: 4096: kata": 2,
+                  "create: 4096: runc": 1,
+                  "read 262,144  kata/runc": 12,
+                  "read 4096 kata/runc": 9,
+                  "read : 262,144: kata": 11,
+                  "read : 262,144: runc": 10,
+                  "read : 4096: kata": 8,
+                  "read : 4096: runc": 7,
+                  "remove 262,144 kata/runc": 18,
+                  "remove 4096  kata/runc": 15,
+                  "remove : 262,144: kata": 17,
+                  "remove : 262,144: runc": 16,
+                  "remove : 4096: kata": 14,
+                  "remove : 4096: runc": 13
+                },
+                "renameByName": {}
+              }),
+              stateTimeline.transformation.withId('convertFieldType')
+                + stateTimeline.transformation.withOptions({
+                "conversions": [
+                  {
+                    "destinationType": "number",
+                    "targetField": "create 4096 kata/runc"
+                  },
+                  {
+                    "destinationType": "number",
+                    "targetField": "create 262,144 kata/runc"
+                  },
+                  {
+                    "destinationType": "number",
+                    "targetField": "read 4096 kata/runc"
+                  },
+                  {
+                    "destinationType": "number",
+                    "targetField": "read 262,144  kata/runc"
+                  },
+                  {
+                    "destinationType": "number",
+                    "targetField": "remove 4096  kata/runc"
+                  },
+                  {
+                    "destinationType": "number",
+                    "targetField": "remove 262,144 kata/runc"
+                  }
+                ],
+                "fields": {}
+              }),
+              
+
+
+
+
+
+          
+            ]),
+            
+
+
+
+        ]),
+
+
+      ///////////////////////////////
+
 
 
       
@@ -4008,7 +5435,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
       
       
               ])
-
+              
               + elasticsearch.withHide(false)
 
               + elasticsearch.withMetrics([
