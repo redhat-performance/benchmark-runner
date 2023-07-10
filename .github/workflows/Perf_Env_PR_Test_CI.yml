@@ -16,9 +16,15 @@ concurrency:
   cancel-in-progress: false
   
 jobs:
+  approve: # First step
+    runs-on: ubuntu-latest
+    steps:
+      - name: Approve
+        run: echo For security reasons, all pull requests need to be approved first before running any automated CI.
   unittest:
     # run all python versions, in other jobs run the latest python
     name: unittest
+    needs: [approve] # Require the first step to finish
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -90,7 +96,7 @@ jobs:
 
   integration_test:
     name: integration_test
-    needs: [unittest]
+    needs: [approve, unittest]
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -167,7 +173,7 @@ jobs:
 
   e2e:
    name: e2e
-   needs: [unittest, integration_test]
+   needs: [approve, unittest, integration_test]
    runs-on: ubuntu-latest
    strategy:
       matrix:
