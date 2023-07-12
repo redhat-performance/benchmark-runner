@@ -1463,7 +1463,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
               ])
 
-              +elasticsearch.withQuery('!SCALE AND !Run.keyword="fillup" AND kind:$kind AND Run:$vdbench_type AND ocp_version:$ocp_version')
+              +elasticsearch.withQuery("!SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type AND ocp_version:$ocp_version")
               +elasticsearch.withRefId('A')
               +elasticsearch.withTimeField('timestamp'),
 
@@ -1504,7 +1504,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
               ])
 
-              +elasticsearch.withQuery('!SCALE AND !Run.keyword="fillup" AND kind:$kind AND Run:$vdbench_type AND ocp_version:$ocp_version')
+              +elasticsearch.withQuery("!SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type AND ocp_version:$ocp_version")
               +elasticsearch.withRefId('B')
               +elasticsearch.withTimeField('timestamp'),
 
@@ -1543,7 +1543,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
               ])
 
-              +elasticsearch.withQuery('!SCALE AND !Run.keyword="fillup" AND kind:$kind AND Run:$vdbench_type AND ocp_version:$ocp_version')
+              +elasticsearch.withQuery("!SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type AND ocp_version:$ocp_version")
               +elasticsearch.withRefId('C')
               +elasticsearch.withTimeField('timestamp'),
 
@@ -1606,7 +1606,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
               ])
 
-              +elasticsearch.withQuery('SCALE AND !Run.keyword="fillup" AND kind:$kind AND Run:$vdbench_type AND ocp_version:$ocp_version')
+              +elasticsearch.withQuery("!SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type AND ocp_version:$ocp_version")
               +elasticsearch.withRefId('D')
               +elasticsearch.withTimeField('timestamp'),
 
@@ -1647,7 +1647,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
               ])
 
-              +elasticsearch.withQuery('SCALE AND !Run.keyword="fillup" AND kind:$kind AND Run:$vdbench_type AND ocp_version:$ocp_version')
+              +elasticsearch.withQuery("!SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type AND ocp_version:$ocp_version")
               +elasticsearch.withRefId('E')
               +elasticsearch.withTimeField('timestamp'),
 
@@ -1687,7 +1687,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
               ])
 
-              +elasticsearch.withQuery('SCALE AND !Run.keyword="fillup" AND kind:$kind AND Run:$vdbench_type AND ocp_version:$ocp_version')
+              +elasticsearch.withQuery("!SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type AND ocp_version:$ocp_version")
               +elasticsearch.withRefId('F')
               +elasticsearch.withTimeField('timestamp'),
 
@@ -2766,12 +2766,12 @@ g.dashboard.new('PerfCI-Regression-Summary')
               + stateTimeline.link.withUrl('https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=now-45d&to=now&viewPanel=150')
 
             ])
-            + stateTimeline.options.withAlignValue('left')
+            + stateTimeline.options.withAlignValue('center')
             + stateTimeline.options.legend.withDisplayMode('list')
             + stateTimeline.options.legend.withPlacement('bottom')
             + stateTimeline.options.withMergeValues(value = false)
             + stateTimeline.options.withRowHeight(value = 0.9)
-            + stateTimeline.options.withShowValue('auto')
+            + stateTimeline.options.withShowValue('always')
             + stateTimeline.options.tooltip.withMode('single')
 
             + g.panel.stateTimeline.withTargets([
@@ -2801,6 +2801,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
               + elasticsearch.withMetrics([
                 elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('read.iops')
                 + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('6')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.settings.withScript('_value/1000')
                 + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max')
 
               ])
@@ -5173,10 +5174,16 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
             + stateTimeline.fieldConfig.defaults.withDecimals(1)
             + stateTimeline.fieldConfig.defaults.withMappings([
-              stateTimeline.valueMapping.SpecialValueMap.options.result.withColor('transparent')
-              + stateTimeline.valueMapping.SpecialValueMap.options.result.withIndex(0)
-              + stateTimeline.valueMapping.SpecialValueMap.options.result.withText('.')
-              + stateTimeline.valueMapping.SpecialValueMap.withType('value')
+              stateTimeline.valueMapping.ValueMap.withOptions(
+                {	
+                  "0": {	
+                  "color": "transparent",	
+                  "index": 0,	
+                  "text": "."	
+                  }     	
+                }
+              )
+              + stateTimeline.valueMapping.ValueMap.withType('value')
 
             ])
             + stateTimeline.standardOptions.withMax(-1)
@@ -5719,10 +5726,16 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
             + stateTimeline.fieldConfig.defaults.withDecimals(1)
             + stateTimeline.fieldConfig.defaults.withMappings([
-              stateTimeline.valueMapping.SpecialValueMap.options.result.withColor('transparent')
-              + stateTimeline.valueMapping.SpecialValueMap.options.result.withIndex(0)
-              + stateTimeline.valueMapping.SpecialValueMap.options.result.withText('.')
-              + stateTimeline.valueMapping.SpecialValueMap.withType('value')
+              stateTimeline.valueMapping.ValueMap.withOptions(
+                {	
+                  "0": {	
+                  "color": "transparent",	
+                  "index": 0,	
+                  "text": "."	
+                  }     	
+                }
+              )
+              + stateTimeline.valueMapping.ValueMap.withType('value')
 
             ])
             + stateTimeline.standardOptions.withMax(-1)
@@ -7674,17 +7687,17 @@ g.dashboard.new('PerfCI-Regression-Summary')
           ]),
 
     ////////////////////////////////////////////
-                  
+    
 
+
+
+        ])
 
           
 
 
 
 
-        ])
 
-    
-      
 ])
 
