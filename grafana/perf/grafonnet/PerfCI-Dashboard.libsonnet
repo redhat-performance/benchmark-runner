@@ -6,11 +6,55 @@ local var = g.dashboard.variable;
 
 
 g.dashboard.new('PerfCI-Regression-Summary')
++ g.dashboard.time.withFrom('now-45d')
++ g.dashboard.time.withTo('now')
 + g.dashboard.withTimepicker({},)
 + g.dashboard.withTimezone("")
 + g.dashboard.withUid('T4775LKnzzmichey')
 + g.dashboard.withVersion(409)
 + g.dashboard.withWeekStart("")
++ g.dashboard.withLiveNow(false)
+
+
++ g.dashboard.withLinks([
+  g.dashboard.link.link.new('Environment', 'https://docs.google.com/spreadsheets/d/1eSOmyZKJ6f0RIHN0zJNnH-S2YrqrU0oyzp7PNSQvksE/edit#gid=0')
+  + g.dashboard.link.link.options.withAsDropdown(false)
+  + g.dashboard.link.link.withIcon('info')
+  + g.dashboard.link.link.options.withIncludeVars(false)
+  + g.dashboard.link.link.options.withKeepTime(false)
+  + g.dashboard.link.link.options.withTargetBlank(true),
+
+  g.dashboard.link.link.new('Issues', 'https://docs.google.com/spreadsheets/d/1vZtg0Gj8IxKPGLWAkB4iD1O59u_WA4ky5P7gGX6xW3M/edit#gid=0')
+  + g.dashboard.link.link.options.withAsDropdown(false)
+  + g.dashboard.link.link.withIcon('bolt')
+  + g.dashboard.link.link.options.withIncludeVars(false)
+  + g.dashboard.link.link.options.withKeepTime(false)
+  + g.dashboard.link.link.options.withTargetBlank(true),
+
+  g.dashboard.link.link.new('Kibana', 'https://kibana-perf-chmf841sh975bznl3b.ibm.rhperfscale.org')
+  + g.dashboard.link.link.options.withAsDropdown(false)
+  + g.dashboard.link.link.withIcon('cloud')
+  + g.dashboard.link.link.options.withIncludeVars(false)
+  + g.dashboard.link.link.options.withKeepTime(false)
+  + g.dashboard.link.link.options.withTargetBlank(true),
+
+  g.dashboard.link.link.new('Func-Ci', 'https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/1AZC4GxVz/funcci-regression-summary?orgId=1&from=now-45d&to=now')
+  + g.dashboard.link.link.options.withAsDropdown(false)
+  + g.dashboard.link.link.withIcon('dashboard')
+  + g.dashboard.link.link.options.withIncludeVars(false)
+  + g.dashboard.link.link.options.withKeepTime(false)
+  + g.dashboard.link.link.options.withTargetBlank(true),
+
+  g.dashboard.link.link.new('LogsAnalyzer', 'https://jupyterlab-perf-chmf841sh776bznl3b.ibm.rhperfscale.org/lab/tree/templates')
+  + g.dashboard.link.link.options.withAsDropdown(false)
+  + g.dashboard.link.link.withIcon('cloud')
+  + g.dashboard.link.link.withTooltip('LogsAnalyzer')
+  + g.dashboard.link.link.options.withIncludeVars(false)
+  + g.dashboard.link.link.options.withKeepTime(false)
+  + g.dashboard.link.link.options.withTargetBlank(true)
+
+
+])
 
 
 //////////////////////////////////////////////////////
@@ -7687,15 +7731,15 @@ g.dashboard.new('PerfCI-Regression-Summary')
           ]),
 
     ////////////////////////////////////////////
-    
+                  
+  
+
 
 
 
         ])
 
           
-
-
 
 
 
