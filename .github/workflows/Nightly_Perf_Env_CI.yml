@@ -175,7 +175,7 @@ jobs:
         WORKER_DISK_IDS: ${{ secrets.PERF_WORKER_DISK_IDS }}
         TIMEOUT: 8000
         SCALE: 2
-        BOOTSTROM_SCALE: 100
+        BOOTSTORM_SCALE: 80
         WINDOWS_SCALE: 40
         THREADS_LIMIT: 20
         RUN_TYPE: 'perf_ci'
@@ -192,7 +192,7 @@ jobs:
             # bootstorm_vm_scale: no need redis for synchronization but need SCALE and THREADS_LIMIT
             if [[ '${{ matrix.workload }}' == 'bootstorm_vm_scale' ]]
             then
-              SCALE=$BOOTSTROM_SCALE
+              SCALE=$BOOTSTORM_SCALE
             elif [[ '${{ matrix.workload }}' == 'windows_vm_scale' ]]
             then
               SCALE=$WINDOWS_SCALE
