@@ -2,7 +2,7 @@ attrs==21.4.0
 azure==4.0.0
 boto3==1.26.1
 botocore==1.29.1
-cryptography==41.0.0
+cryptography==41.0.2
 elasticsearch==7.16.1
 elasticsearch_dsl==7.4.0
 ipywidgets==8.0.6
