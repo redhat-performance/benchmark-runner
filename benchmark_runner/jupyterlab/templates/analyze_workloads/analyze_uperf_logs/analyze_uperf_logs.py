@@ -1,26 +1,25 @@
-import csv
+
 import os
 import pandas as pd
-
-# display df
-from IPython.display import display
+from typeguard import typechecked
 
 # display bokeh
 from bokeh.plotting import figure, show
 from bokeh.io import output_notebook, output_file
-from bokeh.models import HoverTool, NumeralTickFormatter
+from bokeh.models import HoverTool, Label, ColumnDataSource, LabelSet, Circle, NumeralTickFormatter
 
-from typeguard import typechecked
 
 from benchmark_runner.jupyterlab.templates.logs_operations.logs_operations import LogsOperations
+from benchmark_runner.jupyterlab.templates.analyze_workloads.visualize_workload_operations import VisualizeWorkloadOperations
 
 
-class AnalyzeUperfLogs:
+class AnalyzeUperfLogs(VisualizeWorkloadOperations):
     """
     This class analyzes Uperf logs
     """
 
     def __init__(self, s3_logs_url: str):
+        super().__init__()
         self.__workload = 'uperf'
         self.s3_logs_url = s3_logs_url
         self.__logs_operations = LogsOperations(s3_logs_url=self.s3_logs_url)
@@ -30,7 +29,7 @@ class AnalyzeUperfLogs:
         This method returns uperf log file
         @return: uperf log file
         """
-        workload_dir = self.__logs_operations.get_workload_dir(workload=self.__workload)
+        workload_dir = self.__logs_operations.get_workload_dir()
         workload_files_names = [file for file in os.listdir(workload_dir) if
                                 file.startswith(f'{self.__workload}-client')]
         workload_log_file = os.path.join(workload_dir, workload_files_names[0])
@@ -85,16 +84,15 @@ class AnalyzeUperfLogs:
         df['Metric'] = df.index.tolist()
 
         # Create a Bokeh figure
-        p = figure(x_range=df['Metric'].tolist(), width=300, title=workload_log_file.split('/')[-1], y_axis_label='Value')
+        p = figure(x_range=df['Metric'].tolist(), width=VisualizeWorkloadOperations.WIDTH, title=workload_log_file.split('/')[-1], y_axis_label='Value')
 
         # Add vertical bars to the figure
         bars = p.vbar(x=df['Metric'], top=df['Value'], width=0.5)
 
         # Add labels to the bars
         labels = [f"{val:.2f}" for val in df['Value']]
-        p.text(x=df['Metric'], y=df['Value'], text=labels, text_baseline="top", text_align="center",
-               text_font_size='10pt', text_color='white')
-        # p.text(x=df['Metric'], y=df['Value'], text=labels, text_baseline='top', text_align='center', text_font_size='10pt')
+        p.text(x=df['Metric'], y=df['Value'], text=labels, text_baseline="bottom", text_align="center",
+               text_font_size='10pt', text_color='black')
 
         # Add hover tool with tooltips
         hover = HoverTool(tooltips=[('Metric', '@x'), ('Value', '@top{0.00}')], renderers=[bars])
@@ -105,3 +103,18 @@ class AnalyzeUperfLogs:
 
         # Display the graph
         show(p)
+
+    def compare_results(self, result1: dict, result2: dict, legend_label1: str, legend_label2: str, block_size: str):
+        """
+        This method compare between 2 uperf results
+        @param result1:
+        @param result2:
+        @param legend_label1:
+        @param legend_label2:
+        @param block_size: 64, 1024, 8192
+        @return:
+        """
+        self.compare_run_results(result1=result1, result2=result2, legend_label1=legend_label1,
+                                                         legend_label2=legend_label2,
+                                                         title=f'Uperf block size {block_size}',
+                                                         x_axis_label='Metric', y_axis_label='Rate')

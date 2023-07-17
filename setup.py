@@ -4,7 +4,7 @@ from os import path
 from setuptools import setup, find_packages
 
 
-__version__ = '1.0.491'
+__version__ = '1.0.499'
 
 
 here = path.abspath(path.dirname(__file__))
@@ -45,7 +45,7 @@ setup(
         'azure==4.0.0',
         'boto3==1.26.1',  # s3
         'botocore==1.29.1',  # s3
-        'cryptography==41.0.0',  # for paramiko
+        'cryptography==41.0.2',  # for paramiko
         'elasticsearch==7.16.1',
         'elasticsearch_dsl==7.4.0',  # for deep search
         'ipywidgets==8.0.6',  # for jupyterlab widgets

@@ -27,9 +27,9 @@ class LogsOperations:
         if not s3_logs_url:
             raise ValueError("s3_logs_url is empty")
         self.s3_logs_url = s3_logs_url
-        self.logs_dir = os.path.join(os.path.join(os.getcwd(), 'logs'))
         self.filename = self.s3_logs_url.split('/')[-1]
-        self.log_dir_path = os.path.join(self.logs_dir, self.filename)
+        self.logs_dir = os.path.join(os.getcwd(), 'logs')
+        self.log_dir_filename = os.path.join(self.logs_dir, self.filename)
 
     def cleanup(self):
         """
@@ -78,15 +78,13 @@ class LogsOperations:
         This method untars and sets the chmod for logs directory, and returns the path to the logs directory
         @return:
         """
-        logger.info(f'untar download file {self.log_dir_path}')
-        os.system(f"tar -xvf {self.log_dir_path} -C {self.logs_dir}")
+        logger.info(f'untar download file {self.log_dir_filename}')
+        os.system(f"tar -xvf {self.log_dir_filename} -C {self.logs_dir}")
 
-    @typechecked
-    def get_workload_dir(self, workload: str):
+    def get_workload_dir(self):
         """
-        This method return workload directory
-        @param workload:
+        This method returns workload directory
         @return:
         """
-        workload__directory = [folder for folder in os.listdir(self.logs_dir) if folder.startswith(workload) and not '.tar.gz' in folder]
+        workload__directory = [folder for folder in os.listdir(self.logs_dir) if folder.startswith(self.filename.replace('.tar.gz','')) and not '.tar.gz' in folder]
         return os.path.join(self.logs_dir, workload__directory[0])

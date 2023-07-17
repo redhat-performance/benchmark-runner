@@ -6,6 +6,7 @@ name: Perf Env PR Test CI
 
 on:
   pull_request_target:
+    types: [labeled, synchronize]
     branches: [ main ]
   workflow_dispatch:
 
@@ -15,13 +16,21 @@ concurrency:
   cancel-in-progress: false
   
 jobs:
+  approve: # First step
+    runs-on: ubuntu-latest
+    steps:
+      - name: Approve
+        run: echo For security reasons, all pull requests need to be approved first before running any automated CI.
   unittest:
     # run all python versions, in other jobs run the latest python
     name: unittest
+    needs: [approve] # Require the first step to finish
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: [ '3.7', '3.8', '3.9', '3.10' ]
+    # minimize potential vulnerabilities
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'ok-to-test') }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -87,7 +96,7 @@ jobs:
 
   integration_test:
     name: integration_test
-    needs: [unittest]
+    needs: [approve, unittest]
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -164,7 +173,7 @@ jobs:
 
   e2e:
    name: e2e
-   needs: [unittest, integration_test]
+   needs: [approve, unittest, integration_test]
    runs-on: ubuntu-latest
    strategy:
       matrix:

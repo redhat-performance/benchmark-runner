@@ -7,4 +7,4 @@ moto==2.2.16
 pandas
 pytest
 PyYAML==6.0
-typeguard
+typeguard==2.12.1
