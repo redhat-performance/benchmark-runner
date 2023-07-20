@@ -12,7 +12,8 @@ ENV VIRTCTL_VERSION="$VIRTCTL_VERSION"
 
 # Install system dependencies
 RUN dnf update -y && \
-    dnf install -y wget podman curl python3 python3-pip python3-devel nodejs npm && \
+    # jq required by benchmark-runner for parser
+    dnf install -y wget podman curl python3 python3-pip python3-devel nodejs npm jq && \
     dnf clean all && \
     rm -rf /var/cache/dnf && \
     pip3 install --no-cache-dir jupyterlab=="$JUPYTERLAB_VERSION" benchmark-runner bokeh && \
