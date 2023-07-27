@@ -192,9 +192,12 @@ jobs:
             # bootstorm_vm_scale: no need redis for synchronization but need SCALE and THREADS_LIMIT
             if [[ '${{ matrix.workload }}' == 'bootstorm_vm_scale' ]]
             then
+              # Warm-up: Pull the Fedora image from quay.io for each node
+              ssh -t provision "podman run --rm -t -e WORKLOAD='$workload' -e KUBEADMIN_PASSWORD='$KUBEADMIN_PASSWORD' -e SCALE='$SCALE' -e SCALE_NODES=$SCALE_NODES -e REDIS='$REDIS' -e RUN_ARTIFACTS_URL='$RUN_ARTIFACTS_URL' -e BUILD_VERSION='$build_version' -e RUN_TYPE='$RUN_TYPE' -e KATA_CPUOFFLINE_WORKAROUND='True' -e SAVE_ARTIFACTS_LOCAL='False' -e ENABLE_PROMETHEUS_SNAPSHOT='$ENABLE_PROMETHEUS_SNAPSHOT' -e THREADS_LIMIT='$THREADS_LIMIT' -e WINDOWS_URL='$WINDOWS_URL' -e TIMEOUT='$TIMEOUT' -e log_level='INFO' -v '$CONTAINER_KUBECONFIG_PATH':'$CONTAINER_KUBECONFIG_PATH' --privileged 'quay.io/ebattat/benchmark-runner:latest'"
               SCALE=$BOOTSTORM_SCALE
             elif [[ '${{ matrix.workload }}' == 'windows_vm_scale' ]]
             then
+              # Warm-up is not required because the DV is loaded before running the test
               SCALE=$WINDOWS_SCALE
             fi
             workload=$(awk -F_ '{print $1"_"$2}' <<< '${{ matrix.workload }}')
