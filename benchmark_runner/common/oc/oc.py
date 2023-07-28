@@ -44,7 +44,7 @@ class OC(SSH):
         This method return ocp server version
         :return:
         """
-        return self.run(f"{self.__cli} version -ojson | jq -r '.openshiftVersion'")
+        return self.run(f"{self.__cli} get clusterversion version -o jsonpath='{{.status.desired.version}}'")
 
     def get_cnv_version(self):
         """
