@@ -34,6 +34,8 @@ class OC(SSH):
         self.__environment_variables_dict = environment_variables.environment_variables_dict
         self._run_artifacts = self.__environment_variables_dict.get('run_artifacts_path', '')
         self.__elasticsearch_url = self.__environment_variables_dict.get('elasticsearch_url', '')
+        self.__kata_channel = self.__environment_variables_dict.get('kata_channel', '')
+        self.__kata_csv = self.__environment_variables_dict.get('kata_csv', '')
         self.__cli = self.__environment_variables_dict.get('cli', '')
         self.__worker_disk_ids = self.__environment_variables_dict.get('worker_disk_ids', '')
         if self.__worker_disk_ids:
@@ -169,9 +171,15 @@ class OC(SSH):
         """
         Populate any additional variables needed for setup templates
         """
-        env['kata_csv'] = self._get_kata_csv()
+        if self.__kata_channel:  # custom kata version
+            env['kata_channel'] = self.__kata_channel
+        else:  # latest kata version
+            env['kata_channel'] = self._get_kata_channel()
+        if self.__kata_csv:  # custom kata version
+            env['kata_csv'] = self.__kata_csv
+        else:  # latest kata version
+            env['kata_csv'] = self._get_kata_csv()
         env['kata_catalog_source'] = self._get_kata_catalog_source()
-        env['kata_channel'] = self._get_kata_channel()
         env['kata_namespace'] = self._get_kata_namespace()
 
     def is_cnv_installed(self):

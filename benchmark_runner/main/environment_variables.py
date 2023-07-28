@@ -212,6 +212,9 @@ class EnvironmentVariables:
         self._environment_variables_dict['quay_password'] = EnvironmentVariables.get_env('QUAY_PASSWORD', '')
         # odf version
         self._environment_variables_dict['odf_version'] = EnvironmentVariables.get_env('ODF_VERSION', '')
+        # custom kata version, if empty fetch auto latest version
+        self._environment_variables_dict['kata_channel'] = EnvironmentVariables.get_env('KATA_CHANNEL', '')
+        self._environment_variables_dict['kata_csv'] = EnvironmentVariables.get_env('KATA_CSV', '')
         # number of odf disk for discovery
         self._environment_variables_dict['num_odf_disk'] = EnvironmentVariables.get_env('NUM_ODF_DISK', 4)
         self._environment_variables_dict['worker_disk_ids'] = EnvironmentVariables.get_env('WORKER_DISK_IDS', "")
