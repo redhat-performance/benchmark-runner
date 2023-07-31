@@ -80,7 +80,7 @@ jobs:
           CNV_VERSION: "4.13"
           ODF_VERSION: "4.12"
           NUM_ODF_DISK : "4"
-          KATA_CSV: "sandboxed-containers-operator.v1.4.0"
+          KATA_CSV: ""
           QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
           QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
           IBM_API_KEY: ${{ secrets.IBM_API_KEY }}
@@ -125,7 +125,7 @@ jobs:
           CNV_VERSION: "4.13"
           ODF_VERSION: "4.12"
           NUM_ODF_DISK: "4"
-          KATA_CSV: "sandboxed-containers-operator.v1.4.0"
+          KATA_CSV: ""
           QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
           QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
           IBM_API_KEY: ${{ secrets.IBM_API_KEY }}
