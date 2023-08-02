@@ -55,7 +55,10 @@ class CreateKata(CreateOCPResourceOperations):
                 self.wait_for_ocp_resource_create(resource='kata',
                                                   verify_cmd='if oc get crd kataconfigs.kataconfiguration.openshift.io >/dev/null 2>&1 ; then echo succeeded ; fi',
                                                   status='succeeded')
-            elif '02_config.yaml' == resource:
+            elif '02_operator_141_patch.sh' == resource:
+                self.__oc.run(
+                    cmd=f'chmod +x {os.path.join(self.__path, resource)}; {os.path.join(self.__path, resource)}')
+            elif '03_config.yaml' == resource:
                 # This one's tricky.  The problem is that it appears
                 # that the kataconfigs CRD can exist, but attempting
                 # to apply it doesn't "take" unless some other things
@@ -71,6 +74,6 @@ class CreateKata(CreateOCPResourceOperations):
                 completed_nodes_count = self.__oc.run(cmd="oc get kataconfig -ojsonpath='{.items[0].status.installationStatus.completed.completedNodesCount}'")
                 if total_nodes_count != completed_nodes_count:
                     raise KataInstallationFailed(f'not all nodes installed successfully total {total_nodes_count} != completed {completed_nodes_count}')
-            elif resource.endswith('.sh'):
+            elif '04_ocp48_patch.sh' == resource:
                 self.__oc.run(cmd=f'chmod +x {os.path.join(self.__path, resource)}; {os.path.join(self.__path, resource)}')
         return True
