@@ -12,7 +12,7 @@ from benchmark_runner.common.virtctl.virtctl import Virtctl
 from benchmark_runner.common.template_operations.template_operations import TemplateOperations
 from benchmark_runner.common.elasticsearch.elasticsearch_operations import ElasticSearchOperations
 from benchmark_runner.common.ssh.ssh import SSH
-from benchmark_runner.benchmark_operator.benchmark_operator_exceptions import ODFNonInstalled, EmptyLSOPath
+from benchmark_runner.benchmark_operator.benchmark_operator_exceptions import ODFNotInstalled, CNVNotInstalled, KataNotInstalled, EmptyLSOPath
 from benchmark_runner.main.environment_variables import environment_variables
 from benchmark_runner.common.clouds.shared.s3.s3_operations import S3Operations
 from benchmark_runner.common.prometheus.prometheus_snapshot import PrometheusSnapshot
@@ -21,7 +21,7 @@ from benchmark_runner.common.prometheus.prometheus_snapshot_exceptions import Pr
 
 class BenchmarkOperatorWorkloadsOperations:
     """
-    This class contains all the custom_workloads
+    This class contains benchmark-operator workload operations
     """
     def __init__(self):
         # environment variables
@@ -82,7 +82,7 @@ class BenchmarkOperatorWorkloadsOperations:
 
     def set_login(self, kubeadmin_password: str = ''):
         """
-        This method set oc login
+        This method sets oc login
         :param kubeadmin_password:
         :return:
         """
@@ -93,7 +93,7 @@ class BenchmarkOperatorWorkloadsOperations:
     @logger_time_stamp
     def update_node_selector(self, runner_path: str = environment_variables.environment_variables_dict['runner_path'], yaml_path: str = '', pin_node: str = ''):
         """
-        This method update node selector in yaml
+        This method updates node selector in yaml
         @return:
         """
         data = []
@@ -118,7 +118,7 @@ class BenchmarkOperatorWorkloadsOperations:
     @logger_time_stamp
     def make_deploy_benchmark_controller_manager(self, runner_path: str = environment_variables.environment_variables_dict['runner_path']):
         """
-        This method make deploy benchmark operator
+        This method deploys the benchmark operator
         :return:
         """
         benchmark_operator_path = 'benchmark-operator'
@@ -135,7 +135,7 @@ class BenchmarkOperatorWorkloadsOperations:
     @logger_time_stamp
     def make_undeploy_benchmark_controller_manager(self, runner_path: str = environment_variables.environment_variables_dict['runner_path']):
         """
-        This method make undeploy benchmark operator
+       This method removes a benchmark-operator deployment
         :return:
         """
         benchmark_operator_path = 'benchmark-operator'
@@ -148,7 +148,7 @@ class BenchmarkOperatorWorkloadsOperations:
     @logger_time_stamp
     def make_undeploy_benchmark_controller_manager_if_exist(self, runner_path: str = environment_variables.environment_variables_dict['runner_path']):
         """
-        This method make undeploy benchmark controller manager if exist
+        This method undeploys benchmark controller manager, if it exists
         @return:
         """
         # delete benchmark-operator pod if exist
@@ -159,14 +159,14 @@ class BenchmarkOperatorWorkloadsOperations:
     @logger_time_stamp
     def login(self):
         """
-        This method login to the cluster
+        This method logs in to the cluster
         """
         self._oc.login()
 
     @logger_time_stamp
     def tear_down_pod_after_error(self, yaml: str, pod_name: str):
         """
-        This method tear down pod in case of error
+        This method tears down pod in case of error
         @param yaml:
         @param pod_name:
         @return:
@@ -178,7 +178,7 @@ class BenchmarkOperatorWorkloadsOperations:
     @logger_time_stamp
     def tear_down_vm_after_error(self, yaml: str, vm_name: str):
         """
-        This method tear down vm in case of error
+        This method tears down vm in case of error
         @param yaml:
         @param vm_name:
         """
@@ -189,7 +189,7 @@ class BenchmarkOperatorWorkloadsOperations:
     @logger_time_stamp
     def system_metrics_collector(self, workload: str, es_fetch_min_time: int = None):
         """
-        This method run system metrics collector
+        This method runs system metrics collector
         @param workload: the workload
         @param es_fetch_min_time:
         :return:
@@ -211,8 +211,8 @@ class BenchmarkOperatorWorkloadsOperations:
 
     def __get_metadata(self, kind: str = None, database: str = None, status: str = None, run_artifacts_url: str = None, uuid: str = None) -> dict:
         """
-        This method return metadata kind and database argument are optional
-        @param kind: optional: pod, vm, or kata
+        This method returns metadata for a run, optionally filtered by runtime kind and database
+        @param kind: optionally: pod, vm, or kata
         @param database: optional:mssql, postgres or mariadb
         @param status:
         @param run_artifacts_url:
@@ -255,7 +255,7 @@ class BenchmarkOperatorWorkloadsOperations:
     @logger_time_stamp
     def _update_elasticsearch_index(self, index: str, id: str, kind: str, status: str, run_artifacts_url: str, database: str = ''):
         """
-        This method update elasticsearch id
+        This method updates elasticsearch id
         :param index:
         :param id:
         :param kind:
@@ -268,7 +268,7 @@ class BenchmarkOperatorWorkloadsOperations:
 
     def _upload_to_elasticsearch(self, index: str, kind: str, status: str, run_artifacts_url: str, database: str = '', uuid: str = ''):
         """
-        This method upload to elasticsearch
+        This method uploads data to elasticsearch
         :param index:
         :param kind:
         :param status:
@@ -280,7 +280,7 @@ class BenchmarkOperatorWorkloadsOperations:
 
     def _verify_elasticsearch_data_uploaded(self, index: str, uuid: str, workload: str = '', fast_check: bool = False, timeout: int = None, es_fetch_min_time: int = None):
         """
-        This method verify that elasticsearch data uploaded
+        This method verifies that elasticsearch data uploaded
         :param index:
         :param uuid:
         :param workload:
@@ -295,7 +295,7 @@ class BenchmarkOperatorWorkloadsOperations:
 
     def _upload_workload_to_elasticsearch(self, index: str, kind: str, status: str, result: dict = None):
         """
-        This method upload to elasticsearch
+        This method uploads to elasticsearch
         :param index:
         :param kind:
         :param status:
@@ -306,7 +306,7 @@ class BenchmarkOperatorWorkloadsOperations:
 
     def _verify_elasticsearch_workload_data_uploaded(self, index: str, uuid: str):
         """
-        This method verify that elasticsearch data uploaded
+        This method verifies that elasticsearch data was uploaded
         :param index:
         :param uuid:
         :return:
@@ -315,7 +315,7 @@ class BenchmarkOperatorWorkloadsOperations:
 
     def _create_vm_log(self, labels: list) -> str:
         """
-        This method set vm log per workload
+        This method sets vm log per workload
         :param labels: list of labels
         :return: vm_name
         """
@@ -327,7 +327,7 @@ class BenchmarkOperatorWorkloadsOperations:
 
     def _create_pod_log(self, label: str = '', database: str = '') -> str:
         """
-        This method create pod log per workload
+        This method creates pod log per workload
         :param label:pod label
         :param database:
         :return:
@@ -340,7 +340,7 @@ class BenchmarkOperatorWorkloadsOperations:
 
     def _get_run_artifacts_hierarchy(self, workload_name: str = '', is_file: bool = False):
         """
-        This method return log hierarchy
+        This method returns log hierarchy
         :param workload_name: workload name
         :param is_file: is file name
         :return:
@@ -358,7 +358,7 @@ class BenchmarkOperatorWorkloadsOperations:
 
     def _create_run_artifacts(self, workload: str = '', database: str = '', labels: list = [], pod: bool = True):
         """
-        This method create pod logs of benchmark-controller-manager, system-metrics and workload pod
+        This method creates pod logs of benchmark-controller-manager, system-metrics and workload pod
         :param workload: workload name
         :param database: database name
         :param pod: False in case of vm
@@ -383,7 +383,7 @@ class BenchmarkOperatorWorkloadsOperations:
 
     def __make_run_artifacts_tarfile(self, workload: str):
         """
-        This method tar.gz log path and return the tar.gz path
+        This method compresses the log file and returns the compressed path
         :return:
         """
         tar_run_artifacts_path = f"{self._run_artifacts_path}.tar.gz"
@@ -394,7 +394,7 @@ class BenchmarkOperatorWorkloadsOperations:
     @logger_time_stamp
     def delete_local_artifacts(self):
         """
-        This method delete local artifacts
+        This method deletes local artifacts
         :return:
         """
         workload = self._workload_name
@@ -428,7 +428,7 @@ class BenchmarkOperatorWorkloadsOperations:
     @logger_time_stamp
     def start_prometheus(self):
         """
-        This method start collection of Prometheus snapshot
+        This method starts collection of Prometheus snapshot
         :return:
         """
         if self._enable_prometheus_snapshot:
@@ -442,7 +442,7 @@ class BenchmarkOperatorWorkloadsOperations:
     @logger_time_stamp
     def end_prometheus(self):
         """
-        This method retrieve the Prometheus snapshot
+        This method retrieves the Prometheus snapshot
         :return:
         """
         if self._enable_prometheus_snapshot:
@@ -454,20 +454,20 @@ class BenchmarkOperatorWorkloadsOperations:
                 raise err
 
     @logger_time_stamp
-    def odf_pvc_verification(self):
+    def odf_workload_verification(self):
         """
-        This method verified if odf or pvc is required for workload, raise error in case of missing odf
+        This method verifies whether the ODF operator is installed for ODF workloads and raises an error if it is missing.
         :return:
         """
         workload_name = self._workload.split('_')
         if workload_name[0] in self._workloads_odf_pvc:
             if not self._oc.is_odf_installed():
-                raise ODFNonInstalled()
+                raise ODFNotInstalled(workload=self._workload)
 
     @logger_time_stamp
     def verify_lso(self):
         """
-        This method Verifies that lso path exist
+        This method verifies that lso path exist
         :return:
         """
         if not self._lso_disk_id:
@@ -476,7 +476,7 @@ class BenchmarkOperatorWorkloadsOperations:
     @logger_time_stamp
     def delete_all(self):
         """
-        This method delete all pod or unbound pv in namespace
+        This method deletes all pod or unbound pv in namespace
         :return:
         """
         # make undeploy benchmark controller manager if exist
@@ -490,7 +490,7 @@ class BenchmarkOperatorWorkloadsOperations:
     @logger_time_stamp
     def clear_nodes_cache(self):
         """
-        This method clear nodes cache
+        This method clears nodes cache
         """
         self._oc.clear_node_caches()
 
@@ -499,10 +499,16 @@ class BenchmarkOperatorWorkloadsOperations:
         This method includes all the initialization of workload
         :return:
         """
+        # Verify that CNV operator in installed for CNV workloads
+        if '_vm' in self._workload and not self._oc.is_cnv_installed():
+            raise CNVNotInstalled(workload=self._workload)
+        # Verify that Kata operator in installed for kata workloads
+        if '_kata' in self._workload and not self._oc.is_kata_installed():
+            raise KataNotInstalled(workload=self._workload)
         self.delete_all()
         self.clear_nodes_cache()
         if self._odf_pvc:
-            self.odf_pvc_verification()
+            self.odf_workload_verification()
         if 'lso' in self._workload:
             self.verify_lso()
         # make deploy benchmark controller manager

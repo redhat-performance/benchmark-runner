@@ -9,11 +9,11 @@ from benchmark_runner.benchmark_operator.benchmark_operator_workloads_operations
 
 class UperfVM(BenchmarkOperatorWorkloadsOperations):
     """
-    This class for uperf vm workload
+    This class runs uperf vm workload
     """
     def __init__(self):
         """
-        All inherit from WorkloadsOperations
+        All inherit from BenchmarkOperatorWorkloadsOperations
         """
         super().__init__()
         self.__name = ''
@@ -25,7 +25,7 @@ class UperfVM(BenchmarkOperatorWorkloadsOperations):
     @logger_time_stamp
     def run(self):
         """
-        This method run uperf vm workload
+        This method runs uperf vm workload
         :return:
         """
         try:

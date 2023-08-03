@@ -11,7 +11,7 @@ from benchmark_runner.common.prometheus.prometheus_metrics_operations import Pro
 
 class VdbenchVM(WorkloadsOperations):
     """
-    This class run vdbench vm
+    This class runs vdbench vm
     """
     START_STAMP = '@@~@@START-WORKLOAD@@~@@'
     END_STAMP = '@@~@@END-WORKLOAD@@~@@'
@@ -31,14 +31,14 @@ class VdbenchVM(WorkloadsOperations):
 
     def __create_vm_scale(self, vm_num: str):
         """
-        This method create vm in parallel
+        This method creates vm in parallel
         """
         self._oc.create_async(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}_{vm_num}.yaml'))
         self._oc.wait_for_vm_create(vm_name=f'{self.__vm_name}-{vm_num}')
 
     def __run_vm_scale(self, vm_num: str):
         """
-        This method run vm in parallel
+        This method runs vm in parallel
         """
         self._oc.wait_for_ready(label=f'app=vdbench-{self._trunc_uuid}-{vm_num}', run_type='vm', label_uuid=False)
         # Create vm log should be direct after vm is ready
@@ -63,7 +63,7 @@ class VdbenchVM(WorkloadsOperations):
 
     def __delete_vm_scale(self, vm_num: str):
         """
-        This method delete vm in parallel
+        This method deletes vm in parallel
         """
         self._oc.delete_async(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}_{vm_num}.yaml'))
 

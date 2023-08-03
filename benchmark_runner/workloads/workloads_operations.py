@@ -8,7 +8,7 @@ import shutil
 from csv import DictReader
 
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp
-from benchmark_runner.workloads.workloads_exceptions import ODFNonInstalled, MissingScaleNodes, MissingRedis
+from benchmark_runner.workloads.workloads_exceptions import ODFNotInstalled, CNVNotInstalled, KataNotInstalled, MissingScaleNodes, MissingRedis
 from benchmark_runner.common.oc.oc import OC
 from benchmark_runner.common.virtctl.virtctl import Virtctl
 from benchmark_runner.common.elasticsearch.elasticsearch_operations import ElasticSearchOperations
@@ -26,7 +26,7 @@ class WorkloadsOperations:
     REPEAT_TIMES = 3
     SLEEP_TIME = 3
     """
-    This class run workloads
+    This class contains workloads operations
     """
     def __init__(self):
         # environment variables
@@ -85,8 +85,8 @@ class WorkloadsOperations:
                                                            timeout=self._timeout)
         # Generate templates class
         self._template = TemplateOperations(workload=self._workload)
-        # set oc login
 
+        # set oc login
         if WorkloadsOperations.oc is None:
             WorkloadsOperations.oc = self.set_login(kubeadmin_password=self._kubeadmin_password)
         self._oc = WorkloadsOperations.oc
@@ -109,7 +109,7 @@ class WorkloadsOperations:
 
     def set_login(self, kubeadmin_password: str = ''):
         """
-        This method set oc login
+        This method sets login
         :param kubeadmin_password:
         :return: oc instance
         """
@@ -120,7 +120,7 @@ class WorkloadsOperations:
     @logger_time_stamp
     def delete_all(self):
         """
-        This method delete all resources in namespace
+        This method deletes all resources in namespace
         :return:
         """
         self._oc.delete_namespace()
@@ -128,7 +128,7 @@ class WorkloadsOperations:
     @logger_time_stamp
     def start_prometheus(self):
         """
-        This method start collection of Prometheus snapshot
+        This method starts collection of Prometheus snapshot
         :return:
         """
         if self._enable_prometheus_snapshot:
@@ -142,7 +142,7 @@ class WorkloadsOperations:
     @logger_time_stamp
     def end_prometheus(self):
         """
-        This method retrieve the Prometheus snapshot
+        This method retrieves the Prometheus snapshot
         :return:
         """
         if self._enable_prometheus_snapshot:
@@ -154,19 +154,19 @@ class WorkloadsOperations:
                 raise err
 
     @logger_time_stamp
-    def odf_pvc_verification(self):
+    def odf_workload_verification(self):
         """
-        This method verified if odf or pvc is required for workload, raise error in case of missing odf
+        This method verifies whether the ODF operator is installed for ODF workloads and raises an error if it is missing.
         :return:
         """
         workload_name = self._workload.split('_')
         if workload_name[0] in self._workloads_odf_pvc:
             if not self._oc.is_odf_installed():
-                raise ODFNonInstalled()
+                raise ODFNotInstalled(workload=self._workload)
 
     def _create_vm_log(self, labels: list) -> str:
         """
-        This method set vm log per workload
+        This method sets vm log per workload
         :param labels: list of labels
         :return: vm_name
         """
@@ -178,7 +178,7 @@ class WorkloadsOperations:
 
     def _create_pod_log(self, pod: str = '', log_type: str = ''):
         """
-        This method create pod log per workload
+        This method creates pod log per workload
         :param pod: pod name
         :return: save_pod_log file
         """
@@ -187,7 +187,7 @@ class WorkloadsOperations:
 
     def _get_run_artifacts_hierarchy(self, workload_name: str = '', is_file: bool = False):
         """
-        This method return log hierarchy
+        This method returns log hierarchy
         :param workload_name: workload name
         :param is_file: is file name
         :return:
@@ -206,7 +206,7 @@ class WorkloadsOperations:
     @staticmethod
     def __is_float(value) -> bool:
         """
-        This method check if value is float
+        This method checks if value is float
         :param value:
         :return:
         """
@@ -218,7 +218,7 @@ class WorkloadsOperations:
 
     def _create_scale_logs(self):
         """
-        The method create scale logs
+        The method creates scale logs
         :return:
         """
         self._create_pod_log(pod='state-signals-exporter', log_type='.log')
@@ -226,7 +226,7 @@ class WorkloadsOperations:
 
     def _create_pod_run_artifacts(self, pod_name: str, log_type: str):
         """
-        This method create pod run artifacts
+        This method creates pod run artifacts
         :param pod_name: pod name
         :param log_type: log type extension
         :return: run results list of dicts
@@ -251,7 +251,7 @@ class WorkloadsOperations:
 
     def _create_vm_run_artifacts(self, vm_name: str, start_stamp: str, end_stamp: str, log_type: str):
         """
-        This method create vm run artifacts
+        This method creates vm run artifacts
         :param vm_name: vm name
         :param start_stamp: start stamp
         :param end_stamp: end stamp
@@ -288,7 +288,7 @@ class WorkloadsOperations:
 
     def __make_run_artifacts_tarfile(self, workload: str):
         """
-        This method tar.gz log path and return the tar.gz path
+        This method compresses the log file and returns the compressed path
         :return:
         """
         tar_run_artifacts_path = f"{self._run_artifacts_path}.tar.gz"
@@ -300,7 +300,7 @@ class WorkloadsOperations:
     @logger_time_stamp
     def delete_local_artifacts(self):
         """
-        This method delete local artifacts
+        This method deletes local artifacts
         :return:
         """
         workload = self._workload.replace('_', '-')
@@ -334,8 +334,8 @@ class WorkloadsOperations:
 
     def __get_metadata(self, kind: str = None, status: str = None, result: dict = None) -> dict:
         """
-        This method return metadata kind and database argument are optional
-        @param kind: optional: pod, vm, or kata
+        This method returns metadata for a run, optionally updates by runtime kind
+        @param kind: optionally: pod, vm, or kata
         @param status:
         @param result:
         :return:
@@ -371,7 +371,7 @@ class WorkloadsOperations:
 
     def _upload_to_elasticsearch(self, index: str, kind: str, status: str, result: dict = None):
         """
-        This method upload to elasticsearch
+        This method uploads results to elasticsearch
         :param index:
         :param kind:
         :param status:
@@ -382,7 +382,7 @@ class WorkloadsOperations:
 
     def _verify_elasticsearch_data_uploaded(self, index: str, uuid: str):
         """
-        This method verify that elasticsearch data uploaded
+        This method verifies that elasticsearch data was uploaded
         :param index:
         :param uuid:
         :return:
@@ -392,7 +392,7 @@ class WorkloadsOperations:
     @logger_time_stamp
     def update_ci_status(self, status: str, ci_minutes_time: int, benchmark_runner_id: str, benchmark_operator_id: str, benchmark_wrapper_id: str, ocp_install_minutes_time: int = 0, ocp_resource_install_minutes_time: int = 0):
         """
-        This method update ci status Pass/Failed
+        This method updates ci status Pass/Failed
         :param status: Pass/Failed
         :param ci_minutes_time: ci time in minutes
         :param benchmark_runner_id: benchmark_runner last repository commit id
@@ -430,7 +430,7 @@ class WorkloadsOperations:
     @logger_time_stamp
     def parse_prometheus_metrics(data):
         """
-        This method parse prometheus metrics and return summary result
+        This method parses prometheus metrics and return summary result
         @return:
         """
         result_dict = {}
@@ -453,7 +453,7 @@ class WorkloadsOperations:
     @logger_time_stamp
     def clear_nodes_cache(self):
         """
-        This method clear nodes cache
+        This method clears nodes cache
         """
         for i in range(self.REPEAT_TIMES-1):
             self._oc.clear_node_caches()
@@ -465,10 +465,16 @@ class WorkloadsOperations:
         This method includes all the initialization of workload
         :return:
         """
+        # Verify that CNV operator in installed for CNV workloads
+        if '_vm' in self._workload and not self._oc.is_cnv_installed():
+            raise CNVNotInstalled(workload=self._workload)
+        # Verify that Kata operator in installed for kata workloads
+        if '_kata' in self._workload and not self._oc.is_kata_installed():
+            raise KataNotInstalled(workload=self._workload)
         self.delete_all()
         self.clear_nodes_cache()
         if self._odf_pvc:
-            self.odf_pvc_verification()
+            self.odf_workload_verification()
         self._template.generate_yamls(scale=str(self._scale), scale_nodes=self._scale_node_list, redis=self._redis, thread_limit=self._threads_limit)
         if self._enable_prometheus_snapshot:
             self.start_prometheus()

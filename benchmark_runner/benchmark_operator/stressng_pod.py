@@ -10,11 +10,11 @@ from benchmark_runner.benchmark_operator.benchmark_operator_workloads_operations
 
 class StressngPod(BenchmarkOperatorWorkloadsOperations):
     """
-    This class for stressng workload
+    This class runs stressng workload
     """
     def __init__(self):
         """
-        All inherit from WorkloadsOperations
+        All inherit from BenchmarkOperatorWorkloadsOperations
         """
         super().__init__()
         self.__name = ''
@@ -26,7 +26,7 @@ class StressngPod(BenchmarkOperatorWorkloadsOperations):
     @logger_time_stamp
     def run(self):
         """
-        This method run stressng workload
+        This method runs stressng workload
         :return:
         """
         try:

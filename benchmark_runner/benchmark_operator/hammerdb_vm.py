@@ -9,13 +9,13 @@ from benchmark_runner.benchmark_operator.benchmark_operator_workloads_operations
 
 class HammerdbVM(BenchmarkOperatorWorkloadsOperations):
     """
-    This class for hammerdb vm workload
+    This class runs hammerdb vm workload
     """
     ES_FETCH_TIME = 30
 
     def __init__(self):
         """
-        All inherit from WorkloadsOperations
+        All inherit from BenchmarkOperatorWorkloadsOperations
         """
         super().__init__()
         self.__name = ''
@@ -29,7 +29,7 @@ class HammerdbVM(BenchmarkOperatorWorkloadsOperations):
     @logger_time_stamp
     def run(self):
         """
-        This method run hammerdb vm workload
+        This method runs hammerdb vm workload
         :return:
         """
         try:

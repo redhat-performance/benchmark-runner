@@ -11,7 +11,7 @@ from benchmark_runner.common.oc.oc import VMStatus
 
 class WindowsVM(BootstormVM):
     """
-    This class run Windows vm
+    This class runs Windows vm
     """
     def __init__(self):
         super().__init__()

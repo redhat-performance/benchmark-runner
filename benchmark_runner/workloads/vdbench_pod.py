@@ -11,7 +11,7 @@ from benchmark_runner.common.prometheus.prometheus_metrics_operations import Pro
 
 class VdbenchPod(WorkloadsOperations):
     """
-    This class run vdbench pod
+    This class runs vdbench pod
     """
     def __init__(self):
         super().__init__()
@@ -27,7 +27,7 @@ class VdbenchPod(WorkloadsOperations):
 
     def __create_pod_scale(self, pod_num: str):
         """
-        This method create pod in parallel
+        This method creates pod in parallel
         """
         self._oc.create_async(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}_{pod_num}.yaml'))
         self._oc.wait_for_pod_create(pod_name=f'{self.__pod_name}-{pod_num}')
@@ -55,14 +55,14 @@ class VdbenchPod(WorkloadsOperations):
 
     def __delete_pod_scale(self, pod_num: str):
         """
-        This method create pod in parallel
+        This method creates pod in parallel
         """
         self._oc.delete_async(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}_{pod_num}.yaml'))
 
     @logger_time_stamp
     def run(self):
         """
-        This method run the workload
+        This method runs the workload
         :return:
         """
         try:
