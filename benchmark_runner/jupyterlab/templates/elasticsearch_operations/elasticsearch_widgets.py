@@ -39,14 +39,22 @@ class ElasticSearchWidgets:
         """
         return elastic_index
 
+    def get_perfci_indexes(self):
+        """
+        This method returns sorted perfci elasticsearch indexes that contains 'results' or 'status'
+        @return:
+        """
+        # Use list comprehension to filter strings containing 'result' or 'status'
+        return [item for item in self.__elasticsearch.get_all_indexes() if 'result' in item or 'status' in item]
+
     def index_dropdown(self):
         """
         index dropdown widget
         @return:
         """
         dropdown = widgets.Dropdown(
-            options=self.__elasticsearch.get_all_result_index(),
-            value=self.__elasticsearch.get_all_result_index()[0],
+            options=self.get_perfci_indexes(),
+            value=self.get_perfci_indexes()[0],
             description='Choose INDEX & DATES:',
             style={'description_width': 'initial'},
             layout=widgets.Layout(width='500px')

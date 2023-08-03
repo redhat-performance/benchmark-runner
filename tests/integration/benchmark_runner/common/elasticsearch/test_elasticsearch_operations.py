@@ -64,13 +64,13 @@ def test_get_delete_ids_elasticsearch_last_day():
     assert len(elastic.get_index_ids_between_dates(index=TEST_INDEX_NAME, start_datetime=day_before_timestamp, end_datetime=current_timestamp)) == 0
 
 
-def test_get_all_result_index():
+def test_get_all_indexes():
     """
-    This method gets all result index
+    This method gets all indexes
     @return:
     """
     elastic = ElasticSearchOperations(es_host=test_environment_variable.get('elasticsearch', ''),
                                       es_port=test_environment_variable.get('elasticsearch_port', ''),
                                       es_user=test_environment_variable.get('elasticsearch_user', ''),
                                       es_password=test_environment_variable.get('elasticsearch_password', ''))
-    assert len(elastic.get_all_result_index()) > 1
+    assert len(elastic.get_all_indexes()) > 1
