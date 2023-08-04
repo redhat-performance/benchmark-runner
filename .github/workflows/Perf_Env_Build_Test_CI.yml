@@ -260,10 +260,56 @@ jobs:
           sudo docker push quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:latest
           echo '⌛ Wait 30 sec till image will be updated in quay.io'
           sleep 30
+          
+  grafonnet_generator:
+    name: grafonnet_generator
+    needs: [unittest, integration_test, pypi_upload, pypi_validate, quay_upload]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Run grafana json container generator
+        run: |
+          sudo docker run --rm --name run_grafonnet -v $GITHUB_WORKSPACE/grafana/perf:/app --privileged quay.io/ebattat/run_grafonnet:latest
+
+      - name: Check for changes in grafana json file
+        id: check_changes
+        run: |
+          # backup output.json
+          cp $GITHUB_WORKSPACE/grafana/perf/output.json $GITHUB_WORKSPACE/grafana/perf/output_original.json
+          git diff --quiet $GITHUB_WORKSPACE/grafana/perf/output.json || echo "changes=true" >>$GITHUB_OUTPUT
+
+      - name: Update Grafana dashboard with new json
+        if: steps.check_changes.outputs.changes == 'true'
+        env:
+          PERF_GRAFANA_URL: ${{ secrets.PERF_GRAFANA_URL }}
+          PERF_GRAFANA_API_KEY: ${{ secrets.PERF_GRAFANA_API_KEY }}
+          PERF_GRAFANA_JSON: grafana/perf/output.json
+        run: |
+              python $GITHUB_WORKSPACE/grafana/update_grafana_dashboard.py
+              # revert output.json after python version change
+              cp $GITHUB_WORKSPACE/grafana/perf/output_original.json $GITHUB_WORKSPACE/grafana/perf/output.json
+
+      - name: Commit grafana json file after update version
+        if: steps.check_changes.outputs.changes == 'true'
+        run: |
+          echo ${{ steps.check_changes.outputs.changes }}
+          git checkout main
+          git config --global user.email ${{ secrets.EMAIL }}
+          git config --global user.name  ${{ secrets.USER_NAME }}
+          git add $GITHUB_WORKSPACE/grafana/perf/output.json
+          git commit -m "Update grafana json file"
+
+          # Pull the latest changes from the remote main branch
+          git pull origin main
+
+          # Push the changes to the remote main branch
+          git push
 
   bump_version:
     name: bump_version
-    needs: [unittest, integration_test, pypi_upload, pypi_validate, quay_upload]
+    needs: [unittest, integration_test, pypi_upload, pypi_validate, quay_upload, grafonnet_generator]
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -295,7 +341,7 @@ jobs:
 
   e2e:
     name: e2e
-    needs: [unittest, integration_test, pypi_upload, pypi_validate, quay_upload, bump_version]
+    needs: [unittest, integration_test, pypi_upload, pypi_validate, quay_upload, grafonnet_generator, bump_version]
     runs-on: ubuntu-latest
     strategy:
        # run one job every time
