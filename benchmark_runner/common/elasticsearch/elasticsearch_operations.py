@@ -305,15 +305,14 @@ class ElasticSearchOperations:
             raise Exception('Empty parameters: index/ start_datetime/ end_datetime')
 
     @logger_time_stamp
-    def get_all_result_index(self):
+    def get_all_indexes(self):
         """
-        This method returns sorted elasticsearch indexes that contains results
+        This method returns sorted elasticsearch indexes
         @return:
         """
-        index_results = []
+        indexes = []
         # Fetch all indices
         indices = self.__es.cat.indices(format="json")
         for index in indices:
-            if 'results' in index['index']:
-                index_results.append(index['index'])
-        return sorted(index_results)
+            indexes.append(index['index'])
+        return sorted(indexes)
