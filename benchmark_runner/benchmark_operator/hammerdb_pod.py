@@ -10,13 +10,13 @@ from benchmark_runner.benchmark_operator.benchmark_operator_workloads_operations
 
 class HammerdbPod(BenchmarkOperatorWorkloadsOperations):
     """
-    This class for uperf workload
+    This class runs hammerdb workload
     """
     ES_FETCH_TIME = 30
 
     def __init__(self):
         """
-        All inherit from WorkloadsOperations
+        All inherit from BenchmarkOperatorWorkloadsOperations
         """
         super().__init__()
         self.__name = ''
@@ -30,7 +30,7 @@ class HammerdbPod(BenchmarkOperatorWorkloadsOperations):
     @logger_time_stamp
     def run(self):
         """
-        This method run hammerdb workload
+        This method runs hammerdb workload
         :return:
         """
         try:

@@ -8,7 +8,7 @@ from benchmark_runner.benchmark_operator.benchmark_operator_workloads_operations
 
 class BenchmarkOperatorWorkloads(BenchmarkOperatorWorkloadsOperations):
     """
-    This class contains all the custom_workloads
+    This class runs benchmark-operator workload operations
     """
     def __init__(self):
         super().__init__()
@@ -16,7 +16,7 @@ class BenchmarkOperatorWorkloads(BenchmarkOperatorWorkloadsOperations):
     @logger_time_stamp
     def run(self):
         """
-        The method run workload
+        The method runs benchmark-operator workload
         :return:
         """
 

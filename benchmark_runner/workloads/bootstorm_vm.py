@@ -12,7 +12,7 @@ from benchmark_runner.common.prometheus.prometheus_metrics_operations import Pro
 
 class BootstormVM(WorkloadsOperations):
     """
-    This class run bootstorm vm
+    This class runs bootstorm vm
     """
     def __init__(self):
         super().__init__()
@@ -63,7 +63,7 @@ class BootstormVM(WorkloadsOperations):
 
     def _run_vm_scale(self, vm_num: str):
         """
-        This method start VMs in parallel and wait for login to be enabled
+        This method starts VMs in parallel and wait for login to be enabled
         """
         vm_name = f'{self._workload_name}-{self._trunc_uuid}-{vm_num}'
         self._set_bootstorm_vm_start_time(vm_name=f'{self._workload_name}-{self._trunc_uuid}-{vm_num}')

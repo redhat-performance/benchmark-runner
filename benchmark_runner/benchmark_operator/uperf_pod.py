@@ -10,11 +10,11 @@ from benchmark_runner.benchmark_operator.benchmark_operator_workloads_operations
 
 class UperfPod(BenchmarkOperatorWorkloadsOperations):
     """
-    This class for uperf workload
+    This class runs uperf workload
     """
     def __init__(self):
         """
-        All inherit from WorkloadsOperations
+        All inherit from BenchmarkOperatorWorkloadsOperations
         """
         super().__init__()
         self.__name = ''
@@ -26,7 +26,7 @@ class UperfPod(BenchmarkOperatorWorkloadsOperations):
     @logger_time_stamp
     def run(self):
         """
-        This method run uperf workload
+        This method runs uperf workload
         :return:
         """
         try:

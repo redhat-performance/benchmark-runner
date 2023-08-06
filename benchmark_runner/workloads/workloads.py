@@ -8,7 +8,7 @@ from benchmark_runner.workloads.workloads_operations import WorkloadsOperations
 
 class Workloads(WorkloadsOperations):
     """
-    This class create workload
+    This class run workload
     """
     def __init__(self):
         """

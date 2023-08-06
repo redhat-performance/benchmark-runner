@@ -5,26 +5,45 @@ class BenchmarkOperatorError(Exception):
     pass
 
 
-class ODFNonInstalled(BenchmarkOperatorError):
+class CNVNotInstalled(BenchmarkOperatorError):
     """
-    This class is error that ODF operator is not installed
+    This class raises an error that CNV operator is not installed
     """
-    def __init__(self):
-        self.message = "ODF is not installed, set 'ODF_PVC' to False"
-        super(ODFNonInstalled, self).__init__(self.message)
+    def __init__(self, workload):
+        self.message = f"{workload} requires CNV to be installed"
+        super(CNVNotInstalled, self).__init__(self.message)
+
+
+class KataNotInstalled(BenchmarkOperatorError):
+    """
+    This class raises an error that Kata operator is not installed
+    """
+    def __init__(self, workload):
+        self.message = f"{workload} requires Kata to be installed"
+        super(KataNotInstalled, self).__init__(self.message)
+
+
+class ODFNotInstalled(BenchmarkOperatorError):
+    """
+    This class raises an error that ODF operator is not installed
+    """
+    def __init__(self, workload):
+        self.message = f"{workload} requires ODF to be installed, set 'ODF_PVC' to False to run with Ephemeral"
+        super(ODFNotInstalled, self).__init__(self.message)
 
 
 class EmptyLSOPath(BenchmarkOperatorError):
     """
-    This class is error that LSO path is empty
+    This class raises an error that LSO path is empty
     """
     def __init__(self):
         self.message = "LSO path is empty"
         super(EmptyLSOPath, self).__init__(self.message)
 
+
 class PrometheusSnapshotFailed(BenchmarkOperatorError):
     """
-    Prometheus snapshot failed
+    This class raises an error when Prometheus snapshot failed
     """
     def __init__(self, err):
         self.message = f'Prometheus snapshot failed: {err}'

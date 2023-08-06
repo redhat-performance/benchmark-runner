@@ -9,11 +9,11 @@ from benchmark_runner.benchmark_operator.benchmark_operator_workloads_operations
 
 class StressngVM(BenchmarkOperatorWorkloadsOperations):
     """
-    This class for stressng vm workload
+    This class runs stressng vm workload
     """
     def __init__(self):
         """
-        All inherit from WorkloadsOperations
+        All inherit from BenchmarkOperatorWorkloadsOperations
         """
         super().__init__()
         self.__name = ''
@@ -25,7 +25,7 @@ class StressngVM(BenchmarkOperatorWorkloadsOperations):
     @logger_time_stamp
     def run(self):
         """
-        This method run stressng vm workload
+        This method runs stressng vm workload
         :return:
         """
         try:

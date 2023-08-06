@@ -42,35 +42,35 @@ class OC(SSH):
 
     def get_ocp_server_version(self):
         """
-        This method return ocp server version
+        This method returns ocp server version
         :return:
         """
         return self.run(f"{self.__cli} get clusterversion version -o jsonpath='{{.status.desired.version}}'")
 
     def get_cnv_version(self):
         """
-        This method return cnv version
+        This method returns cnv version
         :return:
         """
         return self.run(f"{self.__cli} get csv -n openshift-cnv $(oc get csv -n openshift-cnv --no-headers | awk '{{ print $1; }}') -ojsonpath='{{.spec.version}}'")
 
     def get_odf_version(self):
         """
-        This method return odf version
+        This method returns odf version
         :return:
         """
         return self.run(f"{self.__cli} get csv -n openshift-storage -ojsonpath='{{.items[0].spec.labels.full_version}}'")
 
     def get_pv_disk_ids(self):
         """
-        This method return list of pv disk ids
+        This method returns list of pv disk ids
         """
         result = self.run(f"{self.__cli} get pv -o jsonpath={{.items[*].metadata.annotations.'storage\.openshift\.com/device-id'}}")
         return result.split()
 
     def get_worker_disk_ids(self):
         """
-        The method return worker disk ids
+        The method returns worker disk ids
         """
         workers_disk_ids = []
         if self.__worker_disk_ids:
@@ -88,7 +88,7 @@ class OC(SSH):
 
     def get_free_disk_id(self):
         """
-        This method return free disk (workers_all_disk_ids - workers_odf_pv_disk_ids)
+        This method returns free disk (workers_all_disk_ids - workers_odf_pv_disk_ids)
         """
         workers_disk_ids = self.get_worker_disk_ids()
         workers_pv_disk_ids = self.get_pv_disk_ids()
@@ -114,13 +114,13 @@ class OC(SSH):
 
     def _get_kata_default_channel(self):
         """
-        Retrieve the default channel for Kata
+        This method retrieves the default channel for Kata
         """
         return self.run(f"{self.__cli} get packagemanifest -n openshift-marketplace sandboxed-containers-operator -ojsonpath='{{.status.defaultChannel}}'")
 
     def _get_kata_default_channel_field(self, channel_field: str):
         """
-        Retrieve a field from the packagemanifest for the default Kata channel
+        This method retrieves a field from the packagemanifest for the default Kata channel
         """
         default_channel = f'"{self._get_kata_default_channel()}"'
         command = f"{self.__cli} get packagemanifest -n openshift-marketplace sandboxed-containers-operator -ojson | jq -r '[foreach .status.channels[] as $channel ([[],[]];0;(if ($channel.name == {default_channel}) then $channel.{channel_field} else null end))] | flatten | map (select (. != null))[]'"
@@ -128,31 +128,31 @@ class OC(SSH):
 
     def _get_kata_csv(self):
         """
-        Retrieve the CSV of the sandboxed containers operator for installation"
+        This method retrieves the CSV of the sandboxed containers operator for installation"
         """
         return self._get_kata_default_channel_field("currentCSV")
 
     def _get_kata_catalog_source(self):
         """
-        Retrieve the catalog source of the sandboxed containers operator for installation"
+        This method retrieves the catalog source of the sandboxed containers operator for installation"
         """
         return self.run(f"{self.__cli} get packagemanifest -n openshift-marketplace sandboxed-containers-operator -ojsonpath='{{.status.catalogSource}}'")
 
     def _get_kata_channel(self):
         """
-        Retrieve the channel of the sandboxed containers operator for installation"
+        This method retrieves the channel of the sandboxed containers operator for installation"
         """
         return self._get_kata_default_channel_field("name")
 
     def _get_kata_namespace(self):
         """
-        Retrieve the namespace of the sandboxed containers operator for installation"
+        This method retrieves the namespace of the sandboxed containers operator for installation"
         """
         return self._get_kata_default_channel_field('currentCSVDesc.annotations."operatorframework.io/suggested-namespace"')
 
     def set_kata_threads_pool(self, thread_pool_size: str):
         """
-        This methods sets kata thread-pool-size in every worker node
+        This method sets kata thread-pool-size in every worker node
         @param thread_pool_size:
         @return:
         """
@@ -160,7 +160,7 @@ class OC(SSH):
 
     def delete_kata_threads_pool(self):
         """
-        This methods deletes kata thread-pool-size from every worker node
+        This method deletes kata thread-pool-size from every worker node
         @return:
         """
         self.run(fr"""{self.__cli} get nodes -l node-role.kubernetes.io/worker= -o jsonpath="{{range .items[*]}}{{.metadata.name}}{{'\\n'}}{{end}}" |  xargs -I{{}} oc debug node/{{}} -- chroot /host sh -c "rm -f /etc/kata-containers/configuration.toml" """)
@@ -168,7 +168,7 @@ class OC(SSH):
     @typechecked
     def populate_additional_template_variables(self, env: dict):
         """
-        Populate any additional variables needed for setup templates
+        This method populates any additional variables needed for setup templates
         """
         if self.__kata_csv:  # custom kata version
             env['kata_csv'] = self.__kata_csv
@@ -180,7 +180,7 @@ class OC(SSH):
 
     def is_cnv_installed(self):
         """
-        This method check if cnv operator is installed
+        This method checks if cnv operator is installed
         :return:
         """
         verify_cmd = f"{self.__cli} get csv -n openshift-cnv -ojsonpath='{{.items[0].status.phase}}'"
@@ -190,7 +190,7 @@ class OC(SSH):
 
     def is_odf_installed(self):
         """
-        This method check if odf operator is installed
+        This method checks if odf operator is installed
         :return:
         """
         verify_cmd = f"{self.__cli} get csv -n openshift-storage -ojsonpath='{{.items[0].status.phase}}'"
@@ -202,7 +202,7 @@ class OC(SSH):
                         status: str,
                         namespace: str = environment_variables.environment_variables_dict['namespace']):
         """
-        This method check dv status
+        This method checks dv status
         :return:
         """
         namespace = f'-n {namespace}' if namespace else ''
@@ -217,7 +217,7 @@ class OC(SSH):
                            status: str = 'Succeeded',
                            timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
         """
-        This method wait for methods status
+        This method waits for methods status
         @return: True/ False if reach to status
         """
         current_wait_time = 0
@@ -239,7 +239,7 @@ class OC(SSH):
 
     def is_kata_installed(self):
         """
-        This method check if kata operator is installed
+        This method checks if kata operator is installed
         :return:
         """
         verify_cmd = "oc get csv -n openshift-sandboxed-containers-operator -ojsonpath='{.items[0].status.phase}'"
@@ -249,21 +249,21 @@ class OC(SSH):
 
     def get_master_nodes(self):
         """
-        This method return master nodes
+        This method returns master nodes
         :return:
         """
         return self.run(fr""" {self.__cli} get nodes -l node-role.kubernetes.io/master= -o jsonpath="{{range .items[*]}}{{.metadata.name}}{{'\n'}}{{end}}" """)
 
     def get_worker_nodes(self):
         """
-        This method return worker nodes
+        This method returns worker nodes
         :return:
         """
         return self.run(fr""" {self.__cli} get nodes -l node-role.kubernetes.io/worker= -o jsonpath="{{range .items[*]}}{{.metadata.name}}{{'\n'}}{{end}}" """)
 
     def delete_available_released_pv(self):
         """
-        This method delete available or released pv because that avoid launching new pv
+        This method deletes available or released pv because that avoid launching new pv
         """
         pv_status_list = self.run(fr"{self.__cli} get pv -ojsonpath={{..status.phase}}").split()
         for ind, pv_status in enumerate(pv_status_list):
@@ -280,7 +280,7 @@ class OC(SSH):
 
     def __get_short_uuid(self, workload: str):
         """
-        This method return uuid
+        This method returns uuid
         :return:
         """
         long_uuid = self.get_long_uuid(workload=workload)
@@ -290,7 +290,7 @@ class OC(SSH):
 
     def get_num_active_nodes(self):
         """
-        This method return the number of active nodes
+        This method returns the number of active nodes
         :return:
         """
         # count the number of active master/worker nodes
@@ -304,7 +304,7 @@ class OC(SSH):
     @logger_time_stamp
     def apply_security_privileged(self, namespace: str = environment_variables.environment_variables_dict['namespace']):
         """
-        This method apply security privileged for namespace
+        This method applies security privileged for namespace
         @param namespace:
         @return:
         """
@@ -315,7 +315,7 @@ class OC(SSH):
     @logger_time_stamp
     def create_async(self, yaml: str, is_check: bool = False):
         """
-        This method create yaml in async
+        This method creates yaml in async
         @param yaml:
         @param is_check:
         :return:
@@ -329,7 +329,7 @@ class OC(SSH):
     @logger_time_stamp
     def delete_async(self, yaml: str):
         """
-        This method delete yaml in async
+        This method deletes yaml in async
         :param yaml:
         :return:
         """
@@ -342,7 +342,7 @@ class OC(SSH):
     def _get_pod_name(self, pod_name: str,
                       namespace: str = environment_variables.environment_variables_dict['namespace']):
         """
-        This method return pod name if exist or raise error
+        This method returns pod name if exist or raise error
         :param pod_name:
         :param namespace:
         :return:
@@ -356,7 +356,7 @@ class OC(SSH):
     def pod_exists(self, pod_name: str,
                    namespace: str = environment_variables.environment_variables_dict['namespace']):
         """
-        This method return True if exist or False if not
+        This method returns True if exist or False if not
         :param pod_name:
         :param namespace:
         :return:
@@ -371,7 +371,7 @@ class OC(SSH):
     def pod_label_exists(self, label_name: str,
                          namespace: str = environment_variables.environment_variables_dict['namespace']):
         """
-        This method return True if pod exist or not by label
+        This method returns True if pod exist or not by label
         :param label_name:
         :param namespace:
         :return:
@@ -386,7 +386,7 @@ class OC(SSH):
     @typechecked()
     def get_long_uuid(self, workload: str):
         """
-        This method return uuid
+        This method returns uuid
         :return:
         """
         long_uuid = self.run(
@@ -409,7 +409,7 @@ class OC(SSH):
 
     def get_prom_token(self):
         """
-        This method return prometheus token
+        This method returns prometheus token
         :return:
         """
         # OCP 4.10 and below
@@ -431,7 +431,7 @@ class OC(SSH):
     @logger_time_stamp
     def login(self):
         """
-        This method login to the cluster
+        This method logs in to the cluster
         :return:
         """
         try:
@@ -445,7 +445,7 @@ class OC(SSH):
     @logger_time_stamp
     def get_pod(self, label: str, database: str = '', namespace: str = environment_variables.environment_variables_dict['namespace']):
         """
-        This method get pods according to label
+        This method gets pods according to label
         :param label:
         :param database:
         :param namespace:
@@ -463,7 +463,7 @@ class OC(SSH):
     @logger_time_stamp
     def save_pod_log(self, pod_name: str, database: str = '', log_type: str = ''):
         """
-        This method save pod log in log_path
+        This method saves pod log in log_path
         :param pod_name: pod name with uuid
         :param database: database
         :param log_type: log type extension
@@ -484,7 +484,7 @@ class OC(SSH):
 
     def describe_pod(self, pod_name: str, namespace: str = ''):
         """
-        This method describe pod into log
+        This method describes pod into log
         :param pod_name: pod name with uuid
         :param namespace: namespace
         :return: output_filename
@@ -496,7 +496,7 @@ class OC(SSH):
     @logger_time_stamp
     def get_pods(self):
         """
-        This method get pods
+        This method retrieves information on benchmark-runner pods in oc get pod format
         :return:
         """
         return self.run(f'{self.__cli} get pods', is_check=True)
@@ -507,7 +507,7 @@ class OC(SSH):
                             namespace: str = environment_variables.environment_variables_dict['namespace'],
                             timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
         """
-        This method is wait till pod name is creating or throw exception after timeout
+        This method waits till pod name is creating or throw exception after timeout
         :param namespace:
         :param pod_name:
         :param timeout:
@@ -530,7 +530,7 @@ class OC(SSH):
                                namespace: str = environment_variables.environment_variables_dict['namespace'],
                                timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
         """
-        This method is wait till pod name is terminating or throw exception after timeout
+        This method waits till pod name is terminating or throw exception after timeout
         :param namespace:
         :param pod_name:
         :param timeout:
@@ -551,7 +551,7 @@ class OC(SSH):
                         namespace: str = environment_variables.environment_variables_dict['namespace'],
                         timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
         """
-        This method create pod yaml in async
+        This method creates pod yaml in async
         :param namespace:
         :param timeout:
         :param pod_name:
@@ -567,7 +567,7 @@ class OC(SSH):
                         namespace: str = environment_variables.environment_variables_dict['namespace'],
                         timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
         """
-        This method delete pod yaml in async, only if exist and return false if not exist
+        This method deletes pod yaml in async, only if exist and return false if not exist
         :param namespace:
         :param timeout:
         :param pod_name:
@@ -583,7 +583,7 @@ class OC(SSH):
     @typechecked
     def delete_namespace(self, namespace: str = environment_variables.environment_variables_dict['namespace']):
         """
-        This method delete namespace
+        This method deletes namespace
         :param namespace:
         :return:
         """
@@ -595,7 +595,7 @@ class OC(SSH):
                              namespace: str = environment_variables.environment_variables_dict['namespace'],
                              timeout: int = SHORT_TIMEOUT):
         """
-        This method wait to pod to be initialized
+        This method waits to pod to be initialized
         :param namespace:
         :param label:
         :param status:
@@ -659,7 +659,7 @@ class OC(SSH):
     @typechecked
     def exec(self, command: str, pod_name: str, namespace: str = environment_variables.environment_variables_dict['namespace'], container: str = ''):
         """
-        oc exec a command and return the answer
+        This method executes a command within a specified pod and optional container and returns the output
         :param command:
         :param pod_name:
         :param namespace:
@@ -678,7 +678,7 @@ class OC(SSH):
                            namespace: str = environment_variables.environment_variables_dict['namespace'],
                            timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
         """
-        Delete a pod based on name and namespace only
+        This method deletes a pod based on name and namespace only
         :param pod_name:
         :param namespace:
         :param timeout:
@@ -697,7 +697,7 @@ class OC(SSH):
                            namespace: str = environment_variables.environment_variables_dict['namespace'],
                            timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
         """
-        Wait for a pod to be ready and running
+        This method waits for a pod to be ready and running
         :param pod_name:
         :param namespace:
         :param timeout:
@@ -722,7 +722,7 @@ class OC(SSH):
                                namespace: str = environment_variables.environment_variables_dict['namespace'],
                                timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
         """
-        This method wait to pod to be completed
+        This method waits for a pod to be completed
         :param workload:
         :param label:
         :param label_uuid: need to get uuid from label (benchmark-operator)
@@ -756,7 +756,7 @@ class OC(SSH):
 
     def describe_vmi(self, vm_name: str, namespace: str):
         """
-        This method describe vmi into log
+        This method describes vmi into log
         :param vm_name: vm name with uuid
         :param namespace: namespace
         :return: output_filename
@@ -782,7 +782,7 @@ class OC(SSH):
     @typechecked
     def vm_exists(self, vm_name: str, namespace: str = environment_variables.environment_variables_dict['namespace']):
         """
-        This method return True or False if vm name exist
+        This method returns True or False if vm name exist
         :param vm_name:
         :param namespace:
         :return: True or False
@@ -798,7 +798,7 @@ class OC(SSH):
     @logger_time_stamp
     def get_vm(self, label: str = '', namespace: str = environment_variables.environment_variables_dict['namespace']):
         """
-        This method get vm according to label
+        This method gets vm according to label
         :param label:
         :param namespace:
         :return:
@@ -813,7 +813,7 @@ class OC(SSH):
     @logger_time_stamp
     def __verify_vm_log_complete(self, vm_name: str, timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
         """
-        This method verify that vm log is complete
+        This method verifies that vm log is complete
         :param vm_name: vm name with uuid
         :return:
         """
@@ -832,7 +832,7 @@ class OC(SSH):
     @logger_time_stamp
     def get_exposed_vm_port(self, vm_name: str, namespace: str = environment_variables.environment_variables_dict['namespace']):
         """
-        The method get exposed vm port
+        The method gets exposed vm port
         @param vm_name:
         @return:
         """
@@ -854,7 +854,7 @@ class OC(SSH):
                            namespace: str = environment_variables.environment_variables_dict['namespace'],
                            timeout: int = SHORT_TIMEOUT):
         """
-        This method wait for VM to reach the specified status
+        This method waits for VM to reach the specified status
         :param vm_name:
         :param status: Stopped, Starting, Running
         :param namespace:
@@ -897,7 +897,7 @@ class OC(SSH):
     @logger_time_stamp
     def get_vm_node(self, vm_name: str, namespace: str = environment_variables.environment_variables_dict['namespace']):
         """
-        This method get vm node
+        This method gets vm node
         :param vm_name:
         :param namespace:
         :return:
@@ -911,7 +911,7 @@ class OC(SSH):
                            namespace: str = environment_variables.environment_variables_dict['namespace'],
                            timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
         """
-        This method is wait till vm name is creating or throw exception after timeout
+        This method waits till vm name is creating or throw exception after timeout
         :param vm_name:
         :param namespace:
         :param timeout:
@@ -934,7 +934,7 @@ class OC(SSH):
                        namespace: str = environment_variables.environment_variables_dict['namespace'],
                        timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
         """
-        This method create vm synchronously
+        This method creates vm synchronously
         :param timeout:
         :param vm_name:
         :param yaml:
@@ -965,7 +965,7 @@ class OC(SSH):
     @logger_time_stamp
     def delete_all_vms(self, namespace: str = environment_variables.environment_variables_dict['namespace']):
         """
-        This method delete all vms
+        This method deletes all vms
         :return:
         """
         namespace = f'-n {namespace}' if namespace else ''
@@ -1046,7 +1046,7 @@ class OC(SSH):
     @logger_time_stamp
     def extract_vm_results(self, vm_name: str = '', start_stamp: str = '', end_stamp: str = '', output_filename: str = ''):
         """
-        This method extract vm results from vm output log
+        This method extracts vm results from vm output log
         :param vm_name:
         :param start_stamp: start of run stamp
         :param end_stamp: end of run stamp
