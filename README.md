@@ -128,10 +128,9 @@ SAVE RUN ARTIFACTS LOCAL:
 ## Grafana dashboards
 
 There are 2 grafana dashboards templates:
-1. [grafana/func/benchmark-runner-ci-status-report.json](grafana/func/benchmark-runner-ci-status-report.json)
-   ![](media/benchmark-runner-ci-status.png)
-2. [grafana/func/benchmark-runner-report.json](grafana/func/benchmark-runner-report.json)
-   ![](media/benchmark-runner-report.png)
+1. [FuncCi dashboard](benchmark_runner/grafana/func/dashboard.json)
+2. [PerfCi dashboard](benchmark_runner/grafana/perf/dashboard.json)
+** PerfCi dashboard is generated automatically in [Build GitHub actions](https://github.com/redhat-performance/benchmark-runner/blob/main/.github/workflows/Perf_Env_Build_Test_CI.yml) from [main.libsonnet](benchmark_runner/grafana/perf/jsonnet/main.libsonnet)
 
 ** After importing json in grafana, you need to configure elasticsearch data source. (for more details: see [HOW_TO.md](HOW_TO.md))
 

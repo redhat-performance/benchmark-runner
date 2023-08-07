@@ -226,10 +226,10 @@ any template .yaml files.
       6. Save & test
 2. Open grafana dashboard benchmark-runner-report:
    1. Open grafana
-   2. Create(+) -> import -> paste [grafana/func/benchmark-runner-report.json](grafana/func/benchmark-runner-report.json) -> Load
-   3. Create panel from scratch or duplicate existing on (stressng/uperf)
+   2. Create(+) -> import -> paste [grafana/func/dashboard.json](benchmark_runner/grafana/func/dashboard.json) -> Load
+   3. Create panel from scratch or duplicate existing on (e.g. uperf)
    4. Configure the workload related metrics
-   5. Save dashboard -> share -> Export -> view json -> Copy to clipboard -> override existing one [grafana/func/benchmark-runner-report.json](grafana/func/benchmark-runner-report.json)
+   5. Save dashboard -> share -> Export -> view json -> Copy to clipboard -> override existing one [grafana/func/dashboard.json](benchmark_runner/grafana/func/dashboard.json)
    
 ### Data template 
 

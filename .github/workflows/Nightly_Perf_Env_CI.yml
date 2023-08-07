@@ -217,6 +217,7 @@ jobs:
       if: always()
       run: |
           if [[ "${{ job.status }}" == "failure" || "${{ job.status }}" == "cancelled" ]]; then echo "status=${{ job.status }}" >> $GITHUB_OUTPUT; fi
+
   finalize_nightly:
     name: finalize nightly
     runs-on: ubuntu-latest
@@ -314,3 +315,84 @@ jobs:
         echo "if [[ \"\$(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)\" != \"\" ]]; then sudo podman rmi -f \$(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null); fi" > "$RUNNER_PATH/remove_image.sh"
         scp -r "$RUNNER_PATH/remove_image.sh" provision:"/tmp/remove_image.sh"
         ssh -t provision "chmod +x /tmp/remove_image.sh;/tmp/./remove_image.sh;rm -f /tmp/remove_image.sh"
+
+  update_grafana_dashboard:
+    # update grafana dashboard with latest product versions/ grafonnet code
+    name: update_grafana_dashboard
+    needs: [ initialize_nightly, workload, finalize_nightly ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [[ -f requirements.txt ]]; then pip install -r requirements.txt; fi
+
+      - name: Update latest product versions in main.libsonnet
+        env:
+          MAIN_LIBSONNET_PATH: ${{ secrets.PERF_MAIN_LIBSONNET_PATH }}
+          ELASTICSEARCH: ${{ secrets.PERF_ELASTICSEARCH }}
+          ELASTICSEARCH_PORT: ${{ secrets.PERF_ELASTICSEARCH_PORT }}
+          ELASTICSEARCH_USER: ${{ secrets.PERF_ELASTICSEARCH_USER }}
+          ELASTICSEARCH_PASSWORD: ${{ secrets.PERF_ELASTICSEARCH_PASSWORD }}
+        run: |
+          python "$GITHUB_WORKSPACE"/grafonnet_generator/grafana/update_versions_main_libsonnet.py
+
+      - name: Generate grafana dashboard.json using grafonnet container
+        run: |
+          sudo podman run --rm --name run_grafonnet -v "$GITHUB_WORKSPACE"/benchmark_runner/grafana/perf:/app --privileged quay.io/ebattat/run_grafonnet:latest
+
+      - name: Check for changes in dashboard.json
+        id: json_check_changes
+        run: |
+          git diff --quiet "$GITHUB_WORKSPACE"/benchmark_runner/grafana/perf/dashboard.json || echo "changes=true" >> "$GITHUB_OUTPUT"
+
+      - name: Update the Grafana dashboard if any changes are detected in dashboard.json
+        if: steps.json_check_changes.outputs.changes == 'true'
+        env:
+          PERF_GRAFANA_URL: ${{ secrets.PERF_GRAFANA_URL }}
+          PERF_GRAFANA_API_KEY: ${{ secrets.PERF_GRAFANA_API_KEY }}
+          GRAFANA_JSON: ${{ secrets.PERF_GRAFANA_JSON }}
+        run: |
+          # Backup dashboard.json before before adding dashboard version by Python code
+          cp -p "$GITHUB_WORKSPACE"/benchmark_runner/grafana/perf/dashboard.json "$GITHUB_WORKSPACE"/benchmark_runner/grafana/perf/dashboard_backup.json
+          # Updates new product versions and override Grafana dashboard
+          python "$GITHUB_WORKSPACE"/benchmark_runner/grafana/update_grafana_dashboard.py
+          # Revert dashboard.json after adding dashboard version by Python code
+          cp -p "$GITHUB_WORKSPACE"/benchmark_runner/grafana/perf/dashboard_backup.json "$GITHUB_WORKSPACE"/benchmark_runner/grafana/perf/dashboard.json
+
+      - name: Commit dashboard.json if any changes are detected
+        if: steps.json_check_changes.outputs.changes == 'true'
+        run: |
+          git checkout main
+          git config --global user.email "${{ secrets.EMAIL }}"
+          git config --global user.name  "${{ secrets.USER_NAME }}"
+          git add "$GITHUB_WORKSPACE"/benchmark_runner/grafana/perf/dashboard.json
+          git commit -m "Update grafana json file"
+
+          # Pull the latest changes from the remote main branch
+          git pull origin main
+
+          # Push the changes to the remote main branch
+          git push
+
+      - name: Check if adding new products versions in main.libsonnet
+        id: libsonnet_check_changes
+        run: |
+          git diff --quiet "$GITHUB_WORKSPACE"/benchmark_runner/grafana/perf/jsonnet/main.libsonnet || echo "changes=true" >> "$GITHUB_OUTPUT"
+
+      - name: Commit main.libsonnet if any changes are detected
+        if: steps.libsonnet_check_changes.outputs.changes == 'true'
+        run: |
+          git checkout main
+          git config --global user.email "${{ secrets.EMAIL }}"
+          git config --global user.name  "${{ secrets.USER_NAME }}"
+          git add "$GITHUB_WORKSPACE"/benchmark_runner/grafana/perf/jsonnet/main.libsonnet
+          git commit -m "Update grafana json file"
+
+          # Pull the latest changes from the remote main branch
+          git pull origin main
+
+          # Push the changes to the remote main branch
+          git push

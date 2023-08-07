@@ -148,6 +148,9 @@ jobs:
         IBM_BUCKET: ${{ secrets.IBM_BUCKET }}
         IBM_KEY: ${{ secrets.IBM_KEY }}
         RUN_ARTIFACTS_URL: ${{ secrets.PERF_RUN_ARTIFACTS_URL }}
+        GRAFANA_URL: ${{ secrets.PERF_GRAFANA_URL }}
+        GRAFANA_API_KEY: ${{ secrets.PERF_GRAFANA_API_KEY }}
+        GRAFANA_JSON: ${{ secrets.PERF_GRAFANA_JSON }}
       run: |
         # Install Dockerfile content for pytest
         # install oc/kubectl
