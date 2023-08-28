@@ -26,7 +26,7 @@ def __get_test_environment_variable():
     # Grafana
     test_environment_variable['grafana_url'] = EnvironmentVariables.get_env('GRAFANA_URL', '')
     test_environment_variable['grafana_api_key'] = EnvironmentVariables.get_env('GRAFANA_API_KEY', '')
-    test_environment_variable['grafana_json'] = EnvironmentVariables.get_env('GRAFANA_JSON', '')
+    test_environment_variable['grafana_json_path'] = EnvironmentVariables.get_env('GRAFANA_JSON_PATH', '')
 
     # end dynamic parameters - configure for local run
     ##################################################################################################

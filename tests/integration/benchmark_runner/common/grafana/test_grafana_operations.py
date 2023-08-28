@@ -11,7 +11,7 @@ def test_fetch_all_dashboards():
     if test_environment_variable.get('grafana_url'):
         grafana_operations = GrafanaOperations(grafana_url=test_environment_variable.get('grafana_url', ''),
                                                grafana_api_key=test_environment_variable.get('grafana_api_key', ''),
-                                               grafana_json=test_environment_variable.get('grafana_json', ''))
+                                               grafana_json_path=test_environment_variable.get('grafana_json_path', ''))
         all_dashboards = grafana_operations.fetch_all_dashboards()
         assert all_dashboards
     else:
