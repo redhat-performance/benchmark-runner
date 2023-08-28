@@ -193,6 +193,12 @@ class EnvironmentVariables:
         self._environment_variables_dict['bucket'] = EnvironmentVariables.get_env('IBM_BUCKET', '')
         self._environment_variables_dict['key'] = EnvironmentVariables.get_env('IBM_KEY', '')
 
+        # Grafana
+        self._environment_variables_dict['grafana_url'] = EnvironmentVariables.get_env('GRAFANA_URL', '')
+        self._environment_variables_dict['grafana_api_key'] = EnvironmentVariables.get_env('GRAFANA_API_KEY', '')
+        self._environment_variables_dict['grafana_json_path'] = EnvironmentVariables.get_env('GRAFANA_JSON_PATH', '')
+        self._environment_variables_dict['main_libsonnet_path'] = EnvironmentVariables.get_env('MAIN_LIBSONNET_PATH', '')
+
         # Parameters below related to 'install_ocp()'
         # MANDATORY for OCP install: assisted installer version i.e. 'latest-4.11' or '4.11.16' : https://mirror.openshift.com/pub/openshift-v4/clients/ocp
         self._environment_variables_dict['install_ocp_version'] = EnvironmentVariables.get_env('INSTALL_OCP_VERSION', '')

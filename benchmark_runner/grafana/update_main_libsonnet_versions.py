@@ -1,0 +1,10 @@
+
+from benchmark_runner.common.grafana.update_grafana_last_value_mappings import UpdateGrafanaLastValueMappings
+from benchmark_runner.main.environment_variables import environment_variables
+
+# Update perf main.libsonnet with last versions
+environment_variables_dict = environment_variables.environment_variables_dict
+update_grafana_mappings_value = UpdateGrafanaLastValueMappings(main_libsonnet_path=environment_variables_dict.get('main_libsonnet_path', ''))
+last_versions = update_grafana_mappings_value.get_last_elasticsearch_versions()
+update_grafana_mappings_value.update_value_mappings_last_versions(last_versions=last_versions)
+update_grafana_mappings_value.update_main_libsonnet()

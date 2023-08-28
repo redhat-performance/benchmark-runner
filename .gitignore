@@ -200,6 +200,11 @@ fabric.properties
 # Editor-based Rest Client
 .idea/httpRequests
 
+# Terraform
+.terraform
+.terraform.lock.hcl
+terraform.tfstate
+
 # custom file configuration
 /benchmark_runner/main/empty_environment_variables.py
 /benchmark_runner/main/empty_test_environment_variables.py
