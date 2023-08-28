@@ -321,6 +321,9 @@ jobs:
     name: update_grafana_dashboard
     needs: [ initialize_nightly, workload, finalize_nightly ]
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ '3.10' ]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -337,7 +340,7 @@ jobs:
           ELASTICSEARCH_USER: ${{ secrets.PERF_ELASTICSEARCH_USER }}
           ELASTICSEARCH_PASSWORD: ${{ secrets.PERF_ELASTICSEARCH_PASSWORD }}
         run: |
-          python "$GITHUB_WORKSPACE"/grafonnet_generator/grafana/update_versions_main_libsonnet.py
+          python "$GITHUB_WORKSPACE"/benchmark_runner/grafana/update_versions_main_libsonnet.py
 
       - name: Generate grafana dashboard.json using grafonnet container
         run: |
