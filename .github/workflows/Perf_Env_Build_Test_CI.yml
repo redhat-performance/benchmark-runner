@@ -288,7 +288,7 @@ jobs:
           ELASTICSEARCH_USER: ${{ secrets.PERF_ELASTICSEARCH_USER }}
           ELASTICSEARCH_PASSWORD: ${{ secrets.PERF_ELASTICSEARCH_PASSWORD }}
         run: |
-          python "$GITHUB_WORKSPACE"/benchmark_runner/grafana/update_versions_main_libsonnet.py
+          cd "$GITHUB_WORKSPACE" && PYTHONPATH=. python benchmark_runner/grafana/update_versions_main_libsonnet.py
 
       - name: Generate grafana dashboard.json using grafonnet container
         run: |

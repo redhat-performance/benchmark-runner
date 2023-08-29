@@ -6,7 +6,7 @@ from benchmark_runner.main.environment_variables import environment_variables
 from benchmark_runner.common.elasticsearch.elasticsearch_operations import ElasticSearchOperations
 
 
-class UpdateGrafanaLastValueMappings:
+class UpdateGrafanaLatestValueMappings:
     """
     This class updates grafana dashboard with last value mappings from ElasticSearch
     """
