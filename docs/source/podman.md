@@ -3,11 +3,11 @@
 
 The following options may be passed via command line flags or set in the environment:
 
-**mandatory:** WORKLOAD=$WORKLOAD
-
 **mandatory:** KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD
 
 **mandatory:** $KUBECONFIG [ kubeconfig file path]
+
+**mandatory:** WORKLOAD=$WORKLOAD
 
 Choose one from the following list:
 
@@ -16,6 +16,8 @@ Choose one from the following list:
 ** For hammerdb mssql must run only once [permission](https://github.com/redhat-performance/benchmark-runner/blob/main/benchmark_runner/common/ocp_resources/custom/template/02_mssql_patch_template.sh)
 
 ** clusterbuster workloads: cpusoaker, files, fio, uperf.  For more details [see](https://github.com/RobertKrawitz/OpenShift4-tools)
+
+Not mandatory:
 
 **auto:** NAMESPACE=benchmark-operator [ The default namespace is benchmark-operator ]
 

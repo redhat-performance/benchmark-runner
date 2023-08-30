@@ -5,7 +5,7 @@
 -----------------
 
 # Benchmark-Runner: Running benchmarks
-[![Actions Status](https://github.com/redhat-performance/benchmark-runner/workflows/CI/badge.svg)](https://github.com/redhat-performance/benchmark-runner/actions)
+[![Actions Status](https://github.com/redhat-performance/benchmark-runner/actions/workflows/Perf_Env_Build_Test_CI.yml/badge.svg)](https://github.com/redhat-performance/benchmark-runner/actions)
 [![PyPI Latest Release](https://img.shields.io/pypi/v/benchmark-runner.svg)](https://pypi.org/project/benchmark-runner/)
 [![Container Repository on Quay](https://quay.io/repository/projectquay/quay/status "Container Repository on Quay")](https://quay.io/repository/ebattat/benchmark-runner?tab=tags)
 [![Coverage Status](https://coveralls.io/repos/github/redhat-performance/benchmark-runner/badge.svg?branch=main)](https://coveralls.io/github/redhat-performance/benchmark-runner?branch=main&kill_cache=1)
@@ -57,17 +57,19 @@ _**Table of Contents**_
 
 The following options may be passed via command line flags or set in the environment:
 
-**mandatory:** WORKLOAD=$WORKLOAD
-
 **mandatory:** KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD
 
 **mandatory:** $KUBECONFIG [ kubeconfig file path]
+
+**mandatory:** WORKLOAD=$WORKLOAD
 
 Choose one from the following list:
 
 `['stressng_pod', 'stressng_vm', 'stressng_kata', 'uperf_pod', 'uperf_vm', 'uperf_kata', 'hammerdb_pod_mariadb', 'hammerdb_vm_mariadb', 'hammerdb_kata_mariadb', 'hammerdb_pod_mariadb_lso', 'hammerdb_vm_mariadb_lso', 'hammerdb_kata_mariadb_lso', 'hammerdb_pod_postgres', 'hammerdb_vm_postgres', 'hammerdb_kata_postgres', 'hammerdb_pod_postgres_lso', 'hammerdb_vm_postgres_lso', 'hammerdb_kata_postgres_lso', 'hammerdb_pod_mssql', 'hammerdb_vm_mssql', 'hammerdb_kata_mssql', 'hammerdb_pod_mssql_lso', 'hammerdb_vm_mssql_lso', 'hammerdb_kata_mssql_lso', 'vdbench_pod', 'vdbench_kata', 'vdbench_vm', 'clusterbuster', 'bootstorm_vm']`
 
 ** clusterbuster workloads: cpusoaker, files, fio, uperf. for more details [see](https://github.com/RobertKrawitz/OpenShift4-tools)
+
+Not mandatory:
 
 **auto:** NAMESPACE=benchmark-operator [ The default namespace is benchmark-operator ]
 
