@@ -321,6 +321,7 @@ jobs:
     name: update_grafana_dashboard
     needs: [ initialize_nightly, workload, finalize_nightly ]
     runs-on: ubuntu-latest
+    if: always()
     strategy:
       matrix:
         python-version: [ '3.10' ]
