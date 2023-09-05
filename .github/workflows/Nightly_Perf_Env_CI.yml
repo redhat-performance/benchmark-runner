@@ -361,7 +361,7 @@ jobs:
           # Backup dashboard.json before before adding dashboard version by Python code
           cp -p "$GITHUB_WORKSPACE"/benchmark_runner/grafana/perf/dashboard.json "$GITHUB_WORKSPACE"/benchmark_runner/grafana/perf/dashboard_backup.json
           # Updates new product versions and override Grafana dashboard
-          python "$GITHUB_WORKSPACE"/benchmark_runner/grafana/update_grafana_dashboard.py
+          cd "$GITHUB_WORKSPACE" && PYTHONPATH=. python "$GITHUB_WORKSPACE"/benchmark_runner/grafana/update_grafana_dashboard.py
           # Revert dashboard.json after adding dashboard version by Python code
           cp -p "$GITHUB_WORKSPACE"/benchmark_runner/grafana/perf/dashboard_backup.json "$GITHUB_WORKSPACE"/benchmark_runner/grafana/perf/dashboard.json
 
