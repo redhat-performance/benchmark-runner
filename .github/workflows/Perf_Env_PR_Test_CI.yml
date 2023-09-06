@@ -150,7 +150,7 @@ jobs:
         RUN_ARTIFACTS_URL: ${{ secrets.PERF_RUN_ARTIFACTS_URL }}
         GRAFANA_URL: ${{ secrets.PERF_GRAFANA_URL }}
         GRAFANA_API_KEY: ${{ secrets.PERF_GRAFANA_API_KEY }}
-        GRAFANA_JSON: ${{ secrets.PERF_GRAFANA_JSON }}
+        GRAFANA_JSON_PATH: ${{ secrets.PERF_GRAFANA_JSON_PATH }}
       run: |
         # Install Dockerfile content for pytest
         # install oc/kubectl
