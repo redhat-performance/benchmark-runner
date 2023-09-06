@@ -468,9 +468,9 @@
                            "index": 140,
                            "text": "4.12.5-2"
                         },
-                        "41263": {
+                        "41272": {
                            "index": 149,
-                           "text": "4.12.6-3"
+                           "text": "4.12.7-2"
                         },
                         "4130": {
                            "index": 106,
@@ -556,9 +556,9 @@
                            "index": 109,
                            "text": "4.13.1"
                         },
-                        "41310": {
+                        "41311": {
                            "index": 147,
-                           "text": "4.13.10"
+                           "text": "4.13.11"
                         },
                         "4131154": {
                            "index": 115,
@@ -624,13 +624,13 @@
                            "index": 130,
                            "text": "4.13.4"
                         },
+                        "4134140": {
+                           "index": 148,
+                           "text": "4.13.4-140"
+                        },
                         "413426": {
                            "index": 145,
                            "text": "4.13.4-26"
-                        },
-                        "413482": {
-                           "index": 148,
-                           "text": "4.13.4-82"
                         },
                         "4136": {
                            "index": 122,
@@ -1032,7 +1032,7 @@
                   {
                      "targetBlank": true,
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&viewPanel=128"
+                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&viewPanel=32&from=now-45d&to=now"
                   }
                ],
                "options": {
@@ -1192,7 +1192,7 @@
                   {
                      "targetBlank": true,
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&viewPanel=129"
+                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&editPanel=33&from=now-45d&to=now"
                   }
                ],
                "options": {
@@ -1394,7 +1394,7 @@
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&viewPanel=129"
+                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&editPanel=33&from=now-45d&to=now"
                   }
                ],
                "options": {
@@ -1544,11 +1544,11 @@
                   {
                      "targetBlank": true,
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=133"
+                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=34"
                   },
                   {
-                     "title": "scale  log link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=195"
+                     "title": "scale artifacts link",
+                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=35"
                   }
                ],
                "options": {
@@ -1913,7 +1913,11 @@
                   {
                      "targetBlank": true,
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&editPanel=133&from=now-45d&to=now"
+                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=34"
+                  },
+                  {
+                     "title": "scale artifacts link",
+                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=35"
                   }
                ],
                "options": {
@@ -2290,7 +2294,7 @@
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=now-45d&to=now&viewPanel=150"
+                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=36"
                   }
                ],
                "options": {
@@ -2524,7 +2528,7 @@
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=now-45d&to=now&viewPanel=150"
+                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=36"
                   }
                ],
                "options": {
@@ -2725,7 +2729,7 @@
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=now-45d&to=now&viewPanel=150"
+                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=36"
                   }
                ],
                "options": {
@@ -3026,7 +3030,7 @@
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=now-45d&to=now&viewPanel=150"
+                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=36"
                   }
                ],
                "options": {
@@ -3532,7 +3536,7 @@
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=now-45d&to=now&viewPanel=150"
+                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=36"
                   }
                ],
                "options": {
@@ -4012,7 +4016,7 @@
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=now-45d&to=now&viewPanel=150"
+                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=36"
                   }
                ],
                "options": {
@@ -4239,7 +4243,7 @@
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=now-45d&to=now&viewPanel=150"
+                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=36"
                   }
                ],
                "options": {
@@ -4479,7 +4483,7 @@
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=1659592686997&to=1663480686997&viewPanel=166"
+                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=37"
                   }
                ],
                "options": {
@@ -4880,7 +4884,7 @@
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=now-45d&to=now&viewPanel=150"
+                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=37"
                   }
                ],
                "options": {
@@ -5276,7 +5280,7 @@
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=now-45d&to=now&viewPanel=150"
+                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=37"
                   }
                ],
                "options": {
@@ -5402,7 +5406,7 @@
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=now-45d&to=now&viewPanel=150"
+                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=37"
                   }
                ],
                "options": {
@@ -5563,7 +5567,7 @@
                   {
                      "targetBlank": true,
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=now-45d&to=now&viewPanel=190"
+                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=38"
                   }
                ],
                "options": {
@@ -6151,7 +6155,7 @@
                   {
                      "targetBlank": true,
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=194"
+                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=39"
                   }
                ],
                "options": {
