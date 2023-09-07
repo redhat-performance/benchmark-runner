@@ -12,6 +12,7 @@ class UpdateGrafanaLatestValueMappings:
     """
     # Prevent error messages from being saved instead of versions in case of a connection issue
     MAX_VERSION_LEN = 20
+    LAST_ES_FETCH_DAYS = 30
 
     def __init__(self, main_libsonnet_path: str):
         # Stamp start/ end value mapping for extract value mapping
@@ -25,15 +26,15 @@ class UpdateGrafanaLatestValueMappings:
         self.main_libsonnet_path = main_libsonnet_path
         self.value_mappings = self.get_value_mappings()
 
-    def get_last_elasticsearch_versions(self, last_days=7):
+    def get_last_elasticsearch_versions(self, last_es_fetch_days=LAST_ES_FETCH_DAYS):
         """
-        This method fetched new version from ElasticSearch
-        :param last_days: default fetch 7 days
+        This method fetches new versions from ElasticSearch
+        :param last_es_fetch_days: default fetch 30 days
         :return:
         """
         new_versions = {}
         current_datetime = datetime.now()
-        start_datetime = current_datetime - timedelta(days=last_days)
+        start_datetime = current_datetime - timedelta(days=last_es_fetch_days)
 
         ids = self.elasticsearch.get_index_ids_between_dates(index='ci-status', start_datetime=start_datetime,
                                                              end_datetime=current_datetime)
