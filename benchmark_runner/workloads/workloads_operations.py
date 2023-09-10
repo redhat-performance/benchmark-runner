@@ -18,6 +18,7 @@ from benchmark_runner.common.prometheus.prometheus_snapshot import PrometheusSna
 from benchmark_runner.common.prometheus.prometheus_snapshot_exceptions import PrometheusSnapshotError
 from benchmark_runner.common.template_operations.template_operations import TemplateOperations
 from benchmark_runner.common.clouds.IBM.ibm_operations import IBMOperations
+from benchmark_runner.common.prometheus.prometheus_metrics_operations import PrometheusMetricsOperation
 
 
 class WorkloadsOperations:
@@ -96,6 +97,7 @@ class WorkloadsOperations:
         if self._enable_prometheus_snapshot:
             self._snapshot = PrometheusSnapshot(oc=self._oc, artifacts_path=self._run_artifacts_path, verbose=True)
         self._prometheus_snap_interval = self._environment_variables_dict.get('prometheus_snap_interval', '')
+        self._prometheus_metrics_operation = PrometheusMetricsOperation()
 
     def __get_workload_file_name(self, workload):
         """
@@ -425,30 +427,6 @@ class WorkloadsOperations:
         length = len(iterable)
         for ndx in range(0, length, limit):
             yield iterable[ndx:min(ndx + limit, length)]
-
-    @staticmethod
-    @logger_time_stamp
-    def parse_prometheus_metrics(data):
-        """
-        This method parses prometheus metrics and return summary result
-        @return:
-        """
-        result_dict = {}
-        for query, data_list in data.items():
-            if 'containerCPU-benchmark-runner' in query:
-                suffix = 'CPU'
-            elif 'containerMemory-benchmark-runner' in query:
-                suffix = 'Memory'
-            total = 0
-            max = 0
-            for item in data_list:
-                for val in item['values']:
-                    if float(val[1]) > max:
-                        max = round(float(val[1]), 3)
-                total = total + max
-                result_dict[f"{item['metric']['node']}_{suffix}"] = max
-                result_dict[f'total_{suffix}'] = total
-        return result_dict
 
     @logger_time_stamp
     def clear_nodes_cache(self):
