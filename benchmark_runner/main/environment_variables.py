@@ -198,6 +198,7 @@ class EnvironmentVariables:
         self._environment_variables_dict['grafana_api_key'] = EnvironmentVariables.get_env('GRAFANA_API_KEY', '')
         self._environment_variables_dict['grafana_json_path'] = EnvironmentVariables.get_env('GRAFANA_JSON_PATH', '')
         self._environment_variables_dict['main_libsonnet_path'] = EnvironmentVariables.get_env('MAIN_LIBSONNET_PATH', '')
+        self._environment_variables_dict['grafana_folder_name'] = EnvironmentVariables.get_env('GRAFANA_FOLDER_NAME', '')
 
         # Parameters below related to 'install_ocp()'
         # MANDATORY for OCP install: assisted installer version i.e. 'latest-4.11' or '4.11.16' : https://mirror.openshift.com/pub/openshift-v4/clients/ocp
