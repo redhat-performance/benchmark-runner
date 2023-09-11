@@ -1,4 +1,5 @@
 
+
 # container CPU/Memory
 
 - query: (sum(irate(container_cpu_usage_seconds_total{container!="",namespace="benchmark-runner", mode!="idle"}[2m])) by (node)) > 0
@@ -7,4 +8,12 @@
 - query: sum(container_memory_rss{namespace="benchmark-runner"} and on (node) kube_node_role{role="worker"}) by (node) > 0
   metricName: containerMemory-benchmark-runner
 
+- query: container_memory_cache{pod=~"virt-launcher.*", container="compute"}
+  metricName: VM Memory Cache
+
+- query: container_memory_working_set_bytes{pod=~"virt-launcher.*", container="compute"}
+  metricName: VM Memory working set bytes
+
+- query: container_memory_max_usage_bytes{pod=~"virt-launcher.*", container="compute"}
+  metricName: VM Memory Max Usage Bytes
 
