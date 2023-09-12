@@ -384,7 +384,7 @@ jobs:
           git pull origin main
 
           # Push the changes to the remote main branch
-          git push
+          git push origin main
 
       - name: Check if adding new products versions in main.libsonnet
         id: libsonnet_check_changes
@@ -404,4 +404,4 @@ jobs:
           git pull origin main
 
           # Push the changes to the remote main branch
-          git push
+          git push origin main
