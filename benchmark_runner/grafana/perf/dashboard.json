@@ -468,8 +468,12 @@
                            "index": 140,
                            "text": "4.12.5-2"
                         },
-                        "41272": {
+                        "41263": {
                            "index": 149,
+                           "text": "4.12.6-3"
+                        },
+                        "41272": {
+                           "index": 152,
                            "text": "4.12.7-2"
                         },
                         "4130": {
@@ -556,8 +560,12 @@
                            "index": 109,
                            "text": "4.13.1"
                         },
-                        "41311": {
+                        "41310": {
                            "index": 147,
+                           "text": "4.13.10"
+                        },
+                        "41311": {
+                           "index": 150,
                            "text": "4.13.11"
                         },
                         "4131154": {
@@ -569,7 +577,7 @@
                            "text": "4.13.1-18"
                         },
                         "41312": {
-                           "index": 150,
+                           "index": 153,
                            "text": "4.13.12"
                         },
                         "4131206": {
@@ -629,16 +637,20 @@
                            "text": "4.13.4"
                         },
                         "4134140": {
-                           "index": 148,
+                           "index": 151,
                            "text": "4.13.4-140"
                         },
                         "4134192": {
-                           "index": 151,
+                           "index": 154,
                            "text": "4.13.4-192"
                         },
                         "413426": {
                            "index": 145,
                            "text": "4.13.4-26"
+                        },
+                        "413482": {
+                           "index": 148,
+                           "text": "4.13.4-82"
                         },
                         "4136": {
                            "index": 122,
@@ -1040,7 +1052,7 @@
                   {
                      "targetBlank": true,
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&viewPanel=32&from=now-45d&to=now"
+                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&viewPanel=128"
                   }
                ],
                "options": {
@@ -1200,7 +1212,7 @@
                   {
                      "targetBlank": true,
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&editPanel=33&from=now-45d&to=now"
+                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&viewPanel=129"
                   }
                ],
                "options": {
@@ -1402,7 +1414,7 @@
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&editPanel=33&from=now-45d&to=now"
+                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&viewPanel=129"
                   }
                ],
                "options": {
@@ -1552,11 +1564,11 @@
                   {
                      "targetBlank": true,
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=34"
+                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=133"
                   },
                   {
-                     "title": "scale artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=35"
+                     "title": "scale  log link",
+                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=195"
                   }
                ],
                "options": {
@@ -1634,48 +1646,7 @@
                      "timeField": "timestamp"
                   },
                   {
-                     "alias": "Total {{term kind.keyword}} Memory (GB) [384GB]",
-                     "bucketAggs": [
-                        {
-                           "field": "kind.keyword",
-                           "id": "6",
-                           "settings": {
-                              "min_doc_count": "1",
-                              "order": "desc",
-                              "orderBy": "_term",
-                              "size": "10"
-                           },
-                           "type": "terms"
-                        },
-                        {
-                           "field": "timestamp",
-                           "id": "5",
-                           "settings": {
-                              "interval": "auto",
-                              "min_doc_count": "0",
-                              "timeZone": "utc",
-                              "trimEdges": "0"
-                           },
-                           "type": "date_histogram"
-                        }
-                     ],
-                     "hide": false,
-                     "metrics": [
-                        {
-                           "field": "total_Memory",
-                           "id": "1",
-                           "settings": {
-                              "script": "_value/1000000000"
-                           },
-                           "type": "max"
-                        }
-                     ],
-                     "query": "!SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type AND ocp_version:$ocp_version",
-                     "refId": "B",
-                     "timeField": "timestamp"
-                  },
-                  {
-                     "alias": "Total {{term kind.keyword}} %CPU [240 cores]",
+                     "alias": "Total %CPU [240 cores]: 1 {{term kind.keyword}}",
                      "bucketAggs": [
                         {
                            "field": "kind.keyword",
@@ -1709,6 +1680,63 @@
                         }
                      ],
                      "query": "!SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type AND ocp_version:$ocp_version",
+                     "refId": "B",
+                     "timeField": "timestamp"
+                  },
+                  {
+                     "alias": "{{field}} [GB]",
+                     "bucketAggs": [
+                        {
+                           "field": "kind.keyword",
+                           "id": "6",
+                           "settings": {
+                              "min_doc_count": "1",
+                              "order": "desc",
+                              "orderBy": "_term",
+                              "size": "10"
+                           },
+                           "type": "terms"
+                        },
+                        {
+                           "field": "timestamp",
+                           "id": "5",
+                           "settings": {
+                              "interval": "auto",
+                              "min_doc_count": "0",
+                              "timeZone": "utc",
+                              "trimEdges": "0"
+                           },
+                           "type": "date_histogram"
+                        }
+                     ],
+                     "hide": false,
+                     "metrics": [
+                        {
+                           "field": "VM Memory Cache",
+                           "id": "1",
+                           "settings": {
+                              "script": "_value/1000000000"
+                           },
+                           "type": "max"
+                        },
+                        {
+                           "field": "VM Memory working set bytes",
+                           "id": "2",
+                           "settings": {
+                              "script": "_value/1000000000"
+                           },
+                           "type": "max"
+                        },
+                        {
+                           "field": "VM Memory Max Usage Bytes",
+                           "id": "3",
+                           "settings": {
+                              "script": "_value/1000000000"
+                           },
+                           "type": "max"
+                        }
+                     ],
+                     "query": "!SCALE AND !Run.keyword='fillup' AND kind:'vm' AND Run:$vdbench_type AND ocp_version:$ocp_version",
                      "refId": "C",
                      "timeField": "timestamp"
                   },
@@ -1779,12 +1807,12 @@
                            "type": "avg"
                         }
                      ],
-                     "query": "!SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type AND ocp_version:$ocp_version",
+                     "query": "SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type AND ocp_version:$ocp_version",
                      "refId": "D",
                      "timeField": "timestamp"
                   },
                   {
-                     "alias": "Total {{term kind.keyword}} Memory (GB) [384GB]",
+                     "alias": "Total %CPU [240 cores]: {{term scale}} {{term kind.keyword}}",
                      "bucketAggs": [
                         {
                            "field": "kind.keyword",
@@ -1798,38 +1826,8 @@
                            "type": "terms"
                         },
                         {
-                           "field": "timestamp",
-                           "id": "5",
-                           "settings": {
-                              "interval": "auto",
-                              "min_doc_count": "0",
-                              "timeZone": "utc",
-                              "trimEdges": "0"
-                           },
-                           "type": "date_histogram"
-                        }
-                     ],
-                     "hide": false,
-                     "metrics": [
-                        {
-                           "field": "total_Memory",
-                           "id": "1",
-                           "settings": {
-                              "script": "_value/1000000000"
-                           },
-                           "type": "max"
-                        }
-                     ],
-                     "query": "!SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type AND ocp_version:$ocp_version",
-                     "refId": "E",
-                     "timeField": "timestamp"
-                  },
-                  {
-                     "alias": "Total {{term kind.keyword}} %CPU [240 cores]",
-                     "bucketAggs": [
-                        {
-                           "field": "kind.keyword",
-                           "id": "2",
+                           "field": "scale",
+                           "id": "3",
                            "settings": {
                               "min_doc_count": "1",
                               "order": "desc",
@@ -1859,7 +1857,64 @@
                            "type": "max"
                         }
                      ],
-                     "query": "!SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type AND ocp_version:$ocp_version",
+                     "query": "SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type AND ocp_version:$ocp_version",
+                     "refId": "E",
+                     "timeField": "timestamp"
+                  },
+                  {
+                     "alias": "{{field}} [GB]",
+                     "bucketAggs": [
+                        {
+                           "field": "kind.keyword",
+                           "id": "6",
+                           "settings": {
+                              "min_doc_count": "1",
+                              "order": "desc",
+                              "orderBy": "_term",
+                              "size": "10"
+                           },
+                           "type": "terms"
+                        },
+                        {
+                           "field": "timestamp",
+                           "id": "5",
+                           "settings": {
+                              "interval": "auto",
+                              "min_doc_count": "0",
+                              "timeZone": "utc",
+                              "trimEdges": "0"
+                           },
+                           "type": "date_histogram"
+                        }
+                     ],
+                     "hide": false,
+                     "metrics": [
+                        {
+                           "field": "VM Memory Cache",
+                           "id": "1",
+                           "settings": {
+                              "script": "_value/1000000000"
+                           },
+                           "type": "max"
+                        },
+                        {
+                           "field": "VM Memory working set bytes",
+                           "id": "2",
+                           "settings": {
+                              "script": "_value/1000000000"
+                           },
+                           "type": "max"
+                        },
+                        {
+                           "field": "VM Memory Max Usage Bytes",
+                           "id": "3",
+                           "settings": {
+                              "script": "_value/1000000000"
+                           },
+                           "type": "max"
+                        }
+                     ],
+                     "query": "SCALE AND !Run.keyword='fillup' AND kind:'vm' AND Run:$vdbench_type AND ocp_version:$ocp_version",
                      "refId": "F",
                      "timeField": "timestamp"
                   }
@@ -1921,11 +1976,7 @@
                   {
                      "targetBlank": true,
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=34"
-                  },
-                  {
-                     "title": "scale artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=35"
+                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&editPanel=133&from=now-45d&to=now"
                   }
                ],
                "options": {
@@ -2003,48 +2054,7 @@
                      "timeField": "timestamp"
                   },
                   {
-                     "alias": "\"Total {{term kind.keyword}} Memory (GB) [384GB]",
-                     "bucketAggs": [
-                        {
-                           "field": "kind.keyword",
-                           "id": "3",
-                           "settings": {
-                              "min_doc_count": "1",
-                              "order": "desc",
-                              "orderBy": "_term",
-                              "size": "10"
-                           },
-                           "type": "terms"
-                        },
-                        {
-                           "field": "timestamp",
-                           "id": "5",
-                           "settings": {
-                              "interval": "auto",
-                              "min_doc_count": "0",
-                              "timeZone": "utc",
-                              "trimEdges": "0"
-                           },
-                           "type": "date_histogram"
-                        }
-                     ],
-                     "hide": false,
-                     "metrics": [
-                        {
-                           "field": "total_Memory",
-                           "id": "1",
-                           "settings": {
-                              "script": "_value/1000000000"
-                           },
-                           "type": "max"
-                        }
-                     ],
-                     "query": "!SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type AND ocp_version:$ocp_version",
-                     "refId": "B",
-                     "timeField": "timestamp"
-                  },
-                  {
-                     "alias": "Total {{term kind.keyword}} %CPU [240 cores]",
+                     "alias": "Total %CPU [240 cores]: 1 {{term kind.keyword}}",
                      "bucketAggs": [
                         {
                            "field": "kind.keyword",
@@ -2078,7 +2088,64 @@
                         }
                      ],
                      "query": "!SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type AND ocp_version:$ocp_version",
-                     "refId": "D",
+                     "refId": "B",
+                     "timeField": "timestamp"
+                  },
+                  {
+                     "alias": "{{field}} [GB]",
+                     "bucketAggs": [
+                        {
+                           "field": "kind.keyword",
+                           "id": "6",
+                           "settings": {
+                              "min_doc_count": "1",
+                              "order": "desc",
+                              "orderBy": "_term",
+                              "size": "10"
+                           },
+                           "type": "terms"
+                        },
+                        {
+                           "field": "timestamp",
+                           "id": "5",
+                           "settings": {
+                              "interval": "auto",
+                              "min_doc_count": "0",
+                              "timeZone": "utc",
+                              "trimEdges": "0"
+                           },
+                           "type": "date_histogram"
+                        }
+                     ],
+                     "hide": false,
+                     "metrics": [
+                        {
+                           "field": "VM Memory Cache",
+                           "id": "1",
+                           "settings": {
+                              "script": "_value/1000000000"
+                           },
+                           "type": "max"
+                        },
+                        {
+                           "field": "VM Memory working set bytes",
+                           "id": "2",
+                           "settings": {
+                              "script": "_value/1000000000"
+                           },
+                           "type": "max"
+                        },
+                        {
+                           "field": "VM Memory Max Usage Bytes",
+                           "id": "3",
+                           "settings": {
+                              "script": "_value/1000000000"
+                           },
+                           "type": "max"
+                        }
+                     ],
+                     "query": "!SCALE AND !Run.keyword='fillup' AND kind:'vm' AND Run:$vdbench_type AND ocp_version:$ocp_version",
+                     "refId": "C",
                      "timeField": "timestamp"
                   },
                   {
@@ -2149,15 +2216,15 @@
                         }
                      ],
                      "query": "SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type AND ocp_version:$ocp_version",
-                     "refId": "C",
+                     "refId": "D",
                      "timeField": "timestamp"
                   },
                   {
-                     "alias": "Total {{term kind.keyword}} Memory (GB) [384GB]",
+                     "alias": "Total %CPU [240 cores]: {{term scale}} {{term kind.keyword}}",
                      "bucketAggs": [
                         {
                            "field": "kind.keyword",
-                           "id": "3",
+                           "id": "2",
                            "settings": {
                               "min_doc_count": "1",
                               "order": "desc",
@@ -2167,37 +2234,7 @@
                            "type": "terms"
                         },
                         {
-                           "field": "timestamp",
-                           "id": "5",
-                           "settings": {
-                              "interval": "auto",
-                              "min_doc_count": "0",
-                              "timeZone": "utc",
-                              "trimEdges": "0"
-                           },
-                           "type": "date_histogram"
-                        }
-                     ],
-                     "hide": false,
-                     "metrics": [
-                        {
-                           "field": "total_Memory",
-                           "id": "1",
-                           "settings": {
-                              "script": "_value/1000000000"
-                           },
-                           "type": "max"
-                        }
-                     ],
-                     "query": "SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type AND ocp_version:$ocp_version",
-                     "refId": "E",
-                     "timeField": "timestamp"
-                  },
-                  {
-                     "alias": "Total {{term kind.keyword}} %CPU [240 cores]",
-                     "bucketAggs": [
-                        {
-                           "field": "kind.keyword",
+                           "field": "scale",
                            "id": "3",
                            "settings": {
                               "min_doc_count": "1",
@@ -2229,11 +2266,68 @@
                         }
                      ],
                      "query": "SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type AND ocp_version:$ocp_version",
+                     "refId": "E",
+                     "timeField": "timestamp"
+                  },
+                  {
+                     "alias": "{{field}} [GB]",
+                     "bucketAggs": [
+                        {
+                           "field": "kind.keyword",
+                           "id": "6",
+                           "settings": {
+                              "min_doc_count": "1",
+                              "order": "desc",
+                              "orderBy": "_term",
+                              "size": "10"
+                           },
+                           "type": "terms"
+                        },
+                        {
+                           "field": "timestamp",
+                           "id": "5",
+                           "settings": {
+                              "interval": "auto",
+                              "min_doc_count": "0",
+                              "timeZone": "utc",
+                              "trimEdges": "0"
+                           },
+                           "type": "date_histogram"
+                        }
+                     ],
+                     "hide": false,
+                     "metrics": [
+                        {
+                           "field": "VM Memory Cache",
+                           "id": "1",
+                           "settings": {
+                              "script": "_value/1000000000"
+                           },
+                           "type": "max"
+                        },
+                        {
+                           "field": "VM Memory working set bytes",
+                           "id": "2",
+                           "settings": {
+                              "script": "_value/1000000000"
+                           },
+                           "type": "max"
+                        },
+                        {
+                           "field": "VM Memory Max Usage Bytes",
+                           "id": "3",
+                           "settings": {
+                              "script": "_value/1000000000"
+                           },
+                           "type": "max"
+                        }
+                     ],
+                     "query": "SCALE AND !Run.keyword='fillup' AND kind:'vm' AND Run:$vdbench_type AND ocp_version:$ocp_version",
                      "refId": "F",
                      "timeField": "timestamp"
                   }
                ],
-               "title": "vdbench Latency  (sec)",
+               "title": "vdbench Latency (sec)",
                "type": "state-timeline"
             }
          ],
@@ -2302,7 +2396,7 @@
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=36"
+                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=now-45d&to=now&viewPanel=150"
                   }
                ],
                "options": {
@@ -2536,7 +2630,7 @@
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=36"
+                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=now-45d&to=now&viewPanel=150"
                   }
                ],
                "options": {
@@ -2737,7 +2831,7 @@
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=36"
+                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=now-45d&to=now&viewPanel=150"
                   }
                ],
                "options": {
@@ -3038,7 +3132,7 @@
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=36"
+                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=now-45d&to=now&viewPanel=150"
                   }
                ],
                "options": {
@@ -3544,7 +3638,7 @@
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=36"
+                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=now-45d&to=now&viewPanel=150"
                   }
                ],
                "options": {
@@ -4024,7 +4118,7 @@
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=36"
+                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=now-45d&to=now&viewPanel=150"
                   }
                ],
                "options": {
@@ -4251,7 +4345,7 @@
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=36"
+                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=now-45d&to=now&viewPanel=150"
                   }
                ],
                "options": {
@@ -4491,7 +4585,7 @@
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=37"
+                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=1659592686997&to=1663480686997&viewPanel=166"
                   }
                ],
                "options": {
@@ -4892,7 +4986,7 @@
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=37"
+                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=now-45d&to=now&viewPanel=150"
                   }
                ],
                "options": {
@@ -5288,7 +5382,7 @@
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=37"
+                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=now-45d&to=now&viewPanel=150"
                   }
                ],
                "options": {
@@ -5414,7 +5508,7 @@
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=37"
+                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=now-45d&to=now&viewPanel=150"
                   }
                ],
                "options": {
@@ -5575,7 +5669,7 @@
                   {
                      "targetBlank": true,
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=38"
+                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/regression-summary?orgId=1&from=now-45d&to=now&viewPanel=190"
                   }
                ],
                "options": {
@@ -5764,158 +5858,6 @@
                      "timeField": "timestamp"
                   },
                   {
-                     "alias": "Memory(GB) [384GB]",
-                     "bucketAggs": [
-                        {
-                           "field": "scale",
-                           "id": "3",
-                           "settings": {
-                              "min_doc_count": "1",
-                              "order": "desc",
-                              "orderBy": "_term",
-                              "size": "10"
-                           },
-                           "type": "terms"
-                        },
-                        {
-                           "field": "timestamp",
-                           "id": "2",
-                           "settings": {
-                              "interval": "auto"
-                           },
-                           "type": "date_histogram"
-                        }
-                     ],
-                     "hide": false,
-                     "metrics": [
-                        {
-                           "field": "total_Memory",
-                           "id": "1",
-                           "settings": {
-                              "script": "_value/1000000000"
-                           },
-                           "type": "max"
-                        }
-                     ],
-                     "query": "scale:240 AND ocp_version:$ocp_version",
-                     "refId": "F",
-                     "timeField": "timestamp"
-                  },
-                  {
-                     "alias": "Memory Worker-0 (GB) [128GB]",
-                     "bucketAggs": [
-                        {
-                           "field": "scale",
-                           "id": "3",
-                           "settings": {
-                              "min_doc_count": "1",
-                              "order": "desc",
-                              "orderBy": "_term",
-                              "size": "10"
-                           },
-                           "type": "terms"
-                        },
-                        {
-                           "field": "timestamp",
-                           "id": "2",
-                           "settings": {
-                              "interval": "auto"
-                           },
-                           "type": "date_histogram"
-                        }
-                     ],
-                     "hide": false,
-                     "metrics": [
-                        {
-                           "field": "worker-0_Memory",
-                           "id": "1",
-                           "settings": {
-                              "script": "_value/1000000000"
-                           },
-                           "type": "max"
-                        }
-                     ],
-                     "query": "scale:240 AND ocp_version:$ocp_version",
-                     "refId": "E",
-                     "timeField": "timestamp"
-                  },
-                  {
-                     "alias": "Memory Worker-1 (GB) [128GB]",
-                     "bucketAggs": [
-                        {
-                           "field": "scale",
-                           "id": "3",
-                           "settings": {
-                              "min_doc_count": "1",
-                              "order": "desc",
-                              "orderBy": "_term",
-                              "size": "10"
-                           },
-                           "type": "terms"
-                        },
-                        {
-                           "field": "timestamp",
-                           "id": "2",
-                           "settings": {
-                              "interval": "auto"
-                           },
-                           "type": "date_histogram"
-                        }
-                     ],
-                     "hide": false,
-                     "metrics": [
-                        {
-                           "field": "worker-1_Memory",
-                           "id": "1",
-                           "settings": {
-                              "script": "_value/1000000000"
-                           },
-                           "type": "max"
-                        }
-                     ],
-                     "query": "scale:240 AND ocp_version:$ocp_version",
-                     "refId": "G",
-                     "timeField": "timestamp"
-                  },
-                  {
-                     "alias": "Memory Worker-2 (GB) [128GB]",
-                     "bucketAggs": [
-                        {
-                           "field": "scale",
-                           "id": "3",
-                           "settings": {
-                              "min_doc_count": "1",
-                              "order": "desc",
-                              "orderBy": "_term",
-                              "size": "10"
-                           },
-                           "type": "terms"
-                        },
-                        {
-                           "field": "timestamp",
-                           "id": "2",
-                           "settings": {
-                              "interval": "auto"
-                           },
-                           "type": "date_histogram"
-                        }
-                     ],
-                     "hide": false,
-                     "metrics": [
-                        {
-                           "field": "worker-2_Memory",
-                           "id": "1",
-                           "settings": {
-                              "script": "_value/1000000000"
-                           },
-                           "type": "max"
-                        }
-                     ],
-                     "query": "scale:240 AND ocp_version:$ocp_version",
-                     "refId": "H",
-                     "timeField": "timestamp"
-                  },
-                  {
                      "alias": "%CPU [240 cores]",
                      "bucketAggs": [
                         {
@@ -5948,7 +5890,7 @@
                         }
                      ],
                      "query": "scale:240 AND ocp_version:$ocp_version",
-                     "refId": "I",
+                     "refId": "E",
                      "timeField": "timestamp"
                   },
                   {
@@ -5984,7 +5926,7 @@
                         }
                      ],
                      "query": "scale:240 AND ocp_version:$ocp_version",
-                     "refId": "J",
+                     "refId": "F",
                      "timeField": "timestamp"
                   },
                   {
@@ -6020,7 +5962,7 @@
                         }
                      ],
                      "query": "scale:240 AND ocp_version:$ocp_version",
-                     "refId": "K",
+                     "refId": "G",
                      "timeField": "timestamp"
                   },
                   {
@@ -6056,7 +5998,61 @@
                         }
                      ],
                      "query": "scale:240 AND ocp_version:$ocp_version",
-                     "refId": "L",
+                     "refId": "H",
+                     "timeField": "timestamp"
+                  },
+                  {
+                     "alias": "{{field}} [GB]",
+                     "bucketAggs": [
+                        {
+                           "field": "scale",
+                           "id": "3",
+                           "settings": {
+                              "min_doc_count": "1",
+                              "order": "desc",
+                              "orderBy": "_term",
+                              "size": "10"
+                           },
+                           "type": "terms"
+                        },
+                        {
+                           "field": "timestamp",
+                           "id": "2",
+                           "settings": {
+                              "interval": "auto"
+                           },
+                           "type": "date_histogram"
+                        }
+                     ],
+                     "hide": false,
+                     "metrics": [
+                        {
+                           "field": "VM Memory Cache",
+                           "id": "1",
+                           "settings": {
+                              "script": "_value/1000000000"
+                           },
+                           "type": "max"
+                        },
+                        {
+                           "field": "VM Memory working set bytes",
+                           "id": "2",
+                           "settings": {
+                              "script": "_value/1000000000"
+                           },
+                           "type": "max"
+                        },
+                        {
+                           "field": "VM Memory Max Usage Bytes",
+                           "id": "3",
+                           "settings": {
+                              "script": "_value/1000000000"
+                           },
+                           "type": "max"
+                        }
+                     ],
+                     "query": "scale:240 AND ocp_version:$ocp_version",
+                     "refId": "I",
                      "timeField": "timestamp"
                   },
                   {
@@ -6090,7 +6086,7 @@
                         }
                      ],
                      "query": "scale:240 AND ocp_version:$ocp_version",
-                     "refId": "M",
+                     "refId": "J",
                      "timeField": "timestamp"
                   }
                ],
@@ -6163,7 +6159,7 @@
                   {
                      "targetBlank": true,
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=39"
+                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=194"
                   }
                ],
                "options": {
@@ -6352,158 +6348,6 @@
                      "timeField": "timestamp"
                   },
                   {
-                     "alias": "Memory(GB) [384GB]",
-                     "bucketAggs": [
-                        {
-                           "field": "scale",
-                           "id": "3",
-                           "settings": {
-                              "min_doc_count": "1",
-                              "order": "desc",
-                              "orderBy": "_term",
-                              "size": "10"
-                           },
-                           "type": "terms"
-                        },
-                        {
-                           "field": "timestamp",
-                           "id": "2",
-                           "settings": {
-                              "interval": "auto"
-                           },
-                           "type": "date_histogram"
-                        }
-                     ],
-                     "hide": false,
-                     "metrics": [
-                        {
-                           "field": "total_Memory",
-                           "id": "1",
-                           "settings": {
-                              "script": "_value/1000000000/2"
-                           },
-                           "type": "max"
-                        }
-                     ],
-                     "query": "scale:120 AND ocp_version:$ocp_version",
-                     "refId": "F",
-                     "timeField": "timestamp"
-                  },
-                  {
-                     "alias": "Memory Worker-0 (GB) [128GB]",
-                     "bucketAggs": [
-                        {
-                           "field": "scale",
-                           "id": "3",
-                           "settings": {
-                              "min_doc_count": "1",
-                              "order": "desc",
-                              "orderBy": "_term",
-                              "size": "10"
-                           },
-                           "type": "terms"
-                        },
-                        {
-                           "field": "timestamp",
-                           "id": "2",
-                           "settings": {
-                              "interval": "auto"
-                           },
-                           "type": "date_histogram"
-                        }
-                     ],
-                     "hide": false,
-                     "metrics": [
-                        {
-                           "field": "worker-0_Memory",
-                           "id": "1",
-                           "settings": {
-                              "script": "_value/1000000000"
-                           },
-                           "type": "max"
-                        }
-                     ],
-                     "query": "scale:240 AND ocp_version:$ocp_version",
-                     "refId": "E",
-                     "timeField": "timestamp"
-                  },
-                  {
-                     "alias": "Memory Worker-1 (GB) [128GB]",
-                     "bucketAggs": [
-                        {
-                           "field": "scale",
-                           "id": "3",
-                           "settings": {
-                              "min_doc_count": "1",
-                              "order": "desc",
-                              "orderBy": "_term",
-                              "size": "10"
-                           },
-                           "type": "terms"
-                        },
-                        {
-                           "field": "timestamp",
-                           "id": "2",
-                           "settings": {
-                              "interval": "auto"
-                           },
-                           "type": "date_histogram"
-                        }
-                     ],
-                     "hide": false,
-                     "metrics": [
-                        {
-                           "field": "worker-1_Memory",
-                           "id": "1",
-                           "settings": {
-                              "script": "_value/1000000000/2"
-                           },
-                           "type": "max"
-                        }
-                     ],
-                     "query": "scale:120 AND ocp_version:$ocp_version",
-                     "refId": "G",
-                     "timeField": "timestamp"
-                  },
-                  {
-                     "alias": "Memory Worker-2 (GB) [128GB]",
-                     "bucketAggs": [
-                        {
-                           "field": "scale",
-                           "id": "3",
-                           "settings": {
-                              "min_doc_count": "1",
-                              "order": "desc",
-                              "orderBy": "_term",
-                              "size": "10"
-                           },
-                           "type": "terms"
-                        },
-                        {
-                           "field": "timestamp",
-                           "id": "2",
-                           "settings": {
-                              "interval": "auto"
-                           },
-                           "type": "date_histogram"
-                        }
-                     ],
-                     "hide": false,
-                     "metrics": [
-                        {
-                           "field": "worker-2_Memory",
-                           "id": "1",
-                           "settings": {
-                              "script": "_value/1000000000/2"
-                           },
-                           "type": "max"
-                        }
-                     ],
-                     "query": "scale:120 AND ocp_version:$ocp_version",
-                     "refId": "H",
-                     "timeField": "timestamp"
-                  },
-                  {
                      "alias": "%CPU [240 cores]",
                      "bucketAggs": [
                         {
@@ -6536,7 +6380,7 @@
                         }
                      ],
                      "query": "scale:120 AND ocp_version:$ocp_version",
-                     "refId": "I",
+                     "refId": "E",
                      "timeField": "timestamp"
                   },
                   {
@@ -6572,7 +6416,7 @@
                         }
                      ],
                      "query": "scale:120 AND ocp_version:$ocp_version",
-                     "refId": "J",
+                     "refId": "F",
                      "timeField": "timestamp"
                   },
                   {
@@ -6608,7 +6452,7 @@
                         }
                      ],
                      "query": "scale:120 AND ocp_version:$ocp_version",
-                     "refId": "K",
+                     "refId": "G",
                      "timeField": "timestamp"
                   },
                   {
@@ -6644,7 +6488,61 @@
                         }
                      ],
                      "query": "scale:120 AND ocp_version:$ocp_version",
-                     "refId": "L",
+                     "refId": "H",
+                     "timeField": "timestamp"
+                  },
+                  {
+                     "alias": "{{field}} [GB]",
+                     "bucketAggs": [
+                        {
+                           "field": "scale",
+                           "id": "3",
+                           "settings": {
+                              "min_doc_count": "1",
+                              "order": "desc",
+                              "orderBy": "_term",
+                              "size": "10"
+                           },
+                           "type": "terms"
+                        },
+                        {
+                           "field": "timestamp",
+                           "id": "2",
+                           "settings": {
+                              "interval": "auto"
+                           },
+                           "type": "date_histogram"
+                        }
+                     ],
+                     "hide": false,
+                     "metrics": [
+                        {
+                           "field": "VM Memory Cache",
+                           "id": "1",
+                           "settings": {
+                              "script": "_value/1000000000"
+                           },
+                           "type": "max"
+                        },
+                        {
+                           "field": "VM Memory working set bytes",
+                           "id": "2",
+                           "settings": {
+                              "script": "_value/1000000000"
+                           },
+                           "type": "max"
+                        },
+                        {
+                           "field": "VM Memory Max Usage Bytes",
+                           "id": "3",
+                           "settings": {
+                              "script": "_value/1000000000"
+                           },
+                           "type": "max"
+                        }
+                     ],
+                     "query": "scale:120 AND ocp_version:$ocp_version",
+                     "refId": "I",
                      "timeField": "timestamp"
                   },
                   {
@@ -6678,7 +6576,7 @@
                         }
                      ],
                      "query": "scale:120 AND ocp_version:$ocp_version",
-                     "refId": "M",
+                     "refId": "J",
                      "timeField": "timestamp"
                   }
                ],
