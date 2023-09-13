@@ -418,6 +418,7 @@ jobs:
           GRAFANA_URL: ${{ secrets.PERF_GRAFANA_URL }}
           GRAFANA_API_KEY: ${{ secrets.PERF_GRAFANA_API_KEY }}
           GRAFANA_JSON_PATH: ${{ secrets.PERF_GRAFANA_JSON_PATH }}
+          GRAFANA_FOLDER_NAME: ${{ secrets.PERF_GRAFANA_FOLDER_NAME }}
         run: |
           # Backup dashboard.json before before adding dashboard version by Python code
           cp -p "$GITHUB_WORKSPACE"/benchmark_runner/grafana/perf/dashboard.json "$GITHUB_WORKSPACE"/benchmark_runner/grafana/perf/dashboard_backup.json
@@ -446,7 +447,7 @@ jobs:
         run: |
           git diff --quiet "$GITHUB_WORKSPACE"/benchmark_runner/grafana/perf/jsonnet/main.libsonnet || echo "changes=true" >> "$GITHUB_OUTPUT"
 
-      - name: Commit main.libsonnet if any changes are detected
+      - name: Commit main.libsonnet if any changes to product versions are detected
         if: steps.libsonnet_check_changes.outputs.changes == 'true'
         run: |
           git checkout main
