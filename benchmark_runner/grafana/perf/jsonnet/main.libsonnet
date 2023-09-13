@@ -255,8 +255,8 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
       + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTargetBlank(true)
-              + stateTimeline.link.withTitle('OCP version')
-              + stateTimeline.link.withUrl('https://openshift-release.apps.ci.l2s4.p1.openshiftapps.com/')
+              + stateTimeline.link.withTitle('CI Status)
+              + stateTimeline.link.withUrl('https://github.com/redhat-performance/benchmark-runner/actions/workflows/Nightly_Perf_Env_CI.yml')
 
       ])
 
@@ -916,7 +916,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
         + g.panel.row.withId(142)
         + g.panel.row.withPanels([
 
-          g.panel.stateTimeline.new('vdbench (IOPS) test')
+          g.panel.stateTimeline.new('vdbench (IOPS)')
             + stateTimeline.queryOptions.withDatasource('Elasticsearch-vdbench-results')
 
             + stateTimeline.standardOptions.color.withMode('thresholds')
