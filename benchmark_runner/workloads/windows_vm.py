@@ -6,7 +6,6 @@ from multiprocessing import Process
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 from benchmark_runner.common.elasticsearch.elasticsearch_exceptions import ElasticSearchDataNotUploaded
 from benchmark_runner.workloads.bootstorm_vm import BootstormVM
-from benchmark_runner.common.oc.oc import VMStatus
 
 
 class WindowsVM(BootstormVM):

@@ -17,6 +17,7 @@ from benchmark_runner.main.environment_variables import environment_variables
 from benchmark_runner.common.clouds.shared.s3.s3_operations import S3Operations
 from benchmark_runner.common.prometheus.prometheus_snapshot import PrometheusSnapshot
 from benchmark_runner.common.prometheus.prometheus_snapshot_exceptions import PrometheusSnapshotError
+from benchmark_runner.common.prometheus.prometheus_metrics_operations import PrometheusMetricsOperation
 
 
 class BenchmarkOperatorWorkloadsOperations:
@@ -72,6 +73,7 @@ class BenchmarkOperatorWorkloadsOperations:
         # PrometheusSnapshot
         if self._enable_prometheus_snapshot:
             self._snapshot = PrometheusSnapshot(oc=self._oc, artifacts_path=self._run_artifacts_path, verbose=True)
+        self._prometheus_metrics_operation = PrometheusMetricsOperation()
         # update lso_disk_id
         self._lso_disk_id = self._oc.get_free_disk_id()
         if self._lso_disk_id:
@@ -209,7 +211,7 @@ class BenchmarkOperatorWorkloadsOperations:
             else:
                 self._verify_elasticsearch_data_uploaded(index=es_index, uuid=self._oc.get_long_uuid(workload=workload), workload='system-metrics', fast_check=True)
 
-    def __get_metadata(self, kind: str = None, database: str = None, status: str = None, run_artifacts_url: str = None, uuid: str = None) -> dict:
+    def __get_metadata(self, kind: str = None, database: str = None, status: str = None, run_artifacts_url: str = None, uuid: str = None, prometheus_result: dict = None) -> dict:
         """
         This method returns metadata for a run, optionally filtered by runtime kind and database
         @param kind: optionally: pod, vm, or kata
@@ -243,6 +245,8 @@ class BenchmarkOperatorWorkloadsOperations:
             metadata.update({'vm_os_version': 'fedora34'})
         if uuid:
             metadata.update({'uuid': uuid})
+        if prometheus_result:
+            metadata.update(prometheus_result)
         # for hammerdb
         if database == 'mssql':
             metadata.update({'db_version': 2019})
@@ -253,7 +257,7 @@ class BenchmarkOperatorWorkloadsOperations:
         return metadata
 
     @logger_time_stamp
-    def _update_elasticsearch_index(self, index: str, id: str, kind: str, status: str, run_artifacts_url: str, database: str = ''):
+    def _update_elasticsearch_index(self, index: str, id: str, kind: str, status: str, run_artifacts_url: str, database: str = '', prometheus_result: dict = None):
         """
         This method updates elasticsearch id
         :param index:
@@ -264,7 +268,7 @@ class BenchmarkOperatorWorkloadsOperations:
         :param run_artifacts_url:
         :return:
         """
-        self.__es_operations.update_elasticsearch_index(index=index, id=id, metadata=self.__get_metadata(kind=kind, database=database, status=status, run_artifacts_url=run_artifacts_url))
+        self.__es_operations.update_elasticsearch_index(index=index, id=id, metadata=self.__get_metadata(kind=kind, database=database, status=status, run_artifacts_url=run_artifacts_url, prometheus_result=prometheus_result))
 
     def _upload_to_elasticsearch(self, index: str, kind: str, status: str, run_artifacts_url: str, database: str = '', uuid: str = ''):
         """

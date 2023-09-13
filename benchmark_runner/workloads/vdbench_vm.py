@@ -6,7 +6,6 @@ from multiprocessing import Process
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 from benchmark_runner.common.elasticsearch.elasticsearch_exceptions import ElasticSearchDataNotUploaded
 from benchmark_runner.workloads.workloads_operations import WorkloadsOperations
-from benchmark_runner.common.prometheus.prometheus_metrics_operations import PrometheusMetricsOperation
 
 
 class VdbenchVM(WorkloadsOperations):
@@ -44,6 +43,7 @@ class VdbenchVM(WorkloadsOperations):
         self.__vm_name = self._create_vm_log(labels=[f'{self.__workload_name}-{self._trunc_uuid}-{vm_num}'])
         self.__status = self._oc.wait_for_vm_log_completed(vm_name=self.__vm_name, end_stamp=self.END_STAMP)
         self.__status = 'complete' if self.__status else 'failed'
+        # prometheus queries
         self._prometheus_metrics_operation.finalize_prometheus()
         metric_results = self._prometheus_metrics_operation.run_prometheus_queries()
         prometheus_result = self._prometheus_metrics_operation.parse_prometheus_metrics(data=metric_results)
@@ -94,6 +94,7 @@ class VdbenchVM(WorkloadsOperations):
                 self.__status = 'complete' if self.__status else 'failed'
                 # save run artifacts logs
                 result_list = self._create_vm_run_artifacts(vm_name=self.__vm_name, start_stamp=self.START_STAMP, end_stamp=self.END_STAMP, log_type='.csv')
+                # prometheus queries
                 self._prometheus_metrics_operation.finalize_prometheus()
                 metric_results = self._prometheus_metrics_operation.run_prometheus_queries()
                 prometheus_result = self._prometheus_metrics_operation.parse_prometheus_metrics(data=metric_results)

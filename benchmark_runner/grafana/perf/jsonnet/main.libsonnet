@@ -225,7 +225,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
       + stateTimeline.fieldConfig.defaults.withMappings([
         stateTimeline.valueMapping.RegexMap.withOptions(
         //START_VALUE_MAPPING_227
-				 {"0": {"index": 0, "text": "fail"}, "1": {"index": 1, "text": "pass"}, "102": {"index": 13, "text": "1.0.2"}, "110": {"index": 14, "text": "1.1.0"}, "120": {"index": 15, "text": "1.2.0"}, "121": {"index": 16, "text": "1.2.1"}, "130": {"index": 45, "text": "1.3.0"}, "131": {"index": 117, "text": "1.3.1"}, "132": {"index": 76, "text": "1.3.2"}, "133": {"index": 77, "text": "1.3.3"}, "140": {"index": 118, "text": "1.4.0"}, "483": {"index": 0, "text": "4.8.3"}, "484": {"index": 1, "text": "4.8.4"}, "485": {"index": 2, "text": "4.8.5"}, "486": {"index": 3, "text": "4.8.6"}, "487": {"index": 4, "text": "4.8.7"}, "488": {"index": 5, "text": "4.8.8"}, "3025": {"index": 86, "text": "3.0.2-5"}, "3026": {"index": 119, "text": "3.0.2-6"}, "4102": {"index": 33, "text": "4.10.2"}, "4104": {"index": 34, "text": "4.10.4"}, "4105": {"index": 35, "text": "4.10.5"}, "4106": {"index": 36, "text": "4.10.6"}, "4108": {"index": 37, "text": "4.10.8"}, "4109": {"index": 38, "text": "4.10.9"}, "4114": {"index": 54, "text": "4.11.4"}, "4115": {"index": 55, "text": "4.11.5"}, "4116": {"index": 56, "text": "4.11.6"}, "4117": {"index": 57, "text": "4.11.7"}, "4118": {"index": 58, "text": "4.11.8"}, "4119": {"index": 59, "text": "4.11.9"}, "4120": {"index": 68, "text": "4.12.0"}, "4121": {"index": 69, "text": "4.12.1"}, "4122": {"index": 70, "text": "4.12.2"}, "4124": {"index": 80, "text": "4.12.4"}, "4130": {"index": 106, "text": "4.13.0"}, "4131": {"index": 109, "text": "4.13.1"}, "4132": {"index": 110, "text": "4.13.2"}, "4133": {"index": 111, "text": "4.13.3"}, "4814": {"index": 6, "text": "4.8.14"}, "4932": {"index": 8, "text": "4.9.3-2"}, "4947": {"index": 9, "text": "4.9.4-7"}, "4955": {"index": 10, "text": "4.9.5-5"}, "4961": {"index": 11, "text": "4.9.6-1"}, "4972": {"index": 12, "text": "4.9.7-2"}, "41002": {"index": 30, "text": "4.10.0-rc.2"}, "41003": {"index": 31, "text": "4.10.0-rc.3"}, "41007": {"index": 32, "text": "4.10.0-rc.7"}, "41010": {"index": 39, "text": "4.10.10"}, "41011": {"index": 40, "text": "4.10.11"}, "41012": {"index": 41, "text": "4.10.12"}, "41013": {"index": 42, "text": "4.10.13"}, "41014": {"index": 43, "text": "4.10.14"}, "41015": {"index": 44, "text": "4.10.15"}, "41016": {"index": 21, "text": "4.10.1-6"}, "41021": {"index": 28, "text": "4.10.2-1"}, "41023": {"index": 29, "text": "4.10.2-3"}, "41054": {"index": 49, "text": "4.10.5-4"}, "41066": {"index": 48, "text": "4.10.6-6"}, "41110": {"index": 60, "text": "4.11.10"}, "41111": {"index": 61, "text": "4.11.11"}, "41112": {"index": 62, "text": "4.11.12"}, "41113": {"index": 63, "text": "4.11.13"}, "41114": {"index": 64, "text": "4.11.14"}, "41144": {"index": 78, "text": "4.11.4-4"}, "41159": {"index": 79, "text": "4.11.5-9"}, "41206": {"index": 65, "text": "4.12.0.6"}, "41207": {"index": 66, "text": "4.12.0.7"}, "41208": {"index": 67, "text": "4.12.0.8"}, "41218": {"index": 73, "text": "4.12.1-8"}, "41224": {"index": 85, "text": "4.12.2-4"}, "41304": {"index": 102, "text": "4.13.0-rc.4"}, "41305": {"index": 103, "text": "4.13.0-rc.5"}, "41307": {"index": 104, "text": "4.13.0-rc.7"}, "41308": {"index": 105, "text": "4.13.0-rc.8"}, "49211": {"index": 7, "text": "4.9.2-11"}, "410129": {"index": 22, "text": "4.10.1-29"}, "410136": {"index": 23, "text": "4.10.1-36"}, "410160": {"index": 24, "text": "4.10.1-60"}, "410170": {"index": 25, "text": "4.10.1-70"}, "410197": {"index": 26, "text": "4.10.1-97"}, "411115": {"index": 52, "text": "4.11.1-15"}, "411121": {"index": 51, "text": "4.11.1-21"}, "411135": {"index": 46, "text": "4.11.1-35"}, "411142": {"index": 47, "text": "4.11.1-42"}, "411605": {"index": 53, "text": "4.11.6-5"}, "412116": {"index": 74, "text": "4.12.1-16"}, "412119": {"index": 84, "text": "4.12.1-19"}, "412122": {"index": 75, "text": "4.12.1-22"}, "412139": {"index": 82, "text": "4.12.1-39"}, "412140": {"index": 81, "text": "4.12.1-40"}, "412317": {"index": 121, "text": "4.12.3-17"}, "413014": {"index": 101, "text": "4.13.0-ec.4"}, "413118": {"index": 113, "text": "4.13.1-18"}, "413140": {"index": 114, "text": "4.13.1-40"}, "4100683": {"index": 17, "text": "4.10.0-683"}, "4100688": {"index": 18, "text": "4.10.0-688"}, "4100700": {"index": 19, "text": "4.10.0-700"}, "4100729": {"index": 20, "text": "4.10.0-729"}, "4101101": {"index": 27, "text": "4.10.1-101"}, "4110137": {"index": 50, "text": "4.11.0-137"}, "4120173": {"index": 83, "text": "4.12.0-173"}, "4120777": {"index": 71, "text": "4.12.0-777"}, "4120781": {"index": 72, "text": "4.12.0-781"}, "4131154": {"index": 115, "text": "4.13.1-154"}, "41301586": {"index": 88, "text": "4.13.0-1586"}, "41301649": {"index": 89, "text": "4.13.0-1649"}, "41301666": {"index": 91, "text": "4.13.0-1666"}, "41301689": {"index": 90, "text": "4.13.0-1689"}, "41301782": {"index": 92, "text": "4.13.0-1782"}, "41301856": {"index": 93, "text": "4.13.0-1856"}, "41301938": {"index": 94, "text": "4.13.0-1938"}, "41301943": {"index": 95, "text": "4.13.0-1943"}, "41302115": {"index": 96, "text": "4.13.0-2115"}, "41302176": {"index": 97, "text": "4.13.0-2176"}, "41302229": {"index": 98, "text": "4.13.0-2229"}, "41302251": {"index": 99, "text": "4.13.0-2251"}, "41302269": {"index": 100, "text": "4.13.0-2269"}, "4130ec3": {"index": 87, "text": "4.13.0-ec.3"}, "CNV": {"index": 112, "text": "CNV"}, "KATA": {"index": 116, "text": "KATA"}, "OCP": {"index": 108, "text": "OCP"}, "ODF": {"index": 120, "text": "ODF"}, "Product Versions": {"index": 107, "text": "Product Versions"}, "4136": {"index": 122, "text": "4.13.6"}, "413360": {"index": 123, "text": "4.13.3-60"}, "41244": {"index": 126, "text": "4.12.4-4"}, "4134": {"index": 130, "text": "4.13.4"}, "4131206": {"index": 131, "text": "4.13.1-206"}, "4131214": {"index": 132, "text": "4.13.1-214"}, "41323": {"index": 133, "text": "4.13.2-3"}, "413273": {"index": 134, "text": "4.13.2-73"}, "41338": {"index": 135, "text": "4.13.3-8"}, "413267": {"index": 136, "text": "4.13.2-67"}, "4137": {"index": 137, "text": "4.13.7"}, "4133166": {"index": 138, "text": "4.13.3-166"}, "141": {"index": 139, "text": "1.4.1"}, "41252": {"index": 140, "text": "4.12.5-2"}, "4138": {"index": 141, "text": "4.13.8"}, "4133203": {"index": 142, "text": "4.13.3-203"}, "4139": {"index": 143, "text": "4.13.9"}, "413426": {"index": 145, "text": "4.13.4-26"}, "4133266": {"index": 146, "text": "4.13.3-266"}, "41310": {"index": 147, "text": "4.13.10"}, "413482": {"index": 148, "text": "4.13.4-82"}, "41263": {"index": 149, "text": "4.12.6-3"}, "41311": {"index": 150, "text": "4.13.11"}, "4134140": {"index": 151, "text": "4.13.4-140"}, "41272": {"index": 152, "text": "4.12.7-2"}, "41312": {"index": 153, "text": "4.13.12"}, "4134192": {"index": 154, "text": "4.13.4-192"}} 
+				 {"0": {"index": 0, "text": "fail"}, "1": {"index": 1, "text": "pass"}, "102": {"index": 13, "text": "1.0.2"}, "110": {"index": 14, "text": "1.1.0"}, "120": {"index": 15, "text": "1.2.0"}, "121": {"index": 16, "text": "1.2.1"}, "130": {"index": 45, "text": "1.3.0"}, "131": {"index": 117, "text": "1.3.1"}, "132": {"index": 76, "text": "1.3.2"}, "133": {"index": 77, "text": "1.3.3"}, "140": {"index": 118, "text": "1.4.0"}, "483": {"index": 0, "text": "4.8.3"}, "484": {"index": 1, "text": "4.8.4"}, "485": {"index": 2, "text": "4.8.5"}, "486": {"index": 3, "text": "4.8.6"}, "487": {"index": 4, "text": "4.8.7"}, "488": {"index": 5, "text": "4.8.8"}, "3025": {"index": 86, "text": "3.0.2-5"}, "3026": {"index": 119, "text": "3.0.2-6"}, "4102": {"index": 33, "text": "4.10.2"}, "4104": {"index": 34, "text": "4.10.4"}, "4105": {"index": 35, "text": "4.10.5"}, "4106": {"index": 36, "text": "4.10.6"}, "4108": {"index": 37, "text": "4.10.8"}, "4109": {"index": 38, "text": "4.10.9"}, "4114": {"index": 54, "text": "4.11.4"}, "4115": {"index": 55, "text": "4.11.5"}, "4116": {"index": 56, "text": "4.11.6"}, "4117": {"index": 57, "text": "4.11.7"}, "4118": {"index": 58, "text": "4.11.8"}, "4119": {"index": 59, "text": "4.11.9"}, "4120": {"index": 68, "text": "4.12.0"}, "4121": {"index": 69, "text": "4.12.1"}, "4122": {"index": 70, "text": "4.12.2"}, "4124": {"index": 80, "text": "4.12.4"}, "4130": {"index": 106, "text": "4.13.0"}, "4131": {"index": 109, "text": "4.13.1"}, "4132": {"index": 110, "text": "4.13.2"}, "4133": {"index": 111, "text": "4.13.3"}, "4814": {"index": 6, "text": "4.8.14"}, "4932": {"index": 8, "text": "4.9.3-2"}, "4947": {"index": 9, "text": "4.9.4-7"}, "4955": {"index": 10, "text": "4.9.5-5"}, "4961": {"index": 11, "text": "4.9.6-1"}, "4972": {"index": 12, "text": "4.9.7-2"}, "41002": {"index": 30, "text": "4.10.0-rc.2"}, "41003": {"index": 31, "text": "4.10.0-rc.3"}, "41007": {"index": 32, "text": "4.10.0-rc.7"}, "41010": {"index": 39, "text": "4.10.10"}, "41011": {"index": 40, "text": "4.10.11"}, "41012": {"index": 41, "text": "4.10.12"}, "41013": {"index": 42, "text": "4.10.13"}, "41014": {"index": 43, "text": "4.10.14"}, "41015": {"index": 44, "text": "4.10.15"}, "41016": {"index": 21, "text": "4.10.1-6"}, "41021": {"index": 28, "text": "4.10.2-1"}, "41023": {"index": 29, "text": "4.10.2-3"}, "41054": {"index": 49, "text": "4.10.5-4"}, "41066": {"index": 48, "text": "4.10.6-6"}, "41110": {"index": 60, "text": "4.11.10"}, "41111": {"index": 61, "text": "4.11.11"}, "41112": {"index": 62, "text": "4.11.12"}, "41113": {"index": 63, "text": "4.11.13"}, "41114": {"index": 64, "text": "4.11.14"}, "41144": {"index": 78, "text": "4.11.4-4"}, "41159": {"index": 79, "text": "4.11.5-9"}, "41206": {"index": 65, "text": "4.12.0.6"}, "41207": {"index": 66, "text": "4.12.0.7"}, "41208": {"index": 67, "text": "4.12.0.8"}, "41218": {"index": 73, "text": "4.12.1-8"}, "41224": {"index": 85, "text": "4.12.2-4"}, "41304": {"index": 102, "text": "4.13.0-rc.4"}, "41305": {"index": 103, "text": "4.13.0-rc.5"}, "41307": {"index": 104, "text": "4.13.0-rc.7"}, "41308": {"index": 105, "text": "4.13.0-rc.8"}, "49211": {"index": 7, "text": "4.9.2-11"}, "410129": {"index": 22, "text": "4.10.1-29"}, "410136": {"index": 23, "text": "4.10.1-36"}, "410160": {"index": 24, "text": "4.10.1-60"}, "410170": {"index": 25, "text": "4.10.1-70"}, "410197": {"index": 26, "text": "4.10.1-97"}, "411115": {"index": 52, "text": "4.11.1-15"}, "411121": {"index": 51, "text": "4.11.1-21"}, "411135": {"index": 46, "text": "4.11.1-35"}, "411142": {"index": 47, "text": "4.11.1-42"}, "411605": {"index": 53, "text": "4.11.6-5"}, "412116": {"index": 74, "text": "4.12.1-16"}, "412119": {"index": 84, "text": "4.12.1-19"}, "412122": {"index": 75, "text": "4.12.1-22"}, "412139": {"index": 82, "text": "4.12.1-39"}, "412140": {"index": 81, "text": "4.12.1-40"}, "412317": {"index": 121, "text": "4.12.3-17"}, "413014": {"index": 101, "text": "4.13.0-ec.4"}, "413118": {"index": 113, "text": "4.13.1-18"}, "413140": {"index": 114, "text": "4.13.1-40"}, "4100683": {"index": 17, "text": "4.10.0-683"}, "4100688": {"index": 18, "text": "4.10.0-688"}, "4100700": {"index": 19, "text": "4.10.0-700"}, "4100729": {"index": 20, "text": "4.10.0-729"}, "4101101": {"index": 27, "text": "4.10.1-101"}, "4110137": {"index": 50, "text": "4.11.0-137"}, "4120173": {"index": 83, "text": "4.12.0-173"}, "4120777": {"index": 71, "text": "4.12.0-777"}, "4120781": {"index": 72, "text": "4.12.0-781"}, "4131154": {"index": 115, "text": "4.13.1-154"}, "41301586": {"index": 88, "text": "4.13.0-1586"}, "41301649": {"index": 89, "text": "4.13.0-1649"}, "41301666": {"index": 91, "text": "4.13.0-1666"}, "41301689": {"index": 90, "text": "4.13.0-1689"}, "41301782": {"index": 92, "text": "4.13.0-1782"}, "41301856": {"index": 93, "text": "4.13.0-1856"}, "41301938": {"index": 94, "text": "4.13.0-1938"}, "41301943": {"index": 95, "text": "4.13.0-1943"}, "41302115": {"index": 96, "text": "4.13.0-2115"}, "41302176": {"index": 97, "text": "4.13.0-2176"}, "41302229": {"index": 98, "text": "4.13.0-2229"}, "41302251": {"index": 99, "text": "4.13.0-2251"}, "41302269": {"index": 100, "text": "4.13.0-2269"}, "4130ec3": {"index": 87, "text": "4.13.0-ec.3"}, "CNV": {"index": 112, "text": "CNV"}, "KATA": {"index": 116, "text": "KATA"}, "OCP": {"index": 108, "text": "OCP"}, "ODF": {"index": 120, "text": "ODF"}, "Product Versions": {"index": 107, "text": "Product Versions"}, "4136": {"index": 122, "text": "4.13.6"}, "413360": {"index": 123, "text": "4.13.3-60"}, "41244": {"index": 126, "text": "4.12.4-4"}, "4134": {"index": 130, "text": "4.13.4"}, "4131206": {"index": 131, "text": "4.13.1-206"}, "4131214": {"index": 132, "text": "4.13.1-214"}, "41323": {"index": 133, "text": "4.13.2-3"}, "413273": {"index": 134, "text": "4.13.2-73"}, "41338": {"index": 135, "text": "4.13.3-8"}, "413267": {"index": 136, "text": "4.13.2-67"}, "4137": {"index": 137, "text": "4.13.7"}, "4133166": {"index": 138, "text": "4.13.3-166"}, "141": {"index": 139, "text": "1.4.1"}, "41252": {"index": 140, "text": "4.12.5-2"}, "4138": {"index": 141, "text": "4.13.8"}, "4133203": {"index": 142, "text": "4.13.3-203"}, "4139": {"index": 143, "text": "4.13.9"}, "413426": {"index": 145, "text": "4.13.4-26"}, "4133266": {"index": 146, "text": "4.13.3-266"}, "41310": {"index": 147, "text": "4.13.10"}, "413482": {"index": 148, "text": "4.13.4-82"}, "41263": {"index": 149, "text": "4.12.6-3"}, "41311": {"index": 150, "text": "4.13.11"}, "4134140": {"index": 151, "text": "4.13.4-140"}, "41272": {"index": 152, "text": "4.12.7-2"}, "41312": {"index": 153, "text": "4.13.12"}, "4134192": {"index": 154, "text": "4.13.4-192"}, "41313": {"index": 155, "text": "4.13.13"}, "4134237": {"index": 156, "text": "4.13.4-237"}}
  		//END_VALUE_MAPPING_227
  		)
         + stateTimeline.valueMapping.RegexMap.withType('value')
@@ -255,8 +255,8 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
       + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTargetBlank(true)
-              + stateTimeline.link.withTitle('OCP version')
-              + stateTimeline.link.withUrl('https://openshift-release.apps.ci.l2s4.p1.openshiftapps.com/')
+              + stateTimeline.link.withTitle('CI Status')
+              + stateTimeline.link.withUrl('https://github.com/redhat-performance/benchmark-runner/actions/workflows/Nightly_Perf_Env_CI.yml')
 
       ])
 
@@ -488,7 +488,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
             + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTargetBlank(true)
               + stateTimeline.link.withTitle('artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&viewPanel=32&from=now-45d&to=now')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&viewPanel=32&from=now-45d&to=now')
 
             ])
 
@@ -566,6 +566,115 @@ g.dashboard.new('PerfCI-Regression-Summary')
               + elasticsearch.withQuery('_exists_:tpm AND db_type:$db_type AND current_worker:$current_worker AND kind:$kind AND ocp_version:$ocp_version')
               + elasticsearch.withRefId('A')
               + elasticsearch.withTimeField('timestamp')
+            ]),
+          ////
+          g.panel.stateTimeline.new('HammerDB VM Memory')
+            + stateTimeline.queryOptions.withDatasource('Elasticsearch-hammerdb-results')
+            + stateTimeline.withDescription("MariaDB: innodb_buffer_pool_size = 8GB \n\nPostgreSQL: shared_buffers = 4GB")
+
+            + stateTimeline.standardOptions.color.withMode('thresholds')
+            + stateTimeline.fieldConfig.defaults.custom.withFillOpacity(70)
+            + stateTimeline.fieldConfig.defaults.custom.withLineWidth(0)
+
+            + stateTimeline.fieldConfig.defaults.withMappings([])
+            + stateTimeline.standardOptions.withMin(0)
+            + stateTimeline.fieldConfig.defaults.thresholds.withMode('percentage')
+            + stateTimeline.fieldConfig.defaults.thresholds.withSteps([
+              stateTimeline.thresholdStep.withColor('dark-red'),
+
+              stateTimeline.thresholdStep.withColor('semi-dark-orange')
+              + stateTimeline.thresholdStep.withValue(50),
+
+              stateTimeline.thresholdStep.withColor('super-light-green')
+              + stateTimeline.thresholdStep.withValue(80),
+
+              stateTimeline.thresholdStep.withColor('dark-green')
+              + stateTimeline.thresholdStep.withValue(90),
+
+              stateTimeline.thresholdStep.withColor('dark-blue')
+              + stateTimeline.thresholdStep.withValue(100)
+
+            ])
+            + stateTimeline.fieldConfig.withOverrides([])
+
+            + stateTimeline.gridPos.withH(13)
+            + stateTimeline.gridPos.withW(24)
+            + stateTimeline.gridPos.withX(0)
+            + stateTimeline.gridPos.withY(51)
+
+            + stateTimeline.withId(120)
+            + stateTimeline.withInterval('1d')
+
+            + stateTimeline.panelOptions.withLinks([
+              stateTimeline.link.withTargetBlank(true)
+              + stateTimeline.link.withTitle('artifacts link')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&viewPanel=32&from=now-45d&to=now')
+
+            ])
+
+            + stateTimeline.options.withAlignValue('center')
+            + stateTimeline.options.legend.withDisplayMode('list')
+            + stateTimeline.options.legend.withPlacement('bottom')
+            + stateTimeline.options.withMergeValues(value = false)
+            + stateTimeline.options.withRowHeight(value = 0.9)
+            + stateTimeline.options.withShowValue('always')
+            + stateTimeline.options.tooltip.withMode('single')
+
+            + stateTimeline.withPluginVersion()
+
+
+            + g.panel.stateTimeline.withTargets([
+              elasticsearch.withAlias('{{term db_type.keyword}}  : {{field}} [GB]: {{term storage_type.keyword}}')
+
+              + elasticsearch.withBucketAggs([
+                elasticsearch.bucketAggs.Terms.withField('db_type.keyword')
+                + elasticsearch.bucketAggs.Terms.withId('3')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+                + elasticsearch.bucketAggs.Terms.settings.withOrder('asc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
+                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
+                + elasticsearch.bucketAggs.Terms.withType('terms'),
+
+                elasticsearch.bucketAggs.Terms.withField('storage_type.keyword')
+                + elasticsearch.bucketAggs.Terms.withId('5')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
+                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
+                + elasticsearch.bucketAggs.Terms.withType('terms'),
+
+                elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
+                + elasticsearch.bucketAggs.DateHistogram.withId('2')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
+                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+
+
+
+
+
+              ])
+
+
+
+              + elasticsearch.withMetrics([
+                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('VM Memory Cache')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('1')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Average.settings.withScript('_value/1000000000')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max'),
+                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('VM Memory working set bytes')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('2')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Average.settings.withScript('_value/1000000000')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max'),
+                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('VM Memory Max Usage Bytes')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('3')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Average.settings.withScript('_value/1000000000')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max'),
+
+
+              ])
+              + elasticsearch.withQuery('_exists_:tpm AND db_type:$db_type AND kind:vm AND ocp_version:$ocp_version')
+              + elasticsearch.withRefId('A')
+              + elasticsearch.withTimeField('timestamp')
             ])
 
 
@@ -602,7 +711,6 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
           g.panel.stateTimeline.new('Uperf Latency (usecs)')
             + stateTimeline.queryOptions.withDatasource('Elasticsearch-uperf-results')
-
             + g.panel.stateTimeline.withDescription('Lower is better')
 
             + stateTimeline.standardOptions.color.withMode('thresholds')
@@ -642,7 +750,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
             + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTargetBlank(true)
               + stateTimeline.link.withTitle('artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&editPanel=33&from=now-45d&to=now')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&editPanel=33&from=now-45d&to=now')
 
             ])
 
@@ -777,7 +885,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
             ]),
 
-            g.panel.stateTimeline.new('Uperf Throughput (Gbits/s)')
+          g.panel.stateTimeline.new('Uperf Throughput (Gbits/s)')
             + stateTimeline.queryOptions.withDatasource('Elasticsearch-uperf-results')
 
             + stateTimeline.standardOptions.color.withMode('thresholds')
@@ -816,7 +924,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
             + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTitle('artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&editPanel=33&from=now-45d&to=now')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&editPanel=33&from=now-45d&to=now')
 
             ])
 
@@ -887,8 +995,102 @@ g.dashboard.new('PerfCI-Regression-Summary')
               +elasticsearch.withRefId('A')
               +elasticsearch.withTimeField('timestamp')
 
+            ]),
+
+          g.panel.stateTimeline.new('Uperf VM Memory')
+            + stateTimeline.queryOptions.withDatasource('Elasticsearch-uperf-results')
+
+            + stateTimeline.standardOptions.color.withMode('thresholds')
+            + stateTimeline.fieldConfig.defaults.custom.withFillOpacity(70)
+            + stateTimeline.fieldConfig.defaults.custom.withLineWidth(0)
+
+            + stateTimeline.fieldConfig.defaults.withDecimals(1)
+            + stateTimeline.fieldConfig.defaults.withMappings([])
+            + stateTimeline.standardOptions.withMin(0)
+            + stateTimeline.fieldConfig.defaults.thresholds.withMode('percentage')
+            + stateTimeline.fieldConfig.defaults.thresholds.withSteps([
+              stateTimeline.thresholdStep.withColor('semi-dark-red'),
+
+              stateTimeline.thresholdStep.withColor('semi-dark-orange')
+              + stateTimeline.thresholdStep.withValue(50),
+
+              stateTimeline.thresholdStep.withColor('super-light-green')
+              + stateTimeline.thresholdStep.withValue(80),
+
+              stateTimeline.thresholdStep.withColor('dark-green')
+              + stateTimeline.thresholdStep.withValue(90),
+
+              stateTimeline.thresholdStep.withColor('dark-blue')
+              + stateTimeline.thresholdStep.withValue(100)
+
+            ])
+            + stateTimeline.fieldConfig.withOverrides([])
+
+            + stateTimeline.gridPos.withH(6)
+            + stateTimeline.gridPos.withW(24)
+            + stateTimeline.gridPos.withX(0)
+            + stateTimeline.gridPos.withY(67)
+
+            + stateTimeline.withId(115)
+            + stateTimeline.withInterval('1d')
+
+            + stateTimeline.panelOptions.withLinks([
+              stateTimeline.link.withTitle('artifacts link')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&editPanel=33&from=now-45d&to=now')
+
             ])
 
+            + stateTimeline.options.withAlignValue('center')
+            + stateTimeline.options.legend.withDisplayMode('list')
+            + stateTimeline.options.legend.withPlacement('bottom')
+            + stateTimeline.options.withMergeValues(value = false)
+            + stateTimeline.options.withRowHeight(value = 0.9)
+            + stateTimeline.options.withShowValue('always')
+            + stateTimeline.options.tooltip.withMode('single')
+
+            + g.panel.stateTimeline.withTargets([
+              elasticsearch.withAlias('{{field}} [GB]')
+
+              + elasticsearch.withBucketAggs([
+
+
+                elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
+                + elasticsearch.bucketAggs.DateHistogram.withId('2')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('0')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone('utc')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges('0')
+                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+
+
+
+
+
+              ])
+
+
+              + elasticsearch.withMetrics([
+                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('VM Memory Cache')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('1')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Average.settings.withScript('_value/1000000000')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max'),
+                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('VM Memory working set bytes')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('2')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Average.settings.withScript('_value/1000000000')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max'),
+                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('VM Memory Max Usage Bytes')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('3')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Average.settings.withScript('_value/1000000000')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max'),
+
+
+              ])
+
+              +elasticsearch.withQuery('_exists_:norm_ops AND kind:vm AND ocp_version:$ocp_version')
+              +elasticsearch.withRefId('A')
+              +elasticsearch.withTimeField('timestamp')
+
+            ])
 
         ]),
 
@@ -916,7 +1118,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
         + g.panel.row.withId(142)
         + g.panel.row.withPanels([
 
-          g.panel.stateTimeline.new('vdbench (IOPS) test')
+          g.panel.stateTimeline.new('vdbench (IOPS)')
             + stateTimeline.queryOptions.withDatasource('Elasticsearch-vdbench-results')
 
             + stateTimeline.standardOptions.color.withMode('thresholds')
@@ -955,10 +1157,10 @@ g.dashboard.new('PerfCI-Regression-Summary')
             + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTargetBlank(true)
               + stateTimeline.link.withTitle('artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=34'),
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=34'),
 
               stateTimeline.link.withTitle('scale artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=35')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=35')
 
             ])
 
@@ -1066,54 +1268,6 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
               ////
 
-              elasticsearch.withAlias('{{field}} [GB]: 1 vm')
-
-              + elasticsearch.withBucketAggs([
-
-                elasticsearch.bucketAggs.Terms.withField('kind.keyword')
-                + elasticsearch.bucketAggs.Terms.withId('6')
-                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
-                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
-                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
-                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
-                + elasticsearch.bucketAggs.Terms.withType('terms'),
-
-                elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
-                + elasticsearch.bucketAggs.DateHistogram.withId('5')
-                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
-                + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('0')
-                + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone('utc')
-                + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges('0')
-                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-
-
-              ])
-
-
-              + elasticsearch.withHide(false)
-
-              + elasticsearch.withMetrics([
-                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('VM Memory Cache')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('1')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Average.settings.withScript('_value/1000000000')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max'),
-                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('VM Memory working set bytes')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('2')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Average.settings.withScript('_value/1000000000')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max'),
-                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('VM Memory Max Usage Bytes')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('3')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Average.settings.withScript('_value/1000000000')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max'),
-
-              ])
-
-              +elasticsearch.withQuery("!SCALE AND !Run.keyword='fillup' AND kind:'vm' AND Run:$vdbench_type AND ocp_version:$ocp_version")
-              +elasticsearch.withRefId('C')
-              +elasticsearch.withTimeField('timestamp'),
-
-              ////
-
               elasticsearch.withAlias('{{term Run.keyword}} : {{term Threads}}th :{{term scale}} {{term kind.keyword}}s')
 
               + elasticsearch.withBucketAggs([
@@ -1171,7 +1325,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
               ])
 
               +elasticsearch.withQuery("SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type AND ocp_version:$ocp_version")
-              +elasticsearch.withRefId('D')
+              +elasticsearch.withRefId('C')
               +elasticsearch.withTimeField('timestamp'),
 
 
@@ -1220,67 +1374,10 @@ g.dashboard.new('PerfCI-Regression-Summary')
               ])
 
               +elasticsearch.withQuery("SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type AND ocp_version:$ocp_version")
-              +elasticsearch.withRefId('E')
+              +elasticsearch.withRefId('D')
               +elasticsearch.withTimeField('timestamp'),
 
             ////
-
-             elasticsearch.withAlias('{{field}} [GB]: {{term scale}} {{kind.keyword}}s')
-
-              + elasticsearch.withBucketAggs([
-
-                elasticsearch.bucketAggs.Terms.withField('scale')
-                + elasticsearch.bucketAggs.Terms.withId('7')
-                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
-                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
-                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
-                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
-                + elasticsearch.bucketAggs.Terms.withType('terms'),
-
-                elasticsearch.bucketAggs.Terms.withField('kind.keyword')
-                + elasticsearch.bucketAggs.Terms.withId('6')
-                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
-                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
-                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
-                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
-                + elasticsearch.bucketAggs.Terms.withType('terms'),
-
-                elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
-                + elasticsearch.bucketAggs.DateHistogram.withId('5')
-                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
-                + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('0')
-                + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone('utc')
-                + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges('0')
-                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-
-
-              ])
-
-
-              + elasticsearch.withHide(false)
-
-              + elasticsearch.withMetrics([
-                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('VM Memory Cache')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('1')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Average.settings.withScript('_value/1000000000')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max'),
-                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('VM Memory working set bytes')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('2')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Average.settings.withScript('_value/1000000000')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max'),
-                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('VM Memory Max Usage Bytes')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('3')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Average.settings.withScript('_value/1000000000')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max'),
-
-              ])
-
-              +elasticsearch.withQuery("SCALE AND !Run.keyword='fillup' AND kind:'vm' AND Run:$vdbench_type AND ocp_version:$ocp_version")
-              +elasticsearch.withRefId('F')
-              +elasticsearch.withTimeField('timestamp'),
-
-              ////
-
 
 
             ]),
@@ -1289,7 +1386,6 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
             g.panel.stateTimeline.new('vdbench Latency (sec)')
             + stateTimeline.queryOptions.withDatasource('Elasticsearch-vdbench-results')
-
 
             + g.panel.stateTimeline.withDescription('Lower is better')
 
@@ -1330,10 +1426,10 @@ g.dashboard.new('PerfCI-Regression-Summary')
             + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTargetBlank(true)
               + stateTimeline.link.withTitle('artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=34'),
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=34'),
 
               stateTimeline.link.withTitle('scale artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=35')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=35')
 
             ])
 
@@ -1438,54 +1534,6 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
             ////
 
-             elasticsearch.withAlias('{{field}} [GB]: 1 vm')
-
-              + elasticsearch.withBucketAggs([
-
-                elasticsearch.bucketAggs.Terms.withField('kind.keyword')
-                + elasticsearch.bucketAggs.Terms.withId('6')
-                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
-                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
-                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
-                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
-                + elasticsearch.bucketAggs.Terms.withType('terms'),
-
-                elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
-                + elasticsearch.bucketAggs.DateHistogram.withId('5')
-                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
-                + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('0')
-                + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone('utc')
-                + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges('0')
-                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-
-
-              ])
-
-
-              + elasticsearch.withHide(false)
-
-              + elasticsearch.withMetrics([
-                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('VM Memory Cache')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('1')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Average.settings.withScript('_value/1000000000')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max'),
-                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('VM Memory working set bytes')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('2')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Average.settings.withScript('_value/1000000000')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max'),
-                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('VM Memory Max Usage Bytes')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('3')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Average.settings.withScript('_value/1000000000')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max'),
-
-              ])
-
-              +elasticsearch.withQuery("!SCALE AND !Run.keyword='fillup' AND kind:'vm' AND Run:$vdbench_type AND ocp_version:$ocp_version")
-              +elasticsearch.withRefId('C')
-              +elasticsearch.withTimeField('timestamp'),
-
-              ////
-
             elasticsearch.withAlias('{{term Run.keyword}} : {{term Threads}}th :{{term scale}} {{term kind.keyword}}s')
               + elasticsearch.withBucketAggs([
                 elasticsearch.bucketAggs.Terms.withField('Run.keyword')
@@ -1540,7 +1588,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
               ])
 
               +elasticsearch.withQuery("SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type AND ocp_version:$ocp_version")
-              +elasticsearch.withRefId('D')
+              +elasticsearch.withRefId('C')
               +elasticsearch.withTimeField('timestamp'),
 
             ////
@@ -1585,10 +1633,122 @@ g.dashboard.new('PerfCI-Regression-Summary')
               ])
 
               +elasticsearch.withQuery("SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type AND ocp_version:$ocp_version")
-              +elasticsearch.withRefId('E')
+              +elasticsearch.withRefId('D')
               +elasticsearch.withTimeField('timestamp'),
 
+              ////
+
+
+            ]),
             ////
+
+            g.panel.stateTimeline.new('vdbench VM memory')
+            + stateTimeline.queryOptions.withDatasource('Elasticsearch-vdbench-results')
+
+            + g.panel.stateTimeline.withDescription('Lower is better')
+
+            + stateTimeline.standardOptions.color.withMode('thresholds')
+            + stateTimeline.fieldConfig.defaults.custom.withFillOpacity(70)
+            + stateTimeline.fieldConfig.defaults.custom.withLineWidth(0)
+
+            + stateTimeline.fieldConfig.defaults.withDecimals(1)
+            + stateTimeline.fieldConfig.defaults.withMappings([])
+            + stateTimeline.standardOptions.withMax(-1)
+            + stateTimeline.fieldConfig.defaults.thresholds.withMode('percentage')
+            + stateTimeline.fieldConfig.defaults.thresholds.withSteps([
+              stateTimeline.thresholdStep.withColor('dark-blue'),
+
+              stateTimeline.thresholdStep.withColor('dark-green')
+              + stateTimeline.thresholdStep.withValue(1),
+
+              stateTimeline.thresholdStep.withColor('super-light-green')
+              + stateTimeline.thresholdStep.withValue(10),
+
+              stateTimeline.thresholdStep.withColor('semi-dark-orange')
+              + stateTimeline.thresholdStep.withValue(20),
+
+              stateTimeline.thresholdStep.withColor('dark-red')
+              + stateTimeline.thresholdStep.withValue(50)
+
+            ])
+            + stateTimeline.fieldConfig.withOverrides([])
+
+            + stateTimeline.gridPos.withH(10)
+            + stateTimeline.gridPos.withW(24)
+            + stateTimeline.gridPos.withX(0)
+            + stateTimeline.gridPos.withY(131)
+
+            + stateTimeline.withId(134)
+            + stateTimeline.withInterval('1d')
+
+            + stateTimeline.panelOptions.withLinks([
+              stateTimeline.link.withTargetBlank(true)
+              + stateTimeline.link.withTitle('artifacts link')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=34'),
+
+              stateTimeline.link.withTitle('scale artifacts link')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=35')
+
+            ])
+
+            + stateTimeline.options.withAlignValue('center')
+            + stateTimeline.options.legend.withDisplayMode('list')
+            + stateTimeline.options.legend.withPlacement('bottom')
+            + stateTimeline.options.withMergeValues(value = false)
+            + stateTimeline.options.withRowHeight(value = 0.9)
+            + stateTimeline.options.withShowValue('always')
+            + stateTimeline.options.tooltip.withMode('single')
+
+            + g.panel.stateTimeline.withTargets([
+
+             elasticsearch.withAlias('{{field}} [GB]: 1 vm')
+
+              + elasticsearch.withBucketAggs([
+
+                elasticsearch.bucketAggs.Terms.withField('kind.keyword')
+                + elasticsearch.bucketAggs.Terms.withId('6')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
+                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
+                + elasticsearch.bucketAggs.Terms.withType('terms'),
+
+                elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
+                + elasticsearch.bucketAggs.DateHistogram.withId('5')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('0')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone('utc')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges('0')
+                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+
+
+              ])
+
+
+              + elasticsearch.withHide(false)
+
+              + elasticsearch.withMetrics([
+                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('VM Memory Cache')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('1')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Average.settings.withScript('_value/1000000000')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max'),
+                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('VM Memory working set bytes')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('2')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Average.settings.withScript('_value/1000000000')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max'),
+                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('VM Memory Max Usage Bytes')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('3')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Average.settings.withScript('_value/1000000000')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max'),
+
+              ])
+
+              +elasticsearch.withQuery("!SCALE AND !Run.keyword='fillup' AND kind:'vm' AND Run:$vdbench_type AND ocp_version:$ocp_version")
+              +elasticsearch.withRefId('A')
+              +elasticsearch.withTimeField('timestamp'),
+
+              ////
+
 
              elasticsearch.withAlias('{{field}} [GB]: {{term scale}} {{kind.keyword}}s')
 
@@ -1641,13 +1801,14 @@ g.dashboard.new('PerfCI-Regression-Summary')
               ])
 
               +elasticsearch.withQuery("SCALE AND !Run.keyword='fillup' AND kind:'vm' AND Run:$vdbench_type AND ocp_version:$ocp_version")
-              +elasticsearch.withRefId('F')
+              +elasticsearch.withRefId('B')
               +elasticsearch.withTimeField('timestamp'),
 
               ////
 
 
             ])
+
 
 
 
@@ -1705,7 +1866,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
             + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTitle('artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=36')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=36')
 
             ])
 
@@ -1917,7 +2078,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
             + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTitle('artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=36')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=36')
 
             ])
 
@@ -2099,7 +2260,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
             + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTitle('artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=36')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=36')
 
             ])
 
@@ -2390,7 +2551,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
             + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTitle('artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=36')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=36')
 
             ])
             + stateTimeline.options.withAlignValue('center')
@@ -2859,7 +3020,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
             + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTitle('artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=36')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=36')
 
             ])
             + stateTimeline.options.withAlignValue('left')
@@ -3313,7 +3474,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
             + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTitle('artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=36')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=36')
 
             ])
             + stateTimeline.options.withAlignValue('left')
@@ -3516,7 +3677,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
             + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTitle('artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=36')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=36')
 
             ])
             + stateTimeline.options.withAlignValue('left')
@@ -3738,7 +3899,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
             + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTitle('artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=37')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=37')
 
             ])
 
@@ -4134,7 +4295,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
             + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTitle('artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=37')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=37')
 
             ])
 
@@ -4566,7 +4727,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
             + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTitle('artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=37')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=37')
 
             ])
 
@@ -4686,7 +4847,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
             + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTitle('artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=37')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=37')
 
             ])
 
@@ -4845,7 +5006,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
             + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTargetBlank(true)
               + stateTimeline.link.withTitle('artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=38')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=38')
 
             ])
 
@@ -5154,6 +5315,111 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
               ////
 
+              elasticsearch.withAlias('VMs #')
+
+              + elasticsearch.withBucketAggs([
+                elasticsearch.bucketAggs.Terms.withField('scale')
+                + elasticsearch.bucketAggs.Terms.withId('3')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
+                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
+                + elasticsearch.bucketAggs.Terms.withType('terms'),
+
+                elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
+                + elasticsearch.bucketAggs.DateHistogram.withId('2')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
+                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+
+
+              ])
+
+              + elasticsearch.withHide(false)
+
+              + elasticsearch.withMetrics([
+                elasticsearch.metrics.MetricAggregationWithSettings.UniqueCount.withId('1')
+                + elasticsearch.metrics.MetricAggregationWithSettings.UniqueCount.withType('count')
+
+              ])
+
+              + elasticsearch.withQuery('scale:240 AND ocp_version:$ocp_version')
+              + elasticsearch.withRefId('I')
+              + elasticsearch.withTimeField('timestamp')
+
+              ////
+
+
+            ]),
+            ////////////////////////
+
+            g.panel.stateTimeline.new('240 Fedora37 VM Memory')
+            + stateTimeline.queryOptions.withDatasource('Elasticsearch-bootstorm-results')
+            + g.panel.stateTimeline.withDescription('Time till VM Login - Lower is better')
+
+            + stateTimeline.standardOptions.color.withMode('thresholds')
+            + stateTimeline.fieldConfig.defaults.custom.withFillOpacity(77)
+            + stateTimeline.fieldConfig.defaults.custom.withLineWidth(0)
+
+            + stateTimeline.fieldConfig.defaults.withDecimals(1)
+            + stateTimeline.fieldConfig.defaults.withMappings([
+              stateTimeline.valueMapping.ValueMap.withOptions(
+                {
+                  "0": {
+                  "color": "transparent",
+                  "index": 0,
+                  "text": "."
+                  }
+                }
+              )
+              + stateTimeline.valueMapping.ValueMap.withType('value')
+
+            ])
+            + stateTimeline.standardOptions.withMax(-1)
+            + stateTimeline.fieldConfig.defaults.thresholds.withMode('percentage')
+            + stateTimeline.fieldConfig.defaults.thresholds.withSteps([
+              stateTimeline.thresholdStep.withColor('dark-blue'),
+
+              stateTimeline.thresholdStep.withColor('dark-green')
+              + stateTimeline.thresholdStep.withValue(1),
+
+              stateTimeline.thresholdStep.withColor('super-light-green')
+              + stateTimeline.thresholdStep.withValue(10),
+
+              stateTimeline.thresholdStep.withColor('semi-dark-orange')
+              + stateTimeline.thresholdStep.withValue(20),
+
+              stateTimeline.thresholdStep.withColor('dark-red')
+              + stateTimeline.thresholdStep.withValue(50)
+
+            ])
+            + stateTimeline.standardOptions.withUnit('none')
+            + stateTimeline.fieldConfig.withOverrides([])
+
+            + stateTimeline.gridPos.withH(5)
+            + stateTimeline.gridPos.withW(24)
+            + stateTimeline.gridPos.withX(0)
+            + stateTimeline.gridPos.withY(187)
+
+            + stateTimeline.withId(178)
+            + stateTimeline.withInterval('1d')
+
+            + stateTimeline.panelOptions.withLinks([
+              stateTimeline.link.withTargetBlank(true)
+              + stateTimeline.link.withTitle('artifacts link')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=38')
+
+            ])
+
+            + stateTimeline.options.withAlignValue('center')
+            + stateTimeline.options.legend.withDisplayMode('hidden')
+            + stateTimeline.options.legend.withPlacement('bottom')
+            + stateTimeline.options.withMergeValues(value = false)
+            + stateTimeline.options.withRowHeight(value = 0.9)
+            + stateTimeline.options.withShowValue('always')
+            + stateTimeline.options.tooltip.withMode('single')
+
+            + g.panel.stateTimeline.withTargets([
+
               elasticsearch.withAlias('{{field}} [GB]')
 
               + elasticsearch.withBucketAggs([
@@ -5192,54 +5458,12 @@ g.dashboard.new('PerfCI-Regression-Summary')
               ])
 
               + elasticsearch.withQuery('scale:240 AND ocp_version:$ocp_version')
-              + elasticsearch.withRefId('I')
-              + elasticsearch.withTimeField('timestamp'),
-
-              ////
-
-              elasticsearch.withAlias('VMs #')
-
-              + elasticsearch.withBucketAggs([
-                elasticsearch.bucketAggs.Terms.withField('scale')
-                + elasticsearch.bucketAggs.Terms.withId('3')
-                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
-                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
-                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
-                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
-                + elasticsearch.bucketAggs.Terms.withType('terms'),
-
-                elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
-                + elasticsearch.bucketAggs.DateHistogram.withId('2')
-                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
-                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-
-
-              ])
-
-              + elasticsearch.withHide(false)
-
-              + elasticsearch.withMetrics([
-                elasticsearch.metrics.MetricAggregationWithSettings.UniqueCount.withId('1')
-                + elasticsearch.metrics.MetricAggregationWithSettings.UniqueCount.withType('count')
-
-              ])
-
-              + elasticsearch.withQuery('scale:240 AND ocp_version:$ocp_version')
-              + elasticsearch.withRefId('J')
+              + elasticsearch.withRefId('A')
               + elasticsearch.withTimeField('timestamp')
 
               ////
 
-
-
-
-
-
-
-
-
             ]),
-
             ////////////////////////
 
 
@@ -5297,7 +5521,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
             + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTargetBlank(true)
               + stateTimeline.link.withTitle('artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=39')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=39')
 
             ])
 
@@ -5606,6 +5830,120 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
               ////
 
+              elasticsearch.withAlias('VMs #')
+
+              + elasticsearch.withBucketAggs([
+                elasticsearch.bucketAggs.Terms.withField('scale')
+                + elasticsearch.bucketAggs.Terms.withId('3')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
+                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
+                + elasticsearch.bucketAggs.Terms.withType('terms'),
+
+                elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
+                + elasticsearch.bucketAggs.DateHistogram.withId('2')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
+                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+
+
+              ])
+
+              + elasticsearch.withHide(false)
+
+              + elasticsearch.withMetrics([
+                elasticsearch.metrics.MetricAggregationWithSettings.UniqueCount.withId('1')
+                + elasticsearch.metrics.MetricAggregationWithSettings.UniqueCount.withType('count')
+
+              ])
+
+              + elasticsearch.withQuery('scale:120 AND ocp_version:$ocp_version')
+              + elasticsearch.withRefId('I')
+              + elasticsearch.withTimeField('timestamp')
+
+              ////
+
+
+
+
+
+
+
+
+
+            ]),
+            ////////////////////////
+
+
+            g.panel.stateTimeline.new('120 Windows Server 2019 VM Memory')
+            + stateTimeline.queryOptions.withDatasource('Elasticsearch-windows-results')
+            + g.panel.stateTimeline.withDescription('Time till VM Login - Lower is better')
+
+            + stateTimeline.standardOptions.color.withMode('thresholds')
+            + stateTimeline.fieldConfig.defaults.custom.withFillOpacity(77)
+            + stateTimeline.fieldConfig.defaults.custom.withLineWidth(0)
+
+            + stateTimeline.fieldConfig.defaults.withDecimals(1)
+            + stateTimeline.fieldConfig.defaults.withMappings([
+              stateTimeline.valueMapping.ValueMap.withOptions(
+                {
+                  "0": {
+                  "color": "transparent",
+                  "index": 0,
+                  "text": "."
+                  }
+                }
+              )
+              + stateTimeline.valueMapping.ValueMap.withType('value')
+
+            ])
+            + stateTimeline.standardOptions.withMax(-1)
+            + stateTimeline.fieldConfig.defaults.thresholds.withMode('percentage')
+            + stateTimeline.fieldConfig.defaults.thresholds.withSteps([
+              stateTimeline.thresholdStep.withColor('dark-blue'),
+
+              stateTimeline.thresholdStep.withColor('dark-green')
+              + stateTimeline.thresholdStep.withValue(1),
+
+              stateTimeline.thresholdStep.withColor('super-light-green')
+              + stateTimeline.thresholdStep.withValue(10),
+
+              stateTimeline.thresholdStep.withColor('semi-dark-orange')
+              + stateTimeline.thresholdStep.withValue(20),
+
+              stateTimeline.thresholdStep.withColor('dark-red')
+              + stateTimeline.thresholdStep.withValue(50)
+
+            ])
+            + stateTimeline.standardOptions.withUnit('none')
+            + stateTimeline.fieldConfig.withOverrides([])
+
+            + stateTimeline.gridPos.withH(5)
+            + stateTimeline.gridPos.withW(24)
+            + stateTimeline.gridPos.withX(0)
+            + stateTimeline.gridPos.withY(206)
+
+            + stateTimeline.withId(193)
+            + stateTimeline.withInterval('1d')
+
+            + stateTimeline.panelOptions.withLinks([
+              stateTimeline.link.withTargetBlank(true)
+              + stateTimeline.link.withTitle('artifacts link')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=39')
+
+            ])
+
+            + stateTimeline.options.withAlignValue('center')
+            + stateTimeline.options.legend.withDisplayMode('hidden')
+            + stateTimeline.options.legend.withPlacement('bottom')
+            + stateTimeline.options.withMergeValues(value = false)
+            + stateTimeline.options.withRowHeight(value = 0.9)
+            + stateTimeline.options.withShowValue('always')
+            + stateTimeline.options.tooltip.withMode('single')
+
+            + g.panel.stateTimeline.withTargets([
+
+              ////
 
               elasticsearch.withAlias('{{field}} [GB]')
 
@@ -5645,50 +5983,10 @@ g.dashboard.new('PerfCI-Regression-Summary')
               ])
 
               + elasticsearch.withQuery('scale:120 AND ocp_version:$ocp_version')
-              + elasticsearch.withRefId('I')
+              + elasticsearch.withRefId('A')
               + elasticsearch.withTimeField('timestamp'),
 
               ////
-
-              elasticsearch.withAlias('VMs #')
-
-              + elasticsearch.withBucketAggs([
-                elasticsearch.bucketAggs.Terms.withField('scale')
-                + elasticsearch.bucketAggs.Terms.withId('3')
-                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
-                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
-                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
-                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
-                + elasticsearch.bucketAggs.Terms.withType('terms'),
-
-                elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
-                + elasticsearch.bucketAggs.DateHistogram.withId('2')
-                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
-                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-
-
-              ])
-
-              + elasticsearch.withHide(false)
-
-              + elasticsearch.withMetrics([
-                elasticsearch.metrics.MetricAggregationWithSettings.UniqueCount.withId('1')
-                + elasticsearch.metrics.MetricAggregationWithSettings.UniqueCount.withType('count')
-
-              ])
-
-              + elasticsearch.withQuery('scale:120 AND ocp_version:$ocp_version')
-              + elasticsearch.withRefId('J')
-              + elasticsearch.withTimeField('timestamp')
-
-              ////
-
-
-
-
-
-
-
 
 
             ])
