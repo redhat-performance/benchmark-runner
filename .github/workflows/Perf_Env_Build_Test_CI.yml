@@ -288,7 +288,7 @@ jobs:
           pip install bumpversion
           git config --global user.email "${{ secrets.EMAIL }}"
           git config --global user.name  "${{ secrets.USER_NAME }}"
-          git config pull.rebase false  # merge (the default strategy)
+          git config pull.rebase false  # merge
           bumpversion patch
           # GITHUB_REPOSITORY already taken => GIT_REPOSITORY
           git commit .bumpversion.cfg setup.py -m "bump version to exist version v$version"
@@ -433,14 +433,13 @@ jobs:
           git checkout main
           git config --global user.email "${{ secrets.EMAIL }}"
           git config --global user.name  "${{ secrets.USER_NAME }}"
+          git config pull.rebase false  # merge
+
           git add "$GITHUB_WORKSPACE"/benchmark_runner/grafana/perf/dashboard.json
           git commit -m "Update grafana json file"
 
-          # Pull the latest changes from the remote main branch
-          git pull origin main
-
-          # Push the changes to the remote main branch
-          git push origin main
+          git pull main
+          git push main
 
       - name: Check if adding new products versions in main.libsonnet
         id: libsonnet_check_changes
@@ -453,11 +452,9 @@ jobs:
           git checkout main
           git config --global user.email "${{ secrets.EMAIL }}"
           git config --global user.name  "${{ secrets.USER_NAME }}"
+          git config pull.rebase false  # merge 
           git add "$GITHUB_WORKSPACE"/benchmark_runner/grafana/perf/jsonnet/main.libsonnet
           git commit -m "Update grafana json file"
 
-          # Pull the latest changes from the remote main branch
-          git pull origin main
-
-          # Push the changes to the remote main branch
-          git push origin main
+          git pull main
+          git push main
