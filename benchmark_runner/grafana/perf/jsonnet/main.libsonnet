@@ -255,7 +255,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
       + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTargetBlank(true)
-              + stateTimeline.link.withTitle('CI Status)
+              + stateTimeline.link.withTitle('CI Status')
               + stateTimeline.link.withUrl('https://github.com/redhat-performance/benchmark-runner/actions/workflows/Nightly_Perf_Env_CI.yml')
 
       ])
