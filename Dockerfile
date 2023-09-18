@@ -32,20 +32,16 @@ RUN python3.10 -m pip --no-cache-dir install --upgrade pip && pip --no-cache-dir
 
 # install oc/kubectl client tools for OpenShift/Kubernetes
 ARG oc_client_version="4.14.0-rc.0"
-RUN  curl -L "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${oc_client_version}/openshift-client-linux-${oc_client_version}.tar.gz" -o "~/openshift-client-linux-${oc_client_version}.tar.gz" \
-     && tar -xzvf  ~/openshift-client-linux-${oc_client_version}.tar.gz -C  ~/ \
-     && rm -rf ~/openshift-client-linux-${oc_client_version}.tar.gz \
-     && cp ~/kubectl /usr/local/bin/kubectl \
-     && cp ~/oc /usr/local/bin/oc \
-     && rm -rf ~/kubectl \
-     && rm -rf ~/oc
+RUN  curl -L "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${oc_client_version}/openshift-client-linux-${oc_client_version}.tar.gz" -o "/tmp/openshift-client-linux-${oc_client_version}.tar.gz" \
+     && tar -xzvf /tmp/openshift-client-linux-${oc_client_version}.tar.gz -C /tmp/ \
+     && mv /tmp/kubectl /usr/local/bin/kubectl \
+     && mv /tmp/oc /usr/local/bin/oc \
+     && rm -rf /tmp/openshift-client-linux-${oc_client_version}.tar.gz /tmp/kubectl /tmp/oc
 
-# install virtctl for VNC
+# Install virtctl for VNC
 ARG virtctl_version="1.0.0"
-RUN curl -L https://github.com/kubevirt/kubevirt/releases/download/v${virtctl_version}/virtctl-v${virtctl_version}-linux-amd64 -o  ~/virtctl \
-    && chmod +x ~/virtctl \
-    && cp ~/virtctl /usr/local/bin/virtctl \
-    && rm -rf ~/virtctl
+RUN curl -L "https://github.com/kubevirt/kubevirt/releases/download/v${virtctl_version}/virtctl-v${virtctl_version}-linux-amd64" -o /usr/local/bin/virtctl \
+    && chmod +x /usr/local/bin/virtctl
 
 # Activate root alias
 RUN source ~/.bashrc
