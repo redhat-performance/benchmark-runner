@@ -44,7 +44,8 @@ class UpdateGrafanaLatestValueMappings:
             data = self.elasticsearch.get_elasticsearch_index_by_id(index='ci-status', id=id)
             for version, value in data['_source'].items():
                 if version in display_versions and value not in new_versions.values() and len(value) < self.MAX_VERSION_LEN:
-                    new_versions[value.replace(".", "").replace("-", "")] = value
+                    # Display only numbers in the Grafana panel, removing characters
+                    new_versions[value.translate(str.maketrans('', '', '.-rcef'))] = value
 
         return new_versions
 
