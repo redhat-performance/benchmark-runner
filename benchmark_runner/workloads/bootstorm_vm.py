@@ -39,7 +39,6 @@ class BootstormVM(WorkloadsOperations):
         @return: Dictionary with vm_name, node and its boot elapse time
         """
         vm_bootstorm_time = {}
-
         self._virtctl.expose_vm(vm_name=vm_name)
         # wait till vm login
         vm_node = self._oc.get_vm_node(vm_name=vm_name)
@@ -72,6 +71,7 @@ class BootstormVM(WorkloadsOperations):
         self._data_dict['run_artifacts_url'] = os.path.join(self._run_artifacts_url,
                                                             f'{self._get_run_artifacts_hierarchy(workload_name=self._workload_name, is_file=True)}-{self._time_stamp_format}.tar.gz')
         self._status = 'complete' if self._data_dict else 'failed'
+        # prometheus queries
         self._prometheus_metrics_operation.finalize_prometheus()
         metric_results = self._prometheus_metrics_operation.run_prometheus_queries()
         prometheus_result = self._prometheus_metrics_operation.parse_prometheus_metrics(data=metric_results)
@@ -97,6 +97,7 @@ class BootstormVM(WorkloadsOperations):
         self._data_dict = self._get_bootstorm_vm_elapsed_time(vm_name=vm_name)
         self._data_dict['run_artifacts_url'] = os.path.join(self._run_artifacts_url, f'{self._get_run_artifacts_hierarchy(workload_name=self._workload_name, is_file=True)}-scale-{self._time_stamp_format}.tar.gz')
         self._status = 'complete' if self._data_dict else 'failed'
+        # prometheus queries
         self._prometheus_metrics_operation.finalize_prometheus()
         metric_results = self._prometheus_metrics_operation.run_prometheus_queries()
         prometheus_result = self._prometheus_metrics_operation.parse_prometheus_metrics(data=metric_results)
