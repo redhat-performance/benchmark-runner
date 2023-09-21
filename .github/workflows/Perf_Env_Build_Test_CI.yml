@@ -67,13 +67,13 @@ jobs:
           IBM_BUCKET: ${{ secrets.IBM_BUCKET }}
           IBM_KEY: ${{ secrets.IBM_KEY }}
           RUN_ARTIFACTS_URL: ${{ secrets.PERF_RUN_ARTIFACTS_URL }}
+          OC_CLIENT_VERSION: ${{ secrets.PERF_OC_CLIENT_VERSION }}
         run: |
           # Install Dockerfile content for pytest
           # install oc/kubectl
-          oc_version="4.13.0-0.okd-2023-06-04-080300"
-          curl -L "https://github.com/openshift/okd/releases/download/${oc_version}/openshift-client-linux-${oc_version}.tar.gz" -o "$RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz"
-          tar -xzvf $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz -C $RUNNER_PATH/
-          rm $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz
+          curl -L "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${OC_CLIENT_VERSION}/openshift-client-linux-${OC_CLIENT_VERSION}.tar.gz" -o "$RUNNER_PATH/openshift-client-linux-${OC_CLIENT_VERSION}.tar.gz"
+          tar -xzvf $RUNNER_PATH/openshift-client-linux-${OC_CLIENT_VERSION}.tar.gz -C $RUNNER_PATH/
+          rm $RUNNER_PATH/openshift-client-linux-${OC_CLIENT_VERSION}.tar.gz
           cp $RUNNER_PATH/kubectl /usr/local/bin/kubectl
           cp $RUNNER_PATH/oc /usr/local/bin/oc
           
@@ -138,20 +138,20 @@ jobs:
         GRAFANA_URL: ${{ secrets.PERF_GRAFANA_URL }}
         GRAFANA_API_KEY: ${{ secrets.PERF_GRAFANA_API_KEY }}
         GRAFANA_JSON: ${{ secrets.PERF_GRAFANA_JSON }}
+        OC_CLIENT_VERSION: ${{ secrets.PERF_OC_CLIENT_VERSION }}
       run: |
         # Install Dockerfile content for pytest
         # install oc/kubectl
-        oc_version="4.13.0-0.okd-2023-06-04-080300"
-        curl -L "https://github.com/openshift/okd/releases/download/${oc_version}/openshift-client-linux-${oc_version}.tar.gz" -o "$RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz"
-        tar -xzvf $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz -C $RUNNER_PATH/
-        rm $RUNNER_PATH/openshift-client-linux-${oc_version}.tar.gz
+        curl -L "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${OC_CLIENT_VERSION}/openshift-client-linux-${OC_CLIENT_VERSION}.tar.gz" -o "$RUNNER_PATH/openshift-client-linux-${OC_CLIENT_VERSION}.tar.gz"
+        tar -xzvf $RUNNER_PATH/openshift-client-linux-${OC_CLIENT_VERSION}.tar.gz -C $RUNNER_PATH/
+        rm $RUNNER_PATH/openshift-client-linux-${OC_CLIENT_VERSION}.tar.gz
         cp $RUNNER_PATH/kubectl /usr/local/bin/kubectl
         cp $RUNNER_PATH/oc /usr/local/bin/oc
         rm -rf $RUNNER_PATH/kubectl
         rm -rf $RUNNER_PATH/oc
         
          # install virtctl for VNC
-        virtctl_version="0.59.1"
+        virtctl_version="1.0.0"
         curl -L "https://github.com/kubevirt/kubevirt/releases/download/v${virtctl_version}/virtctl-v${virtctl_version}-linux-amd64" -o  "$RUNNER_PATH/virtctl"
         chmod +x $RUNNER_PATH/virtctl 
         cp $RUNNER_PATH/virtctl /usr/local/bin/virtctl 
@@ -288,7 +288,7 @@ jobs:
           pip install bumpversion
           git config --global user.email "${{ secrets.EMAIL }}"
           git config --global user.name  "${{ secrets.USER_NAME }}"
-          git config pull.rebase false  # merge (the default strategy)
+          git config pull.rebase false  # merge
           bumpversion patch
           # GITHUB_REPOSITORY already taken => GIT_REPOSITORY
           git commit .bumpversion.cfg setup.py -m "bump version to exist version v$version"
@@ -433,14 +433,13 @@ jobs:
           git checkout main
           git config --global user.email "${{ secrets.EMAIL }}"
           git config --global user.name  "${{ secrets.USER_NAME }}"
+          git config pull.rebase false  # merge
+
           git add "$GITHUB_WORKSPACE"/benchmark_runner/grafana/perf/dashboard.json
           git commit -m "Update grafana json file"
 
-          # Pull the latest changes from the remote main branch
-          git pull origin main
-
-          # Push the changes to the remote main branch
-          git push origin main
+          git pull https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} main
+          git push https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} main
 
       - name: Check if adding new products versions in main.libsonnet
         id: libsonnet_check_changes
@@ -453,11 +452,9 @@ jobs:
           git checkout main
           git config --global user.email "${{ secrets.EMAIL }}"
           git config --global user.name  "${{ secrets.USER_NAME }}"
+          git config pull.rebase false  # merge 
           git add "$GITHUB_WORKSPACE"/benchmark_runner/grafana/perf/jsonnet/main.libsonnet
           git commit -m "Update grafana json file"
 
-          # Pull the latest changes from the remote main branch
-          git pull origin main
-
-          # Push the changes to the remote main branch
-          git push origin main
+          git pull https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} main
+          git push https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} main
