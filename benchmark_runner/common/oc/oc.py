@@ -36,6 +36,7 @@ class OC(SSH):
         self.__elasticsearch_url = self.__environment_variables_dict.get('elasticsearch_url', '')
         self.__kata_csv = self.__environment_variables_dict.get('kata_csv', '')
         self.__cli = self.__environment_variables_dict.get('cli', '')
+        self.__worker_disk_prefix = self.__environment_variables_dict.get('worker_disk_prefix', '')
         self.__worker_disk_ids = self.__environment_variables_dict.get('worker_disk_ids', '')
         if self.__worker_disk_ids:
             self.__worker_disk_ids = ast.literal_eval(self.__worker_disk_ids)
@@ -68,17 +69,6 @@ class OC(SSH):
         result = self.run(f"{self.__cli} get pv -o jsonpath={{.items[*].metadata.annotations.'storage\.openshift\.com/device-id'}}")
         return result.split()
 
-    def get_worker_disk_ids(self):
-        """
-        The method returns worker disk ids
-        """
-        workers_disk_ids = []
-        if self.__worker_disk_ids:
-            for node, disk_ids in self.__worker_disk_ids.items():
-                for disk_id in disk_ids:
-                    workers_disk_ids.append(disk_id)
-        return workers_disk_ids
-
     def remove_lso_path(self):
         """
         The method removes lso path on each node
@@ -86,14 +76,32 @@ class OC(SSH):
         """
         self.run(fr"""{self.__cli} get nodes -l node-role.kubernetes.io/worker= -o jsonpath="{{range .items[*]}}{{.metadata.name}}{{'\\n'}}{{end}}" |  xargs -I{{}} oc debug node/{{}} -- chroot /host sh -c "rm -rf /mnt/local-storage/local-sc" """)
 
+    def get_worker_disk_ids(self):
+        """
+        The method returns worker disk ids
+        """
+        workers_disk_ids = []
+        if self.__worker_disk_ids:
+            workers_disk_ids = [disk_id for disk_list in self.__worker_disk_ids.values() for disk_id in disk_list]
+        return workers_disk_ids
+
     def get_free_disk_id(self):
         """
-        This method returns free disk (workers_all_disk_ids - workers_odf_pv_disk_ids)
+        This method finds the free disk by searching for worker_disk_ids that do not exist in the odf_pv_disk_ids list.
+        :return: It returns the free disk ID concatenated with the worker_disk_prefix
         """
-        workers_disk_ids = self.get_worker_disk_ids()
-        workers_pv_disk_ids = self.get_pv_disk_ids()
-        if workers_disk_ids:
-            return list(set(workers_disk_ids) - set(workers_pv_disk_ids))
+        free_disk_id = ''
+        for worker_disk_id in self.get_worker_disk_ids():
+            found = False
+            for odf_pv_disk_id in self.get_pv_disk_ids():
+                if odf_pv_disk_id.endswith(worker_disk_id):
+                    found = True
+                    break
+            if not found:
+                free_disk_id = f'{self.__worker_disk_prefix}{worker_disk_id}'
+                break  # Exit the loop once a free disk ID is found
+
+        return free_disk_id
 
     def get_kata_operator_version(self):
         """
