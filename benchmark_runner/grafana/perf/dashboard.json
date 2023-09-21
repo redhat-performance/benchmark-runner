@@ -1072,7 +1072,7 @@
                   {
                      "targetBlank": true,
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&viewPanel=32&from=now-45d&to=now"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&viewPanel=32&from=now-45d&to=now"
                   }
                ],
                "options": {
@@ -1163,6 +1163,145 @@
                ],
                "title": "HammerDB KTPM",
                "type": "state-timeline"
+            },
+            {
+               "datasource": "Elasticsearch-hammerdb-results",
+               "description": "MariaDB: innodb_buffer_pool_size = 8GB \n\nPostgreSQL: shared_buffers = 4GB",
+               "fieldConfig": {
+                  "defaults": {
+                     "color": {
+                        "mode": "thresholds"
+                     },
+                     "custom": {
+                        "fillOpacity": 70,
+                        "lineWidth": 0
+                     },
+                     "mappings": [ ],
+                     "min": 0,
+                     "thresholds": {
+                        "mode": "percentage",
+                        "steps": [
+                           {
+                              "color": "dark-red"
+                           },
+                           {
+                              "color": "semi-dark-orange",
+                              "value": 50
+                           },
+                           {
+                              "color": "super-light-green",
+                              "value": 80
+                           },
+                           {
+                              "color": "dark-green",
+                              "value": 90
+                           },
+                           {
+                              "color": "dark-blue",
+                              "value": 100
+                           }
+                        ]
+                     }
+                  },
+                  "overrides": [ ]
+               },
+               "gridPos": {
+                  "h": 13,
+                  "w": 24,
+                  "x": 0,
+                  "y": 51
+               },
+               "id": 6,
+               "interval": "1d",
+               "links": [
+                  {
+                     "targetBlank": true,
+                     "title": "artifacts link",
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&viewPanel=32&from=now-45d&to=now"
+                  }
+               ],
+               "options": {
+                  "alignValue": "center",
+                  "legend": {
+                     "displayMode": "list",
+                     "placement": "bottom"
+                  },
+                  "mergeValues": false,
+                  "rowHeight": 0.90000000000000002,
+                  "showValue": "always",
+                  "tooltip": {
+                     "mode": "single"
+                  }
+               },
+               "pluginVersion": "v10.0.0",
+               "targets": [
+                  {
+                     "alias": "{{term db_type.keyword}}  : {{field}} [GB]: {{term storage_type.keyword}}",
+                     "bucketAggs": [
+                        {
+                           "field": "db_type.keyword",
+                           "id": "3",
+                           "settings": {
+                              "min_doc_count": "1",
+                              "order": "asc",
+                              "orderBy": "_term",
+                              "size": "10"
+                           },
+                           "type": "terms"
+                        },
+                        {
+                           "field": "storage_type.keyword",
+                           "id": "5",
+                           "settings": {
+                              "min_doc_count": "1",
+                              "order": "desc",
+                              "orderBy": "_term",
+                              "size": "10"
+                           },
+                           "type": "terms"
+                        },
+                        {
+                           "field": "timestamp",
+                           "id": "2",
+                           "settings": {
+                              "interval": "auto"
+                           },
+                           "type": "date_histogram"
+                        }
+                     ],
+                     "metrics": [
+                        {
+                           "field": "VM Memory Cache",
+                           "id": "1",
+                           "settings": {
+                              "script": "_value/1000000000"
+                           },
+                           "type": "max"
+                        },
+                        {
+                           "field": "VM Memory working set bytes",
+                           "id": "2",
+                           "settings": {
+                              "script": "_value/1000000000"
+                           },
+                           "type": "max"
+                        },
+                        {
+                           "field": "VM Memory Max Usage Bytes",
+                           "id": "3",
+                           "settings": {
+                              "script": "_value/1000000000"
+                           },
+                           "type": "max"
+                        }
+                     ],
+                     "query": "_exists_:tpm AND db_type:$db_type AND kind:vm AND ocp_version:$ocp_version",
+                     "refId": "A",
+                     "timeField": "timestamp"
+                  }
+               ],
+               "title": "HammerDB VM Memory",
+               "type": "state-timeline"
             }
          ],
          "title": "Hammerdb",
@@ -1176,7 +1315,7 @@
             "x": 0,
             "y": 13
          },
-         "id": 6,
+         "id": 7,
          "panels": [
             {
                "datasource": "Elasticsearch-uperf-results",
@@ -1226,13 +1365,13 @@
                   "x": 0,
                   "y": 52
                },
-               "id": 7,
+               "id": 8,
                "interval": "1d",
                "links": [
                   {
                      "targetBlank": true,
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&editPanel=33&from=now-45d&to=now"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&editPanel=33&from=now-45d&to=now"
                   }
                ],
                "options": {
@@ -1429,12 +1568,12 @@
                   "x": 0,
                   "y": 67
                },
-               "id": 8,
+               "id": 9,
                "interval": "1d",
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&editPanel=33&from=now-45d&to=now"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&editPanel=33&from=now-45d&to=now"
                   }
                ],
                "options": {
@@ -1517,6 +1656,125 @@
                ],
                "title": "Uperf Throughput (Gbits/s)",
                "type": "state-timeline"
+            },
+            {
+               "datasource": "Elasticsearch-uperf-results",
+               "fieldConfig": {
+                  "defaults": {
+                     "color": {
+                        "mode": "thresholds"
+                     },
+                     "custom": {
+                        "fillOpacity": 70,
+                        "lineWidth": 0
+                     },
+                     "decimals": 1,
+                     "mappings": [ ],
+                     "min": 0,
+                     "thresholds": {
+                        "mode": "percentage",
+                        "steps": [
+                           {
+                              "color": "semi-dark-red"
+                           },
+                           {
+                              "color": "semi-dark-orange",
+                              "value": 50
+                           },
+                           {
+                              "color": "super-light-green",
+                              "value": 80
+                           },
+                           {
+                              "color": "dark-green",
+                              "value": 90
+                           },
+                           {
+                              "color": "dark-blue",
+                              "value": 100
+                           }
+                        ]
+                     }
+                  },
+                  "overrides": [ ]
+               },
+               "gridPos": {
+                  "h": 6,
+                  "w": 24,
+                  "x": 0,
+                  "y": 67
+               },
+               "id": 10,
+               "interval": "1d",
+               "links": [
+                  {
+                     "title": "artifacts link",
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&editPanel=33&from=now-45d&to=now"
+                  }
+               ],
+               "options": {
+                  "alignValue": "center",
+                  "legend": {
+                     "displayMode": "list",
+                     "placement": "bottom"
+                  },
+                  "mergeValues": false,
+                  "rowHeight": 0.90000000000000002,
+                  "showValue": "always",
+                  "tooltip": {
+                     "mode": "single"
+                  }
+               },
+               "pluginVersion": "v10.0.0",
+               "targets": [
+                  {
+                     "alias": "{{field}} [GB]",
+                     "bucketAggs": [
+                        {
+                           "field": "timestamp",
+                           "id": "2",
+                           "settings": {
+                              "interval": "auto",
+                              "min_doc_count": "0",
+                              "timeZone": "utc",
+                              "trimEdges": "0"
+                           },
+                           "type": "date_histogram"
+                        }
+                     ],
+                     "metrics": [
+                        {
+                           "field": "VM Memory Cache",
+                           "id": "1",
+                           "settings": {
+                              "script": "_value/1000000000"
+                           },
+                           "type": "max"
+                        },
+                        {
+                           "field": "VM Memory working set bytes",
+                           "id": "2",
+                           "settings": {
+                              "script": "_value/1000000000"
+                           },
+                           "type": "max"
+                        },
+                        {
+                           "field": "VM Memory Max Usage Bytes",
+                           "id": "3",
+                           "settings": {
+                              "script": "_value/1000000000"
+                           },
+                           "type": "max"
+                        }
+                     ],
+                     "query": "_exists_:norm_ops AND kind:vm AND ocp_version:$ocp_version",
+                     "refId": "A",
+                     "timeField": "timestamp"
+                  }
+               ],
+               "title": "Uperf VM Memory",
+               "type": "state-timeline"
             }
          ],
          "title": "Uperf",
@@ -1530,7 +1788,7 @@
             "x": 0,
             "y": 14
          },
-         "id": 9,
+         "id": 11,
          "panels": [
             {
                "datasource": "Elasticsearch-vdbench-results",
@@ -1578,17 +1836,17 @@
                   "x": 0,
                   "y": 83
                },
-               "id": 10,
+               "id": 12,
                "interval": "1d",
                "links": [
                   {
                      "targetBlank": true,
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=34"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=34"
                   },
                   {
                      "title": "scale artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=35"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=35"
                   }
                ],
                "options": {
@@ -1704,63 +1962,6 @@
                      "timeField": "timestamp"
                   },
                   {
-                     "alias": "{{field}} [GB]: 1 vm",
-                     "bucketAggs": [
-                        {
-                           "field": "kind.keyword",
-                           "id": "6",
-                           "settings": {
-                              "min_doc_count": "1",
-                              "order": "desc",
-                              "orderBy": "_term",
-                              "size": "10"
-                           },
-                           "type": "terms"
-                        },
-                        {
-                           "field": "timestamp",
-                           "id": "5",
-                           "settings": {
-                              "interval": "auto",
-                              "min_doc_count": "0",
-                              "timeZone": "utc",
-                              "trimEdges": "0"
-                           },
-                           "type": "date_histogram"
-                        }
-                     ],
-                     "hide": false,
-                     "metrics": [
-                        {
-                           "field": "VM Memory Cache",
-                           "id": "1",
-                           "settings": {
-                              "script": "_value/1000000000"
-                           },
-                           "type": "max"
-                        },
-                        {
-                           "field": "VM Memory working set bytes",
-                           "id": "2",
-                           "settings": {
-                              "script": "_value/1000000000"
-                           },
-                           "type": "max"
-                        },
-                        {
-                           "field": "VM Memory Max Usage Bytes",
-                           "id": "3",
-                           "settings": {
-                              "script": "_value/1000000000"
-                           },
-                           "type": "max"
-                        }
-                     ],
-                     "query": "!SCALE AND !Run.keyword='fillup' AND kind:'vm' AND Run:$vdbench_type AND ocp_version:$ocp_version",
-                     "refId": "C",
-                     "timeField": "timestamp"
-                  },
-                  {
                      "alias": "{{term Run.keyword}} : {{term Threads}}th :{{term scale}} {{term kind.keyword}}s",
                      "bucketAggs": [
                         {
@@ -1828,7 +2029,7 @@
                         }
                      ],
                      "query": "SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type AND ocp_version:$ocp_version",
-                     "refId": "D",
+                     "refId": "C",
                      "timeField": "timestamp"
                   },
                   {
@@ -1878,75 +2079,7 @@
                         }
                      ],
                      "query": "SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type AND ocp_version:$ocp_version",
-                     "refId": "E",
-                     "timeField": "timestamp"
-                  },
-                  {
-                     "alias": "{{field}} [GB]: {{term scale}} {{kind.keyword}}s",
-                     "bucketAggs": [
-                        {
-                           "field": "scale",
-                           "id": "7",
-                           "settings": {
-                              "min_doc_count": "1",
-                              "order": "desc",
-                              "orderBy": "_term",
-                              "size": "10"
-                           },
-                           "type": "terms"
-                        },
-                        {
-                           "field": "kind.keyword",
-                           "id": "6",
-                           "settings": {
-                              "min_doc_count": "1",
-                              "order": "desc",
-                              "orderBy": "_term",
-                              "size": "10"
-                           },
-                           "type": "terms"
-                        },
-                        {
-                           "field": "timestamp",
-                           "id": "5",
-                           "settings": {
-                              "interval": "auto",
-                              "min_doc_count": "0",
-                              "timeZone": "utc",
-                              "trimEdges": "0"
-                           },
-                           "type": "date_histogram"
-                        }
-                     ],
-                     "hide": false,
-                     "metrics": [
-                        {
-                           "field": "VM Memory Cache",
-                           "id": "1",
-                           "settings": {
-                              "script": "_value/1000000000"
-                           },
-                           "type": "max"
-                        },
-                        {
-                           "field": "VM Memory working set bytes",
-                           "id": "2",
-                           "settings": {
-                              "script": "_value/1000000000"
-                           },
-                           "type": "max"
-                        },
-                        {
-                           "field": "VM Memory Max Usage Bytes",
-                           "id": "3",
-                           "settings": {
-                              "script": "_value/1000000000"
-                           },
-                           "type": "max"
-                        }
-                     ],
-                     "query": "SCALE AND !Run.keyword='fillup' AND kind:'vm' AND Run:$vdbench_type AND ocp_version:$ocp_version",
-                     "refId": "F",
+                     "refId": "D",
                      "timeField": "timestamp"
                   }
                ],
@@ -2001,17 +2134,17 @@
                   "x": 0,
                   "y": 131
                },
-               "id": 11,
+               "id": 13,
                "interval": "1d",
                "links": [
                   {
                      "targetBlank": true,
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=34"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=34"
                   },
                   {
                      "title": "scale artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=35"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=35"
                   }
                ],
                "options": {
@@ -2127,63 +2260,6 @@
                      "timeField": "timestamp"
                   },
                   {
-                     "alias": "{{field}} [GB]: 1 vm",
-                     "bucketAggs": [
-                        {
-                           "field": "kind.keyword",
-                           "id": "6",
-                           "settings": {
-                              "min_doc_count": "1",
-                              "order": "desc",
-                              "orderBy": "_term",
-                              "size": "10"
-                           },
-                           "type": "terms"
-                        },
-                        {
-                           "field": "timestamp",
-                           "id": "5",
-                           "settings": {
-                              "interval": "auto",
-                              "min_doc_count": "0",
-                              "timeZone": "utc",
-                              "trimEdges": "0"
-                           },
-                           "type": "date_histogram"
-                        }
-                     ],
-                     "hide": false,
-                     "metrics": [
-                        {
-                           "field": "VM Memory Cache",
-                           "id": "1",
-                           "settings": {
-                              "script": "_value/1000000000"
-                           },
-                           "type": "max"
-                        },
-                        {
-                           "field": "VM Memory working set bytes",
-                           "id": "2",
-                           "settings": {
-                              "script": "_value/1000000000"
-                           },
-                           "type": "max"
-                        },
-                        {
-                           "field": "VM Memory Max Usage Bytes",
-                           "id": "3",
-                           "settings": {
-                              "script": "_value/1000000000"
-                           },
-                           "type": "max"
-                        }
-                     ],
-                     "query": "!SCALE AND !Run.keyword='fillup' AND kind:'vm' AND Run:$vdbench_type AND ocp_version:$ocp_version",
-                     "refId": "C",
-                     "timeField": "timestamp"
-                  },
-                  {
                      "alias": "{{term Run.keyword}} : {{term Threads}}th :{{term scale}} {{term kind.keyword}}s",
                      "bucketAggs": [
                         {
@@ -2251,7 +2327,7 @@
                         }
                      ],
                      "query": "SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type AND ocp_version:$ocp_version",
-                     "refId": "D",
+                     "refId": "C",
                      "timeField": "timestamp"
                   },
                   {
@@ -2301,7 +2377,144 @@
                         }
                      ],
                      "query": "SCALE AND !Run.keyword='fillup' AND kind:$kind AND Run:$vdbench_type AND ocp_version:$ocp_version",
-                     "refId": "E",
+                     "refId": "D",
+                     "timeField": "timestamp"
+                  }
+               ],
+               "title": "vdbench Latency (sec)",
+               "type": "state-timeline"
+            },
+            {
+               "datasource": "Elasticsearch-vdbench-results",
+               "description": "Lower is better",
+               "fieldConfig": {
+                  "defaults": {
+                     "color": {
+                        "mode": "thresholds"
+                     },
+                     "custom": {
+                        "fillOpacity": 70,
+                        "lineWidth": 0
+                     },
+                     "decimals": 1,
+                     "mappings": [ ],
+                     "max": -1,
+                     "thresholds": {
+                        "mode": "percentage",
+                        "steps": [
+                           {
+                              "color": "dark-blue"
+                           },
+                           {
+                              "color": "dark-green",
+                              "value": 1
+                           },
+                           {
+                              "color": "super-light-green",
+                              "value": 10
+                           },
+                           {
+                              "color": "semi-dark-orange",
+                              "value": 20
+                           },
+                           {
+                              "color": "dark-red",
+                              "value": 50
+                           }
+                        ]
+                     }
+                  },
+                  "overrides": [ ]
+               },
+               "gridPos": {
+                  "h": 10,
+                  "w": 24,
+                  "x": 0,
+                  "y": 131
+               },
+               "id": 14,
+               "interval": "1d",
+               "links": [
+                  {
+                     "targetBlank": true,
+                     "title": "artifacts link",
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=34"
+                  },
+                  {
+                     "title": "scale artifacts link",
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=35"
+                  }
+               ],
+               "options": {
+                  "alignValue": "center",
+                  "legend": {
+                     "displayMode": "list",
+                     "placement": "bottom"
+                  },
+                  "mergeValues": false,
+                  "rowHeight": 0.90000000000000002,
+                  "showValue": "always",
+                  "tooltip": {
+                     "mode": "single"
+                  }
+               },
+               "pluginVersion": "v10.0.0",
+               "targets": [
+                  {
+                     "alias": "{{field}} [GB]: 1 vm",
+                     "bucketAggs": [
+                        {
+                           "field": "kind.keyword",
+                           "id": "6",
+                           "settings": {
+                              "min_doc_count": "1",
+                              "order": "desc",
+                              "orderBy": "_term",
+                              "size": "10"
+                           },
+                           "type": "terms"
+                        },
+                        {
+                           "field": "timestamp",
+                           "id": "5",
+                           "settings": {
+                              "interval": "auto",
+                              "min_doc_count": "0",
+                              "timeZone": "utc",
+                              "trimEdges": "0"
+                           },
+                           "type": "date_histogram"
+                        }
+                     ],
+                     "hide": false,
+                     "metrics": [
+                        {
+                           "field": "VM Memory Cache",
+                           "id": "1",
+                           "settings": {
+                              "script": "_value/1000000000"
+                           },
+                           "type": "max"
+                        },
+                        {
+                           "field": "VM Memory working set bytes",
+                           "id": "2",
+                           "settings": {
+                              "script": "_value/1000000000"
+                           },
+                           "type": "max"
+                        },
+                        {
+                           "field": "VM Memory Max Usage Bytes",
+                           "id": "3",
+                           "settings": {
+                              "script": "_value/1000000000"
+                           },
+                           "type": "max"
+                        }
+                     ],
+                     "query": "!SCALE AND !Run.keyword='fillup' AND kind:'vm' AND Run:$vdbench_type AND ocp_version:$ocp_version",
+                     "refId": "A",
                      "timeField": "timestamp"
                   },
                   {
@@ -2369,11 +2582,11 @@
                         }
                      ],
                      "query": "SCALE AND !Run.keyword='fillup' AND kind:'vm' AND Run:$vdbench_type AND ocp_version:$ocp_version",
-                     "refId": "F",
+                     "refId": "B",
                      "timeField": "timestamp"
                   }
                ],
-               "title": "vdbench Latency (sec)",
+               "title": "vdbench VM memory",
                "type": "state-timeline"
             }
          ],
@@ -2388,7 +2601,7 @@
             "x": 0,
             "y": 15
          },
-         "id": 12,
+         "id": 15,
          "panels": [
             {
                "datasource": "Elasticsearch-clusterbuster-cpusoaker-results",
@@ -2437,12 +2650,12 @@
                   "x": 0,
                   "y": 182
                },
-               "id": 13,
+               "id": 16,
                "interval": "1d",
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=36"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=36"
                   }
                ],
                "options": {
@@ -2671,12 +2884,12 @@
                   "x": 0,
                   "y": 192
                },
-               "id": 14,
+               "id": 17,
                "interval": "1d",
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=36"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=36"
                   }
                ],
                "options": {
@@ -2872,12 +3085,12 @@
                   "x": 0,
                   "y": 195
                },
-               "id": 15,
+               "id": 18,
                "interval": "1d",
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=36"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=36"
                   }
                ],
                "options": {
@@ -3124,7 +3337,7 @@
             "x": 0,
             "y": 16
          },
-         "id": 16,
+         "id": 19,
          "panels": [
             {
                "datasource": "Elasticsearch-clusterbuster-fio-results",
@@ -3173,12 +3386,12 @@
                   "x": 0,
                   "y": 183
                },
-               "id": 17,
+               "id": 20,
                "interval": "1d",
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=36"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=36"
                   }
                ],
                "options": {
@@ -3629,7 +3842,7 @@
             "x": 0,
             "y": 17
          },
-         "id": 18,
+         "id": 21,
          "panels": [
             {
                "datasource": "Elasticsearch-clusterbuster-files-results",
@@ -3679,12 +3892,12 @@
                   "x": 0,
                   "y": 184
                },
-               "id": 19,
+               "id": 22,
                "interval": "1d",
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=36"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=36"
                   }
                ],
                "options": {
@@ -4109,7 +4322,7 @@
             "x": 0,
             "y": 18
          },
-         "id": 20,
+         "id": 23,
          "panels": [
             {
                "datasource": "Elasticsearch-clusterbuster-uperf-results",
@@ -4159,12 +4372,12 @@
                   "x": 0,
                   "y": 185
                },
-               "id": 21,
+               "id": 24,
                "interval": "1d",
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=36"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=36"
                   }
                ],
                "options": {
@@ -4386,12 +4599,12 @@
                   "x": 0,
                   "y": 194
                },
-               "id": 22,
+               "id": 25,
                "interval": "1d",
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=36"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=36"
                   }
                ],
                "options": {
@@ -4577,7 +4790,7 @@
             "x": 0,
             "y": 19
          },
-         "id": 23,
+         "id": 26,
          "panels": [
             {
                "datasource": "Elasticsearch-clusterbuster-cpusoaker-release-results",
@@ -4626,12 +4839,12 @@
                   "x": 0,
                   "y": 261
                },
-               "id": 24,
+               "id": 27,
                "interval": "1d",
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=37"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=37"
                   }
                ],
                "options": {
@@ -5027,12 +5240,12 @@
                   "x": 0,
                   "y": 297
                },
-               "id": 25,
+               "id": 28,
                "interval": "1d",
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=37"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=37"
                   }
                ],
                "options": {
@@ -5423,12 +5636,12 @@
                   "x": 0,
                   "y": 333
                },
-               "id": 26,
+               "id": 29,
                "interval": "1d",
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=37"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=37"
                   }
                ],
                "options": {
@@ -5549,12 +5762,12 @@
                   "x": 0,
                   "y": 369
                },
-               "id": 27,
+               "id": 30,
                "interval": "1d",
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=37"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=37"
                   }
                ],
                "options": {
@@ -5647,7 +5860,7 @@
             "x": 0,
             "y": 20
          },
-         "id": 28,
+         "id": 31,
          "panels": [
             {
                "datasource": "Elasticsearch-bootstorm-results",
@@ -5709,13 +5922,13 @@
                   "x": 0,
                   "y": 187
                },
-               "id": 29,
+               "id": 32,
                "interval": "1d",
                "links": [
                   {
                      "targetBlank": true,
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=38"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=38"
                   }
                ],
                "options": {
@@ -6048,6 +6261,128 @@
                      "timeField": "timestamp"
                   },
                   {
+                     "alias": "VMs #",
+                     "bucketAggs": [
+                        {
+                           "field": "scale",
+                           "id": "3",
+                           "settings": {
+                              "min_doc_count": "1",
+                              "order": "desc",
+                              "orderBy": "_term",
+                              "size": "10"
+                           },
+                           "type": "terms"
+                        },
+                        {
+                           "field": "timestamp",
+                           "id": "2",
+                           "settings": {
+                              "interval": "auto"
+                           },
+                           "type": "date_histogram"
+                        }
+                     ],
+                     "hide": false,
+                     "metrics": [
+                        {
+                           "id": "1",
+                           "type": "count"
+                        }
+                     ],
+                     "query": "scale:240 AND ocp_version:$ocp_version",
+                     "refId": "I",
+                     "timeField": "timestamp"
+                  }
+               ],
+               "title": "240 Fedora37 VMs(Sec)",
+               "type": "state-timeline"
+            },
+            {
+               "datasource": "Elasticsearch-bootstorm-results",
+               "description": "Time till VM Login - Lower is better",
+               "fieldConfig": {
+                  "defaults": {
+                     "color": {
+                        "mode": "thresholds"
+                     },
+                     "custom": {
+                        "fillOpacity": 77,
+                        "lineWidth": 0
+                     },
+                     "decimals": 1,
+                     "mappings": [
+                        {
+                           "options": {
+                              "0": {
+                                 "color": "transparent",
+                                 "index": 0,
+                                 "text": "."
+                              }
+                           },
+                           "type": "value"
+                        }
+                     ],
+                     "max": -1,
+                     "thresholds": {
+                        "mode": "percentage",
+                        "steps": [
+                           {
+                              "color": "dark-blue"
+                           },
+                           {
+                              "color": "dark-green",
+                              "value": 1
+                           },
+                           {
+                              "color": "super-light-green",
+                              "value": 10
+                           },
+                           {
+                              "color": "semi-dark-orange",
+                              "value": 20
+                           },
+                           {
+                              "color": "dark-red",
+                              "value": 50
+                           }
+                        ]
+                     },
+                     "unit": "none"
+                  },
+                  "overrides": [ ]
+               },
+               "gridPos": {
+                  "h": 5,
+                  "w": 24,
+                  "x": 0,
+                  "y": 187
+               },
+               "id": 33,
+               "interval": "1d",
+               "links": [
+                  {
+                     "targetBlank": true,
+                     "title": "artifacts link",
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=38"
+                  }
+               ],
+               "options": {
+                  "alignValue": "center",
+                  "legend": {
+                     "displayMode": "hidden",
+                     "placement": "bottom"
+                  },
+                  "mergeValues": false,
+                  "rowHeight": 0.90000000000000002,
+                  "showValue": "always",
+                  "tooltip": {
+                     "mode": "single"
+                  }
+               },
+               "pluginVersion": "v10.0.0",
+               "targets": [
+                  {
                      "alias": "{{field}} [GB]",
                      "bucketAggs": [
                         {
@@ -6098,45 +6433,11 @@
                         }
                      ],
                      "query": "scale:240 AND ocp_version:$ocp_version",
-                     "refId": "I",
-                     "timeField": "timestamp"
-                  },
-                  {
-                     "alias": "VMs #",
-                     "bucketAggs": [
-                        {
-                           "field": "scale",
-                           "id": "3",
-                           "settings": {
-                              "min_doc_count": "1",
-                              "order": "desc",
-                              "orderBy": "_term",
-                              "size": "10"
-                           },
-                           "type": "terms"
-                        },
-                        {
-                           "field": "timestamp",
-                           "id": "2",
-                           "settings": {
-                              "interval": "auto"
-                           },
-                           "type": "date_histogram"
-                        }
-                     ],
-                     "hide": false,
-                     "metrics": [
-                        {
-                           "id": "1",
-                           "type": "count"
-                        }
-                     ],
-                     "query": "scale:240 AND ocp_version:$ocp_version",
-                     "refId": "J",
+                     "refId": "A",
                      "timeField": "timestamp"
                   }
                ],
-               "title": "240 Fedora37 VMs(Sec)",
+               "title": "240 Fedora37 VM Memory",
                "type": "state-timeline"
             },
             {
@@ -6199,13 +6500,13 @@
                   "x": 0,
                   "y": 206
                },
-               "id": 30,
+               "id": 34,
                "interval": "1d",
                "links": [
                   {
                      "targetBlank": true,
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf5l4sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=39"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=39"
                   }
                ],
                "options": {
@@ -6538,6 +6839,128 @@
                      "timeField": "timestamp"
                   },
                   {
+                     "alias": "VMs #",
+                     "bucketAggs": [
+                        {
+                           "field": "scale",
+                           "id": "3",
+                           "settings": {
+                              "min_doc_count": "1",
+                              "order": "desc",
+                              "orderBy": "_term",
+                              "size": "10"
+                           },
+                           "type": "terms"
+                        },
+                        {
+                           "field": "timestamp",
+                           "id": "2",
+                           "settings": {
+                              "interval": "auto"
+                           },
+                           "type": "date_histogram"
+                        }
+                     ],
+                     "hide": false,
+                     "metrics": [
+                        {
+                           "id": "1",
+                           "type": "count"
+                        }
+                     ],
+                     "query": "scale:120 AND ocp_version:$ocp_version",
+                     "refId": "I",
+                     "timeField": "timestamp"
+                  }
+               ],
+               "title": "120 Windows Server 2019 VMs virtio (Sec)",
+               "type": "state-timeline"
+            },
+            {
+               "datasource": "Elasticsearch-windows-results",
+               "description": "Time till VM Login - Lower is better",
+               "fieldConfig": {
+                  "defaults": {
+                     "color": {
+                        "mode": "thresholds"
+                     },
+                     "custom": {
+                        "fillOpacity": 77,
+                        "lineWidth": 0
+                     },
+                     "decimals": 1,
+                     "mappings": [
+                        {
+                           "options": {
+                              "0": {
+                                 "color": "transparent",
+                                 "index": 0,
+                                 "text": "."
+                              }
+                           },
+                           "type": "value"
+                        }
+                     ],
+                     "max": -1,
+                     "thresholds": {
+                        "mode": "percentage",
+                        "steps": [
+                           {
+                              "color": "dark-blue"
+                           },
+                           {
+                              "color": "dark-green",
+                              "value": 1
+                           },
+                           {
+                              "color": "super-light-green",
+                              "value": 10
+                           },
+                           {
+                              "color": "semi-dark-orange",
+                              "value": 20
+                           },
+                           {
+                              "color": "dark-red",
+                              "value": 50
+                           }
+                        ]
+                     },
+                     "unit": "none"
+                  },
+                  "overrides": [ ]
+               },
+               "gridPos": {
+                  "h": 5,
+                  "w": 24,
+                  "x": 0,
+                  "y": 206
+               },
+               "id": 35,
+               "interval": "1d",
+               "links": [
+                  {
+                     "targetBlank": true,
+                     "title": "artifacts link",
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=39"
+                  }
+               ],
+               "options": {
+                  "alignValue": "center",
+                  "legend": {
+                     "displayMode": "hidden",
+                     "placement": "bottom"
+                  },
+                  "mergeValues": false,
+                  "rowHeight": 0.90000000000000002,
+                  "showValue": "always",
+                  "tooltip": {
+                     "mode": "single"
+                  }
+               },
+               "pluginVersion": "v10.0.0",
+               "targets": [
+                  {
                      "alias": "{{field}} [GB]",
                      "bucketAggs": [
                         {
@@ -6588,45 +7011,11 @@
                         }
                      ],
                      "query": "scale:120 AND ocp_version:$ocp_version",
-                     "refId": "I",
-                     "timeField": "timestamp"
-                  },
-                  {
-                     "alias": "VMs #",
-                     "bucketAggs": [
-                        {
-                           "field": "scale",
-                           "id": "3",
-                           "settings": {
-                              "min_doc_count": "1",
-                              "order": "desc",
-                              "orderBy": "_term",
-                              "size": "10"
-                           },
-                           "type": "terms"
-                        },
-                        {
-                           "field": "timestamp",
-                           "id": "2",
-                           "settings": {
-                              "interval": "auto"
-                           },
-                           "type": "date_histogram"
-                        }
-                     ],
-                     "hide": false,
-                     "metrics": [
-                        {
-                           "id": "1",
-                           "type": "count"
-                        }
-                     ],
-                     "query": "scale:120 AND ocp_version:$ocp_version",
-                     "refId": "J",
+                     "refId": "A",
                      "timeField": "timestamp"
                   }
                ],
-               "title": "120 Windows Server 2019 VMs virtio (Sec)",
+               "title": "120 Windows Server 2019 VM Memory",
                "type": "state-timeline"
             }
          ],
@@ -6641,7 +7030,7 @@
             "x": 0,
             "y": 21
          },
-         "id": 31,
+         "id": 36,
          "panels": [
             {
                "datasource": "Elasticsearch-hammerdb-results",
@@ -6775,7 +7164,7 @@
                   "x": 0,
                   "y": 22
                },
-               "id": 32,
+               "id": 37,
                "interval": "1d",
                "links": [
                   {
@@ -7020,7 +7409,7 @@
                   "x": 0,
                   "y": 50
                },
-               "id": 33,
+               "id": 38,
                "interval": "1d",
                "links": [
                   {
@@ -7266,7 +7655,7 @@
                   "x": 0,
                   "y": 65
                },
-               "id": 34,
+               "id": 39,
                "interval": "1d",
                "links": [
                   {
@@ -7488,7 +7877,7 @@
                   "x": 0,
                   "y": 75
                },
-               "id": 35,
+               "id": 40,
                "interval": "1d",
                "links": [
                   {
@@ -7650,7 +8039,7 @@
                   "x": 0,
                   "y": 85
                },
-               "id": 36,
+               "id": 41,
                "interval": "1d",
                "links": [
                   {
@@ -7814,7 +8203,7 @@
                   "x": 0,
                   "y": 91
                },
-               "id": 37,
+               "id": 42,
                "links": [
                   {
                      "targetBlank": true,
@@ -8058,7 +8447,7 @@
                   "x": 0,
                   "y": 97
                },
-               "id": 38,
+               "id": 43,
                "links": [
                   {
                      "targetBlank": true,
@@ -8289,7 +8678,7 @@
                   "x": 0,
                   "y": 102
                },
-               "id": 39,
+               "id": 44,
                "interval": "1d",
                "links": [
                   {
@@ -8395,7 +8784,7 @@
                   "x": 19,
                   "y": 107
                },
-               "id": 40,
+               "id": 45,
                "links": [
                   {
                      "targetBlank": true,
