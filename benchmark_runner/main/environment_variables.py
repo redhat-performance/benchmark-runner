@@ -224,6 +224,7 @@ class EnvironmentVariables:
         # number of odf disk for discovery
         self._environment_variables_dict['num_odf_disk'] = EnvironmentVariables.get_env('NUM_ODF_DISK', 4)
         self._environment_variables_dict['worker_disk_ids'] = EnvironmentVariables.get_env('WORKER_DISK_IDS', "")
+        self._environment_variables_dict['worker_disk_prefix'] = EnvironmentVariables.get_env('WORKER_DISK_PREFIX', '')
         # install resources list
         self._environment_variables_dict['install_resources_list'] = EnvironmentVariables.get_env('INSTALL_RESOURCES_LIST', '')
 

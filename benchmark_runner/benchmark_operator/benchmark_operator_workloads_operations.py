@@ -75,10 +75,9 @@ class BenchmarkOperatorWorkloadsOperations:
             self._snapshot = PrometheusSnapshot(oc=self._oc, artifacts_path=self._run_artifacts_path, verbose=True)
         self._prometheus_metrics_operation = PrometheusMetricsOperation()
         # update lso_disk_id
-        self._lso_disk_id = self._oc.get_free_disk_id()
-        if self._lso_disk_id:
-            # Choose first list item
-            self._environment_variables_dict['lso_disk_id'] = self._lso_disk_id[0]
+        if self._oc.get_free_disk_id():
+            self._lso_disk_id = self._oc.get_free_disk_id()
+            self._environment_variables_dict['lso_disk_id'] = self._lso_disk_id
         else:
             self._lso_disk_id = self._environment_variables_dict.get('lso_disk_id', '')
 

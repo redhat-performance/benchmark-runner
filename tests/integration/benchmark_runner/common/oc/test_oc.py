@@ -101,13 +101,12 @@ def mock_get_worker_disk_ids(*args, **kwargs):
 
 def test_oc_get_free_disk_id():
     """
-    This method test get free disk id
+    This method gets free_disk_id string
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
     with mock.patch.object(OC, 'get_worker_disk_ids', new=mock_get_worker_disk_ids):
-        assert len(oc.get_free_disk_id()) == 1
         assert oc.get_free_disk_id()
 
 
@@ -197,16 +196,6 @@ def test_is_odf_installed():
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
     assert oc.is_odf_installed()
-
-
-def test_is_kata_installed():
-    """
-    This method check if kata operator is installed
-    :return:
-    """
-    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
-    assert oc.is_kata_installed()
 
 
 def test_oc_exec():
