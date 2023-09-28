@@ -3503,10 +3503,10 @@ g.dashboard.new('PerfCI-Regression-Summary')
               ])
 
               + elasticsearch.withMetrics([
-                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('max_time_op')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('6')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.settings.withScript('_value*1000')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max')
+                elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('avg_time_op')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Average.settings.withScript('_value*1000000')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg')
 
               ])
 
