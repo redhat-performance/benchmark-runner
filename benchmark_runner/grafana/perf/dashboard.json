@@ -1297,14 +1297,6 @@
                               "script": "_value/1000000000"
                            },
                            "type": "max"
-                        },
-                        {
-                           "field": "VM Memory Max Usage Bytes",
-                           "id": "3",
-                           "settings": {
-                              "script": "_value/1000000000"
-                           },
-                           "type": "max"
                         }
                      ],
                      "query": "_exists_:tpm AND db_type:$db_type AND kind:vm AND ocp_version:$ocp_version",
@@ -1766,14 +1758,6 @@
                         {
                            "field": "VM Memory working set bytes",
                            "id": "2",
-                           "settings": {
-                              "script": "_value/1000000000"
-                           },
-                           "type": "max"
-                        },
-                        {
-                           "field": "VM Memory Max Usage Bytes",
-                           "id": "3",
                            "settings": {
                               "script": "_value/1000000000"
                            },
@@ -2515,14 +2499,6 @@
                               "script": "_value/1000000000"
                            },
                            "type": "max"
-                        },
-                        {
-                           "field": "VM Memory Max Usage Bytes",
-                           "id": "3",
-                           "settings": {
-                              "script": "_value/1000000000"
-                           },
-                           "type": "max"
                         }
                      ],
                      "query": "!SCALE AND !Run.keyword='fillup' AND kind:'vm' AND Run:$vdbench_type AND ocp_version:$ocp_version",
@@ -2579,14 +2555,6 @@
                         {
                            "field": "VM Memory working set bytes",
                            "id": "2",
-                           "settings": {
-                              "script": "_value/1000000000"
-                           },
-                           "type": "max"
-                        },
-                        {
-                           "field": "VM Memory Max Usage Bytes",
-                           "id": "3",
                            "settings": {
                               "script": "_value/1000000000"
                            },
@@ -6434,14 +6402,6 @@
                               "script": "_value/1000000000"
                            },
                            "type": "max"
-                        },
-                        {
-                           "field": "VM Memory Max Usage Bytes",
-                           "id": "3",
-                           "settings": {
-                              "script": "_value/1000000000"
-                           },
-                           "type": "max"
                         }
                      ],
                      "query": "scale:240 AND ocp_version:$ocp_version",
@@ -7008,14 +6968,6 @@
                         {
                            "field": "VM Memory working set bytes",
                            "id": "2",
-                           "settings": {
-                              "script": "_value/1000000000"
-                           },
-                           "type": "max"
-                        },
-                        {
-                           "field": "VM Memory Max Usage Bytes",
-                           "id": "3",
                            "settings": {
                               "script": "_value/1000000000"
                            },
