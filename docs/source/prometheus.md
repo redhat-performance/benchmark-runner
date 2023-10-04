@@ -31,7 +31,14 @@ run()
 
 ## Inspect Prometheus Snapshots
 
-The CI jobs store snapshots of the Prometheus database for each run as part of the artifacts.  Within the artifact directory is a Prometheus snapshot directory named:
+The CI jobs store snapshots of the Prometheus database for each run as part of the artifacts.  
+Download run artifacts from S3:
+```
+$ wget https://myuser:mypassword@run-artifacts-perfci.com
+$ tar -xvf $(pwd)/hammerdb-vm-mariadb-2022-01-04-08-21-23.tar.gz
+
+```
+Within the artifact directory is a Prometheus snapshot directory named:
 
 ```
 promdb-YYYY_MM_DDTHH_mm_ss+0000_YYYY_MM_DDTHH_mm_ss+0000.tar
@@ -47,15 +54,15 @@ snapshot within is named
 `promdb_2022_01_04T08_21_52+0000_2022_01_04T08_45_47+0000`, you could run as follows:
 
 ```
-$ tar -xvf /hammerdb-vm-mariadb-2022-01-04-08-21-23/promdb_2022_01_04T08_21_52+0000_2022_01_04T08_45_47+0000.tar
-$ local_prometheus_snapshot=/hammerdb-vm-mariadb-2022-01-04-08-21-23/promdb_2022_01_04T08_21_52+0000_2022_01_04T08_45_47+0000
+$ tar -xvf $(pwd)/hammerdb-vm-mariadb-2022-01-04-08-21-23/promdb_2022_01_04T08_21_52+0000_2022_01_04T08_45_47+0000.tar
+$ local_prometheus_snapshot=$(pwd)/hammerdb-vm-mariadb-2022-01-04-08-21-23/promdb_2022_01_04T08_21_52+0000_2022_01_04T08_45_47+0000
 $ chmod -R g-s,a+rw "$local_prometheus_snapshot"
 $ sudo podman pod create --name prometheus_grafana_pod -p 9090:9090 -p 3000:3000
 $ sudo podman run --name grafana --pod prometheus_grafana_pod -d --name=grafana grafana/grafana
-$ sudo podman run --name prometheus --pod prometheus_grafana_pod -uroot -v "$local_prometheus_snapshot:/prometheus" --privileged prom/prometheus --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheus --storage.tsdb.retention.time=100000d --storage.tsdb.retention.size=1000PB
+$ sudo podman run --name prometheus --pod prometheus_grafana_pod -uroot -v "$local_prometheus_snapshot":/prometheus --privileged prom/prometheus --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheus --storage.tsdb.retention.time=100000d --storage.tsdb.retention.size=1000PB
 
 For removing pod:
-$ sudo podman pod rm -f prometheus_grafana_pod```
+$ sudo podman pod rm -f prometheus_grafana_pod
 
 1. Open http://localhost:9090/, you can run queries against it
 2. Open http://localhost:3000/, add prometheus data source and you can run queries against it
