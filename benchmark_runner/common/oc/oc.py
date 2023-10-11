@@ -62,13 +62,6 @@ class OC(SSH):
         """
         return self.run(f"{self.__cli} get csv -n openshift-storage -ojsonpath='{{.items[0].spec.labels.full_version}}'")
 
-    def get_pv_disk_ids(self):
-        """
-        This method returns list of pv disk ids
-        """
-        result = self.run(f"{self.__cli} get pv -o jsonpath={{.items[*].metadata.annotations.'storage\.openshift\.com/device-id'}}")
-        return result.split()
-
     def remove_lso_path(self):
         """
         The method removes lso path on each node
@@ -78,30 +71,34 @@ class OC(SSH):
 
     def get_worker_disk_ids(self):
         """
-        The method returns worker disk ids
+        The method returns worker disk ids only when there are worker disk ids
         """
         workers_disk_ids = []
         if self.__worker_disk_ids:
-            workers_disk_ids = [disk_id for disk_list in self.__worker_disk_ids.values() for disk_id in disk_list]
+            for node, disk_ids in self.__worker_disk_ids.items():
+                for disk_id in disk_ids:
+                    workers_disk_ids.append(disk_id)
         return workers_disk_ids
+
+    def get_pv_disk_ids(self):
+        """
+        This method returns list of pv disk ids
+        """
+        pv_ids = self.run(f"{self.__cli} get pv -o jsonpath={{.items[*].metadata.annotations.'storage\.openshift\.com/device-id'}}")
+        # SATA disks in /dev/disk/by-id conventionally are prefixed with `wwn-0x` and `scsi-3`; ODF requires use of the `wwn-0x` prefix while LSO requires the `scsi-3` prefix.  We have to be prepared to use either prefix, but as they are the same length, we can presently strip the first 6 characters of the name.
+        return [pv[len(self.__worker_disk_prefix):] for pv in pv_ids.split()]
 
     def get_free_disk_id(self):
         """
-        This method finds the free disk by searching for worker_disk_ids that do not exist in the odf_pv_disk_ids list.
-        :return: It returns the free disk ID concatenated with the worker_disk_prefix
+        This method returns free disk (workers_all_disk_ids - workers_odf_pv_disk_ids) with its prefix only when there are worker disk ids
         """
-        free_disk_id = ''
-        for worker_disk_id in self.get_worker_disk_ids():
-            found = False
-            for odf_pv_disk_id in self.get_pv_disk_ids():
-                if odf_pv_disk_id.endswith(worker_disk_id):
-                    found = True
-                    break
-            if not found:
-                free_disk_id = f'{self.__worker_disk_prefix}{worker_disk_id}'
-                break  # Exit the loop once a free disk ID is found
-
-        return free_disk_id
+        workers_disk_ids = self.get_worker_disk_ids()
+        workers_pv_disk_ids = self.get_pv_disk_ids()
+        free_disk_id = f'{self.__worker_disk_prefix}{list(set(workers_disk_ids) - set(workers_pv_disk_ids))[0]}'
+        if free_disk_id:
+            return free_disk_id
+        else:
+            raise Exception('Missing free disk id')
 
     def get_kata_operator_version(self):
         """
