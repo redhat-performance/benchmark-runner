@@ -10,12 +10,13 @@ class CreateODF(CreateOCPResourceOperations):
     """
     This class is created ODF operator
     """
-    def __init__(self, oc: OC, path: str, resource_list: list, worker_disk_ids: list):
+    def __init__(self, oc: OC, path: str, resource_list: list, worker_disk_ids: list, worker_disk_prefix: str):
         super().__init__(oc)
         self.__oc = oc
         self.__path = path
         self.__resource_list = resource_list
         self.__worker_disk_ids = worker_disk_ids
+        self.__worker_disk_prefix = worker_disk_prefix
 
     @logger_time_stamp
     def create_odf(self):
@@ -32,7 +33,7 @@ class CreateODF(CreateOCPResourceOperations):
                     result_dict = {}
                     for node, disk_ids in self.__worker_disk_ids.items():
                         for disk_id in disk_ids:
-                            node_sgdisk += f'sgdisk --zap-all /dev/disk/by-id/{disk_id};'
+                            node_sgdisk += f'sgdisk --zap-all /dev/disk/by-id/{self.__worker_disk_prefix}{disk_id}; wipefs -a /dev/disk/by-id/{self.__worker_disk_prefix}{disk_id};'
                         result_dict[node] = node_sgdisk
                         node_sgdisk = ''
                     self.__oc.run(cmd=f'chmod +x {os.path.join(self.__path, resource)}; {self.__path}/./{resource} "{list(result_dict.keys())[0]}" "{list(result_dict.values())[0]}" "{list(result_dict.keys())[1]}" "{list(result_dict.values())[1]}" "{list(result_dict.keys())[2]}" "{list(result_dict.values())[2]}"')

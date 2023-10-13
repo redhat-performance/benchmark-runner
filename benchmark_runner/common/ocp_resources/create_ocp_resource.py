@@ -22,6 +22,7 @@ class CreateOCPResource:
         self.__oc = OC(kubeadmin_password=self.__environment_variables_dict.get('kubeadmin_password', ''))
         self.__oc.login()
         self.__oc.populate_additional_template_variables(self.__environment_variables_dict)
+        self.__worker_disk_prefix = self.__environment_variables_dict.get('worker_disk_prefix', '')
         self.__worker_disk_ids = self.__environment_variables_dict.get('worker_disk_ids', '')
         if self.__worker_disk_ids:
             # Solved GitHub Actions issue that env variable detect as string instead of dict/ list
@@ -79,7 +80,7 @@ class CreateOCPResource:
             self.__create_lso = CreateLSO(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files)
             self.__create_lso.create_lso()
         elif 'odf' == resource:
-            self.__create_odf = CreateODF(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files, worker_disk_ids=self.__worker_disk_ids)
+            self.__create_odf = CreateODF(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files, worker_disk_ids=self.__worker_disk_ids, worker_disk_prefix=self.__worker_disk_prefix)
             self.__create_odf.create_odf()
         elif 'kata' == resource:
             self.__create_kata = CreateKata(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files)
