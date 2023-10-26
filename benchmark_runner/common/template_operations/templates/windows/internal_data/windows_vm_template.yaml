@@ -1,4 +1,4 @@
-apiVersion: kubevirt.io/v1alpha3
+apiVersion: kubevirt.io/v1
 kind: VirtualMachine
 metadata:
   {% if scale -%}
@@ -33,6 +33,12 @@ spec:
       terminationGracePeriodSeconds: 0
       evictionStrategy: LiveMigrate
       domain:
+        features:
+          smm: {}
+        firmware:
+          bootloader:
+            efi:
+              secureBoot: false
         clock:
           timer:
             hpet:
@@ -63,11 +69,12 @@ spec:
           - masquerade: {}
             model: virtio
             name: nic-0
+            networkInterfaceMultiqueue: true
+            tpm: { }
         features:
           acpi: {}
           apic: {}
           hyperv:
-            evmcs: {}
             frequencies: {}
             ipi: {}
             reenlightenment: {}
@@ -78,7 +85,8 @@ spec:
             spinlocks:
               spinlocks: 8191
             synic: {}
-            synictimer: {}
+            synictimer:
+                direct: {}
             vapic: {}
             vpindex: {}
         machine:
