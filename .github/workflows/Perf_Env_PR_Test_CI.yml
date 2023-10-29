@@ -78,13 +78,13 @@ jobs:
           IBM_BUCKET: ${{ secrets.IBM_BUCKET }}
           IBM_KEY: ${{ secrets.IBM_KEY }}
           RUN_ARTIFACTS_URL: ${{ secrets.PERF_RUN_ARTIFACTS_URL }}
-          OC_CLIENT_VERSION: ${{ secrets.PERF_OC_CLIENT_VERSION }}
+          OCP_CLIENT_VERSION: ${{ secrets.PERF_OCP_CLIENT_VERSION }}
         run: |
           # Install Dockerfile content for pytest
           # install oc/kubectl
-          curl -L "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${OC_CLIENT_VERSION}/openshift-client-linux-${OC_CLIENT_VERSION}.tar.gz" -o "$RUNNER_PATH/openshift-client-linux-${OC_CLIENT_VERSION}.tar.gz"
-          tar -xzvf $RUNNER_PATH/openshift-client-linux-${OC_CLIENT_VERSION}.tar.gz -C $RUNNER_PATH/
-          rm $RUNNER_PATH/openshift-client-linux-${OC_CLIENT_VERSION}.tar.gz
+          curl -L "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${OCP_CLIENT_VERSION}/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz" -o "$RUNNER_PATH/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz"
+          tar -xzvf $RUNNER_PATH/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz -C $RUNNER_PATH/
+          rm $RUNNER_PATH/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz
           cp $RUNNER_PATH/kubectl /usr/local/bin/kubectl
           cp $RUNNER_PATH/oc /usr/local/bin/oc
           
@@ -151,13 +151,13 @@ jobs:
         GRAFANA_URL: ${{ secrets.PERF_GRAFANA_URL }}
         GRAFANA_API_KEY: ${{ secrets.PERF_GRAFANA_API_KEY }}
         GRAFANA_JSON_PATH: ${{ secrets.PERF_GRAFANA_JSON_PATH }}
-        OC_CLIENT_VERSION: ${{ secrets.PERF_OC_CLIENT_VERSION }}
+        OCP_CLIENT_VERSION: ${{ secrets.PERF_OCP_CLIENT_VERSION }}
       run: |
         # Install Dockerfile content for pytest
         # install oc/kubectl
-        curl -L "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${OC_CLIENT_VERSION}/openshift-client-linux-${OC_CLIENT_VERSION}.tar.gz" -o "$RUNNER_PATH/openshift-client-linux-${OC_CLIENT_VERSION}.tar.gz"
-        tar -xzvf $RUNNER_PATH/openshift-client-linux-${OC_CLIENT_VERSION}.tar.gz -C $RUNNER_PATH/
-        rm $RUNNER_PATH/openshift-client-linux-${OC_CLIENT_VERSION}.tar.gz
+        curl -L "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${OCP_CLIENT_VERSION}/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz" -o "$RUNNER_PATH/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz"
+        tar -xzvf $RUNNER_PATH/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz -C $RUNNER_PATH/
+        rm $RUNNER_PATH/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz
         cp $RUNNER_PATH/kubectl /usr/local/bin/kubectl
         cp $RUNNER_PATH/oc /usr/local/bin/oc
         
@@ -217,13 +217,13 @@ jobs:
        ELASTICSEARCH_PORT: ${{ secrets.PERF_ELASTICSEARCH_PORT }}
        ELASTICSEARCH_USER: ${{ secrets.PERF_ELASTICSEARCH_USER }}
        ELASTICSEARCH_PASSWORD: ${{ secrets.PERF_ELASTICSEARCH_PASSWORD }}
-       OC_CLIENT_VERSION: ${{ secrets.PERF_OC_CLIENT_VERSION }}
+       OCP_CLIENT_VERSION: ${{ secrets.PERF_OCP_CLIENT_VERSION }}
      run: |
        # Install Dockerfile content for pytest
        # install oc/kubectl
-       curl -L "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${OC_CLIENT_VERSION}/openshift-client-linux-${OC_CLIENT_VERSION}.tar.gz" -o "$RUNNER_PATH/openshift-client-linux-${OC_CLIENT_VERSION}.tar.gz"
-       tar -xzvf $RUNNER_PATH/openshift-client-linux-${OC_CLIENT_VERSION}.tar.gz -C $RUNNER_PATH/
-       rm $RUNNER_PATH/openshift-client-linux-${OC_CLIENT_VERSION}.tar.gz
+       curl -L "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${OCP_CLIENT_VERSION}/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz" -o "$RUNNER_PATH/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz"
+       tar -xzvf $RUNNER_PATH/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz -C $RUNNER_PATH/
+       rm $RUNNER_PATH/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz
        cp $RUNNER_PATH/kubectl /usr/local/bin/kubectl
        cp $RUNNER_PATH/oc /usr/local/bin/oc
 
