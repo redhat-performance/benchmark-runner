@@ -77,23 +77,23 @@ class CreateOCPResource:
         self.remove_resource_files(path=os.path.join(self.__dir_path, resource))
         resource_files = self.get_sorted_resources(resource=resource)
         if 'lso' == resource:
-            self.__create_lso = CreateLSO(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files)
-            self.__create_lso.create_lso()
+            create_lso = CreateLSO(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files)
+            create_lso.create_lso()
         elif 'odf' == resource:
-            self.__create_odf = CreateODF(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files, worker_disk_ids=self.__worker_disk_ids, worker_disk_prefix=self.__worker_disk_prefix)
-            self.__create_odf.create_odf()
+            create_odf = CreateODF(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files, worker_disk_ids=self.__worker_disk_ids, worker_disk_prefix=self.__worker_disk_prefix)
+            create_odf.create_odf()
         elif 'kata' == resource:
-            self.__create_kata = CreateKata(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files)
-            self.__create_kata.create_kata()
+            create_kata = CreateKata(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files)
+            create_kata.create_kata()
         elif 'cnv' == resource:
-            self.__create_cnv = CreateCNV(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files)
-            self.__create_cnv.create_cnv()
+            create_cnv = CreateCNV(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files)
+            create_cnv.create_cnv()
         elif 'infra' == resource:
-            self.__create_infra = MigrateInfra(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files)
-            self.__create_infra.migrate_infra()
+            create_infra = MigrateInfra(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files)
+            create_infra.migrate_infra()
         elif 'custom' == resource:
-            self.__create_custom = CreateCustom(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files)
-            self.__create_custom.create_custom()
+            create_custom = CreateCustom(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files)
+            create_custom.create_custom()
             # remove resource files
         self.remove_resource_files(path=os.path.join(self.__dir_path, resource))
 
