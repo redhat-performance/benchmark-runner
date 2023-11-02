@@ -27,15 +27,16 @@ class CreateODF(CreateOCPResourceOperations):
         for resource in self.__resource_list:
             logger.info(f'run {resource}')
             if resource.endswith('.sh'):
-                # build sgdisks path dynamically
-                if '01_sgdisks.sh' == resource:
-                    node_sgdisk = ''
+                # disk cleanup - reference: https://rook.io/docs/rook/v1.12/Getting-Started/ceph-teardown/#delete-the-data-on-hosts
+                if '01_delete_disks.sh' == resource:
+                    delete_node_disk = ''
                     result_dict = {}
                     for node, disk_ids in self.__worker_disk_ids.items():
                         for disk_id in disk_ids:
-                            node_sgdisk += f'sgdisk --zap-all /dev/disk/by-id/{self.__worker_disk_prefix}{disk_id}; wipefs -a /dev/disk/by-id/{self.__worker_disk_prefix}{disk_id};'
-                        result_dict[node] = node_sgdisk
-                        node_sgdisk = ''
+                            disk = f'/dev/disk/by-id/{self.__worker_disk_prefix}{disk_id}'
+                            delete_node_disk += f"sgdisk --zap-all {disk}; wipefs -a {disk}; dd if=/dev/zero of='{disk}' bs=1M count=100 oflag=direct,dsync; blkdiscard {disk}; partprobe {disk}"
+                        result_dict[node] = delete_node_disk
+                        delete_node_disk = ''
                     self.__oc.run(cmd=f'chmod +x {os.path.join(self.__path, resource)}; {self.__path}/./{resource} "{list(result_dict.keys())[0]}" "{list(result_dict.values())[0]}" "{list(result_dict.keys())[1]}" "{list(result_dict.values())[1]}" "{list(result_dict.keys())[2]}" "{list(result_dict.values())[2]}"')
                 else:
                     self.__oc.run(cmd=f'chmod +x {os.path.join(self.__path, resource)}; {self.__path}/./{resource}')
