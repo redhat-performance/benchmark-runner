@@ -14,6 +14,6 @@ spec:
       - ReadWriteMany
     resources:
       requests:
-        storage: 40Gi
+        storage: 70Gi
     volumeMode: Block
     storageClassName: ocs-storagecluster-ceph-rbd

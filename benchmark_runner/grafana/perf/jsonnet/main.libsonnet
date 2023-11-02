@@ -4914,16 +4914,6 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
 
 
-
-
-
-
-
-
-
-
-
-
         //////////////////////////////////////////////////////
 
 
@@ -4981,7 +4971,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
             + stateTimeline.standardOptions.withUnit('none')
             + stateTimeline.fieldConfig.withOverrides([])
 
-            + stateTimeline.gridPos.withH(19)
+            + stateTimeline.gridPos.withH(10)
             + stateTimeline.gridPos.withW(24)
             + stateTimeline.gridPos.withX(0)
             + stateTimeline.gridPos.withY(187)
@@ -5005,6 +4995,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
             + stateTimeline.options.tooltip.withMode('single')
 
             + g.panel.stateTimeline.withTargets([
+              ////
               elasticsearch.withAlias('Min')
 
               + elasticsearch.withBucketAggs([
@@ -5040,6 +5031,42 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
               ////
 
+              elasticsearch.withAlias('')
+
+              + elasticsearch.withBucketAggs([
+                elasticsearch.bucketAggs.Terms.withField('scale')
+                + elasticsearch.bucketAggs.Terms.withId('3')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
+                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
+                + elasticsearch.bucketAggs.Terms.withType('terms'),
+
+                elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
+                + elasticsearch.bucketAggs.DateHistogram.withId('2')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
+                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+
+
+              ])
+
+              + elasticsearch.withHide(false)
+
+              + elasticsearch.withMetrics([
+                elasticsearch.metrics.MetricAggregationWithSettings.Percentiles.withField('bootstorm_time')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Percentiles.withId('1')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Percentiles.settings.withPercents(['50', '90'])
+                + elasticsearch.metrics.MetricAggregationWithSettings.Percentiles.settings.withScript('_value/1000')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Percentiles.withType('percentiles')
+
+              ])
+
+              + elasticsearch.withQuery('scale:240 AND ocp_version:$ocp_version')
+              + elasticsearch.withRefId('B')
+              + elasticsearch.withTimeField('timestamp'),
+
+              ///
+
               elasticsearch.withAlias('Max')
 
               + elasticsearch.withBucketAggs([
@@ -5070,238 +5097,83 @@ g.dashboard.new('PerfCI-Regression-Summary')
               ])
 
               + elasticsearch.withQuery('scale:240 AND ocp_version:$ocp_version')
-              + elasticsearch.withRefId('B')
-              + elasticsearch.withTimeField('timestamp'),
-
-              ////
-
-
-              elasticsearch.withAlias('')
-
-              + elasticsearch.withBucketAggs([
-                elasticsearch.bucketAggs.Terms.withField('scale')
-                + elasticsearch.bucketAggs.Terms.withId('3')
-                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
-                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
-                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
-                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
-                + elasticsearch.bucketAggs.Terms.withType('terms'),
-
-                elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
-                + elasticsearch.bucketAggs.DateHistogram.withId('2')
-                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
-                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-
-
-              ])
-
-              + elasticsearch.withHide(false)
-
-              + elasticsearch.withMetrics([
-                elasticsearch.metrics.MetricAggregationWithSettings.Percentiles.withField('bootstorm_time')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Percentiles.withId('1')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Percentiles.settings.withPercents(['25', '50', '75', '95', '99'])
-                + elasticsearch.metrics.MetricAggregationWithSettings.Percentiles.settings.withScript('_value/1000')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Percentiles.withType('percentiles')
-
-              ])
-
-              + elasticsearch.withQuery('scale:240 AND ocp_version:$ocp_version')
               + elasticsearch.withRefId('C')
               + elasticsearch.withTimeField('timestamp'),
 
               ////
 
+            ]),
+            ////////////////////////
 
-              elasticsearch.withAlias('AVG. 100 vms {{term node.keyword}}')
+            g.panel.stateTimeline.new('')
+            + stateTimeline.queryOptions.withDatasource('Elasticsearch-bootstorm-results')
+            + g.panel.stateTimeline.withDescription('Time till VM Login - Lower is better')
 
-              + elasticsearch.withBucketAggs([
-                elasticsearch.bucketAggs.Terms.withField('scale')
-                + elasticsearch.bucketAggs.Terms.withId('3')
-                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
-                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
-                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
-                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
-                + elasticsearch.bucketAggs.Terms.withType('terms'),
+            + stateTimeline.standardOptions.color.withMode('thresholds')
+            + stateTimeline.fieldConfig.defaults.custom.withFillOpacity(77)
+            + stateTimeline.fieldConfig.defaults.custom.withLineWidth(0)
 
-                elasticsearch.bucketAggs.Terms.withField('node.keyword')
-                + elasticsearch.bucketAggs.Terms.withId('4')
-                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
-                + elasticsearch.bucketAggs.Terms.settings.withOrder('asc')
-                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
-                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
-                + elasticsearch.bucketAggs.Terms.withType('terms'),
+            + stateTimeline.fieldConfig.defaults.withDecimals(1)
+            + stateTimeline.fieldConfig.defaults.withMappings([
+              stateTimeline.valueMapping.ValueMap.withOptions(
+                {
+                  "0": {
+                  "color": "transparent",
+                  "index": 0,
+                  "text": "."
+                  }
+                }
+              )
+              + stateTimeline.valueMapping.ValueMap.withType('value')
 
-                elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
-                + elasticsearch.bucketAggs.DateHistogram.withId('2')
-                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
-                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+            ])
+            + stateTimeline.standardOptions.withMax(-1)
+            + stateTimeline.fieldConfig.defaults.thresholds.withMode('percentage')
+            + stateTimeline.fieldConfig.defaults.thresholds.withSteps([
+              stateTimeline.thresholdStep.withColor('red'),
 
+              stateTimeline.thresholdStep.withColor('semi-dark-orange')
+              + stateTimeline.thresholdStep.withValue(50),
 
-              ])
+              stateTimeline.thresholdStep.withColor('super-light-green')
+              + stateTimeline.thresholdStep.withValue(80),
 
-              + elasticsearch.withHide(false)
+              stateTimeline.thresholdStep.withColor('dark-green')
+              + stateTimeline.thresholdStep.withValue(90),
 
-              + elasticsearch.withMetrics([
-                elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('bootstorm_time')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Average.settings.withScript('_value/1000')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg')
+              stateTimeline.thresholdStep.withColor('dark-blue')
+              + stateTimeline.thresholdStep.withValue(100)
 
-              ])
+            ])
+            + stateTimeline.standardOptions.withUnit('none')
+            + stateTimeline.fieldConfig.withOverrides([])
 
-              + elasticsearch.withQuery('scale:240 AND ocp_version:$ocp_version')
-              + elasticsearch.withRefId('D')
-              + elasticsearch.withTimeField('timestamp'),
+            + stateTimeline.gridPos.withH(3)
+            + stateTimeline.gridPos.withW(24)
+            + stateTimeline.gridPos.withX(0)
+            + stateTimeline.gridPos.withY(187)
 
+            + stateTimeline.withId(178)
+            + stateTimeline.withInterval('1d')
 
+            + stateTimeline.panelOptions.withLinks([
+              stateTimeline.link.withTargetBlank(true)
+              + stateTimeline.link.withTitle('artifacts link')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=43')
+
+            ])
+
+            + stateTimeline.options.withAlignValue('center')
+            + stateTimeline.options.legend.withDisplayMode('hidden')
+            + stateTimeline.options.legend.withPlacement('bottom')
+            + stateTimeline.options.withMergeValues(value = false)
+            + stateTimeline.options.withRowHeight(value = 0.9)
+            + stateTimeline.options.withShowValue('always')
+            + stateTimeline.options.tooltip.withMode('single')
+
+            + g.panel.stateTimeline.withTargets([
               ////
-
-
-
-              elasticsearch.withAlias('%CPU [240 cores]')
-
-              + elasticsearch.withBucketAggs([
-                elasticsearch.bucketAggs.Terms.withField('scale')
-                + elasticsearch.bucketAggs.Terms.withId('3')
-                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
-                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
-                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
-                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
-                + elasticsearch.bucketAggs.Terms.withType('terms'),
-
-                elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
-                + elasticsearch.bucketAggs.DateHistogram.withId('2')
-                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
-                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-
-
-              ])
-
-              + elasticsearch.withHide(false)
-
-              + elasticsearch.withMetrics([
-                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('total_CPU')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('1')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withSettings({})
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max')
-
-              ])
-
-              + elasticsearch.withQuery('scale:240 AND ocp_version:$ocp_version')
-              + elasticsearch.withRefId('E')
-              + elasticsearch.withTimeField('timestamp'),
-
-              ////
-
-
-              elasticsearch.withAlias('%CPU worker-0 [80 cores]')
-
-              + elasticsearch.withBucketAggs([
-                elasticsearch.bucketAggs.Terms.withField('scale')
-                + elasticsearch.bucketAggs.Terms.withId('3')
-                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
-                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
-                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
-                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
-                + elasticsearch.bucketAggs.Terms.withType('terms'),
-
-                elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
-                + elasticsearch.bucketAggs.DateHistogram.withId('2')
-                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
-                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-
-
-              ])
-
-              + elasticsearch.withHide(false)
-
-              + elasticsearch.withMetrics([
-                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('worker-0_CPU')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('1')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withSettings({})
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max')
-
-              ])
-
-              + elasticsearch.withQuery('scale:240 AND ocp_version:$ocp_version')
-              + elasticsearch.withRefId('F')
-              + elasticsearch.withTimeField('timestamp'),
-
-              ////
-
-
-              elasticsearch.withAlias('%CPU worker-1 [80 cores]')
-
-              + elasticsearch.withBucketAggs([
-                elasticsearch.bucketAggs.Terms.withField('scale')
-                + elasticsearch.bucketAggs.Terms.withId('3')
-                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
-                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
-                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
-                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
-                + elasticsearch.bucketAggs.Terms.withType('terms'),
-
-                elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
-                + elasticsearch.bucketAggs.DateHistogram.withId('2')
-                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
-                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-
-
-              ])
-
-              + elasticsearch.withHide(false)
-
-              + elasticsearch.withMetrics([
-                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('worker-1_CPU')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('1')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withSettings({})
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max')
-
-              ])
-
-              + elasticsearch.withQuery('scale:240 AND ocp_version:$ocp_version')
-              + elasticsearch.withRefId('G')
-              + elasticsearch.withTimeField('timestamp'),
-
-              ////
-
-              elasticsearch.withAlias('%CPU worker-2 [80 cores]')
-
-              + elasticsearch.withBucketAggs([
-                elasticsearch.bucketAggs.Terms.withField('scale')
-                + elasticsearch.bucketAggs.Terms.withId('3')
-                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
-                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
-                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
-                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
-                + elasticsearch.bucketAggs.Terms.withType('terms'),
-
-                elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
-                + elasticsearch.bucketAggs.DateHistogram.withId('2')
-                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
-                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-
-
-              ])
-
-              + elasticsearch.withHide(false)
-
-              + elasticsearch.withMetrics([
-                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('worker-2_CPU')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('1')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withSettings({})
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max')
-
-              ])
-
-              + elasticsearch.withQuery('scale:240 AND ocp_version:$ocp_version')
-              + elasticsearch.withRefId('H')
-              + elasticsearch.withTimeField('timestamp'),
-
-              ////
-
-              elasticsearch.withAlias('VMs #')
+              elasticsearch.withAlias('VMs #: Fedora')
 
               + elasticsearch.withBucketAggs([
                 elasticsearch.bucketAggs.Terms.withField('scale')
@@ -5329,13 +5201,14 @@ g.dashboard.new('PerfCI-Regression-Summary')
               ])
 
               + elasticsearch.withQuery('scale:240 AND ocp_version:$ocp_version')
-              + elasticsearch.withRefId('I')
+              + elasticsearch.withRefId('A')
               + elasticsearch.withTimeField('timestamp')
 
               ////
 
 
             ]),
+
             ////////////////////////
 
             g.panel.stateTimeline.new('240 Fedora37 VM Memory')
@@ -5450,7 +5323,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
             ////////////////////////
 
 
-            g.panel.stateTimeline.new('120 Windows Server 2019 VMs virtio (Sec)')
+            g.panel.stateTimeline.new('120 Windows VMs virtio (Sec)')
             + stateTimeline.queryOptions.withDatasource('Elasticsearch-windows-results')
             + g.panel.stateTimeline.withDescription('Time till VM Login - Lower is better')
 
@@ -5517,11 +5390,20 @@ g.dashboard.new('PerfCI-Regression-Summary')
             + stateTimeline.options.tooltip.withMode('single')
 
             + g.panel.stateTimeline.withTargets([
-              elasticsearch.withAlias('Min')
+              ////
+              elasticsearch.withAlias('Min: {{term vm_os_version.keyword}}')
 
               + elasticsearch.withBucketAggs([
                 elasticsearch.bucketAggs.Terms.withField('scale')
                 + elasticsearch.bucketAggs.Terms.withId('3')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
+                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
+                + elasticsearch.bucketAggs.Terms.withType('terms'),
+
+                elasticsearch.bucketAggs.Terms.withField('vm_os_version.keyword')
+                + elasticsearch.bucketAggs.Terms.withId('4')
                 + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
                 + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
                 + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
@@ -5552,11 +5434,63 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
               ////
 
-              elasticsearch.withAlias('Max')
+              elasticsearch.withAlias('')
 
               + elasticsearch.withBucketAggs([
                 elasticsearch.bucketAggs.Terms.withField('scale')
                 + elasticsearch.bucketAggs.Terms.withId('3')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
+                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
+                + elasticsearch.bucketAggs.Terms.withType('terms'),
+
+                elasticsearch.bucketAggs.Terms.withField('vm_os_version.keyword')
+                + elasticsearch.bucketAggs.Terms.withId('4')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
+                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
+                + elasticsearch.bucketAggs.Terms.withType('terms'),
+
+                elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
+                + elasticsearch.bucketAggs.DateHistogram.withId('2')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
+                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+
+
+              ])
+
+              + elasticsearch.withHide(false)
+
+              + elasticsearch.withMetrics([
+                elasticsearch.metrics.MetricAggregationWithSettings.Percentiles.withField('bootstorm_time')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Percentiles.withId('1')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Percentiles.settings.withPercents(['50', '90'])
+                + elasticsearch.metrics.MetricAggregationWithSettings.Percentiles.settings.withScript('_value/1000')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Percentiles.withType('percentiles')
+
+              ])
+
+              + elasticsearch.withQuery('scale:120 AND ocp_version:$ocp_version')
+              + elasticsearch.withRefId('B')
+              + elasticsearch.withTimeField('timestamp'),
+
+              ////
+
+              elasticsearch.withAlias('Max: {{term vm_os_version.keyword}}')
+
+              + elasticsearch.withBucketAggs([
+                elasticsearch.bucketAggs.Terms.withField('scale')
+                + elasticsearch.bucketAggs.Terms.withId('3')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
+                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
+                + elasticsearch.bucketAggs.Terms.withType('terms'),
+
+                elasticsearch.bucketAggs.Terms.withField('vm_os_version.keyword')
+                + elasticsearch.bucketAggs.Terms.withId('4')
                 + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
                 + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
                 + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
@@ -5582,50 +5516,85 @@ g.dashboard.new('PerfCI-Regression-Summary')
               ])
 
               + elasticsearch.withQuery('scale:120 AND ocp_version:$ocp_version')
-              + elasticsearch.withRefId('B')
-              + elasticsearch.withTimeField('timestamp'),
-
-              ////
-
-
-              elasticsearch.withAlias('')
-
-              + elasticsearch.withBucketAggs([
-                elasticsearch.bucketAggs.Terms.withField('scale')
-                + elasticsearch.bucketAggs.Terms.withId('3')
-                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
-                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
-                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
-                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
-                + elasticsearch.bucketAggs.Terms.withType('terms'),
-
-                elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
-                + elasticsearch.bucketAggs.DateHistogram.withId('2')
-                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
-                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-
-
-              ])
-
-              + elasticsearch.withHide(false)
-
-              + elasticsearch.withMetrics([
-                elasticsearch.metrics.MetricAggregationWithSettings.Percentiles.withField('bootstorm_time')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Percentiles.withId('1')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Percentiles.settings.withPercents(['25', '50', '75', '95', '99'])
-                + elasticsearch.metrics.MetricAggregationWithSettings.Percentiles.settings.withScript('_value/1000')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Percentiles.withType('percentiles')
-
-              ])
-
-              + elasticsearch.withQuery('scale:120 AND ocp_version:$ocp_version')
               + elasticsearch.withRefId('C')
               + elasticsearch.withTimeField('timestamp'),
 
               ////
 
 
-              elasticsearch.withAlias('AVG. 40 vms {{term node.keyword}}')
+            ]),
+            ////////////////////////
+
+            g.panel.stateTimeline.new('')
+            + stateTimeline.queryOptions.withDatasource('Elasticsearch-windows-results')
+            + g.panel.stateTimeline.withDescription('Time till VM Login - Lower is better')
+
+            + stateTimeline.standardOptions.color.withMode('thresholds')
+            + stateTimeline.fieldConfig.defaults.custom.withFillOpacity(77)
+            + stateTimeline.fieldConfig.defaults.custom.withLineWidth(0)
+
+            + stateTimeline.fieldConfig.defaults.withDecimals(1)
+            + stateTimeline.fieldConfig.defaults.withMappings([
+              stateTimeline.valueMapping.ValueMap.withOptions(
+                {
+                  "0": {
+                  "color": "transparent",
+                  "index": 0,
+                  "text": "."
+                  }
+                }
+              )
+              + stateTimeline.valueMapping.ValueMap.withType('value')
+
+            ])
+            + stateTimeline.standardOptions.withMax(-1)
+            + stateTimeline.fieldConfig.defaults.thresholds.withMode('percentage')
+            + stateTimeline.fieldConfig.defaults.thresholds.withSteps([
+              stateTimeline.thresholdStep.withColor('red'),
+
+              stateTimeline.thresholdStep.withColor('semi-dark-orange')
+              + stateTimeline.thresholdStep.withValue(50),
+
+              stateTimeline.thresholdStep.withColor('super-light-green')
+              + stateTimeline.thresholdStep.withValue(80),
+
+              stateTimeline.thresholdStep.withColor('dark-green')
+              + stateTimeline.thresholdStep.withValue(90),
+
+              stateTimeline.thresholdStep.withColor('dark-blue')
+              + stateTimeline.thresholdStep.withValue(100)
+
+            ])
+            + stateTimeline.standardOptions.withUnit('none')
+            + stateTimeline.fieldConfig.withOverrides([])
+
+            + stateTimeline.gridPos.withH(5)
+
+            + stateTimeline.gridPos.withW(24)
+            + stateTimeline.gridPos.withX(0)
+            + stateTimeline.gridPos.withY(206)
+
+            + stateTimeline.withId(193)
+            + stateTimeline.withInterval('1d')
+
+            + stateTimeline.panelOptions.withLinks([
+              stateTimeline.link.withTargetBlank(true)
+              + stateTimeline.link.withTitle('artifacts link')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=44')
+
+            ])
+
+            + stateTimeline.options.withAlignValue('center')
+            + stateTimeline.options.legend.withDisplayMode('hidden')
+            + stateTimeline.options.legend.withPlacement('bottom')
+            + stateTimeline.options.withMergeValues(value = false)
+            + stateTimeline.options.withRowHeight(value = 0.9)
+            + stateTimeline.options.withShowValue('always')
+            + stateTimeline.options.tooltip.withMode('single')
+
+            + g.panel.stateTimeline.withTargets([
+
+              elasticsearch.withAlias('VMs #: {{term vm_os_version.keyword}}')
 
               + elasticsearch.withBucketAggs([
                 elasticsearch.bucketAggs.Terms.withField('scale')
@@ -5636,188 +5605,8 @@ g.dashboard.new('PerfCI-Regression-Summary')
                 + elasticsearch.bucketAggs.Terms.settings.withSize('10')
                 + elasticsearch.bucketAggs.Terms.withType('terms'),
 
-                elasticsearch.bucketAggs.Terms.withField('node.keyword')
+                elasticsearch.bucketAggs.Terms.withField('vm_os_version.keyword')
                 + elasticsearch.bucketAggs.Terms.withId('4')
-                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
-                + elasticsearch.bucketAggs.Terms.settings.withOrder('asc')
-                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
-                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
-                + elasticsearch.bucketAggs.Terms.withType('terms'),
-
-                elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
-                + elasticsearch.bucketAggs.DateHistogram.withId('2')
-                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
-                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-
-
-              ])
-
-              + elasticsearch.withHide(false)
-
-              + elasticsearch.withMetrics([
-                elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('bootstorm_time')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Average.settings.withScript('_value/1000')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg')
-
-              ])
-
-              + elasticsearch.withQuery('scale:120 AND ocp_version:$ocp_version')
-              + elasticsearch.withRefId('D')
-              + elasticsearch.withTimeField('timestamp'),
-
-
-              ////
-
-
-
-              elasticsearch.withAlias('%CPU [240 cores]')
-
-              + elasticsearch.withBucketAggs([
-                elasticsearch.bucketAggs.Terms.withField('scale')
-                + elasticsearch.bucketAggs.Terms.withId('3')
-                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
-                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
-                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
-                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
-                + elasticsearch.bucketAggs.Terms.withType('terms'),
-
-                elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
-                + elasticsearch.bucketAggs.DateHistogram.withId('2')
-                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
-                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-
-
-              ])
-
-              + elasticsearch.withHide(false)
-
-              + elasticsearch.withMetrics([
-                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('total_CPU')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('1')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withSettings({})
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max')
-
-              ])
-
-              + elasticsearch.withQuery('scale:120 AND ocp_version:$ocp_version')
-              + elasticsearch.withRefId('E')
-              + elasticsearch.withTimeField('timestamp'),
-
-              ////
-
-
-              elasticsearch.withAlias('%CPU worker-0 [80 cores]')
-
-              + elasticsearch.withBucketAggs([
-                elasticsearch.bucketAggs.Terms.withField('scale')
-                + elasticsearch.bucketAggs.Terms.withId('3')
-                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
-                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
-                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
-                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
-                + elasticsearch.bucketAggs.Terms.withType('terms'),
-
-                elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
-                + elasticsearch.bucketAggs.DateHistogram.withId('2')
-                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
-                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-
-
-              ])
-
-              + elasticsearch.withHide(false)
-
-              + elasticsearch.withMetrics([
-                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('worker-0_CPU')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('1')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withSettings({})
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max')
-
-              ])
-
-              + elasticsearch.withQuery('scale:120 AND ocp_version:$ocp_version')
-              + elasticsearch.withRefId('F')
-              + elasticsearch.withTimeField('timestamp'),
-
-              ////
-
-
-              elasticsearch.withAlias('%CPU worker-1 [80 cores]')
-
-              + elasticsearch.withBucketAggs([
-                elasticsearch.bucketAggs.Terms.withField('scale')
-                + elasticsearch.bucketAggs.Terms.withId('3')
-                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
-                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
-                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
-                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
-                + elasticsearch.bucketAggs.Terms.withType('terms'),
-
-                elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
-                + elasticsearch.bucketAggs.DateHistogram.withId('2')
-                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
-                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-
-
-              ])
-
-              + elasticsearch.withHide(false)
-
-              + elasticsearch.withMetrics([
-                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('worker-1_CPU')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('1')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withSettings({})
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max')
-
-              ])
-
-              + elasticsearch.withQuery('scale:120 AND ocp_version:$ocp_version')
-              + elasticsearch.withRefId('G')
-              + elasticsearch.withTimeField('timestamp'),
-
-              ////
-
-              elasticsearch.withAlias('%CPU worker-2 [80 cores]')
-
-              + elasticsearch.withBucketAggs([
-                elasticsearch.bucketAggs.Terms.withField('scale')
-                + elasticsearch.bucketAggs.Terms.withId('3')
-                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
-                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
-                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
-                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
-                + elasticsearch.bucketAggs.Terms.withType('terms'),
-
-                elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
-                + elasticsearch.bucketAggs.DateHistogram.withId('2')
-                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
-                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-
-
-              ])
-
-              + elasticsearch.withHide(false)
-
-              + elasticsearch.withMetrics([
-                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('worker-2_CPU')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('1')
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withSettings({})
-                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max')
-
-              ])
-
-              + elasticsearch.withQuery('scale:120 AND ocp_version:$ocp_version')
-              + elasticsearch.withRefId('H')
-              + elasticsearch.withTimeField('timestamp'),
-
-              ////
-
-              elasticsearch.withAlias('VMs #')
-
-              + elasticsearch.withBucketAggs([
-                elasticsearch.bucketAggs.Terms.withField('scale')
-                + elasticsearch.bucketAggs.Terms.withId('3')
                 + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
                 + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
                 + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
@@ -5841,24 +5630,16 @@ g.dashboard.new('PerfCI-Regression-Summary')
               ])
 
               + elasticsearch.withQuery('scale:120 AND ocp_version:$ocp_version')
-              + elasticsearch.withRefId('I')
+              + elasticsearch.withRefId('A')
               + elasticsearch.withTimeField('timestamp')
 
               ////
 
 
-
-
-
-
-
-
-
             ]),
             ////////////////////////
 
-
-            g.panel.stateTimeline.new('120 Windows Server 2019 VM Memory')
+            g.panel.stateTimeline.new('120 Windows VM Memory')
             + stateTimeline.queryOptions.withDatasource('Elasticsearch-windows-results')
             + g.panel.stateTimeline.withDescription('Time till VM Login - Lower is better')
 
@@ -5901,7 +5682,8 @@ g.dashboard.new('PerfCI-Regression-Summary')
             + stateTimeline.standardOptions.withUnit('none')
             + stateTimeline.fieldConfig.withOverrides([])
 
-            + stateTimeline.gridPos.withH(5)
+            + stateTimeline.gridPos.withH(9)
+
             + stateTimeline.gridPos.withW(24)
             + stateTimeline.gridPos.withX(0)
             + stateTimeline.gridPos.withY(206)
@@ -5928,11 +5710,19 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
               ////
 
-              elasticsearch.withAlias('{{field}} [GB]')
+              elasticsearch.withAlias('{{field}} [GB]: {{term vm_os_version.keyword}}')
 
               + elasticsearch.withBucketAggs([
                 elasticsearch.bucketAggs.Terms.withField('scale')
                 + elasticsearch.bucketAggs.Terms.withId('3')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
+                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
+                + elasticsearch.bucketAggs.Terms.withType('terms'),
+
+                elasticsearch.bucketAggs.Terms.withField('vm_os_version.keyword')
+                + elasticsearch.bucketAggs.Terms.withId('4')
                 + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
                 + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
                 + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
@@ -6880,17 +6670,6 @@ g.dashboard.new('PerfCI-Regression-Summary')
               + g.panel.table.fieldOverride.byName.withProperty('custom.width',1000)
               + g.panel.table.fieldOverride.byName.withProperty('displayName','Artifacts Link'),
 
-              g.panel.table.fieldOverride.byName.new('Average')
-              + g.panel.table.fieldOverride.byName.withProperty('displayName','Average Rate'),
-
-              g.panel.table.fieldOverride.byName.new('Run.keyword')
-              + g.panel.table.fieldOverride.byName.withProperty('custom.width',140)
-              + g.panel.table.fieldOverride.byName.withProperty('displayName','Run'),
-
-              g.panel.table.fieldOverride.byName.new('Threads')
-              + g.panel.table.fieldOverride.byName.withProperty('custom.width',100)
-              + g.panel.table.fieldOverride.byName.withProperty('displayName','Thread')
-
 
             ])
 
@@ -7021,20 +6800,17 @@ g.dashboard.new('PerfCI-Regression-Summary')
               + g.panel.table.fieldOverride.byName.withProperty('custom.width',100)
               + g.panel.table.fieldOverride.byName.withProperty('displayName','Kind'),
 
+              g.panel.table.fieldOverride.byName.new('scale')
+              + g.panel.table.fieldOverride.byName.withProperty('custom.width',100)
+              + g.panel.table.fieldOverride.byName.withProperty('displayName','Scale'),
+
+              g.panel.table.fieldOverride.byName.new('vm_os_version.keyword')
+              + g.panel.table.fieldOverride.byName.withProperty('custom.width',200)
+              + g.panel.table.fieldOverride.byName.withProperty('displayName','OS Version'),
+
               g.panel.table.fieldOverride.byName.new('run_artifacts_url.keyword')
               + g.panel.table.fieldOverride.byName.withProperty('custom.width',1000)
               + g.panel.table.fieldOverride.byName.withProperty('displayName','Artifacts Link'),
-
-              g.panel.table.fieldOverride.byName.new('Average')
-              + g.panel.table.fieldOverride.byName.withProperty('displayName','Average Rate'),
-
-              g.panel.table.fieldOverride.byName.new('Run.keyword')
-              + g.panel.table.fieldOverride.byName.withProperty('custom.width',140)
-              + g.panel.table.fieldOverride.byName.withProperty('displayName','Run'),
-
-              g.panel.table.fieldOverride.byName.new('Threads')
-              + g.panel.table.fieldOverride.byName.withProperty('custom.width',100)
-              + g.panel.table.fieldOverride.byName.withProperty('displayName','Thread')
 
             ])
 
@@ -7084,8 +6860,16 @@ g.dashboard.new('PerfCI-Regression-Summary')
                 + elasticsearch.bucketAggs.Terms.settings.withSize('10')
                 + elasticsearch.bucketAggs.Terms.withType('terms'),
 
+                elasticsearch.bucketAggs.Terms.withField('vm_os_version.keyword')
+                + elasticsearch.bucketAggs.Terms.withId('11')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
+                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
+                + elasticsearch.bucketAggs.Terms.withType('terms'),
+
                 elasticsearch.bucketAggs.DateHistogram.withField('run_artifacts_url.keyword')
-                + elasticsearch.bucketAggs.DateHistogram.withId('11')
+                + elasticsearch.bucketAggs.DateHistogram.withId('12')
                 + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
                 + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
                 + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
@@ -7114,11 +6898,6 @@ g.dashboard.new('PerfCI-Regression-Summary')
                 "indexByName": {},
                 "renameByName": {}
               })
-
-
-
-
-
 
 
             ]),

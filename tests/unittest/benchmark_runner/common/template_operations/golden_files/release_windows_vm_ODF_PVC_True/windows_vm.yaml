@@ -1,4 +1,4 @@
-apiVersion: kubevirt.io/v1alpha3
+apiVersion: kubevirt.io/v1
 kind: VirtualMachine
 metadata:
   name:  windows-vm-deadbeef
@@ -17,6 +17,12 @@ spec:
       terminationGracePeriodSeconds: 0
       evictionStrategy: LiveMigrate
       domain:
+        features:
+          smm: {}
+        firmware:
+          bootloader:
+            efi:
+              secureBoot: false
         clock:
           timer:
             hpet:
@@ -43,11 +49,12 @@ spec:
           - masquerade: {}
             model: virtio
             name: nic-0
+            networkInterfaceMultiqueue: true
+            tpm: { }
         features:
           acpi: {}
           apic: {}
           hyperv:
-            evmcs: {}
             frequencies: {}
             ipi: {}
             reenlightenment: {}
@@ -58,7 +65,8 @@ spec:
             spinlocks:
               spinlocks: 8191
             synic: {}
-            synictimer: {}
+            synictimer:
+                direct: {}
             vapic: {}
             vpindex: {}
         machine:
@@ -89,7 +97,7 @@ spec:
         - ReadWriteMany
         resources:
           requests:
-            storage: 40Gi
+            storage: 70Gi
         volumeMode: Block
         storageClassName: ocs-storagecluster-ceph-rbd
       source:
