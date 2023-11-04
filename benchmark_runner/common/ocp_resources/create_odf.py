@@ -1,5 +1,6 @@
 
 import os
+import time
 
 from benchmark_runner.common.oc.oc import OC
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
@@ -47,7 +48,8 @@ class CreateODF(CreateOCPResourceOperations):
                     self.wait_for_ocp_resource_create(resource='odf',
                                                       verify_cmd=r"""oc get pod -n openshift-local-storage -o jsonpath="{range .items[*]}{.metadata.name}{'\n'}{end}" | grep diskmaker""")
                     self.wait_for_ocp_resource_create(resource='odf',
-                                                      verify_cmd=r"""oc get pod -n openshift-local-storage -o jsonpath="{range .items[*]}{.metadata.name}{'\n'}{end}" | grep diskmaker | wc -l""", count_local_storage=True)
+                                                      verify_cmd=r"""oc get pod -n openshift-local-storage -o jsonpath="{range .items[*]}{.metadata.name}{'\n'}{end}" | grep diskmaker | wc -l""",
+                                                      count_disk_maker=True)
                     # openshift persistence volume (pv)
                     self.wait_for_ocp_resource_create(resource='odf',
                                                       verify_cmd=r"""oc get pv -o jsonpath="{range .items[*]}{.metadata.name}{'\n'}{end}" | grep local""")
@@ -69,4 +71,7 @@ class CreateODF(CreateOCPResourceOperations):
                     self.wait_for_ocp_resource_create(resource='odf',
                                                       verify_cmd='oc get pod -n openshift-storage | grep osd | grep -v prepare | wc -l',
                                                       count_openshift_storage=True)
+            # sleep between each resource run for avoiding installation failure
+            logger.info(f"sleep {self._environment_variables_dict.get('bulk_sleep_time', '')} seconds")
+            time.sleep(int(self._environment_variables_dict.get('bulk_sleep_time', '')))
         return True

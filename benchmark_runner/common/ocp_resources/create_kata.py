@@ -22,7 +22,7 @@ class CreateKata(CreateOCPResourceOperations):
 
     def __install_and_wait_for_resource_with_retry(self, yaml_file: str, resource_type: str, resource: str):
         """
-        Create a resource where the creation process itself may fail
+        This method creates a resource where the creation process itself may fail
         without indicating an error and then have to be retried.
         :param yaml_file:YAML file to create the resource
         :param resource_type:type of resource to create
@@ -44,7 +44,7 @@ class CreateKata(CreateOCPResourceOperations):
     @logger_time_stamp
     def create_kata(self):
         """
-        This method create kata resource
+        This method creates kata resource
         :return:
         """
         for resource in self.__resource_list:
