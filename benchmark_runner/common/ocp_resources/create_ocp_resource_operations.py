@@ -10,7 +10,7 @@ from benchmark_runner.common.ocp_resources.create_ocp_resource_exceptions import
 
 class CreateOCPResourceOperations:
     """
-    This class is create OCP resources
+    This class is created OCP resources
     """
     def __init__(self, oc: OC):
         self._environment_variables_dict = environment_variables.environment_variables_dict
@@ -20,7 +20,7 @@ class CreateOCPResourceOperations:
     @typechecked
     def _replace_in_file(file_path: str, old_value: str, new_value: str):
         """
-        This method replace string in file
+        This method replaces string in file
         :param file_path:
         :param old_value:
         :param new_value:
@@ -37,35 +37,15 @@ class CreateOCPResourceOperations:
         with open(file_path, 'w') as file:
             file.write(file_data)
 
-    def _install_and_wait_for_resource(self, yaml_file: str, resource_type: str, resource: str):
-            """
-            Create a resource where the creation process itself may fail and has to be retried
-            :param yaml_file:YAML file to create the resource
-            :param resource_type:type of resource to create
-            :param resource: name of resource to create
-            :return:
-            """
-            timeout = int(environment_variables.environment_variables_dict['timeout'])
-            current_wait_time = 0
-            while timeout <= 0 or current_wait_time < timeout:
-                self.__oc.create_async(yaml_file)
-                # We cannot wait for a condition here, because the
-                # create_async may simply not work even if it returns success.
-                time.sleep(OC.SLEEP_TIME)
-                if self.__oc.run(f'if oc get {resource_type} {resource} > /dev/null 2>&1 ; then echo succeeded; fi') == 'succeeded':
-                    return True
-                current_wait_time += OC.SLEEP_TIME
-            return False
-
     @typechecked
     @logger_time_stamp
-    def wait_for_ocp_resource_create(self, resource: str, verify_cmd: str, status: str = '', count_local_storage: bool = False, count_openshift_storage: bool = False, kata_worker_machine_count: bool = False, timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
+    def wait_for_ocp_resource_create(self, resource: str, verify_cmd: str, status: str = '', count_disk_maker: bool = False, count_openshift_storage: bool = False, kata_worker_machine_count: bool = False, timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
         """
-        This method is wait till operator is created or throw exception after timeout
+        This method waits till operator is created or throw exception after timeout
         :param resource: The resource cnv, local storage, odf, kata
         :param verify_cmd: Verify command that resource was created successfully
         :param status: The final success status
-        :param count_local_storage: count local storage disks
+        :param count_disk_maker: count disk maker
         :param count_openshift_storage: count openshift storage disks
         :param kata_worker_machine_count: count kata worker machine
         :return: True if met the result
@@ -76,16 +56,14 @@ class CreateOCPResourceOperations:
             if count_openshift_storage:
                 if int(self.__oc.run(verify_cmd)) == self.__oc.get_num_active_nodes() * int(environment_variables.environment_variables_dict['num_odf_disk']):
                     return True
-                # Count local storage disks (worker/master * (discovery+manager)
-            elif count_local_storage:
-                if int(self.__oc.run(verify_cmd)) == self.__oc.get_num_active_nodes() * 2:
+                # Count disk maker (worker/master number * disk maker)
+            elif count_disk_maker:
+                if int(self.__oc.run(verify_cmd)) == int(self.__oc.get_num_active_nodes()) * 2:
                     return True
                 # Count worker machines
             elif kata_worker_machine_count:
                 if int(self.__oc.run(verify_cmd)) > 0:
                     return True
-                else:
-                    return False
             # verify query return positive result
             if status:
                 # catch equal or contains
@@ -101,7 +79,7 @@ class CreateOCPResourceOperations:
 
     def apply_non_approved_patch(self, approved_values_list: list, namespace: str, resource: str):
         """
-        This method return the index of not approved InstallPlan
+        This method returns the index of not approved InstallPlan
         :param approved_values_list:
         :param namespace:
         :param resource:
@@ -132,7 +110,7 @@ class CreateOCPResourceOperations:
 
     def apply_patch(self, namespace: str, resource: str):
         """
-        This method return the index of not approved InstallPlan
+        This method applies not approved InstallPlan
         :param namespace:
         :param resource:
         :return:

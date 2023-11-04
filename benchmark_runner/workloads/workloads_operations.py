@@ -358,7 +358,9 @@ class WorkloadsOperations:
                     'uuid': self._uuid,
                     'pin_node1': self._pin_node1,
                     'pin_node2': self._pin_node2,
-                    'odf_disk_count': self._oc.get_odf_disk_count()}
+                    # display -1 when 0,1 for avoiding conflict with 0/1 status code
+                    'odf_disk_count': -1 if self._oc.get_odf_disk_count() in {0, 1} else self._oc.get_odf_disk_count()
+}
         if kind:
             metadata.update({'kind': kind})
         if status:

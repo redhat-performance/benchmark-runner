@@ -212,7 +212,7 @@ jobs:
                    'windows_vm_scale_windows11') WINDOWS_URL=$WINDOWS11_URL ;;
                    'windows_vm_scale_windows_server_2019') WINDOWS_URL=$WINDOWS_SERVER_2019_URL ;;
                    'windows_vm_scale_windows_server_2022') WINDOWS_URL=$WINDOWS_SERVER_2022_URL ;;
-                    *) echo "Unknown Windows scale workload ${{ matrix.workload }}"; exit 1 ;;
+                    *) echo "Unknown Windows scale workload ${{ matrix_workload }}"; exit 1 ;;
               esac
               # Warm-up: Load DV for Windows
               ssh -t provision "podman run --rm -t -e WORKLOAD='$workload' -e KUBEADMIN_PASSWORD='$KUBEADMIN_PASSWORD' -e SCALE='$SCALE' -e SCALE_NODES=$SCALE_NODES -e REDIS='$REDIS' -e RUN_ARTIFACTS_URL='$RUN_ARTIFACTS_URL' -e BUILD_VERSION='$build_version' -e RUN_TYPE='$RUN_TYPE' -e KATA_CPUOFFLINE_WORKAROUND='True' -e SAVE_ARTIFACTS_LOCAL='False' -e ENABLE_PROMETHEUS_SNAPSHOT='$ENABLE_PROMETHEUS_SNAPSHOT' -e THREADS_LIMIT='$THREADS_LIMIT' -e WINDOWS_URL='$WINDOWS_URL' -e TIMEOUT='$TIMEOUT' -e log_level='INFO' -v '$CONTAINER_KUBECONFIG_PATH':'$CONTAINER_KUBECONFIG_PATH' --privileged 'quay.io/ebattat/benchmark-runner:latest'"
