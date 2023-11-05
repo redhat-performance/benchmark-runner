@@ -1,5 +1,5 @@
 
-name: Deploy Perf Env Nightly CI
+name: Deploy Perf Env Nightly CI Scale
 
 on:
   workflow_dispatch:
