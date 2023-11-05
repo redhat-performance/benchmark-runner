@@ -174,3 +174,4 @@ name of the promdb snapshot.
 ## How to develop in benchmark-runner
 
 see [HOW_TO.md](HOW_TO.md)
+

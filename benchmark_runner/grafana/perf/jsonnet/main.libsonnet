@@ -271,7 +271,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
       + stateTimeline.withPluginVersion()
 
       + g.panel.stateTimeline.withTargets([
-
+        ////
         elasticsearch.withAlias('Openshift')
           + elasticsearch.withBucketAggs([
             elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
@@ -316,7 +316,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
           ])
 
           + elasticsearch.withQuery('_exists_:cnv_version AND ocp_version:$ocp_version')
-          + elasticsearch.withRefId('C')
+          + elasticsearch.withRefId('B')
           + elasticsearch.withTimeField('timestamp'),
 
         ////
@@ -339,34 +339,11 @@ g.dashboard.new('PerfCI-Regression-Summary')
           ])
 
           + elasticsearch.withQuery('_exists_:kata_version AND ocp_version:$ocp_version')
-          + elasticsearch.withRefId('D')
+          + elasticsearch.withRefId('C')
           + elasticsearch.withTimeField('timestamp'),
 
         ////
-        elasticsearch.withAlias('Kata rpm')
-          + elasticsearch.withBucketAggs([
-            elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
-            + elasticsearch.bucketAggs.DateHistogram.withId('2')
-            + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
-            + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-          ])
 
-
-          + elasticsearch.withHide(false)
-
-          + elasticsearch.withMetrics([
-            elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('ci_minutes_time')
-            + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('1')
-            + elasticsearch.metrics.MetricAggregationWithSettings.Max.settings.withScript('Integer.parseInt(\"0\"+doc["kata_rpm_version.keyword"].value.replace(\".\",\"\").replace(\"r\",\"\").replace(\"c\",\"\").replace(\"f\",\"\").replace(\"-\",\"\").replace(\"e\",\"1\").replace(\"c\",\"\").replace(\"r\",\"\"))')
-            + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max')
-
-          ])
-
-          + elasticsearch.withQuery('_exists_:kata_rpm_version AND ocp_version:$ocp_version')
-          + elasticsearch.withRefId('F')
-          + elasticsearch.withTimeField('timestamp'),
-
-        ////
         elasticsearch.withAlias('ODF op.')
           + elasticsearch.withBucketAggs([
             elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
@@ -387,10 +364,11 @@ g.dashboard.new('PerfCI-Regression-Summary')
           ])
 
           + elasticsearch.withQuery('_exists_:odf_version AND ocp_version:$ocp_version')
-          + elasticsearch.withRefId('E')
+          + elasticsearch.withRefId('D')
           + elasticsearch.withTimeField('timestamp'),
 
         ////
+
         elasticsearch.withAlias('ODF # disks')
           + elasticsearch.withBucketAggs([
             elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
@@ -410,9 +388,11 @@ g.dashboard.new('PerfCI-Regression-Summary')
           ])
 
           + elasticsearch.withQuery('ocp_version:$ocp_version')
-          + elasticsearch.withRefId('B')
+          + elasticsearch.withRefId('E')
           + elasticsearch.withTimeField('timestamp'),
+
         ////
+
         elasticsearch.withAlias('Ci Status')
           + elasticsearch.withBucketAggs([
             elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
@@ -432,7 +412,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
           ])
 
           + elasticsearch.withQuery('ocp_version:$ocp_version')
-          + elasticsearch.withRefId('B')
+          + elasticsearch.withRefId('F')
           + elasticsearch.withTimeField('timestamp')
 
       ]),
