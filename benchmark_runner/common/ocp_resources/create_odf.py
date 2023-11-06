@@ -39,9 +39,6 @@ class CreateODF(CreateOCPResourceOperations):
                         result_dict[node] = delete_node_disk
                         delete_node_disk = ''
                     self.__oc.run(cmd=f'chmod +x {os.path.join(self.__path, resource)}; {self.__path}/./{resource} "{list(result_dict.keys())[0]}" "{list(result_dict.values())[0]}" "{list(result_dict.keys())[1]}" "{list(result_dict.values())[1]}" "{list(result_dict.keys())[2]}" "{list(result_dict.values())[2]}"')
-                    # add sleep after Ceph disk deletion for avoiding installation failure
-                    logger.info(f"sleep {self._environment_variables_dict.get('bulk_sleep_time', '')} seconds")
-                    time.sleep(int(self._environment_variables_dict.get('bulk_sleep_time', '')))
                 else:
                     self.__oc.run(cmd=f'chmod +x {os.path.join(self.__path, resource)}; {self.__path}/./{resource}')
             else:  # yaml
@@ -77,4 +74,7 @@ class CreateODF(CreateOCPResourceOperations):
                     self.wait_for_ocp_resource_create(resource='odf',
                                                       verify_cmd='oc get pod -n openshift-storage | grep osd | grep -v prepare | wc -l',
                                                       count_openshift_storage=True, verify_installation=True)
+            # @todo: investigate: add sleep after Ceph disk deletion for avoiding installation failure
+            logger.info(f"sleep {self._environment_variables_dict.get('bulk_sleep_time', '')} seconds")
+            time.sleep(int(self._environment_variables_dict.get('bulk_sleep_time', '')))
         return True
