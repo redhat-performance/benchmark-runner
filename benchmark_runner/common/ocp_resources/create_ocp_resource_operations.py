@@ -3,14 +3,14 @@ import time
 from typeguard import typechecked
 
 from benchmark_runner.common.oc.oc import OC
-from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
+from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp
 from benchmark_runner.main.environment_variables import environment_variables
-from benchmark_runner.common.ocp_resources.create_ocp_resource_exceptions import OCPResourceNotCreateTimeout
+from benchmark_runner.common.ocp_resources.create_ocp_resource_exceptions import OCPResourceCreationTimeout, ODFInstallationFailed
 
 
 class CreateOCPResourceOperations:
     """
-    This class is created OCP resources
+    This class creates OCP resources
     """
     def __init__(self, oc: OC):
         self._environment_variables_dict = environment_variables.environment_variables_dict
@@ -39,7 +39,7 @@ class CreateOCPResourceOperations:
 
     @typechecked
     @logger_time_stamp
-    def wait_for_ocp_resource_create(self, resource: str, verify_cmd: str, status: str = '', count_disk_maker: bool = False, count_openshift_storage: bool = False, kata_worker_machine_count: bool = False, timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
+    def wait_for_ocp_resource_create(self, resource: str, verify_cmd: str, status: str = '', count_disk_maker: bool = False, count_openshift_storage: bool = False, kata_worker_machine_count: bool = False, verify_installation: bool = False, timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
         """
         This method waits till operator is created or throw exception after timeout
         :param resource: The resource cnv, local storage, odf, kata
@@ -48,6 +48,8 @@ class CreateOCPResourceOperations:
         :param count_disk_maker: count disk maker
         :param count_openshift_storage: count openshift storage disks
         :param kata_worker_machine_count: count kata worker machine
+        :param verify_installation: Verify that the installation was successful
+        :param timeout: Timeout duration for OpenShift resource creation.
         :return: True if met the result
         """
         current_wait_time = 0
@@ -56,6 +58,10 @@ class CreateOCPResourceOperations:
             if count_openshift_storage:
                 if int(self.__oc.run(verify_cmd)) == self.__oc.get_num_active_nodes() * int(environment_variables.environment_variables_dict['num_odf_disk']):
                     return True
+                else:
+                    # Verify ODF installation that all Ceph disks are operational. If not, raise an exception.
+                    if verify_installation:
+                        raise ODFInstallationFailed(disk_num=self.__oc.run(verify_cmd))
                 # Count disk maker (worker/master number * disk maker)
             elif count_disk_maker:
                 if int(self.__oc.run(verify_cmd)) == int(self.__oc.get_num_active_nodes()) * 2:
@@ -75,7 +81,7 @@ class CreateOCPResourceOperations:
             # sleep for x seconds
             time.sleep(OC.SLEEP_TIME)
             current_wait_time += OC.SLEEP_TIME
-        raise OCPResourceNotCreateTimeout(resource)
+        raise OCPResourceCreationTimeout(resource)
 
     def apply_non_approved_patch(self, approved_values_list: list, namespace: str, resource: str):
         """
