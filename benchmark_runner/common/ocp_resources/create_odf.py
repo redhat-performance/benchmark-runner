@@ -31,14 +31,12 @@ class CreateODF(CreateOCPResourceOperations):
                 # Ceph disk deletion - reference: https://rook.io/docs/rook/v1.12/Getting-Started/ceph-teardown/#delete-the-data-on-hosts
                 if '01_delete_disks.sh' == resource:
                     delete_node_disk = ''
-                    result_dict = {}
                     for node, disk_ids in self.__worker_disk_ids.items():
                         for disk_id in disk_ids:
                             disk = f'/dev/disk/by-id/{self.__worker_disk_prefix}{disk_id}'
-                            delete_node_disk += f"sgdisk --zap-all {disk}; wipefs -a {disk}; dd if=/dev/zero of='{disk}' bs=1M count=100 oflag=direct,dsync; blkdiscard {disk}; partprobe {disk}"
-                        result_dict[node] = delete_node_disk
+                            delete_node_disk += f"sgdisk --zap-all {disk}; wipefs -a {disk}; dd if=/dev/zero of='{disk}' bs=1M count=100 oflag=direct,dsync; blkdiscard {disk}; partprobe {disk};"
+                        self.__oc.run(cmd=f'chmod +x {os.path.join(self.__path, resource)}; {self.__path}/./{resource} "{node}" "{delete_node_disk}"')
                         delete_node_disk = ''
-                    self.__oc.run(cmd=f'chmod +x {os.path.join(self.__path, resource)}; {self.__path}/./{resource} "{list(result_dict.keys())[0]}" "{list(result_dict.values())[0]}" "{list(result_dict.keys())[1]}" "{list(result_dict.values())[1]}" "{list(result_dict.keys())[2]}" "{list(result_dict.values())[2]}"')
                 else:
                     self.__oc.run(cmd=f'chmod +x {os.path.join(self.__path, resource)}; {self.__path}/./{resource}')
             else:  # yaml
@@ -74,7 +72,4 @@ class CreateODF(CreateOCPResourceOperations):
                     self.wait_for_ocp_resource_create(resource='odf',
                                                       verify_cmd='oc get pod -n openshift-storage | grep osd | grep -v prepare | wc -l',
                                                       count_openshift_storage=True, verify_installation=True)
-            # @todo: investigate: add sleep after Ceph disk deletion for avoiding installation failure
-            logger.info(f"sleep {self._environment_variables_dict.get('bulk_sleep_time', '')} seconds")
-            time.sleep(int(self._environment_variables_dict.get('bulk_sleep_time', '')))
         return True
