@@ -37,6 +37,9 @@ class CreateODF(CreateOCPResourceOperations):
                             delete_node_disk += f"sgdisk --zap-all {disk}; wipefs -a {disk}; dd if=/dev/zero of='{disk}' bs=1M count=100 oflag=direct,dsync; blkdiscard {disk}; partprobe {disk};"
                         self.__oc.run(cmd=f'chmod +x {os.path.join(self.__path, resource)}; {self.__path}/./{resource} "{node}" "{delete_node_disk}"')
                         delete_node_disk = ''
+                        # add sleep after Ceph disk deletion for avoiding installation failure
+                        logger.info(f"sleep {self._environment_variables_dict.get('bulk_sleep_time', '')} seconds")
+                        time.sleep(int(self._environment_variables_dict.get('bulk_sleep_time', '')))
                 else:
                     self.__oc.run(cmd=f'chmod +x {os.path.join(self.__path, resource)}; {self.__path}/./{resource}')
             else:  # yaml
