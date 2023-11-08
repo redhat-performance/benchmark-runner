@@ -100,6 +100,16 @@ class OC(SSH):
         else:
             raise Exception('Missing free disk id')
 
+    @typechecked
+    def run_debug_node(self, node: str, cmd: str):
+        """
+        This method runs command in debug node
+        :param: node
+        :param: cmd
+        :return:
+        """
+        self.run(f"{self.__cli} debug node/{node} --no-tty=true -- chroot /host sh -c '{cmd}'")
+
     def get_kata_operator_version(self):
         """
         This method returns kata operator version
