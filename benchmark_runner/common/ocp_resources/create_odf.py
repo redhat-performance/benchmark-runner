@@ -72,4 +72,7 @@ class CreateODF(CreateOCPResourceOperations):
                     self.wait_for_ocp_resource_create(resource='odf',
                                                       verify_cmd='oc get pod -n openshift-storage | grep osd | grep -v prepare | wc -l',
                                                       count_openshift_storage=True, verify_installation=True)
+            # @todo - remove if not solve ODF installation failure
+            logger.info(f"sleep {self._environment_variables_dict.get('bulk_sleep_time', '')} seconds")
+            time.sleep(int(self._environment_variables_dict.get('bulk_sleep_time', '')))
         return True
