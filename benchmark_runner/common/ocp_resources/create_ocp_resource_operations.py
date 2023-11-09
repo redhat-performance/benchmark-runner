@@ -83,46 +83,46 @@ class CreateOCPResourceOperations:
             current_wait_time += OC.SLEEP_TIME
         raise OCPResourceCreationTimeout(resource)
 
-    def apply_non_approved_patch(self, approved_values_list: list, namespace: str, resource: str):
+    def apply_last_non_approved_patch(self, approved_values_list: list, namespace: str, resource: str):
         """
-        This method returns the index of not approved InstallPlan
+        This method applies last non approve patch
         :param approved_values_list:
         :param namespace:
         :param resource:
         :return:
         """
-        for index, approved in enumerate(approved_values_list):
-            # APPROVED false - need to patch
-            if approved == 'false':
-                install_plan = """ oc get InstallPlan -n namespace -ojsonpath={.items[index].metadata.name} """.replace('index', str(index))
-                install_plan = install_plan.replace('namespace', namespace)
-                install_plan = self.__oc.run(cmd=install_plan)
-                install_plan_cmd = """ oc patch InstallPlan -n namespace install_plan -p '{"spec":{"approved":true}}' --type merge""".replace('install_plan', str(install_plan))
-                run_install_plan_cmd = install_plan_cmd.replace('namespace', namespace)
-                self.__oc.run(cmd=run_install_plan_cmd)
-                # verify current status
-                check_status = 'oc get InstallPlan -n namespace -ojsonpath={..spec.approved}'.replace('namespace', namespace).strip()
-                result = self.__oc.run(cmd=check_status).split()[index]
-                if result == 'true':
-                    if resource == 'odf':
-                        for ind in range(3):
-                            self.wait_for_ocp_resource_create(resource=resource,
-                                                              verify_cmd="oc get csv -n namespace -ojsonpath='{.items[ind].status.phase}'".replace('namespace', namespace).replace('ind', str(ind)),
-                                                              status='Succeeded')
-                    if resource == 'cnv':
+        last_index = len(approved_values_list) - 1
+        # APPROVED false - need to patch
+        if approved_values_list[last_index] == 'false':
+            install_plan = """ oc get InstallPlan -n namespace -ojsonpath={.items[index].metadata.name} """.replace('index', str(last_index))
+            install_plan = install_plan.replace('namespace', namespace)
+            install_plan = self.__oc.run(cmd=install_plan)
+            install_plan_cmd = """ oc patch InstallPlan -n namespace install_plan -p '{"spec":{"approved":true}}' --type merge""".replace('install_plan', str(install_plan))
+            run_install_plan_cmd = install_plan_cmd.replace('namespace', namespace)
+            self.__oc.run(cmd=run_install_plan_cmd)
+            # verify current status
+            check_status = 'oc get InstallPlan -n namespace -ojsonpath={..spec.approved}'.replace('namespace', namespace).strip()
+            result = self.__oc.run(cmd=check_status).split()[last_index]
+            if result == 'true':
+                if resource == 'odf':
+                    for ind in range(3):
                         self.wait_for_ocp_resource_create(resource=resource,
-                                                          verify_cmd="oc get csv -n namespace -ojsonpath='{.items[0].status.phase}'".replace('namespace', namespace),
+                                                          verify_cmd="oc get csv -n namespace -ojsonpath='{.items[ind].status.phase}'".replace('namespace', namespace).replace('ind', str(ind)),
                                                           status='Succeeded')
+                if resource == 'cnv':
+                    self.wait_for_ocp_resource_create(resource=resource,
+                                                      verify_cmd="oc get csv -n namespace -ojsonpath='{.items[0].status.phase}'".replace('namespace', namespace),
+                                                      status='Succeeded')
 
     def apply_patch(self, namespace: str, resource: str):
         """
-        This method applies not approved InstallPlan
+        This method applies not approved patch
         :param namespace:
         :param resource:
         :return:
         """
         install_plan_cmd = 'oc get InstallPlan -n namespace -ojsonpath={..spec.approved}'.replace('namespace', namespace).strip()
         approved_values_list = self.__oc.run(cmd=install_plan_cmd).split()
-        while 'false' in approved_values_list:
-            self.apply_non_approved_patch(approved_values_list, namespace, resource)
-            approved_values_list = self.__oc.run(cmd=install_plan_cmd).split()
+        if 'false' in approved_values_list[-1]:
+            self.apply_last_non_approved_patch(approved_values_list, namespace, resource)
+            self.__oc.run(cmd=install_plan_cmd).split()
