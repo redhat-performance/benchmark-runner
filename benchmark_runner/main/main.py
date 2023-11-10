@@ -108,7 +108,11 @@ def install_resources():
     ibm_operations = IBMOperations(user=provision_user)
     ibm_operations.ibm_connect()
     install_resources_list = environment_variables_dict.get('install_resources_list', '')
-    resources = ast.literal_eval(install_resources_list)
+    # convert str to list
+    try:
+        resources = ast.literal_eval(install_resources_list) if isinstance(install_resources_list, str) else install_resources_list
+    except (ValueError, SyntaxError):
+        resources = [install_resources_list]
     logger.info(f'Start IBM OCP resources installation')
     oc = ibm_operations.oc_login()
     ibm_operations.verify_cluster_is_up(oc)
