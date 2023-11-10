@@ -103,6 +103,7 @@ jobs:
           build_version="$(cut -d'=' -f2 <<<"$build")"
           start=$(printf '%(%s)T' -1)
           scp -r "$RUNNER_PATH/private_key.txt" provision:"$CONTAINER_PRIVATE_KEY_PATH"
+          scp -r "$RUNNER_PATH/.kube/config" provision:"$CONTAINER_KUBECONFIG_PATH"
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>>> Start ${{ matrix.resource }} installation >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
           # cnv-nightly
           if [[ "${{ matrix.resource }}" == "cnv" ]]
