@@ -102,7 +102,7 @@ jobs:
           build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
           build_version="$(cut -d'=' -f2 <<<"$build")"
           start=$(printf '%(%s)T' -1)
-          scp -r "$RUNNER_PATH/private_key.txt" provision:"$CONTAINER_KUBECONFIG_PATH"
+          scp -r "$RUNNER_PATH/private_key.txt" provision:"$CONTAINER_PRIVATE_KEY_PATH"
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>>> Start ${{ matrix.resource }} installation >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
           # cnv-nightly
           if [[ "${{ matrix.resource }}" == "cnv" ]]
