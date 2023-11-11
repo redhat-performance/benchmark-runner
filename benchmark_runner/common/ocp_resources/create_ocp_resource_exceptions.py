@@ -11,13 +11,6 @@ class OCPResourceCreationTimeout(OCPResourceError):
         super(OCPResourceCreationTimeout, self).__init__(self.message)
 
 
-class ODFInstallationFailed(OCPResourceError):
-    """This exception returns failure to install ODF"""
-    def __init__(self, disk_num):
-        self.message = f'Incorrect ODF Ceph disk number: {disk_num}'
-        super(ODFInstallationFailed, self).__init__(self.message)
-
-
 class KataInstallationFailed(OCPResourceError):
     """This exception returns failure to install sandboxed containers"""
     def __init__(self, reason):
