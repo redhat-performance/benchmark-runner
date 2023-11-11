@@ -69,7 +69,4 @@ class CreateODF(CreateOCPResourceOperations):
                     self.wait_for_ocp_resource_create(resource='odf',
                                                       verify_cmd='oc get pod -n openshift-storage | grep osd | grep -v prepare | wc -l',
                                                       count_openshift_storage=True)
-                    self.wait_for_ocp_resource_create(resource='odf',
-                                                      verify_cmd='oc get pod -n openshift-storage | grep osd | grep -v prepare | wc -l',
-                                                      count_openshift_storage=True, verify_installation=True)
         return True
