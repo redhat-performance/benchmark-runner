@@ -70,14 +70,16 @@ class CreateOCPResourceOperations:
             elif kata_worker_machine_count:
                 if int(self.__oc.run(verify_cmd)) > 0:
                     return True
-            # verify query return positive result
-            if status:
-                # catch equal or contains
-                if status in self.__oc.run(verify_cmd):
-                    return True
-            else:
-                if self.__oc.run(verify_cmd) != '':
-                    return True
+            # skip for count_openshift_storage
+            if not count_openshift_storage:
+                # verify query return positive result
+                if status:
+                    # catch equal or contains
+                    if status in self.__oc.run(verify_cmd):
+                        return True
+                else:
+                    if self.__oc.run(verify_cmd) != '':
+                        return True
             # sleep for x seconds
             time.sleep(OC.SLEEP_TIME)
             current_wait_time += OC.SLEEP_TIME
