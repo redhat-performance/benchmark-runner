@@ -78,7 +78,7 @@ jobs:
       - name: ☉ install ${{ matrix.resource }} Operator 
         env:
           CNV_VERSION: "4.14"
-          ODF_VERSION: "4.14"
+          ODF_VERSION: "4.13"
           NUM_ODF_DISK: "4"
           KATA_CSV: ""
           QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
@@ -103,6 +103,8 @@ jobs:
           build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
           build_version="$(cut -d'=' -f2 <<<"$build")"
           start=$(printf '%(%s)T' -1)
+          scp -r "$RUNNER_PATH/private_key.txt" provision:"$CONTAINER_PRIVATE_KEY_PATH"
+          scp -r "$RUNNER_PATH/.kube/config" provision:"$CONTAINER_KUBECONFIG_PATH"
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>>> Start ${{ matrix.resource }} installation >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
           # cnv-nightly
           if [[ "${{ matrix.resource }}" == "cnv" ]]
@@ -115,7 +117,7 @@ jobs:
              scp -r "$RUNNER_PATH/nightly_cnv_registered.sh" provision:"/tmp/nightly_cnv_registered.sh"
              ssh -t provision "chmod +x /tmp/nightly_cnv_registered.sh;/tmp/./nightly_cnv_registered.sh;oc create -f /tmp/cnv_nightly_catlog_source.yaml;rm -f /tmp/nightly_cnv_registered.sh;rm -f /tmp/cnv_nightly_catlog_source.yaml"
           fi
-          podman run --rm -e IBM_API_KEY="$IBM_API_KEY" -e GITHUB_TOKEN="$GITHUB_TOKEN" -e KUBEADMIN_PASSWORD="$KUBEADMIN_PASSWORD" -e INSTALL_OCP_RESOURCES="True" -e CNV_VERSION="$CNV_VERSION" -e QUAY_USERNAME="$QUAY_USERNAME" -e QUAY_PASSWORD="$QUAY_PASSWORD" -e ODF_VERSION="$ODF_VERSION" -e KATA_CSV="$KATA_CSV" -e NUM_ODF_DISK="$NUM_ODF_DISK" -e INSTALL_RESOURCES_LIST="[ '${{ matrix.resource }}' ]" -e WORKER_IDS="$WORKER_IDS" -e PROVISION_IP="$PROVISION_IP" -e CONTAINER_PRIVATE_KEY_PATH="$CONTAINER_PRIVATE_KEY_PATH" -e PROVISION_USER="$PROVISION_USER" -e PROVISION_OC_USER="$PROVISION_OC_USER" -e PROVISION_PORT="$PROVISION_PORT" -e GITHUB_REPOSITORY_SHORT="$GITHUB_REPOSITORY_SHORT" -e WORKER_DISK_IDS="$WORKER_DISK_IDS" -e WORKER_DISK_PREFIX="$WORKER_DISK_PREFIX" -e PROVISION_TIMEOUT="3600" -e log_level="INFO" -v "$PROVISION_PRIVATE_KEY_PATH":"$CONTAINER_PRIVATE_KEY_PATH" -v "$KUBECONFIG_PATH":"$CONTAINER_KUBECONFIG_PATH" --privileged "quay.io/ebattat/benchmark-runner:latest"
+          ssh -t provision "podman run --rm -e IBM_API_KEY=$IBM_API_KEY -e GITHUB_TOKEN=$GITHUB_TOKEN -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e INSTALL_OCP_RESOURCES=True -e CNV_VERSION=$CNV_VERSION -e QUAY_USERNAME=$QUAY_USERNAME -e QUAY_PASSWORD=$QUAY_PASSWORD -e ODF_VERSION=$ODF_VERSION -e KATA_CSV=$KATA_CSV -e NUM_ODF_DISK=$NUM_ODF_DISK -e INSTALL_RESOURCES_LIST=${{ matrix.resource }} -e WORKER_IDS=$WORKER_IDS -e PROVISION_IP=$PROVISION_IP -e CONTAINER_PRIVATE_KEY_PATH=$CONTAINER_PRIVATE_KEY_PATH -e PROVISION_USER=$PROVISION_USER -e PROVISION_OC_USER=$PROVISION_OC_USER -e PROVISION_PORT=$PROVISION_PORT -e GITHUB_REPOSITORY_SHORT=$GITHUB_REPOSITORY_SHORT -e WORKER_DISK_IDS=$WORKER_DISK_IDS -e WORKER_DISK_PREFIX=$WORKER_DISK_PREFIX -e PROVISION_TIMEOUT=3600 -e log_level=INFO -v $CONTAINER_PRIVATE_KEY_PATH:$CONTAINER_PRIVATE_KEY_PATH -v $CONTAINER_KUBECONFIG_PATH:$CONTAINER_KUBECONFIG_PATH --privileged quay.io/ebattat/benchmark-runner:latest"
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End  ${{ matrix.resource }} installation   >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
           end=$(printf '%(%s)T' -1)
           echo "INSTALL_OCP_RESOURCE_MINUTES_TIME=$(( (( end - start )) / 60))" >> "$GITHUB_ENV"
