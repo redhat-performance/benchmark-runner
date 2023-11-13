@@ -16,3 +16,10 @@ class KataInstallationFailed(OCPResourceError):
     def __init__(self, reason):
         self.message = f'Installation of sandboxed containers failed: {reason}'
         super(KataInstallationFailed, self).__init__(self.message)
+
+
+class ODFInstallationFailed(OCPResourceError):
+    """This exception returns failure to install ODF"""
+    def __init__(self):
+        self.message = f'ODF installation failed'
+        super(ODFInstallationFailed, self).__init__(self.message)
