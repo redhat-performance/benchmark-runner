@@ -93,12 +93,12 @@ class CreateOCPResourceOperations:
             check_approved = f"oc get InstallPlan -n {namespace} {name} -ojsonpath={{..spec.approved}}"
             approved = self.__oc.run(cmd=check_approved)
             # APPROVED false - need to patch
-            if not approved:
+            if not {'true': True, 'false': False}.get(approved.lower(), False):
                 install_plan_cmd = (f"oc patch InstallPlan -n {namespace} {name} -p '{{\"spec\":{{\"approved\":true}}}}' --type merge")
                 self.__oc.run(cmd=install_plan_cmd)
                 # verify current status
                 result = self.__oc.run(cmd=check_approved)
-                if result == 'true':
+                if {'true': True, 'false': False}.get(result.lower(), False):
                     if resource == 'odf':
                         # Check status for each CSV name
                         csv_names = self.__oc.run(f"oc get csv -n {namespace} -ojsonpath={{$.items[*].metadata.name}}")
