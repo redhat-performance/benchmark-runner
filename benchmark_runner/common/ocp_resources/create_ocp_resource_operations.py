@@ -80,46 +80,33 @@ class CreateOCPResourceOperations:
             current_wait_time += OC.SLEEP_TIME
         raise OCPResourceCreationTimeout(resource)
 
-    def apply_non_approved_patch(self, approved_values_list: list, namespace: str, resource: str):
+    def apply_patch(self, namespace: str, resource: str):
         """
-        This method returns the index of not approved InstallPlan
-        :param approved_values_list:
+        This method applies an InstallPlan that has not been approved
         :param namespace:
         :param resource:
         :return:
         """
-        for index, approved in enumerate(approved_values_list):
+        install_plan_cmd = f"oc get InstallPlan -n {namespace} -ojsonpath={{$.items[*].metadata.name}}"
+        install_plan_names = self.__oc.run(cmd=install_plan_cmd).split()
+        for name in install_plan_names:
+            check_approved = f"oc get InstallPlan -n {namespace} {name} -ojsonpath={{..spec.approved}}"
+            approved = self.__oc.run(cmd=check_approved)
             # APPROVED false - need to patch
-            if approved == 'false':
-                install_plan = """ oc get InstallPlan -n namespace -ojsonpath={.items[index].metadata.name} """.replace('index', str(index))
-                install_plan = install_plan.replace('namespace', namespace)
-                install_plan = self.__oc.run(cmd=install_plan)
-                install_plan_cmd = """ oc patch InstallPlan -n namespace install_plan -p '{"spec":{"approved":true}}' --type merge""".replace('install_plan', str(install_plan))
-                run_install_plan_cmd = install_plan_cmd.replace('namespace', namespace)
-                self.__oc.run(cmd=run_install_plan_cmd)
+            if not approved:
+                install_plan_cmd = (f"oc patch InstallPlan -n {namespace} {name} -p '{{\"spec\":{{\"approved\":true}}}}' --type merge")
+                self.__oc.run(cmd=install_plan_cmd)
                 # verify current status
-                check_status = 'oc get InstallPlan -n namespace -ojsonpath={..spec.approved}'.replace('namespace', namespace).strip()
-                result = self.__oc.run(cmd=check_status).split()[index]
+                result = self.__oc.run(cmd=check_approved)
                 if result == 'true':
                     if resource == 'odf':
-                        for ind in range(3):
+                        # Check status for each CSV name
+                        csv_names = self.__oc.run(f"oc get csv -n {namespace} -ojsonpath={{$.items[*].metadata.name}}")
+                        for csv_name in csv_names.split():
                             self.wait_for_ocp_resource_create(resource=resource,
-                                                              verify_cmd="oc get csv -n namespace -ojsonpath='{.items[ind].status.phase}'".replace('namespace', namespace).replace('ind', str(ind)),
+                                                              verify_cmd=f"oc get csv -n {namespace} {csv_name} -ojsonpath='{{.status.phase}}'",
                                                               status='Succeeded')
                     if resource == 'cnv':
                         self.wait_for_ocp_resource_create(resource=resource,
-                                                          verify_cmd="oc get csv -n namespace -ojsonpath='{.items[0].status.phase}'".replace('namespace', namespace),
+                                                          verify_cmd=f"oc get csv -n {namespace} -ojsonpath='{{.items[0].status.phase}}'",
                                                           status='Succeeded')
-
-    def apply_patch(self, namespace: str, resource: str):
-        """
-        This method applies not approved InstallPlan
-        :param namespace:
-        :param resource:
-        :return:
-        """
-        install_plan_cmd = 'oc get InstallPlan -n namespace -ojsonpath={..spec.approved}'.replace('namespace', namespace).strip()
-        approved_values_list = self.__oc.run(cmd=install_plan_cmd).split()
-        while 'false' in approved_values_list:
-            self.apply_non_approved_patch(approved_values_list, namespace, resource)
-            approved_values_list = self.__oc.run(cmd=install_plan_cmd).split()
