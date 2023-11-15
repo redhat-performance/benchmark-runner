@@ -1,10 +1,10 @@
 
 import os
-import time
 
 from benchmark_runner.common.oc.oc import OC
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 from benchmark_runner.common.ocp_resources.create_ocp_resource_operations import CreateOCPResourceOperations
+from benchmark_runner.common.ocp_resources.create_ocp_resource_exceptions import ODFInstallationFailed
 
 
 class CreateODF(CreateOCPResourceOperations):
@@ -69,4 +69,7 @@ class CreateODF(CreateOCPResourceOperations):
                     self.wait_for_ocp_resource_create(resource='odf',
                                                       verify_cmd='oc get pod -n openshift-storage | grep osd | grep -v prepare | wc -l',
                                                       count_openshift_storage=True)
+        # Verify ODF installation
+        if not self.__oc.verify_odf_installation():
+            raise ODFInstallationFailed
         return True

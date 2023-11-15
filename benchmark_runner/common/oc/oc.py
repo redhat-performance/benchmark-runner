@@ -244,6 +244,16 @@ class OC(SSH):
             current_wait_time += OC.SLEEP_TIME
         raise DVStatusTimeout(status=status)
 
+    def verify_odf_installation(self):
+        """
+        This method verifies ODF installation
+        :return: True ODF passed, False failed
+        """
+        self.run(""" oc patch storagecluster ocs-storagecluster -n openshift-storage --type json --patch '[{ "op": "replace", "path": "/spec/enableCephTools", "value": true }]' """)
+        rook_ceph_tools_pod = self._get_pod_name(pod_name='rook-ceph-tools', namespace='openshift-storage')
+        result = self.run(f"oc -n openshift-storage rsh {rook_ceph_tools_pod} ceph health")
+        return 'HEALTH_OK' == result.strip()
+
     def get_odf_disk_count(self):
         """
         This method returns odf disk count
