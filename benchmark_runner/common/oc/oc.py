@@ -244,16 +244,17 @@ class OC(SSH):
             current_wait_time += OC.SLEEP_TIME
         raise DVStatusTimeout(status=status)
 
-    def verify_odf_installation(self, namespace='openshift-storage'):
+    def verify_odf_installation(self, namespace: str = 'openshift-storage'):
         """
         This method verifies ODF installation
         :return: True ODF passed, False failed
         """
-        self.run(f"oc patch storagecluster ocs-storagecluster -n {namespace} --type json --patch '[{{ \"op\": \"replace\", \"path\": \"/spec/enableCephTools\", \"value\": true }}]'")
-        rook_ceph_tools_pod = self._get_pod_name(pod_name='rook-ceph-tools', namespace=namespace)
-        self.wait_for_pod_create(pod_name=rook_ceph_tools_pod, namespace=namespace, timeout=self.timeout)
-        result = self.run(f"oc -n openshift-storage rsh {rook_ceph_tools_pod} ceph health")
-        return 'HEALTH_OK' == result.strip()
+        self.run(
+            f"oc patch storagecluster ocs-storagecluster -n {namespace} --type json --patch '[{{ \"op\": \"replace\", \"path\": \"/spec/enableCephTools\", \"value\": true }}]'")
+        self.wait_for_patch(pod_name='rook-ceph-tools', label='app=rook-ceph-tools', label_uuid=False, namespace=namespace)
+        health_check = self.run(
+            f"oc -n {namespace} rsh {self._get_pod_name(pod_name='rook-ceph-tools', namespace=namespace)} ceph health")
+        return 'HEALTH_OK' == health_check.strip()
 
     def get_odf_disk_count(self):
         """
@@ -647,6 +648,27 @@ class OC(SSH):
                 raise VMNotInitializedTimeout(workload=workload)
             else:
                 raise PodNotInitializedTimeout(workload=workload)
+
+    @typechecked
+    @logger_time_stamp
+    def wait_for_patch(self, pod_name: str, label: str, label_uuid: bool, namespace: str, timeout: int = SHORT_TIMEOUT):
+        """
+        This method waits for patch, needs to wait that pod is created and then wait for ready
+        @param pod_name:
+        @param label:
+        @param label_uuid:
+        @param namespace:
+        @param timeout:
+        @return:
+        """
+        current_wait_time = 0
+        while timeout <= 0 or current_wait_time <= timeout:
+            if self._get_pod_name(pod_name=pod_name, namespace=namespace) and self.wait_for_ready(label=label, label_uuid=label_uuid, namespace=namespace):
+                return True
+            # sleep for x seconds
+            time.sleep(OC.SLEEP_TIME)
+            current_wait_time += OC.SLEEP_TIME
+        raise PodNotReadyTimeout(label)
 
     @typechecked
     @logger_time_stamp

@@ -42,30 +42,23 @@ class CreateODF(CreateOCPResourceOperations):
             else:  # yaml
                 self.__oc.create_async(yaml=os.path.join(self.__path, resource))
                 if '04_local_volume_set.yaml' in resource:
-                    # openshift local storage
-                    self.wait_for_ocp_resource_create(resource='odf',
-                                                      verify_cmd=r"""oc get pod -n openshift-local-storage -o jsonpath="{range .items[*]}{.metadata.name}{'\n'}{end}" | grep diskmaker""")
+                    # openshift local storage - diskmaker
                     self.wait_for_ocp_resource_create(resource='odf',
                                                       verify_cmd=r"""oc get pod -n openshift-local-storage -o jsonpath="{range .items[*]}{.metadata.name}{'\n'}{end}" | grep diskmaker | wc -l""",
                                                       count_disk_maker=True)
-                    # openshift persistence volume (pv)
-                    self.wait_for_ocp_resource_create(resource='odf',
-                                                      verify_cmd=r"""oc get pv -o jsonpath="{range .items[*]}{.metadata.name}{'\n'}{end}" | grep local""")
+                    # openshift persistence volume - pv
                     self.wait_for_ocp_resource_create(resource='odf',
                                                       verify_cmd=r"""oc get pv -o jsonpath="{range .items[*]}{.metadata.name}{'\n'}{end}" | grep local | wc -l""",
                                                       count_openshift_storage=True)
                 if '07_subscription.yaml' in resource:
                     # wait till get the patch
-                    self.wait_for_ocp_resource_create(resource=resource,
+                    self.wait_for_ocp_resource_create(resource='odf',
                                                       verify_cmd="oc get InstallPlan -n openshift-storage -ojsonpath={.items[0].metadata.name}",
                                                       status="install-")
                     self.apply_patch(namespace='openshift-storage', resource='odf')
                 elif '08_storage_cluster.yaml' in resource:
-                    self.wait_for_ocp_resource_create(resource='odf',
-                                                      verify_cmd=r"""oc get pod -n openshift-storage | grep osd | grep -v prepare""")
-                    self.wait_for_ocp_resource_create(resource='odf',
-                                                      verify_cmd="oc get csv -n openshift-storage -ojsonpath='{.items[0].status.phase}'",
-                                                      status='Succeeded')
+                    # Must be run after installing the storage cluster because CSVs sometimes fail
+                    self.verify_csv_installation(namespace='openshift-storage', resource='odf')
                     self.wait_for_ocp_resource_create(resource='odf',
                                                       verify_cmd='oc get pod -n openshift-storage | grep osd | grep -v prepare | wc -l',
                                                       count_openshift_storage=True)
