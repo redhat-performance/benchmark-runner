@@ -26,8 +26,8 @@ class CreateCNV(CreateOCPResourceOperations):
         logger.info('wait for cnv-nightly kubevirt-hyperconverged')
         # cnv_nightly_catalog_source.yaml already run direct through Github actions - just need to wait
         self.wait_for_ocp_resource_create(resource='cnv_nightly_catalog_source.yaml',
-                                      verify_cmd="oc get packagemanifest -l catalog=cnv-nightly-catalog-source | grep kubevirt-hyperconverged",
-                                      status="kubevirt-hyperconverged")
+                                          verify_cmd="oc get packagemanifest -l catalog=cnv-nightly-catalog-source | grep kubevirt-hyperconverged",
+                                          status="kubevirt-hyperconverged")
         starting_csv = self.__oc.run(""" oc get packagemanifest -l "catalog=cnv-nightly-catalog-source" -o jsonpath="{$.items[?(@.metadata.name=='kubevirt-hyperconverged')].status.channels[?(@.name==\\"nightly-cnv_version\\")].currentCSV}" """.replace('cnv_version', cnv_version))
         self._replace_in_file(file_path=os.path.join(self.__path, '01_operator.yaml'), old_value="@starting_csv@", new_value=starting_csv)
         for resource in self.__resource_list:
