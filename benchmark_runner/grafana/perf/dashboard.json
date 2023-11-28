@@ -136,6 +136,10 @@
                "mappings": [
                   {
                      "options": {
+                        "": {
+                           "index": 192,
+                           "text": ""
+                        },
                         "0": {
                            "index": 0,
                            "text": "fail"
