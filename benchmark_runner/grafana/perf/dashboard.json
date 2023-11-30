@@ -136,10 +136,6 @@
                "mappings": [
                   {
                      "options": {
-                        "": {
-                           "index": 192,
-                           "text": ""
-                        },
                         "0": {
                            "index": 0,
                            "text": "fail"
@@ -189,7 +185,7 @@
                            "text": "1.4.1"
                         },
                         "150": {
-                           "index": 194,
+                           "index": 193,
                            "text": "1.5.0"
                         },
                         "3025": {
@@ -801,7 +797,7 @@
                            "text": "4.14.1"
                         },
                         "4141118": {
-                           "index": 193,
+                           "index": 192,
                            "text": "4.14.1-118"
                         },
                         "414112": {
@@ -1581,72 +1577,8 @@
                            "type": "avg"
                         }
                      ],
-                     "query": "_exists_:norm_ltcy AND read_message_size:(64 OR 1024 OR 8192) AND num_threads:(1) AND test_type:rr AND norm_ltcy:<1000 AND kind:$kind  AND ocp_version:$ocp_version",
+                     "query": "_exists_:norm_ltcy AND read_message_size:(64 OR 1024 OR 8192) AND num_threads:(1 OR 8) AND test_type:rr AND norm_ltcy:<1000 AND kind:$kind AND ocp_version:$ocp_version",
                      "refId": "A",
-                     "timeField": "timestamp"
-                  },
-                  {
-                     "alias": "msg size: {{term read_message_size}} :{{term num_threads}}th: {{term kind.keyword}}",
-                     "bucketAggs": [
-                        {
-                           "field": "read_message_size",
-                           "id": "3",
-                           "settings": {
-                              "min_doc_count": "1",
-                              "order": "asc",
-                              "orderBy": "_term",
-                              "size": "10"
-                           },
-                           "type": "terms"
-                        },
-                        {
-                           "field": "num_threads",
-                           "id": "4",
-                           "settings": {
-                              "min_doc_count": "1",
-                              "order": "asc",
-                              "orderBy": "_term",
-                              "size": "10"
-                           },
-                           "type": "terms"
-                        },
-                        {
-                           "field": "kind.keyword",
-                           "id": "5",
-                           "settings": {
-                              "min_doc_count": "1",
-                              "order": "desc",
-                              "orderBy": "_term",
-                              "size": "10"
-                           },
-                           "type": "terms"
-                        },
-                        {
-                           "field": "timestamp",
-                           "id": "2",
-                           "settings": {
-                              "interval": "auto"
-                           },
-                           "type": "date_histogram"
-                        }
-                     ],
-                     "datasource": {
-                        "type": "elasticsearch",
-                        "uid": "cd4b9568-576c-4528-b200-89b91a098410"
-                     },
-                     "hide": false,
-                     "metrics": [
-                        {
-                           "field": "norm_ltcy",
-                           "id": "1",
-                           "settings": {
-                              "script": "_value*8"
-                           },
-                           "type": "avg"
-                        }
-                     ],
-                     "query": "_exists_:norm_ltcy AND read_message_size:(64 OR 1024 OR 8192) AND num_threads:(8) AND test_type:rr AND norm_ltcy:<1000 AND kind:$kind  AND ocp_version:$ocp_version",
-                     "refId": "B",
                      "timeField": "timestamp"
                   }
                ],
@@ -1781,7 +1713,7 @@
                            "type": "avg"
                         }
                      ],
-                     "query": "_exists_:norm_ops AND read_message_size:(64 OR 1024 OR 8192) AND num_threads:(1 OR 8) AND test_type:stream AND kind:$kind  AND ocp_version:$ocp_version",
+                     "query": "_exists_:norm_ops AND read_message_size:(64 OR 1024 OR 8192) AND num_threads:(1 OR 8) AND test_type:stream AND kind:$kind AND ocp_version:$ocp_version",
                      "refId": "A",
                      "timeField": "timestamp"
                   }
