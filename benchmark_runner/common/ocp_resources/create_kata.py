@@ -65,12 +65,8 @@ class CreateKata(CreateOCPResourceOperations):
                     raise KataInstallationFailed('Failed to apply kataconfig resource')
                 # Next, we have to wait for the kata bits to actually install
                 self.wait_for_ocp_resource_create(resource='kata',
-                                                  verify_cmd="oc get kataconfig -ojsonpath='{.items[0].status.installationStatus.IsInProgress}'",
+                                                  verify_cmd="""oc get kataconfig -ojsonpath='{.items[0].status.conditions[?(@.type == "InProgress")].status}'""",
                                                   status='False')
-                total_nodes_count = self.__oc.run(cmd="oc get kataconfig -ojsonpath='{.items[0].status.totalNodesCount}'")
-                completed_nodes_count = self.__oc.run(cmd="oc get kataconfig -ojsonpath='{.items[0].status.installationStatus.completed.completedNodesCount}'")
-                if total_nodes_count != completed_nodes_count:
-                    raise KataInstallationFailed(f'not all nodes installed successfully total {total_nodes_count} != completed {completed_nodes_count}')
             elif resource.endswith('.sh'):
                 self.__oc.run(cmd=f'chmod +x {os.path.join(self.__path, resource)}; {os.path.join(self.__path, resource)}')
         return True
