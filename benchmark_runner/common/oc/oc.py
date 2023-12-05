@@ -53,7 +53,7 @@ class OC(SSH):
         This method returns cnv version
         :return:
         """
-        return self.run(f"{self.__cli} get csv -n openshift-cnv $(oc get csv -n openshift-cnv --no-headers | awk '{{ print $1; }}') -ojsonpath='{{.spec.version}}'")
+        return self.run(f"{self.__cli} get csv -n openshift-cnv $({self.__cli} get csv -n openshift-cnv --no-headers | awk '{{ print $1; }}') -ojsonpath='{{.spec.version}}'")
 
     def get_odf_version(self):
         """
@@ -67,7 +67,7 @@ class OC(SSH):
         The method removes lso path on each node
         @return:
         """
-        self.run(fr"""{self.__cli} get nodes -l node-role.kubernetes.io/worker= -o jsonpath="{{range .items[*]}}{{.metadata.name}}{{'\\n'}}{{end}}" |  xargs -I{{}} oc debug node/{{}} -- chroot /host sh -c "rm -rf /mnt/local-storage/local-sc" """)
+        self.run(fr"""{self.__cli} get nodes -l node-role.kubernetes.io/worker= -o jsonpath="{{range .items[*]}}{{.metadata.name}}{{'\\n'}}{{end}}" |  xargs -I{{}} {self.__cli} debug node/{{}} -- chroot /host sh -c "rm -rf /mnt/local-storage/local-sc" """)
 
     def get_worker_disk_ids(self):
         """
@@ -171,14 +171,14 @@ class OC(SSH):
         @param thread_pool_size:
         @return:
         """
-        self.run(fr"""{self.__cli} get nodes -l node-role.kubernetes.io/worker= -o jsonpath="{{range .items[*]}}{{.metadata.name}}{{'\\n'}}{{end}}" |  xargs -I{{}} oc debug node/{{}} -- chroot /host sh -c "mkdir -p /etc/kata-containers; cp /usr/share/kata-containers/defaults/configuration.toml /etc/kata-containers/; sed -i 's/thread-pool-size=1/thread-pool-size={thread_pool_size}/' /etc/kata-containers/configuration.toml" """)
+        self.run(fr"""{self.__cli} get nodes -l node-role.kubernetes.io/worker= -o jsonpath="{{range .items[*]}}{{.metadata.name}}{{'\\n'}}{{end}}" |  xargs -I{{}} {self.__cli} debug node/{{}} -- chroot /host sh -c "mkdir -p /etc/kata-containers; cp /usr/share/kata-containers/defaults/configuration.toml /etc/kata-containers/; sed -i 's/thread-pool-size=1/thread-pool-size={thread_pool_size}/' /etc/kata-containers/configuration.toml" """)
 
     def delete_kata_threads_pool(self):
         """
         This method deletes kata thread-pool-size from every worker node
         @return:
         """
-        self.run(fr"""{self.__cli} get nodes -l node-role.kubernetes.io/worker= -o jsonpath="{{range .items[*]}}{{.metadata.name}}{{'\\n'}}{{end}}" |  xargs -I{{}} oc debug node/{{}} -- chroot /host sh -c "rm -f /etc/kata-containers/configuration.toml" """)
+        self.run(fr"""{self.__cli} get nodes -l node-role.kubernetes.io/worker= -o jsonpath="{{range .items[*]}}{{.metadata.name}}{{'\\n'}}{{end}}" |  xargs -I{{}} {self.__cli} debug node/{{}} -- chroot /host sh -c "rm -f /etc/kata-containers/configuration.toml" """)
 
     @typechecked
     def populate_additional_template_variables(self, env: dict):
@@ -250,10 +250,10 @@ class OC(SSH):
         :return: True ODF passed, False failed
         """
         self.run(
-            f"oc patch storagecluster ocs-storagecluster -n {namespace} --type json --patch '[{{ \"op\": \"replace\", \"path\": \"/spec/enableCephTools\", \"value\": true }}]'")
+            f"{self.__cli} patch storagecluster ocs-storagecluster -n {namespace} --type json --patch '[{{ \"op\": \"replace\", \"path\": \"/spec/enableCephTools\", \"value\": true }}]'")
         self.wait_for_patch(pod_name='rook-ceph-tools', label='app=rook-ceph-tools', label_uuid=False, namespace=namespace)
         health_check = self.run(
-            f"oc -n {namespace} rsh {self._get_pod_name(pod_name='rook-ceph-tools', namespace=namespace)} ceph health")
+            f"{self.__cli} -n {namespace} rsh {self._get_pod_name(pod_name='rook-ceph-tools', namespace=namespace)} ceph health")
         return 'HEALTH_OK' == health_check.strip()
 
     def get_odf_disk_count(self):
@@ -269,7 +269,7 @@ class OC(SSH):
         This method checks if kata operator is installed
         :return:
         """
-        verify_cmd = "oc get csv -n openshift-sandboxed-containers-operator -ojsonpath='{.items[0].status.phase}'"
+        verify_cmd = f"{self.__cli} get csv -n openshift-sandboxed-containers-operator -ojsonpath='{{.items[0].status.phase}}'"
         if 'Succeeded' in self.run(verify_cmd):
             return True
         return False
