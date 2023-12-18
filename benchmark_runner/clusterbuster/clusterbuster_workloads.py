@@ -94,13 +94,10 @@ class ClusterBusterWorkloads(WorkloadsOperations):
         :return:
         """
         # release pass uuid and workload
-        # WORKAROUND 20230615: --threadpoolsize causes failures in 4.13 due to Rust
-        # virtiofsd rejecting superseding arguments on the commandline, so we need
-        # to ensure that we suppress that for now.
         if self._run_type == 'release':
-            self.__ssh.run(cmd=f'{self.__clusterbuster_path} --run_type={self._run_type} --client-pin-node={self._pin_node1} --server-pin-node={self._pin_node2} --sync-pin-node={self._pin_node2} --force-cleanup-i-know-this-is-dangerous=600 --basename={self.__namespace} --artifactdir={self.__artifactdir} --analyze={self.__result_report} --uuid={self.__clusterbuster_uuid} {self.__clusterbuster_workload} > {self.__clusterbuster_log} --virtiofsd-threadpoolsize=0 2>&1')
+            self.__ssh.run(cmd=f'{self.__clusterbuster_path} --run_type={self._run_type} --client-pin-node={self._pin_node1} --server-pin-node={self._pin_node2} --sync-pin-node={self._pin_node2} --force-cleanup-i-know-this-is-dangerous=600 --basename={self.__namespace} --artifactdir={self.__artifactdir} --analyze={self.__result_report} --uuid={self.__clusterbuster_uuid} {self.__clusterbuster_workload} > {self.__clusterbuster_log} 2>&1')
         else:
-            self.__ssh.run(cmd=f'{self.__clusterbuster_path} --run_type={self._run_type} --client-pin-node={self._pin_node1} --server-pin-node={self._pin_node2} --sync-pin-node={self._pin_node2} --force-cleanup-i-know-this-is-dangerous=600 --basename={self.__namespace} --artifactdir={self.__artifactdir} --analyze={self.__result_report} > {self.__clusterbuster_log} --virtiofsd-threadpoolsize=0 2>&1')
+            self.__ssh.run(cmd=f'{self.__clusterbuster_path} --run_type={self._run_type} --client-pin-node={self._pin_node1} --server-pin-node={self._pin_node2} --sync-pin-node={self._pin_node2} --force-cleanup-i-know-this-is-dangerous=600 --basename={self.__namespace} --artifactdir={self.__artifactdir} --analyze={self.__result_report} > {self.__clusterbuster_log} 2>&1')
         # Check that Result file exist and not empty
         if os.path.exists(os.path.join(self.__result_report)) and not os.stat(self.__result_report).st_size == 0:
             self.__ssh.run(cmd=f'cp {self.__result_report} {self._run_artifacts_path}')
