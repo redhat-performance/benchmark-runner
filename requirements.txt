@@ -11,7 +11,7 @@ myst-parser==0.17.0
 openshift-client==1.0.17
 prometheus-api-client==0.5.1
 pandas
-paramiko==3.0.0
+paramiko==3.4.0
 PyGitHub==1.55
 PyYAML==6.0
 sphinx==4.5.0
