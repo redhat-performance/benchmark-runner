@@ -258,9 +258,9 @@ class ElasticSearchOperations:
 
     @typechecked()
     @logger_time_stamp
-    def get_index_ids_between_dates(self, index: str, start_datetime: datetime = None, end_datetime: datetime = None):
+    def get_index_data_between_dates(self, index: str, start_datetime: datetime = None, end_datetime: datetime = None):
         """
-        This method returns list of index ids between dates
+        This method returns list of index data between dates
         @param index:
         @param start_datetime:
         @param end_datetime:
@@ -281,10 +281,23 @@ class ElasticSearchOperations:
                     es_data.extend(response.get('hits').get('hits'))
                 else:
                     break
-            ids = [hit["_id"] for hit in es_data]
-            return ids
+            return es_data
         else:
             raise Exception('Empty parameters: index/ start_datetime/ end_datetime')
+
+    @typechecked()
+    @logger_time_stamp
+    def get_index_ids_between_dates(self, index: str, start_datetime: datetime = None, end_datetime: datetime = None):
+        """
+        This method returns list of index ids between dates
+        @param index:
+        @param start_datetime:
+        @param end_datetime:
+        @return: list of ids
+        """
+        es_data = self.get_index_data_between_dates(index=index, start_datetime=start_datetime, end_datetime=end_datetime)
+        ids = [hit["_id"] for hit in es_data]
+        return ids
 
     @typechecked()
     @logger_time_stamp
