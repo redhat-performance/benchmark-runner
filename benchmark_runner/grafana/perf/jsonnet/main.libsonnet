@@ -488,7 +488,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
             + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTargetBlank(true)
               + stateTimeline.link.withTitle('artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=37')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=39')
 
             ])
 
@@ -608,7 +608,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
             + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTargetBlank(true)
               + stateTimeline.link.withTitle('artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=37')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=39')
 
             ])
 
@@ -746,7 +746,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
             + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTargetBlank(true)
               + stateTimeline.link.withTitle('artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=38')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=40')
 
             ])
 
@@ -860,7 +860,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
             + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTitle('artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=38')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=40')
 
             ])
 
@@ -972,7 +972,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
             + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTitle('artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=38')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=40')
 
             ])
 
@@ -1089,10 +1089,10 @@ g.dashboard.new('PerfCI-Regression-Summary')
             + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTargetBlank(true)
               + stateTimeline.link.withTitle('artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=39'),
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=41'),
 
               stateTimeline.link.withTitle('scale artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=40')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=42')
 
             ])
 
@@ -1358,10 +1358,10 @@ g.dashboard.new('PerfCI-Regression-Summary')
             + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTargetBlank(true)
               + stateTimeline.link.withTitle('artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=39'),
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=41'),
 
               stateTimeline.link.withTitle('scale artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=40')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=42')
 
             ])
 
@@ -1616,10 +1616,10 @@ g.dashboard.new('PerfCI-Regression-Summary')
             + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTargetBlank(true)
               + stateTimeline.link.withTitle('artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=39'),
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=41'),
 
               stateTimeline.link.withTitle('scale artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=40')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=42')
 
             ])
 
@@ -1792,7 +1792,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
             + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTitle('artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=41')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=43')
 
             ])
 
@@ -2004,7 +2004,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
             + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTitle('artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=41')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=43')
 
             ])
 
@@ -2186,7 +2186,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
             + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTitle('artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=41')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=43')
 
             ])
 
@@ -2477,7 +2477,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
             + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTitle('artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=41')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=43')
 
             ])
             + stateTimeline.options.withAlignValue('center')
@@ -2946,7 +2946,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
             + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTitle('artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=41')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=43')
 
             ])
             + stateTimeline.options.withAlignValue('left')
@@ -3400,7 +3400,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
             + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTitle('artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=41')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=43')
 
             ])
             + stateTimeline.options.withAlignValue('left')
@@ -3603,7 +3603,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
             + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTitle('artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=41')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=43')
 
             ])
             + stateTimeline.options.withAlignValue('left')
@@ -3825,7 +3825,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
             + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTitle('artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=42')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=44')
 
             ])
 
@@ -4221,7 +4221,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
             + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTitle('artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=42')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=44')
 
             ])
 
@@ -4653,7 +4653,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
             + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTitle('artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=42')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=44')
 
             ])
 
@@ -4773,7 +4773,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
             + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTitle('artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=42')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=44')
 
             ])
 
@@ -4922,7 +4922,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
             + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTargetBlank(true)
               + stateTimeline.link.withTitle('artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=43')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=45')
 
             ])
 
@@ -4939,14 +4939,6 @@ g.dashboard.new('PerfCI-Regression-Summary')
               elasticsearch.withAlias('Min')
 
               + elasticsearch.withBucketAggs([
-                elasticsearch.bucketAggs.Terms.withField('scale')
-                + elasticsearch.bucketAggs.Terms.withId('3')
-                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
-                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
-                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
-                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
-                + elasticsearch.bucketAggs.Terms.withType('terms'),
-
                 elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
                 + elasticsearch.bucketAggs.DateHistogram.withId('2')
                 + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
@@ -4974,14 +4966,6 @@ g.dashboard.new('PerfCI-Regression-Summary')
               elasticsearch.withAlias('')
 
               + elasticsearch.withBucketAggs([
-                elasticsearch.bucketAggs.Terms.withField('scale')
-                + elasticsearch.bucketAggs.Terms.withId('3')
-                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
-                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
-                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
-                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
-                + elasticsearch.bucketAggs.Terms.withType('terms'),
-
                 elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
                 + elasticsearch.bucketAggs.DateHistogram.withId('2')
                 + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
@@ -5010,14 +4994,6 @@ g.dashboard.new('PerfCI-Regression-Summary')
               elasticsearch.withAlias('Max')
 
               + elasticsearch.withBucketAggs([
-                elasticsearch.bucketAggs.Terms.withField('scale')
-                + elasticsearch.bucketAggs.Terms.withId('3')
-                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
-                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
-                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
-                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
-                + elasticsearch.bucketAggs.Terms.withType('terms'),
-
                 elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
                 + elasticsearch.bucketAggs.DateHistogram.withId('2')
                 + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
@@ -5038,6 +5014,34 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
               + elasticsearch.withQuery('scale:240 AND ocp_version:$ocp_version')
               + elasticsearch.withRefId('C')
+              + elasticsearch.withTimeField('timestamp'),
+
+              ////
+
+
+              elasticsearch.withAlias('{{field}} (min.)')
+
+              + elasticsearch.withBucketAggs([
+                elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
+                + elasticsearch.bucketAggs.DateHistogram.withId('2')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
+                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+
+
+              ])
+
+              + elasticsearch.withHide(false)
+
+              + elasticsearch.withMetrics([
+                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('total_run_time')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('1')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.settings.withScript('_value/1000/60')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max')
+
+              ])
+
+              + elasticsearch.withQuery('scale:240 AND ocp_version:$ocp_version')
+              + elasticsearch.withRefId('D')
               + elasticsearch.withTimeField('timestamp'),
 
               ////
@@ -5099,7 +5103,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
             + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTargetBlank(true)
               + stateTimeline.link.withTitle('artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=43')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=45')
 
             ])
 
@@ -5116,14 +5120,6 @@ g.dashboard.new('PerfCI-Regression-Summary')
               elasticsearch.withAlias('VMs #: Fedora')
 
               + elasticsearch.withBucketAggs([
-                elasticsearch.bucketAggs.Terms.withField('scale')
-                + elasticsearch.bucketAggs.Terms.withId('3')
-                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
-                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
-                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
-                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
-                + elasticsearch.bucketAggs.Terms.withType('terms'),
-
                 elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
                 + elasticsearch.bucketAggs.DateHistogram.withId('2')
                 + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
@@ -5205,7 +5201,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
             + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTargetBlank(true)
               + stateTimeline.link.withTitle('artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=43')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=45')
 
             ])
 
@@ -5222,19 +5218,10 @@ g.dashboard.new('PerfCI-Regression-Summary')
               elasticsearch.withAlias('{{field}} [GB]')
 
               + elasticsearch.withBucketAggs([
-                elasticsearch.bucketAggs.Terms.withField('scale')
-                + elasticsearch.bucketAggs.Terms.withId('3')
-                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
-                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
-                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
-                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
-                + elasticsearch.bucketAggs.Terms.withType('terms'),
-
                 elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
                 + elasticsearch.bucketAggs.DateHistogram.withId('2')
                 + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
                 + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
-
 
               ])
 
@@ -5263,9 +5250,9 @@ g.dashboard.new('PerfCI-Regression-Summary')
             ////////////////////////
 
 
-            g.panel.stateTimeline.new('120 Windows VMs virtio (Sec)')
+            g.panel.stateTimeline.new('111 Windows VMs virtio (Sec)')
             + stateTimeline.queryOptions.withDatasource('Elasticsearch-windows-results')
-            + g.panel.stateTimeline.withDescription('Time till VM Login - Lower is better')
+            + g.panel.stateTimeline.withDescription('Time till VM Login - Lower is better [changed to 111 vms in 01/07/2024]')
 
             + stateTimeline.standardOptions.color.withMode('thresholds')
             + stateTimeline.fieldConfig.defaults.custom.withFillOpacity(77)
@@ -5317,7 +5304,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
             + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTargetBlank(true)
               + stateTimeline.link.withTitle('artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=44')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=46')
 
             ])
 
@@ -5334,14 +5321,6 @@ g.dashboard.new('PerfCI-Regression-Summary')
               elasticsearch.withAlias('Min: {{term vm_os_version.keyword}}')
 
               + elasticsearch.withBucketAggs([
-                elasticsearch.bucketAggs.Terms.withField('scale')
-                + elasticsearch.bucketAggs.Terms.withId('3')
-                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
-                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
-                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
-                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
-                + elasticsearch.bucketAggs.Terms.withType('terms'),
-
                 elasticsearch.bucketAggs.Terms.withField('vm_os_version.keyword')
                 + elasticsearch.bucketAggs.Terms.withId('4')
                 + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
@@ -5368,7 +5347,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
               ])
 
-              + elasticsearch.withQuery('scale:120 AND ocp_version:$ocp_version')
+              + elasticsearch.withQuery('scale:(111 OR 120) AND ocp_version:$ocp_version')
               + elasticsearch.withRefId('A')
               + elasticsearch.withTimeField('timestamp'),
 
@@ -5377,14 +5356,6 @@ g.dashboard.new('PerfCI-Regression-Summary')
               elasticsearch.withAlias('')
 
               + elasticsearch.withBucketAggs([
-                elasticsearch.bucketAggs.Terms.withField('scale')
-                + elasticsearch.bucketAggs.Terms.withId('3')
-                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
-                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
-                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
-                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
-                + elasticsearch.bucketAggs.Terms.withType('terms'),
-
                 elasticsearch.bucketAggs.Terms.withField('vm_os_version.keyword')
                 + elasticsearch.bucketAggs.Terms.withId('4')
                 + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
@@ -5412,7 +5383,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
               ])
 
-              + elasticsearch.withQuery('scale:120 AND ocp_version:$ocp_version')
+              + elasticsearch.withQuery('scale:(111 OR 120) AND ocp_version:$ocp_version')
               + elasticsearch.withRefId('B')
               + elasticsearch.withTimeField('timestamp'),
 
@@ -5421,14 +5392,6 @@ g.dashboard.new('PerfCI-Regression-Summary')
               elasticsearch.withAlias('Max: {{term vm_os_version.keyword}}')
 
               + elasticsearch.withBucketAggs([
-                elasticsearch.bucketAggs.Terms.withField('scale')
-                + elasticsearch.bucketAggs.Terms.withId('3')
-                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
-                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
-                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
-                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
-                + elasticsearch.bucketAggs.Terms.withType('terms'),
-
                 elasticsearch.bucketAggs.Terms.withField('vm_os_version.keyword')
                 + elasticsearch.bucketAggs.Terms.withId('4')
                 + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
@@ -5455,7 +5418,43 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
               ])
 
-              + elasticsearch.withQuery('scale:120 AND ocp_version:$ocp_version')
+              + elasticsearch.withQuery('scale:(111 OR 120) AND ocp_version:$ocp_version')
+              + elasticsearch.withRefId('C')
+              + elasticsearch.withTimeField('timestamp'),
+
+              ////
+
+
+              elasticsearch.withAlias('{{field}} {{term vm_os_version.keyword}} (min.)')
+
+              + elasticsearch.withBucketAggs([
+                elasticsearch.bucketAggs.Terms.withField('vm_os_version.keyword')
+                + elasticsearch.bucketAggs.Terms.withId('4')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
+                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
+                + elasticsearch.bucketAggs.Terms.withType('terms'),
+
+                elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
+                + elasticsearch.bucketAggs.DateHistogram.withId('2')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
+                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+
+
+              ])
+
+              + elasticsearch.withHide(false)
+
+              + elasticsearch.withMetrics([
+                elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('total_run_time')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('1')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.settings.withScript('_value/1000/60')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max')
+
+              ])
+
+              + elasticsearch.withQuery('scale:(111 OR 120) AND ocp_version:$ocp_version')
               + elasticsearch.withRefId('C')
               + elasticsearch.withTimeField('timestamp'),
 
@@ -5520,7 +5519,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
             + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTargetBlank(true)
               + stateTimeline.link.withTitle('artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=44')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=46')
 
             ])
 
@@ -5537,14 +5536,6 @@ g.dashboard.new('PerfCI-Regression-Summary')
               elasticsearch.withAlias('VMs #: {{term vm_os_version.keyword}}')
 
               + elasticsearch.withBucketAggs([
-                elasticsearch.bucketAggs.Terms.withField('scale')
-                + elasticsearch.bucketAggs.Terms.withId('3')
-                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
-                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
-                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
-                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
-                + elasticsearch.bucketAggs.Terms.withType('terms'),
-
                 elasticsearch.bucketAggs.Terms.withField('vm_os_version.keyword')
                 + elasticsearch.bucketAggs.Terms.withId('4')
                 + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
@@ -5569,7 +5560,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
               ])
 
-              + elasticsearch.withQuery('scale:120 AND ocp_version:$ocp_version')
+              + elasticsearch.withQuery('scale:(111 OR 120) AND ocp_version:$ocp_version')
               + elasticsearch.withRefId('A')
               + elasticsearch.withTimeField('timestamp')
 
@@ -5634,7 +5625,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
             + stateTimeline.panelOptions.withLinks([
               stateTimeline.link.withTargetBlank(true)
               + stateTimeline.link.withTitle('artifacts link')
-              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=44')
+              + stateTimeline.link.withUrl('https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=46')
 
             ])
 
@@ -5653,14 +5644,6 @@ g.dashboard.new('PerfCI-Regression-Summary')
               elasticsearch.withAlias('{{field}} [GB]: {{term vm_os_version.keyword}}')
 
               + elasticsearch.withBucketAggs([
-                elasticsearch.bucketAggs.Terms.withField('scale')
-                + elasticsearch.bucketAggs.Terms.withId('3')
-                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
-                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
-                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
-                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
-                + elasticsearch.bucketAggs.Terms.withType('terms'),
-
                 elasticsearch.bucketAggs.Terms.withField('vm_os_version.keyword')
                 + elasticsearch.bucketAggs.Terms.withId('4')
                 + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
@@ -5692,7 +5675,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
               ])
 
-              + elasticsearch.withQuery('scale:120 AND ocp_version:$ocp_version')
+              + elasticsearch.withQuery('scale:(111 OR 120) AND ocp_version:$ocp_version')
               + elasticsearch.withRefId('A')
               + elasticsearch.withTimeField('timestamp'),
 
@@ -6825,7 +6808,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
 
               ])
-              + elasticsearch.withQuery("scale:120")
+              + elasticsearch.withQuery("scale:(111 OR 120)")
               + elasticsearch.withRefId('A')
               + elasticsearch.withTimeField('timestamp')
             ])

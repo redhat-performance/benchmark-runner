@@ -181,7 +181,7 @@ jobs:
         TIMEOUT: 8000
         SCALE: 2
         BOOTSTORM_SCALE: 80
-        WINDOWS_SCALE: 40
+        WINDOWS_SCALE: 37
         THREADS_LIMIT: 20
         RUN_TYPE: 'perf_ci'
         ENABLE_PROMETHEUS_SNAPSHOT: 'True'

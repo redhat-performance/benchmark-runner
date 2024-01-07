@@ -22,14 +22,6 @@ spec:
         kubevirt.io/vm: windows-{{ kind }}-{{ trunc_uuid }}
         {%- endif %}
     spec:
-      {%- if pin_node1 or scale_node %}
-      nodeSelector:
-        {% if scale -%}
-        kubernetes.io/hostname: {{ scale_node }}
-        {%- else -%}
-        kubernetes.io/hostname: {{ pin_node1 }}
-        {%- endif %}
-      {%- endif %}
       terminationGracePeriodSeconds: 0
       evictionStrategy: LiveMigrate
       domain:
@@ -117,11 +109,6 @@ spec:
   - metadata:
       annotations:
         descheduler.alpha.kubernetes.io/evict: "true"
-        {% if scale -%}
-        kubevirt.io/provisionOnNode: {{ scale_node }}
-        {%- else -%}
-        kubevirt.io/provisionOnNode: {{ pin_node1 }}
-        {%- endif %}
       {% if scale -%}
       name: windows-{{ kind }}-root-disk-{{ trunc_uuid }}-{{ scale }}
       {%- else -%}
