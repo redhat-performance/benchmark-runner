@@ -1260,7 +1260,7 @@
                   {
                      "targetBlank": true,
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=37"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=39"
                   }
                ],
                "options": {
@@ -1405,7 +1405,7 @@
                   {
                      "targetBlank": true,
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=37"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=39"
                   }
                ],
                "options": {
@@ -1551,7 +1551,7 @@
                   {
                      "targetBlank": true,
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=38"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=40"
                   }
                ],
                "options": {
@@ -1689,7 +1689,7 @@
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=38"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=40"
                   }
                ],
                "options": {
@@ -1825,7 +1825,7 @@
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=38"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=40"
                   }
                ],
                "options": {
@@ -1950,11 +1950,11 @@
                   {
                      "targetBlank": true,
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=39"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=41"
                   },
                   {
                      "title": "scale artifacts link",
-                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=40"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=42"
                   }
                ],
                "options": {
@@ -2248,11 +2248,11 @@
                   {
                      "targetBlank": true,
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=39"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=41"
                   },
                   {
                      "title": "scale artifacts link",
-                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=40"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=42"
                   }
                ],
                "options": {
@@ -2546,11 +2546,11 @@
                   {
                      "targetBlank": true,
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=39"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=41"
                   },
                   {
                      "title": "scale artifacts link",
-                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=40"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=42"
                   }
                ],
                "options": {
@@ -2747,7 +2747,7 @@
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=41"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=43"
                   }
                ],
                "options": {
@@ -2981,7 +2981,7 @@
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=41"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=43"
                   }
                ],
                "options": {
@@ -3182,7 +3182,7 @@
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=41"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=43"
                   }
                ],
                "options": {
@@ -3483,7 +3483,7 @@
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=41"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=43"
                   }
                ],
                "options": {
@@ -3989,7 +3989,7 @@
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=41"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=43"
                   }
                ],
                "options": {
@@ -4469,7 +4469,7 @@
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=41"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=43"
                   }
                ],
                "options": {
@@ -4696,7 +4696,7 @@
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=41"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=43"
                   }
                ],
                "options": {
@@ -4936,7 +4936,7 @@
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=42"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=44"
                   }
                ],
                "options": {
@@ -5337,7 +5337,7 @@
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=42"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=44"
                   }
                ],
                "options": {
@@ -5733,7 +5733,7 @@
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=42"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=44"
                   }
                ],
                "options": {
@@ -5859,7 +5859,7 @@
                "links": [
                   {
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=42"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=44"
                   }
                ],
                "options": {
@@ -6020,7 +6020,7 @@
                   {
                      "targetBlank": true,
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=43"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=45"
                   }
                ],
                "options": {
@@ -6041,17 +6041,6 @@
                   {
                      "alias": "Min",
                      "bucketAggs": [
-                        {
-                           "field": "scale",
-                           "id": "3",
-                           "settings": {
-                              "min_doc_count": "1",
-                              "order": "desc",
-                              "orderBy": "_term",
-                              "size": "10"
-                           },
-                           "type": "terms"
-                        },
                         {
                            "field": "timestamp",
                            "id": "2",
@@ -6079,17 +6068,6 @@
                   {
                      "alias": "",
                      "bucketAggs": [
-                        {
-                           "field": "scale",
-                           "id": "3",
-                           "settings": {
-                              "min_doc_count": "1",
-                              "order": "desc",
-                              "orderBy": "_term",
-                              "size": "10"
-                           },
-                           "type": "terms"
-                        },
                         {
                            "field": "timestamp",
                            "id": "2",
@@ -6122,17 +6100,6 @@
                      "alias": "Max",
                      "bucketAggs": [
                         {
-                           "field": "scale",
-                           "id": "3",
-                           "settings": {
-                              "min_doc_count": "1",
-                              "order": "desc",
-                              "orderBy": "_term",
-                              "size": "10"
-                           },
-                           "type": "terms"
-                        },
-                        {
                            "field": "timestamp",
                            "id": "2",
                            "settings": {
@@ -6154,6 +6121,33 @@
                      ],
                      "query": "scale:240 AND ocp_version:$ocp_version",
                      "refId": "C",
+                     "timeField": "timestamp"
+                  },
+                  {
+                     "alias": "{{field}} (min.)",
+                     "bucketAggs": [
+                        {
+                           "field": "timestamp",
+                           "id": "2",
+                           "settings": {
+                              "interval": "auto"
+                           },
+                           "type": "date_histogram"
+                        }
+                     ],
+                     "hide": false,
+                     "metrics": [
+                        {
+                           "field": "total_run_time",
+                           "id": "1",
+                           "settings": {
+                              "script": "_value/1000/60"
+                           },
+                           "type": "max"
+                        }
+                     ],
+                     "query": "scale:240 AND ocp_version:$ocp_version",
+                     "refId": "D",
                      "timeField": "timestamp"
                   }
                ],
@@ -6226,7 +6220,7 @@
                   {
                      "targetBlank": true,
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=43"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=45"
                   }
                ],
                "options": {
@@ -6247,17 +6241,6 @@
                   {
                      "alias": "VMs #: Fedora",
                      "bucketAggs": [
-                        {
-                           "field": "scale",
-                           "id": "3",
-                           "settings": {
-                              "min_doc_count": "1",
-                              "order": "desc",
-                              "orderBy": "_term",
-                              "size": "10"
-                           },
-                           "type": "terms"
-                        },
                         {
                            "field": "timestamp",
                            "id": "2",
@@ -6348,7 +6331,7 @@
                   {
                      "targetBlank": true,
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=43"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=45"
                   }
                ],
                "options": {
@@ -6369,17 +6352,6 @@
                   {
                      "alias": "{{field}} [GB]",
                      "bucketAggs": [
-                        {
-                           "field": "scale",
-                           "id": "3",
-                           "settings": {
-                              "min_doc_count": "1",
-                              "order": "desc",
-                              "orderBy": "_term",
-                              "size": "10"
-                           },
-                           "type": "terms"
-                        },
                         {
                            "field": "timestamp",
                            "id": "2",
@@ -6418,7 +6390,7 @@
             },
             {
                "datasource": "Elasticsearch-windows-results",
-               "description": "Time till VM Login - Lower is better",
+               "description": "Time till VM Login - Lower is better [changed to 111 vms in 01/07/2024]",
                "fieldConfig": {
                   "defaults": {
                      "color": {
@@ -6482,7 +6454,7 @@
                   {
                      "targetBlank": true,
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=44"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=46"
                   }
                ],
                "options": {
@@ -6503,17 +6475,6 @@
                   {
                      "alias": "Min: {{term vm_os_version.keyword}}",
                      "bucketAggs": [
-                        {
-                           "field": "scale",
-                           "id": "3",
-                           "settings": {
-                              "min_doc_count": "1",
-                              "order": "desc",
-                              "orderBy": "_term",
-                              "size": "10"
-                           },
-                           "type": "terms"
-                        },
                         {
                            "field": "vm_os_version.keyword",
                            "id": "4",
@@ -6545,24 +6506,13 @@
                            "type": "min"
                         }
                      ],
-                     "query": "scale:120 AND ocp_version:$ocp_version",
+                     "query": "scale:(111 OR 120) AND ocp_version:$ocp_version",
                      "refId": "A",
                      "timeField": "timestamp"
                   },
                   {
                      "alias": "",
                      "bucketAggs": [
-                        {
-                           "field": "scale",
-                           "id": "3",
-                           "settings": {
-                              "min_doc_count": "1",
-                              "order": "desc",
-                              "orderBy": "_term",
-                              "size": "10"
-                           },
-                           "type": "terms"
-                        },
                         {
                            "field": "vm_os_version.keyword",
                            "id": "4",
@@ -6598,24 +6548,13 @@
                            "type": "percentiles"
                         }
                      ],
-                     "query": "scale:120 AND ocp_version:$ocp_version",
+                     "query": "scale:(111 OR 120) AND ocp_version:$ocp_version",
                      "refId": "B",
                      "timeField": "timestamp"
                   },
                   {
                      "alias": "Max: {{term vm_os_version.keyword}}",
                      "bucketAggs": [
-                        {
-                           "field": "scale",
-                           "id": "3",
-                           "settings": {
-                              "min_doc_count": "1",
-                              "order": "desc",
-                              "orderBy": "_term",
-                              "size": "10"
-                           },
-                           "type": "terms"
-                        },
                         {
                            "field": "vm_os_version.keyword",
                            "id": "4",
@@ -6647,12 +6586,50 @@
                            "type": "max"
                         }
                      ],
-                     "query": "scale:120 AND ocp_version:$ocp_version",
+                     "query": "scale:(111 OR 120) AND ocp_version:$ocp_version",
+                     "refId": "C",
+                     "timeField": "timestamp"
+                  },
+                  {
+                     "alias": "{{field}} {{term vm_os_version.keyword}} (min.)",
+                     "bucketAggs": [
+                        {
+                           "field": "vm_os_version.keyword",
+                           "id": "4",
+                           "settings": {
+                              "min_doc_count": "1",
+                              "order": "desc",
+                              "orderBy": "_term",
+                              "size": "10"
+                           },
+                           "type": "terms"
+                        },
+                        {
+                           "field": "timestamp",
+                           "id": "2",
+                           "settings": {
+                              "interval": "auto"
+                           },
+                           "type": "date_histogram"
+                        }
+                     ],
+                     "hide": false,
+                     "metrics": [
+                        {
+                           "field": "total_run_time",
+                           "id": "1",
+                           "settings": {
+                              "script": "_value/1000/60"
+                           },
+                           "type": "max"
+                        }
+                     ],
+                     "query": "scale:(111 OR 120) AND ocp_version:$ocp_version",
                      "refId": "C",
                      "timeField": "timestamp"
                   }
                ],
-               "title": "120 Windows VMs virtio (Sec)",
+               "title": "111 Windows VMs virtio (Sec)",
                "type": "state-timeline"
             },
             {
@@ -6721,7 +6698,7 @@
                   {
                      "targetBlank": true,
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=44"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=46"
                   }
                ],
                "options": {
@@ -6742,17 +6719,6 @@
                   {
                      "alias": "VMs #: {{term vm_os_version.keyword}}",
                      "bucketAggs": [
-                        {
-                           "field": "scale",
-                           "id": "3",
-                           "settings": {
-                              "min_doc_count": "1",
-                              "order": "desc",
-                              "orderBy": "_term",
-                              "size": "10"
-                           },
-                           "type": "terms"
-                        },
                         {
                            "field": "vm_os_version.keyword",
                            "id": "4",
@@ -6780,7 +6746,7 @@
                            "type": "count"
                         }
                      ],
-                     "query": "scale:120 AND ocp_version:$ocp_version",
+                     "query": "scale:(111 OR 120) AND ocp_version:$ocp_version",
                      "refId": "A",
                      "timeField": "timestamp"
                   }
@@ -6854,7 +6820,7 @@
                   {
                      "targetBlank": true,
                      "title": "artifacts link",
-                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=44"
+                     "url": "https://grafana-perf-chmf648sh776bznl3b.ibm.rhperfscale.org/d/T4775LKnzzmichey/perfci-regression-summary?orgId=1&from=now-45d&to=now&viewPanel=46"
                   }
                ],
                "options": {
@@ -6875,17 +6841,6 @@
                   {
                      "alias": "{{field}} [GB]: {{term vm_os_version.keyword}}",
                      "bucketAggs": [
-                        {
-                           "field": "scale",
-                           "id": "3",
-                           "settings": {
-                              "min_doc_count": "1",
-                              "order": "desc",
-                              "orderBy": "_term",
-                              "size": "10"
-                           },
-                           "type": "terms"
-                        },
                         {
                            "field": "vm_os_version.keyword",
                            "id": "4",
@@ -6925,7 +6880,7 @@
                            "type": "max"
                         }
                      ],
-                     "query": "scale:120 AND ocp_version:$ocp_version",
+                     "query": "scale:(111 OR 120) AND ocp_version:$ocp_version",
                      "refId": "A",
                      "timeField": "timestamp"
                   }
@@ -8626,7 +8581,7 @@
                            "type": "avg"
                         }
                      ],
-                     "query": "scale:120",
+                     "query": "scale:(111 OR 120)",
                      "refId": "A",
                      "timeField": "timestamp"
                   }
