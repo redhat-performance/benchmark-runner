@@ -12,8 +12,6 @@ spec:
       labels:
         kubevirt.io/vm: windows-vm-deadbeef
     spec:
-      nodeSelector:
-        kubernetes.io/hostname: pin-node-1
       terminationGracePeriodSeconds: 0
       evictionStrategy: LiveMigrate
       domain:
@@ -89,7 +87,6 @@ spec:
   - metadata:
       annotations:
         descheduler.alpha.kubernetes.io/evict: "true"
-        kubevirt.io/provisionOnNode: pin-node-1
       name: windows-vm-root-disk-deadbeef
     spec:
       pvc:

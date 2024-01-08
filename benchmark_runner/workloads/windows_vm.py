@@ -30,25 +30,7 @@ class WindowsVM(BootstormVM):
             # create windows dv
             self._oc.create_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'windows_dv.yaml'))
             self._oc.wait_for_dv_status(status='Succeeded')
-            if not self._scale:
-                self._run_vm()
-            # scale
-            else:
-                # create run bulks
-                bulks = tuple(self.split_run_bulks(iterable=range(self._scale * len(self._scale_node_list)), limit=self._threads_limit))
-                # create, run and delete vms
-                for target in (self._create_vm_scale, self._run_vm_scale, self._stop_vm_scale, self._wait_for_stop_vm_scale, self._delete_vm_scale, self._wait_for_delete_vm_scale):
-                    proc = []
-                    for bulk in bulks:
-                        for vm_num in bulk:
-                            p = Process(target=target, args=(str(vm_num),))
-                            p.start()
-                            proc.append(p)
-                        for p in proc:
-                            p.join()
-                        # sleep between bulks
-                        time.sleep(self._bulk_sleep_time)
-                        proc = []
+            self.run_vm_workload()
             # delete windows dv
             self._oc.delete_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'windows_dv.yaml'))
             # delete namespace

@@ -24,14 +24,6 @@ spec:
      labels:
         kubevirt.io/vm: bootstorm
     spec:
-      {%- if pin_node1 or scale_node %}
-      nodeSelector:
-        {% if scale -%}
-        kubernetes.io/hostname: {{ scale_node }}
-        {%- else -%}
-        kubernetes.io/hostname: {{ pin_node1 }}
-        {%- endif %}
-      {%- endif %}
       domain:
         cpu:
           sockets: {{ sockets }}

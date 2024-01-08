@@ -15,8 +15,6 @@ spec:
      labels:
         kubevirt.io/vm: bootstorm
     spec:
-      nodeSelector:
-        kubernetes.io/hostname: pin-node-1
       domain:
         cpu:
           sockets: 1
