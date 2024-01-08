@@ -5570,7 +5570,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
             ]),
             ////////////////////////
 
-            g.panel.stateTimeline.new('120 Windows VM Memory')
+            g.panel.stateTimeline.new('111 Windows VM Memory')
             + stateTimeline.queryOptions.withDatasource('Elasticsearch-windows-results')
             + g.panel.stateTimeline.withDescription('Time till VM Login - Lower is better')
 
