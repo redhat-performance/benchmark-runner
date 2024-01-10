@@ -180,7 +180,7 @@ class PrometheusMetricsOperation:
             elif 'containerMemory-benchmark-runner' in query:
                 suffix = 'Memory'
             else:
-                suffix = ''
+                suffix = None
             total = 0
             max = 0
             for item in data_list:
@@ -188,7 +188,7 @@ class PrometheusMetricsOperation:
                     if float(val[1]) > max:
                         max = round(float(val[1]), 3)
                 total = total + max
-                if 'VM Memory' in query:
+                if not suffix:
                     result_dict[f'{query}'] = max
                 else:
                     result_dict[f"{item['metric']['node']}_{suffix}"] = max
