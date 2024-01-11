@@ -49,7 +49,7 @@ setup(
         'elasticsearch==7.16.1',
         'elasticsearch_dsl==7.4.0',  # for deep search
         'ipywidgets==8.0.6',  # for jupyterlab widgets
-        'jinja2==3.1.2',  # for yaml templates and df.style
+        'jinja2==3.1.3',  # for yaml templates and df.style
         'myst-parser==0.17.0',  # readthedocs
         'openshift-client==1.0.17',  # clusterbuster && prometheus metrics
         'prometheus-api-client==0.5.1',  # clusterbuster && prometheus metrics
