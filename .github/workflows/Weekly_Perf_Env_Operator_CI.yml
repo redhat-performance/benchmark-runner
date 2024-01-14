@@ -77,8 +77,8 @@ jobs:
           sudo tee -a /etc/hosts <<< "$OCP_HOSTS" > /dev/null
       - name: ☉ install ${{ matrix.resource }} Operator 
         env:
-          CNV_VERSION: "4.14"
-          ODF_VERSION: "4.13"
+          CNV_VERSION: "4.13"
+          ODF_VERSION: "4.12"
           NUM_ODF_DISK: "4"
           KATA_CSV: ""
           QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
