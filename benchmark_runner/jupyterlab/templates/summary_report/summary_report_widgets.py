@@ -14,10 +14,13 @@ class SummaryReportWidgets:
 
     FILTER_KIND = 'vm'
     FETCH_OCP_VERSIONS_DAYS = 365
-    DEFAULT_END_DATE = datetime.combine(datetime.now().date(), datetime.min.time())
+    # take 1 day extra for end time
+    DEFAULT_END_DATE = datetime.combine(datetime.now().date(), datetime.max.time())
     DEFAULT_START_DATE = datetime.combine(DEFAULT_END_DATE - timedelta(days=FETCH_OCP_VERSIONS_DAYS),
                                           datetime.min.time())
-
+    STORAGE_TYPES = {'hammerdb': 'ODF', 'hammerdb_lso': 'LSO', 'uperf': 'Ephemeral', 'vdbench': 'ODF', 'vdbench_scale': 'ODF', 'bootstorm': 'Ephemeral', 'windows': 'ODF (virtio)'}
+    NETWORK_SPEED = '25GB'
+    GRAFANA_URL = 'http://cloud-governance-stage.rdu2.scalelab.redhat.com:3000'
     compared_ocp_versions = None
 
     def __init__(self, elasticsearch: ElasticSearchOperations):
@@ -140,14 +143,16 @@ class SummaryReportWidgets:
         return self.summary_report.calc_median_geometric_mean_df(workload=workload, df=filter_df)
 
     @typechecked
-    def analyze_workload(self, workload: str):
+    def get_filtered_df(self, workload: str):
         """
-        This method analyzes workload metrics between different OpenShift versions
+        This method returns filtered dataframe between different OpenShift versions
         @return:
         """
         # Get workload filtered data
         if workload == 'hammerdb':
             filtered_df = self.get_workload_filtered_data(workload=workload, filter_field={'storage_type': 'odf'})
+        elif workload == 'hammerdb_lso':
+            filtered_df = self.get_workload_filtered_data(workload='hammerdb', filter_field={'storage_type': 'lso'})
         elif workload == 'vdbench':
             filtered_df = self.get_workload_filtered_data(workload=workload, filter_field={'scale': None})
         elif workload == 'vdbench_scale':
@@ -156,12 +161,19 @@ class SummaryReportWidgets:
         # uperf, bootstorm
         else:
             filtered_df = self.get_workload_filtered_data(workload=workload)
-        median_geometric_mean_df = self.calc_median_geometric_mean_df(workload, filtered_df)
-        median_geometric_mean_df.rename(columns={'result': self.get_two_last_major_versions()}, inplace=True)
+        return filtered_df
 
+    @typechecked
+    def analyze_workload(self, workload: str):
+        """
+        This method analyzes workload metrics between different OpenShift versions
+        @return:
+        """
+        median_geometric_mean_df = self.calc_median_geometric_mean_df(workload, self.get_filtered_df(workload))
+        median_geometric_mean_df.rename(columns={'result': self.get_two_last_major_versions()}, inplace=True)
         return median_geometric_mean_df
 
-    def analyze_all_workload(self, workloads: list = ['hammerdb', 'uperf', 'vdbench', 'vdbench_scale', 'bootstorm', 'windows']):
+    def analyze_all_workload(self, workloads: list = ['hammerdb', 'hammerdb_lso', 'uperf', 'vdbench', 'vdbench_scale', 'bootstorm', 'windows']):
         """
         This method analyzes all the workloads
         @param workloads:
@@ -170,18 +182,35 @@ class SummaryReportWidgets:
         result_df = None
         for workload in workloads:
             median_geometric_mean_df = self.analyze_workload(workload=workload)
+
+            # Add column types before comparison result
+            median_geometric_mean_df.insert(len(median_geometric_mean_df.columns) - 1, 'storage type',
+                                            median_geometric_mean_df['workload'].map(self.STORAGE_TYPES))
+
             result_df = pd.concat([result_df, median_geometric_mean_df], ignore_index=True)
+        # change workloads names
+        result_df.loc[result_df['workload'] == 'hammerdb_lso', 'workload'] = 'hammerdb'
+        result_df.loc[result_df['workload'] == 'windows', 'workload'] = 'bootstorm'
+
         return result_df
 
     @staticmethod
-    def color_negative_red(val):
+    def color_percentage_values(val):
         """
-        This method defines a function for coloring negative values red and positive values green
+        This method defines a function for coloring percentage values
         @param val:
         @return:
         """
         if pd.notna(val) and isinstance(val, (int, float)):
-            color = 'red' if val < 0 else 'green'
+            if val < -50:
+                color = 'red'
+            elif val < -10:
+                color = 'orange'
+            elif val < 0:
+                color = 'black'
+            else:
+                color = 'green'
+
             return f'color: {color}; text-align: center;'
         else:
             return ''  # Handle NaN values or non-numeric values
@@ -195,9 +224,6 @@ class SummaryReportWidgets:
         last_column_name = df.columns[-1]
         df[last_column_name] = pd.to_numeric(df[last_column_name], errors='coerce')
 
-        grafana_url = "http://cloud-governance-stage.rdu2.scalelab.redhat.com:3000/"
-        df['Grafana URL [VPN ON]'] = f'<a href="{grafana_url}" target="_blank">{grafana_url}</a>'
-
         # align all values to the left
         styled_df = df.style.set_table_styles([
             {'selector': 'th:not(:last-child)', 'props': [('text-align', 'left')]},
@@ -206,22 +232,33 @@ class SummaryReportWidgets:
         # add % to last column values
         styled_df = styled_df.format({last_column_name: "{}%"})
         # add color to positive/negative
-        styled_df = styled_df.map(self.color_negative_red)
-        # HTML code to style the text
-        html_code = '<div style="color: blue; font-weight: bold;">OCP Comparison results:</div>'
-
-        # Display the HTML code
-        display(HTML(html_code))
+        styled_df = styled_df.map(self.color_percentage_values)
+        # html
+        network_speed = f'<div><span style="color: black; font-weight: bold;"> Network Speed: </span><span style="color: blue;">{self.NETWORK_SPEED}</span></div>'
+        grafana_url = f'<div><span style="color: black; font-weight: bold;">** For more details Grafana url:</span> <a href="{self.GRAFANA_URL}" style="color: blue;" target="_blank">{self.GRAFANA_URL}</a></div>'
+        # Display the HTML
         display(HTML(styled_df._repr_html_()))
+        display(HTML(network_speed))
+        display(HTML(grafana_url))
 
-    def get_operators_versions(self):
+    def get_comparison_details(self):
         """
-        This method returns operator versions
+        This method returns comparison details versions, dates, uuid
         @return:
         """
-        # HTML code to style the text
-        html_code = '<div style="color: blue; font-weight: bold;">Operators versions:</div>'
+        details_df = self.summary_report.extract_comparison_details(self.get_filtered_df(workload='hammerdb'))
 
-        # Display the HTML code
-        display(HTML(html_code))
-        return self.summary_report.get_operator_versions()
+        # Set display options to show all values without truncation
+        pd.set_option('display.max_colwidth', None)
+
+        # Use HTML and CSS to style the DataFrame for left alignment
+        style_html = """
+        <style>
+        th, td {
+            text-align: left !important;
+        }
+        </style>
+        """
+
+        # Display the HTML-styled DataFrame
+        display(HTML(style_html + details_df.to_html(index=False)))

@@ -15,6 +15,15 @@ class SummaryReportOperations:
     """ This class is filtering data, aggregate data per workload and calculate geometric mean per run"""
     GB = 1_000_000_000
     MILLISECONDS = 1000
+    HAMMERDB_METRIC = 'TPM'
+    UPERF_THROUGHPUT_METRIC = 'Throughput'
+    UPERF_LATENCY_METRIC = 'Latency'
+    VDBENCH_LATENCY_METRIC = 'Latency'
+    VDBENCH_IOPS_METRIC = 'Iops'
+    BOOTSTORM_FEDORA = 'fedora37'
+    BOOTSTORM_WINDOWS = ['windows10', 'windows11', 'windows_server_2019', 'windows_server_2022']
+    BOOTSTORM_FEDORA_METRIC = '240 VMs run time'
+    BOOTSTORM_WINDOWS_METRIC = '111 VMs run time'
 
     def __init__(self, elasticsearch: ElasticSearchOperations):
         self.elasticsearch = elasticsearch
@@ -25,13 +34,6 @@ class SummaryReportOperations:
         self.bootstorm_df = None
         self.median_indices = None
         self.geometric_mean_df = None
-        self.operator_versions = None
-
-    def get_operator_versions(self):
-        """
-        @return: operator versions dataframe
-        """
-        return self.operator_versions
 
     @typechecked
     def get_workload_data(self, start_datetime: datetime, end_datetime: datetime, index: str ='ci-status'):
@@ -176,11 +178,11 @@ class SummaryReportOperations:
         @param unique_uuid:
         @return:
         """
-        # Calculate iops and latency
-        self.bootstorm_df = subset.groupby(['vm_os_version', 'uuid', 'ocp_version', 'cnv_version', 'odf_version'])['bootstorm_time'].quantile(0.9).reset_index()
+        # Calculate bootstorm total run time
+        self.bootstorm_df = subset.groupby(['vm_os_version', 'uuid', 'ocp_version', 'cnv_version', 'odf_version'])['total_run_time'].mean().reset_index()
         logger.info('geometric_mean_df', self.geometric_mean_df)
         self.__update_geometric_mean_data(subset, unique_uuid)
-        self.geometric_mean_data['geometric_mean'].append(self.bootstorm_df['bootstorm_time'].iloc[0])
+        self.geometric_mean_data['geometric_mean'].append(self.bootstorm_df['total_run_time'].iloc[0])
         self.geometric_mean_data['metric'].append(self.bootstorm_df['vm_os_version'].iloc[0])
 
     @typechecked()
@@ -195,25 +197,25 @@ class SummaryReportOperations:
         # Initialize common structure
         common_structure = {'uuid': [], 'ocp_version': [], 'cnv_version': [], 'odf_version': []}
 
-        if workload == 'hammerdb':
+        if workload in ['hammerdb', 'hammerdb_lso']:
             self.geometric_mean_data = {'workload': workload, **common_structure, 'db_type': [], 'geometric_mean': []}
         elif workload == 'uperf':
             # Filter out values greater than 1000
             df = df[(df['norm_ltcy'] < 1000) & df['norm_ltcy'].notna()]
             self.geometric_mean_data = {**common_structure}
-            self.geometric_mean_data_latency = {'workload': workload, **common_structure, 'metric': 'latency',
+            self.geometric_mean_data_latency = {'workload': workload, **common_structure, 'metric': self.UPERF_LATENCY_METRIC,
                                                 'geometric_mean': []}
-            self.geometric_mean_data_throughput = {'workload': workload, **common_structure, 'metric': 'throughput',
+            self.geometric_mean_data_throughput = {'workload': workload, **common_structure, 'metric': self.UPERF_THROUGHPUT_METRIC,
                                                    'geometric_mean': []}
         elif workload in ['vdbench', 'vdbench_scale']:
             df = df[df['Run'] != 'fillup']
             self.geometric_mean_data = {**common_structure}
-            self.geometric_mean_data_iops = {'workload': workload, **common_structure, 'metric': 'iops',
+            self.geometric_mean_data_iops = {'workload': workload, **common_structure, 'metric': self.VDBENCH_IOPS_METRIC,
                                              'geometric_mean': []}
-            self.geometric_mean_data_latency = {'workload': workload, **common_structure, 'metric': 'latency',
+            self.geometric_mean_data_latency = {'workload': workload, **common_structure, 'metric': self.VDBENCH_LATENCY_METRIC,
                                                 'geometric_mean': []}
         elif workload in ['bootstorm', 'windows']:
-            self.geometric_mean_data = {'workload': 'bootstorm', **common_structure, 'metric': [], 'geometric_mean': []}
+            self.geometric_mean_data = {'workload': workload, **common_structure, 'metric': [], 'geometric_mean': []}
 
         return df
 
@@ -246,11 +248,6 @@ class SummaryReportOperations:
         geometric_mean_df = pd.DataFrame(geometric_mean_data)
         self.median_indices = geometric_mean_df.groupby(['metric', 'ocp_version']).apply(self.__get_median)
         geometric_mean_df = geometric_mean_df.loc[self.median_indices['median_result']]
-        # update versions for multiple options
-        if workload in ['bootstorm', 'windows']:
-            self.retrieving_operator_versions(geometric_mean_df[geometric_mean_df['metric'] == metric])
-        else:
-            self.retrieving_operator_versions(geometric_mean_df)
         return self.__calc_percentage(geometric_mean_df, complementary)
 
     def aggregate_hammerdb_dataframe(self, workload):
@@ -260,9 +257,9 @@ class SummaryReportOperations:
         """
         # rename db_type to metric to get same columns as other workloads
         self.geometric_mean_data['metric'] = self.geometric_mean_data.pop('db_type')
-        self.geometric_mean_df = self.__calc_workload_precentage_diff(workload, self.geometric_mean_data, metric='mariadb')
+        self.geometric_mean_df = self.__calc_workload_precentage_diff(workload, self.geometric_mean_data, metric='pg')
         # updates metric names
-        replace_dict = {'mariadb': 'TPM (mariadb)', 'mssql': 'TPM (mssql)', 'pg': 'TPM (postgresql)'}
+        replace_dict = {'mariadb': f'{self.HAMMERDB_METRIC} (mariadb)', 'mssql': f'{self.HAMMERDB_METRIC} (mssql)', 'pg': f'{self.HAMMERDB_METRIC} (postgresql)'}
         self.geometric_mean_df['metric'] = self.geometric_mean_df['metric'].replace(replace_dict)
 
     def aggregate_uperf_dataframe(self, workload):
@@ -295,11 +292,10 @@ class SummaryReportOperations:
         self.geometric_mean_df = self.__calc_workload_precentage_diff(workload, self.geometric_mean_data, complementary=True, metric='windows_server_2019')
         # updates metric names
         if workload == 'windows':
-            windows_os = ['windows10', 'windows11', 'windows_server_2019', 'windows_server_2022']
-            for os in windows_os:
-                self.geometric_mean_df['metric'] = self.geometric_mean_df['metric'].replace({os: f'p90 ({os})'})
+            for os in self.BOOTSTORM_WINDOWS:
+                self.geometric_mean_df['metric'] = self.geometric_mean_df['metric'].replace({os: f'{self.BOOTSTORM_WINDOWS_METRIC} ({os})'})
         else:
-            self.geometric_mean_df['metric'] = self.geometric_mean_df['metric'].replace({'fedora37': 'p90 (fedora37)'})
+            self.geometric_mean_df['metric'] = self.geometric_mean_df['metric'].replace({f'{self.BOOTSTORM_FEDORA}': f'{self.BOOTSTORM_FEDORA_METRIC} ({self.BOOTSTORM_FEDORA})'})
 
     @typechecked()
     def aggregate_workload_dataframe(self, workload: str):
@@ -308,7 +304,7 @@ class SummaryReportOperations:
         @param workload:
         @return:
         """
-        if workload == 'hammerdb':
+        if workload in ['hammerdb', 'hammerdb_lso']:
             self.aggregate_hammerdb_dataframe(workload)
         elif workload == 'uperf':
             self.aggregate_uperf_dataframe(workload)
@@ -344,7 +340,7 @@ class SummaryReportOperations:
         for label, unique_uuid in enumerate(uniques):
             # logger.info(f"For each UUID {unique_uuid}:")
             subset = df[labels == label]
-            if workload == 'hammerdb':
+            if workload in ['hammerdb', 'hammerdb_lso']:
                 # Skip empty columns and skip NaN tpm values
                 if not subset.empty and subset['tpm'].notna().all():
                     self.update_hammerdb_data(subset, unique_uuid)
@@ -355,16 +351,32 @@ class SummaryReportOperations:
                 if not subset.empty and subset['Rate'].notna().all() and subset['Resp'].notna().all():
                     self.update_vdbench_data(subset, unique_uuid)
             elif workload in ['bootstorm', 'windows']:
-                if not subset.empty and subset['bootstorm_time'].notna().all():
+                if not subset.empty and subset['total_run_time'].notna().all():
                     self.update_bootstorm_data(subset, unique_uuid)
 
         self.aggregate_workload_dataframe(workload)
         return self.geometric_mean_df
 
     @typechecked()
-    def retrieving_operator_versions(self, df: pd.DataFrame):
+    def extract_comparison_details(self, df: pd.DataFrame):
         """
-        This method returns relevant operators versions columns
+        This method returns comparison details ocp_version, odf_version, cnv_nightly_version, sample_dates and uuid
         @return:
         """
-        self.operator_versions = df[['ocp_version', 'cnv_version', 'odf_version']]
+        df['timestamp'] = pd.to_datetime(df['timestamp'])
+        df['date'] = df['timestamp'].dt.date
+        aggregated_df = df.groupby('date').agg({
+            'ocp_version': 'first',
+            'odf_version': 'first',
+            'cnv_version': 'first',
+            'uuid': 'first'
+        }).reset_index()
+
+        aggregated_df = aggregated_df[['date', 'ocp_version', 'odf_version', 'cnv_version', 'uuid']]
+        # Group by 'ocp_version' and aggregate every column with distinct values
+        grouped_df = aggregated_df.groupby('ocp_version', as_index=False).agg(lambda x: list(set(x.explode())))
+
+        grouped_df = grouped_df.rename(columns={'cnv_version': 'cnv_nightly_version'})
+        grouped_df = grouped_df.rename(columns={'date': 'sample_dates'})
+
+        return grouped_df[['ocp_version', 'odf_version', 'cnv_nightly_version', 'sample_dates', 'uuid']]
