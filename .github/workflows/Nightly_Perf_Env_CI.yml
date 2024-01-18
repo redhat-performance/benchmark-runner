@@ -178,7 +178,7 @@ jobs:
         REDIS: ${{ secrets.REDIS }}
         WORKER_DISK_IDS: ${{ secrets.PERF_WORKER_DISK_IDS }}
         WORKER_DISK_PREFIX: ${{ secrets.PERF_WORKER_DISK_PREFIX }}
-        TIMEOUT: 8000
+        TIMEOUT: 14400
         SCALE: 2
         BOOTSTORM_SCALE: 80
         WINDOWS_SCALE: 37
