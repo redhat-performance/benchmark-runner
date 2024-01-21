@@ -102,7 +102,7 @@ class WorkloadsOperations:
             file_name = os.path.basename(self._environment_variables_dict.get('windows_url', ''))
             self._windows_os = os.path.splitext(file_name)[0]
 
-    def __get_workload_file_name(self, workload):
+    def _get_workload_file_name(self, workload):
         """
         This method returns workload name
         :return:
@@ -249,7 +249,7 @@ class WorkloadsOperations:
                 elif value == 'n/a':
                     line_dict[key] = 0.0
             line_dict['pod_name'] = pod_name
-            workload = self.__get_workload_file_name(workload=self._get_run_artifacts_hierarchy(workload_name=workload_name, is_file=True))
+            workload = self._get_workload_file_name(workload=self._get_run_artifacts_hierarchy(workload_name=workload_name, is_file=True))
             line_dict['run_artifacts_url'] = os.path.join(self._run_artifacts_url, f'{workload}.tar.gz')
             result_list.append(dict(line_dict))
         return result_list
@@ -286,7 +286,7 @@ class WorkloadsOperations:
                 elif value == 'n/a':
                     line_dict[key] = 0.0
             line_dict['vm_name'] = vm_name
-            workload = self.__get_workload_file_name(workload=self._get_run_artifacts_hierarchy(workload_name=workload_name, is_file=True))
+            workload = self._get_workload_file_name(workload=self._get_run_artifacts_hierarchy(workload_name=workload_name, is_file=True))
             line_dict['run_artifacts_url'] = os.path.join(self._run_artifacts_url, f'{workload}.tar.gz')
             result_list.append(dict(line_dict))
         return result_list
@@ -298,7 +298,7 @@ class WorkloadsOperations:
         """
         tar_run_artifacts_path = f"{self._run_artifacts_path}.tar.gz"
         with tarfile.open(tar_run_artifacts_path, mode='w:gz') as archive:
-            workload_file_name = self.__get_workload_file_name(workload)
+            workload_file_name = self._get_workload_file_name(workload)
             archive.add(self._run_artifacts_path, arcname=workload_file_name, recursive=True)
         return tar_run_artifacts_path
 
@@ -330,7 +330,7 @@ class WorkloadsOperations:
         # Upload when endpoint_url is not None
         s3operations = S3Operations()
         # change workload to key convention
-        workload_file_name = self.__get_workload_file_name(workload)
+        workload_file_name = self._get_workload_file_name(workload)
         upload_file = f"{workload_file_name}.tar.gz"
         s3operations.upload_file(file_name_path=tar_run_artifacts_path,
                                  bucket=self._environment_variables_dict.get('bucket', ''),
