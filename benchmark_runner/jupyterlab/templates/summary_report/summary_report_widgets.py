@@ -1,4 +1,5 @@
 
+import re
 import pandas as pd
 from datetime import datetime, timedelta
 import ipywidgets as widgets
@@ -50,6 +51,20 @@ class SummaryReportWidgets:
             # Handle the case when compared_ocp_versions is not defined
             return None
 
+    def version_key(self, version):
+        """
+        This method splits the version string into parts and returns the numeric parts
+        @param version:
+        @return:
+        """
+        # Split the version string into parts: removing characters from versions like '4.X.0-rc.4' and '4.X.0-ec.4' to enable proper ordering
+        parts = version.replace('-rc.', '-ec.').split('.')
+
+        # Extract the numeric parts and convert them to integers
+        numeric_parts = [int(re.search(r'\d+', part).group()) if re.search(r'\d+', part) else part for part in parts]
+
+        return numeric_parts
+
     def get_ocp_distinct_list(self):
         """
         This method returns distinct list
@@ -61,7 +76,7 @@ class SummaryReportWidgets:
         ocp_versions_list = [entry.get('_source').get('ocp_version') for entry in entries if
                              entry.get('_source').get('ocp_version') not in [None, 0]]
         distinct_ocp_versions = set(ocp_versions_list)
-        ocp_versions_list = sorted(list(distinct_ocp_versions), reverse=True)
+        ocp_versions_list = sorted(list(distinct_ocp_versions), key=self.version_key, reverse=True)
         return ocp_versions_list
 
     def get_two_last_major_versions(self):
