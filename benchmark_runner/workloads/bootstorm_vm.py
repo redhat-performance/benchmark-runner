@@ -27,6 +27,19 @@ class BootstormVM(WorkloadsOperations):
         # calc total run time - save first vm run time
         self._bootstorm_first_run_time = None
 
+    def save_error_logs(self):
+        """
+        This method uploads logs into elastic and s3 bucket in case of error
+        @return:
+        """
+        if self._es_host:
+            self._data_dict['run_artifacts_url'] = os.path.join(self._run_artifacts_url,
+                                                                f'{self._get_run_artifacts_hierarchy(workload_name=self._get_workload_file_name(self._workload_name), is_file=True)}.tar.gz')
+            self._upload_to_elasticsearch(index=self._es_index, kind=self._kind, status='failed',
+                                          result=self._data_dict)
+            # verify that data upload to elastic search according to unique uuid
+            self._verify_elasticsearch_data_uploaded(index=self._es_index, uuid=self._uuid)
+
     @logger_time_stamp
     def _set_bootstorm_vm_first_run_time(self):
         """
@@ -75,8 +88,13 @@ class BootstormVM(WorkloadsOperations):
         """
         This method creates VMs in parallel
         """
-        self._oc.create_async(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self._name}_{vm_num}.yaml'))
-        self._oc.wait_for_vm_status(vm_name=f'{self._workload_name}-{self._trunc_uuid}-{vm_num}', status=VMStatus.Stopped)
+        try:
+            self._oc.create_async(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self._name}_{vm_num}.yaml'))
+            self._oc.wait_for_vm_status(vm_name=f'{self._workload_name}-{self._trunc_uuid}-{vm_num}', status=VMStatus.Stopped)
+        except Exception as err:
+            # save run artifacts logs
+            self.save_error_logs()
+            raise err
 
     def _finalize_vm(self):
         self._status = 'complete' if self._data_dict else 'failed'
@@ -117,38 +135,63 @@ class BootstormVM(WorkloadsOperations):
         """
         This method runs VMs in parallel and wait for login to be enabled
         """
-        vm_name = f'{self._workload_name}-{self._trunc_uuid}-{vm_num}'
-        self._set_bootstorm_vm_start_time(vm_name=f'{self._workload_name}-{self._trunc_uuid}-{vm_num}')
-        self._virtctl.start_vm_async(vm_name=f'{self._workload_name}-{self._trunc_uuid}-{vm_num}')
-        self._virtctl.wait_for_vm_status(vm_name=vm_name, status=VMStatus.Running)
-        self._data_dict = self._get_bootstorm_vm_elapsed_time(vm_name=vm_name)
-        self._data_dict['run_artifacts_url'] = os.path.join(self._run_artifacts_url, f'{self._get_run_artifacts_hierarchy(workload_name=self._workload_name, is_file=True)}-scale-{self._time_stamp_format}.tar.gz')
-        self._finalize_vm()
+        try:
+            vm_name = f'{self._workload_name}-{self._trunc_uuid}-{vm_num}'
+            self._set_bootstorm_vm_start_time(vm_name=f'{self._workload_name}-{self._trunc_uuid}-{vm_num}')
+            self._virtctl.start_vm_async(vm_name=f'{self._workload_name}-{self._trunc_uuid}-{vm_num}')
+            self._virtctl.wait_for_vm_status(vm_name=vm_name, status=VMStatus.Running)
+            self._data_dict = self._get_bootstorm_vm_elapsed_time(vm_name=vm_name)
+            self._data_dict['run_artifacts_url'] = os.path.join(self._run_artifacts_url, f'{self._get_run_artifacts_hierarchy(workload_name=self._workload_name, is_file=True)}-scale-{self._time_stamp_format}.tar.gz')
+            self._finalize_vm()
+        except Exception as err:
+            # save run artifacts logs
+            self.save_error_logs()
+            raise err
 
     def _stop_vm_scale(self, vm_num: str):
         """
         This method stops VMs async in parallel
         """
-        self._virtctl.stop_vm_async(vm_name=f'{self._workload_name}-{self._trunc_uuid}-{vm_num}')
+        try:
+            self._virtctl.stop_vm_async(vm_name=f'{self._workload_name}-{self._trunc_uuid}-{vm_num}')
+        except Exception as err:
+            # save run artifacts logs
+            self.save_error_logs()
+            raise err
 
     def _wait_for_stop_vm_scale(self, vm_num: str):
         """
         This method waits for VMs stop in parallel
         """
-        self._virtctl.wait_for_vm_status(vm_name=f'{self._workload_name}-{self._trunc_uuid}-{vm_num}')
+        try:
+            self._virtctl.wait_for_vm_status(vm_name=f'{self._workload_name}-{self._trunc_uuid}-{vm_num}')
+        except Exception as err:
+            # save run artifacts logs
+            self.save_error_logs()
+            raise err
 
     def _delete_vm_scale(self, vm_num: str):
         """
         This method deletes VMs async in parallel
         """
-        self._oc.delete_async(
-            yaml=os.path.join(f'{self._run_artifacts_path}', f'{self._name}_{vm_num}.yaml'))
+        try:
+            self._oc.delete_async(
+                yaml=os.path.join(f'{self._run_artifacts_path}', f'{self._name}_{vm_num}.yaml'))
+        except Exception as err:
+            # save run artifacts logs
+            self.save_error_logs()
+            raise err
 
     def _wait_for_delete_vm_scale(self, vm_num: str):
         """
         This method waits for VMs delete in parallel
         """
-        self._oc.wait_for_vm_delete(vm_name=f'{self._workload_name}-{self._trunc_uuid}-{vm_num}')
+        try:
+            self._oc.wait_for_vm_delete(vm_name=f'{self._workload_name}-{self._trunc_uuid}-{vm_num}')
+        except Exception as err:
+            # save run artifacts logs
+            self.save_error_logs()
+            raise err
 
     def _initialize_run(self):
         """
@@ -213,9 +256,5 @@ class BootstormVM(WorkloadsOperations):
             raise err
         except Exception as err:
             # save run artifacts logs
-            if self._es_host:
-                self._data_dict['run_artifacts_url'] = os.path.join(self._run_artifacts_url, f'{self._get_run_artifacts_hierarchy(workload_name=self._workload_name, is_file=True)}-{self._time_stamp_format}.tar.gz')
-                self._upload_to_elasticsearch(index=self._es_index, kind=self._kind, status='failed', result=self._data_dict)
-                # verify that data upload to elastic search according to unique uuid
-                self._verify_elasticsearch_data_uploaded(index=self._es_index, uuid=self._uuid)
+            self.save_error_logs()
             raise err

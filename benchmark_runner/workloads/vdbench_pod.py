@@ -24,40 +24,68 @@ class VdbenchPod(WorkloadsOperations):
         self.__scale = ''
         self.__data_dict = {}
 
+    def save_error_logs(self):
+        """
+        This method uploads logs into elastic and s3 bucket in case of error
+        @return:
+        """
+        if self._es_host:
+            self.__data_dict['run_artifacts_url'] = os.path.join(self._run_artifacts_url,
+                                                                f'{self._get_run_artifacts_hierarchy(workload_name=self._get_workload_file_name(self.__workload_name), is_file=True)}.tar.gz')
+            self._upload_to_elasticsearch(index=self.__es_index, kind=self.__kind, status='failed',
+                                          result=self.__data_dict)
+            # verify that data upload to elastic search according to unique uuid
+            self._verify_elasticsearch_data_uploaded(index=self.__es_index, uuid=self._uuid)
+
     def __create_pod_scale(self, pod_num: str):
         """
         This method creates pod in parallel
         """
-        self._oc.create_async(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}_{pod_num}.yaml'))
-        self._oc.wait_for_pod_create(pod_name=f'{self.__pod_name}-{pod_num}')
+        try:
+            self._oc.create_async(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}_{pod_num}.yaml'))
+            self._oc.wait_for_pod_create(pod_name=f'{self.__pod_name}-{pod_num}')
+        except Exception as err:
+            # save run artifacts logs
+            self.save_error_logs()
+            raise err
 
     def __run_pod_scale(self, pod_num: str):
         """
         This method runs pod in parallel
         """
-        self._oc.wait_for_initialized(label=f'app=vdbench-{self._trunc_uuid}-{pod_num}', label_uuid=False)
-        self._oc.wait_for_ready(label=f'app=vdbench-{self._trunc_uuid}-{pod_num}', label_uuid=False)
-        self.__status = self._oc.wait_for_pod_completed(label=f'app=vdbench-{self._trunc_uuid}-{pod_num}', label_uuid=False, job=False)
-        self.__status = 'complete' if self.__status else 'failed'
-        # prometheus queries
-        self._prometheus_metrics_operation.finalize_prometheus()
-        metric_results = self._prometheus_metrics_operation.run_prometheus_queries()
-        prometheus_result = self._prometheus_metrics_operation.parse_prometheus_metrics(data=metric_results)
-        # save run artifacts logs
-        result_list = self._create_pod_run_artifacts(pod_name=f'{self.__pod_name}-{pod_num}', log_type='.csv')
-        if self._es_host:
-            # upload several run results
-            for result in result_list:
-                result.update(prometheus_result)
-                self._upload_to_elasticsearch(index=self.__es_index, kind=self.__kind, status=self.__status, result=result)
-            # verify that data upload to elastic search according to unique uuid
-            self._verify_elasticsearch_data_uploaded(index=self.__es_index, uuid=self._uuid)
+        try:
+            self._oc.wait_for_initialized(label=f'app=vdbench-{self._trunc_uuid}-{pod_num}', label_uuid=False)
+            self._oc.wait_for_ready(label=f'app=vdbench-{self._trunc_uuid}-{pod_num}', label_uuid=False)
+            self.__status = self._oc.wait_for_pod_completed(label=f'app=vdbench-{self._trunc_uuid}-{pod_num}', label_uuid=False, job=False)
+            self.__status = 'complete' if self.__status else 'failed'
+            # prometheus queries
+            self._prometheus_metrics_operation.finalize_prometheus()
+            metric_results = self._prometheus_metrics_operation.run_prometheus_queries()
+            prometheus_result = self._prometheus_metrics_operation.parse_prometheus_metrics(data=metric_results)
+            # save run artifacts logs
+            result_list = self._create_pod_run_artifacts(pod_name=f'{self.__pod_name}-{pod_num}', log_type='.csv')
+            if self._es_host:
+                # upload several run results
+                for result in result_list:
+                    result.update(prometheus_result)
+                    self._upload_to_elasticsearch(index=self.__es_index, kind=self.__kind, status=self.__status, result=result)
+                # verify that data upload to elastic search according to unique uuid
+                self._verify_elasticsearch_data_uploaded(index=self.__es_index, uuid=self._uuid)
+        except Exception as err:
+            # save run artifacts logs
+            self.save_error_logs()
+            raise err
 
     def __delete_pod_scale(self, pod_num: str):
         """
         This method creates pod in parallel
         """
-        self._oc.delete_async(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}_{pod_num}.yaml'))
+        try:
+            self._oc.delete_async(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}_{pod_num}.yaml'))
+        except Exception as err:
+            # save run artifacts logs
+            self.save_error_logs()
+            raise err
 
     @logger_time_stamp
     def run(self):
@@ -156,11 +184,7 @@ class VdbenchPod(WorkloadsOperations):
             # save run artifacts logs
             if self._oc.pod_exists(pod_name=self.__pod_name):
                 self._create_pod_log(pod=self.__pod_name)
-            self.__data_dict['run_artifacts_url'] = os.path.join(self._run_artifacts_url, f'{self._get_run_artifacts_hierarchy(workload_name=self.__workload_name, is_file=True)}-{self._time_stamp_format}.tar.gz')
-            if self._es_host:
-                self._upload_to_elasticsearch(index=self.__es_index, kind=self.__kind, status='failed', result=self.__data_dict)
-                # verify that data upload to elastic search according to unique uuid
-                self._verify_elasticsearch_data_uploaded(index=self.__es_index, uuid=self._uuid)
+            self.save_error_logs()
             self._oc.delete_pod_sync(
                 yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}.yaml'), pod_name=self.__pod_name)
             raise err
