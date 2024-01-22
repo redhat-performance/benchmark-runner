@@ -212,13 +212,13 @@ class WorkloadsOperations:
     def __is_float(value) -> bool:
         """
         This method checks if value is float
-        :param value:
-        :return:
+        :param value: The value to check
+        :return: True if the value is a float, False when cannot be converted to a float
         """
         try:
             float(value)
             return True
-        except ValueError:
+        except (ValueError, TypeError):
             return False
 
     def _create_scale_logs(self):
