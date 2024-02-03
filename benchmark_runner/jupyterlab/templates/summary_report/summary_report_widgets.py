@@ -1,4 +1,5 @@
 
+import os
 import re
 import pandas as pd
 from datetime import datetime, timedelta
@@ -13,15 +14,15 @@ from benchmark_runner.jupyterlab.templates.summary_report.summary_report_operati
 class SummaryReportWidgets:
     """ This class is analyzing workload data and visualization """
 
-    FILTER_KIND = 'vm'
-    FETCH_OCP_VERSIONS_DAYS = 365
+    NETWORK_SPEED = os.getenv('network_speed')
+    GRAFANA_URL = os.getenv('grafana_url')
+    FETCH_OCP_VERSIONS_DAYS = int(os.getenv('fetch_ocp_versions_days'))
+    FILTER_KIND = os.getenv('filter_kind')
     # take 1 day extra for end time
     DEFAULT_END_DATE = datetime.combine(datetime.now().date(), datetime.max.time())
     DEFAULT_START_DATE = datetime.combine(DEFAULT_END_DATE - timedelta(days=FETCH_OCP_VERSIONS_DAYS),
                                           datetime.min.time())
     STORAGE_TYPES = {'hammerdb': 'ODF', 'hammerdb_lso': 'LSO', 'uperf': 'Ephemeral', 'vdbench': 'ODF', 'vdbench_scale': 'ODF', 'bootstorm': 'Ephemeral', 'windows': 'ODF (virtio)'}
-    NETWORK_SPEED = '25GB'
-    GRAFANA_URL = 'http://cloud-governance-stage.rdu2.scalelab.redhat.com:3000'
     compared_ocp_versions = None
 
     def __init__(self, elasticsearch: ElasticSearchOperations):
