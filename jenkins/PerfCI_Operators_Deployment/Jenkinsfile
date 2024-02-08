@@ -1,0 +1,142 @@
+pipeline {
+    agent {
+        label 'PerfCi'
+    }
+    environment {
+        CONTACT_EMAIL1 = credentials('perfci_contact_email1')
+        PROVISION_USER = credentials('perfci_provision_user')
+        PROVISION_IP = credentials('perfci_provision_ip')
+        WORKER_DISK_IDS = credentials('perfci_worker_disk_ids')
+        WORKER_DISK_PREFIX = credentials('perfci_worker_disk_ids_prefix')
+        CNV_VERSION = credentials('perfci_cnv_version')
+        ODF_VERSION = credentials('perfci_odf_version')
+        CLUSTER_TYPE = credentials('perfci_cluster_type')
+        EXPECTED_NODES = credentials('perfci_expected_nodes')
+        KUBEADMIN_PASSWORD = readFile('/home/jenkins/.kube/kubeadmin-password').trim()
+        KUBEADMIN_PASSWORD_PATH = '/home/jenkins/.kube/kubeadmin-password'
+        KUBECONFIG_PATH = '/root/.kube/config'
+        PRIVATE_KEY_PATH = '/home/jenkins/.ssh/provision_private_key'
+        CONFIG_PATH = '/home/jenkins/.ssh/config'
+        WORKSPACE='/home/jenkins'
+        CONTAINER_PRIVATE_KEY_PATH = '/root/.ssh/provision_private_key'
+        PROVISION_PORT = 22
+        NUM_ODF_DISK = 6
+        PROVISION_TIMEOUT = 3600
+    }
+    stages {
+        stage('Cleanup') {
+            steps {
+                script {
+                    sh 'sudo podman ps -a --filter "name=benchmark-runner" -q | sudo xargs -r podman rm'
+                    sh 'sudo podman volume ls -q | sudo xargs -r podman volume rm'
+                }
+            }
+        }
+
+        stage('⚙️ SET SSH key') {
+            steps {
+                script {
+                    sh 'umask 77 && mkdir -p $WORKSPACE/.ssh/'
+                    withCredentials([file(credentialsId: 'perfci_provision_private_key_file', variable: 'PROVISION_PRIVATE_KEY_FILE')]) {
+                        sh "sudo cp \$PROVISION_PRIVATE_KEY_FILE $WORKSPACE/.ssh/provision_private_key"
+                    }
+                    sh 'chmod 600 $PRIVATE_KEY_PATH'
+                    sh '''
+                        cat > "$CONFIG_PATH" <<END
+    Host provision
+        HostName ${PROVISION_IP}
+        User ${PROVISION_USER}
+        IdentityFile $PRIVATE_KEY_PATH
+        StrictHostKeyChecking no
+        ServerAliveInterval 30
+        ServerAliveCountMax 5
+END
+                    '''
+                    sh 'chmod 600 $CONFIG_PATH'
+                }
+            }
+        }
+
+        stage('CNV Nightly Registered ') {
+            steps {
+                script {
+                    sh 'mkdir -p $WORKSPACE/cnv_nightly'
+                    withCredentials([file(credentialsId: 'perfci_cnv_nightly_registered_file', variable: 'CNV_NIGHTLY_REGISTERED_FILE')]) {
+                        sh "yes | sudo cp \$CNV_NIGHTLY_REGISTERED_FILE $WORKSPACE/perfci/cnv_nightly/registered.sh"
+                    }
+                    withCredentials([file(credentialsId: 'perfci_cnv_nightly_catalog_source_file', variable: 'CNV_NIGHTLY_CATALOG_SOURCE_FILE')]) {
+                        sh "yes | sudo cp \$CNV_NIGHTLY_CATALOG_SOURCE_FILE $WORKSPACE/perfci/cnv_nightly/catalog_source.yaml"
+                    }
+                    sh 'sudo chown jenkins:jenkins $WORKSPACE/perfci/cnv_nightly/registered.sh'
+                    sh 'chmod +x $WORKSPACE/perfci/cnv_nightly/registered.sh'
+                    sh '$WORKSPACE/perfci/cnv_nightly/./registered.sh'
+                    sh 'sudo sed -i "s/{{ cnv_version }}/$CNV_VERSION/g" $WORKSPACE/perfci/cnv_nightly/catalog_source.yaml'
+                    sh 'sudo chown jenkins:jenkins $WORKSPACE/perfci/cnv_nightly/catalog_source.yaml'
+                    sh 'oc apply -f $WORKSPACE/perfci/cnv_nightly/catalog_source.yaml'
+                }
+            }
+        }
+
+        stage('Operators Deployment') {
+            matrix {
+                axes {
+                    axis {
+                        name 'RESOURCE'
+                        values 'lso', 'odf', 'cnv', 'infra', 'custom'
+                    }
+                }
+                stages {
+                     stage("Run Operator Deployment") {
+                        steps {
+                            script {
+                                withCredentials([string(credentialsId: 'perfci_provision_ip', variable: 'PROVISION_IP')]) {
+                                    withCredentials([string(credentialsId: 'perfci_provision_user', variable: 'PROVISION_USER')]) {
+                                        withCredentials([file(credentialsId: 'perfci_provision_private_key_file', variable: 'PROVISION_PRIVATE_KEY_FILE')]) {
+                                            sh """
+                                                sudo podman run --rm \
+                                                    -e INSTALL_OCP_RESOURCES=True \
+                                                    -e INSTALL_RESOURCES_LIST="${RESOURCE}" \
+                                                    -e CNV_VERSION="${CNV_VERSION}" \
+                                                    -e ODF_VERSION="${ODF_VERSION}" \
+                                                    -e NUM_ODF_DISK="${NUM_ODF_DISK}" \
+                                                    -e KUBEADMIN_PASSWORD="${KUBEADMIN_PASSWORD}" \
+                                                    -e PROVISION_IP="${PROVISION_IP}" \
+                                                    -e CONTAINER_PRIVATE_KEY_PATH="${CONTAINER_PRIVATE_KEY_PATH}" \
+                                                    -e PROVISION_USER="${PROVISION_USER}" \
+                                                    -e PROVISION_PORT="${PROVISION_PORT}" \
+                                                    -e WORKER_DISK_IDS="${WORKER_DISK_IDS}" \
+                                                    -e WORKER_DISK_PREFIX="${WORKER_DISK_PREFIX}" \
+                                                    -e PROVISION_TIMEOUT="${PROVISION_TIMEOUT}" \
+                                                    -e log_level=INFO \
+                                                    -v "${PRIVATE_KEY_PATH}:${CONTAINER_PRIVATE_KEY_PATH}" \
+                                                    -v "${KUBECONFIG_PATH}:${KUBECONFIG_PATH}" \
+                                                    --privileged quay.io/ebattat/benchmark-runner:latest
+                                            """
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            script {
+                sh 'sudo podman ps -a --filter "name=benchmark-runner" -q | sudo xargs -r podman rm'
+                sh 'sudo podman volume ls -q | sudo xargs -r podman volume rm'
+            }
+        }
+        failure {
+            script {
+                msg = "Build error for ${env.JOB_NAME} ${env.BUILD_NUMBER} (${env.BUILD_URL})"
+                emailext body: """\
+                    Jenkins job: ${env.BUILD_URL}\nSee the console output for more details:  ${env.BUILD_URL}consoleFull\n\n
+                """, subject: msg, to: "${CONTACT_EMAIL1}"
+            }
+        }
+    }
+}

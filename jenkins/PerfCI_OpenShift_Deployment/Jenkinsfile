@@ -1,0 +1,118 @@
+pipeline {
+    agent {
+        label 'PerfCi'
+    }
+    environment {
+        CONTACT_EMAIL1 = credentials('perfci_contact_email1')
+        PROVISION_PRIVATE_KEY_FILE = credentials('perfci_provision_private_key_file')
+        PROVISION_IP = credentials('perfci_provision_ip')
+        PROVISION_USER = credentials('perfci_provision_user')
+        CLUSTER_TYPE = credentials('perfci_cluster_type')
+        EXPECTED_NODES = credentials('perfci_expected_nodes')
+        INSTALL_OCP_VERSION = credentials('perfci_install_ocp_version')
+        OCP_CLIENT_VERSION = credentials('perfci_ocp_client_version')
+        WORKSPACE = '/home/jenkins'
+        PROVISION_PORT = 22
+        KUBEADMIN_PASSWORD_PATH = '/root/.kube/kubeadmin-password'
+        KUBECONFIG_PATH = '/root/.kube/config'
+        PROVISION_INSTALLER_PATH = '/root/jetlag/./run_jetlag.sh'
+        PROVISION_INSTALLER_CMD = 'pushd /root/jetlag;/root/jetlag/./run_jetlag.sh 1>/dev/null 2>&1;popd'
+        PROVISION_INSTALLER_LOG = 'tail -40 /root/jetlag/jetlag.log'
+        PRIVATE_KEY_PATH = '/home/jenkins/.ssh/provision_private_key'
+        CONFIG_PATH = '/home/jenkins/.ssh/config'
+        CONTAINER_PRIVATE_KEY_PATH = '/root/.ssh/provision_private_key'
+        CONTAINER_CONFIG_PATH = '/root/.ssh/config'
+        PROVISION_TIMEOUT = 7200
+    }
+    stages {
+        stage('Cleanup') {
+            steps {
+                script {
+                    sh 'sudo podman ps -a --filter "name=benchmark-runner" -q | sudo xargs -r podman rm'
+                    sh 'sudo podman volume ls -q | sudo xargs -r podman volume rm'
+                }
+            }
+        }
+
+        stage('⚙️ SET SSH key') {
+            steps {
+                script {
+                    sh 'umask 77 && mkdir -p $WORKSPACE/.ssh/'
+                    withCredentials([file(credentialsId: 'perfci_provision_private_key_file', variable: 'PROVISION_PRIVATE_KEY_FILE')]) {
+                        sh "sudo cp \$PROVISION_PRIVATE_KEY_FILE $WORKSPACE/.ssh/provision_private_key"
+                    }
+                    sh 'chmod 600 $PRIVATE_KEY_PATH'
+                    sh '''
+                        cat > "$CONFIG_PATH" <<END
+    Host provision
+        HostName ${PROVISION_IP}
+        User ${PROVISION_USER}
+        IdentityFile $PRIVATE_KEY_PATH
+        StrictHostKeyChecking no
+        ServerAliveInterval 30
+        ServerAliveCountMax 5
+END
+                    '''
+                    sh 'chmod 600 $CONFIG_PATH'
+                }
+            }
+        }
+
+        stage('OCP Deployment') {
+            matrix {
+                axes {
+                    axis {
+                        name 'INSTALL_STEP'
+                        values 'run_bm_ocp_installer', 'verify_bm_install_complete'
+                    }
+                }
+                stages {
+                    stage('Run Step') {
+                        steps {
+                            script {
+                                withCredentials([string(credentialsId: 'perfci_provision_ip', variable: 'PROVISION_IP')]) {
+                                    withCredentials([string(credentialsId: 'perfci_provision_user', variable: 'PROVISION_USER')]) {
+                                        withCredentials([file(credentialsId: 'perfci_provision_private_key_file', variable: 'PROVISION_PRIVATE_KEY_FILE')]) {
+                                            sh """
+                                                sudo podman run --rm -e INSTALL_OCP_VERSION="${INSTALL_OCP_VERSION}" \
+                                                    -e INSTALL_STEP="${INSTALL_STEP}" -e PROVISION_IP="${PROVISION_IP}" \
+                                                    -e PROVISION_USER="${PROVISION_USER}" -e PROVISION_PORT="${PROVISION_PORT}" \
+                                                    -e KUBEADMIN_PASSWORD_PATH="${KUBEADMIN_PASSWORD_PATH}" \
+                                                    -e KUBECONFIG_PATH="${KUBECONFIG_PATH}" \
+                                                    -e PROVISION_INSTALLER_PATH="${PROVISION_INSTALLER_PATH}" \
+                                                    -e PROVISION_INSTALLER_CMD="${PROVISION_INSTALLER_CMD}" \
+                                                    -e PROVISION_INSTALLER_LOG="${PROVISION_INSTALLER_LOG}" \
+                                                    -e CONTAINER_PRIVATE_KEY_PATH="${CONTAINER_PRIVATE_KEY_PATH}" \
+                                                    -e PROVISION_TIMEOUT="${PROVISION_TIMEOUT}" \
+                                                    -e log_level="INFO" -v "${PRIVATE_KEY_PATH}":"${CONTAINER_PRIVATE_KEY_PATH}" \
+                                                    -v "${KUBECONFIG_PATH}":"${KUBECONFIG_PATH}" \
+                                                    --privileged "quay.io/ebattat/benchmark-runner:latest"
+                                            """
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            script {
+                sh 'sudo podman ps -a --filter "name=benchmark-runner" -q | sudo xargs -r podman rm'
+                sh 'sudo podman volume ls -q | sudo xargs -r podman volume rm'
+            }
+        }
+        failure {
+            script {
+                msg = "Build error for ${env.JOB_NAME} ${env.BUILD_NUMBER} (${env.BUILD_URL})"
+                emailext body: """\
+                    Jenkins job: ${env.BUILD_URL}\nSee the console output for more details:  ${env.BUILD_URL}consoleFull\n\n
+                """, subject: msg, to: "${CONTACT_EMAIL1}"
+            }
+        }
+    }
+}
