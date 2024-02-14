@@ -33,8 +33,6 @@ pipeline {
                             sudo podman rmi -f $(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)
                         fi
                     '''
-                    // containers cleanup: must be done for Jetlag containers and also to avoid reaching to container storage leak
-                    sh 'podman ps | awk '{print $1}' | xargs -I % podman stop %; podman ps -a | awk '{print $1}' | xargs -I % podman rm %; podman pod ps | awk '{print $1}' | xargs -I % podman pod rm % 2>&1'
                 }
             }
         }
