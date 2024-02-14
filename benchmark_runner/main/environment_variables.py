@@ -203,7 +203,7 @@ class EnvironmentVariables:
         # Parameters below related to 'install_ocp()'
         # MANDATORY for OCP install: assisted installer version i.e. 'latest-4.11' or '4.11.16' : https://mirror.openshift.com/pub/openshift-v4/clients/ocp
         self._environment_variables_dict['install_ocp_version'] = EnvironmentVariables.get_env('INSTALL_OCP_VERSION', '')
-        # There are 4 options: run_baremetal_ocp_installer/ verify_baremetal_install_complete/ run_ibm_ocp_installer/ verify_ibm_install_complete
+        # There are 4 options: run_bare_metal_ocp_installer/ verify_bare_metal_install_complete/ run_ibm_ocp_installer/ verify_ibm_install_complete
         self._environment_variables_dict['install_step'] = EnvironmentVariables.get_env('INSTALL_STEP', '')
         # SNO or empty for regular
         self._environment_variables_dict['cluster_type'] = EnvironmentVariables.get_env('CLUSTER_TYPE', '')
