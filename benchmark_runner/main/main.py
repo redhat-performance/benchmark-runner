@@ -8,6 +8,7 @@ from benchmark_runner.workloads.workloads import Workloads
 from benchmark_runner.main.environment_variables import environment_variables
 from benchmark_runner.common.clouds.Azure.azure_operations import AzureOperations
 from benchmark_runner.common.clouds.IBM.ibm_operations import IBMOperations
+from benchmark_runner.common.clouds.BareMetal.bare_metal_operations import BareMetalOperations
 from benchmark_runner.clusterbuster.clusterbuster_workloads import ClusterBusterWorkloads
 
 # logger
@@ -61,7 +62,7 @@ if workload and not ci_status:
 @logger_time_stamp
 def azure_cluster_start_stop():
     """
-    This method start stop azure cluster
+    This method starts/ stops azure cluster
     :return:
     """
     azure_operation = AzureOperations(azure_clientid=environment_variables_dict.get('azure_clientid', ''),
@@ -78,15 +79,18 @@ def azure_cluster_start_stop():
 
 
 @logger_time_stamp
-def install_ocp(ibm_operations: IBMOperations, step: str):
+def install_ocp_ibm_cloud(step: str):
     """
-    This method install ocp version
+    This method runs IBM cloud OCP installation
     :return:
     """
+    ibm_operations = IBMOperations(user=provision_user)
+    ibm_operations.connect_to_provisioner()
     if step == 'run_ibm_ocp_installer':
-        ibm_operations.update_ocp_version()
-        ibm_operations.run_ibm_ocp_installer()
-    elif step == 'verify_install_complete':
+        ibm_operations.update_ocp_version(file_name='ibmcloud.yml')
+        ibm_operations.run_ocp_installer()
+    # including update GitHub OCP credentials
+    elif step == 'verify_ibm_install_complete':
         complete = ibm_operations.verify_install_complete()
         if complete:
             logger.info(f'OCP {install_ocp_version} installation complete successfully')
@@ -96,36 +100,58 @@ def install_ocp(ibm_operations: IBMOperations, step: str):
             ibm_operations.update_ocp_github_credentials()
         else:
             logger.info(f'OCP {install_ocp_version} installation failed')
-    ibm_operations.ibm_disconnect()
+    ibm_operations.disconnect_from_provisioner()
+
+
+@logger_time_stamp
+def install_ocp_bare_metal(step: str):
+    """
+    This method runs Bare Metal OCP installation
+    :return:
+    """
+    bm_operations = BareMetalOperations(user=provision_user)
+    bm_operations.connect_to_provisioner()
+    if step == 'run_baremetal_ocp_installer':
+        bm_operations.update_ocp_version(file_name='all.yml')
+        bm_operations.run_ocp_installer()
+    elif step == 'verify_baremetal_install_complete':
+        complete = bm_operations.verify_install_complete()
+        if complete:
+            logger.info(f'OCP {install_ocp_version} installation complete successfully')
+            logger.info(f'restart pod ci')
+            bm_operations.restart_pod_ci()
+        else:
+            logger.info(f'OCP {install_ocp_version} installation failed')
+    bm_operations.disconnect_from_provisioner()
 
 
 @logger_time_stamp
 def install_resources():
     """
-    This method install ocp resources
+    This method installs OpenShift resources
     :return:
     """
-    ibm_operations = IBMOperations(user=provision_user)
-    ibm_operations.ibm_connect()
+    bare_metal_operations = BareMetalOperations(user=provision_user)
+    bare_metal_operations.connect_to_provisioner()
     install_resources_list = environment_variables_dict.get('install_resources_list', '')
     # convert str to list
     try:
         resources = ast.literal_eval(install_resources_list) if isinstance(install_resources_list, str) else install_resources_list
     except (ValueError, SyntaxError):
         resources = [install_resources_list]
-    logger.info(f'Start IBM OCP resources installation')
-    oc = ibm_operations.oc_login()
-    ibm_operations.verify_cluster_is_up(oc)
+    logger.info(f'Start Bare-Metal OpenShift resources installation')
+    oc = bare_metal_operations.oc_login()
+    bare_metal_operations.verify_cluster_is_up(oc)
     # ibm_blk_disk_name for odf install
-    ibm_operations.install_ocp_resources(resources=resources)
-    ibm_operations.ibm_disconnect()
-    logger.info(f'End IBM OCP resources installation')
+    bare_metal_operations.install_ocp_resources(resources=resources)
+    bare_metal_operations.disconnect_from_provisioner()
+    logger.info(f'End Bare-Metal OpenShift resources installation')
 
 
 @logger_time_stamp
 def update_ci_status():
     """
-    This method update ci status
+    This method updates ci status
     :return:
     """
     ci_minutes_time = environment_variables_dict.get('ci_minutes_time', '')
@@ -142,7 +168,7 @@ def update_ci_status():
 @logger_time_stamp
 def run_benchmark_operator_workload():
     """
-    This method run benchmark-operator workload
+    This method runs benchmark-operator workload
     :return:
     """
     # benchmark-operator node selector
@@ -156,7 +182,7 @@ def run_benchmark_operator_workload():
 @logger_time_stamp
 def run_benchmark_runner_workload():
     """
-    This method run benchmark-runner workload
+    This method runs benchmark-runner workload
     :return:
     """
     # benchmark-runner node selector
@@ -166,7 +192,7 @@ def run_benchmark_runner_workload():
 @logger_time_stamp
 def run_clusterbuster_workload():
     """
-    This method run clusterbuster workload
+    This method runs clusterbuster workload
     :return:
     """
     # benchmark-runner node selector
@@ -176,7 +202,7 @@ def run_clusterbuster_workload():
 @logger_time_stamp
 def main():
     """
-    The main of benchmark-runner handle Azure operations or Workload runs
+    MAIN of benchmark-runner framework
     """
     success = True
     # azure_cluster_start_stop
@@ -184,15 +210,18 @@ def main():
         azure_cluster_start_stop()
     # install_ocp_version
     elif install_ocp_version:
-        ibm_operations = IBMOperations(user=provision_user)
-        ibm_operations.ibm_connect()
         install_step = environment_variables_dict.get('install_step', '')
-        if install_step == 'run_ibm_ocp_installer':
-            install_ocp(ibm_operations=ibm_operations, step=install_step)
-        elif install_step == 'verify_install_complete':
-            install_ocp(ibm_operations=ibm_operations, step=install_step)
+        logger.info(f'Starting installation step: {install_step}')
+        if install_step == 'run_baremetal_ocp_installer':
+            install_ocp_bare_metal(step=install_step)
+        elif install_step == 'run_ibm_ocp_installer':
+            install_ocp_ibm_cloud(step=install_step)
+        elif install_step == 'verify_baremetal_install_complete':
+            install_ocp_bare_metal(step=install_step)
+        elif install_step == 'verify_ibm_install_complete':
+            install_ocp_ibm_cloud(step=install_step)
         else:
-            logger.info(f'{ibm_operations.get_ocp_server_version().strip()} version already installed, skip OCP installation')
+            raise Exception(f'Invalid install step: {install_step}')
     # install_ocp_resource
     elif install_ocp_resources:
         install_resources()
