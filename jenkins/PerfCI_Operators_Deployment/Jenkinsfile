@@ -36,13 +36,14 @@ pipeline {
         stage('⚙️ SET SSH key') {
             steps {
                 script {
-                    sh 'umask 77 && mkdir -p $WORKSPACE/.ssh/'
+                    sh 'mkdir -p $WORKSPACE/.ssh/'
+                    sh 'sudo chmod 700 $WORKSPACE/.ssh/'
                     withCredentials([file(credentialsId: 'perfci_provision_private_key_file', variable: 'PROVISION_PRIVATE_KEY_FILE')]) {
                         sh "sudo cp \$PROVISION_PRIVATE_KEY_FILE $WORKSPACE/.ssh/provision_private_key"
                     }
-                    sh 'chmod 600 $PRIVATE_KEY_PATH'
+                    sh 'sudo chmod 600 $PRIVATE_KEY_PATH'
                     sh '''
-                        cat > "$CONFIG_PATH" <<END
+                        sudo cat > "$CONFIG_PATH" <<END
     Host provision
         HostName ${PROVISION_IP}
         User ${PROVISION_USER}
@@ -52,7 +53,7 @@ pipeline {
         ServerAliveCountMax 5
 END
                     '''
-                    sh 'chmod 600 $CONFIG_PATH'
+                    sh 'sudo chmod 600 $CONFIG_PATH'
                 }
             }
         }
