@@ -27,7 +27,11 @@ pipeline {
         stage('Cleanup') {
             steps {
                 script {
-                    sh 'sudo podman ps -a --filter "name=benchmark-runner" -q | sudo xargs -r podman rm'
+                    sh '''
+                        if [[ "$(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)" != "" ]]; then
+                            sudo podman rmi -f $(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)
+                        fi
+                    '''
                     sh 'sudo podman volume ls -q | sudo xargs -r podman volume rm'
                 }
             }
@@ -39,7 +43,8 @@ pipeline {
                     sh 'mkdir -p $WORKSPACE/.ssh/'
                     sh 'sudo chmod 700 $WORKSPACE/.ssh/'
                     withCredentials([file(credentialsId: 'perfci_provision_private_key_file', variable: 'PROVISION_PRIVATE_KEY_FILE')]) {
-                        sh "sudo cp \$PROVISION_PRIVATE_KEY_FILE $WORKSPACE/.ssh/provision_private_key"
+                        sh "sudo cp ${PROVISION_PRIVATE_KEY_FILE} ${WORKSPACE}/.ssh/provision_private_key"
+                        sh "sudo chown jenkins:jenkins ${WORKSPACE}/.ssh/provision_private_key"
                     }
                     sh 'sudo chmod 600 $PRIVATE_KEY_PATH'
                     sh '''
@@ -61,12 +66,12 @@ END
         stage('CNV Nightly Registered ') {
             steps {
                 script {
-                    sh 'mkdir -p $WORKSPACE/cnv_nightly'
+                    sh "sudo mkdir -p ${WORKSPACE}/cnv_nightly"
                     withCredentials([file(credentialsId: 'perfci_cnv_nightly_registered_file', variable: 'CNV_NIGHTLY_REGISTERED_FILE')]) {
-                        sh "yes | sudo cp \$CNV_NIGHTLY_REGISTERED_FILE $WORKSPACE/perfci/cnv_nightly/registered.sh"
+                        sh "yes | sudo cp ${CNV_NIGHTLY_REGISTERED_FILE} ${WORKSPACE}/perfci/cnv_nightly/registered.sh"
                     }
                     withCredentials([file(credentialsId: 'perfci_cnv_nightly_catalog_source_file', variable: 'CNV_NIGHTLY_CATALOG_SOURCE_FILE')]) {
-                        sh "yes | sudo cp \$CNV_NIGHTLY_CATALOG_SOURCE_FILE $WORKSPACE/perfci/cnv_nightly/catalog_source.yaml"
+                        sh "yes | sudo cp ${CNV_NIGHTLY_CATALOG_SOURCE_FILE} ${WORKSPACE}/perfci/cnv_nightly/catalog_source.yaml"
                     }
                     sh 'sudo chown jenkins:jenkins $WORKSPACE/perfci/cnv_nightly/registered.sh'
                     sh 'chmod +x $WORKSPACE/perfci/cnv_nightly/registered.sh'
@@ -127,7 +132,11 @@ END
     post {
         always {
             script {
-                sh 'sudo podman ps -a --filter "name=benchmark-runner" -q | sudo xargs -r podman rm'
+                sh '''
+                    if [[ "$(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)" != "" ]]; then
+                        sudo podman rmi -f $(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)
+                    fi
+                '''
                 sh 'sudo podman volume ls -q | sudo xargs -r podman volume rm'
             }
         }
