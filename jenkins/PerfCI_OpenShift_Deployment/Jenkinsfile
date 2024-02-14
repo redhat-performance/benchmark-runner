@@ -28,19 +28,24 @@ pipeline {
         stage('Cleanup') {
             steps {
                 script {
-                    sh 'sudo podman ps -a --filter "name=benchmark-runner" -q | sudo xargs -r podman rm'
+                    sh '''
+                        if [[ "$(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)" != "" ]]; then
+                            sudo podman rmi -f $(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)
+                        fi
+                    '''
                     sh 'sudo podman volume ls -q | sudo xargs -r podman volume rm'
                 }
             }
         }
 
-        stage('⚙️ SET SSH key') {
+                stage('⚙️ SET SSH key') {
             steps {
                 script {
                     sh 'mkdir -p $WORKSPACE/.ssh/'
                     sh 'sudo chmod 700 $WORKSPACE/.ssh/'
                     withCredentials([file(credentialsId: 'perfci_provision_private_key_file', variable: 'PROVISION_PRIVATE_KEY_FILE')]) {
-                        sh "sudo cp \$PROVISION_PRIVATE_KEY_FILE $WORKSPACE/.ssh/provision_private_key"
+                        sh "sudo cp ${PROVISION_PRIVATE_KEY_FILE} ${WORKSPACE}/.ssh/provision_private_key"
+                        sh "sudo chown jenkins:jenkins ${WORKSPACE}/.ssh/provision_private_key"
                     }
                     sh 'sudo chmod 600 $PRIVATE_KEY_PATH'
                     sh '''
@@ -64,7 +69,7 @@ END
                 axes {
                     axis {
                         name 'INSTALL_STEP'
-                        values 'run_bm_ocp_installer', 'verify_bm_install_complete'
+                        values 'run_bare_metal_ocp_installer', 'verify_bare_metal_install_complete'
                     }
                 }
                 stages {
@@ -103,7 +108,11 @@ END
     post {
         always {
             script {
-                sh 'sudo podman ps -a --filter "name=benchmark-runner" -q | sudo xargs -r podman rm'
+                sh '''
+                    if [[ "$(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)" != "" ]]; then
+                        sudo podman rmi -f $(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)
+                    fi
+                '''
                 sh 'sudo podman volume ls -q | sudo xargs -r podman volume rm'
             }
         }

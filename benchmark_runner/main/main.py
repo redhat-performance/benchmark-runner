@@ -111,10 +111,10 @@ def install_ocp_bare_metal(step: str):
     """
     bm_operations = BareMetalOperations(user=provision_user)
     bm_operations.connect_to_provisioner()
-    if step == 'run_baremetal_ocp_installer':
+    if step == 'run_bare_metal_ocp_installer':
         bm_operations.update_ocp_version(file_name='all.yml')
         bm_operations.run_ocp_installer()
-    elif step == 'verify_baremetal_install_complete':
+    elif step == 'verify_bare_metal_install_complete':
         complete = bm_operations.verify_install_complete()
         if complete:
             logger.info(f'OCP {install_ocp_version} installation complete successfully')
@@ -212,11 +212,11 @@ def main():
     elif install_ocp_version:
         install_step = environment_variables_dict.get('install_step', '')
         logger.info(f'Starting installation step: {install_step}')
-        if install_step == 'run_baremetal_ocp_installer':
+        if install_step == 'run_bare_metal_ocp_installer':
             install_ocp_bare_metal(step=install_step)
         elif install_step == 'run_ibm_ocp_installer':
             install_ocp_ibm_cloud(step=install_step)
-        elif install_step == 'verify_baremetal_install_complete':
+        elif install_step == 'verify_bare_metal_install_complete':
             install_ocp_bare_metal(step=install_step)
         elif install_step == 'verify_ibm_install_complete':
             install_ocp_ibm_cloud(step=install_step)
