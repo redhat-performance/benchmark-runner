@@ -32,7 +32,6 @@ pipeline {
                             sudo podman rmi -f $(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)
                         fi
                     '''
-                    sh 'sudo podman volume ls -q | sudo xargs -r podman volume rm'
                 }
             }
         }
@@ -137,7 +136,6 @@ END
                         sudo podman rmi -f $(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)
                     fi
                 '''
-                sh 'sudo podman volume ls -q | sudo xargs -r podman volume rm'
             }
         }
         failure {
