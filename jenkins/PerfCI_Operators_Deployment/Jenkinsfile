@@ -10,14 +10,13 @@ pipeline {
         WORKER_DISK_PREFIX = credentials('perfci_worker_disk_ids_prefix')
         CNV_VERSION = credentials('perfci_cnv_version')
         ODF_VERSION = credentials('perfci_odf_version')
-        CLUSTER_TYPE = credentials('perfci_cluster_type')
         EXPECTED_NODES = credentials('perfci_expected_nodes')
         KUBEADMIN_PASSWORD = readFile('/home/jenkins/.kube/kubeadmin-password').trim()
         KUBEADMIN_PASSWORD_PATH = '/home/jenkins/.kube/kubeadmin-password'
         KUBECONFIG_PATH = '/root/.kube/config'
         PRIVATE_KEY_PATH = '/home/jenkins/.ssh/provision_private_key'
         CONFIG_PATH = '/home/jenkins/.ssh/config'
-        WORKSPACE='/home/jenkins'
+        WORKSPACE = '/home/jenkins'
         CONTAINER_PRIVATE_KEY_PATH = '/root/.ssh/provision_private_key'
         PROVISION_PORT = 22
         NUM_ODF_DISK = 6
@@ -27,6 +26,9 @@ pipeline {
         stage('Cleanup') {
             steps {
                 script {
+                    // Clean the Jenkins workspace
+                        echo "Cleaning Jenkins workspace"
+                        deleteDir()
                     sh '''
                         if [[ "$(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)" != "" ]]; then
                             sudo podman rmi -f $(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)
@@ -62,7 +64,7 @@ END
             }
         }
 
-        stage('CNV Nightly Registered ') {
+        stage('CNV Nightly Registered') {
             steps {
                 script {
                     sh "sudo mkdir -p ${WORKSPACE}/cnv_nightly"
@@ -73,8 +75,8 @@ END
                         sh "yes | sudo cp ${CNV_NIGHTLY_CATALOG_SOURCE_FILE} ${WORKSPACE}/perfci/cnv_nightly/catalog_source.yaml"
                     }
                     sh 'sudo chown jenkins:jenkins $WORKSPACE/perfci/cnv_nightly/registered.sh'
-                    sh 'chmod +x $WORKSPACE/perfci/cnv_nightly/registered.sh'
-                    sh '$WORKSPACE/perfci/cnv_nightly/./registered.sh'
+                    sh 'sudo chmod +x $WORKSPACE/perfci/cnv_nightly/registered.sh'
+                    sh 'sudo $WORKSPACE/perfci/cnv_nightly/./registered.sh'
                     sh 'sudo sed -i "s/{{ cnv_version }}/$CNV_VERSION/g" $WORKSPACE/perfci/cnv_nightly/catalog_source.yaml'
                     sh 'sudo chown jenkins:jenkins $WORKSPACE/perfci/cnv_nightly/catalog_source.yaml'
                     sh 'oc apply -f $WORKSPACE/perfci/cnv_nightly/catalog_source.yaml'
@@ -83,40 +85,46 @@ END
         }
 
         stage('Operators Deployment') {
-            matrix {
-                axes {
-                    axis {
-                        name 'RESOURCE'
-                        values 'lso', 'odf', 'cnv', 'infra', 'custom'
-                    }
-                }
-                stages {
-                     stage("Run Operator Deployment") {
-                        steps {
+            steps {
+                script {
+                    def resources = ['lso', 'odf', 'cnv', 'infra', 'custom']
+
+                    for (resource in resources) {
+                        echo "Run Operator Deployment for ${resource}"
+
+                        // Create a stage for each resource
+                        stage("Deployment ${resource}") {
+                            echo "Running deployment for ${resource}"
+                            // Deployment code
                             script {
                                 withCredentials([string(credentialsId: 'perfci_provision_ip', variable: 'PROVISION_IP')]) {
                                     withCredentials([string(credentialsId: 'perfci_provision_user', variable: 'PROVISION_USER')]) {
                                         withCredentials([file(credentialsId: 'perfci_provision_private_key_file', variable: 'PROVISION_PRIVATE_KEY_FILE')]) {
-                                            sh """
-                                                sudo podman run --rm \
-                                                    -e INSTALL_OCP_RESOURCES=True \
-                                                    -e INSTALL_RESOURCES_LIST="${RESOURCE}" \
-                                                    -e CNV_VERSION="${CNV_VERSION}" \
-                                                    -e ODF_VERSION="${ODF_VERSION}" \
-                                                    -e NUM_ODF_DISK="${NUM_ODF_DISK}" \
-                                                    -e KUBEADMIN_PASSWORD="${KUBEADMIN_PASSWORD}" \
-                                                    -e PROVISION_IP="${PROVISION_IP}" \
-                                                    -e CONTAINER_PRIVATE_KEY_PATH="${CONTAINER_PRIVATE_KEY_PATH}" \
-                                                    -e PROVISION_USER="${PROVISION_USER}" \
-                                                    -e PROVISION_PORT="${PROVISION_PORT}" \
-                                                    -e WORKER_DISK_IDS="${WORKER_DISK_IDS}" \
-                                                    -e WORKER_DISK_PREFIX="${WORKER_DISK_PREFIX}" \
-                                                    -e PROVISION_TIMEOUT="${PROVISION_TIMEOUT}" \
-                                                    -e log_level=INFO \
-                                                    -v "${PRIVATE_KEY_PATH}:${CONTAINER_PRIVATE_KEY_PATH}" \
-                                                    -v "${KUBECONFIG_PATH}:${KUBECONFIG_PATH}" \
-                                                    --privileged quay.io/ebattat/benchmark-runner:latest
-                                            """
+                                            withCredentials([string(credentialsId: 'perfci_worker_disk_ids', variable: 'WORKER_DISK_IDS')]) {
+                                                withCredentials([string(credentialsId: 'perfci_expected_nodes', variable: 'EXPECTED_NODES')]) {
+                                                    sh """
+                                                        sudo podman run --rm \
+                                                            -e INSTALL_OCP_RESOURCES=True \
+                                                            -e INSTALL_RESOURCES_LIST="${resource}" \
+                                                            -e EXPECTED_NODES="${EXPECTED_NODES}" \
+                                                            -e CNV_VERSION="${CNV_VERSION}" \
+                                                            -e ODF_VERSION="${ODF_VERSION}" \
+                                                            -e NUM_ODF_DISK="${NUM_ODF_DISK}" \
+                                                            -e KUBEADMIN_PASSWORD="${KUBEADMIN_PASSWORD}" \
+                                                            -e PROVISION_IP="${PROVISION_IP}" \
+                                                            -e CONTAINER_PRIVATE_KEY_PATH="${CONTAINER_PRIVATE_KEY_PATH}" \
+                                                            -e PROVISION_USER="${PROVISION_USER}" \
+                                                            -e PROVISION_PORT="${PROVISION_PORT}" \
+                                                            -e WORKER_DISK_IDS="${WORKER_DISK_IDS}" \
+                                                            -e WORKER_DISK_PREFIX="${WORKER_DISK_PREFIX}" \
+                                                            -e PROVISION_TIMEOUT="${PROVISION_TIMEOUT}" \
+                                                            -e log_level=INFO \
+                                                            -v "${PRIVATE_KEY_PATH}:${CONTAINER_PRIVATE_KEY_PATH}" \
+                                                            -v "${KUBECONFIG_PATH}:${KUBECONFIG_PATH}" \
+                                                            --privileged quay.io/ebattat/benchmark-runner:latest
+                                                    """
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -126,6 +134,8 @@ END
                 }
             }
         }
+
+
     }
 
     post {

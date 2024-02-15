@@ -28,11 +28,29 @@ pipeline {
         stage('Cleanup') {
             steps {
                 script {
-                    sh '''
+                    try {
+                        // Clean the Jenkins workspace
+                        echo "Cleaning Jenkins workspace"
+                        deleteDir()
+
+                        // Delete benchmark-runner images
+                        sh '''
                         if [[ "$(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)" != "" ]]; then
                             sudo podman rmi -f $(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)
                         fi
-                    '''
+                        '''
+                        // Stop running containers
+                        sh 'sudo podman ps | awk \'{print $1}\' | sudo xargs -I % sudo podman stop % 2>/dev/null'
+
+                        // Remove stopped containers
+                        sh 'sudo podman ps -a | awk \'{print $1}\' | sudo xargs -I % sudo podman rm % 2>/dev/null'
+
+                        // Remove pods
+                        sh 'sudo podman pod ps | awk \'{print $1}\' | sudo xargs -I % sudo podman pod rm % 2>/dev/null'
+                    } catch (Exception e) {
+                        echo "Error: ${e.getMessage()}"
+                        // Additional error handling or actions can be added here
+                    }
                 }
             }
         }
@@ -62,25 +80,25 @@ END
                 }
             }
         }
+        stage('OpenShift Deployment') {
+            steps {
+                script {
+                    def install_steps = ['run_bare_metal_ocp_installer', 'verify_bare_metal_install_complete']
 
-        stage('OCP Deployment') {
-            matrix {
-                axes {
-                    axis {
-                        name 'INSTALL_STEP'
-                        values 'run_bare_metal_ocp_installer', 'verify_bare_metal_install_complete'
-                    }
-                }
-                stages {
-                    stage('Run Step') {
-                        steps {
+                    for (install_step in install_steps) {
+                        echo "Run OpenShift Deployment for ${install_step}"
+
+                        // Create a stage for each resource
+                        stage("Deployment ${install_step}") {
+                            echo "Running deployment for ${install_step}"
+                            // deployment code
                             script {
                                 withCredentials([string(credentialsId: 'perfci_provision_ip', variable: 'PROVISION_IP')]) {
                                     withCredentials([string(credentialsId: 'perfci_provision_user', variable: 'PROVISION_USER')]) {
                                         withCredentials([file(credentialsId: 'perfci_provision_private_key_file', variable: 'PROVISION_PRIVATE_KEY_FILE')]) {
                                             sh """
                                                 sudo podman run --rm -e INSTALL_OCP_VERSION="${INSTALL_OCP_VERSION}" \
-                                                    -e INSTALL_STEP="${INSTALL_STEP}" -e PROVISION_IP="${PROVISION_IP}" \
+                                                    -e INSTALL_STEP="${install_step}" -e PROVISION_IP="${PROVISION_IP}" \
                                                     -e PROVISION_USER="${PROVISION_USER}" -e PROVISION_PORT="${PROVISION_PORT}" \
                                                     -e KUBEADMIN_PASSWORD_PATH="${KUBEADMIN_PASSWORD_PATH}" \
                                                     -e KUBECONFIG_PATH="${KUBECONFIG_PATH}" \
@@ -124,7 +142,7 @@ END
         }
         success {
             echo 'Triggering PerfCI-Operators-Deployment pipeline'
-            build job: 'PerfCI-Operators-Deployment', wait: false
+            build job: 'PerfCI-Operators-Deployment', wait: true
         }
     }
 }
