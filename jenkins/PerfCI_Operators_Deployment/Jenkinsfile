@@ -7,7 +7,6 @@ pipeline {
         PROVISION_USER = credentials('perfci_provision_user')
         PROVISION_IP = credentials('perfci_provision_ip')
         WORKER_DISK_IDS = credentials('perfci_worker_disk_ids')
-        WORKER_DISK_PREFIX = credentials('perfci_worker_disk_ids_prefix')
         CNV_VERSION = credentials('perfci_cnv_version')
         ODF_VERSION = credentials('perfci_odf_version')
         EXPECTED_NODES = credentials('perfci_expected_nodes')
@@ -18,6 +17,7 @@ pipeline {
         CONFIG_PATH = '/home/jenkins/.ssh/config'
         WORKSPACE = '/home/jenkins'
         CONTAINER_PRIVATE_KEY_PATH = '/root/.ssh/provision_private_key'
+        WORKER_DISK_PREFIX = 'wwn-0x'
         PROVISION_PORT = 22
         NUM_ODF_DISK = 6
         PROVISION_TIMEOUT = 3600
@@ -67,7 +67,7 @@ END
         stage('CNV Nightly Registered') {
             steps {
                 script {
-                    sh "sudo mkdir -p ${WORKSPACE}/cnv_nightly"
+                    sh "sudo mkdir -p ${WORKSPACE}/perfci/cnv_nightly"
                     withCredentials([file(credentialsId: 'perfci_cnv_nightly_registered_file', variable: 'CNV_NIGHTLY_REGISTERED_FILE')]) {
                         sh "yes | sudo cp ${CNV_NIGHTLY_REGISTERED_FILE} ${WORKSPACE}/perfci/cnv_nightly/registered.sh"
                     }
@@ -85,22 +85,22 @@ END
         }
 
         stage('Operators Deployment') {
-            steps {
-                script {
-                    def resources = ['lso', 'odf', 'cnv', 'infra', 'custom']
+        steps {
+            script {
+                def resources = ['lso', 'odf', 'cnv', 'infra', 'custom']
 
-                    for (resource in resources) {
-                        echo "Run Operator Deployment for ${resource}"
+                for (resource in resources) {
+                    echo "Run Operator Deployment for ${resource}"
 
-                        // Create a stage for each resource
-                        stage("Deployment ${resource}") {
-                            echo "Running deployment for ${resource}"
-                            // Deployment code
-                            script {
-                                withCredentials([string(credentialsId: 'perfci_provision_ip', variable: 'PROVISION_IP')]) {
-                                    withCredentials([string(credentialsId: 'perfci_provision_user', variable: 'PROVISION_USER')]) {
-                                        withCredentials([file(credentialsId: 'perfci_provision_private_key_file', variable: 'PROVISION_PRIVATE_KEY_FILE')]) {
-                                            withCredentials([string(credentialsId: 'perfci_worker_disk_ids', variable: 'WORKER_DISK_IDS')]) {
+                    // Create a stage for each resource
+                    stage("Deployment ${resource}") {
+                        echo "Running deployment for ${resource}"
+                        // Deployment code
+                        script {
+                            withCredentials([string(credentialsId: 'perfci_provision_ip', variable: 'PROVISION_IP')]) {
+                                withCredentials([string(credentialsId: 'perfci_provision_user', variable: 'PROVISION_USER')]) {
+                                    withCredentials([file(credentialsId: 'perfci_provision_private_key_file', variable: 'PROVISION_PRIVATE_KEY_FILE')]) {
+                                        withCredentials([string(credentialsId: 'perfci_worker_disk_ids', variable: 'WORKER_DISK_IDS')]) {
                                                 withCredentials([string(credentialsId: 'perfci_expected_nodes', variable: 'EXPECTED_NODES')]) {
                                                     sh """
                                                         sudo podman run --rm \
@@ -126,7 +126,6 @@ END
                                                 }
                                             }
                                         }
-                                    }
                                 }
                             }
                         }
@@ -134,6 +133,8 @@ END
                 }
             }
         }
+    }
+
 
 
     }
