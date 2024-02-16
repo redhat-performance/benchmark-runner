@@ -89,7 +89,7 @@ END
                         echo "Run OpenShift Deployment for ${install_step}"
 
                         // Create a stage for each resource
-                        stage("Deployment ${install_step}") {
+                        stage("${install_step} Deployment") {
                             echo "Running deployment for ${install_step}"
                             // deployment code
                             script {
