@@ -81,6 +81,7 @@ jobs:
           ODF_VERSION: "4.13"
           NUM_ODF_DISK : "4"
           KATA_CSV: ""
+          WORKER_DISK_PREFIX: "wwn-0x"
           QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
           QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
           IBM_API_KEY: ${{ secrets.IBM_API_KEY }}

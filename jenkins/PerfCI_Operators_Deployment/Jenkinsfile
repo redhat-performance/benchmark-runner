@@ -93,7 +93,7 @@ END
                     echo "Run Operator Deployment for ${resource}"
 
                     // Create a stage for each resource
-                    stage("Deployment ${resource}") {
+                    stage("${resource} Deployment") {
                         echo "Running deployment for ${resource}"
                         // Deployment code
                         script {
