@@ -81,7 +81,6 @@ jobs:
           ODF_VERSION: "4.13"
           NUM_ODF_DISK : "4"
           KATA_CSV: ""
-          WORKER_DISK_PREFIX: "wwn-0x"
           QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
           QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
           IBM_API_KEY: ${{ secrets.IBM_API_KEY }}
@@ -99,6 +98,7 @@ jobs:
           CNV_NIGHTLY_REGISTERED: ${{ secrets.CNV_NIGHTLY_REGISTERED }}
           CNV_NIGHTLY_CATALOG_SOURCE: ${{ secrets.CNV_NIGHTLY_CATALOG_SOURCE }}
           WORKER_DISK_IDS:  ${{ secrets.PERF_WORKER_DISK_IDS }}
+          WORKER_DISK_PREFIX:  ${{ secrets.PERF_WORKER_DISK_PREFIX }}
           EXPECTED_NODES: ${{ secrets.PERF_EXPECTED_NODES }}
         run: |
           build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
