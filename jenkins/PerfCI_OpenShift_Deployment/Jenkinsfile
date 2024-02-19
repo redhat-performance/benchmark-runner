@@ -142,7 +142,7 @@ END
         }
         success {
             echo 'Triggering PerfCI-Operators-Deployment pipeline'
-            build job: 'PerfCI-Operators-Deployment', wait: true
+            build job: 'PerfCI-Operators-Deployment', wait: false
         }
     }
 }
