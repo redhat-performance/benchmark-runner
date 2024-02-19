@@ -33,6 +33,9 @@ pipeline {
                         echo "Cleaning Jenkins workspace"
                         deleteDir()
 
+                        // Delete assisted installer previous deployments
+                        sh "curl http://${PROVISION_IP}:8090/api/assisted-install/v2/clusters | jq '.[].id' -r | xargs -I % curl -X DELETE http://${PROVISION_IP}:8090/api/assisted-install/v2/clusters/%"
+
                         // Delete benchmark-runner images
                         sh '''
                         if [[ "$(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)" != "" ]]; then
