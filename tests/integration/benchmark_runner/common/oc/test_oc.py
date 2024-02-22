@@ -107,7 +107,7 @@ def test_oc_get_free_disk_id():
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
     with mock.patch.object(OC, 'get_worker_disk_ids', new=mock_get_worker_disk_ids):
-        assert oc.get_free_disk_id()
+        assert oc.get_free_disk_id(node=test_environment_variable['pin_node1'])
 
 
 def test_oc_get_odf_disk_count():
