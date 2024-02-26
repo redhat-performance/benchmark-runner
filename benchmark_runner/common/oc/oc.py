@@ -69,15 +69,20 @@ class OC(SSH):
         """
         self.run(fr"""{self.__cli} get nodes -l node-role.kubernetes.io/worker= -o jsonpath="{{range .items[*]}}{{.metadata.name}}{{'\\n'}}{{end}}" |  xargs -I{{}} {self.__cli} debug node/{{}} -- chroot /host sh -c "rm -rf /mnt/local-storage/local-sc" """)
 
-    def get_worker_disk_ids(self):
+    def get_worker_disk_ids(self, node: str = None):
         """
-        The method returns worker disk ids only when there are worker disk ids
+        This method returns all worker disk ids or disk ids by node
+        :param node:
+        :return:
         """
         workers_disk_ids = []
-        if self.__worker_disk_ids:
+
+        if node and node in self.__worker_disk_ids:
+            workers_disk_ids.extend(self.__worker_disk_ids[node])
+        else:
             for node, disk_ids in self.__worker_disk_ids.items():
-                for disk_id in disk_ids:
-                    workers_disk_ids.append(disk_id)
+                workers_disk_ids.extend(disk_ids)
+
         return workers_disk_ids
 
     def get_pv_disk_ids(self):
@@ -85,20 +90,19 @@ class OC(SSH):
         This method returns list of pv disk ids
         """
         pv_ids = self.run(f"{self.__cli} get pv -o jsonpath={{.items[*].metadata.annotations.'storage\.openshift\.com/device-id'}}")
-        # SATA disks in /dev/disk/by-id conventionally are prefixed with `wwn-0x` and `scsi-3`; ODF requires use of the `wwn-0x` prefix while LSO requires the `scsi-3` prefix.  We have to be prepared to use either prefix, but as they are the same length, we can presently strip the first 6 characters of the name.
         return [pv[len(self.__worker_disk_prefix):] for pv in pv_ids.split()]
 
-    def get_free_disk_id(self):
+    def get_free_disk_id(self, node: str = None):
         """
-        This method returns free disk (workers_all_disk_ids - workers_odf_pv_disk_ids) with its prefix only when there are worker disk ids
+        This method returns free disk per node  [workers disk ids - workers pv disk ids]
         """
-        workers_disk_ids = self.get_worker_disk_ids()
+        workers_disk_ids = self.get_worker_disk_ids(node)
         workers_pv_disk_ids = self.get_pv_disk_ids()
-        free_disk_id = f'{self.__worker_disk_prefix}{list(set(workers_disk_ids) - set(workers_pv_disk_ids))[0]}'
+        free_disk_id = f'{self.__worker_disk_prefix}{[disk_id for disk_id in workers_disk_ids if disk_id not in workers_pv_disk_ids][0]}'
         if free_disk_id:
             return free_disk_id
         else:
-            raise Exception('Missing free disk id')
+            raise ValueError('Missing free disk id')
 
     @typechecked
     def run_debug_node(self, node: str, cmd: str):

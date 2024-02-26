@@ -46,5 +46,4 @@ def test_short_uuid():
 
     with mock.patch.object(OC, 'get_long_uuid', new=dummy_long_uuid):
         oc = OC()
-        assert oc._OC__get_short_uuid(workload='streeng-pod') == 'bb2be20e'
-
+        assert oc._OC__get_short_uuid(workload='stressng_pod') == 'bb2be20e'
