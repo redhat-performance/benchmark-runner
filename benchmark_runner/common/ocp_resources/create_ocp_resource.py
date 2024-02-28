@@ -25,9 +25,11 @@ class CreateOCPResource:
         self.__worker_disk_prefix = self.__environment_variables_dict.get('worker_disk_prefix', '')
         self.__worker_disk_ids = self.__environment_variables_dict.get('worker_disk_ids', '')
         if self.__worker_disk_ids:
-            # Solved GitHub Actions issue that env variable detect as string instead of dict/ list
-            self.__worker_disk_ids = self.__worker_disk_ids.replace('"', '')
-            self.__worker_disk_ids = ast.literal_eval(self.__worker_disk_ids)
+            if self.__worker_disk_ids:
+                # Solved GitHub Actions issue that env variable detect as string instead of dict/ list -skip for Jenkins
+                if self.__environment_variables_dict.get('github_token', ''):
+                    self.__worker_disk_ids = self.__worker_disk_ids.replace('"', '')
+                self.__worker_disk_ids = ast.literal_eval(self.__worker_disk_ids)
 
     @staticmethod
     def __get_yaml_files(path: str, extensions: list = ['.yaml', '.sh']):
