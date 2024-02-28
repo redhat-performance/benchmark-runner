@@ -98,8 +98,9 @@ class WorkloadsOperations:
             self._snapshot = PrometheusSnapshot(oc=self._oc, artifacts_path=self._run_artifacts_path, verbose=True)
         self._prometheus_snap_interval = self._environment_variables_dict.get('prometheus_snap_interval', '')
         self._prometheus_metrics_operation = PrometheusMetricsOperation()
-        if self._environment_variables_dict.get('windows_url', ''):
-            file_name = os.path.basename(self._environment_variables_dict.get('windows_url', ''))
+        self._windows_url = self._environment_variables_dict.get('windows_url', '')
+        if self._windows_url:
+            file_name = os.path.basename(self._windows_url)
             self._windows_os = os.path.splitext(file_name)[0]
 
     def _get_workload_file_name(self, workload):
