@@ -105,22 +105,22 @@ END
                                                     sh """
                                                         sudo podman run --rm \
                                                             -e INSTALL_OCP_RESOURCES=True \
-                                                            -e INSTALL_RESOURCES_LIST="${resource}" \
-                                                            -e EXPECTED_NODES="${EXPECTED_NODES}" \
-                                                            -e CNV_VERSION="${CNV_VERSION}" \
-                                                            -e ODF_VERSION="${ODF_VERSION}" \
-                                                            -e NUM_ODF_DISK="${NUM_ODF_DISK}" \
-                                                            -e KUBEADMIN_PASSWORD="${KUBEADMIN_PASSWORD}" \
-                                                            -e PROVISION_IP="${PROVISION_IP}" \
-                                                            -e CONTAINER_PRIVATE_KEY_PATH="${CONTAINER_PRIVATE_KEY_PATH}" \
-                                                            -e PROVISION_USER="${PROVISION_USER}" \
-                                                            -e PROVISION_PORT="${PROVISION_PORT}" \
-                                                            -e WORKER_DISK_IDS="${WORKER_DISK_IDS}" \
-                                                            -e WORKER_DISK_PREFIX="${WORKER_DISK_PREFIX}" \
-                                                            -e PROVISION_TIMEOUT="${PROVISION_TIMEOUT}" \
-                                                            -e log_level=INFO \
-                                                            -v "${PRIVATE_KEY_PATH}:${CONTAINER_PRIVATE_KEY_PATH}" \
-                                                            -v "${KUBECONFIG_PATH}:${KUBECONFIG_PATH}" \
+                                                            -e INSTALL_RESOURCES_LIST='${resource}' \
+                                                            -e EXPECTED_NODES='${EXPECTED_NODES}' \
+                                                            -e CNV_VERSION='${CNV_VERSION}' \
+                                                            -e ODF_VERSION='${ODF_VERSION}' \
+                                                            -e NUM_ODF_DISK='${NUM_ODF_DISK}' \
+                                                            -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' \
+                                                            -e PROVISION_IP='${PROVISION_IP}' \
+                                                            -e CONTAINER_PRIVATE_KEY_PATH='${CONTAINER_PRIVATE_KEY_PATH}' \
+                                                            -e PROVISION_USER='${PROVISION_USER}' \
+                                                            -e PROVISION_PORT='${PROVISION_PORT}' \
+                                                            -e WORKER_DISK_IDS='${WORKER_DISK_IDS}' \
+                                                            -e WORKER_DISK_PREFIX='${WORKER_DISK_PREFIX}' \
+                                                            -e PROVISION_TIMEOUT='${PROVISION_TIMEOUT}' \
+                                                            -e log_level='INFO' \
+                                                            -v '${PRIVATE_KEY_PATH}:${CONTAINER_PRIVATE_KEY_PATH}' \
+                                                            -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
                                                             --privileged quay.io/ebattat/benchmark-runner:latest
                                                     """
                                                 }
@@ -156,6 +156,10 @@ END
                     Jenkins job: ${env.BUILD_URL}\nSee the console output for more details:  ${env.BUILD_URL}consoleFull\n\n
                 """, subject: msg, to: "${CONTACT_EMAIL1}"
             }
+        }
+        success {
+            echo 'Triggering PerfCI-Workloads-Deployment pipeline'
+            build job: 'PerfCI-Workloads-Deployment', wait: false
         }
     }
 }
