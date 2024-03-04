@@ -1,23 +1,11 @@
-stages:
-  - Install_dependencies
-  - run_pytest
-
-Install_dependencies:
-  tags:
-    - cloud_governance
-  stage: Install_dependencies
-  script:
-    - python3 -m pip3 install --upgrade pip3
-    - pip3 install flake8 pytest pytest-cov
-    - if [[ -f requirements.txt ]]; then pip3 install -r requirements.txt; fi
-    - if [[ -f tests_requirements.txt ]]; then pip3 install -r tests_requirements.txt; fi
-  environment: testing
-
 run_pytest:
   tags:
+    - docker
     - cloud_governance
+  image: python:3.9
   stage: run_pytest
+  before_script:
+    - apt-get update && apt-get install build-essential python3-dev libldap2-dev libsasl2-dev -y -q
   script:
-    - ls
-    - pytest -v tests/unittest/
-  environment: testing
+    pytest -v tests/unittest/
+
