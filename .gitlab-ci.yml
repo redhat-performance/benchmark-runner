@@ -1,0 +1,12 @@
+stages:
+  - run_pytest
+
+run_pytest:
+  tags:
+    - PerfCi
+  stage: run_pytest
+  script:
+    - ls
+    - oc get node
+    - pytest -v tests/unittest/
+  environment: testing
