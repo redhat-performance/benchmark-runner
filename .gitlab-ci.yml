@@ -7,6 +7,5 @@ run_pytest:
   stage: run_pytest
   script:
     - ls
-    - oc get node
     - pytest -v tests/unittest/
   environment: testing
