@@ -4,7 +4,7 @@ workflow:
     - local: '.gitlab/workflows/test_branch.yml'
       rules:
         - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - local: '.gitlab-ci-templates/test_merge.yml'
+    - local: '.gitlab/workflows/test_merge.yml'
       rules:
         - if: $CI_DEFAULT_BRANCH == "react_app" && $CI_PIPELINE_SOURCE == "push"
 
