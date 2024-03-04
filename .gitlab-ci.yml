@@ -7,10 +7,10 @@ Install_dependencies:
     - cloud_governance
   stage: Install_dependencies
   script:
-    - python -m pip install --upgrade pip
-    - pip install flake8 pytest pytest-cov
-    - if [[ -f requirements.txt ]]; then pip install -r requirements.txt; fi
-    - if [[ -f tests_requirements.txt ]]; then pip install -r tests_requirements.txt; fi
+    - python3 -m pip3 install --upgrade pip3
+    - pip3 install flake8 pytest pytest-cov
+    - if [[ -f requirements.txt ]]; then pip3 install -r requirements.txt; fi
+    - if [[ -f tests_requirements.txt ]]; then pip3 install -r tests_requirements.txt; fi
   environment: testing
 
 run_pytest:
