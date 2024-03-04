@@ -16,7 +16,7 @@ run_pytest:
   script:
     - pip install pytest
     - pytest -v tests/unittest/
-
+  environment: testing
 
 
 
