@@ -17,7 +17,7 @@ pipeline {
         KUBECONFIG_PATH = '/root/.kube/config'
         PROVISION_INSTALLER_PATH = '/root/jetlag/./run_jetlag.sh'
         PROVISION_INSTALLER_CMD = 'pushd /root/jetlag;/root/jetlag/./run_jetlag.sh 1>/dev/null 2>&1;popd'
-        PROVISION_INSTALLER_LOG = 'tail -40 /root/jetlag/jetlag.log'
+        PROVISION_INSTALLER_LOG = 'tail -100 /root/jetlag/jetlag.log'
         PRIVATE_KEY_PATH = '/home/jenkins/.ssh/provision_private_key'
         CONFIG_PATH = '/home/jenkins/.ssh/config'
         CONTAINER_PRIVATE_KEY_PATH = '/root/.ssh/provision_private_key'
