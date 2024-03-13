@@ -56,7 +56,7 @@ RUN mkdir -p ~/.ssh/
 RUN mkdir -p /tmp/run_artifacts
 
 # download benchmark-operator to /tmp default path
-RUN git clone -b v1.0.2 https://github.com/cloud-bulldozer/benchmark-operator /tmp/benchmark-operator
+RUN git clone -b v1.0.3 https://github.com/cloud-bulldozer/benchmark-operator /tmp/benchmark-operator
 
 # download clusterbuster to /tmp default path && install cluster-buster dependency
 RUN git clone -b v1.2.2-kata-ci https://github.com/RobertKrawitz/OpenShift4-tools /tmp/OpenShift4-tools \
