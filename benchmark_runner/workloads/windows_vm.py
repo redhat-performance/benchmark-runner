@@ -14,6 +14,8 @@ class WindowsVM(BootstormVM):
     """
     def __init__(self):
         super().__init__()
+        if not self._windows_url:
+            raise ValueError('Missing Windows DV URL')
 
     @logger_time_stamp
     def run(self):

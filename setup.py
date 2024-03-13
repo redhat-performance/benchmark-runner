@@ -45,19 +45,19 @@ setup(
         'azure==4.0.0',
         'boto3==1.26.1',  # s3
         'botocore==1.29.1',  # s3
-        'cryptography==42.0.0',  # for paramiko
+        'cryptography==42.0.4',  # for paramiko
         'elasticsearch==7.16.1',
         'elasticsearch_dsl==7.4.0',  # for deep search
         'ipywidgets==8.0.6',  # for jupyterlab widgets
         'jinja2==3.1.3',  # for yaml templates and df.style
-        'myst-parser==0.17.0',  # readthedocs
+        'myst-parser==1.0.0',  # readthedocs
         'openshift-client==1.0.17',  # clusterbuster && prometheus metrics
         'prometheus-api-client==0.5.1',  # clusterbuster && prometheus metrics
         'pandas',  # required latest
         'paramiko==3.4.0',
         'PyGitHub==1.55',  # update secrets
         'PyYAML==6.0',
-        'sphinx==4.5.0',  # readthedocs
+        'sphinx==5.0.0',  # readthedocs
         'sphinx-rtd-theme==1.0.0',  # readthedocs
         'tenacity==8.0.1',  # retry decorator
         'tqdm==4.65.0',  # for jupyterlab download file

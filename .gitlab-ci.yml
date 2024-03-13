@@ -1,0 +1,25 @@
+stages:
+  - "run_pytest"
+  
+run_pytest:
+  tags:
+    - docker
+    - cloud_governance
+  image: python:3.9
+  stage: run_pytest
+  before_script:
+    - apt-get update && apt-get install -y build-essential python3-dev libldap2-dev libsasl2-dev
+    - python -m pip install --upgrade pip
+    - pip install flake8 pytest pytest-cov
+    - if [[ -f requirements.txt ]]; then pip install -r requirements.txt; fi
+    - if [[ -f tests_requirements.txt ]]; then pip install -r tests_requirements.txt; fi
+  script:
+    - pip install pytest
+    - pytest -v tests/unittest/
+  environment: testing
+
+
+
+
+
+

@@ -131,6 +131,7 @@ class EnvironmentVariables:
 
         # LSO Disk id - auto-detect when located on worker-2
         self._environment_variables_dict['lso_disk_id'] = EnvironmentVariables.get_env('LSO_DISK_ID', '')
+        self._environment_variables_dict['lso_node'] = EnvironmentVariables.get_env('LSO_NODE', '')
         # Workloads that required ODF
         self._environment_variables_dict['workloads_odf_pvc'] = ['vdbench', 'hammerdb']
         # This parameter get from Test_CI.yml file

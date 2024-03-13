@@ -7,13 +7,13 @@
   metricName: containerMemory-benchmark-runner
 
 - query: container_memory_cache{pod=~"virt-launcher.*", container="compute"}
-  metricName: VM Memory Cache
+  metricName: virt launcher Cache
 
 - query: container_memory_working_set_bytes{pod=~"virt-launcher.*", container="compute"}
-  metricName: VM Memory working set bytes
+  metricName: virt launcher working set bytes
 
 - query: container_memory_max_usage_bytes{pod=~"virt-launcher.*", container="compute"}
-  metricName: VM Memory Max Usage Bytes
+  metricName: virt launcher Max Usage Bytes
 
 - query: container_memory_cache{pod=~"virt-launcher.*", container="compute"}
   metricName: virt launcher Cache
