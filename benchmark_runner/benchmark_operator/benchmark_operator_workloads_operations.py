@@ -74,12 +74,16 @@ class BenchmarkOperatorWorkloadsOperations:
         if self._enable_prometheus_snapshot:
             self._snapshot = PrometheusSnapshot(oc=self._oc, artifacts_path=self._run_artifacts_path, verbose=True)
         self._prometheus_metrics_operation = PrometheusMetricsOperation()
-        # Update lso_disk_id only if both worker_disk_ids and a free disk exist
-        if self._environment_variables_dict.get('worker_disk_ids', '') and self._oc.get_free_disk_id(node=self._environment_variables_dict['lso_node']):
-            self._lso_disk_id = self._oc.get_free_disk_id(node=self._environment_variables_dict['lso_node'])
-            self._environment_variables_dict['lso_disk_id'] = self._lso_disk_id
+        # Extract lso id for LSO workload
+        if '_lso' in self._environment_variables_dict.get('workload'):
+            # Update lso_disk_id only if both worker_disk_ids and a free disk exist
+            if self._environment_variables_dict.get('worker_disk_ids', '') and self._oc.get_free_disk_id():
+                self._lso_disk_id = self._oc.get_free_disk_id()
+                self._environment_variables_dict['lso_disk_id'] = self._lso_disk_id
+            else:
+                self._lso_disk_id = self._environment_variables_dict.get('lso_disk_id', '')
         else:
-            self._lso_disk_id = self._environment_variables_dict.get('lso_disk_id', '')
+            self._lso_disk_id = None
 
     def set_login(self, kubeadmin_password: str = ''):
         """

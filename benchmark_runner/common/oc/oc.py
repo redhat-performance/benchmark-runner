@@ -67,7 +67,7 @@ class OC(SSH):
         The method removes lso path on each node
         @return:
         """
-        self.run(fr"""{self.__cli} get nodes -l node-role.kubernetes.io/worker= -o jsonpath="{{range .items[*]}}{{.metadata.name}}{{'\\n'}}{{end}}" |  xargs -I{{}} {self.__cli} debug node/{{}} -- chroot /host sh -c "rm -rf /mnt/local-storage/local-sc" """)
+        self.run(fr"""{self.__cli} get nodes -l node-role.kubernetes.io/worker= -o jsonpath="{{range .items[*]}}{{.metadata.name}}{{'\\n'}}{{end}}" |  xargs -I{{}} {self.__cli} debug node/{{}} -- chroot /host sh -c "rm -rfv /mnt/local-storage/local-sc/" """)
 
     def get_worker_disk_ids(self, node: str = None):
         """
@@ -301,6 +301,7 @@ class OC(SSH):
             if pv_status == 'Available' or pv_status == 'Released':
                 available_pv = self.run(fr"{self.__cli} get pv -ojsonpath={{.items[{ind}].metadata.name}}")
                 logger.info(f'Delete {pv_status} pv {available_pv}')
+                self.run(fr"{self.__cli} delete localvolume -n openshift-local-storage local-disks")
                 self.run(fr"{self.__cli} delete pv {available_pv}")
 
     def clear_node_caches(self):
