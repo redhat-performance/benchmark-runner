@@ -1,0 +1,168 @@
+pipeline {
+    agent {
+        label 'PerfCi'
+    }
+    environment {
+        CONTACT_EMAIL1 = credentials('perfci_contact_email1')
+        ELASTICSEARCH = credentials('perfci_elasticsearch')
+        ELASTICSEARCH_PORT = credentials('perfci_elasticsearch_port')
+        GRAFANA_URL = credentials('perfci_grafana_url')
+        GRAFANA_API_KEY = credentials('perfci_grafana_api_key')
+        GRAFANA_JSON_PATH = credentials('perfci_grafana_json_path')
+        GRAFANA_FOLDER_NAME = credentials('perfci_grafana_folder_name')
+        MAIN_LIBSONNET_PATH = credentials('perfci_main_libsonnet_path')
+        EMAIL = credentials('perfci_email')
+        USER_NAME = credentials('perfci_user_name')
+        GIT_TOKEN = credentials('perfci_git_token')
+        GIT_REPOSITORY = credentials('perfci_git_repository')
+    }
+
+    stages {
+        stage('Cleanup') {
+            steps {
+                script {
+                        // Clean the Jenkins workspace
+                        echo "Cleaning Jenkins workspace"
+                        deleteDir()
+                        //sh '[ -d ${WORKSPACE} ] && rm -rf ${WORKSPACE}'
+                    sh '''
+                        if [[ "$(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)" != "" ]]; then
+                            sudo podman rmi -f $(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)
+                        fi
+                    '''
+                }
+            }
+        }
+
+        stage('Checkout') {
+            steps {
+                script {
+                    // Git checkout
+                    git branch: 'main', url: 'https://github.com/redhat-performance/benchmark-runner'
+                }
+            }
+        }
+
+       stage('Install dependencies') {
+            steps {
+                script {
+                    sh 'sudo python3 -m pip install --upgrade pip'
+                    sh 'if [[ -f requirements.txt ]]; then pip install -r requirements.txt; fi'
+                    sh 'pip install --upgrade benchmark-runner'
+                    }
+            }
+        }
+
+        stage('Update latest product versions in main.libsonnet') {
+            steps {
+                script {
+                        sh """ PYTHONPATH=. sudo python3 "${WORKSPACE}"/benchmark_runner/grafana/update_versions_main_libsonnet.py --elasticsearch=${ELASTICSEARCH} --elasticsearch_port='${ELASTICSEARCH_PORT}' --main_libsonnet_path='${MAIN_LIBSONNET_PATH}' """
+                    }
+            }
+        }
+
+        stage('Generate grafana dashboard.json using grafonnet container') {
+            steps {
+                script {
+                        sh """ podman run --rm --name run_grafonnet -v "${WORKSPACE}"/benchmark_runner/grafana/perf:/app --privileged quay.io/ebattat/run_grafonnet:latest """
+                    }
+            }
+        }
+
+        stage('Check for changes in dashboard.json and main.libsonnet') {
+        steps {
+            script {
+                CHANGES_DASHBOARD = sh(script: "git diff --quiet ${WORKSPACE}/benchmark_runner/grafana/perf/dashboard.json || echo true", returnStatus: true) == 0
+                echo "CHANGES_DASHBOARD=${CHANGES_DASHBOARD}"
+
+                CHANGES_MAIN_LIBSONNET = sh(script: "git diff --quiet ${WORKSPACE}/benchmark_runner/grafana/perf/jsonnet/main.libsonnet || echo true", returnStatus: true) == 0
+                echo "CHANGES_MAIN_LIBSONNET=${CHANGES_MAIN_LIBSONNET}"
+            }
+        }
+    }
+
+        stage('Update Grafana files and commit changes') {
+        when {
+            expression { return CHANGES_DASHBOARD.toBoolean() || CHANGES_MAIN_LIBSONNET.toBoolean() }
+        }
+        steps {
+            script {
+                try {
+                    dir(WORKSPACE) {
+                        // Git configuration
+                        sh '''
+                            git checkout main
+                            git config --global user.email "${EMAIL}"
+                            git config --global user.name "${USER_NAME}"
+                            git config pull.rebase false  # merge
+                        '''
+
+                        // Update dashboard.json
+                        if (CHANGES_DASHBOARD.toBoolean()) {
+                            sh '''
+                                cp -p benchmark_runner/grafana/perf/dashboard.json benchmark_runner/grafana/perf/dashboard_backup.json;
+                                PYTHONPATH=. sudo python3 benchmark_runner/grafana/update_grafana_dashboard.py --grafana_url="${GRAFANA_URL}" --grafana_api_key="${GRAFANA_API_KEY}" --grafana_json_path="${GRAFANA_JSON_PATH}" --grafana_folder_name="${GRAFANA_FOLDER_NAME}";
+                                cp -p benchmark_runner/grafana/perf/dashboard_backup.json benchmark_runner/grafana/perf/dashboard.json;
+                            '''
+                            sh 'git add benchmark_runner/grafana/perf/dashboard.json'
+                        }
+
+                        // Update main.libsonnet
+                        if (CHANGES_MAIN_LIBSONNET.toBoolean()) {
+                            sh '''
+                                cp -p benchmark_runner/grafana/perf/jsonnet/main.libsonnet benchmark_runner/grafana/perf/jsonnet/main.libsonnet_backup
+                                # Add code to update main.libsonnet here
+                            '''
+                            sh 'git add benchmark_runner/grafana/perf/jsonnet/main.libsonnet'
+                        }
+
+                        // Check if there are changes to commit
+                        def hasChanges = sh(script: 'git diff --exit-code', returnStatus: true) != 0
+
+                        if (hasChanges) {
+                            // Commit, pull, and push
+                            sh '''
+                                git commit -m "Update Grafana files"
+                                git pull https://${GIT_TOKEN}@${GIT_REPOSITORY} main
+                                git push https://${GIT_TOKEN}@${GIT_REPOSITORY} main
+                            '''
+                        } else {
+                            echo 'No changes to commit.'
+                        }
+                    }
+                } catch (Exception e) {
+                    currentBuild.result = 'FAILURE'
+                    error("Failed to execute Git commands: ${e.message}")
+                }
+            }
+        }
+    }
+
+
+
+    }
+
+    post {
+        always {
+            script {
+                sh '''
+                    if [[ "$(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)" != "" ]]; then
+                        sudo podman rmi -f $(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)
+                    fi
+                '''
+            }
+        }
+        failure {
+            script {
+                msg = "Build error for ${env.JOB_NAME} ${env.BUILD_NUMBER} (${env.BUILD_URL})"
+                emailext body: """\
+                    Jenkins job: ${env.BUILD_URL}\nSee the console output for more details:  ${env.BUILD_URL}consoleFull\n\n
+                """, subject: msg, to: "${CONTACT_EMAIL1}"
+            }
+        }
+        success {
+            echo 'TBD'
+            //build job: 'PerfCI-Workloads-Deployment', wait: false
+        }
+    }
+}
