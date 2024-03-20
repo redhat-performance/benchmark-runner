@@ -18,6 +18,17 @@ run_pytest:
     - pytest -v tests/unittest/
   environment: testing
 
+set_kubeconfig_and_hosts:
+  stage: setup
+  script:
+    - mkdir -p "$RUNNER_PATH/.kube/"
+    - echo "$KUBECONFIG_CONTENTS" > "$RUNNER_PATH/.kube/config"
+    - echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$CI_ENVIRONMENT_URL/.env"
+    - echo "$OCP_HOSTS" | sudo tee -a /etc/hosts > /dev/null
+  variables:
+    KUBECONFIG_CONTENTS: "$PERF_KUBECONFIG"
+    RUNNER_PATH: "$RUNNER_PATH"
+    OCP_HOSTS: "$PERF_OCP_HOSTS"
 
 
 
