@@ -107,4 +107,3 @@ spec:
       namespace: {{ namespace }}
       persistentVolumeClaim:
         claimName: vdbench-pvc
-

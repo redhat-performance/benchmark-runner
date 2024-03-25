@@ -16,6 +16,7 @@ def __get_test_environment_variable():
     test_environment_variable['kubeadmin_password'] = EnvironmentVariables.get_env('KUBEADMIN_PASSWORD', '')
     # Node Selector
     test_environment_variable['pin_node1'] = EnvironmentVariables.get_env('PIN_NODE1', '')
+    test_environment_variable['pin_node2'] = EnvironmentVariables.get_env('PIN_NODE2', '')
     # ElasticSearch
     test_environment_variable['elasticsearch'] = EnvironmentVariables.get_env('ELASTICSEARCH', '')
     test_environment_variable['elasticsearch_port'] = EnvironmentVariables.get_env('ELASTICSEARCH_PORT', '')

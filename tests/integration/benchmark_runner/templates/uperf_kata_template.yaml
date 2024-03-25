@@ -1,25 +1,26 @@
 apiVersion: ripsaw.cloudbulldozer.io/v1alpha1
 kind: Benchmark
 metadata:
-  name: uperf-kata
-  namespace: benchmark-operator
+  name: uperf-pod
+  namespace: {{ namespace }}
 spec:
   system_metrics:
-    collection: True
+    collection: {{ system_metrics }}
     prom_url: "https://prometheus-k8s.openshift-monitoring.svc.cluster.local:9091"
-    es_url: "http://elasticsearch.example.com:gol9999"
-    prom_token: "fake_prom_token"
-    metrics_profile: "node-metrics.yml"
-    index_name: system-metrics
+    es_url: "{{ elasticsearch_url }}"
+    prom_token: "{{ prom_token }}"
+    metrics_profile: node-metrics.yml
+    index_name: system-metrics-test
   elasticsearch:
-    url: "http://elasticsearch.example.com:gol9999"
-    index_name: uperf
+    url: "{{ elasticsearch_url }}"
+    index_name: uperf-pod-test
   metadata:
-    collection: true
-  cleanup: false
+    collection: false
   workload:
     name: uperf
     args:
+      # general options
+      runtime_class: "kata"
       client_resources:
         requests:
           cpu: 10m
@@ -35,8 +36,8 @@ spec:
           cpu: 4
           memory: 8Gi
       pin: True
-      pin_server: "pin-node-1"
-      pin_client: "pin-node-2"
+      pin_server: "{{ pin_node1 }}"
+      pin_client: "{{ pin_node2 }}"
       serviceip: False
       hostnetwork: False
       networkpolicy: False
@@ -53,5 +54,4 @@ spec:
       nthrs:
         - 1
       runtime: 10
-      runtime_class: kata
       kind: pod

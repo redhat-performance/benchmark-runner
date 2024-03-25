@@ -56,7 +56,8 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
       - name: mssql
-        image: mcr.microsoft.com/mssql/rhel/server:2019-latest
+        # mcr.microsoft.com/mssql/rhel/server:2019-latest - rate limit issue
+        image: quay.io/ebattat/server:2019-latest
         imagePullPolicy: "IfNotPresent"
         ports:
         - containerPort: 1433

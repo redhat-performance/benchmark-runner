@@ -290,7 +290,7 @@ Boilerplate data that is independent of workload has been moved to `common.yaml`
       1. Pass all mandatory parameters in [benchmark_runner/main/environment_variables.py](benchmark_runner/main/environment_variables.py) or set their equivalent variables in the environment (command line options override environment variables):
          1. `--workload` (`WORKLOAD`) = e.g. stressng_pod
          2. `--runner-path` (`RUNNER_PATH`) = path to local cloned benchmark-operator (e.g. /home/user/)
-            1. git clone -b v1.0.2 https://github.com/cloud-bulldozer/benchmark-operator  (inside `runner_path`)
+            1. git clone -b v1.0.3 https://github.com/cloud-bulldozer/benchmark-operator  (inside `runner_path`)
          3. `--kubeadmin_password` (`KUBEADMIN_PASSWORD`)
          4. `--pin-node-benchmark-operator` (`PIN_NODE_BENCHMARK_OPERATOR`) - benchmark-operator node selector
          5. `--pin-node1` (`PIN_NODE1`) - workload first node selector
@@ -308,7 +308,7 @@ Boilerplate data that is independent of workload has been moved to `common.yaml`
       3. Verify that benchmark-runner run the workload
    2. Run workload through integration/unittest tests [using pytest]
       1. Need to set all mandatory parameters in [tests/integration/benchmark_runner/test_environment_variables.py](tests/integration/benchmark_runner/test_environment_variables.py) in the environment.
-            1. git clone -b v1.0.2 https://github.com/cloud-bulldozer/benchmark-operator (inside 'RUNNER_PATH')
+            1. git clone -b v1.0.3 https://github.com/cloud-bulldozer/benchmark-operator (inside 'RUNNER_PATH')
          2. `KUBEADMIN_PASSWORD`
          3. `PIN_NODE1` - workload first node selector
          4. `ELASTICSEARCH` - elasticsearch url without http prefix
