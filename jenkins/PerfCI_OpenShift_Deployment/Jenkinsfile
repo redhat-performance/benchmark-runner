@@ -83,37 +83,40 @@ END
                 }
             }
         }
+
         stage('OpenShift Deployment') {
             steps {
                 script {
                     def install_steps = ['run_bare_metal_ocp_installer', 'verify_bare_metal_install_complete']
 
-                    for (install_step in install_steps) {
-                        echo "Run OpenShift Deployment for ${install_step}"
+                    retry(3) { // Retry the entire loop 3 times in case of failure
+                        for (install_step in install_steps) {
+                            echo "Run OpenShift Deployment for ${install_step}"
 
-                        // Create a stage for each resource
-                        stage("${install_step} Deployment") {
-                            echo "Running deployment for ${install_step}"
-                            // deployment code
-                            script {
-                                withCredentials([string(credentialsId: 'perfci_provision_ip', variable: 'PROVISION_IP')]) {
-                                    withCredentials([string(credentialsId: 'perfci_provision_user', variable: 'PROVISION_USER')]) {
-                                        withCredentials([file(credentialsId: 'perfci_provision_private_key_file', variable: 'PROVISION_PRIVATE_KEY_FILE')]) {
-                                            sh """
-                                                sudo podman run --rm -e INSTALL_OCP_VERSION="${INSTALL_OCP_VERSION}" \
-                                                    -e INSTALL_STEP="${install_step}" -e PROVISION_IP="${PROVISION_IP}" \
-                                                    -e PROVISION_USER="${PROVISION_USER}" -e PROVISION_PORT="${PROVISION_PORT}" \
-                                                    -e KUBEADMIN_PASSWORD_PATH="${KUBEADMIN_PASSWORD_PATH}" \
-                                                    -e KUBECONFIG_PATH="${KUBECONFIG_PATH}" \
-                                                    -e PROVISION_INSTALLER_PATH="${PROVISION_INSTALLER_PATH}" \
-                                                    -e PROVISION_INSTALLER_CMD="${PROVISION_INSTALLER_CMD}" \
-                                                    -e PROVISION_INSTALLER_LOG="${PROVISION_INSTALLER_LOG}" \
-                                                    -e CONTAINER_PRIVATE_KEY_PATH="${CONTAINER_PRIVATE_KEY_PATH}" \
-                                                    -e PROVISION_TIMEOUT="${PROVISION_TIMEOUT}" \
-                                                    -e log_level="INFO" -v "${PRIVATE_KEY_PATH}":"${CONTAINER_PRIVATE_KEY_PATH}" \
-                                                    -v "${KUBECONFIG_PATH}":"${KUBECONFIG_PATH}" \
-                                                    --privileged "quay.io/ebattat/benchmark-runner:latest"
-                                            """
+                            // Create a stage for each resource
+                            stage("${install_step} Deployment") {
+                                echo "Running deployment for ${install_step}"
+                                // deployment code
+                                script {
+                                    withCredentials([string(credentialsId: 'perfci_provision_ip', variable: 'PROVISION_IP')]) {
+                                        withCredentials([string(credentialsId: 'perfci_provision_user', variable: 'PROVISION_USER')]) {
+                                            withCredentials([file(credentialsId: 'perfci_provision_private_key_file', variable: 'PROVISION_PRIVATE_KEY_FILE')]) {
+                                                sh """
+                                                    sudo podman run --rm -e INSTALL_OCP_VERSION="${INSTALL_OCP_VERSION}" \
+                                                        -e INSTALL_STEP="${install_step}" -e PROVISION_IP="${PROVISION_IP}" \
+                                                        -e PROVISION_USER="${PROVISION_USER}" -e PROVISION_PORT="${PROVISION_PORT}" \
+                                                        -e KUBEADMIN_PASSWORD_PATH="${KUBEADMIN_PASSWORD_PATH}" \
+                                                        -e KUBECONFIG_PATH="${KUBECONFIG_PATH}" \
+                                                        -e PROVISION_INSTALLER_PATH="${PROVISION_INSTALLER_PATH}" \
+                                                        -e PROVISION_INSTALLER_CMD="${PROVISION_INSTALLER_CMD}" \
+                                                        -e PROVISION_INSTALLER_LOG="${PROVISION_INSTALLER_LOG}" \
+                                                        -e CONTAINER_PRIVATE_KEY_PATH="${CONTAINER_PRIVATE_KEY_PATH}" \
+                                                        -e PROVISION_TIMEOUT="${PROVISION_TIMEOUT}" \
+                                                        -e log_level="INFO" -v "${PRIVATE_KEY_PATH}":"${CONTAINER_PRIVATE_KEY_PATH}" \
+                                                        -v "${KUBECONFIG_PATH}":"${KUBECONFIG_PATH}" \
+                                                        --privileged "quay.io/ebattat/benchmark-runner:latest"
+                                                """
+                                            }
                                         }
                                     }
                                 }
@@ -123,7 +126,7 @@ END
                 }
             }
         }
-    }
+    } // stages
 
     post {
         always {

@@ -213,6 +213,7 @@ END
         success {
             script {
                 sh """ sudo podman run --rm -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' -e ELASTICSEARCH='${ELASTICSEARCH}' -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' -e CI_STATUS='pass' -e RUN_TYPE='${RUN_TYPE}' -e log_level='INFO' -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' --privileged 'quay.io/ebattat/benchmark-runner:latest' """
+                build job: 'PerfCI-Grafana-Deployment', wait: false
             }
         }
     }
