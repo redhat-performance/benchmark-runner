@@ -39,7 +39,7 @@ def __delete_test_objects(workload: str, kind: str):
 @pytest.fixture(scope="session", autouse=True)
 def before_after_all_tests_fixture():
     """
-    This method is create benchmark operator pod once for ALL tests
+    This method creates benchmark operator pod once for ALL tests
     :return:
     """
     print('Deploy benchmark-operator pod')
@@ -59,13 +59,13 @@ def before_after_each_test_fixture():
     :return:
     """
     # before all test: setup
-    kinds = ('pod', 'kata', 'vm')
+    kinds = ('pod', 'vm')
     for kind in kinds:
-        __generate_yamls(workload='stressng', kind=kind)
+        __generate_yamls(workload='uperf', kind=kind)
     yield
     # After all tests
     for kind in kinds:
-        __delete_test_objects(workload='stressng', kind=kind)
+        __delete_test_objects(workload='uperf', kind=kind)
     print('Test End')
 
 ###################################################### POD Tests ##################################################
@@ -90,7 +90,7 @@ def test_yaml_file_not_exist_error():
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
     with pytest.raises(YAMLNotExist) as err:
-        oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng1.yaml'), pod_name='stressng-pod-workload', timeout=1)
+        oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', 'uperf1.yaml'), pod_name='uperf-client', timeout=1)
 
 
 def test_create_sync_pod_timeout_error():
@@ -101,7 +101,7 @@ def test_create_sync_pod_timeout_error():
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
     with pytest.raises(PodNotCreateTimeout) as err:
-        oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_pod.yaml'), pod_name='stressng-pod-workload', timeout=1)
+        oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', 'uperf_pod.yaml'), pod_name='uperf-client', timeout=1)
 
 
 def test_delete_sync_pod_timeout_error():
@@ -111,9 +111,9 @@ def test_delete_sync_pod_timeout_error():
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
-    oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_pod.yaml'), pod_name='stressng-pod-workload')
+    oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', 'uperf_pod.yaml'), pod_name='uperf-client')
     with pytest.raises(PodTerminateTimeout) as err:
-        oc.delete_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_pod.yaml'), pod_name='stressng-pod-workload', timeout=1)
+        oc.delete_pod_sync(yaml=os.path.join(f'{templates_path}', 'uperf_pod.yaml'), pod_name='uperf-client', timeout=1)
 
 
 def test_get_long_short_uuid():
@@ -123,50 +123,55 @@ def test_get_long_short_uuid():
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
-    oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_pod.yaml'), pod_name='stressng-pod-workload')
-    assert len(oc.get_long_uuid(workload='stressng-pod')) == 36
-    assert len(oc._OC__get_short_uuid(workload='stressng-pod')) == 8
+    oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', 'uperf_pod.yaml'), pod_name='uperf-client')
+    assert len(oc.get_long_uuid(workload='uperf-pod')) == 36
+    assert len(oc._OC__get_short_uuid(workload='uperf-pod')) == 8
 
 
-@pytest.mark.skip(reason="Already verified in 'test_es_operations:test_verify_es_data_uploaded_stressng_pod' ")
+@pytest.mark.skip(reason="Already verified in 'test_es_operations:test_verify_es_data_uploaded_uperf_pod' ")
 def test_wait_for_pod_create_initialized_ready_completed_system_metrics_deleted():
     """
     This method test wait for pod create, initialized, ready, completed, system-metrics, delete
     :return:
     """
-    workload = 'stressng-pod'
+    workload = 'uperf-pod'
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
-    assert oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_pod.yaml'), pod_name='stressng-pod-workload')
-    assert oc.wait_for_initialized(label='app=stressng_workload', workload=workload)
-    assert oc.wait_for_ready(label='app=stressng_workload', workload=workload)
-    assert oc.wait_for_pod_completed(label='app=stressng_workload', workload=workload)
+    assert oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', 'uperf_pod.yaml'), pod_name='uperf-client')
+    assert oc.wait_for_initialized(label='app=uperf-bench-server-0', workload=workload)
+    assert oc.wait_for_ready(label='app=uperf-bench-server-0', workload=workload)
+    assert oc.wait_for_initialized(label='app=uperf-bench-client', workload=workload)
+    assert oc.wait_for_ready(label='app=uperf-bench-client', workload=workload)
+    assert oc.wait_for_pod_completed(label='app=uperf-bench-client', workload=workload)
     # system-metrics
     if test_environment_variable['system_metrics']:
         assert oc.wait_for_pod_create(pod_name='system-metrics-collector')
         assert oc.wait_for_initialized(label='app=system-metrics-collector', workload=workload)
         assert oc.wait_for_pod_completed(label='app=system-metrics-collector', workload=workload)
-        assert oc.delete_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_pod.yaml'), pod_name='stressng-pod-workload')
+        assert oc.delete_pod_sync(yaml=os.path.join(f'{templates_path}', 'uperf_pod.yaml'), pod_name='uperf-client')
 
 
+@pytest.mark.skip(reason="Disable kata")
 def test_wait_for_kata_create_initialized_ready_completed_system_metrics_deleted():
     """
     This method test wait for pod create, initialized, ready, completed, system-metrics, delete
     :return:
     """
-    workload = 'stressng-kata'
+    workload = 'uperf-kata'
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
-    assert oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_kata.yaml'), pod_name='stressng-kata-workload')
-    assert oc.wait_for_initialized(label='app=stressng_workload', workload=workload)
-    assert oc.wait_for_ready(label='app=stressng_workload', workload=workload)
-    assert oc.wait_for_pod_completed(label='app=stressng_workload', workload=workload)
+    assert oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', 'uperf_kata.yaml'), pod_name='uperf-client')
+    assert oc.wait_for_initialized(label='app=uperf-bench-server-0', workload=workload)
+    assert oc.wait_for_ready(label='app=uperf-bench-server-0', workload=workload)
+    assert oc.wait_for_initialized(label='app=uperf-bench-client', workload=workload)
+    assert oc.wait_for_ready(label='app=uperf-bench-client', workload=workload)
+    assert oc.wait_for_pod_completed(label='app=uperf-bench-client', workload=workload)
     # system-metrics
     if test_environment_variable['system_metrics']:
         assert oc.wait_for_pod_create(pod_name='system-metrics-collector')
         assert oc.wait_for_initialized(label='app=system-metrics-collector', workload=workload)
         assert oc.wait_for_pod_completed(label='app=system-metrics-collector', workload=workload)
-        assert oc.delete_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_kata.yaml'), pod_name='stressng-kata-workload')
+        assert oc.delete_pod_sync(yaml=os.path.join(f'{templates_path}', 'uperf_kata.yaml'), pod_name='uperf-client')
 
 ###################################################### VM Tests ##################################################
 
@@ -179,7 +184,7 @@ def test_create_sync_vm_timeout_error():
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
     with pytest.raises(VMNotCreateTimeout) as err:
-        oc.create_vm_sync(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'), vm_name='stressng-vm-workload', timeout=1)
+        oc.create_vm_sync(yaml=os.path.join(f'{templates_path}', 'uperf_vm.yaml'), vm_name='uperf-vm-workload', timeout=1)
 
 
 @pytest.mark.skip(reason="Already verified in: test_vm_create_initialized_ready_completed_system_metrics_deleted ")
@@ -190,11 +195,11 @@ def test_oc_get_vm_name_and_is_vm_exist():
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
-    oc.create_async(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'))
+    oc.create_async(yaml=os.path.join(f'{templates_path}', 'uperf_vm.yaml'))
     # wait 60 sec till vm will be created
     time.sleep(60)
-    assert oc._get_vm_name(vm_name='stressng-vm-workload', namespace=test_environment_variable['namespace'])
-    assert oc.vm_exists(vm_name='stressng-vm-workload', namespace=test_environment_variable['namespace'])
+    assert oc._get_vm_name(vm_name='uperf-vm-workload', namespace=test_environment_variable['namespace'])
+    assert oc.vm_exists(vm_name='uperf-vm-workload', namespace=test_environment_variable['namespace'])
 
 
 @pytest.mark.skip(reason="Already verified in: test_vm_create_initialized_ready_completed_system_metrics_deleted ")
@@ -205,8 +210,8 @@ def test_wait_for_vm_created():
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
-    oc.create_async(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'))
-    assert oc.wait_for_vm_create(vm_name='stressng-vm-workload')
+    oc.create_async(yaml=os.path.join(f'{templates_path}', 'uperf_vm.yaml'))
+    assert oc.wait_for_vm_create(vm_name='uperf-vm-workload')
 
 
 def test_vm_create_initialized_ready_completed_system_metrics_deleted():
@@ -215,13 +220,19 @@ def test_vm_create_initialized_ready_completed_system_metrics_deleted():
     Must have running ElasticSearch server
     :return:
     """
-    workload = 'stressng-vm'
+    workload = 'uperf-vm'
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
-    assert oc.create_vm_sync(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'), vm_name='stressng-vm-workload')
+    assert oc.create_vm_sync(yaml=os.path.join(f'{templates_path}', 'uperf_vm.yaml'), vm_name='uperf-server')
     assert oc.get_vm()
-    assert oc.wait_for_initialized(label='app=stressng_workload', workload=workload)
-    assert oc.wait_for_ready(label='app=stressng_workload', workload=workload)
+    # uperf server
+    assert oc.wait_for_vm_create(vm_name='uperf-server')
+    assert oc.wait_for_initialized(label='app=uperf-bench-server-0', workload=workload)
+    assert oc.wait_for_ready(label='app=uperf-bench-server-0', workload=workload)
+    # client server
+    assert oc.wait_for_vm_create(vm_name='uperf-client')
+    assert oc.wait_for_initialized(label='app=uperf-bench-client', workload=workload)
+    assert oc.wait_for_ready(label='app=uperf-bench-client', workload=workload)
     assert oc.wait_for_vm_completed(workload=workload)
     # system-metrics
     if test_environment_variable['system_metrics']:
@@ -232,7 +243,7 @@ def test_vm_create_initialized_ready_completed_system_metrics_deleted():
         assert es.verify_elasticsearch_data_uploaded(index='system-metrics-test', uuid=oc.get_long_uuid(workload=workload))
     if test_environment_variable['elasticsearch']:
         es = ElasticSearchOperations(es_host=test_environment_variable.get('elasticsearch', ''), es_port=test_environment_variable.get('elasticsearch_port', ''), es_user=test_environment_variable.get('elasticsearch_user', ''), es_password=test_environment_variable.get('elasticsearch_password', ''))
-        assert es.verify_elasticsearch_data_uploaded(index='stressng-vm-test-results', uuid=oc.get_long_uuid(workload=workload))
-    assert oc.delete_vm_sync(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'),
-                             vm_name='stressng-vm-workload')
+        assert es.verify_elasticsearch_data_uploaded(index='uperf-vm-test-results', uuid=oc.get_long_uuid(workload=workload))
+        assert oc.delete_vm_sync(yaml=os.path.join(f'{templates_path}', 'uperf_vm.yaml'),
+                                     vm_name='uperf-server')
 

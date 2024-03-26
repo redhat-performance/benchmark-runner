@@ -30,14 +30,9 @@ template_data:
         - stream
       sizes:
         - 64
-        - 256
-        - 1024
-        - 4096
-        - 16384
       nthrs:
         - 1
-        - 2
-      runtime: 30
+      runtime: 10
   kind:
     vm:
       run_type:

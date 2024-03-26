@@ -1,3 +1,4 @@
+import time
 
 import pytest
 
@@ -14,7 +15,7 @@ def __generate_pod_yamls():
     This method creates pod yaml from template and injects environment variable inside
     :return:
     """
-    yaml_template = 'stressng_pod_template.yaml'
+    yaml_template = 'uperf_pod_template.yaml'
     data = render_yaml_file(dir_path=templates_path, yaml_file=yaml_template, environment_variable_dict=test_environment_variable)
     yaml_file = yaml_template.replace('_template', '')
     with open(os.path.join(templates_path, yaml_file), 'w') as f:
@@ -28,10 +29,10 @@ def __delete_pod_yamls():
     """
     oc = OC(kubeadmin_password=test_environment_variable.get('kubeadmin_password', ''))
     oc.login()
-    if oc.pod_exists(pod_name='stressng-pod-workload', namespace=test_environment_variable.get('namespace', '')):
-        oc.delete_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_pod.yaml'), pod_name='stressng-pod-workload')
-    if os.path.isfile(os.path.join(f'{templates_path}', 'stressng_pod.yaml')):
-        os.remove(os.path.join(f'{templates_path}', 'stressng_pod.yaml'))
+    if oc.pod_exists(pod_name='uperf-pod-workload', namespace=test_environment_variable.get('namespace', '')):
+        oc.delete_pod_sync(yaml=os.path.join(f'{templates_path}', 'uperf_pod.yaml'), pod_name='uperf-pod-workload')
+    if os.path.isfile(os.path.join(f'{templates_path}', 'uperf_pod.yaml')):
+        os.remove(os.path.join(f'{templates_path}', 'uperf_pod.yaml'))
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -66,7 +67,7 @@ def before_after_each_test_fixture():
     print('Test End')
 
 
-def test_verify_elasticsearch_data_uploaded_stressng_pod():
+def test_verify_elasticsearch_data_uploaded_uperf_pod():
     """
     This method verifies that the data uploaded properly to elasticsearch
     :return:
@@ -74,11 +75,13 @@ def test_verify_elasticsearch_data_uploaded_stressng_pod():
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
     try:
-        workload = 'stressng-pod'
-        oc.create_pod_sync(yaml=os.path.join(templates_path, 'stressng_pod.yaml'), pod_name=f'{workload}-workload')
-        oc.wait_for_initialized(label='app=stressng_workload', workload=workload)
-        oc.wait_for_ready(label='app=stressng_workload', workload=workload)
-        oc.wait_for_pod_completed(label='app=stressng_workload', workload=workload)
+        workload = 'uperf-pod'
+        oc.create_pod_sync(yaml=os.path.join(templates_path, 'uperf_pod.yaml'), pod_name='uperf-client')
+        oc.wait_for_initialized(label='app=uperf-bench-server-0', workload=workload)
+        oc.wait_for_ready(label='app=uperf-bench-server-0', workload=workload)
+        oc.wait_for_initialized(label='app=uperf-bench-client', workload=workload)
+        oc.wait_for_ready(label='app=uperf-bench-client', workload=workload)
+        oc.wait_for_pod_completed(label='app=uperf-bench-client', workload=workload)
         # system-metrics
         if test_environment_variable['system_metrics']:
             es = ElasticSearchOperations(es_host=test_environment_variable.get('elasticsearch', ''), es_port=test_environment_variable.get('elasticsearch_port', ''), es_user=test_environment_variable.get('elasticsearch_user', ''), es_password=test_environment_variable.get('elasticsearch_password', ''))
@@ -90,7 +93,7 @@ def test_verify_elasticsearch_data_uploaded_stressng_pod():
         if test_environment_variable['elasticsearch']:
             # verify that data upload to elastic search
             es = ElasticSearchOperations(es_host=test_environment_variable.get('elasticsearch', ''), es_port=test_environment_variable.get('elasticsearch_port', ''), es_user=test_environment_variable.get('elasticsearch_user', ''), es_password=test_environment_variable.get('elasticsearch_password', ''))
-            assert es.verify_elasticsearch_data_uploaded(index='stressng-pod-test-results', uuid=oc.get_long_uuid(workload=workload))
+            assert es.verify_elasticsearch_data_uploaded(index='uperf-pod-test-results', uuid=oc.get_long_uuid(workload=workload))
     except ElasticSearchDataNotUploaded as err:
         raise err
     except Exception as err:

@@ -39,7 +39,8 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
         - name: postgres
-          image: docker.io/centos/postgresql-10-centos8:latest
+          # docker.io/centos/postgresql-10-centos8:latest - rate limit issue
+          image: quay.io/ebattat/postgresql-10-centos8:latest
           imagePullPolicy: "IfNotPresent"
           ports:
             - containerPort: 5432

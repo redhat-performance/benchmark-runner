@@ -88,8 +88,8 @@ jobs:
           cp $RUNNER_PATH/kubectl /usr/local/bin/kubectl
           cp $RUNNER_PATH/oc /usr/local/bin/oc
           
-          # clone benchmark-operator v1.0.2
-          git clone -b v1.0.2 https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
+          # clone benchmark-operator v1.0.3
+          git clone -b v1.0.3 https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
           
           # run pytest - only unittest
           pytest -v tests/unittest/
@@ -168,8 +168,8 @@ jobs:
         cp $RUNNER_PATH/virtctl /usr/local/bin/virtctl 
         rm -rf $RUNNER_PATH/virtctl
         
-        # clone benchmark-operator v1.0.2
-        git clone -b v1.0.2 https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
+        # clone benchmark-operator v1.0.3
+        git clone -b v1.0.3 https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
 
         # run pytest
         pytest
@@ -227,8 +227,8 @@ jobs:
        cp $RUNNER_PATH/kubectl /usr/local/bin/kubectl
        cp $RUNNER_PATH/oc /usr/local/bin/oc
 
-       # clone benchmark-operator v1.0.2
-       git clone -b v1.0.2 https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
+       # clone benchmark-operator v1.0.3
+       git clone -b v1.0.3 https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
        
        # run main
        PYTHONPATH=. python benchmark_runner/main/main.py

@@ -4,6 +4,7 @@ import time
 import tempfile
 import tarfile
 import mock
+import pytest
 
 from benchmark_runner.common.oc.oc import OC
 from tests.integration.benchmark_runner.test_environment_variables import *
@@ -40,6 +41,7 @@ def test_get_ocp_minor_version():
     assert oc.get_ocp_minor_version()
 
 
+@pytest.mark.skip(reason="Disable kata")
 def test_oc_get_kata_operator_version():
     """
     This method gets the sandboxed containers (kata) operator version
@@ -50,6 +52,7 @@ def test_oc_get_kata_operator_version():
     assert oc.get_kata_operator_version()
 
 
+@pytest.mark.skip(reason="Disable kata")
 def test_oc_get_kata_rpm_version():
     """
     This method gets the sandboxed containers (kata) rpm version
@@ -71,6 +74,7 @@ def test_oc_get_cnv_version():
     assert oc.get_cnv_version()
 
 
+@pytest.mark.skip(reason="Disable ODF")
 def test_oc_get_odf_version():
     """
     This method get odf version
@@ -110,6 +114,7 @@ def test_oc_get_free_disk_id():
         assert oc.get_free_disk_id(node=test_environment_variable['pin_node1'])
 
 
+@pytest.mark.skip(reason="Disable ODF")
 def test_oc_get_odf_disk_count():
     """
     This method gets odf disk count
@@ -178,6 +183,7 @@ def test_is_cnv_installed():
     assert oc.is_cnv_installed()
 
 
+@pytest.mark.skip(reason="Disable kata")
 def test_is_kata_installed():
     """
     This method checks if the sandboxed containers (kata) operator is installed
@@ -188,6 +194,7 @@ def test_is_kata_installed():
     assert oc.is_kata_installed()
 
 
+@pytest.mark.skip(reason="Disable ODF")
 def test_is_odf_installed():
     """
     This method check if odf operator is installed
