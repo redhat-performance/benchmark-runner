@@ -101,7 +101,8 @@ END
                     def retryCount = 3 // Number of retries per workload
 
                     for (workload in workloads) {
-                        retry(retryCount) {
+                        boolean success = false
+                        for (int i = 0; i < retryCount && !success; i++) {
                             try {
                                 // workload full name
                                 workload_name = workload
@@ -181,13 +182,21 @@ END
                                         -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
                                         --privileged 'quay.io/ebattat/benchmark-runner:latest'
                                     """
+                                    success = true
                                 }
                             } catch (Exception e) {
                                 echo "Error occurred in workload ${workload}: ${e.message}"
-                                error "Failed to execute workload ${workload}. Retrying..."
-                                sleep(time: 120, unit: 'SECONDS') // Sleep for 2 minutes between retries
+                                if (i < retryCount - 1) {
+                                    echo "Retrying..."
+                                    sleep(time: 120, unit: 'SECONDS') // Sleep for 2 minutes between retries
+                                } else {
+                                    echo "Reached maximum retry attempts for workload ${workload}. Moving to the next workload..."
+                                }
                             }
-                        } // retry
+                        }
+                        if (!success) {
+                            echo "Workload ${workload} failed after ${retryCount} retries."
+                        }
                     }
                 }
             }
@@ -218,4 +227,3 @@ END
         }
     }
 }
-
