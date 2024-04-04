@@ -42,14 +42,16 @@ pipeline {
                             sudo podman rmi -f $(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)
                         fi
                         '''
-                        // Stop running containers
-                        sh 'sudo podman ps | awk \'{print $1}\' | sudo xargs -I % sudo podman stop % 2>/dev/null'
-
-                        // Remove stopped containers
-                        sh 'sudo podman ps -a | awk \'{print $1}\' | sudo xargs -I % sudo podman rm % 2>/dev/null'
-
-                        // Remove pods
-                        sh 'sudo podman pod ps | awk \'{print $1}\' | sudo xargs -I % sudo podman pod rm % 2>/dev/null'
+                        // Avoid container failure errors
+                        try {
+                            sh '''
+                                sudo podman ps | awk '{print $1}' | xargs -I % sudo podman stop % || true;
+                                sudo podman ps -a | awk '{print $1}' | xargs -I % sudo podman rm % || true;
+                                sudo podman pod ps | awk '{print $1}' | xargs -I % sudo podman pod rm % 2>&1 || true
+                            '''
+                        } catch (Exception e) {
+                            echo "An error occurred, but execution will continue."
+                        }
                     } catch (Exception e) {
                         echo "Error: ${e.getMessage()}"
                         // Additional error handling or actions can be added here
