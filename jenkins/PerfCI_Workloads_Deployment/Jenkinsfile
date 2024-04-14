@@ -111,7 +111,7 @@ END
                                 def WORKLOAD = parts[0] + "_" + parts[1]
                                 def RUN = parts.size() >= 3 ? parts[2] : ""
                                 if (RUN == "scale") {
-                                    if (workload == "vdbench_vm_scale") {
+                                    if (workload == "vdbench_pod_scale" || workload == "vdbench_vm_scale") {
                                         SCALE = VDBENCH_SCALE
                                     }
                                     // bootstorm_vm_scale: no need redis for synchronization but need SCALE and THREADS_LIMIT
