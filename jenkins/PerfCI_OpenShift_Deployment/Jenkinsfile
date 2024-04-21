@@ -22,6 +22,7 @@ pipeline {
         CONFIG_PATH = '/home/jenkins/.ssh/config'
         CONTAINER_PRIVATE_KEY_PATH = '/root/.ssh/provision_private_key'
         CONTAINER_CONFIG_PATH = '/root/.ssh/config'
+        ANSIBLE_TMP_PATH = '/root/.ansible/tmp/'
         PROVISION_TIMEOUT = 7200
     }
     stages {
@@ -36,19 +37,27 @@ pipeline {
                         // Delete assisted installer previous deployments
                         sh "curl http://${PROVISION_IP}:8090/api/assisted-install/v2/clusters | jq '.[].id' -r | xargs -I % curl -X DELETE http://${PROVISION_IP}:8090/api/assisted-install/v2/clusters/%"
 
+                        // remove ansible tmp files
+                        sh "sudo rm -rf ${ANSIBLE_TMP_PATH}"
+
                         // Delete benchmark-runner images
                         sh '''
                         if [[ "$(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)" != "" ]]; then
                             sudo podman rmi -f $(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)
                         fi
                         '''
-                        // Avoid container failure errors
                         try {
-                            sh '''
-                                sudo podman ps | awk '{print $1}' | xargs -I % sudo podman stop % || true;
-                                sudo podman ps -a | awk '{print $1}' | xargs -I % sudo podman rm % || true;
-                                sudo podman pod ps | awk '{print $1}' | xargs -I % sudo podman pod rm % 2>&1 || true
-                            '''
+                              // Remove assisted-installer containers - for apply new version in jetlag
+                              sh '''
+                                    sudo podman ps | awk '{print $1}' | xargs -I % sudo podman stop % || true;
+                                    sudo podman ps -a | awk '{print $1}' | xargs -I % sudo podman rm % || true;
+                                    sudo podman pod ps | awk '{print $1}' | xargs -I % sudo podman pod rm % 2>&1 || true
+                                 '''
+                              // Delete all images and volumes - avoid 'no space left on device' issue
+                              sh '''
+                                    sudo podman rmi -f -a
+                                    sudo podman volume prune --force
+                                 '''
                         } catch (Exception e) {
                             echo "An error occurred, but execution will continue."
                         }
