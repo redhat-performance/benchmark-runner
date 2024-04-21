@@ -242,7 +242,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
       + stateTimeline.fieldConfig.withOverrides([
         stateTimeline.fieldOverride.byName.new('Ci Status')
-              + g.panel.table.fieldOverride.byName.withProperty('color', {"mode": "continuous-RdYlGr"})
+              + g.panel.table.fieldOverride.byName.withProperty('color', {"mode": "continuous-GrYlRd"})
       ])
 
       + stateTimeline.gridPos.withH(6)
