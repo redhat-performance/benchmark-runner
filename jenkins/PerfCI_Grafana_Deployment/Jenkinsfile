@@ -21,18 +21,26 @@ pipeline {
         stage('Cleanup') {
             steps {
                 script {
+                    try {
                         // Clean the Jenkins workspace
                         echo "Cleaning Jenkins workspace"
-                        deleteDir()
-                        //sh '[ -d ${WORKSPACE} ] && rm -rf ${WORKSPACE}'
-                    sh '''
-                        if [[ "$(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)" != "" ]]; then
-                            sudo podman rmi -f $(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)
-                        fi
-                    '''
+                        sh '[ -d ${WORKSPACE} ] && sudo rm -rf ${WORKSPACE}'
+                        // deleteDir() does not delete files with root permissions, such as main.libsonnet/dashboard.json
+
+                        // Remove benchmark-runner images if they exist
+                        sh '''
+                            if [[ "$(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)" != "" ]]; then
+                                sudo podman rmi -f $(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)
+                            fi
+                        '''
+                    } catch (Exception cleanupException) {
+                        echo "An error occurred during cleanup: ${cleanupException.getMessage()}"
+                        // Additional cleanup error handling or actions can be added here
+                    }
                 }
             }
         }
+
 
         stage('Checkout') {
             steps {
@@ -47,7 +55,7 @@ pipeline {
             steps {
                 script {
                     sh 'sudo python3 -m pip install --upgrade pip'
-                    sh 'if [[ -f requirements.txt ]]; then sudo pip install -r requirements.txt; fi'
+                    sh 'if [[ -f requirements.txt ]]; then pip install -r requirements.txt; fi'
                     sh 'sudo pip install --upgrade benchmark-runner'
                     }
             }
