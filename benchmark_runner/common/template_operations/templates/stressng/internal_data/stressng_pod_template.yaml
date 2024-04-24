@@ -36,6 +36,7 @@ spec:
       # cpu stressor options
       cpu_stressors: "{{ cpu_stressors }}"
       cpu_percentage: "{{ cpu_percentage }}"
+      cpu_method: "{{ cpu_method }}"
       # vm stressor option
       vm_stressors: "{{ vm_stressors }}"
       vm_bytes: "{{ vm_bytes }}"

@@ -7,6 +7,7 @@ template_data:
     instances: 1
     # cpu stressor options
     cpu_percentage: 100
+    cpu_method: all
     # vm stressor option
     vm_stressors: 1
     # mem stressor options
