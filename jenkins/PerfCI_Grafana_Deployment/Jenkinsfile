@@ -47,8 +47,8 @@ pipeline {
             steps {
                 script {
                     sh 'sudo python3 -m pip install --upgrade pip'
-                    sh 'if [[ -f requirements.txt ]]; then pip install -r requirements.txt; fi'
-                    sh 'pip install --upgrade benchmark-runner'
+                    sh 'if [[ -f requirements.txt ]]; then sudo pip install -r requirements.txt; fi'
+                    sh 'sudo pip install --upgrade benchmark-runner'
                     }
             }
         }
@@ -64,80 +64,105 @@ pipeline {
         stage('Generate grafana dashboard.json using grafonnet container') {
             steps {
                 script {
-                        sh """ podman run --rm --name run_grafonnet -v "${WORKSPACE}"/benchmark_runner/grafana/perf:/app --privileged quay.io/ebattat/run_grafonnet:latest """
+                        sh """ sudo podman run --rm --name run_grafonnet -v "${WORKSPACE}"/benchmark_runner/grafana/perf:/app --privileged quay.io/ebattat/run_grafonnet:latest """
                     }
             }
         }
 
-        stage('Check for changes in dashboard.json and main.libsonnet') {
-        steps {
-            script {
-                CHANGES_DASHBOARD = sh(script: "git diff --quiet ${WORKSPACE}/benchmark_runner/grafana/perf/dashboard.json || echo true", returnStatus: true) == 0
-                echo "CHANGES_DASHBOARD=${CHANGES_DASHBOARD}"
+        stage('Check for changes in main.libsonnet') {
+            steps {
+                script {
+                    def file_path = "${WORKSPACE}/benchmark_runner/grafana/perf/jsonnet/main.libsonnet"
 
-                CHANGES_MAIN_LIBSONNET = sh(script: "git diff --quiet ${WORKSPACE}/benchmark_runner/grafana/perf/jsonnet/main.libsonnet || echo true", returnStatus: true) == 0
-                echo "CHANGES_MAIN_LIBSONNET=${CHANGES_MAIN_LIBSONNET}"
-            }
-        }
-    }
-
-        stage('Update Grafana files and commit changes') {
-        when {
-            expression { return CHANGES_DASHBOARD.toBoolean() || CHANGES_MAIN_LIBSONNET.toBoolean() }
-        }
-        steps {
-            script {
-                try {
-                    dir(WORKSPACE) {
-                        // Git configuration
-                        sh '''
-                            git checkout main
-                            git config --global user.email "${EMAIL}"
-                            git config --global user.name "${USER_NAME}"
-                            git config pull.rebase false  # merge
-                        '''
-
-                        // Update dashboard.json
-                        if (CHANGES_DASHBOARD.toBoolean()) {
-                            sh '''
-                                cp -p benchmark_runner/grafana/perf/dashboard.json benchmark_runner/grafana/perf/dashboard_backup.json;
-                                PYTHONPATH=. sudo python3 benchmark_runner/grafana/update_grafana_dashboard.py --grafana_url="${GRAFANA_URL}" --grafana_api_key="${GRAFANA_API_KEY}" --grafana_json_path="${GRAFANA_JSON_PATH}" --grafana_folder_name="${GRAFANA_FOLDER_NAME}";
-                                cp -p benchmark_runner/grafana/perf/dashboard_backup.json benchmark_runner/grafana/perf/dashboard.json;
-                            '''
-                            sh 'git add benchmark_runner/grafana/perf/dashboard.json'
-                        }
-
-                        // Update main.libsonnet
-                        if (CHANGES_MAIN_LIBSONNET.toBoolean()) {
-                            sh '''
-                                cp -p benchmark_runner/grafana/perf/jsonnet/main.libsonnet benchmark_runner/grafana/perf/jsonnet/main.libsonnet_backup
-                                # Add code to update main.libsonnet here
-                            '''
-                            sh 'git add benchmark_runner/grafana/perf/jsonnet/main.libsonnet'
-                        }
-
-                        // Check if there are changes to commit
-                        def hasChanges = sh(script: 'git diff --exit-code', returnStatus: true) != 0
-
-                        if (hasChanges) {
-                            // Commit, pull, and push
-                            sh '''
-                                git commit -m "Update Grafana files"
-                                git pull https://${GIT_TOKEN}@${GIT_REPOSITORY} main
-                                git push https://${GIT_TOKEN}@${GIT_REPOSITORY} main
-                            '''
+                    try {
+                        // Check if the file exists
+                        if (fileExists(file_path)) {
+                            // Check if there are any changes in the file
+                            CHANGES_MAIN_LIBSONNET = sh(script: "git diff --quiet $file_path", returnStatus: true) != 0
+                            echo "CHANGES_MAIN_LIBSONNET=${CHANGES_MAIN_LIBSONNET}"
                         } else {
-                            echo 'No changes to commit.'
+                            error "File $file_path does not exist" // Raise an error if the file doesn't exist
                         }
+                    } catch (Exception e) {
+                        // Handle any exceptions here
+                        echo "Error: ${e.message}" // Echo the error message
                     }
-                } catch (Exception e) {
-                    currentBuild.result = 'FAILURE'
-                    error("Failed to execute Git commands: ${e.message}")
                 }
             }
         }
-    }
 
+        stage('Check for changes in dashboard.json') {
+            steps {
+                script {
+                    def file_path = "${WORKSPACE}/benchmark_runner/grafana/perf/dashboard.json"
+
+                    try {
+                        // Check if the file exists
+                        if (fileExists(file_path)) {
+                            // Check if there are any changes in the file
+                            CHANGES_DASHBOARD = sh(script: "git diff --quiet $file_path", returnStatus: true) != 0
+                            echo "CHANGES_DASHBOARD=${CHANGES_DASHBOARD}"
+                        } else {
+                            error "File $file_path does not exist" // Raise an error if the file doesn't exist
+                        }
+                    } catch (Exception e) {
+                        // Handle any exceptions here
+                        echo "Error: ${e.message}" // Echo the error message
+                    }
+                }
+            }
+        }
+
+        stage('Update Grafana files and commit changes') {
+            steps {
+                script {
+                    try {
+                        dir(WORKSPACE) {
+                            // Git configuration
+                            sh '''
+                                git checkout main
+                                git config --global user.email "${EMAIL}"
+                                git config --global user.name "${USER_NAME}"
+                                git config pull.rebase false  # merge
+                            '''
+
+                            // Update dashboard.json
+                            if (CHANGES_DASHBOARD.toBoolean()) {
+                                sh '''
+                                    cp -p benchmark_runner/grafana/perf/dashboard.json benchmark_runner/grafana/perf/dashboard_backup.json;
+                                    PYTHONPATH=. sudo python3 benchmark_runner/grafana/update_grafana_dashboard.py --grafana_url="${GRAFANA_URL}" --grafana_api_key="${GRAFANA_API_KEY}" --grafana_json_path="${GRAFANA_JSON_PATH}" --grafana_folder_name="${GRAFANA_FOLDER_NAME}";
+                                    cp -p benchmark_runner/grafana/perf/dashboard_backup.json benchmark_runner/grafana/perf/dashboard.json;
+                                '''
+                                sh 'git add benchmark_runner/grafana/perf/dashboard.json'
+                            }
+
+                            // Update main.libsonnet
+                            if (CHANGES_MAIN_LIBSONNET.toBoolean()) {
+                                sh '''
+                                    cp -p benchmark_runner/grafana/perf/jsonnet/main.libsonnet benchmark_runner/grafana/perf/jsonnet/main.libsonnet_backup
+                                '''
+                                sh 'git add benchmark_runner/grafana/perf/jsonnet/main.libsonnet'
+                            }
+
+                            // Check if there are changes to commit
+                            if (CHANGES_MAIN_LIBSONNET.toBoolean() || CHANGES_DASHBOARD.toBoolean()) {
+                                // Commit, pull, and push
+                                sh '''
+                                    git commit -m "Update Grafana files"
+                                    git pull https://${GIT_TOKEN}@${GIT_REPOSITORY} main
+                                    git push https://${GIT_TOKEN}@${GIT_REPOSITORY} main
+                                '''
+                            } else {
+                                echo 'No changes to commit.'
+                            }
+                        }
+                    } catch (Exception e) {
+                        echo "Error: ${e.getMessage()}"
+                        currentBuild.result = 'FAILURE'
+                    }
+                }
+            }
+        }
 
 
     }
