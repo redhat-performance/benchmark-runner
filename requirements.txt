@@ -17,6 +17,6 @@ PyYAML==6.0
 sphinx==5.0.0
 sphinx_rtd_theme==1.0.0
 tenacity==8.0.1
-tqdm==4.65.0
+tqdm==4.66.3
 typeguard==2.12.1
 typing==3.7.4.3
