@@ -59,6 +59,7 @@ def before_after_each_test_fixture():
     print('Test End')
 
 
+@pytest.mark.skip(reason="Disable ODF")
 # capture vm output - Must run it with 'pytest -s'
 def test_benchmark_runner_vm_create_ready_stop_start_expose_delete():
     """

@@ -2,35 +2,35 @@ apiVersion: ripsaw.cloudbulldozer.io/v1alpha1
 kind: Benchmark
 metadata:
   name: stressng-kata
-  namespace: benchmark-operator
+  namespace: {{ namespace }}
 spec:
   system_metrics:
-    collection: True
+    collection: {{ system_metrics }}
     prom_url: "https://prometheus-k8s.openshift-monitoring.svc.cluster.local:9091"
-    es_url: "http://elasticsearch.example.com:gol9999"
-    prom_token: "fake_prom_token"
-    metrics_profile: "node-metrics.yml"
-    index_name: system-metrics-test-ci
+    es_url: "{{ elasticsearch_url }}"
+    prom_token: "{{ prom_token }}"
+    metrics_profile: node-metrics.yml
+    index_name: system-metrics-test
   elasticsearch:
-    url: "http://elasticsearch.example.com:gol9999"
-    index_name: stressng-test-ci
+    url: "{{ elasticsearch_url }}"
+    index_name: stressng-kata-test
   metadata:
     collection: false
   workload:
     name: stressng
     args:
-      runtime_class: kata
-      pin: True # enable for nodeSelector
-      pin_node: "pin-node-1"
-      resources: True # enable for resources requests/limits
-      requests_cpu: 10m
-      requests_memory: 1Gi
-      limits_cpu: 2
-      limits_memory: 1Gi
       # general options
-      runtype: "sequential"
+      runtime_class: "kata"
+      runtype: "parallel"
       timeout: "30"
       instances: 1
+      pin: true # enable for nodeSelector
+      pin_node: "{{ pin_node1 }}"
+      resources: true # enable for resources requests/limits
+      requests_cpu: 10m
+      requests_memory: 500Mi
+      limits_cpu: 2
+      limits_memory: 1Gi
       # cpu stressor options
       cpu_stressors: "1"
       cpu_percentage: "100"

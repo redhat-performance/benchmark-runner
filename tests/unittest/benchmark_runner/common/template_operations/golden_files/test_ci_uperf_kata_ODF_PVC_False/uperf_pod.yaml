@@ -23,17 +23,17 @@ spec:
       client_resources:
         requests:
           cpu: 10m
-          memory: 8Gi
+          memory: 1Gi
         limits:
-          cpu: 4
-          memory: 8Gi
+          cpu: 2
+          memory: 1Gi
       server_resources:
         requests:
           cpu: 10m
-          memory: 8Gi
+          memory: 1Gi
         limits:
-          cpu: 4
-          memory: 8Gi
+          cpu: 2
+          memory: 1Gi
       pin: True
       pin_server: "pin-node-1"
       pin_client: "pin-node-2"
@@ -52,6 +52,6 @@ spec:
         - 64
       nthrs:
         - 1
-      runtime: 10
+      runtime: 2
       runtime_class: kata
       kind: pod

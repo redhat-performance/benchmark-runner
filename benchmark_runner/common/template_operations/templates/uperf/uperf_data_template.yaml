@@ -32,7 +32,7 @@ template_data:
         - 64
       nthrs:
         - 1
-      runtime: 10
+      runtime: 2
   kind:
     vm:
       run_type:
@@ -44,9 +44,9 @@ template_data:
           net_queues: 8
         default:
           sockets: 1
-          cores: 4
-          limits_memory: 8Gi
-          requests_memory: 8Gi
+          cores: 2
+          limits_memory: 1Gi
+          requests_memory: 1Gi
           net_queues: 4
     default:
       run_type:
@@ -56,7 +56,7 @@ template_data:
           requests_cpu: 8
           requests_memory: 8Gi
         default:
-          limits_cpu: 4
-          limits_memory: 8Gi
+          limits_cpu: 2
+          limits_memory: 1Gi
           requests_cpu: 10m
-          requests_memory: 8Gi
+          requests_memory: 1Gi

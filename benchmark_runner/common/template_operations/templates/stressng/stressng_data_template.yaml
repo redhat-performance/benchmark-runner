@@ -26,14 +26,14 @@ template_data:
       timeout: 30
       cpu_stressors: 1
       vm_bytes: 128M
-      limits_cpu: 4
-      limits_memory: 16Gi
+      limits_cpu: 2
+      limits_memory: 1Gi
       requests_cpu: 10m
-      requests_memory: 16Gi
+      requests_memory: 1Gi
   kind:
     vm:
       run_type:
         perf_ci:
           sockets: 60
         default:
-          sockets: 4
+          sockets: 2

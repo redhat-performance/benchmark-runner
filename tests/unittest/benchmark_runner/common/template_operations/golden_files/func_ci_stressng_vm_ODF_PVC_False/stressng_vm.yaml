@@ -28,6 +28,7 @@ spec:
       # cpu stressor options
       cpu_stressors: "1"
       cpu_percentage: "100"
+      cpu_method: "all"
       # vm stressor option
       vm_stressors: "1"
       vm_bytes: "128M"
@@ -36,14 +37,14 @@ spec:
       kind: vm
       client_vm:
         dedicatedcpuplacement: false
-        sockets: 4
+        sockets: 2
         cores: 1
         threads: 1
         image: quay.io/kubevirt/fedora-container-disk-images:34
         limits:
-          memory: 16Gi
+          memory: 1Gi
         requests:
-          memory: 16Gi
+          memory: 1Gi
         network:
           front_end: masquerade
           multiqueue:
