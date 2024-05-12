@@ -60,7 +60,7 @@ setup(
         'sphinx==5.0.0',  # readthedocs
         'sphinx-rtd-theme==1.0.0',  # readthedocs
         'tenacity==8.0.1',  # retry decorator
-        'tqdm==4.65.0',  # for jupyterlab download file
+        'tqdm==4.66.3',  # for jupyterlab download file
         'typeguard==2.12.1',
         'typing==3.7.4.3',
         # must add new package inside requirements.txt
