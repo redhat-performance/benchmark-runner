@@ -32,7 +32,7 @@ jobs:
        # continue to next job if failed
        fail-fast: false
        matrix: 
-          resource: ['kata', 'lso', 'odf', 'cnv', 'infra', 'custom']
+          resource: [ 'cnv', 'lso', 'infra', 'custom']
     outputs:
       install_resource_time_output: ${{ steps.ocp_install_resource_step.outputs.install_resource_time }}
     steps:
@@ -77,9 +77,9 @@ jobs:
           sudo tee -a /etc/hosts <<< "$OCP_HOSTS" > /dev/null
       - name: ☉ install ${{ matrix.resource }} Operator 
         env:
-          CNV_VERSION: "4.15"
-          ODF_VERSION: "4.14"
-          NUM_ODF_DISK: "4"
+          CNV_VERSION: "4.16"
+          ODF_VERSION: "4.15"
+          NUM_ODF_DISK: "0"
           KATA_CSV: ""
           QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
           QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
