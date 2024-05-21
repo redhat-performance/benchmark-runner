@@ -4,14 +4,14 @@
 name: Deploy Perf Env Nightly CI
 
 on:
-  # Run on Nightly
-  #schedule:
-  #  - cron: '0 4 * * 2' # run Tuesday at 4 AM UTC/ 0 AM EDT
-  # Run on Monday after assisted installer and operator completed
-  workflow_run:
-    workflows: ["Deploy Operator Perf Env Weekly CI"]
-    types:
-    - completed
+#  # Run on Nightly - Running in an on-premise environment
+#  schedule:
+#    - cron: '0 4 * * 2' # run Tuesday at 4 AM UTC/ 0 AM EDT
+#  # Run on Monday after assisted installer and operator completed
+#  workflow_run:
+#    workflows: ["Deploy Operator Perf Env Weekly CI"]
+#    types:
+#    - completed
   workflow_dispatch:
 
 # on:
