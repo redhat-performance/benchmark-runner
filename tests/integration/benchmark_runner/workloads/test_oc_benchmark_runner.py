@@ -24,7 +24,7 @@ def __generate_yamls(workloads: list, kind: str):
 
 def __delete_test_objects(workloads: list, kind: str):
     """
-    Delete Logs and YAML files if they exist
+    This method deletes logs and YAML files if they exist
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()

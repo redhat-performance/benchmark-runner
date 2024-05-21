@@ -85,6 +85,7 @@ def test_oc_get_odf_version():
     assert oc.get_odf_version()
 
 
+@pytest.mark.skip(reason="Disable ODF")
 def test_oc_get_pv_disk_ids():
     """
     This method test get pv disk ids

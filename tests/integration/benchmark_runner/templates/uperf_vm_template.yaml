@@ -41,13 +41,13 @@ spec:
       server_vm:
         dedicatedcpuplacement: false
         sockets: 1
-        cores: 4
+        cores: 2
         threads: 1
         image: quay.io/kubevirt/fedora-container-disk-images:34
         limits:
-          memory: 8Gi
+          memory: 1Gi
         requests:
-          memory: 8Gi
+          memory: 1Gi
         network:
           front_end: masquerade
           multiqueue:
@@ -59,13 +59,13 @@ spec:
       client_vm:
         dedicatedcpuplacement: false
         sockets: 1
-        cores: 4
+        cores: 2
         threads: 1
         image: quay.io/kubevirt/fedora-container-disk-images:34
         limits:
-          memory: 8Gi
+          memory: 1Gi
         requests:
-          memory: 8Gi
+          memory: 1Gi
         network:
           front_end: masquerade
           multiqueue:

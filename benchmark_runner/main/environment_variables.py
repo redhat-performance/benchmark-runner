@@ -170,10 +170,9 @@ class EnvironmentVariables:
         # ** DO NOT CHANGE THE PARAMETERS BELOW **
         # Constant parameters
 
-        # Parameters below related to 'azure_cluster_start_stop()'
-        # Azure data
-        self._environment_variables_dict['azure_cluster_stop'] = EnvironmentVariables.get_env('AZURE_CLUSTER_STOP', '')
-        self._environment_variables_dict['azure_cluster_start'] = EnvironmentVariables.get_env('AZURE_CLUSTER_START', '')
+        # Azure Parameters
+        # Cluster Operations: START/ STOP
+        self._environment_variables_dict['azure_cluster_operation'] = EnvironmentVariables.get_env('AZURE_CLUSTER_OPERATION', '')
         self._environment_variables_dict['azure_clientid'] = EnvironmentVariables.get_env('AZURE_CLIENTID', '')
         self._environment_variables_dict['azure_secret'] = EnvironmentVariables.get_env('AZURE_SECRET', '')
         self._environment_variables_dict['azure_tenantid'] = EnvironmentVariables.get_env('AZURE_TENANTID', '')
@@ -202,7 +201,7 @@ class EnvironmentVariables:
         self._environment_variables_dict['grafana_folder_name'] = EnvironmentVariables.get_env('GRAFANA_FOLDER_NAME', '')
 
         # Parameters below related to 'install_ocp()'
-        # MANDATORY for OCP install: assisted installer version i.e. 'latest-4.11' or '4.11.16' : https://mirror.openshift.com/pub/openshift-v4/clients/ocp
+        # MANDATORY for OCP install: assisted installer version i.e. 'latest-4.16' or 'latest-4.16.0-rc' or '4.16.0': https://openshift-release.apps.ci.l2s4.p1.openshiftapps.com/
         self._environment_variables_dict['install_ocp_version'] = EnvironmentVariables.get_env('INSTALL_OCP_VERSION', '')
         # There are 4 options: run_bare_metal_ocp_installer/ verify_bare_metal_install_complete/ run_ibm_ocp_installer/ verify_ibm_install_complete
         self._environment_variables_dict['install_step'] = EnvironmentVariables.get_env('INSTALL_STEP', '')

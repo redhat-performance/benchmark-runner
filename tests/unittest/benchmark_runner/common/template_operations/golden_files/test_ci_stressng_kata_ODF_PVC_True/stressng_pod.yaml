@@ -24,9 +24,9 @@ spec:
       pin_node: "pin-node-1"
       resources: True # enable for resources requests/limits
       requests_cpu: 10m
-      requests_memory: 16Gi
-      limits_cpu: 4
-      limits_memory: 16Gi
+      requests_memory: 1Gi
+      limits_cpu: 2
+      limits_memory: 1Gi
       # general options
       runtype: "sequential"
       timeout: "30"
@@ -34,6 +34,7 @@ spec:
       # cpu stressor options
       cpu_stressors: "1"
       cpu_percentage: "100"
+      cpu_method: "all"
       # vm stressor option
       vm_stressors: "1"
       vm_bytes: "128M"

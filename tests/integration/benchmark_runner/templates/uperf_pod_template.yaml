@@ -22,17 +22,17 @@ spec:
       client_resources:
         requests:
           cpu: 10m
-          memory: 8Gi
+          memory: 1Gi
         limits:
-          cpu: 4
-          memory: 8Gi
+          cpu: 2
+          memory: 1Gi
       server_resources:
         requests:
           cpu: 10m
-          memory: 8Gi
+          memory: 1Gi
         limits:
-          cpu: 4
-          memory: 8Gi
+          cpu: 2
+          memory: 1Gi
       pin: True
       pin_server: "{{ pin_node1 }}"
       pin_client: "{{ pin_node2 }}"

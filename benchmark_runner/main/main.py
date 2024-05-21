@@ -1,5 +1,6 @@
 
 import ast  # change string list to list
+from enum import Enum
 
 from benchmark_runner.main.environment_variables import *
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
@@ -27,8 +28,7 @@ environment_variables_dict = environment_variables.environment_variables_dict
 # environment variables data
 provision_user = environment_variables_dict.get('provision_user', '')
 workload = environment_variables_dict.get('workload', '')
-azure_cluster_stop = environment_variables_dict.get('azure_cluster_stop', '')
-azure_cluster_start = environment_variables_dict.get('azure_cluster_start', '')
+azure_cluster_operation = environment_variables_dict.get('azure_cluster_operation', '')
 ci_status = environment_variables_dict.get('ci_status', '')
 install_ocp_version = environment_variables_dict.get('install_ocp_version', '')
 install_ocp_resources = environment_variables_dict.get('install_ocp_resources', False)
@@ -59,23 +59,36 @@ if workload and not ci_status:
         benchmark_runner_workload = Workloads()
 
 
+# Define the Enum for cluster operations
+class ClusterOperation(Enum):
+    START = 'START'
+    STOP = 'STOP'
+
+
 @logger_time_stamp
-def azure_cluster_start_stop():
+def azure_cluster_operations(cluster_operation: str):
     """
-    This method starts/ stops azure cluster
-    :return:
+    This method starts/stops Azure cluster according to input parameter azure_cluster_operation
+    @param cluster_operation: START/ STOP
+    @return:
     """
-    azure_operation = AzureOperations(azure_clientid=environment_variables_dict.get('azure_clientid', ''),
+    azure_operation = AzureOperations(
+                                      azure_clientid=environment_variables_dict.get('azure_clientid', ''),
                                       azure_secret=environment_variables_dict.get('azure_secret', ''),
                                       azure_tenantid=environment_variables_dict.get('azure_tenantid', ''),
                                       azure_subscriptionid=environment_variables_dict.get('azure_subscriptionid', ''),
-                                      azure_resource_group_name=environment_variables_dict.get(
-                                          'azure_resource_group_name', ''))
+                                      azure_resource_group_name=environment_variables_dict.get('azure_resource_group_name', ''),
+                                      kubeadmin_password=environment_variables_dict.get('kubeadmin_password', '')
+                                      )
     azure_vm_name = (environment_variables_dict.get('azure_vm_name', ''))
-    if azure_cluster_start:
-        logger.info(azure_operation.start_vm(vm_name=azure_vm_name))
-    elif azure_cluster_stop:
-        logger.info(azure_operation.stop_vm(vm_name=azure_vm_name))
+    if cluster_operation == ClusterOperation.START.value:
+        logger.info('Start cluster with verification')
+        azure_operation.start_cluster_with_verification(vm_name=azure_vm_name)
+    elif cluster_operation == ClusterOperation.STOP.value:
+        logger.info('Stop cluster')
+        azure_operation.stop_vm(vm_name=azure_vm_name)
+    else:
+        raise Exception(f'Invalid cluster operation: {cluster_operation}')
 
 
 @logger_time_stamp
@@ -142,7 +155,6 @@ def install_resources():
     logger.info(f'Start Bare-Metal OpenShift resources installation')
     oc = bare_metal_operations.oc_login()
     bare_metal_operations.verify_cluster_is_up(oc)
-    # ibm_blk_disk_name for odf install
     bare_metal_operations.install_ocp_resources(resources=resources)
     bare_metal_operations.disconnect_from_provisioner()
     logger.info(f'End Bare-Metal OpenShift resources installation')
@@ -205,9 +217,10 @@ def main():
     MAIN of benchmark-runner framework
     """
     success = True
-    # azure_cluster_start_stop
-    if azure_cluster_stop or azure_cluster_start:
-        azure_cluster_start_stop()
+    # START/ STOP Azure cluster
+    if azure_cluster_operation:
+        azure_cluster_operations(azure_cluster_operation)
+
     # install_ocp_version
     elif install_ocp_version:
         install_step = environment_variables_dict.get('install_step', '')
