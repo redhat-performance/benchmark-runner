@@ -4,7 +4,7 @@ from benchmark_runner.common.clouds.Azure.azure_operations import AzureOperation
 from tests.integration.benchmark_runner.test_environment_variables import *
 
 
-#@pytest.mark.skip(reason="No Azure environment")
+@pytest.mark.skip(reason="No Azure environment")
 def test_get_vm_status():
     """
     This method tests fetch vm status from Azure cluster
