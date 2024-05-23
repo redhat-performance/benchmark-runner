@@ -58,6 +58,12 @@ pipeline {
                                     sudo podman rmi -f -a
                                     sudo podman volume prune --force
                                  '''
+                              // Assisted installer cleanup - avoid 'no space left on device' issue
+                              sh '''
+                                    sudo rm -rf /opt/assisted-service
+                                    sudo rm -rf /opt/http_store
+                                    sudo rm -rf /opt/ocp-version
+                                 '''
                         } catch (Exception e) {
                             echo "An error occurred, but execution will continue."
                         }
