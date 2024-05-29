@@ -41,9 +41,21 @@ class AssistedInstallerVersions:
         else:
             raise Exception(f'Error reading OCP versions from url: {self.__url}')
 
+    def get_several_latest_versions(self, latest_versions: list):
+        """
+        The method returns list of latest versions
+        @param latest_versions: list of required latest versions
+        @return:
+        """
+        result = []
+        for latest_version in latest_versions:
+            latest = self.get_latest_version(latest_version)
+            result.append(latest)
+        return result
+
     def get_latest_version(self, latest_version: str):
         """
-        This method get the latest version from json data
+        This method returns the latest version from json data
         :param latest_version: 4.XX or 4.XX.0-rc/ec/fc
         rc=release candidate| ec=engineering candidate| fc=feature candidate
         :return:
