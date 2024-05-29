@@ -306,7 +306,7 @@ jobs:
        # continue to next job if failed
        fail-fast: false
        matrix:
-          workload: [ 'stressng_pod', 'uperf_vm' ]
+          workload: [ 'stressng_pod', 'stressng_vm' ]
           python-version: [ '3.10' ]
     steps:
     - uses: actions/checkout@v4
