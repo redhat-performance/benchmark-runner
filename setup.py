@@ -33,6 +33,8 @@ setup(
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
     ],
 
     zip_safe=False,
@@ -56,7 +58,7 @@ setup(
         'pandas',  # required latest
         'paramiko==3.4.0',
         'PyGitHub==1.55',  # update secrets
-        'PyYAML==6.0',
+        'PyYAML==6.0.1',
         'sphinx==5.0.0',  # readthedocs
         'sphinx-rtd-theme==1.0.0',  # readthedocs
         'tenacity==8.0.1',  # retry decorator

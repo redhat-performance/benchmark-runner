@@ -13,7 +13,7 @@ prometheus-api-client==0.5.1
 pandas
 paramiko==3.4.0
 PyGitHub==1.55
-PyYAML==6.0
+PyYAML==6.0.1
 sphinx==5.0.0
 sphinx_rtd_theme==1.0.0
 tenacity==8.0.1

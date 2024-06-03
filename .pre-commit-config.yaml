@@ -9,4 +9,3 @@ repos:
       # Docs: https://source.redhat.com/departments/it/it-information-security/leaktk/leaktk_components/rh_pre_commit
       - id: rh-pre-commit
       # - id: rh-pre-commit.commit-msg # Optional for commit-msg attestation
-
