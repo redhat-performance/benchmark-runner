@@ -3,8 +3,8 @@ elasticsearch==7.16.1
 elasticsearch_dsl==7.4.0
 jinja2==3.1.4
 mock
-moto==2.2.16
+moto==4.0.1
 pandas
 pytest
-PyYAML==6.0
+PyYAML==6.0.1
 typeguard==2.12.1
