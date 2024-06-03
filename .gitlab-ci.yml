@@ -1,6 +1,6 @@
 stages:
   - "run_pytest"
-  
+
 run_pytest:
   tags:
     - docker

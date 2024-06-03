@@ -6,11 +6,11 @@
 cd /notebooks/templates/run_workloads
 ```
 
-2. Clone the repository if not already cloned: 
+2. Clone the repository if not already cloned:
 
 ```
 git clone https://github.com/redhat-performance/benchmark-runner
-or 
+or
 update the repository with "git pull" if already cloned.
 ```
 

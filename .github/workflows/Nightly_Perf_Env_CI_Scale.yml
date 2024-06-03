@@ -65,13 +65,13 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       job_status: ${{ steps.job_step.outputs.status }}
-    needs: initialize_nightly 
+    needs: initialize_nightly
     strategy:
        # run one job every time
        max-parallel: 1
        # continue to next job if failed
        fail-fast: false
-       matrix: 
+       matrix:
           workload:
               - 'vdbench_pod_scale'
               - 'vdbench_kata_scale'

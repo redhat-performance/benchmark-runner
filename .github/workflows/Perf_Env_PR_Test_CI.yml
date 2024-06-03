@@ -10,11 +10,11 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
-# Ensures that only one deploy task per branch/environment will run at a time. 
+# Ensures that only one deploy task per branch/environment will run at a time.
 concurrency:
   group: performance-environment
   cancel-in-progress: false
-  
+
 jobs:
   approve: # First step
     runs-on: ubuntu-latest
@@ -87,10 +87,10 @@ jobs:
           rm $RUNNER_PATH/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz
           cp $RUNNER_PATH/kubectl /usr/local/bin/kubectl
           cp $RUNNER_PATH/oc /usr/local/bin/oc
-          
+
           # clone benchmark-operator v1.0.3
           git clone -b v1.0.3 https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
-          
+
           # run pytest - only unittest
           pytest -v tests/unittest/
 
@@ -160,14 +160,14 @@ jobs:
         rm $RUNNER_PATH/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz
         cp $RUNNER_PATH/kubectl /usr/local/bin/kubectl
         cp $RUNNER_PATH/oc /usr/local/bin/oc
-        
+
         # install virtctl for VNC
         virtctl_version="1.0.0"
         curl -L "https://github.com/kubevirt/kubevirt/releases/download/v${virtctl_version}/virtctl-v${virtctl_version}-linux-amd64" -o  "$RUNNER_PATH/virtctl"
-        chmod +x $RUNNER_PATH/virtctl 
-        cp $RUNNER_PATH/virtctl /usr/local/bin/virtctl 
+        chmod +x $RUNNER_PATH/virtctl
+        cp $RUNNER_PATH/virtctl /usr/local/bin/virtctl
         rm -rf $RUNNER_PATH/virtctl
-        
+
         # clone benchmark-operator v1.0.3
         git clone -b v1.0.3 https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
 
@@ -229,6 +229,6 @@ jobs:
 
        # clone benchmark-operator v1.0.3
        git clone -b v1.0.3 https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
-       
+
        # run main
        PYTHONPATH=. python benchmark_runner/main/main.py

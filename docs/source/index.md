@@ -3,7 +3,7 @@
 
 ## What is it?
 
-**benchmark-runner** is a containerized Python lightweight and flexible framework for running benchmark workloads 
+**benchmark-runner** is a containerized Python lightweight and flexible framework for running benchmark workloads
 on Kubernetes/OpenShift runtype kinds Pod, kata and VM.
 
 This framework support the following embedded workloads:
@@ -23,7 +23,7 @@ Reference:
 
 ![](../../media/docker2.png)
 
-### Run vdbench workload in Pod using OpenShift 
+### Run vdbench workload in Pod using OpenShift
 ![](../../media/benchmark-runner-demo.gif)
 
 ### Run vdbench workload in Pod using Kubernetes
