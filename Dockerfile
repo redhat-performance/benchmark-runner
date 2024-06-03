@@ -1,4 +1,4 @@
-FROM quay.io/centos/centos:stream8
+FROM quay.io/centos/centos:stream9
 
 # benchmark-runner latest version
 ARG VERSION
@@ -7,12 +7,10 @@ ARG VERSION
 RUN dnf update -y --nobest
 
 # install make
-Run dnf group install -y "Development Tools"
+RUN dnf group install -y "Development Tools"
 
 # install podman and jq
-Run dnf config-manager --set-enabled powertools \
-    && dnf install -y @container-tools \
-    && dnf install -y jq
+RUN dnf install -y podman jq
 
 # Prerequisite for Python installation
 ARG python_full_version=3.10.8
@@ -28,7 +26,7 @@ RUN wget https://www.python.org/ftp/python/${python_full_version}/Python-${pytho
     && rm -rf Python-${python_full_version}.tgz
 
 # install & run benchmark-runner (--no-cache-dir for take always the latest)
-RUN python3.10 -m pip --no-cache-dir install --upgrade pip && pip --no-cache-dir install benchmark-runner --upgrade
+RUN python3.10 -m pip install --upgrade pip && pip install --upgrade benchmark-runner
 
 # install oc/kubectl client tools for OpenShift/Kubernetes
 ARG OCP_CLIENT_VERSION="4.15.0"
