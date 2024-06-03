@@ -10,3 +10,8 @@ repos:
       - id: rh-pre-commit
       # - id: rh-pre-commit.commit-msg # Optional for commit-msg attestation
 
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: check-json
+      - id: check-yaml
