@@ -31,7 +31,7 @@ run()
 
 ## Inspect Prometheus Snapshots
 
-The CI jobs store snapshots of the Prometheus database for each run as part of the artifacts.  
+The CI jobs store snapshots of the Prometheus database for each run as part of the artifacts.
 Download run artifacts from S3:
 ```
 $ wget https://myuser:mypassword@run-artifacts-perfci.com
@@ -70,7 +70,7 @@ $ sudo podman pod rm -f prometheus_grafana_pod
 ** Important: please select the exact file time: 2022_01_04T08_21_52+0000_2022_01_04T08_45_47+0000
 
 ```
-Example query: 
+Example query:
 
 sum(irate(node_cpu_seconds_total[2m])) by (mode,instance) > 0
 

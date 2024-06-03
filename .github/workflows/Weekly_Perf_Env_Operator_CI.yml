@@ -31,7 +31,7 @@ jobs:
        max-parallel: 1
        # continue to next job if failed
        fail-fast: false
-       matrix: 
+       matrix:
           resource: [ 'cnv', 'lso', 'infra', 'custom']
     outputs:
       install_resource_time_output: ${{ steps.ocp_install_resource_step.outputs.install_resource_time }}
@@ -75,7 +75,7 @@ jobs:
           echo "$KUBECONFIG_CONTENTS" > "$RUNNER_PATH/.kube/config"
           echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
           sudo tee -a /etc/hosts <<< "$OCP_HOSTS" > /dev/null
-      - name: ☉ install ${{ matrix.resource }} Operator 
+      - name: ☉ install ${{ matrix.resource }} Operator
         env:
           CNV_VERSION: "4.16"
           ODF_VERSION: "4.15"
@@ -121,7 +121,7 @@ jobs:
           scp -r "$RUNNER_PATH/.kube/config" provision:"$CONTAINER_KUBECONFIG_PATH"
           echo -e "podman run --rm -e IBM_API_KEY=$IBM_API_KEY -e GITHUB_TOKEN=$GITHUB_TOKEN -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e INSTALL_OCP_RESOURCES=True -e CNV_VERSION=$CNV_VERSION -e QUAY_USERNAME=$QUAY_USERNAME -e QUAY_PASSWORD=$QUAY_PASSWORD -e ODF_VERSION=$ODF_VERSION -e KATA_CSV=$KATA_CSV -e NUM_ODF_DISK=$NUM_ODF_DISK -e INSTALL_RESOURCES_LIST=${{ matrix.resource }} -e WORKER_IDS=$WORKER_IDS -e PROVISION_IP=$PROVISION_IP -e CONTAINER_PRIVATE_KEY_PATH=$CONTAINER_PRIVATE_KEY_PATH -e PROVISION_USER=$PROVISION_USER -e PROVISION_OC_USER=$PROVISION_OC_USER -e PROVISION_PORT=$PROVISION_PORT -e GITHUB_REPOSITORY_SHORT=$GITHUB_REPOSITORY_SHORT -e WORKER_DISK_IDS=$WORKER_DISK_IDS -e WORKER_DISK_PREFIX=$WORKER_DISK_PREFIX -e EXPECTED_NODES=$EXPECTED_NODES -e PROVISION_TIMEOUT=3600 -e log_level=INFO -v $CONTAINER_PRIVATE_KEY_PATH:$CONTAINER_PRIVATE_KEY_PATH -v $CONTAINER_KUBECONFIG_PATH:$CONTAINER_KUBECONFIG_PATH --privileged quay.io/ebattat/benchmark-runner:latest" > "$RUNNER_PATH/install_operator.sh"
           scp -r "$RUNNER_PATH/install_operator.sh" provision:"/tmp/install_operator.sh"
-          ssh -t provision "chmod +x /tmp/install_operator.sh;/tmp/./install_operator.sh;rm -f /tmp/install_operator.sh"        
+          ssh -t provision "chmod +x /tmp/install_operator.sh;/tmp/./install_operator.sh;rm -f /tmp/install_operator.sh"
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End  ${{ matrix.resource }} installation   >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
           end=$(printf '%(%s)T' -1)
           echo "INSTALL_OCP_RESOURCE_MINUTES_TIME=$(( (( end - start )) / 60))" >> "$GITHUB_ENV"

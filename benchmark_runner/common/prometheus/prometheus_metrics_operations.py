@@ -156,7 +156,7 @@ class PrometheusMetricsOperation:
     def upload_result_to_elastic(self):
         """
         This method upload result to ElasticSearch
-        :return: 
+        :return:
         """
         pass
         if self._es_host and self._es_port:

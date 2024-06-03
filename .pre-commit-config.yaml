@@ -15,3 +15,4 @@ repos:
     hooks:
       - id: check-json
       - id: check-yaml
+      - id: trailing-whitespace

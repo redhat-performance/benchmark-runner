@@ -12,7 +12,7 @@ on:
 concurrency:
   group: performance-environment
   cancel-in-progress: false
-  
+
 jobs:
 
   unittest:
@@ -74,10 +74,10 @@ jobs:
           rm $RUNNER_PATH/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz
           cp $RUNNER_PATH/kubectl /usr/local/bin/kubectl
           cp $RUNNER_PATH/oc /usr/local/bin/oc
-          
+
           # clone benchmark-operator v1.0.3
           git clone -b v1.0.3 https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
-          
+
           # run pytest - only unittest
           pytest -v tests/unittest/
 
@@ -184,14 +184,14 @@ jobs:
         cp "$RUNNER_PATH"/oc /usr/local/bin/oc
         rm -rf "$RUNNER_PATH"/kubectl
         rm -rf "$RUNNER_PATH"/oc
-        
+
          # install virtctl for VNC
         virtctl_version="1.0.0"
         curl -L "https://github.com/kubevirt/kubevirt/releases/download/v${virtctl_version}/virtctl-v${virtctl_version}-linux-amd64" -o  "$RUNNER_PATH/virtctl"
-        chmod +x "$RUNNER_PATH"/virtctl 
-        cp "$RUNNER_PATH"/virtctl /usr/local/bin/virtctl 
+        chmod +x "$RUNNER_PATH"/virtctl
+        cp "$RUNNER_PATH"/virtctl /usr/local/bin/virtctl
         rm -rf "$RUNNER_PATH"/virtctl
-        
+
         # clone benchmark-operator
         git clone -b v1.0.3 https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
         # run pytest
@@ -516,7 +516,7 @@ jobs:
           git checkout main
           git config --global user.email "${{ secrets.EMAIL }}"
           git config --global user.name  "${{ secrets.USER_NAME }}"
-          git config pull.rebase false  # merge 
+          git config pull.rebase false  # merge
           git commit benchmark_runner/grafana/perf/jsonnet/main.libsonnet -m "Update main.libsonnet file"
 
           git pull https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} main

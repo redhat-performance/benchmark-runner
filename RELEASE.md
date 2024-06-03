@@ -6,7 +6,7 @@
 There is a new stable version for Benchmark-Runner, it includes:
 
 1. Benchmark-Runner new feature support:
-   
+
 * Adding support for VM workloads
 * Adding support for running Benchmark runner without active Elasticsearch server
 * Adding node selector support for Benchmark-Operator pod [PIN_NODE_BENCHMARK_OPERATOR]

@@ -272,7 +272,7 @@ jobs:
         do
             git clone "https://github.com/$repository" "$RUNNER_PATH/$repository"
             pushd "$RUNNER_PATH/$repository"
-            case $repository in 
+            case $repository in
                'redhat-performance/benchmark-runner')
                     echo "BENCHMARK_RUNNER_ID=$(git rev-parse @)" >> "$GITHUB_ENV"
                     BENCHMARK_RUNNER_ID=$(git rev-parse @)

@@ -1,7 +1,7 @@
 # This workflow will install Python dependencies, run tests and lint with a single version of Python
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 # This is Test PR CI Pipeline against Performance environment when pushing a PR
- 
+
 name: Perf Env E2E Test CI
 
 on:
@@ -32,7 +32,7 @@ jobs:
        max-parallel: 1
        # continue to next job if failed
        fail-fast: false
-       matrix: 
+       matrix:
           resource: [ 'custom']
     outputs:
       install_resource_time_output: ${{ steps.ocp_install_resource_step.outputs.install_resource_time }}

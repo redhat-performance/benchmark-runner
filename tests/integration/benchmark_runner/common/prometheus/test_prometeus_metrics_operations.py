@@ -8,7 +8,7 @@ from benchmark_runner.common.prometheus.prometheus_metrics_operations import Pro
 def test_get_prometheus_timestamp():
     """
     This method test get prometheus timestamp
-    :return: 
+    :return:
     """
     prometheus_metrics_operation = PrometheusMetricsOperation()
     assert prometheus_metrics_operation.get_prometheus_timestamp()
