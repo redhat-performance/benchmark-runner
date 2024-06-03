@@ -285,6 +285,7 @@ jobs:
           pip install benchmark-runner wheel
       - name: 🎁 Bump Version
         run: |
+          pip install setuptools
           version=$(python3 setup.py --version)
           git checkout main
           pip install bumpversion
