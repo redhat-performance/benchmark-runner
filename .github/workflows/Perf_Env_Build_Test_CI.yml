@@ -200,7 +200,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [ '3.10' ]
+        python-version: [ '3.12' ]
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
@@ -216,6 +216,7 @@ jobs:
         # Verify and wait till latest benchmark-runner version will be updated in Pypi (timeout 900 seconds)
         timeout=900
         sleep_time=30
+        pip install setuptools
         expected_version=$(python3 setup.py --version)
         pip --no-cache-dir install benchmark-runner --upgrade
         build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
@@ -255,6 +256,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: ⌛ Build and Upload 🐋 to quay.io
         run: |
+          pip install setuptools
           version=$(python3 setup.py --version)
           sudo docker build --build-arg VERSION=$version -t quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:v$version .
           sudo docker build --build-arg VERSION=latest -t quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:latest .
