@@ -230,7 +230,7 @@ jobs:
               echo 'wait' "$((current_wait_time+sleep_time))" 'seconds'
               sleep $sleep_time
               current_wait_time="$((current_wait_time+sleep_time))"
-              pip --no-cache-dir install benchmark-runner --upgrade
+              pip --no-cache-dir install setuptools benchmark-runner --upgrade
               build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
               actual_version="$(cut -d'=' -f2 <<<"$build")"
               if (( $current_wait_time == $timeout )); then
