@@ -6,7 +6,7 @@ from typeguard import typechecked
 from elasticsearch import Elasticsearch
 from elasticsearch.connection import create_ssl_context
 from elasticsearch_dsl import Search
-from datetime import datetime
+from datetime import datetime, timezone
 
 from benchmark_runner.common.elasticsearch.elasticsearch_exceptions import ElasticSearchDataNotUploaded
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
@@ -169,7 +169,7 @@ class ElasticSearchOperations:
                 data.update(es_add_items)
 
             # utcnow - solve timestamp issue
-            data['timestamp'] = datetime.utcnow()  # datetime.now()
+            data['timestamp'] = datetime.now(timezone.utc)  # datetime.utcnow() or datetime.now()
 
             # Uploads data to elasticsearch server
             try:

@@ -251,8 +251,8 @@ jobs:
         # Verify and wait till latest benchmark-runner version will be updated in Pypi (timeout 900 seconds)
         timeout=900
         sleep_time=30
+        pip --no-cache-dir install setuptools benchmark-runner --upgrade
         expected_version=$(python3 setup.py --version)
-        pip --no-cache-dir install benchmark-runner --upgrade
         build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
         actual_version="$(cut -d'=' -f2 <<<"$build")"
         current_wait_time=0
@@ -290,6 +290,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: ⌛ Build and Upload 🐋 to quay.io
         run: |
+          pip install setuptools
           version=$(python3 setup.py --version)
           sudo docker build --build-arg VERSION=$version -t quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:v$version .
           sudo docker build --build-arg VERSION=latest -t quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:latest .
@@ -318,9 +319,9 @@ jobs:
           pip install benchmark-runner wheel
       - name: 🎁 Bump Version
         run: |
+          pip install setuptools bumpversion
           version=$(python3 setup.py --version)
           git checkout main
-          pip install bumpversion
           git config --global user.email "${{ secrets.EMAIL }}"
           git config --global user.name  "${{ secrets.USER_NAME }}"
           git config pull.rebase false  # merge

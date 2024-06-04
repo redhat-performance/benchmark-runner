@@ -13,7 +13,7 @@ RUN dnf group install -y "Development Tools"
 RUN dnf install -y podman jq
 
 # Prerequisite for Python installation
-ARG python_full_version=3.10.8
+ARG python_full_version=3.12.3
 RUN dnf install openssl-devel bzip2-devel wget libffi-devel -y
 
 # Install Python
@@ -22,14 +22,14 @@ RUN wget https://www.python.org/ftp/python/${python_full_version}/Python-${pytho
     && cd Python-${python_full_version} \
     && ./configure --enable-optimizations \
     && make altinstall \
-    && echo alias python=python3.10 >> ~/.bashrc \
+    && echo alias python=python3.12 >> ~/.bashrc \
     && rm -rf Python-${python_full_version}.tgz
 
 # install & run benchmark-runner (--no-cache-dir for take always the latest)
-RUN python3.10 -m pip install --upgrade pip && pip install --upgrade benchmark-runner
+RUN python3.12 -m pip install --upgrade pip && python3.12 -m pip install --upgrade benchmark-runner
 
 # install oc/kubectl client tools for OpenShift/Kubernetes
-ARG OCP_CLIENT_VERSION="4.15.0"
+ARG OCP_CLIENT_VERSION="4.16.0-rc.3"
 RUN  curl -L "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${OCP_CLIENT_VERSION}/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz" -o "/tmp/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz" \
      && tar -xzvf /tmp/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz -C /tmp/ \
      && mv /tmp/kubectl /usr/local/bin/kubectl \
@@ -37,7 +37,7 @@ RUN  curl -L "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${OCP_CL
      && rm -rf /tmp/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz /tmp/kubectl /tmp/oc
 
 # Install virtctl for VNC
-ARG virtctl_version="1.0.0"
+ARG virtctl_version="1.2.0"
 RUN curl -L "https://github.com/kubevirt/kubevirt/releases/download/v${virtctl_version}/virtctl-v${virtctl_version}-linux-amd64" -o /usr/local/bin/virtctl \
     && chmod +x /usr/local/bin/virtctl
 
@@ -63,7 +63,7 @@ RUN git clone -b v1.2.2-kata-ci https://github.com/RobertKrawitz/OpenShift4-tool
 # Add main
 COPY benchmark_runner/main/main.py /benchmark_runner/main/main.py
 
-CMD [ "python3.10", "/benchmark_runner/main/main.py"]
+CMD [ "python3.12", "/benchmark_runner/main/main.py"]
 
 # oc: https://www.ibm.com/docs/en/fci/6.5.1?topic=steps-setting-up-installation-server
 # sudo podman build -t quay.io/ebattat/benchmark-runner:latest . --no-cache
