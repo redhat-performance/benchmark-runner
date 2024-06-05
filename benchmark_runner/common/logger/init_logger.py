@@ -26,4 +26,3 @@ def get_log_path():
     :return:
     """
     return f'{run_artifacts_path}/benchmark_runner.log'
-

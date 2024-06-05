@@ -60,7 +60,7 @@ class CreateOCPResource:
         for resource_file in os.listdir(os.path.join(self.__dir_path, resource, 'template')):
             with open(os.path.join(self.__dir_path, resource, 'template', resource_file)) as f:
                 template_str = f.read()
-            tm = Template(template_str)
+            tm = Template(template_str, keep_trailing_newline=True)
             data = tm.render(self.__environment_variables_dict)
             resource_file = resource_file.replace('_template', '')
             with open(os.path.join(self.__dir_path, resource, resource_file), 'w') as f:
@@ -98,4 +98,3 @@ class CreateOCPResource:
             create_custom.create_custom()
             # remove resource files
         self.remove_resource_files(path=os.path.join(self.__dir_path, resource))
-

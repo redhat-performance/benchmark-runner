@@ -23,7 +23,7 @@ def render_yaml_string(template_str: str, environment_variable_dict: dict = None
         # set prom token, skip if running on kubernetes just for now
         if environment_variable_dict.get("cluster") != 'kubernetes':
             environment_variable_dict['prom_token'] = oc.get_prom_token()
-    return Template(template_str).render(environment_variable_dict)
+    return Template(template_str, keep_trailing_newline=True).render(environment_variable_dict)
 
 
 def render_yaml_file(dir_path: str, yaml_file: str, environment_variable_dict: dict = None):

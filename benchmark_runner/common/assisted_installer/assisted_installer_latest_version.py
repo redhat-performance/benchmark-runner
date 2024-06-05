@@ -89,7 +89,3 @@ class AssistedInstallerVersions:
             return f'{release_version}.{max(release_list)}'.strip()
         elif release_candidate_list:
             return f'{release_candidate_version}.{max(release_candidate_list)}'.strip()
-
-
-
-

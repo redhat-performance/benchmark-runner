@@ -16,4 +16,3 @@ if match:
         raise ValueError("Extracted content is not valid JSON.")
 else:
     raise ValueError('Dashboard JSON content not found')
-
