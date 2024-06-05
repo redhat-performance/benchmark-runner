@@ -8,15 +8,11 @@ on:
 #  schedule:
 #    - cron: '0 4 * * 2' # run Tuesday at 4 AM UTC/ 0 AM EDT
 #  # Run on Monday after assisted installer and operator completed
-#  workflow_run:
-#    workflows: ["Deploy Operator Perf Env Weekly CI"]
-#    types:
-#    - completed
+  workflow_run:
+    workflows: ["Deploy Operator Perf Env Weekly CI"]
+    types:
+    - completed
   workflow_dispatch:
-
-# on:
-#  push:
-#    branches: [ main ]
 
 # Ensures that only one deploy task per branch/environment will run at a time.
 concurrency:
@@ -88,32 +84,33 @@ jobs:
        matrix:
           workload:
               - 'uperf_pod'
-              - 'uperf_kata'
-              - 'uperf_vm'
-              - 'hammerdb_pod_mariadb'
-              - 'hammerdb_kata_mariadb'
-              - 'hammerdb_vm_mariadb'
-              - 'hammerdb_pod_postgres'
-              - 'hammerdb_kata_postgres'
-              - 'hammerdb_vm_postgres'
-              - 'hammerdb_pod_postgres_lso'
-              - 'hammerdb_kata_postgres_lso'
-              - 'hammerdb_vm_postgres_lso'
-              - 'hammerdb_pod_mssql'
-              - 'hammerdb_kata_mssql'
-              - 'hammerdb_vm_mssql'
-              - 'vdbench_pod'
-              - 'vdbench_kata'
-              - 'vdbench_vm'
-              - 'vdbench_pod_scale'
-              - 'vdbench_kata_scale'
-              - 'vdbench_vm_scale'
-              - 'clusterbuster'
-              - 'bootstorm_vm_scale'
-              - 'windows_vm_scale_windows10'
-              - 'windows_vm_scale_windows11'
-              - 'windows_vm_scale_windows_server_2019'
-              - 'windows_vm_scale_windows_server_2022'
+              - 'bootstorm_vm'
+#              - 'uperf_kata'
+#              - 'uperf_vm'
+#              - 'hammerdb_pod_mariadb'
+#              - 'hammerdb_kata_mariadb'
+#              - 'hammerdb_vm_mariadb'
+#              - 'hammerdb_pod_postgres'
+#              - 'hammerdb_kata_postgres'
+#              - 'hammerdb_vm_postgres'
+#              - 'hammerdb_pod_postgres_lso'
+#              - 'hammerdb_kata_postgres_lso'
+#              - 'hammerdb_vm_postgres_lso'
+#              - 'hammerdb_pod_mssql'
+#              - 'hammerdb_kata_mssql'
+#              - 'hammerdb_vm_mssql'
+#              - 'vdbench_pod'
+#              - 'vdbench_kata'
+#              - 'vdbench_vm'
+#              - 'vdbench_pod_scale'
+#              - 'vdbench_kata_scale'
+#              - 'vdbench_vm_scale'
+#              - 'clusterbuster'
+#              - 'bootstorm_vm_scale'
+#              - 'windows_vm_scale_windows10'
+#              - 'windows_vm_scale_windows11'
+#              - 'windows_vm_scale_windows_server_2019'
+#              - 'windows_vm_scale_windows_server_2022'
 
     steps:
     - uses: actions/checkout@v4
@@ -183,7 +180,7 @@ jobs:
         BOOTSTORM_SCALE: 80
         WINDOWS_SCALE: 37
         THREADS_LIMIT: 20
-        RUN_TYPE: 'perf_ci'
+        RUN_TYPE: 'test_ci'
         ENABLE_PROMETHEUS_SNAPSHOT: 'True'
         WINDOWS10_URL: ${{ secrets.PERF_WINDOWS10_URL }}
         WINDOWS11_URL: ${{ secrets.PERF_WINDOWS11_URL }}
