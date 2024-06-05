@@ -236,5 +236,3 @@ class RemoteSsh:
             if "'" in remote_source or "'" in remote_target:
                 raise IllegalFilename("File name with ' ")
             self.run_command(f"cp -arf -- {remote_source}' '{remote_target}'")
-
-

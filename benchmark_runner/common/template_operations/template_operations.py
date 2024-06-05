@@ -162,10 +162,10 @@ class TemplateOperations:
             answer[filename] = f"{template.render(render_data)}\n"
             # namespace
             if os.path.isfile(os.path.join(self.__dir_path, f'namespace_template.yaml')):
-                answer['namespace.yaml'] = render_yaml_file(dir_path=self.__dir_path, yaml_file='namespace_template.yaml', environment_variable_dict=self.__environment_variables_dict)
+                answer['namespace.yaml'] = render_yaml_file(dir_path=self.__dir_path, yaml_file='namespace_template.yaml', environment_variable_dict=self.__environment_variables_dict) + '\n'
             # windows workload
             if 'windows' in self.__workload_name:
-                answer['windows_dv.yaml'] = render_yaml_file(dir_path=os.path.join(workload_dir_path, 'internal_data'), yaml_file='windows_dv_template.yaml', environment_variable_dict=render_data)
+                answer['windows_dv.yaml'] = render_yaml_file(dir_path=os.path.join(workload_dir_path, 'internal_data'), yaml_file='windows_dv_template.yaml', environment_variable_dict=render_data) + '\n'
             # vdbench scale
             if scale and redis and 'vdbench' in self.__workload_name:
                     answer['redis.yaml'] = render_yaml_file(dir_path=os.path.join(self.__dir_path, 'scale'), yaml_file='redis_template.yaml', environment_variable_dict=self.__environment_variables_dict)

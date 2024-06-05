@@ -6,6 +6,3 @@ mv HammerDB-4.0/* /hammer
 export LD_LIBRARY=/hammer/lib:$LD_LIBRARY_PATH
 dnf install -y tk
 cd /hammer; ./bin/tclsh8.6
-
-
-

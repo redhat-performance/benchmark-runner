@@ -25,4 +25,3 @@ class PrometheusSnapshotAlreadyRetrieved(PrometheusSnapshotError):
     def __init__(self):
         self.message = f'Attempt to retrieve Prometheus snapshot when it was already retrieved'
         super(PrometheusSnapshotAlreadyRetrieved, self).__init__(self.message)
-
