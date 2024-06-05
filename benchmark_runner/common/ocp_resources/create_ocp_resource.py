@@ -98,4 +98,3 @@ class CreateOCPResource:
             create_custom.create_custom()
             # remove resource files
         self.remove_resource_files(path=os.path.join(self.__dir_path, resource))
-

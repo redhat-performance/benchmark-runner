@@ -24,4 +24,3 @@ spec:
   startingCSV: @starting_csv@
   channel: "nightly-{{ cnv_version }}"
   installPlanApproval: Manual
-

@@ -83,5 +83,3 @@ class Virtctl(OC):
         """
         namespace = f'-n {namespace}' if namespace else ''
         self.run(cmd=f'virtctl expose vm {vm_name} --name {vm_name} {namespace} --port 27022 --target-port 22 --type NodePort')
-
-
