@@ -9,7 +9,3 @@ def test_run_cmd():
     """
     ssh = SSH()
     assert ssh.run(cmd='ls')
-
-
-
-
