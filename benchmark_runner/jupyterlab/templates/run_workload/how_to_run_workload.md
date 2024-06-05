@@ -34,5 +34,3 @@ or
 **Optional**: instead of arguments, set environment variables in benchmark_runner/main/environment_variables.py, e.g., ('WORKLOAD', 'vdbench_vm').
 
 **Optional**: For custom workload parameters, configure the templates in benchmark_runner/common/template_operations/templates.
-
-

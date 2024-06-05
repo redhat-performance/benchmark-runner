@@ -33,4 +33,3 @@ $ sudo systemctl start postgresql
 $ sudo systemctl status postgresql
 $ echo "alter role postgres password 'postgres'" > input
 $ psql -U postgres -d postgres < input
-

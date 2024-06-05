@@ -65,4 +65,3 @@ class ConnectionData:
         :return:
         """
         return self.__timeout
-
