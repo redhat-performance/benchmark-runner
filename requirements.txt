@@ -1,7 +1,7 @@
 attrs==21.4.0
 azure==4.0.0
-boto3==1.34.119
-botocore==1.34.119
+boto3==1.33.13
+botocore==1.33.13
 cryptography==42.0.4
 elasticsearch==7.16.1
 elasticsearch_dsl==7.4.0

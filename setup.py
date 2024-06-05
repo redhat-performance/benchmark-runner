@@ -45,8 +45,8 @@ setup(
     install_requires=[
         'attrs==21.4.0',  # readthedocs
         'azure==4.0.0',
-        'boto3==1.26.1',  # s3
-        'botocore==1.29.1',  # s3
+        'boto3==1.33.13',  # s3
+        'botocore==1.33.13',  # s3
         'cryptography==42.0.4',  # for paramiko
         'elasticsearch==7.16.1',
         'elasticsearch_dsl==7.4.0',  # for deep search
