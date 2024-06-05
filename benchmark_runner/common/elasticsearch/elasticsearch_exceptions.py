@@ -10,4 +10,3 @@ class ElasticSearchDataNotUploaded(ElasticSearchError):
     def __init__(self):
         self.message = f'Data did not upload to elastic search'
         super(ElasticSearchDataNotUploaded, self).__init__(self.message)
-

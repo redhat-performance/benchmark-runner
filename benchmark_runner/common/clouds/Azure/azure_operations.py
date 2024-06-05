@@ -123,4 +123,3 @@ class AzureOperations:
 
         logger.error(f"Failed to start the cluster after {max_retry} attempts.")
         return False
-

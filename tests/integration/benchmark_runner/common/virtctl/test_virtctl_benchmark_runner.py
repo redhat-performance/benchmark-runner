@@ -80,4 +80,3 @@ def test_benchmark_runner_vm_create_ready_stop_start_expose_delete():
     assert oc.get_nodes_addresses()[vm_node]
     assert oc.get_exposed_vm_port(vm_name=vm_name, namespace=test_environment_variable['namespace'])
     assert oc.delete_vm_sync(yaml=os.path.join(f'{templates_path}', 'vdbench_vm.yaml'), vm_name=vm_name, namespace=test_environment_variable['namespace'], timeout=600)
-

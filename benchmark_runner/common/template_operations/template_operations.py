@@ -156,10 +156,10 @@ class TemplateOperations:
                 template_file = f'{file_components[0]}_template{file_components[1]}'
             try:
                 with open(os.path.join(workload_dir_path, 'internal_data', template_file)) as f:
-                    template = Template(f.read())
+                    template = Template(f.read(), keep_trailing_newline=True)
             except TemplateSyntaxError as err:
                 raise SyntaxError(f"Error while rendering {template_file}: {err}")
-            answer[filename] = f"{template.render(render_data)}\n"
+            answer[filename] = f"{template.render(render_data)}"
             # namespace
             if os.path.isfile(os.path.join(self.__dir_path, f'namespace_template.yaml')):
                 answer['namespace.yaml'] = render_yaml_file(dir_path=self.__dir_path, yaml_file='namespace_template.yaml', environment_variable_dict=self.__environment_variables_dict)

@@ -3,4 +3,3 @@
 include= */benchmark_runner/*
 
 omit= *__init__*, */usr/local/lib*, *Test*, *init_logger*
-

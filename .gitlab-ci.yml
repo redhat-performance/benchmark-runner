@@ -29,8 +29,3 @@ set_kubeconfig_and_hosts:
     KUBECONFIG_CONTENTS: "$PERF_KUBECONFIG"
     RUNNER_PATH: "$RUNNER_PATH"
     OCP_HOSTS: "$PERF_OCP_HOSTS"
-
-
-
-
-
