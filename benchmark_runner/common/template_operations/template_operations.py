@@ -173,6 +173,10 @@ class TemplateOperations:
         for filename, data in answer.items():
             with open(os.path.join(self.__run_artifacts_path, filename), 'w') as f:
                 f.write(data)
+            # Ensure a newline is added to the last line of the file
+            with open(os.path.join(self.__run_artifacts_path, filename), 'a') as f:
+                f.write('\n')
+
 
     @logger_time_stamp
     def generate_yamls(self, scale: str = '', scale_nodes: list = [], redis: str = None, thread_limit: int = None):

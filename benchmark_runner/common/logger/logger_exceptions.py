@@ -12,4 +12,3 @@ class MethodError(LoggerError):
     def __init__(self, method_name, exception):
         self.message = f'method error: {method_name}, exception: {exception}'
         super(MethodError, self).__init__(self.message)
-

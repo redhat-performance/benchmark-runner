@@ -49,4 +49,3 @@ class CreateCNV(CreateOCPResourceOperations):
                                                       verify_cmd="oc get csv -n openshift-cnv -ojsonpath='{.items[0].status.phase}'",
                                                       status='Succeeded')
         return True
-

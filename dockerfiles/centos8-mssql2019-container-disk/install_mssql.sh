@@ -18,4 +18,3 @@ SELECT Name from sys.tables
 $ sudo systemctl stop mssql-server
 $ sudo systemctl start mssql-server
 $ sudo systemctl status mssql-server
-
