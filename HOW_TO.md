@@ -5,6 +5,7 @@ _**Table of Contents**_
 <!-- TOC -->
 - [Benchmark-runner: How to?](#benchmark-runner-how-to)
     - [Add any new Python code](#add-any-new-python-code)
+    - [Commit any changes](#commit-any-changes)
     - [Update workload, modify parameters to workload, or change parameters for any CI job](#add-new-workload-modify-parameters-to-workload-or-change-parameters-for-any-ci-job)
     - [Add new benchmark operator workload to benchmark runner](#add-new-benchmark-operator-workload-to-benchmark-runner)
     - [Add new custom workload to benchmark runner](#add-new-custom-workload-to-benchmark-runner)
@@ -35,6 +36,11 @@ ls: cannot access 'tests/unittest/benchmark_runner/common/template_operations/__
 ```
 
 you need to create an empty file by that name and `git add` it.
+
+## Commit any changes
+
+When you commit any changes, you should run `pre-commit`, following
+[the instructions here](DOCS/PRE-COMMIT.md):
 
 ## Add new workload, modify parameters to workload, or change parameters for any CI job
 
@@ -263,7 +269,7 @@ kind_data:
 
 The `shared_data` section is mandatory, but all other sections are optional.  Generally, the `run_type` data for `func_ci` and `test_ci` is identical, so only `perf_ci` data need be specified, and the otherwise shared data under `default`.  Similarly, the `kata` and `pod` kinds use identical data, and only vm data need be specified separately.
 
-Boilerplate data that is independent of workload has been moved to `common.yaml` at top level in the `templates` directory.
+Boilerplate data that is independent of workload has been moved to `common_template.yaml` at top level in the `templates` directory.
 
 ## Monitor and debug workload
 1. git clone https://github.com/redhat-performance/benchmark-runner

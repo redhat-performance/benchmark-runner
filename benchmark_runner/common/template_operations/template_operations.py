@@ -132,7 +132,7 @@ class TemplateOperations:
             'scale_node': scale_node
             }
         self.__environment_variables_dict = {**self.__environment_variables_dict, **template_render_data}
-        common_data = yaml.load(render_yaml_file(dir_path=self.__dir_path, yaml_file='common.yaml', environment_variable_dict=self.__environment_variables_dict), Loader=yaml.FullLoader)['common_data']
+        common_data = yaml.load(render_yaml_file(dir_path=self.__dir_path, yaml_file='common_template.yaml', environment_variable_dict=self.__environment_variables_dict), Loader=yaml.FullLoader)['common_data']
 
         template_render_data = {**self.__environment_variables_dict, **common_data}
 

@@ -15,6 +15,24 @@ repos:
     hooks:
       - id: check-json
       - id: check-yaml
+        exclude: _template.yaml$
+        args:
+          - --allow-multiple-documents
       - id: trailing-whitespace
+        exclude: benchmark_runner/grafana/perf/jsonnet/main.libsonnet$
+        args:
+          - --markdown-linebreak-ext=md
       - id: check-added-large-files
       - id: end-of-file-fixer
+      - id: check-json
+      - id: detect-private-key
+      - id: check-executables-have-shebangs
+      - id: check-shebang-scripts-are-executable
+      - id: mixed-line-ending
+        args:
+          - --fix=lf
+      - id: requirements-txt-fixer
+      - id: check-ast
+      - id: check-docstring-first
+      - id: check-merge-conflict
+      - id: detect-aws-credentials
