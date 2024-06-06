@@ -13,8 +13,9 @@ repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.4.0
     hooks:
+#- id: check-yaml # Comment it out because it affects all golden test YAML files.
       - id: check-json
-      - id: check-yaml
       - id: trailing-whitespace
+        exclude: benchmark_runner/grafana/perf/jsonnet/main.libsonnet
       - id: check-added-large-files
       - id: end-of-file-fixer
