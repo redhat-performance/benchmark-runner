@@ -188,7 +188,7 @@ kind_data:
 
 The `shared_data` section is mandatory, but all other sections are optional.  Generally, the `run_type` data for `func_ci` and `test_ci` is identical, so only `perf_ci` data need be specified, and the otherwise shared data under `default`.  Similarly, the `kata` and `pod` kinds use identical data, and only vm data need be specified separately.
 
-Boilerplate data that is independent of workload has been moved to `common.yaml` at top level in the `templates` directory.
+Boilerplate data that is independent of workload has been moved to `common_template.yaml` at top level in the `templates` directory.
 
 ## Monitor and debug workload
 1. git clone https://github.com/redhat-performance/benchmark-runner

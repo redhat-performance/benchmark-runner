@@ -1,3 +1,5 @@
+#!/usr/bin/env sh
+
 podman pod rm -f ci_pod
 echo "delete images"
 podman rmi -f quay.io/mimehta/custom-grafana:latest

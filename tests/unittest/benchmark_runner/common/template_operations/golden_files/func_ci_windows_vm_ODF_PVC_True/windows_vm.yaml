@@ -15,8 +15,6 @@ spec:
       terminationGracePeriodSeconds: 0
       evictionStrategy: LiveMigrate
       domain:
-        features:
-          smm: {}
         firmware:
           bootloader:
             efi:
@@ -67,6 +65,7 @@ spec:
                 direct: {}
             vapic: {}
             vpindex: {}
+          smm: {}
         machine:
           type: q35
         resources:
