@@ -59,6 +59,7 @@ setup(
         'paramiko==3.4.0',
         'PyGitHub==1.55',  # update secrets
         'PyYAML==6.0.1',
+        'setuptools'  # for python3.12
         'sphinx==5.0.0',  # readthedocs
         'sphinx-rtd-theme==1.0.0',  # readthedocs
         'tenacity==8.0.1',  # retry decorator
