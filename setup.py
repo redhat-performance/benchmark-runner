@@ -4,7 +4,7 @@ from os import path
 from setuptools import setup, find_packages
 
 
-__version__ = '1.0.613'
+__version__ = '1.0.614'  # update also .bumpversion.cfg
 
 
 here = path.abspath(path.dirname(__file__))
@@ -59,7 +59,7 @@ setup(
         'paramiko==3.4.0',
         'PyGitHub==1.55',  # update secrets
         'PyYAML==6.0.1',
-        'setuptools'  # for python3.12
+        'setuptools',  # for python3.12
         'sphinx==5.0.0',  # readthedocs
         'sphinx-rtd-theme==1.0.0',  # readthedocs
         'tenacity==8.0.1',  # retry decorator
