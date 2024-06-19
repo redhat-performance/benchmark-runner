@@ -38,7 +38,7 @@ class S3Operations:
     @typeguard.typechecked
     def upload_file(self, file_name_path: str, bucket: str, key: str, upload_file: str):
         """
-        This method upload file to s3
+        This method uploads file/object to s3
         :param file_name_path:'/home/user/test.txt'
         :param bucket:'benchmark'
         :param key:'test-data'
@@ -59,7 +59,7 @@ class S3Operations:
     @typeguard.typechecked
     def download_file(self, bucket: str, key: str, download_file: str, file_name_path: str):
         """
-        This method download file from s3
+        This method downloads file/object from s3
         :param bucket:'benchmark'
         :param key:'logs/ec2-idle/2021/01/19/18'
         :param download_file: 'test.txt'
@@ -80,7 +80,7 @@ class S3Operations:
     @typeguard.typechecked
     def delete_file(self, bucket: str, key: str, file_name: str):
         """
-        This method delete file from s3
+        This method deletes file/object from s3
         :param bucket:'benchmark'
         :param key:'test-data'
         :param file_name: 'test.txt'
@@ -97,7 +97,7 @@ class S3Operations:
     @typeguard.typechecked
     def delete_folder(self, bucket: str, key: str):
         """
-        This method delete folder from s3
+        This method deletes folder/key from s3
         :param bucket:'benchmark'
         :param key:'framework/test'
         :return:
@@ -117,7 +117,7 @@ class S3Operations:
     @typeguard.typechecked
     def create_folder(self, bucket: str, key: str):
         """
-        This method download file from s3
+        This method creates folder/key is s3
         :param bucket:'benchmark'
         :param key:'framework/test'
         :return:
@@ -133,7 +133,7 @@ class S3Operations:
     @typeguard.typechecked
     def file_exist(self, bucket: str, key: str, file_name: str):
         """
-        This method check if file exist
+        This method checks if file/object exists in s3
         :param bucket:'benchmark'
         :param key:'framework/test'
         :param file_name:'file.txt'
@@ -154,9 +154,28 @@ class S3Operations:
             raise S3FileNotExist
 
     @typeguard.typechecked
+    def folder_exist(self, bucket: str, key: str):
+        """
+        This method checks if folder/key exists in s3
+        :param bucket:'benchmark'
+        :param key:'framework/test'
+        :return:
+        """
+        try:
+            response = self.__s3_client.list_objects_v2(Bucket=bucket, Prefix=key)
+            if response.get('Contents'):
+                return True
+            return False
+        # Todo add custom error
+        except ClientError:
+            raise
+        except Exception:
+            raise S3KeyNotCreated
+
+    @typeguard.typechecked
     def upload_objects(self, local_source: str, s3_target: str):
         """
-        This method upload local data folder to s3 target path
+        This method uploads local data folder to s3 target path
         :param local_source: local data folder i.e. '/home/user/'
         :param s3_target: target s3 path i.e. 'data_store/calc_image_data/'
         :return:
@@ -183,7 +202,7 @@ class S3Operations:
     @typeguard.typechecked
     def download_objects(self, s3_target: str, local_source: str):
         """
-        This method download from s3 target to local data folder
+        This method downloads from s3 target to local data folder
         :param local_source: local data folder i.e. '/home/user/
         :param s3_target: target s3 path i.e. 'data_store/calc_image_data/'
         :return:

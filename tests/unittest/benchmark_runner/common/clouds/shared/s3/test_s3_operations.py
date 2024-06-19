@@ -27,7 +27,7 @@ def test_upload_file():
                                  bucket='benchmark',
                                  key='test-data',
                                  upload_file=expected_file_name)
-        assert s3operations.file_exist(bucket='benchmark', key='test-data', file_name=expected_file_name)
+        assert s3operations.object_exist(bucket='benchmark', key='test-data', object_name=expected_file_name)
 
 
 @mock_s3
@@ -140,7 +140,7 @@ def test_file_exist():
         s3operations = S3Operations(region_name='us-east-1')
         s3operations.upload_file(file_name_path=os.path.join(temp_local_directory1, expected_file_name),
                                  bucket='benchmark', key='test-data', upload_file=expected_file_name)
-        assert s3operations.file_exist(bucket='benchmark', key='test-data', file_name=expected_file_name)
+        assert s3operations.object_exist(bucket='benchmark', key='test-data', object_name=expected_file_name)
 
 
 @mock_s3
@@ -156,7 +156,7 @@ def test_file_delete():
         s3operations.upload_file(file_name_path=os.path.join(temp_local_directory1, expected_file_name),
                                  bucket='benchmark', key='test-data', upload_file=expected_file_name)
         s3operations.delete_file(bucket='benchmark', key='test-data', file_name=expected_file_name)
-        assert not s3operations.file_exist(bucket='benchmark', key='test-data', file_name=expected_file_name)
+        assert not s3operations.object_exist(bucket='benchmark', key='test-data', object_name=expected_file_name)
 
 
 @mock_s3
@@ -172,5 +172,5 @@ def test_folder_delete():
         s3operations = S3Operations(region_name='us-east-1')
         s3operations.upload_objects(local_source=temp_local_directory1, s3_target='benchmark/test-data')
         s3operations.delete_folder(bucket='benchmark', key='test-data')
-        assert not s3operations.file_exist(bucket='benchmark', key='test-data', file_name=expected_files_list[0])
-        assert not s3operations.file_exist(bucket='benchmark', key='test-data', file_name=expected_files_list[1])
+        assert not s3operations.object_exist(bucket='benchmark', key='test-data', object_name=expected_files_list[0])
+        assert not s3operations.object_exist(bucket='benchmark', key='test-data', object_name=expected_files_list[1])
