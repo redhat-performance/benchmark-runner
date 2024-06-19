@@ -48,7 +48,7 @@ setup(
         'boto3==1.33.13',  # s3
         'botocore==1.33.13',  # s3
         'cryptography==42.0.4',  # for paramiko
-        'elasticsearch==7.16.1',
+        'elasticsearch==7.17.9',
         'elasticsearch_dsl==7.4.0',  # for deep search
         'ipywidgets==8.0.6',  # for jupyterlab widgets
         'jinja2==3.1.4',  # for yaml templates and df.style
