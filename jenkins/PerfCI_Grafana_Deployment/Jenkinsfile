@@ -54,9 +54,9 @@ pipeline {
        stage('Install dependencies') {
             steps {
                 script {
-                    sh 'sudo python3 -m pip install --upgrade pip'
+                    sh 'python3 -m pip install --upgrade pip'
                     sh 'if [[ -f requirements.txt ]]; then pip install -r requirements.txt; fi'
-                    sh 'sudo pip install --upgrade benchmark-runner'
+                    sh 'pip install --upgrade benchmark-runner'
                     }
             }
         }
