@@ -7,7 +7,7 @@ from tests.integration.benchmark_runner.test_environment_variables import *
 
 def __get_run_artifacts_hierarchy(workload_name: str = ''):
     """
-    This method return log hierarchy
+    This method returns log hierarchy
     :param workload_name: workload name
     :return:
     """
@@ -21,7 +21,7 @@ def __get_run_artifacts_hierarchy(workload_name: str = ''):
 
 def get_s3operations():
     """
-    This method return s3operations instance
+    This method returns s3operations instance
     :return:
     """
     return S3Operations(region_name=test_environment_variable.get('region_name', ''),
@@ -32,7 +32,7 @@ def get_s3operations():
 
 def test_upload_file():
     """
-    This test upload file to s3 and verify it
+    This test uploads file/object to s3 and verify it
     :return:
     """
     s3operations = get_s3operations()
@@ -49,7 +49,7 @@ def test_upload_file():
 
 def test_download_file():
     """
-    This test download file from s3 and verify it
+    This test downloads file/object from s3 and verify it
     :return:
     """
     s3operations = get_s3operations()
@@ -64,7 +64,7 @@ def test_download_file():
 
 def test_file_delete():
     """
-    This test delete of file from s3
+    This test deletes of file/object from s3 and verify it
     :return:
     """
     s3operations = get_s3operations()
@@ -75,3 +75,17 @@ def test_file_delete():
     assert not s3operations.file_exist(bucket=test_environment_variable.get('bucket', ''),
                                        key=__get_run_artifacts_hierarchy(workload_name='test'),
                                        file_name=expected_file_name)
+
+
+def test_delete_folder():
+    """
+    This test deletes whole folder/key from s3 and verify it
+    :return:
+    """
+    # Upload test object
+    test_upload_file()
+    s3operations = get_s3operations()
+    s3operations.delete_folder(bucket=test_environment_variable.get('bucket', ''),
+                               key=f"{test_environment_variable.get('key', '')}/test-ci")
+    assert not s3operations.folder_exist(bucket=test_environment_variable.get('bucket', ''),
+                                         key=f"{test_environment_variable.get('key', '')}/test-ci")
