@@ -177,7 +177,7 @@ class BareMetalOperations:
         self._remote_ssh.replace_parameter(remote_path='/root/jetlag/ansible/vars',
                                             file_name=file_name,
                                             parameter='ocp_release_image:',
-                                            value=f'quay.io\/openshift-release-dev\/ocp-release:{self._install_ocp_version}-x86_64')
+                                            value=fr'quay.io\/openshift-release-dev\/ocp-release:{self._install_ocp_version}-x86_64')
         self._remote_ssh.replace_parameter(remote_path='/root/jetlag/ansible/vars',
                                             file_name=file_name,
                                             parameter='openshift_version:',
