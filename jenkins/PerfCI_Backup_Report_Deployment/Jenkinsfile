@@ -1,0 +1,78 @@
+pipeline {
+    agent {
+        label 'PerfCi'
+    }
+    environment {
+        CONTACT_EMAIL1 = credentials('perfci_contact_email1')
+    }
+
+    stages {
+        stage('Cleanup') {
+            steps {
+                script {
+                    try {
+                        // Clean the Jenkins workspace
+                        echo "Cleaning Jenkins workspace"
+                        sh '[ -d ${WORKSPACE} ] && sudo rm -rf ${WORKSPACE}'
+
+                        // Remove benchmark-runner images if they exist
+                        sh '''
+                            if [[ "$(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)" != "" ]]; then
+                                sudo podman rmi -f $(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)
+                            fi
+                        '''
+                    } catch (Exception cleanupException) {
+                        echo "An error occurred during cleanup: ${cleanupException.getMessage()}"
+                        // Additional cleanup error handling or actions can be added here
+                    }
+                }
+            }
+        }
+
+        stage('CI Pod Deployment') {
+            steps {
+                script {
+                       withCredentials([string(credentialsId: 'perfci_ci_pod_deployment', variable: 'CI_POD_DEPLOYMENT')]) {
+                    // Generates CNV workloads summary report in a JupyterLab pod deployment
+                    sh "${CI_POD_DEPLOYMENT}"
+                    }
+                }
+            }
+        }
+
+        stage('Backup to S3') {
+            steps {
+                script {
+                       withCredentials([string(credentialsId: 'perfci_ci_backup', variable: 'CI_BACKUP')]) {
+                    // Uploads CNV workloads summary report and Elastic/Grafana/PerfCi into S3
+                    sh "${CI_BACKUP}"
+                    }
+                }
+            }
+        }
+
+    }
+
+    post {
+        always {
+            script {
+                sh '''
+                    if [[ "$(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)" != "" ]]; then
+                        sudo podman rmi -f $(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)
+                    fi
+                '''
+            }
+        }
+        failure {
+            script {
+                msg = "Build error for ${env.JOB_NAME} ${env.BUILD_NUMBER} (${env.BUILD_URL})"
+                emailext body: """\
+                    Jenkins job: ${env.BUILD_URL}\nSee the console output for more details:  ${env.BUILD_URL}consoleFull\n\n
+                """, subject: msg, to: "${CONTACT_EMAIL1}"
+            }
+        }
+        success {
+            echo 'TBD'
+        }
+    }
+}
