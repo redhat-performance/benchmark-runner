@@ -29,7 +29,7 @@ pipeline {
             }
         }
 
-        stage('CI Pod Deployment') {
+        stage('CI Pod Deployment & Report') {
             steps {
                 script {
                        withCredentials([string(credentialsId: 'perfci_ci_pod_deployment', variable: 'CI_POD_DEPLOYMENT')]) {
@@ -40,7 +40,7 @@ pipeline {
             }
         }
 
-        stage('Backup to S3') {
+        stage('Backup to Google Drive') {
             steps {
                 script {
                        withCredentials([string(credentialsId: 'perfci_ci_backup', variable: 'CI_BACKUP')]) {
