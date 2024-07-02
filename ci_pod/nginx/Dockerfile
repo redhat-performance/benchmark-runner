@@ -7,6 +7,7 @@ ENV USER=$USER
 
 RUN apt-get update && apt-get install -y nginx openssl apache2-utils && \
     htpasswd -b -c /etc/nginx/.htpasswd "$USER" "$TOKEN"
+
 # generate randon certificate
 # RUN openssl req -new -newkey rsa:4096 -days 3650 -nodes -x509 -subj "/C=US/ST=A/L=B/O=C/CN=D" -keyout /mykey.key  -out /mycrt.crt
 

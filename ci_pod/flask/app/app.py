@@ -77,4 +77,4 @@ if __name__ == "__main__":
     Path(ENDPOINT_URL).write_text(os.environ['ENDPOINT_URL'])
     Path(AWS_ACCESS_KEY_ID).write_text(os.environ['AWS_ACCESS_KEY_ID'])
     Path(AWS_SECRET_ACCESS_KEY).write_text(os.environ['AWS_SECRET_ACCESS_KEY'])
-    app.run('0.0.0.0', '3002')
+    app.run('0.0.0.0', '4004')
