@@ -50,6 +50,10 @@ setup(
         'cryptography==42.0.4',  # for paramiko
         'elasticsearch==7.16.1',
         'elasticsearch_dsl==7.4.0',  # for deep search
+        'google-auth==2.30.0',  # for Google Drive
+        'google-auth-httplib2==0.2.0',  # for Google Drive
+        'google-auth-oauthlib==1.2.0',  # for Google Drive
+        'google-api-python-client==2.135.0'  # for Google Drive
         'ipywidgets==8.0.6',  # for jupyterlab widgets
         'jinja2==3.1.4',  # for yaml templates and df.style
         'myst-parser==1.0.0',  # readthedocs

@@ -194,7 +194,7 @@ pipeline {
             }
         }
         success {
-            echo 'TBD'
+            echo 'Triggering PerfCI-Backup-Report-Deployment pipeline'
             build job: 'PerfCI-Backup-Report-Deployment', wait: false
         }
     }
