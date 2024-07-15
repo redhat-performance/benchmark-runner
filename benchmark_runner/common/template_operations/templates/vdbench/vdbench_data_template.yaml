@@ -19,7 +19,7 @@ template_data:
       # used for mixed workload 0-100
       MIX_PRECENTAGE:
       # duration time in sec
-      DURATION: 360
+      DURATION: 720
       # pause after every test in sec
       PAUSE: 20
       # warmup before any test in sec
