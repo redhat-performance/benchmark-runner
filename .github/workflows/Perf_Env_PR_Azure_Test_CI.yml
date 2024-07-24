@@ -17,6 +17,8 @@ concurrency:
 
 jobs:
   approve: # First step
+    # minimize potential vulnerabilities
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'ok-to-test') }}
     runs-on: ubuntu-latest
     steps:
       - name: Approve
@@ -29,8 +31,6 @@ jobs:
     strategy:
       matrix:
         python-version: [ '3.7', '3.8', '3.9', '3.10', '3.11', '3.12' ]
-    # minimize potential vulnerabilities
-    if: ${{ contains(github.event.pull_request.labels.*.name, 'ok-to-test') }}
     steps:
       - uses: actions/checkout@v4
         with:
