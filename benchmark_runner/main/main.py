@@ -1,6 +1,8 @@
 
 import ast  # change string list to list
 from enum import Enum
+from multiprocessing import set_start_method
+import platform
 
 from benchmark_runner.main.environment_variables import *
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
@@ -255,4 +257,8 @@ def main():
         raise SystemExit(SYSTEM_EXIT_BENCHMARK_FAILED)
 
 
-main()
+if __name__ == '__main__':
+    # spawn default in mac: https://docs.python.org/3/library/multiprocessing.html#:~:text=The%20default%20on%20Windows%20and%20macOS.
+    if 'macos' in platform.platform(terse=True).lower():
+        set_start_method('fork')
+    main()
