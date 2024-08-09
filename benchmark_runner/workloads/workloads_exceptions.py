@@ -48,3 +48,12 @@ class MissingRedis(BenchmarkRunnerError):
     def __init__(self):
         self.message = "Missing redis"
         super(MissingRedis, self).__init__(self.message)
+
+
+class MissingVMs(BenchmarkRunnerError):
+    """
+    This class raises an error for missing VMs
+    """
+    def __init__(self):
+        self.message = "Missing running VMs"
+        super(MissingVMs, self).__init__(self.message)

@@ -1,5 +1,6 @@
 
 import os
+import sys
 import time
 from multiprocessing import Process
 
@@ -24,19 +25,21 @@ class WindowsVM(BootstormVM):
         :return:
         """
         try:
-            self._initialize_run()
             if self._run_type == 'test_ci':
                 self._es_index = 'windows-test-ci-results'
             else:
                 self._es_index = 'windows-results'
-            # create windows dv
-            self._oc.create_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'windows_dv.yaml'))
-            self._oc.wait_for_dv_status(status='Succeeded')
+            self._initialize_run()
+            if not self._verification_only:
+                # create windows dv
+                self._oc.create_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'windows_dv.yaml'))
+                self._oc.wait_for_dv_status(status='Succeeded')
             self.run_vm_workload()
-            # delete windows dv
-            self._oc.delete_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'windows_dv.yaml'))
-            # delete namespace
-            self._oc.delete_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'namespace.yaml'))
+            if self._delete_all:
+                # delete windows dv
+                self._oc.delete_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'windows_dv.yaml'))
+                # delete namespace
+                self._oc.delete_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'namespace.yaml'))
         except ElasticSearchDataNotUploaded as err:
             self._oc.delete_vm_sync(
                 yaml=os.path.join(f'{self._run_artifacts_path}', f'{self._name}.yaml'),

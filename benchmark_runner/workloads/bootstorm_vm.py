@@ -5,6 +5,7 @@ from multiprocessing import Process
 
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 from benchmark_runner.common.elasticsearch.elasticsearch_exceptions import ElasticSearchDataNotUploaded
+from benchmark_runner.workloads.workloads_exceptions import MissingVMs
 from benchmark_runner.workloads.workloads_operations import WorkloadsOperations
 from benchmark_runner.common.oc.oc import VMStatus
 
@@ -66,23 +67,33 @@ class BootstormVM(WorkloadsOperations):
         self._bootstorm_start_time[vm_name] = time.time()
 
     @logger_time_stamp
-    def _get_bootstorm_vm_elapsed_time(self, vm_name: str):
+    def _ssh_vm(self, vm_name: str):
+            """
+            Verify ssh into VM and return vm node in success or False if failed
+            @return:
+            """
+            self._virtctl.expose_vm(vm_name=vm_name)
+            # wait till vm ssh login
+            if self._oc.get_vm_node(vm_name=vm_name):
+                vm_node = self._oc.get_vm_node(vm_name=vm_name)
+                if vm_node:
+                    node_ip = self._oc.get_nodes_addresses()[vm_node]
+                    vm_node_port = self._oc.get_exposed_vm_port(vm_name=vm_name)
+                    if self._oc.wait_for_vm_ssh(vm_name=vm_name, node_ip=node_ip, vm_node_port=vm_node_port):
+                        logger.info(f"Successfully ssh into VM: '{vm_name}' in Node: '{vm_node}' ")
+                    return vm_node
+            return False
+
+    @logger_time_stamp
+    def _get_bootstorm_vm_elapsed_time(self, vm_name: str, vm_node: str) -> dict:
         """
-        This method returns boot elapse time for specified VM in milliseconds
-        @return: Dictionary with vm_name, node and its boot elapse time
+        Returns the boot elapse time for the specified VM in milliseconds.
+        @return: Dictionary with vm_name, node, and boot elapse time.
         """
-        vm_bootstorm_time = {}
-        self._virtctl.expose_vm(vm_name=vm_name)
-        # wait till vm login
-        vm_node = self._oc.get_vm_node(vm_name=vm_name)
-        node_ip = self._oc.get_nodes_addresses()[vm_node]
-        vm_node_port = self._oc.get_exposed_vm_port(vm_name=vm_name)
-        if self._oc.wait_for_vm_login(vm_name=vm_name, node_ip=node_ip, vm_node_port=vm_node_port):
-            vm_bootstorm_time['vm_name'] = vm_name
-            vm_bootstorm_time['node'] = vm_node
-            delta = time.time() - self._bootstorm_start_time[vm_name]
-            vm_bootstorm_time['bootstorm_time'] = round(delta, 3) * self.MILLISECONDS
-        return vm_bootstorm_time
+        if vm_node:
+            delta = round((time.time() - self._bootstorm_start_time[vm_name]) * self.MILLISECONDS, 3)
+            return {'vm_name': vm_name, 'node': vm_node, 'bootstorm_time': delta, 'vm_ssh': int(bool(vm_node)),}
+        return {}
 
     def _create_vm_scale(self, vm_num: str):
         """
@@ -103,8 +114,9 @@ class BootstormVM(WorkloadsOperations):
         metric_results = self._prometheus_metrics_operation.run_prometheus_queries()
         prometheus_result = self._prometheus_metrics_operation.parse_prometheus_metrics(data=metric_results)
         # update total vm run time
-        total_run_time = self._get_bootstorm_vm_total_run_time()
-        self._data_dict.update({'total_run_time': total_run_time})
+        if not self._verification_only:
+            total_run_time = self._get_bootstorm_vm_total_run_time()
+            self._data_dict.update({'total_run_time': total_run_time})
         self._data_dict.update(prometheus_result)
         if self._es_host:
             # upload several run results
@@ -123,13 +135,40 @@ class BootstormVM(WorkloadsOperations):
         self._set_bootstorm_vm_first_run_time()
         self._set_bootstorm_vm_start_time(vm_name=self._vm_name)
         self._virtctl.start_vm_sync(vm_name=self._vm_name)
-        self._data_dict = self._get_bootstorm_vm_elapsed_time(vm_name=self._vm_name)
+        self.vm_node = self._ssh_vm(vm_name=self._vm_name)
+        self._data_dict = self._get_bootstorm_vm_elapsed_time(vm_name=self._vm_name, vm_node=self.vm_node)
         self._data_dict['run_artifacts_url'] = os.path.join(self._run_artifacts_url,
                                                             f'{self._get_run_artifacts_hierarchy(workload_name=self._workload_name, is_file=True)}-{self._time_stamp_format}.tar.gz')
         self._finalize_vm()
         self._oc.delete_vm_sync(
             yaml=os.path.join(f'{self._run_artifacts_path}', f'{self._name}.yaml'),
             vm_name=self._vm_name)
+
+    def _verify_vm_ssh(self):
+        """
+        This method verifies each VM ssh login
+        :return:
+        """
+        try:
+            vm_names = self._oc._get_all_vm_names()
+            if not vm_names:
+                raise MissingVMs
+            for vm_name in vm_names:
+                vm_node = self._ssh_vm(vm_name)
+                self._data_dict = {
+                    'vm_name': vm_name,
+                    'node': vm_node,
+                    'vm_ssh': int(bool(vm_node)),
+                    'run_artifacts_url': os.path.join(
+                        self._run_artifacts_url,
+                        f"{self._get_run_artifacts_hierarchy(workload_name=self._workload_name, is_file=True)}-{self._time_stamp_format}.tar.gz"
+                    )
+                }
+                self._finalize_vm()
+        except Exception as err:
+            # save run artifacts logs
+            self.save_error_logs()
+            raise err
 
     def _run_vm_scale(self, vm_num: str):
         """
@@ -140,7 +179,8 @@ class BootstormVM(WorkloadsOperations):
             self._set_bootstorm_vm_start_time(vm_name=f'{self._workload_name}-{self._trunc_uuid}-{vm_num}')
             self._virtctl.start_vm_async(vm_name=f'{self._workload_name}-{self._trunc_uuid}-{vm_num}')
             self._virtctl.wait_for_vm_status(vm_name=vm_name, status=VMStatus.Running)
-            self._data_dict = self._get_bootstorm_vm_elapsed_time(vm_name=vm_name)
+            vm_node = self._ssh_vm(vm_name)
+            self._data_dict = self._get_bootstorm_vm_elapsed_time(vm_name=vm_name, vm_node=vm_node)
             self._data_dict['run_artifacts_url'] = os.path.join(self._run_artifacts_url, f'{self._get_run_artifacts_hierarchy(workload_name=self._workload_name, is_file=True)}-scale-{self._time_stamp_format}.tar.gz')
             self._finalize_vm()
         except Exception as err:
@@ -203,36 +243,47 @@ class BootstormVM(WorkloadsOperations):
         self._vm_name = f'{self._workload_name}-{self._trunc_uuid}'
         self._kind = 'vm'
         self._environment_variables_dict['kind'] = 'vm'
-        # create namespace
-        self._oc.create_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'namespace.yaml'))
+        if not self._verification_only:
+            # create namespace
+            self._oc.create_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'namespace.yaml'))
 
     def run_vm_workload(self):
-        if not self._scale:
-            self._run_vm()
-        # scale
+        # verification only w/o running or deleting any resource
+        if self._verification_only:
+            self._verify_vm_ssh()
         else:
-            first_run_time_updated = False
-            # create run bulks
-            bulks = tuple(self.split_run_bulks(iterable=range(self._scale * len(self._scale_node_list)),
-                                               limit=self._threads_limit))
-            # create, run and delete vms
-            for target in (self._create_vm_scale, self._run_vm_scale, self._stop_vm_scale, self._wait_for_stop_vm_scale,
-                           self._delete_vm_scale, self._wait_for_delete_vm_scale):
-                proc = []
-                for bulk in bulks:
-                    for vm_num in bulk:
-                        # save the first run vm time
-                        if self._run_vm_scale == target and not first_run_time_updated:
-                            self._set_bootstorm_vm_first_run_time()
-                            first_run_time_updated = True
-                        p = Process(target=target, args=(str(vm_num),))
-                        p.start()
-                        proc.append(p)
-                    for p in proc:
-                        p.join()
-                    # sleep between bulks
-                    time.sleep(self._bulk_sleep_time)
+            if not self._scale:
+                self._run_vm()
+            # scale
+            else:
+                first_run_time_updated = False
+                # Run VMs only
+                if not self._delete_all:
+                    steps = (self._create_vm_scale, self._run_vm_scale)
+                else:
+                    steps = (self._create_vm_scale, self._run_vm_scale, self._stop_vm_scale,
+                             self._wait_for_stop_vm_scale,self._delete_vm_scale, self._wait_for_delete_vm_scale)
+
+                # create run bulks
+                bulks = tuple(self.split_run_bulks(iterable=range(self._scale * len(self._scale_node_list)),
+                                                   limit=self._threads_limit))
+                # create, run and delete vms
+                for target in steps:
                     proc = []
+                    for bulk in bulks:
+                        for vm_num in bulk:
+                            # save the first run vm time
+                            if self._run_vm_scale == target and not first_run_time_updated:
+                                self._set_bootstorm_vm_first_run_time()
+                                first_run_time_updated = True
+                            p = Process(target=target, args=(str(vm_num),))
+                            p.start()
+                            proc.append(p)
+                        for p in proc:
+                            p.join()
+                        # sleep between bulks
+                        time.sleep(self._bulk_sleep_time)
+                        proc = []
 
     @logger_time_stamp
     def run(self):

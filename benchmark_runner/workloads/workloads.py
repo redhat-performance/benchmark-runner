@@ -29,14 +29,16 @@ class Workloads(WorkloadsOperations):
         workload_module = importlib.import_module(f'benchmark_runner.workloads.{workload}')
 
         try:
-            self.initialize_workload()
+            if not self._verification_only:
+                self.initialize_workload()
             success = True
             # extract workload module and class
             for cls in inspect.getmembers(workload_module, inspect.isclass):
                 if workload.replace('_', '').lower() == cls[0].lower():
                     if cls[1]().run() == False:
                         success = False
-            self.finalize_workload()
+            if not self._verification_only:
+                self.finalize_workload()
             return success
 
         except Exception as err:

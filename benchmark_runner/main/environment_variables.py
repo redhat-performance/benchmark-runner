@@ -84,6 +84,10 @@ class EnvironmentVariables:
 
         # windows url
         self._environment_variables_dict['windows_url'] = EnvironmentVariables.get_env('WINDOWS_URL', '')
+        # Delete all resources before and after the run, default True
+        self._environment_variables_dict['delete_all'] = EnvironmentVariables.get_boolean_from_environment('DELETE_ALL', True)
+        # Verification only, without running or deleting any resources, default False
+        self._environment_variables_dict['verification_only'] = EnvironmentVariables.get_boolean_from_environment('VERIFICATION_ONLY', False)
 
         # default parameter - change only if needed
         # Parameters below related to 'run_workload()'
