@@ -99,6 +99,8 @@ class WorkloadsOperations:
         self._prometheus_snap_interval = self._environment_variables_dict.get('prometheus_snap_interval', '')
         self._prometheus_metrics_operation = PrometheusMetricsOperation()
         self._windows_url = self._environment_variables_dict.get('windows_url', '')
+        self._delete_all = self._environment_variables_dict.get('delete_all', '')
+        self._verification_only = self._environment_variables_dict.get('verification_only', '')
         if self._windows_url:
             file_name = os.path.basename(self._windows_url)
             self._windows_os = os.path.splitext(file_name)[0]
@@ -455,8 +457,9 @@ class WorkloadsOperations:
         # Verify that Kata operator in installed for kata workloads
         if '_kata' in self._workload and not self._oc.is_kata_installed():
             raise KataNotInstalled(workload=self._workload)
-        self.delete_all()
-        self.clear_nodes_cache()
+        if self._delete_all:
+            self.delete_all()
+            self.clear_nodes_cache()
         if self._odf_pvc:
             self.odf_workload_verification()
         self._template.generate_yamls(scale=str(self._scale), scale_nodes=self._scale_node_list, redis=self._redis, thread_limit=self._threads_limit)
@@ -475,4 +478,5 @@ class WorkloadsOperations:
             self.upload_run_artifacts_to_s3()
         if not self._save_artifacts_local:
             self.delete_local_artifacts()
-        self.delete_all()
+        if self._delete_all:
+            self.delete_all()
