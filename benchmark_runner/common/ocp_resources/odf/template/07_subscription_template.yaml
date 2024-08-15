@@ -5,7 +5,7 @@ metadata:
   namespace: openshift-storage
 spec:
   channel: "stable-{{ odf_version }}"
-  installPlanApproval: Manual
+  installPlanApproval: Automatic
   name: odf-operator
-  source: redhat-operators-v{{ odf_version | replace(".","") }}  # <-- Modify the name of the redhat-operators catalogsource to be correct for your cluster
+  source: redhat-operators
   sourceNamespace: openshift-marketplace

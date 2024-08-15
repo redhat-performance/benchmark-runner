@@ -31,3 +31,13 @@ class OCPInstallationFailed(BareMetalError):
         self.message = (f'Bare-metal OpenShift Container Platform (OCP) installation failed. '
                         f'OpenShift installer logs details: \n {logs}')
         super(OCPInstallationFailed, self).__init__(self.message)
+
+
+class OCPUpgradeFailed(BareMetalError):
+    """
+    This exception class indicates that the Bare-Metal OpenShift upgrade has failed
+    """
+    def __init__(self, logs: str):
+        self.message = (f'Bare-metal OpenShift Container Platform (OCP) upgrade failed. '
+                        f'OpenShift upgrade logs details: \n {logs}')
+        super(OCPUpgradeFailed, self).__init__(self.message)

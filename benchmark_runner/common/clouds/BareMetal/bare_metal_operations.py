@@ -1,4 +1,4 @@
-
+import os
 import time
 from datetime import datetime
 from typeguard import typechecked
@@ -10,7 +10,7 @@ from benchmark_runner.common.remote_ssh.remote_ssh import ConnectionData, Remote
 from benchmark_runner.common.ocp_resources.create_ocp_resource import CreateOCPResource
 from benchmark_runner.common.oc.oc import OC
 from benchmark_runner.common.github.github_operations import GitHubOperations
-from benchmark_runner.common.clouds.BareMetal.bare_metal_exceptions import MissingMasterNodes, MissingWorkerNodes, OCPInstallationFailed
+from benchmark_runner.common.clouds.BareMetal.bare_metal_exceptions import MissingMasterNodes, MissingWorkerNodes, OCPInstallationFailed, OCPUpgradeFailed
 from benchmark_runner.common.ssh.ssh import SSH
 from benchmark_runner.common.assisted_installer.assisted_installer_latest_version import AssistedInstallerVersions
 
@@ -55,6 +55,7 @@ class BareMetalOperations:
             self._github_operations = GitHubOperations()
         self._ssh = SSH()
         self._cli = self._environment_variables_dict.get('cli', '')
+        self._upgrade_ocp_version = self._environment_variables_dict.get('upgrade_ocp_version', '')
 
     def _get_kubeadmin_password(self):
         """
@@ -91,6 +92,24 @@ class BareMetalOperations:
             time.sleep(sleep_time)
             current_wait_time += sleep_time
         raise OCPInstallationFailed(install_log)
+
+    def _wait_for_upgrade_complete(self, oc: OC, sleep_time: int = SHORT_TIMEOUT):
+        """
+        This method waits till ocp upgrade complete
+        :param sleep_time:
+        :return:
+        """
+        current_wait_time = 0
+        logger.info(f'Waiting until the upgrade to version {self._upgrade_ocp_version} starts...')
+        oc.wait_for_upgrade_start(upgrade_version=self._upgrade_ocp_version)
+        while self._provision_timeout <= 0 or current_wait_time <= self._provision_timeout and oc.upgrade_in_progress():
+            if not oc.upgrade_in_progress():
+                return True
+            logger.info(f'Waiting till OCP upgrade complete, waiting {int(current_wait_time / 60)} minutes')
+            # sleep for x seconds
+            time.sleep(sleep_time)
+            current_wait_time += sleep_time
+        raise OCPUpgradeFailed(self._provision_upgrade_log)
 
     def _install_ocp_cmd(self):
         """
@@ -201,11 +220,7 @@ class BareMetalOperations:
     @logger_time_stamp
     def run_ocp_installer(self):
         """
-        This method run ocp assisted installer
-        :return: True if installation success and raise exception if installation failed
-        """
-        """
-        This method run ocp assisted installer
+        This method runs ocp assisted installer
         :return: True if installation success and raise exception if installation failed
         """
         self.update_provision_config()
@@ -215,10 +230,26 @@ class BareMetalOperations:
         logger.info(f'OpenShift cluster {self._get_installation_version()} version is installed successfully, End time: {datetime.now().strftime(datetime_format)}')
 
     @logger_time_stamp
+    def run_ocp_upgrade(self, oc: OC):
+        """
+        This method runs ocp upgrade
+        @param oc:
+        :return: True if installation success and raise exception if installation failed
+        """
+        logger.info(f'Starting OCP upgrade, Start time: {datetime.now().strftime(datetime_format)}')
+        logger.info(f'Stop OCP healthcheck')
+        oc.healthcheck(action='stop')
+        oc.upgrade_ocp(upgrade_ocp_version=self._upgrade_ocp_version)
+        self.verify_upgrade_complete(oc=oc)
+        logger.info(f'Resume OCP healthcheck')
+        oc.healthcheck(action='resume')
+        logger.info(f'Ending OCP upgrade, End time: {datetime.now().strftime(datetime_format)}')
+
+    @logger_time_stamp
     def verify_install_complete(self):
         """
-        This method verify that installation complete
-        :return: True if installation success and raise exception if installation failed
+        This method verifies that the installation has completed
+        :return: Returns True if the installation is successful; raises an exception if the installation fails
         """
         complete = self._wait_for_install_complete()
         if not complete:
@@ -226,6 +257,36 @@ class BareMetalOperations:
             raise OCPInstallationFailed(install_log)
         else:
             return True
+
+    def is_cluster_upgraded(self, oc: OC, cnv_version: str, odf_version: str, lso_version: str):
+        """
+        This method checks if cluster/operators upgraded successfully
+        @param oc:
+        @param cnv_version:
+        @param odf_version:
+        @param lso_version:
+        @return:
+        """
+        # check cluster version upgrade
+        if oc.get_upgrade_version() == self._upgrade_ocp_version:
+            lso_upgraded = oc.wait_for_operator_installation(operator='lso', version=lso_version, namespace='openshift-local-storage')
+            odf_upgraded = oc.wait_for_operator_installation(operator='odf', version=odf_version, namespace='openshift-storage')
+            cnv_upgraded = oc.wait_for_operator_installation(operator='cnv', version=cnv_version, namespace='openshift-cnv')
+            # check operators versions upgrade
+            if cnv_upgraded and lso_upgraded and odf_upgraded:
+                return True
+        return False
+
+    @logger_time_stamp
+    def verify_upgrade_complete(self, oc: OC):
+        """
+        This method verifies that the upgrade has completed
+        :return: True if the upgrade is successful; raises an exception if the upgrade fails
+        """
+        complete = self._wait_for_upgrade_complete(oc)
+        if complete:
+            return True
+        raise OCPUpgradeFailed(logs=oc.get_cluster_status())
 
     @logger_time_stamp
     def oc_login(self):
@@ -270,15 +331,16 @@ class BareMetalOperations:
     @staticmethod
     @logger_time_stamp
     @typechecked
-    def install_ocp_resources(resources: list):
+    def install_ocp_resources(resources: list, upgrade_version: str = None):
         """
         This method installs OCP resources 'cnv', 'lso', 'odf'
         :param resources:
+        :param upgrade_version: upgrade version, default None
         :return:
         """
         create_ocp_resource = CreateOCPResource()
         for resource in resources:
-            create_ocp_resource.create_resource(resource=resource)
+            create_ocp_resource.create_resource(resource=resource, upgrade_version=upgrade_version)
 
     @logger_time_stamp
     def update_ocp_github_credentials(self):

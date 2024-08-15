@@ -96,10 +96,10 @@ class CreateOCPResourceOperations:
         :param namespace:
         :param resource:
         """
-        csv_names = self.__oc.run(f"oc get csv -n {namespace} -ojsonpath={{$.items[*].metadata.name}}")
+        csv_names = self.__oc.run(f"oc get csv -n {namespace} -o jsonpath={{$.items[*].metadata.name}}")
         for csv_name in csv_names.split():
             self.wait_for_ocp_resource_create(resource=resource,
-                                              verify_cmd=f"oc get csv -n {namespace} {csv_name} -ojsonpath='{{.status.phase}}'",
+                                              verify_cmd=f"oc get csv -n {namespace} {csv_name} -o jsonpath='{{.status.phase}}'",
                                               status='Succeeded')
 
     def apply_patch(self, namespace: str, resource: str):

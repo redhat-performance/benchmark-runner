@@ -69,10 +69,11 @@ class CreateOCPResource:
         resource_file_list = sorted(resource_file_list, key=lambda x: os.path.splitext(x)[0])
         return resource_file_list
 
-    def create_resource(self, resource: str):
+    def create_resource(self, resource: str, upgrade_version: str):
         """
         This method create resource with verification
         :param resource:
+        :param upgrade_version:
         :return:
         """
         # remove resource files
@@ -83,7 +84,7 @@ class CreateOCPResource:
             create_lso.create_lso()
         elif 'odf' == resource:
             create_odf = CreateODF(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files, worker_disk_ids=self.__worker_disk_ids, worker_disk_prefix=self.__worker_disk_prefix)
-            create_odf.create_odf()
+            create_odf.create_odf(upgrade_version)
         elif 'kata' == resource:
             create_kata = CreateKata(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files)
             create_kata.create_kata()
