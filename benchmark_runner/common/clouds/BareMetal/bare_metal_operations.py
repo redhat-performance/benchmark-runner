@@ -109,7 +109,7 @@ class BareMetalOperations:
             # sleep for x seconds
             time.sleep(sleep_time)
             current_wait_time += sleep_time
-        raise OCPUpgradeFailed(self._provision_upgrade_log)
+        raise OCPUpgradeFailed(status=oc.get_cluster_status())
 
     def _install_ocp_cmd(self):
         """
@@ -286,7 +286,7 @@ class BareMetalOperations:
         complete = self._wait_for_upgrade_complete(oc)
         if complete:
             return True
-        raise OCPUpgradeFailed(logs=oc.get_cluster_status())
+        raise OCPUpgradeFailed(status=oc.get_cluster_status())
 
     @logger_time_stamp
     def oc_login(self):

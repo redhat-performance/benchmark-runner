@@ -37,7 +37,7 @@ class OCPUpgradeFailed(BareMetalError):
     """
     This exception class indicates that the Bare-Metal OpenShift upgrade has failed
     """
-    def __init__(self, logs: str):
+    def __init__(self, status: str):
         self.message = (f'Bare-metal OpenShift Container Platform (OCP) upgrade failed. '
-                        f'OpenShift upgrade logs details: \n {logs}')
+                        f'Upgrade status: {status}')
         super(OCPUpgradeFailed, self).__init__(self.message)

@@ -30,6 +30,7 @@ class CreateODF(CreateOCPResourceOperations):
         if upgrade_version:
             self.__oc.apply_async(yaml=os.path.join(self.__path, '07_subscription.yaml'))
             self.__oc.wait_for_operator_installation(operator='odf', version=upgrade_version, namespace='openshift-storage')
+            logger.info(f'Wait till ODF upgrade to version: {upgrade_version}')
             self.verify_csv_installation(namespace='openshift-storage', resource='odf')
         else:
             for resource in self.__resource_list:

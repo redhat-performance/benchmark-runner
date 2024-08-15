@@ -57,15 +57,14 @@ class OC(SSH):
         @return:
         """
         ocp_channel = '.'.join(upgrade_ocp_version.split('.')[:2])
-        upgrade_command = f"{self.__cli} adm upgrade ; {self.__cli} adm upgrade channel stable-{ocp_channel} ; {self.__cli} adm upgrade --to={upgrade_ocp_version} --allow-explicit-upgrade;"
 
+        # see: https://access.redhat.com/articles/7031404
         if ocp_channel == "4.16":
             patch_command = f"{self.__cli} -n openshift-config patch cm admin-acks --patch '{{\"data\":{{\"ack-4.15-kube-1.29-api-removals-in-4.16\":\"true\"}}}}' --type=merge"
             self.run(patch_command)
 
-        # sometimes upgrade is not working on the first run
-        for _ in range(2):
-            self.run(upgrade_command)
+        upgrade_command = f"{self.__cli} adm upgrade ; sleep 10; {self.__cli} adm upgrade channel stable-{ocp_channel}; sleep 10; {self.__cli} adm upgrade --to={upgrade_ocp_version};"
+        self.run(upgrade_command)
 
     def upgrade_in_progress(self):
         """
@@ -131,7 +130,7 @@ class OC(SSH):
             time.sleep(OC.SLEEP_TIME)
             current_wait_time += OC.SLEEP_TIME
         if self.get_operator_version(namespace) == version:
-            logger.info(f'{operator} Operator version: {version} in namespace: {namespace} has been installed successfully')
+            logger.info(f'{operator} operator version: {version} in namespace: {namespace} has been installed successfully')
             return True
         else:
             raise OperatorInstallationTimeout(operator=operator, version=version, namespace=namespace)
@@ -947,6 +946,22 @@ class OC(SSH):
             raise VMNameNotExist(vm_name=vm_name)
 
     @typechecked
+    def _get_all_vm_names(self, namespace: str = environment_variables.environment_variables_dict['namespace']):
+        """
+        This method returns a list of VM names in the given namespace.
+
+        :param namespace: str, the namespace to look for VMs in. Defaults to the namespace in environment_variables_dict.
+        :return: list of VM names or an empty list if an error occurs
+        """
+        namespace_option = f'-n {namespace}' if namespace else ''
+        command = f"{self.__cli} get {namespace_option} vm -o jsonpath='{{.items[*].metadata.name}}'"
+        try:
+            vm_names = self.run(command)
+            return vm_names.split() if vm_names else []
+        except Exception:
+            return []
+
+    @typechecked
     def vm_exists(self, vm_name: str, namespace: str = environment_variables.environment_variables_dict['namespace']):
         """
         This method returns True or False if vm name exist
@@ -1040,8 +1055,8 @@ class OC(SSH):
             current_wait_time += OC.SLEEP_TIME
         raise VMStateTimeout(vm_name=vm_name, state=status)
 
-    def wait_for_vm_login(self, vm_name: str = '', node_ip: str = '', vm_node_port: str = '',
-                          timeout: int = SHORT_TIMEOUT):
+    def wait_for_vm_ssh(self, vm_name: str = '', node_ip: str = '', vm_node_port: str = '',
+                        timeout: int = SHORT_TIMEOUT):
         """
         This method waits for VM to be accessible via ssh login
         :param vm_name:
@@ -1052,14 +1067,14 @@ class OC(SSH):
         """
         current_wait_time = 0
         while timeout <= 0 or current_wait_time <= timeout:
-            check_vm_login = f"""if [ "$(ssh -o 'BatchMode=yes' -o ConnectTimeout=1 root@{node_ip} -p {vm_node_port} 2>&1|egrep 'denied|verification failed')" ]; then echo 'True'; else echo 'False'; fi"""
-            result = self.run(check_vm_login)
+            check_vm_ssh = f"""if [ "$(ssh -o 'BatchMode=yes' -o ConnectTimeout=1 root@{node_ip} -p {vm_node_port} 2>&1|egrep 'denied|verification failed')" ]; then echo 'True'; else echo 'False'; fi"""
+            result = self.run(check_vm_ssh)
             if result == 'True':
                 return True
             # sleep for x seconds
             time.sleep(OC.SLEEP_TIME)
             current_wait_time += OC.SLEEP_TIME
-        raise VMStateTimeout(vm_name=vm_name, state='login')
+        raise VMStateTimeout(vm_name=vm_name, state='ssh')
 
     @logger_time_stamp
     def get_vm_node(self, vm_name: str, namespace: str = environment_variables.environment_variables_dict['namespace']):

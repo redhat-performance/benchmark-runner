@@ -161,7 +161,9 @@ def upgrade_ocp_bare_metal(step: str):
         if bare_metal_operations.is_cluster_upgraded(oc, cnv_version=cnv_version, odf_version=odf_version, lso_version=lso_version):
             bare_metal_operations.verify_cluster_is_up(oc)
         else:
-            logger.info(f'OCP {upgrade_ocp_version} upgrade failed')
+            error_message = f'OCP {upgrade_ocp_version} upgrade failed'
+            logger.error(error_message)
+            raise RuntimeError(error_message)
     bare_metal_operations.disconnect_from_provisioner()
 
 
