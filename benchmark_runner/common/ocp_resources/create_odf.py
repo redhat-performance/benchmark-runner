@@ -11,6 +11,8 @@ class CreateODF(CreateOCPResourceOperations):
     """
     This class is created ODF operator
     """
+    ODF_CSV_NUM = 4
+
     def __init__(self, oc: OC, path: str, resource_list: list, worker_disk_ids: list, worker_disk_prefix: str):
         super().__init__(oc)
         self.__oc = oc
@@ -52,14 +54,8 @@ class CreateODF(CreateOCPResourceOperations):
                                                       verify_cmd=r"""oc get pv -o jsonpath="{range .items[*]}{.metadata.name}{'\n'}{end}" | grep local | wc -l""",
                                                       count_openshift_storage=True)
                 if '07_subscription.yaml' in resource:
-                    # wait till get the patch
-                    self.wait_for_ocp_resource_create(resource='odf',
-                                                      verify_cmd="oc get InstallPlan -n openshift-storage -ojsonpath={.items[0].metadata.name}",
-                                                      status="install-")
-                    self.apply_patch(namespace='openshift-storage', resource='odf')
+                    self.verify_csv_installation(namespace='openshift-storage', resource='odf', csv_num=self.ODF_CSV_NUM)
                 elif '08_storage_cluster.yaml' in resource:
-                    # Must be run after installing the storage cluster because CSVs sometimes fail
-                    self.verify_csv_installation(namespace='openshift-storage', resource='odf')
                     self.wait_for_ocp_resource_create(resource='odf',
                                                       verify_cmd='oc get pod -n openshift-storage | grep osd | grep -v prepare | wc -l',
                                                       count_openshift_storage=True)

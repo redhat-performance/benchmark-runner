@@ -8,7 +8,7 @@ from typeguard import typechecked
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 from benchmark_runner.common.oc.oc_exceptions import PodNotCreateTimeout, PodNotInitializedTimeout, PodNotReadyTimeout, \
     PodNotCompletedTimeout, PodTerminateTimeout, PodNameNotExist, LoginFailed, VMNotCreateTimeout, VMDeleteTimeout, \
-    YAMLNotExist, VMNameNotExist, VMNotInitializedTimeout, VMNotReadyTimeout, VMStateTimeout, VMNotCompletedTimeout, ExecFailed, PodFailed, DVStatusTimeout
+    YAMLNotExist, VMNameNotExist, VMNotInitializedTimeout, VMNotReadyTimeout, VMStateTimeout, VMNotCompletedTimeout, ExecFailed, PodFailed, DVStatusTimeout, CSVNotCreateTimeout
 from benchmark_runner.common.ssh.ssh import SSH
 from benchmark_runner.main.environment_variables import environment_variables
 
@@ -653,6 +653,27 @@ class OC(SSH):
                 raise VMNotInitializedTimeout(workload=workload)
             else:
                 raise PodNotInitializedTimeout(workload=workload)
+
+    @typechecked
+    @logger_time_stamp
+    def wait_for_csv(self, csv_num: int = 1, namespace: str = environment_variables.environment_variables_dict['namespace'],
+                            timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
+        """
+        This method waits till csv are creating with the required csv number or throw exception after timeout
+        :param csv_num: number of csvs, default 1
+        :param namespace:
+        :param timeout:
+        :return: csv names if getting csv or raise CSVError
+        """
+        current_wait_time = 0
+        while timeout <= 0 or current_wait_time <= timeout:
+            csv_names = self.run(f"{self.__cli} get csv -n {namespace} -o jsonpath={{$.items[*].metadata.name}}")
+            if csv_names and len(csv_names.split()) >= csv_num:
+                return csv_names
+            # sleep for x seconds
+            time.sleep(OC.SLEEP_TIME)
+            current_wait_time += OC.SLEEP_TIME
+        raise CSVNotCreateTimeout()
 
     @typechecked
     @logger_time_stamp

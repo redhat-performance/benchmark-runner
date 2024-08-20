@@ -129,3 +129,10 @@ class DVStatusTimeout(OCError):
     def __init__(self, status):
         self.message = f'DV status {status} timeout'
         super(DVStatusTimeout, self).__init__(self.message)
+
+
+class CSVNotCreateTimeout(OCError):
+    """This exception return csv create timeout error"""
+    def __init__(self, pod_name):
+        self.message = f'CSV are not created'
+        super(CSVNotCreateTimeout, self).__init__(self.message)

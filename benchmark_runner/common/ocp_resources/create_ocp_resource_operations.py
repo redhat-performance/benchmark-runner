@@ -14,6 +14,7 @@ class CreateOCPResourceOperations:
     """
     # Expected CSVs List names
     EXPECTED_ODF_CSV = ['mcg-operator', 'ocs-operator', 'odf-csi-addons-operator', 'odf-operator']
+    SLEEP_TIME = 30
 
     def __init__(self, oc: OC):
         self._environment_variables_dict = environment_variables.environment_variables_dict
@@ -55,6 +56,7 @@ class CreateOCPResourceOperations:
         :return: True if met the result
         """
         current_wait_time = 0
+        double_check = False
         while timeout <= 0 or current_wait_time <= timeout:
             cmd = self.__oc.run(verify_cmd)
             # Count openshift-storage/ pv
@@ -84,19 +86,29 @@ class CreateOCPResourceOperations:
             elif status:
                 # catch equal or contains
                 if status in cmd:
-                    return True
+                    if double_check:
+                        return True
+                    else:
+                        double_check = True
+                        # sleep for x seconds
+                        time.sleep(self.SLEEP_TIME)
+                        current_wait_time += self.SLEEP_TIME
+                        continue
+                else:
+                    double_check = False
             # sleep for x seconds
-            time.sleep(OC.SLEEP_TIME)
-            current_wait_time += OC.SLEEP_TIME
+            time.sleep(self.SLEEP_TIME)
+            current_wait_time += self.SLEEP_TIME
         raise OCPResourceCreationTimeout(resource)
 
-    def verify_csv_installation(self, namespace: str, resource: str):
+    def verify_csv_installation(self, namespace: str, resource: str, csv_num: int = 1):
         """
         This method verifies csv installation
         :param namespace:
         :param resource:
+        :param csv_num: number of csvs, default 1
         """
-        csv_names = self.__oc.run(f"oc get csv -n {namespace} -ojsonpath={{$.items[*].metadata.name}}")
+        csv_names = self.__oc.wait_for_csv(csv_num=csv_num, namespace=namespace)
         for csv_name in csv_names.split():
             self.wait_for_ocp_resource_create(resource=resource,
                                               verify_cmd=f"oc get csv -n {namespace} {csv_name} -ojsonpath='{{.status.phase}}'",
