@@ -129,3 +129,17 @@ class DVStatusTimeout(OCError):
     def __init__(self, status):
         self.message = f'DV status {status} timeout'
         super(DVStatusTimeout, self).__init__(self.message)
+
+
+class UpgradeNotStartTimeout(OCError):
+    """This exception return ocp upgrade timeout error"""
+    def __init__(self, version):
+        self.message = f"OCP upgrade to {version} didn't start"
+        super(UpgradeNotStartTimeout, self).__init__(self.message)
+
+
+class OperatorInstallationTimeout(OCError):
+    """This exception return dv status timeout error"""
+    def __init__(self, operator, version, namespace):
+        self.message = f"{operator} operator installation to: {version} in namespace: {namespace} didn't complete"
+        super(OperatorInstallationTimeout, self).__init__(self.message)

@@ -6,9 +6,10 @@ from enum import Enum
 from typeguard import typechecked
 
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
-from benchmark_runner.common.oc.oc_exceptions import PodNotCreateTimeout, PodNotInitializedTimeout, PodNotReadyTimeout, \
+from benchmark_runner.common.oc.oc_exceptions import (PodNotCreateTimeout, PodNotInitializedTimeout, PodNotReadyTimeout, \
     PodNotCompletedTimeout, PodTerminateTimeout, PodNameNotExist, LoginFailed, VMNotCreateTimeout, VMDeleteTimeout, \
-    YAMLNotExist, VMNameNotExist, VMNotInitializedTimeout, VMNotReadyTimeout, VMStateTimeout, VMNotCompletedTimeout, ExecFailed, PodFailed, DVStatusTimeout
+    YAMLNotExist, VMNameNotExist, VMNotInitializedTimeout, VMNotReadyTimeout, VMStateTimeout, VMNotCompletedTimeout, \
+    ExecFailed, PodFailed, DVStatusTimeout, UpgradeNotStartTimeout, OperatorInstallationTimeout)
 from benchmark_runner.common.ssh.ssh import SSH
 from benchmark_runner.main.environment_variables import environment_variables
 
@@ -47,6 +48,103 @@ class OC(SSH):
         :return:
         """
         return self.run(f"{self.__cli} get clusterversion version -o jsonpath='{{.status.desired.version}}'")
+
+    def upgrade_ocp(self, upgrade_ocp_version: str):
+        """
+        This method upgrades OCP version with conditional handling for specific versions.
+
+        @param upgrade_ocp_version: Version to upgrade to
+        @return:
+        """
+        ocp_channel = '.'.join(upgrade_ocp_version.split('.')[:2])
+
+        # see: https://access.redhat.com/articles/7031404
+        if ocp_channel == "4.16":
+            patch_command = f"{self.__cli} -n openshift-config patch cm admin-acks --patch '{{\"data\":{{\"ack-4.15-kube-1.29-api-removals-in-4.16\":\"true\"}}}}' --type=merge"
+            self.run(patch_command)
+
+        upgrade_command = f"{self.__cli} adm upgrade ; sleep 10; {self.__cli} adm upgrade channel stable-{ocp_channel}; sleep 10; {self.__cli} adm upgrade --to={upgrade_ocp_version};"
+        self.run(upgrade_command)
+
+    def upgrade_in_progress(self):
+        """
+        This method returns True when an upgrade is in progress and False when it is not.
+        @return: bool
+        """
+        status = self.run(f"{self.__cli} get clusterversion version -o jsonpath='{{.status.conditions[?(@.type==\"Progressing\")].status}}'")
+        return status == 'True'
+
+    @logger_time_stamp
+    def wait_for_upgrade_start(self, upgrade_version: str, timeout: int = SHORT_TIMEOUT):
+        """
+        This method waits for ocp upgrade to start
+        :param upgrade_version:
+        :param timeout:
+        :return:
+        """
+        current_wait_time = 0
+        while timeout <= 0 or current_wait_time <= timeout and not self.upgrade_in_progress():
+            # sleep for x seconds
+            time.sleep(OC.SLEEP_TIME)
+            current_wait_time += OC.SLEEP_TIME
+        if self.upgrade_in_progress():
+            return True
+        else:
+            raise UpgradeNotStartTimeout(version=upgrade_version)
+
+    def get_upgrade_version(self):
+        """
+        This method returns upgrade version
+        @return:
+        """
+        return self.run(f"{self.__cli} get clusterversion version -o jsonpath='{{.status.desired.version}}'")
+
+    def get_cluster_status(self):
+        """
+        This method returns the STATUS from the 'oc get clusterversion' command.
+        @return: str - The current status of the cluster version.
+        """
+        return self.run(f"{self.__cli} get clusterversion version -o jsonpath='{{.status.conditions[?(@.type==\"Progressing\")].message}}'")
+
+    def get_operator_version(self, namespace):
+        """
+        This method returns the operator version from the specified namespace.
+        @param namespace: str - The namespace to search for the operator version.
+        @return: major version
+        """
+        version = self.run(f"{self.__cli} get csv -n {namespace} -o jsonpath='{{.items[0].spec.version}}'")
+        return '.'.join(version.split('.')[:2])
+
+    def wait_for_operator_installation(self, operator: str, version: str, namespace: str, timeout: int = SHORT_TIMEOUT):
+        """
+        This method waits till operator version is installed successfully
+        @param operator:
+        @param version:
+        @param timeout:
+        @param namespace:
+        @return:
+        """
+        current_wait_time = 0
+        while timeout <= 0 or current_wait_time <= timeout and not self.get_operator_version(namespace) == version:
+            # sleep for x seconds
+            time.sleep(OC.SLEEP_TIME)
+            current_wait_time += OC.SLEEP_TIME
+        if self.get_operator_version(namespace) == version:
+            logger.info(f'{operator} operator version: {version} in namespace: {namespace} has been installed successfully')
+            return True
+        else:
+            raise OperatorInstallationTimeout(operator=operator, version=version, namespace=namespace)
+
+    def healthcheck(self, action: str):
+        """
+        This method stops/resumes ocp health check according to action
+        @param action:
+        @return:
+        """
+        if action == 'stop':
+            self.run(f"{self.__cli} -n openshift-machine-api annotate mhc $({self.__cli} get machinehealthcheck -n openshift-machine-api -o jsonpath='{{.items[0].metadata.name}}') cluster.x-k8s.io/paused=\"\"")
+        elif action == 'resume':
+            self.run(f"{self.__cli} -n openshift-machine-api annotate mhc $({self.__cli} get machinehealthcheck -n openshift-machine-api -o jsonpath='{{.items[0].metadata.name}}') cluster.x-k8s.io/paused-")
 
     def get_cnv_version(self):
         """
@@ -89,7 +187,8 @@ class OC(SSH):
         """
         This method returns list of pv disk ids
         """
-        pv_ids = self.run(f"{self.__cli} get pv -o jsonpath={{.items[*].metadata.annotations.'storage\.openshift\.com/device-id'}}")
+        pv_ids = self.run(
+            f"{self.__cli} get pv -o jsonpath={{.items[*].metadata.annotations.'storage.openshift.com/device-id'}}")
         return [pv[len(self.__worker_disk_prefix):] for pv in pv_ids.split()]
 
     def get_free_disk_id(self, node: str = None):
@@ -354,6 +453,20 @@ class OC(SSH):
         """
         if os.path.isfile(yaml):
             return self.run(f'{self.__cli} create -f {yaml}', is_check=is_check)
+        else:
+            raise YAMLNotExist(yaml)
+
+    @typechecked
+    @logger_time_stamp
+    def apply_async(self, yaml: str, is_check: bool = False):
+        """
+        This method creates yaml in async
+        @param yaml:
+        @param is_check:
+        :return:
+        """
+        if os.path.isfile(yaml):
+            return self.run(f'{self.__cli} apply -f {yaml}', is_check=is_check)
         else:
             raise YAMLNotExist(yaml)
 
@@ -848,7 +961,6 @@ class OC(SSH):
         except Exception:
             return []
 
-
     @typechecked
     def vm_exists(self, vm_name: str, namespace: str = environment_variables.environment_variables_dict['namespace']):
         """
@@ -984,7 +1096,6 @@ class OC(SSH):
             # Log the exception details if necessary
             print(f"Error occurred: {e}")
             return None
-
 
     @typechecked
     @logger_time_stamp

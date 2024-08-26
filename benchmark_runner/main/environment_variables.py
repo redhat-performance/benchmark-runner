@@ -209,6 +209,10 @@ class EnvironmentVariables:
         self._environment_variables_dict['install_ocp_version'] = EnvironmentVariables.get_env('INSTALL_OCP_VERSION', '')
         # There are 4 options: run_bare_metal_ocp_installer/ verify_bare_metal_install_complete/ run_ibm_ocp_installer/ verify_ibm_install_complete
         self._environment_variables_dict['install_step'] = EnvironmentVariables.get_env('INSTALL_STEP', '')
+        # Specify the version as '4.15.22'. Ensure that the upgrade version is stable by checking: https://github.com/openshift/cincinnati-graph-data/tree/master/channels )
+        self._environment_variables_dict['upgrade_ocp_version'] = EnvironmentVariables.get_env('UPGRADE_OCP_VERSION','')
+        # There are 2 options: run_bare_metal_ocp_upgrade/ verify_bare_metal_upgrade_complete
+        self._environment_variables_dict['upgrade_step'] = EnvironmentVariables.get_env('UPGRADE_STEP', '')
         # SNO or empty for regular
         self._environment_variables_dict['cluster_type'] = EnvironmentVariables.get_env('CLUSTER_TYPE', '')
         # For SNO: choose 1 master, dictionary: {'master': ['master-0', 'master-1', 'master-2'], 'worker': ['worker-0', 'worker-1', 'worker-2' ] }
@@ -225,6 +229,8 @@ class EnvironmentVariables:
         self._environment_variables_dict['quay_username'] = EnvironmentVariables.get_env('QUAY_USERNAME', '')
         # QUAY_PASSWORD for nightly build
         self._environment_variables_dict['quay_password'] = EnvironmentVariables.get_env('QUAY_PASSWORD', '')
+        # lso version
+        self._environment_variables_dict['lso_version'] = EnvironmentVariables.get_env('LSO_VERSION', '')
         # odf version
         self._environment_variables_dict['odf_version'] = EnvironmentVariables.get_env('ODF_VERSION', '')
         # custom kata version, if empty fetch auto latest version
@@ -233,8 +239,8 @@ class EnvironmentVariables:
         self._environment_variables_dict['num_odf_disk'] = EnvironmentVariables.get_env('NUM_ODF_DISK', 4)
         self._environment_variables_dict['worker_disk_ids'] = EnvironmentVariables.get_env('WORKER_DISK_IDS', "")
         self._environment_variables_dict['worker_disk_prefix'] = EnvironmentVariables.get_env('WORKER_DISK_PREFIX', '')
-        # install resources list
-        self._environment_variables_dict['install_resources_list'] = EnvironmentVariables.get_env('INSTALL_RESOURCES_LIST', '')
+        # install resources list "[ 'lso', 'odf', 'cnv', 'infra', 'custom' ]"
+        self._environment_variables_dict['install_resources_list'] = EnvironmentVariables.get_env('INSTALL_RESOURCES_LIST', "")
 
         # Parameters below related to 'install_ocp()' and 'install_resource()'
         # Mandatory: OCP environment flavor PERF or FUNC for updating GitHub secrets
@@ -258,6 +264,7 @@ class EnvironmentVariables:
         self._environment_variables_dict['provision_installer_path'] = EnvironmentVariables.get_env(f'PROVISION_INSTALLER_PATH', '')
         self._environment_variables_dict['provision_installer_cmd'] = EnvironmentVariables.get_env(f'PROVISION_INSTALLER_CMD', '')
         self._environment_variables_dict['provision_installer_log'] = EnvironmentVariables.get_env(f'PROVISION_INSTALLER_LOG', '')
+
         # timeout 0<=: forever, >0: second (installer)
         self._environment_variables_dict['provision_timeout'] = EnvironmentVariables.get_env(f'PROVISION_TIMEOUT', '10800')
         # timeout 0<=: forever, >0: second
