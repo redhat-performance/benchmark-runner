@@ -205,11 +205,13 @@ class EnvironmentVariables:
         self._environment_variables_dict['grafana_folder_name'] = EnvironmentVariables.get_env('GRAFANA_FOLDER_NAME', '')
 
         # Parameters below related to 'install_ocp()'
-        # MANDATORY for OCP install: assisted installer version i.e. 'latest-4.16' or 'latest-4.16.0-rc' or '4.16.0': https://openshift-release.apps.ci.l2s4.p1.openshiftapps.com/
+        # MANDATORY for OCP install: assisted installer version i.e. 'latest-4.16' or 'latest-4.16.0-rc' or '4.16.0'. Verify the version at https://openshift-release.apps.ci.l2s4.p1.openshiftapps.com/
         self._environment_variables_dict['install_ocp_version'] = EnvironmentVariables.get_env('INSTALL_OCP_VERSION', '')
-        self._environment_variables_dict['upgrade_ocp_version'] = EnvironmentVariables.get_env('UPGRADE_OCP_VERSION','')
         # There are 4 options: run_bare_metal_ocp_installer/ verify_bare_metal_install_complete/ run_ibm_ocp_installer/ verify_ibm_install_complete
         self._environment_variables_dict['install_step'] = EnvironmentVariables.get_env('INSTALL_STEP', '')
+
+        # MANDATORY for OCP upgrade: Specify the version as '4.15.22'. Ensure that the upgrade version is stable by checking: https://github.com/openshift/cincinnati-graph-data/tree/master/channels )
+        self._environment_variables_dict['upgrade_ocp_version'] = EnvironmentVariables.get_env('UPGRADE_OCP_VERSION','')
         # There are 2 options: run_bare_metal_ocp_upgrade/ verify_bare_metal_upgrade_complete
         self._environment_variables_dict['upgrade_step'] = EnvironmentVariables.get_env('UPGRADE_STEP', '')
 

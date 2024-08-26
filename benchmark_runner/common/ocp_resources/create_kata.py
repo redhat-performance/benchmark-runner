@@ -52,7 +52,7 @@ class CreateKata(CreateOCPResourceOperations):
             if '01_operator.yaml' == resource:
                 # Wait for kataconfig CRD to exist
                 self.__oc.create_async(os.path.join(self.__path, resource))
-                self.wait_for_ocp_resource_create(resource='kata',
+                self.wait_for_ocp_resource_create(operator='kata',
                                                   verify_cmd='if oc get crd kataconfigs.kataconfiguration.openshift.io >/dev/null 2>&1 ; then echo succeeded ; fi',
                                                   status='succeeded')
             elif '02_config.yaml' == resource:
@@ -64,8 +64,8 @@ class CreateKata(CreateOCPResourceOperations):
                 if not self.__install_and_wait_for_resource_with_retry(os.path.join(self.__path, resource), 'kataconfig', 'example-kataconfig'):
                     raise KataInstallationFailed('Failed to apply kataconfig resource')
                 # Next, we have to wait for the kata bits to actually install
-                self.wait_for_ocp_resource_create(resource='kata',
-                                                  verify_cmd="""oc get kataconfig -ojsonpath='{.items[0].status.conditions[?(@.type == "InProgress")].status}'""",
+                self.wait_for_ocp_resource_create(operator='kata',
+                                                  verify_cmd="""oc get kataconfig -o jsonpath='{.items[0].status.conditions[?(@.type == "InProgress")].status}'""",
                                                   status='False')
             elif resource.endswith('.sh'):
                 self.__oc.run(cmd=f'chmod +x {os.path.join(self.__path, resource)}; {os.path.join(self.__path, resource)}')

@@ -214,9 +214,11 @@ terraform.tfstate
 /benchmark_runner/main/install_func_environment_variables.py
 /benchmark_runner/main/operator_perf_environment_variables.py
 /benchmark_runner/main/operator_func_environment_variables.py
+/benchmark_runner/main/upgrade_perf_environment_variables.py
 /tests/integration/benchmark_runner/empty_test_environment_variables.py
 /tests/integration/benchmark_runner/filled_test_environment_variables.py
 /benchmark_runner/main/key.txt
+/benchmark_runner/main/perf_key.txt
 /venv.sh
 
 # Emacs autosave and backup files

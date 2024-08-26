@@ -43,10 +43,10 @@ class CreateOCPResourceOperations:
 
     @typechecked
     @logger_time_stamp
-    def wait_for_ocp_resource_create(self, resource: str, verify_cmd: str, status: str = '', count_disk_maker: bool = False, count_openshift_storage: bool = False, kata_worker_machine_count: bool = False, count_csv_names: bool = False, timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
+    def wait_for_ocp_resource_create(self, operator: str, verify_cmd: str, status: str = '', count_disk_maker: bool = False, count_openshift_storage: bool = False, kata_worker_machine_count: bool = False, count_csv_names: bool = False, timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
         """
         This method waits till operator is created or throw exception after timeout
-        :param resource: The resource cnv, local storage, odf, kata
+        :param operator: The operator cnv, lso, odf, kata
         :param verify_cmd: Verify command that resource was created successfully
         :param status: The final success status
         :param count_disk_maker: count disk maker
@@ -76,7 +76,7 @@ class CreateOCPResourceOperations:
                 # Wait to CSV
                 if cmd:
                     # ODF operator: not all CSV are started on the same time
-                    if resource == 'odf':
+                    if operator == 'odf':
                         # Verify each CSV name
                         if all(any(actual_csv.startswith(expected_csv) for actual_csv in cmd.split()) for expected_csv in self.EXPECTED_ODF_CSV):
                             return True
@@ -99,44 +99,47 @@ class CreateOCPResourceOperations:
             # sleep for x seconds
             time.sleep(self.SLEEP_TIME)
             current_wait_time += self.SLEEP_TIME
-        raise OCPResourceCreationTimeout(resource)
+        raise OCPResourceCreationTimeout(operator)
 
-    def verify_csv_installation(self, namespace: str, resource: str, csv_num: int = 1):
+    def verify_csv_installation(self, namespace: str, operator: str, upgrade_version: str = None, csv_num: int = 1):
         """
         This method verifies csv installation
         :param namespace:
-        :param resource:
+        :param operator:
         :param csv_num: number of csvs, default 1
+        :param upgrade_version: in upgrade mode, check for upgrade version
         """
-        csv_names = self.__oc.wait_for_csv(csv_num=csv_num, namespace=namespace)
+        if upgrade_version:
+            self.__oc.wait_for_upgrade_version(operator=operator, upgrade_version=upgrade_version, namespace=namespace)
+        csv_names = self.__oc.wait_for_csv(operator=operator, csv_num=csv_num, namespace=namespace)
         for csv_name in csv_names.split():
-            self.wait_for_ocp_resource_create(resource=resource,
-                                              verify_cmd=f"oc get csv -n {namespace} {csv_name} -ojsonpath='{{.status.phase}}'",
+            self.wait_for_ocp_resource_create(operator=operator,
+                                              verify_cmd=f"oc get csv -n {namespace} {csv_name} -o jsonpath='{{.status.phase}}'",
                                               status='Succeeded')
 
-    def apply_patch(self, namespace: str, resource: str):
+    def apply_patch(self, namespace: str, operator: str):
         """
         This method applies an InstallPlan that has not been approved
         :param namespace:
-        :param resource:
+        :param operator:
         :return:
         """
-        install_plan_cmd = f"oc get InstallPlan -n {namespace} -ojsonpath={{$.items[*].metadata.name}}"
+        install_plan_cmd = f"oc get InstallPlan -n {namespace} -o jsonpath={{$.items[*].metadata.name}}"
         install_plan_names = self.__oc.run(cmd=install_plan_cmd).split()
         for name in install_plan_names:
-            check_approved = f"oc get InstallPlan -n {namespace} {name} -ojsonpath={{..spec.approved}}"
+            check_approved = f"oc get InstallPlan -n {namespace} {name} -o jsonpath={{..spec.approved}}"
             approved = self.__oc.run(cmd=check_approved)
             # APPROVED false - need to patch
             if not {'true': True, 'false': False}.get(approved.lower(), False):
                 install_plan_cmd = (f"oc patch InstallPlan -n {namespace} {name} -p '{{\"spec\":{{\"approved\":true}}}}' --type merge")
                 self.__oc.run(cmd=install_plan_cmd)
                 # Wait till installPlan is approved
-                self.wait_for_ocp_resource_create(resource=resource,
+                self.wait_for_ocp_resource_create(operator=operator,
                                                   verify_cmd=check_approved,
                                                   status="true")
                 # Wait till CSV name is created
-                self.wait_for_ocp_resource_create(resource=resource,
-                                                  verify_cmd=f"oc get csv -n {namespace} -ojsonpath={{$.items[*].metadata.name}}",
+                self.wait_for_ocp_resource_create(operator=operator,
+                                                  verify_cmd=f"oc get csv -n {namespace} -o jsonpath={{$.items[*].metadata.name}}",
                                                   count_csv_names=True)
                 # Verify CSV installation
-                self.verify_csv_installation(namespace=namespace, resource=resource)
+                self.verify_csv_installation(namespace=namespace, operator=operator)

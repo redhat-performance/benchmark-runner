@@ -17,17 +17,22 @@ class CreateLSO(CreateOCPResourceOperations):
         self.__resource_list = resource_list
 
     @logger_time_stamp
-    def create_lso(self):
+    def create_lso(self, upgrade_version: str):
         """
-        This method create local storage
+        This method creates lso operator
         :return:
         """
-        for resource in self.__resource_list:
-            logger.info(f'run {resource}')
-            self.__oc.create_async(yaml=os.path.join(self.__path, resource))
+        if upgrade_version:
+            self.__oc.apply_async(yaml=os.path.join(self.__path, '03_subscription.yaml'))
+            logger.info(f'Wait till LSO upgrade to version: {upgrade_version}')
+            self.verify_csv_installation(namespace='openshift-local-storage', operator='lso', upgrade_version=upgrade_version)
+        else:
+            for resource in self.__resource_list:
+                logger.info(f'run {resource}')
+                self.__oc.create_async(yaml=os.path.join(self.__path, resource))
 
-        # verify once after create all resource files
-        self.wait_for_ocp_resource_create(resource='lso',
-                                          verify_cmd="oc -n openshift-local-storage wait deployment/local-storage-operator --for=condition=Available",
-                                          status='deployment.apps/local-storage-operator condition met')
-        return True
+            # verify once after create all resource files
+            self.wait_for_ocp_resource_create(operator='lso',
+                                              verify_cmd="oc -n openshift-local-storage wait deployment/local-storage-operator --for=condition=Available",
+                                              status='deployment.apps/local-storage-operator condition met')
+            return True

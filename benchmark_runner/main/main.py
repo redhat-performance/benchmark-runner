@@ -33,6 +33,10 @@ workload = environment_variables_dict.get('workload', '')
 azure_cluster_operation = environment_variables_dict.get('azure_cluster_operation', '')
 ci_status = environment_variables_dict.get('ci_status', '')
 install_ocp_version = environment_variables_dict.get('install_ocp_version', '')
+upgrade_ocp_version = environment_variables_dict.get('upgrade_ocp_version', '')
+odf_version = environment_variables_dict.get('odf_version', '')
+lso_version = environment_variables_dict.get('lso_version', '')
+cnv_version = environment_variables_dict.get('cnv_version', '')
 install_ocp_resources = environment_variables_dict.get('install_ocp_resources', False)
 run_type = environment_variables_dict.get('run_type', '')
 
@@ -141,6 +145,30 @@ def install_ocp_bare_metal(step: str):
 
 
 @logger_time_stamp
+def upgrade_ocp_bare_metal(step: str):
+    """
+    This method runs Bare Metal OCP upgrade
+    :return:
+    """
+    bare_metal_operations = BareMetalOperations(user=provision_user)
+    bare_metal_operations.connect_to_provisioner()
+    oc = bare_metal_operations.oc_login()
+    if step == 'run_bare_metal_ocp_upgrade':
+        bare_metal_operations.run_ocp_upgrade(oc)
+        # The LSO/ODF upgrade must be run manually after the OCP upgrade for the channel version; it won't upgrade automatically.
+        bare_metal_operations.install_ocp_resources(resources=['lso'], upgrade_version=lso_version)
+        bare_metal_operations.install_ocp_resources(resources=['odf'], upgrade_version=odf_version)
+    elif step == 'verify_bare_metal_upgrade_complete':
+        if bare_metal_operations.is_cluster_upgraded(oc, cnv_version=cnv_version, odf_version=odf_version, lso_version=lso_version):
+            bare_metal_operations.verify_cluster_is_up(oc)
+        else:
+            error_message = f'OCP {upgrade_ocp_version} upgrade failed'
+            logger.error(error_message)
+            raise RuntimeError(error_message)
+    bare_metal_operations.disconnect_from_provisioner()
+
+
+@logger_time_stamp
 def install_resources():
     """
     This method installs OpenShift resources
@@ -202,7 +230,6 @@ def run_benchmark_runner_workload():
     # benchmark-runner node selector
     return benchmark_runner_workload.run()
 
-
 @logger_time_stamp
 def run_clusterbuster_workload():
     """
@@ -237,6 +264,16 @@ def main():
             install_ocp_ibm_cloud(step=install_step)
         else:
             raise Exception(f'Invalid install step: {install_step}')
+    # upgrade_ocp_version
+    elif upgrade_ocp_version:
+        upgrade_step = environment_variables_dict.get('upgrade_step', '')
+        logger.info(f'Starting upgrading step: {upgrade_step}')
+        if upgrade_step == 'run_bare_metal_ocp_upgrade':
+            upgrade_ocp_bare_metal(step=upgrade_step)
+        elif upgrade_step == 'verify_bare_metal_upgrade_complete':
+            upgrade_ocp_bare_metal(step=upgrade_step)
+        else:
+            raise Exception(f'Invalid upgrade step: {upgrade_step}')
     # install_ocp_resource
     elif install_ocp_resources:
         install_resources()

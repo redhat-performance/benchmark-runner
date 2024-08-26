@@ -27,7 +27,7 @@ class CreateCNV(CreateOCPResourceOperations):
         if cnv_nightly_channel:
             logger.info('wait for cnv-nightly kubevirt-hyperconverged')
             # cnv_nightly_catalog_source.yaml already run direct through Github actions - just need to wait
-            self.wait_for_ocp_resource_create(resource='cnv_nightly_catalog_source.yaml',
+            self.wait_for_ocp_resource_create(operator='cnv_nightly_catalog_source.yaml',
                                               verify_cmd="oc get packagemanifest -l catalog=cnv-nightly-catalog-source | grep kubevirt-hyperconverged",
                                               status="kubevirt-hyperconverged")
             starting_csv = self.__oc.run(""" oc get packagemanifest -l "catalog=cnv-nightly-catalog-source" -o jsonpath="{$.items[?(@.metadata.name=='kubevirt-hyperconverged')].status.channels[?(@.name==\\"nightly-cnv_version\\")].currentCSV}" """.replace('cnv_version', cnv_version))
@@ -41,19 +41,19 @@ class CreateCNV(CreateOCPResourceOperations):
                 if '01_operator.yaml' in resource:
                     if cnv_nightly_channel:
                         # wait till get the patch
-                        self.wait_for_ocp_resource_create(resource=resource,
-                                                          verify_cmd="oc get InstallPlan -n openshift-cnv -ojsonpath={.items[0].metadata.name}",
+                        self.wait_for_ocp_resource_create(operator=resource,
+                                                          verify_cmd="oc get InstallPlan -n openshift-cnv -o jsonpath={.items[0].metadata.name}",
                                                           status="install-")
-                        self.apply_patch(namespace='openshift-cnv', resource='cnv')
+                        self.apply_patch(namespace='openshift-cnv', operator='cnv')
                     # stable channel
                     else:
-                        self.wait_for_ocp_resource_create(resource='cnv',
-                                                          verify_cmd="oc get csv -n openshift-cnv -ojsonpath='{.items[0].status.phase}'",
+                        self.wait_for_ocp_resource_create(operator='cnv',
+                                                          verify_cmd="oc get csv -n openshift-cnv -o jsonpath='{.items[0].status.phase}'",
                                                           status='Succeeded')
                 # for second script wait for refresh status
                 if '02_hyperconverge.yaml' in resource:
                     # Wait that till succeeded
-                    self.wait_for_ocp_resource_create(resource='cnv',
-                                                      verify_cmd="oc get csv -n openshift-cnv -ojsonpath='{.items[0].status.phase}'",
+                    self.wait_for_ocp_resource_create(operator='cnv',
+                                                      verify_cmd="oc get csv -n openshift-cnv -o jsonpath='{.items[0].status.phase}'",
                                                       status='Succeeded')
         return True
