@@ -103,13 +103,14 @@ class BareMetalOperations:
         logger.info(f'Waiting until the upgrade to version {self._upgrade_ocp_version} starts...')
         oc.wait_for_upgrade_start(upgrade_version=self._upgrade_ocp_version)
         while self._provision_timeout <= 0 or current_wait_time <= self._provision_timeout and oc.upgrade_in_progress():
-            if not oc.upgrade_in_progress():
-                return True
             logger.info(f'Waiting till OCP upgrade complete, waiting {int(current_wait_time / 60)} minutes')
             # sleep for x seconds
             time.sleep(sleep_time)
             current_wait_time += sleep_time
-        raise OCPUpgradeFailed(status=oc.get_cluster_status())
+        if f'Cluster version is {self._upgrade_ocp_version}' == oc.get_cluster_status():
+            return True
+        else:
+            raise OCPUpgradeFailed(status=oc.get_cluster_status())
 
     def _install_ocp_cmd(self):
         """

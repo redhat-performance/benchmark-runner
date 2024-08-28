@@ -131,6 +131,13 @@ class DVStatusTimeout(OCError):
         super(DVStatusTimeout, self).__init__(self.message)
 
 
+class CSVNotCreateTimeout(OCError):
+    """This exception return csv create timeout error"""
+    def __init__(self, operator, namespace):
+        self.message = f'{operator} CSV in namespace: {namespace} is not created'
+        super(CSVNotCreateTimeout, self).__init__(self.message)
+
+
 class UpgradeNotStartTimeout(OCError):
     """This exception return ocp upgrade timeout error"""
     def __init__(self, version):
@@ -139,7 +146,14 @@ class UpgradeNotStartTimeout(OCError):
 
 
 class OperatorInstallationTimeout(OCError):
-    """This exception return dv status timeout error"""
+    """This exception return operator installation timeout error"""
     def __init__(self, operator, version, namespace):
         self.message = f"{operator} operator installation to: {version} in namespace: {namespace} didn't complete"
         super(OperatorInstallationTimeout, self).__init__(self.message)
+
+
+class OperatorUpgradeTimeout(OCError):
+    """This exception return operator upgrade timeout error"""
+    def __init__(self, operator, version, namespace):
+        self.message = f"{operator} operator upgrade to: {version} in namespace: {namespace} didn't complete"
+        super(OperatorUpgradeTimeout, self).__init__(self.message)

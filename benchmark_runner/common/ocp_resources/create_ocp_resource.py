@@ -81,7 +81,7 @@ class CreateOCPResource:
         resource_files = self.get_sorted_resources(resource=resource)
         if 'lso' == resource:
             create_lso = CreateLSO(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files)
-            create_lso.create_lso()
+            create_lso.create_lso(upgrade_version)
         elif 'odf' == resource:
             create_odf = CreateODF(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files, worker_disk_ids=self.__worker_disk_ids, worker_disk_prefix=self.__worker_disk_prefix)
             create_odf.create_odf(upgrade_version)

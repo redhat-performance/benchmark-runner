@@ -1,6 +1,5 @@
 
 import os
-import time
 
 from benchmark_runner.common.oc.oc import OC
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
@@ -12,6 +11,8 @@ class CreateODF(CreateOCPResourceOperations):
     """
     This class is created ODF operator
     """
+    ODF_CSV_NUM = 4
+
     def __init__(self, oc: OC, path: str, resource_list: list, worker_disk_ids: list, worker_disk_prefix: str):
         super().__init__(oc)
         self.__oc = oc
@@ -29,9 +30,8 @@ class CreateODF(CreateOCPResourceOperations):
         """
         if upgrade_version:
             self.__oc.apply_async(yaml=os.path.join(self.__path, '07_subscription.yaml'))
-            self.__oc.wait_for_operator_installation(operator='odf', version=upgrade_version, namespace='openshift-storage')
             logger.info(f'Wait till ODF upgrade to version: {upgrade_version}')
-            self.verify_csv_installation(namespace='openshift-storage', resource='odf')
+            self.verify_csv_installation(namespace='openshift-storage', operator='odf', upgrade_version=upgrade_version, csv_num=self.ODF_CSV_NUM)
         else:
             for resource in self.__resource_list:
                 logger.info(f'run {resource}')
@@ -52,18 +52,18 @@ class CreateODF(CreateOCPResourceOperations):
                     self.__oc.create_async(yaml=os.path.join(self.__path, resource))
                     if '04_local_volume_set.yaml' in resource:
                         # openshift local storage - diskmaker
-                        self.wait_for_ocp_resource_create(resource='odf',
+                        self.wait_for_ocp_resource_create(operator='odf',
                                                           verify_cmd=r"""oc get pod -n openshift-local-storage -o jsonpath="{range .items[*]}{.metadata.name}{'\n'}{end}" | grep diskmaker | wc -l""",
                                                           count_disk_maker=True)
                         # openshift persistence volume - pv
-                        self.wait_for_ocp_resource_create(resource='odf',
+                        self.wait_for_ocp_resource_create(operator='odf',
                                                           verify_cmd=r"""oc get pv -o jsonpath="{range .items[*]}{.metadata.name}{'\n'}{end}" | grep local | wc -l""",
                                                           count_openshift_storage=True)
                     if '07_subscription.yaml' in resource:
                         # Must be run after installing the storage cluster because CSVs sometimes fail
-                        self.verify_csv_installation(namespace='openshift-storage', resource='odf')
+                        self.verify_csv_installation(namespace='openshift-storage', operator='odf', csv_num=self.ODF_CSV_NUM)
                     elif '08_storage_cluster.yaml' in resource:
-                        self.wait_for_ocp_resource_create(resource='odf',
+                        self.wait_for_ocp_resource_create(operator='odf',
                                                           verify_cmd='oc get pod -n openshift-storage | grep osd | grep -v prepare | wc -l',
                                                           count_openshift_storage=True)
             # Verify ODF installation
