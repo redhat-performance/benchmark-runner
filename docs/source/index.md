@@ -19,7 +19,7 @@ Benchmark-runner grafana dashboard example:
 
 Reference:
 * The benchmark-runner package is located in [PyPi](https://pypi.org/project/benchmark-runner)
-* The benchmark-runner container image is located in [Quay.io](https://quay.io/repository/ebattat/benchmark-runner)
+* The benchmark-runner container image is located in [Quay.io](https://quay.io/repository/benchmark-runner/benchmark-runner)
 
 ![](../../media/docker2.png)
 

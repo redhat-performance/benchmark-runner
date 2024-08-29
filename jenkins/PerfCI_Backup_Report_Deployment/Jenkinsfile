@@ -4,6 +4,7 @@ pipeline {
     }
     environment {
         CONTACT_EMAIL1 = credentials('perfci_contact_email1')
+        QUAY_BENCHMARK_RUNNER_REPOSITORY = credentials('perfci_quay_repository')
     }
 
     stages {
@@ -17,8 +18,8 @@ pipeline {
 
                         // Remove benchmark-runner images if they exist
                         sh '''
-                            if [[ "$(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)" != "" ]]; then
-                                sudo podman rmi -f $(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)
+                            if [[ "$(sudo podman images -q ${QUAY_BENCHMARK_RUNNER_REPOSITORY} 2> /dev/null)" != "" ]]; then
+                                sudo podman rmi -f $(sudo podman images -q ${QUAY_BENCHMARK_RUNNER_REPOSITORY} 2> /dev/null)
                             fi
                         '''
                     } catch (Exception cleanupException) {
@@ -32,7 +33,7 @@ pipeline {
         stage('CI Pod Deployment & Report') {
             steps {
                 script {
-                       withCredentials([string(credentialsId: 'perfci_ci_pod_deployment', variable: 'CI_POD_DEPLOYMENT')]) {
+                       withCredentials([string(credentialsId: 'perfci_pod_deployment', variable: 'CI_POD_DEPLOYMENT')]) {
                     // Generates CNV workloads summary report in a JupyterLab pod deployment
                     sh "${CI_POD_DEPLOYMENT}"
                     }
@@ -43,7 +44,7 @@ pipeline {
         stage('Backup to Google Drive') {
             steps {
                 script {
-                       withCredentials([string(credentialsId: 'perfci_ci_backup', variable: 'CI_BACKUP')]) {
+                       withCredentials([string(credentialsId: 'perfci_backup', variable: 'CI_BACKUP')]) {
                     // Uploads CNV workloads summary report and Elastic/Grafana/PerfCi into S3
                     sh "${CI_BACKUP}"
                     }
@@ -57,8 +58,8 @@ pipeline {
         always {
             script {
                 sh '''
-                    if [[ "$(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)" != "" ]]; then
-                        sudo podman rmi -f $(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)
+                    if [[ "$(sudo podman images -q ${QUAY_BENCHMARK_RUNNER_REPOSITORY} 2> /dev/null)" != "" ]]; then
+                        sudo podman rmi -f $(sudo podman images -q ${QUAY_BENCHMARK_RUNNER_REPOSITORY} 2> /dev/null)
                     fi
                 '''
             }

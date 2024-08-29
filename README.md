@@ -7,7 +7,7 @@
 # Benchmark-Runner: Running benchmarks
 [![Actions Status](https://github.com/redhat-performance/benchmark-runner/actions/workflows/Perf_Env_Build_Test_CI.yml/badge.svg)](https://github.com/redhat-performance/benchmark-runner/actions)
 [![PyPI Latest Release](https://img.shields.io/pypi/v/benchmark-runner.svg)](https://pypi.org/project/benchmark-runner/)
-[![Container Repository on Quay](https://quay.io/repository/projectquay/quay/status "Container Repository on Quay")](https://quay.io/repository/ebattat/benchmark-runner?tab=tags)
+[![Container Repository on Quay](https://quay.io/repository/projectquay/quay/status "Container Repository on Quay")](https://quay.io/repository/benchmark-runner/benchmark-runner?tab=tags)
 [![Coverage Status](https://coveralls.io/repos/github/redhat-performance/benchmark-runner/badge.svg?branch=main)](https://coveralls.io/github/redhat-performance/benchmark-runner?branch=main&kill_cache=1)
 [![Documentation Status](https://readthedocs.org/projects/benchmark-runner/badge/?version=latest)](https://benchmark-runner.readthedocs.io/en/latest/?badge=latest)
 [![python](https://img.shields.io/pypi/pyversions/benchmark-runner.svg?color=%2334D058)](https://pypi.org/project/benchmark-runner)
@@ -33,7 +33,7 @@ Benchmark-runner grafana dashboard example:
 
 Reference:
 * The benchmark-runner package is located in [PyPi](https://pypi.org/project/benchmark-runner)
-* The benchmark-runner container image is located in [Quay.io](https://quay.io/repository/ebattat/benchmark-runner)
+* The benchmark-runner container image is located in [Quay.io](https://quay.io/repository/benchmark-runner/benchmark-runner)
 
 ## Documentation
 Documentation is available at [benchmark-runner.readthedocs.io](https://benchmark-runner.readthedocs.io/en/latest/)
@@ -106,11 +106,11 @@ Not mandatory:
 For example:
 
 ```sh
-podman run --rm --workload=$WORKLOAD --kubeadmin-password=$KUBEADMIN_PASSWORD --pin-node-benchmark-operator=$PIN_NODE_BENCHMARK_OPERATOR --pin-node1=$PIN_NODE1 --pin-node2=$PIN_NODE2 --elasticsearch=$ELASTICSEARCH --elasticsearch-port=$ELASTICSEARCH_PORT -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:latest
+podman run --rm --workload="hammerdb_vm_mariadb" --kubeadmin-password="$KUBEADMIN_PASSWORD" --pin-node-benchmark-operator="worker-0" --pin-node1="worker-1" --pin-node2="worker-2" -v "$KUBECONFIG":/root/.kube/config --privileged quay.io/benchmark-runner/benchmark-runner:latest
 ```
 or
 ```sh
-podman run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/ebattat/benchmark-runner:latest
+docker run --rm -e WORKLOAD=$WORKLOAD -e KUBEADMIN_PASSWORD=$KUBEADMIN_PASSWORD -e PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR -e PIN_NODE1=$PIN_NODE1 -e PIN_NODE2=$PIN_NODE2 -e ELASTICSEARCH=$ELASTICSEARCH -e ELASTICSEARCH_PORT=$ELASTICSEARCH_PORT -e log_level=INFO -v $KUBECONFIG:/root/.kube/config --privileged quay.io/benchmark-runner/benchmark-runner:latest
 ```
 SAVE RUN ARTIFACTS LOCAL:
 1. add `-e SAVE_ARTIFACTS_LOCAL='True'` or `--save-artifacts-local=true`

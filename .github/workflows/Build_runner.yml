@@ -97,11 +97,14 @@ jobs:
         run: |
           pip install setuptools
           version=$(python3 setup.py --version)
-          sudo docker build --build-arg VERSION=$version -t quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:v$version .
-          sudo docker build --build-arg VERSION=latest -t quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:latest .
-          sudo docker login quay.io -u ${{ secrets.QAUYIO_ROBOT_USER }} -p ${{ secrets.QAUYIO_ROBOT_TOKEN }}
-          sudo docker push quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:v$version
-          sudo docker push quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:latest
+          sudo docker build --build-arg VERSION=$version -t quay.io/${{ secrets.QUAY_REPOSITORY  }}/${{ secrets.PACKAGE_NAME }}:v$version .
+          sudo docker build --build-arg VERSION=latest -t quay.io/${{ secrets.QUAY_REPOSITORY  }}/${{ secrets.PACKAGE_NAME }}:latest .
+          sudo docker build --build-arg VERSION=latest -t  ${{ secrets.QUAY_BENCHMARK_RUNNER_REPOSITORY }} .
+          sudo docker login quay.io -u ${{ secrets.QUAY_ROBOT_USER }} -p ${{ secrets.QUAY_ROBOT_PASSWORD }}
+          sudo docker push quay.io/${{ secrets.QUAY_REPOSITORY  }}/${{ secrets.PACKAGE_NAME }}:v$version
+          sudo docker push quay.io/${{ secrets.QUAY_REPOSITORY  }}/${{ secrets.PACKAGE_NAME }}:latest
+          sudo docker login quay.io -u ${{ secrets.QUAY_ROBOT_BENCHMARK_RUNNER_USER }} -p ${{ secrets.QUAY_ROBOT_BENCHMARK_RUNNER_PASSWORD }}
+          sudo docker push ${{ secrets.QUAY_BENCHMARK_RUNNER_REPOSITORY }}
           echo '⌛ Wait 30 sec till image will be updated in quay.io'
           sleep 30
 

@@ -257,11 +257,14 @@ jobs:
         run: |
           pip install setuptools
           version=$(python3 setup.py --version)
-          sudo docker build --build-arg VERSION=$version -t quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:v$version .
-          sudo docker build --build-arg VERSION=latest -t quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:latest .
-          sudo docker login quay.io -u ${{ secrets.QAUYIO_ROBOT_USER }} -p ${{ secrets.QAUYIO_ROBOT_TOKEN }}
-          sudo docker push quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:v$version
-          sudo docker push quay.io/${{ secrets.QAUYIO_REPOSITORY }}/${{ secrets.PACKAGE_NAME }}:latest
+          sudo docker build --build-arg VERSION=$version -t quay.io/${{ secrets.QUAY_REPOSITORY  }}/${{ secrets.PACKAGE_NAME }}:v$version .
+          sudo docker build --build-arg VERSION=latest -t quay.io/${{ secrets.QUAY_REPOSITORY  }}/${{ secrets.PACKAGE_NAME }}:latest .
+          sudo docker build --build-arg VERSION=latest -t  ${{ secrets.QUAY_BENCHMARK_RUNNER_REPOSITORY }} .
+          sudo docker login quay.io -u ${{ secrets.QUAY_ROBOT_USER }} -p ${{ secrets.QUAY_ROBOT_PASSWORD }}
+          sudo docker push quay.io/${{ secrets.QUAY_REPOSITORY  }}/${{ secrets.PACKAGE_NAME }}:v$version
+          sudo docker push quay.io/${{ secrets.QUAY_REPOSITORY  }}/${{ secrets.PACKAGE_NAME }}:latest
+          sudo docker login quay.io -u ${{ secrets.QUAY_ROBOT_BENCHMARK_RUNNER_USER }} -p ${{ secrets.QUAY_ROBOT_BENCHMARK_RUNNER_PASSWORD }}
+          sudo docker push ${{ secrets.QUAY_BENCHMARK_RUNNER_REPOSITORY }}
           echo '⌛ Wait 30 sec till image will be updated in quay.io'
           sleep 30
 
@@ -374,8 +377,8 @@ jobs:
         build_version="$(cut -d'=' -f2 <<<"$build")"
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start E2E workload: ${{ matrix.workload }} >>>>>>>>>>>>>>>>>>>>>>>>>>'
         scp -r "$RUNNER_PATH/.kube/config" provision:"$CONTAINER_KUBECONFIG_PATH"
-        ssh -t provision "podman run --rm -t -e WORKLOAD='${{ matrix.workload }}' -e KUBEADMIN_PASSWORD='$KUBEADMIN_PASSWORD' -e PIN_NODE_BENCHMARK_OPERATOR='$PIN_NODE_BENCHMARK_OPERATOR' -e PIN_NODE1='$PIN_NODE1' -e PIN_NODE2='$PIN_NODE2' -e ELASTICSEARCH='$ELASTICSEARCH' -e ELASTICSEARCH_PORT='$ELASTICSEARCH_PORT' -e ELASTICSEARCH_USER='$ELASTICSEARCH_USER' -e ELASTICSEARCH_PASSWORD='$ELASTICSEARCH_PASSWORD' -e IBM_REGION_NAME='$IBM_REGION_NAME' -e IBM_ENDPOINT_URL='$IBM_ENDPOINT_URL' -e IBM_ACCESS_KEY_ID='$IBM_ACCESS_KEY_ID' -e IBM_SECRET_ACCESS_KEY='$IBM_SECRET_ACCESS_KEY' -e IBM_BUCKET='$IBM_BUCKET' -e IBM_KEY='$IBM_KEY' -e RUN_ARTIFACTS_URL='$RUN_ARTIFACTS_URL' -e BUILD_VERSION='$build_version' -e RUN_TYPE='test_ci' -e TIMEOUT='2000' -e log_level='INFO' -v '$CONTAINER_KUBECONFIG_PATH':'$CONTAINER_KUBECONFIG_PATH' --privileged 'quay.io/ebattat/benchmark-runner:v$build_version'"
-        ssh -t provision "podman rmi -f 'quay.io/ebattat/benchmark-runner:v$build_version'"
+        ssh -t provision "podman run --rm -t -e WORKLOAD='${{ matrix.workload }}' -e KUBEADMIN_PASSWORD='$KUBEADMIN_PASSWORD' -e PIN_NODE_BENCHMARK_OPERATOR='$PIN_NODE_BENCHMARK_OPERATOR' -e PIN_NODE1='$PIN_NODE1' -e PIN_NODE2='$PIN_NODE2' -e ELASTICSEARCH='$ELASTICSEARCH' -e ELASTICSEARCH_PORT='$ELASTICSEARCH_PORT' -e ELASTICSEARCH_USER='$ELASTICSEARCH_USER' -e ELASTICSEARCH_PASSWORD='$ELASTICSEARCH_PASSWORD' -e IBM_REGION_NAME='$IBM_REGION_NAME' -e IBM_ENDPOINT_URL='$IBM_ENDPOINT_URL' -e IBM_ACCESS_KEY_ID='$IBM_ACCESS_KEY_ID' -e IBM_SECRET_ACCESS_KEY='$IBM_SECRET_ACCESS_KEY' -e IBM_BUCKET='$IBM_BUCKET' -e IBM_KEY='$IBM_KEY' -e RUN_ARTIFACTS_URL='$RUN_ARTIFACTS_URL' -e BUILD_VERSION='$build_version' -e RUN_TYPE='test_ci' -e TIMEOUT='2000' -e log_level='INFO' -v '$CONTAINER_KUBECONFIG_PATH':'$CONTAINER_KUBECONFIG_PATH' --privileged '${{ secrets.QUAY_BENCHMARK_RUNNER_REPOSITORY }}'"
+        ssh -t provision "podman rmi -f '${{ secrets.QUAY_BENCHMARK_RUNNER_REPOSITORY }}'"
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End E2E workload: ${{ matrix.workload }} >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
 
   update_grafana_dashboard:

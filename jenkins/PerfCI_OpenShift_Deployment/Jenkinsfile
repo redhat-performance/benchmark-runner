@@ -11,6 +11,7 @@ pipeline {
         EXPECTED_NODES = credentials('perfci_expected_nodes')
         INSTALL_OCP_VERSION = credentials('perfci_install_ocp_version')
         OCP_CLIENT_VERSION = credentials('perfci_ocp_client_version')
+        QUAY_BENCHMARK_RUNNER_REPOSITORY = credentials('perfci_quay_repository')
         WORKSPACE = '/home/jenkins'
         PROVISION_PORT = 22
         KUBEADMIN_PASSWORD_PATH = '/root/.kube/kubeadmin-password'
@@ -42,8 +43,8 @@ pipeline {
 
                         // Delete benchmark-runner images
                         sh '''
-                        if [[ "$(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)" != "" ]]; then
-                            sudo podman rmi -f $(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)
+                        if [[ "$(sudo podman images -q ${QUAY_BENCHMARK_RUNNER_REPOSITORY} 2> /dev/null)" != "" ]]; then
+                            sudo podman rmi -f $(sudo podman images -q ${QUAY_BENCHMARK_RUNNER_REPOSITORY} 2> /dev/null)
                         fi
                         '''
                         try {
@@ -131,7 +132,7 @@ END
                                                         -e PROVISION_TIMEOUT="${PROVISION_TIMEOUT}" \
                                                         -e log_level="INFO" -v "${PRIVATE_KEY_PATH}":"${CONTAINER_PRIVATE_KEY_PATH}" \
                                                         -v "${KUBECONFIG_PATH}":"${KUBECONFIG_PATH}" \
-                                                        --privileged "quay.io/ebattat/benchmark-runner:latest"
+                                                        --privileged "${QUAY_BENCHMARK_RUNNER_REPOSITORY}"
                                                 """
                                             }
                                         }
@@ -149,8 +150,8 @@ END
         always {
             script {
                 sh '''
-                    if [[ "$(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)" != "" ]]; then
-                        sudo podman rmi -f $(sudo podman images -q quay.io/ebattat/benchmark-runner 2> /dev/null)
+                    if [[ "$(sudo podman images -q ${QUAY_BENCHMARK_RUNNER_REPOSITORY} 2> /dev/null)" != "" ]]; then
+                        sudo podman rmi -f $(sudo podman images -q ${QUAY_BENCHMARK_RUNNER_REPOSITORY} 2> /dev/null)
                     fi
                 '''
             }
