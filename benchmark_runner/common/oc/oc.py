@@ -188,7 +188,7 @@ class OC(SSH):
         This method returns list of pv disk ids
         """
         pv_ids = self.run(
-            f"{self.__cli} get pv -o jsonpath={{.items[*].metadata.annotations.'storage.openshift.com/device-id'}}")
+            f"{self.__cli} get pv -o jsonpath='{{range .items[*]}}{{.metadata.annotations.storage\\.openshift\\.com/device-id}}{{\"\\n\"}}{{end}}'")
         return [pv[len(self.__worker_disk_prefix):] for pv in pv_ids.split()]
 
     def get_free_disk_id(self, node: str = None):
