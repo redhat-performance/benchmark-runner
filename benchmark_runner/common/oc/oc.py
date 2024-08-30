@@ -840,7 +840,7 @@ class OC(SSH):
         """
         current_wait_time = 0
         # Wait until the path is applied for the first time
-        time.sleep(OC.SLEEP_TIME)
+        time.sleep(60)
         while timeout <= 0 or current_wait_time <= timeout:
             if self._get_pod_name(pod_name=pod_name, namespace=namespace) and self.wait_for_ready(label=label, label_uuid=label_uuid, namespace=namespace):
                 return True
