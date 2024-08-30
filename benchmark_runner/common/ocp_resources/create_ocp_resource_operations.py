@@ -14,7 +14,7 @@ class CreateOCPResourceOperations:
     """
     # Expected CSVs List names
     EXPECTED_ODF_CSV = ['mcg-operator', 'ocs-operator', 'odf-csi-addons-operator', 'odf-operator']
-    SLEEP_TIME = 60
+    SLEEP_TIME = 30
 
     def __init__(self, oc: OC):
         self._environment_variables_dict = environment_variables.environment_variables_dict
