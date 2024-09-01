@@ -157,10 +157,6 @@ END
                 emailext body: """\
                     Jenkins job: ${env.BUILD_URL}\nSee the console output for more details:  ${env.BUILD_URL}consoleFull\n\n
                 """, subject: msg, to: "${CONTACT_EMAIL1}"
-
-                // Trigger PerfCI-Openshift-Deployment pipeline on failure
-                echo 'Triggering PerfCI-Openshift-Deployment pipeline due to failure'
-                build job: 'PerfCI-Openshift-Deployment', wait: false
             }
         }
         success {
