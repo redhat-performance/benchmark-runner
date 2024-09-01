@@ -18,7 +18,6 @@ jobs:
   unittest:
     # run all python versions, in other jobs run the latest python
     name: unittest
-    needs: [quay_upload]
     runs-on: ubuntu-latest
     strategy:
       matrix:
