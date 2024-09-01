@@ -256,7 +256,7 @@ virtual environment:
 ## Determine the version of benchmark-runner in the current container image
 
 The version of [https://pypi.org/project/benchmark-runner/](https://pypi.org/project/benchmark-runner/) should match the
-version in `setup.py`, and the [https://quay.io/repository/ebattat/benchmark-runner?tab=tags](https://quay.io/repository/ebattat/benchmark-runner?tab=tags)
+version in `setup.py`, and the [https://quay.io/repository/benchmark-runner/benchmark-runner?tab=tags](https://quay.io/repository/benchmark-runner/benchmark-runner?tab=tags)
 should also match that version.  However, if the version on PyPi is
 not updated quickly enough, the container image may remain stale.
 This may result in unexpected errors.
@@ -270,11 +270,11 @@ version with pip:
 # # podman ps -a |grep benchmark-runner
 # # podman rm $(podman ps -a |grep benchmark-runner |awk '{print $1}')
 # # and repeat the command
-# podman rmi quay.io/ebattat/benchmark-runner
-# podman rmi quay.io/ebattat/benchmark-runner
-Untagged: quay.io/ebattat/benchmark-runner:latest
-# podman run --rm -it quay.io/ebattat/benchmark-runner:latest /bin/bash
-Trying to pull quay.io/ebattat/benchmark-runner:latest...
+# podman rmi quay.io/benchmark-runner/benchmark-runner
+# podman rmi quay.io/benchmark-runner/benchmark-runner
+Untagged: quay.io/benchmark-runner/benchmark-runner:latest
+# podman run --rm -it quay.io/benchmark-runner/benchmark-runner:latest /bin/bash
+Trying to pull quay.io/benchmark-runner/benchmark-runner:latest...
 Getting image source signatures
 ...
 [root@ede12c01460d /]# pip show benchmark-runner

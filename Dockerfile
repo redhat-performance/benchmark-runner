@@ -66,5 +66,5 @@ COPY benchmark_runner/main/main.py /benchmark_runner/main/main.py
 CMD [ "python3.12", "/benchmark_runner/main/main.py"]
 
 # oc: https://www.ibm.com/docs/en/fci/6.5.1?topic=steps-setting-up-installation-server
-# sudo podman build -t quay.io/ebattat/benchmark-runner:latest . --no-cache
-# sudo podman run --rm -it -v /root/.kube/:/root/.kube/ -v /etc/hosts:/etc/hosts --privileged quay.io/ebattat/benchmark-runner:latest /bin/bash
+# sudo podman build -t quay.io/benchmark-runner/benchmark-runner:latest . --no-cache
+# sudo podman run --rm -it -v /root/.kube/:/root/.kube/ -v /etc/hosts:/etc/hosts --privileged quay.io/benchmark-runner/benchmark-runner:latest /bin/bash
