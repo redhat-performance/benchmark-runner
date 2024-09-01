@@ -320,7 +320,7 @@ jobs:
 
   e2e:
     name: e2e
-    needs: [unittest, integration_test, pypi_upload, pypi_validate, private_quay_upload, public_quay_upload, bump_version]
+    needs: [unittest, integration_test, pypi_upload, pypi_validate, private_quay_upload, bump_version]
     runs-on: ubuntu-latest
     strategy:
        # run one job every time
@@ -402,7 +402,7 @@ jobs:
   update_grafana_dashboard:
     # update grafana dashboard with latest product versions/ grafonnet code
     name: update_grafana_dashboard
-    needs: [ unittest, integration_test, pypi_upload, pypi_validate, private_quay_upload, public_quay_upload, bump_version, e2e ]
+    needs: [ unittest, integration_test, pypi_upload, pypi_validate, private_quay_upload, bump_version, e2e ]
     runs-on: ubuntu-latest
     strategy:
       matrix:
