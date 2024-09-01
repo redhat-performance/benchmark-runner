@@ -315,9 +315,9 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: ⌛ Build and Upload 🐋 to quay.io
         run: |
-          sudo docker build --build-arg VERSION=latest -t  ${{ secrets.QUAY_BENCHMARK_RUNNER_REPOSITORY }} .
+          sudo docker build --build-arg VERSION=latest -t quay.io/${{ secrets.PACKAGE_NAME }}/${{ secrets.PACKAGE_NAME }}:latest .
           sudo docker login quay.io -u ${{ secrets.QUAY_ROBOT_BENCHMARK_RUNNER_USER }} -p ${{ secrets.QUAY_ROBOT_BENCHMARK_RUNNER_PASSWORD }}
-          sudo docker push ${{ secrets.QUAY_BENCHMARK_RUNNER_REPOSITORY }}
+          sudo docker push quay.io/${{ secrets.PACKAGE_NAME }}/${{ secrets.PACKAGE_NAME }}:latest
           echo '⌛ Wait 30 sec till image will be updated in quay.io'
           sleep 30
 
