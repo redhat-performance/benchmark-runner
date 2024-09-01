@@ -29,12 +29,12 @@ pipeline {
             }
         }
 
-        stage('CI Pod Deployment & Report') {
+        stage('Deployment POD & Report') {
             steps {
                 script {
-                       withCredentials([string(credentialsId: 'perfci_ci_pod_deployment', variable: 'CI_POD_DEPLOYMENT')]) {
+                       withCredentials([string(credentialsId: 'perfci_deployment_pod', variable: 'DEPLOYMENT_POD')]) {
                     // Generates CNV workloads summary report in a JupyterLab pod deployment
-                    sh "${CI_POD_DEPLOYMENT}"
+                    sh "${DEPLOYMENT_POD}"
                     }
                 }
             }
@@ -43,9 +43,9 @@ pipeline {
         stage('Backup to Google Drive') {
             steps {
                 script {
-                       withCredentials([string(credentialsId: 'perfci_ci_backup', variable: 'CI_BACKUP')]) {
-                    // Uploads CNV workloads summary report and Elastic/Grafana/PerfCi into S3
-                    sh "${CI_BACKUP}"
+                       withCredentials([string(credentialsId: 'perfci_backup', variable: 'BACKUP')]) {
+                    // Uploads CNV workloads summary report and Elastic/Grafana/PerfCi into Google Drive
+                    sh "${BACKUP}"
                     }
                 }
             }
