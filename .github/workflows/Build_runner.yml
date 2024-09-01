@@ -83,8 +83,8 @@ jobs:
             fi
         done
 
-  quay_upload:
-    name: quay_upload
+  private_quay_upload:
+    name: private_quay_upload
     needs: [ pypi_upload, pypi_validate]
     runs-on: ubuntu-latest
     steps:
@@ -99,10 +99,25 @@ jobs:
           version=$(python3 setup.py --version)
           sudo docker build --build-arg VERSION=$version -t quay.io/${{ secrets.QUAY_REPOSITORY  }}/${{ secrets.PACKAGE_NAME }}:v$version .
           sudo docker build --build-arg VERSION=latest -t quay.io/${{ secrets.QUAY_REPOSITORY  }}/${{ secrets.PACKAGE_NAME }}:latest .
-          sudo docker build --build-arg VERSION=latest -t  ${{ secrets.QUAY_BENCHMARK_RUNNER_REPOSITORY }} .
           sudo docker login quay.io -u ${{ secrets.QUAY_ROBOT_USER }} -p ${{ secrets.QUAY_ROBOT_PASSWORD }}
           sudo docker push quay.io/${{ secrets.QUAY_REPOSITORY  }}/${{ secrets.PACKAGE_NAME }}:v$version
           sudo docker push quay.io/${{ secrets.QUAY_REPOSITORY  }}/${{ secrets.PACKAGE_NAME }}:latest
+          echo '⌛ Wait 30 sec till image will be updated in quay.io'
+          sleep 30
+
+  public_quay_upload:
+    name: public_quay_upload
+    needs: [ pypi_upload, pypi_validate ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+      - name: ⌛ Build and Upload 🐋 to quay.io
+        run: |
+          sudo docker build --build-arg VERSION=latest -t  ${{ secrets.QUAY_BENCHMARK_RUNNER_REPOSITORY }} .
           sudo docker login quay.io -u ${{ secrets.QUAY_ROBOT_BENCHMARK_RUNNER_USER }} -p ${{ secrets.QUAY_ROBOT_BENCHMARK_RUNNER_PASSWORD }}
           sudo docker push ${{ secrets.QUAY_BENCHMARK_RUNNER_REPOSITORY }}
           echo '⌛ Wait 30 sec till image will be updated in quay.io'
@@ -110,7 +125,7 @@ jobs:
 
   bump_version:
     name: bump_version
-    needs: [pypi_upload, pypi_validate, quay_upload]
+    needs: [pypi_upload, pypi_validate, private_quay_upload, public_quay_upload]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
