@@ -6,15 +6,13 @@ ARG VERSION
 # Update and use not only best candidate packages (avoiding failures)
 RUN dnf update -y --nobest
 
-# install make
-RUN dnf group install -y "Development Tools"
-
-# install podman and jq
-RUN dnf install -y podman jq
+# Install development tools and necessary dependencies
+RUN dnf group install -y "Development Tools" \
+    && dnf install -y podman jq
 
 # Prerequisite for Python installation
 ARG python_full_version=3.12.3
-RUN dnf install openssl-devel bzip2-devel wget libffi-devel -y
+RUN dnf install -y openssl-devel bzip2-devel wget libffi-devel
 
 # Install Python
 RUN wget https://www.python.org/ftp/python/${python_full_version}/Python-${python_full_version}.tgz \
@@ -44,14 +42,8 @@ RUN curl -L "https://github.com/kubevirt/kubevirt/releases/download/v${virtctl_v
 # Activate root alias
 RUN source ~/.bashrc
 
-# Create folder for config file (kubeconfig)
-RUN mkdir -p ~/.kube
-
-# Create folder for provision private key file (ssh)
-RUN mkdir -p ~/.ssh/
-
-# Create folder for run artifacts
-RUN mkdir -p /tmp/run_artifacts
+# Create necessary directories with the correct permissions
+RUN mkdir -p ~/.kube ~/.ssh /tmp/run_artifacts
 
 # download benchmark-operator to /tmp default path
 RUN git clone -b v1.0.3 https://github.com/cloud-bulldozer/benchmark-operator /tmp/benchmark-operator
@@ -59,6 +51,9 @@ RUN git clone -b v1.0.3 https://github.com/cloud-bulldozer/benchmark-operator /t
 # download clusterbuster to /tmp default path && install cluster-buster dependency
 RUN git clone -b v1.2.2-kata-ci https://github.com/RobertKrawitz/OpenShift4-tools /tmp/OpenShift4-tools \
     && dnf install -y hostname bc procps-ng
+
+# Cleanup to reduce image size
+RUN dnf clean all && rm -rf /var/cache/dnf
 
 # Add main
 COPY benchmark_runner/main/main.py /benchmark_runner/main/main.py
