@@ -47,7 +47,7 @@ setup(
         'azure==4.0.0',
         'boto3==1.33.13',  # s3
         'botocore==1.33.13',  # s3
-        'cryptography==42.0.4',  # for paramiko
+        'cryptography==43.0.1',  # for paramiko
         'elasticsearch==7.16.1',
         'elasticsearch_dsl==7.4.0',  # for deep search
         'google-auth==2.30.0',  # for Google Drive
