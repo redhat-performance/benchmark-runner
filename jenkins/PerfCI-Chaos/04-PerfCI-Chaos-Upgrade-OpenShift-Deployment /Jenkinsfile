@@ -3,9 +3,30 @@ pipeline {
         label 'PerfCi'
     }
     environment {
+        UPGRADE_OCP_VERSION = '4.15.28'
+        LSO_VERSION = '4.15'
+        ODF_VERSION = '4.15'
+        CNV_VERSION = '4.15'
         CONTACT_EMAIL1 = credentials('perfci_contact_email1')
-        PROVISION_USER = credentials('perfci_provision_user')
+        PROVISION_PRIVATE_KEY_FILE = credentials('perfci_provision_private_key_file')
         PROVISION_IP = credentials('perfci_provision_ip')
+        PROVISION_USER = credentials('perfci_provision_user')
+        CLUSTER_TYPE = credentials('perfci_cluster_type')
+        EXPECTED_NODES = credentials('perfci_expected_nodes')
+        OCP_CLIENT_VERSION = credentials('perfci_ocp_client_version')
+        QUAY_BENCHMARK_RUNNER_REPOSITORY = credentials('perfci_quay_repository')
+        WORKSPACE = '/home/jenkins'
+        PROVISION_PORT = 22
+        KUBEADMIN_PASSWORD_PATH = '/home/jenkins/.kube/kubeadmin-password'
+        KUBECONFIG_PATH = '/root/.kube/config'
+        PROVISION_INSTALLER_PATH = '/root/jetlag/./run_jetlag.sh'
+        PROVISION_INSTALLER_CMD = 'pushd /root/jetlag;/root/jetlag/./run_jetlag.sh 1>/dev/null 2>&1;popd'
+        PROVISION_INSTALLER_LOG = 'tail -100 /root/jetlag/jetlag.log'
+        PRIVATE_KEY_PATH = '/home/jenkins/.ssh/provision_private_key'
+        CONFIG_PATH = '/home/jenkins/.ssh/config'
+        CONTAINER_PRIVATE_KEY_PATH = '/root/.ssh/provision_private_key'
+        CONTAINER_CONFIG_PATH = '/root/.ssh/config'
+        ANSIBLE_TMP_PATH = '/root/.ansible/tmp/'
         SCALE_NODES = credentials('perfci_scale_nodes')
         PIN_NODE_BENCHMARK_OPERATOR = credentials('perfci_pin_node_benchmark_operator')
         PIN_NODE1 = credentials('perfci_pin_node1')
@@ -26,41 +47,34 @@ pipeline {
         WINDOWS_SERVER_2019_URL = credentials('perfci_windows_server_2019_url')
         WINDOWS_SERVER_2022_URL = credentials('perfci_windows_server_2022_url')
         LSO_NODE = credentials('perfci_lso_node')
-        QUAY_BENCHMARK_RUNNER_REPOSITORY = credentials('perfci_quay_repository')
         KUBEADMIN_PASSWORD = readFile('/home/jenkins/.kube/kubeadmin-password').trim()
-        KUBEADMIN_PASSWORD_PATH = '/home/jenkins/.kube/kubeadmin-password'
-        KUBECONFIG_PATH = '/root/.kube/config'
-        PRIVATE_KEY_PATH = '/home/jenkins/.ssh/provision_private_key'
-        CONFIG_PATH = '/home/jenkins/.ssh/config'
-        WORKSPACE='/home/jenkins'
-        CONTAINER_PRIVATE_KEY_PATH = '/root/.ssh/provision_private_key'
-        CONTAINER_CONFIG_PATH = '/root/.ssh/config'
         CONTAINER_KUBECONFIG_PATH = '/home/jenkins/.kube/config'
         WORKER_DISK_PREFIX = 'wwn-0x'
-        ENABLE_PROMETHEUS_SNAPSHOT = 'True'
         SAVE_ARTIFACTS_LOCAL = 'False'
+        ENABLE_PROMETHEUS_SNAPSHOT = 'True'
+        DELETE_ALL = 'False' // Not delete the running Windows11 VMs
+        VERIFICATION_ONLY = 'True'
         RUN_TYPE = 'perf_ci'
-        PROVISION_PORT = 22
         NUM_ODF_DISK = 6
-        VDBENCH_SCALE = 2
-        BOOTSTORM_SCALE = 80
-        WINDOWS_SCALE = 37
-        THREADS_LIMIT= 20
-        PROVISION_TIMEOUT = 3600
-        TIMEOUT = 8000
+        WINDOWS_SCALE = 50
+        THREADS_LIMIT = 20
+        PROVISION_TIMEOUT = 7200
+        TIMEOUT = 7200
     }
+
     stages {
         stage('Cleanup') {
             steps {
                 script {
-                    // Clean the Jenkins workspace
+                    try {
+                        // Clean the Jenkins workspace
                         echo "Cleaning Jenkins workspace"
                         deleteDir()
-                    sh '''
-                        if [[ "$(sudo podman images -q ${QUAY_BENCHMARK_RUNNER_REPOSITORY} 2> /dev/null)" != "" ]]; then
-                            sudo podman rmi -f $(sudo podman images -q ${QUAY_BENCHMARK_RUNNER_REPOSITORY} 2> /dev/null)
-                        fi
-                    '''
+
+                    } catch (Exception e) {
+                        echo "Error: ${e.getMessage()}"
+                        // Additional error handling or actions can be added here
+                    }
                 }
             }
         }
@@ -91,16 +105,71 @@ END
             }
         }
 
-        stage('WORKLOADS Deployment') {
+
+        stage('OpenShift Upgrade AND Verifications') {
+            parallel {
+                stage('Upgrade Steps') {
+                    steps {
+                        script {
+                            def upgrade_steps = ['run_bare_metal_ocp_upgrade', 'verify_bare_metal_upgrade_complete']
+
+                            for (upgrade_step in upgrade_steps) {
+                                echo "Run OpenShift Deployment for ${upgrade_step}"
+
+                                // Create a stage for each resource
+                                stage("${upgrade_step} Deployment") {
+                                    echo "Running deployment for ${upgrade_step}"
+                                    // deployment code
+                                    script {
+                                        withCredentials([string(credentialsId: 'perfci_provision_ip', variable: 'PROVISION_IP')]) {
+                                            withCredentials([string(credentialsId: 'perfci_provision_user', variable: 'PROVISION_USER')]) {
+                                                withCredentials([file(credentialsId: 'perfci_provision_private_key_file', variable: 'PROVISION_PRIVATE_KEY_FILE')]) {
+                                                    sh """
+                                                        sudo podman run --rm -e UPGRADE_OCP_VERSION="${UPGRADE_OCP_VERSION}" \
+                                                            -e UPGRADE_STEP="${upgrade_step}" \
+                                                            -e LSO_VERSION="${LSO_VERSION}" \
+                                                            -e ODF_VERSION="${ODF_VERSION}" \
+                                                            -e CNV_VERSION="${CNV_VERSION}" \
+                                                            -e EXPECTED_NODES='${EXPECTED_NODES}' \
+                                                            -e PROVISION_IP="${PROVISION_IP}" \
+                                                            -e PROVISION_USER="${PROVISION_USER}" \
+                                                            -e PROVISION_PORT="${PROVISION_PORT}" \
+                                                            -e KUBEADMIN_PASSWORD_PATH="${KUBEADMIN_PASSWORD_PATH}" \
+                                                            -e KUBECONFIG_PATH="${KUBECONFIG_PATH}" \
+                                                            -e PROVISION_INSTALLER_PATH="${PROVISION_INSTALLER_PATH}" \
+                                                            -e PROVISION_INSTALLER_CMD="${PROVISION_INSTALLER_CMD}" \
+                                                            -e PROVISION_INSTALLER_LOG="${PROVISION_INSTALLER_LOG}" \
+                                                            -e CONTAINER_PRIVATE_KEY_PATH="${CONTAINER_PRIVATE_KEY_PATH}" \
+                                                            -e PROVISION_TIMEOUT="${PROVISION_TIMEOUT}" \
+                                                            -e log_level="INFO" -v "${PRIVATE_KEY_PATH}":"${CONTAINER_PRIVATE_KEY_PATH}" \
+                                                            -v "${KUBECONFIG_PATH}":"${KUBECONFIG_PATH}" \
+                                                            --privileged "${QUAY_BENCHMARK_RUNNER_REPOSITORY}"
+
+                                                    """
+                                                   // Set the flag to indicate that upgrade steps are completed
+                                                   currentBuild.description = "UpgradeStageCompleted"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+            // Parallel stage
+            stage('WORKLOADS Verifications') {
             steps {
                 script {
-                    def workloads =  ['uperf_pod', 'uperf_vm', 'hammerdb_pod_mariadb', 'hammerdb_vm_mariadb','hammerdb_pod_mariadb_lso', 'hammerdb_vm_mariadb_lso', 'hammerdb_pod_postgres', 'hammerdb_vm_postgres', 'hammerdb_pod_postgres_lso', 'hammerdb_vm_postgres_lso', 'hammerdb_pod_mssql', 'hammerdb_vm_mssql', 'hammerdb_pod_mssql_lso', 'hammerdb_vm_mssql_lso', 'vdbench_pod', 'vdbench_vm', 'vdbench_pod_scale', 'vdbench_vm_scale', 'bootstorm_vm_scale', 'windows_vm_scale_windows10', 'windows_vm_scale_windows11', 'windows_vm_scale_windows_server_2019', 'windows_vm_scale_windows_server_2022' ]
+                    def workloads =  [ 'windows_vm_scale_windows11' ]
                     def build_version = sh(script: 'curl -s "https://pypi.org/pypi/benchmark-runner/json" | jq -r .info.version', returnStdout: true).trim()
                     def WINDOWS_URL = ''
                     def SCALE = ''
                     def workload_name = ''
                     def retryCount = 3 // Number of retries per workload
-
+                    // while
+                    while (currentBuild.description != "UpgradeStageCompleted") {
                     for (workload in workloads) {
                         boolean success = false
                         for (int i = 0; i < retryCount && !success; i++) {
@@ -112,15 +181,6 @@ END
                                 def WORKLOAD = parts[0] + "_" + parts[1]
                                 def RUN = parts.size() >= 3 ? parts[2] : ""
                                 if (RUN == "scale") {
-                                    if (workload == "vdbench_pod_scale" || workload == "vdbench_vm_scale") {
-                                        SCALE = VDBENCH_SCALE
-                                    }
-                                    // bootstorm_vm_scale: no need redis for synchronization but need SCALE and THREADS_LIMIT
-                                    if (workload == "bootstorm_vm_scale") {
-                                        // Warm-up: Pull the Fedora image from quay.io for each node
-                                        sh """ sudo podman run --rm -t -e WORKLOAD='${WORKLOAD}' -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' -e RUN_TYPE='${RUN_TYPE}' -e SCALE='1' -e SCALE_NODES='${SCALE_NODES}' -e TIMEOUT='${TIMEOUT}' -e log_level='INFO' -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}' """
-                                        SCALE = BOOTSTORM_SCALE
-                                    }
 
                                     if (WORKLOAD == "windows_vm") {
                                         switch (workload) {
@@ -139,8 +199,6 @@ END
                                             default:
                                                 error "Unknown Windows scale workload ${workload}"
                                         }
-
-                                        sh """ sudo podman run --rm -t -e WORKLOAD='${WORKLOAD}' -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' -e RUN_TYPE='${RUN_TYPE}' -e SCALE='1' -e SCALE_NODES='${SCALE_NODES}' -e WINDOWS_URL='${WINDOWS_URL}' -e TIMEOUT='${TIMEOUT}' -e log_level='INFO' -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}' """
                                         SCALE = WINDOWS_SCALE
                                     }
                                   workload = WORKLOAD
@@ -150,6 +208,7 @@ END
 
                                 // Create a stage for each workload
                                 stage(workload_name) {
+                                    // boolean value w/o ''
                                     sh """
                                         sudo podman run --rm -t \
                                         -e WORKLOAD='${workload}' \
@@ -168,8 +227,8 @@ END
                                         -e RUN_ARTIFACTS_URL='${RUN_ARTIFACTS_URL}' \
                                         -e BUILD_VERSION='${build_version}' \
                                         -e RUN_TYPE='${RUN_TYPE}' \
-                                        -e SAVE_ARTIFACTS_LOCAL='False' \
-                                        -e ENABLE_PROMETHEUS_SNAPSHOT='True' \
+                                        -e SAVE_ARTIFACTS_LOCAL=${SAVE_ARTIFACTS_LOCAL} \
+                                        -e ENABLE_PROMETHEUS_SNAPSHOT=${ENABLE_PROMETHEUS_SNAPSHOT} \
                                         -e WORKER_DISK_IDS='${WORKER_DISK_IDS}' \
                                         -e WORKER_DISK_PREFIX='${WORKER_DISK_PREFIX}' \
                                         -e SCALE='${SCALE}' \
@@ -177,6 +236,8 @@ END
                                         -e REDIS='${REDIS}' \
                                         -e THREADS_LIMIT='${THREADS_LIMIT}' \
                                         -e WINDOWS_URL='${WINDOWS_URL}'  \
+                                        -e DELETE_ALL=${DELETE_ALL} \
+                                        -e VERIFICATION_ONLY=${VERIFICATION_ONLY} \
                                         -e LSO_NODE='${LSO_NODE}'  \
                                         -e TIMEOUT='${TIMEOUT}' \
                                         -e log_level='INFO' \
@@ -198,22 +259,41 @@ END
                         if (!success) {
                             echo "Workload ${workload} failed after ${retryCount} retries."
                         }
-                    }
+                        // sleep 10 sec between each VMs validation interation
+                        sleep(time: 10, unit: 'SECONDS')
+                    } // while
+                 }
                 }
             }
         } // WORKLOADS Deployment
-
+    }
+        }
     } // stages
 
     post {
         always {
             script {
-                sh 'sudo podman ps -a --filter "name=benchmark-runner" -q | xargs -r podman rm'
+                sh '''
+                    # Check if the image exists
+                    if [[ "$(sudo podman images -q ${QUAY_BENCHMARK_RUNNER_REPOSITORY} 2> /dev/null)" != "" ]]; then
+
+                        # Get containers using the image
+                        containers=$(sudo podman ps -a --filter ancestor=${QUAY_BENCHMARK_RUNNER_REPOSITORY} -q)
+
+                        if [[ "$containers" != "" ]]; then
+                            echo "Stopping and removing containers using the image..."
+                            sudo podman stop $containers
+                            sudo podman rm -f $containers
+                        fi
+
+                        # Now remove the image
+                        sudo podman rmi -f $(sudo podman images -q ${QUAY_BENCHMARK_RUNNER_REPOSITORY} 2> /dev/null)
+                    fi
+                '''
             }
         }
         failure {
             script {
-                sh """ sudo podman run --rm -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' -e ELASTICSEARCH='${ELASTICSEARCH}' -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' -e CI_STATUS=''failed'' -e RUN_TYPE='${RUN_TYPE}' -e log_level='INFO' -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}' """
                 msg = "Build error for ${env.JOB_NAME} ${env.BUILD_NUMBER} (${env.BUILD_URL})"
                 emailext body: """\
                     Jenkins job: ${env.BUILD_URL}\nSee the console output for more details:  ${env.BUILD_URL}consoleFull\n\n
@@ -221,10 +301,8 @@ END
             }
         }
         success {
-            script {
-                sh """ sudo podman run --rm -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' -e ELASTICSEARCH='${ELASTICSEARCH}' -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' -e CI_STATUS='pass' -e RUN_TYPE='${RUN_TYPE}' -e log_level='INFO' -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}' """
-                build job: 'PerfCI-Grafana-Deployment', wait: false
-            }
+            echo 'Triggering 05-PerfCI-Chaos-Verify-Windows-VMs-Deployment pipeline'
+            build job: '05-PerfCI-Chaos-Verify-Windows-VMs-Deployment', wait: false
         }
     }
 }

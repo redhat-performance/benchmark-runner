@@ -30,7 +30,19 @@ pipeline {
 
                         // Remove benchmark-runner images if they exist
                         sh '''
+                            # Check if the image exists
                             if [[ "$(sudo podman images -q ${QUAY_BENCHMARK_RUNNER_REPOSITORY} 2> /dev/null)" != "" ]]; then
+
+                                # Get containers using the image
+                                containers=$(sudo podman ps -a --filter ancestor=${QUAY_BENCHMARK_RUNNER_REPOSITORY} -q)
+
+                                if [[ "$containers" != "" ]]; then
+                                    echo "Stopping and removing containers using the image..."
+                                    sudo podman stop $containers
+                                    sudo podman rm -f $containers
+                                fi
+
+                                # Now remove the image
                                 sudo podman rmi -f $(sudo podman images -q ${QUAY_BENCHMARK_RUNNER_REPOSITORY} 2> /dev/null)
                             fi
                         '''
@@ -180,7 +192,19 @@ pipeline {
         always {
             script {
                 sh '''
+                    # Check if the image exists
                     if [[ "$(sudo podman images -q ${QUAY_BENCHMARK_RUNNER_REPOSITORY} 2> /dev/null)" != "" ]]; then
+
+                        # Get containers using the image
+                        containers=$(sudo podman ps -a --filter ancestor=${QUAY_BENCHMARK_RUNNER_REPOSITORY} -q)
+
+                        if [[ "$containers" != "" ]]; then
+                            echo "Stopping and removing containers using the image..."
+                            sudo podman stop $containers
+                            sudo podman rm -f $containers
+                        fi
+
+                        # Now remove the image
                         sudo podman rmi -f $(sudo podman images -q ${QUAY_BENCHMARK_RUNNER_REPOSITORY} 2> /dev/null)
                     fi
                 '''
@@ -195,8 +219,8 @@ pipeline {
             }
         }
         success {
-            echo 'Triggering PerfCI-Backup-Report-Deployment pipeline'
-            build job: 'PerfCI-Backup-Report-Deployment', wait: false
+            echo '05-Triggering PerfCI-Backup-Report-Deployment pipeline'
+            build job: '05-PerfCI-Backup-Report-Deployment', wait: false
         }
     }
 }
