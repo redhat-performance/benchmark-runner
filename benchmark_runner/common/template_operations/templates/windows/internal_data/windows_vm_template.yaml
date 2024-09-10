@@ -121,7 +121,7 @@ spec:
           requests:
             storage: {{ storage }}
         volumeMode: Block
-        storageClassName: ocs-storagecluster-ceph-rbd
+        storageClassName: ocs-storagecluster-ceph-rbd-virtualization
       source:
         pvc:
           namespace: {{ namespace }}
