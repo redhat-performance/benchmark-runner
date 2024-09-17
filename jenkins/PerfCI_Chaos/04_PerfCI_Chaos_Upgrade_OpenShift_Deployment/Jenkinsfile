@@ -3,7 +3,7 @@ pipeline {
         label 'PerfCi'
     }
     environment {
-        UPGRADE_OCP_VERSION = '4.16.10'
+        UPGRADE_OCP_VERSION = '4.16.6'
         LSO_VERSION = '4.16'
         ODF_VERSION = '4.16'
         CNV_VERSION = '4.16'
