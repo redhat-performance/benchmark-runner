@@ -43,16 +43,29 @@ pipeline {
 
                         // Delete benchmark-runner images
                         sh '''
-                        if [[ "$(sudo podman images -q ${QUAY_BENCHMARK_RUNNER_REPOSITORY} 2> /dev/null)" != "" ]]; then
-                            sudo podman rmi -f $(sudo podman images -q ${QUAY_BENCHMARK_RUNNER_REPOSITORY} 2> /dev/null)
-                        fi
+                            # Check if the image exists
+                            if [[ "$(sudo podman images -q ${QUAY_BENCHMARK_RUNNER_REPOSITORY} 2> /dev/null)" != "" ]]; then
+
+                                # Get containers using the image
+                                containers=$(sudo podman ps -a --filter ancestor=${QUAY_BENCHMARK_RUNNER_REPOSITORY} -q)
+
+                                if [[ "$containers" != "" ]]; then
+                                    echo "Stopping and removing containers using the image..."
+                                    sudo podman stop $containers
+                                    sudo podman rm -f $containers
+                                fi
+
+                                # Now remove the image
+                                sudo podman rmi -f $(sudo podman images -q ${QUAY_BENCHMARK_RUNNER_REPOSITORY} 2> /dev/null)
+                            fi
                         '''
                         try {
                               // Remove assisted-installer containers - for apply new version in jetlag
                               sh '''
                                     sudo podman ps | awk '{print $1}' | xargs -I % sudo podman stop % || true;
                                     sudo podman ps -a | awk '{print $1}' | xargs -I % sudo podman rm % || true;
-                                    sudo podman pod ps | awk '{print $1}' | xargs -I % sudo podman pod rm % 2>&1 || true
+                                    sudo podman pod ps | awk '{print $1}' | xargs -I % sudo podman pod rm -f % 2>&1 || true
+
                                  '''
                               // Delete all images and volumes - avoid 'no space left on device' issue
                               sh '''
@@ -150,7 +163,19 @@ END
         always {
             script {
                 sh '''
+                    # Check if the image exists
                     if [[ "$(sudo podman images -q ${QUAY_BENCHMARK_RUNNER_REPOSITORY} 2> /dev/null)" != "" ]]; then
+
+                        # Get containers using the image
+                        containers=$(sudo podman ps -a --filter ancestor=${QUAY_BENCHMARK_RUNNER_REPOSITORY} -q)
+
+                        if [[ "$containers" != "" ]]; then
+                            echo "Stopping and removing containers using the image..."
+                            sudo podman stop $containers
+                            sudo podman rm -f $containers
+                        fi
+
+                        # Now remove the image
                         sudo podman rmi -f $(sudo podman images -q ${QUAY_BENCHMARK_RUNNER_REPOSITORY} 2> /dev/null)
                     fi
                 '''
@@ -165,8 +190,8 @@ END
             }
         }
         success {
-            echo 'Triggering PerfCI-Operators-Deployment pipeline'
-            build job: 'PerfCI-Operators-Deployment', wait: false
+            echo 'Triggering 02-PerfCI-Operators-Deployment pipeline'
+            build job: '02-PerfCI-Operators-Deployment', wait: false
         }
     }
 }

@@ -237,14 +237,17 @@ class BareMetalOperations:
         @param oc:
         :return: True if installation success and raise exception if installation failed
         """
-        logger.info(f'Starting OCP upgrade, Start time: {datetime.now().strftime(datetime_format)}')
-        logger.info(f'Stop OCP healthcheck')
-        oc.healthcheck(action='stop')
-        oc.upgrade_ocp(upgrade_ocp_version=self._upgrade_ocp_version)
-        self.verify_upgrade_complete(oc=oc)
-        logger.info(f'Resume OCP healthcheck')
-        oc.healthcheck(action='resume')
-        logger.info(f'Ending OCP upgrade, End time: {datetime.now().strftime(datetime_format)}')
+        if f'Cluster version is {self._upgrade_ocp_version}' == oc.get_cluster_status():
+            logger.info(f'Cluster is already upgraded to: {self._upgrade_ocp_version}')
+        else:
+            logger.info(f'Starting OCP upgrade, Start time: {datetime.now().strftime(datetime_format)}')
+            logger.info(f'Stop OCP healthcheck')
+            oc.healthcheck(action='stop')
+            oc.upgrade_ocp(upgrade_ocp_version=self._upgrade_ocp_version)
+            self.verify_upgrade_complete(oc=oc)
+            logger.info(f'Resume OCP healthcheck')
+            oc.healthcheck(action='resume')
+            logger.info(f'Ending OCP upgrade, End time: {datetime.now().strftime(datetime_format)}')
 
     @logger_time_stamp
     def verify_install_complete(self):

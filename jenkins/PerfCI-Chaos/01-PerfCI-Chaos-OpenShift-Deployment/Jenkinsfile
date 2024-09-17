@@ -1,0 +1,200 @@
+pipeline {
+    agent {
+        label 'PerfCi'
+    }
+    environment {
+        INSTALL_OCP_VERSION = '4.14.35'
+        CONTACT_EMAIL1 = credentials('perfci_contact_email1')
+        PROVISION_PRIVATE_KEY_FILE = credentials('perfci_provision_private_key_file')
+        PROVISION_IP = credentials('perfci_provision_ip')
+        PROVISION_USER = credentials('perfci_provision_user')
+        CLUSTER_TYPE = credentials('perfci_cluster_type')
+        EXPECTED_NODES = credentials('perfci_expected_nodes')
+        OCP_CLIENT_VERSION = credentials('perfci_ocp_client_version')
+        QUAY_BENCHMARK_RUNNER_REPOSITORY = credentials('perfci_quay_repository')
+        WORKSPACE = '/home/jenkins'
+        PROVISION_PORT = 22
+        KUBEADMIN_PASSWORD_PATH = '/root/.kube/kubeadmin-password'
+        KUBECONFIG_PATH = '/root/.kube/config'
+        PROVISION_INSTALLER_PATH = '/root/jetlag/./run_jetlag.sh'
+        PROVISION_INSTALLER_CMD = 'pushd /root/jetlag;/root/jetlag/./run_jetlag.sh 1>/dev/null 2>&1;popd'
+        PROVISION_INSTALLER_LOG = 'tail -100 /root/jetlag/jetlag.log'
+        PRIVATE_KEY_PATH = '/home/jenkins/.ssh/provision_private_key'
+        CONFIG_PATH = '/home/jenkins/.ssh/config'
+        CONTAINER_PRIVATE_KEY_PATH = '/root/.ssh/provision_private_key'
+        CONTAINER_CONFIG_PATH = '/root/.ssh/config'
+        ANSIBLE_TMP_PATH = '/root/.ansible/tmp/'
+        PROVISION_TIMEOUT = 7200
+    }
+    stages {
+        stage('Cleanup') {
+            steps {
+                script {
+                    try {
+                        // Clean the Jenkins workspace
+                        echo "Cleaning Jenkins workspace"
+                        deleteDir()
+
+                        // Delete assisted installer previous deployments
+                        sh "curl http://${PROVISION_IP}:8090/api/assisted-install/v2/clusters | jq '.[].id' -r | xargs -I % curl -X DELETE http://${PROVISION_IP}:8090/api/assisted-install/v2/clusters/%"
+
+                        // remove ansible tmp files
+                        sh "sudo rm -rf ${ANSIBLE_TMP_PATH}"
+
+                        // Delete benchmark-runner images
+                        sh '''
+                            # Check if the image exists
+                            if [[ "$(sudo podman images -q ${QUAY_BENCHMARK_RUNNER_REPOSITORY} 2> /dev/null)" != "" ]]; then
+
+                                # Get containers using the image
+                                containers=$(sudo podman ps -a --filter ancestor=${QUAY_BENCHMARK_RUNNER_REPOSITORY} -q)
+
+                                if [[ "$containers" != "" ]]; then
+                                    echo "Stopping and removing containers using the image..."
+                                    sudo podman stop $containers
+                                    sudo podman rm -f $containers
+                                fi
+
+                                # Now remove the image
+                                sudo podman rmi -f $(sudo podman images -q ${QUAY_BENCHMARK_RUNNER_REPOSITORY} 2> /dev/null)
+                            fi
+                        '''
+                        try {
+                              // Remove assisted-installer containers - for apply new version in jetlag
+                              sh '''
+                                    sudo podman ps | awk '{print $1}' | xargs -I % sudo podman stop % || true;
+                                    sudo podman ps -a | awk '{print $1}' | xargs -I % sudo podman rm % || true;
+                                    sudo podman pod ps | awk '{print $1}' | xargs -I % sudo podman pod rm -f % 2>&1 || true
+
+                                 '''
+                              // Delete all images and volumes - avoid 'no space left on device' issue
+                              sh '''
+                                    sudo podman rmi -f -a
+                                    sudo podman volume prune --force
+                                 '''
+                              // Assisted installer cleanup - avoid 'no space left on device' issue
+                              sh '''
+                                    sudo rm -rf /opt/assisted-service
+                                    sudo rm -rf /opt/http_store
+                                    sudo rm -rf /opt/ocp-version
+                                 '''
+                        } catch (Exception e) {
+                            echo "An error occurred, but execution will continue."
+                        }
+                    } catch (Exception e) {
+                        echo "Error: ${e.getMessage()}"
+                        // Additional error handling or actions can be added here
+                    }
+                }
+            }
+        }
+
+        stage('⚙️ SET SSH key') {
+            steps {
+                script {
+                    sh 'mkdir -p $WORKSPACE/.ssh/'
+                    sh 'sudo chmod 700 $WORKSPACE/.ssh/'
+                    withCredentials([file(credentialsId: 'perfci_provision_private_key_file', variable: 'PROVISION_PRIVATE_KEY_FILE')]) {
+                        sh "sudo cp ${PROVISION_PRIVATE_KEY_FILE} ${WORKSPACE}/.ssh/provision_private_key"
+                        sh "sudo chown jenkins:jenkins ${WORKSPACE}/.ssh/provision_private_key"
+                    }
+                    sh 'sudo chmod 600 $PRIVATE_KEY_PATH'
+                    sh '''
+                        sudo cat > "$CONFIG_PATH" <<END
+    Host provision
+        HostName ${PROVISION_IP}
+        User ${PROVISION_USER}
+        IdentityFile $PRIVATE_KEY_PATH
+        StrictHostKeyChecking no
+        ServerAliveInterval 30
+        ServerAliveCountMax 5
+END
+                    '''
+                    sh 'sudo chmod 600 $CONFIG_PATH'
+                }
+            }
+        }
+
+        stage('OpenShift Deployment') {
+            steps {
+                script {
+                    def install_steps = ['run_bare_metal_ocp_installer', 'verify_bare_metal_install_complete']
+
+                    retry(3) { // Retry the entire loop 3 times in case of failure
+                        for (install_step in install_steps) {
+                            echo "Run OpenShift Deployment for ${install_step}"
+
+                            // Create a stage for each resource
+                            stage("${install_step} Deployment") {
+                                echo "Running deployment for ${install_step}"
+                                // deployment code
+                                script {
+                                    withCredentials([string(credentialsId: 'perfci_provision_ip', variable: 'PROVISION_IP')]) {
+                                        withCredentials([string(credentialsId: 'perfci_provision_user', variable: 'PROVISION_USER')]) {
+                                            withCredentials([file(credentialsId: 'perfci_provision_private_key_file', variable: 'PROVISION_PRIVATE_KEY_FILE')]) {
+                                                sh """
+                                                    sudo podman run --rm -e INSTALL_OCP_VERSION="${INSTALL_OCP_VERSION}" \
+                                                        -e INSTALL_STEP="${install_step}" \
+                                                        -e EXPECTED_NODES='${EXPECTED_NODES}' \
+                                                        -e PROVISION_IP="${PROVISION_IP}" \
+                                                        -e PROVISION_USER="${PROVISION_USER}" \
+                                                        -e PROVISION_PORT="${PROVISION_PORT}" \
+                                                        -e KUBEADMIN_PASSWORD_PATH="${KUBEADMIN_PASSWORD_PATH}" \
+                                                        -e KUBECONFIG_PATH="${KUBECONFIG_PATH}" \
+                                                        -e PROVISION_INSTALLER_PATH="${PROVISION_INSTALLER_PATH}" \
+                                                        -e PROVISION_INSTALLER_CMD="${PROVISION_INSTALLER_CMD}" \
+                                                        -e PROVISION_INSTALLER_LOG="${PROVISION_INSTALLER_LOG}" \
+                                                        -e CONTAINER_PRIVATE_KEY_PATH="${CONTAINER_PRIVATE_KEY_PATH}" \
+                                                        -e PROVISION_TIMEOUT="${PROVISION_TIMEOUT}" \
+                                                        -e log_level="INFO" -v "${PRIVATE_KEY_PATH}":"${CONTAINER_PRIVATE_KEY_PATH}" \
+                                                        -v "${KUBECONFIG_PATH}":"${KUBECONFIG_PATH}" \
+                                                        --privileged "${QUAY_BENCHMARK_RUNNER_REPOSITORY}"
+                                                """
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    } // stages
+
+    post {
+        always {
+            script {
+                sh '''
+                    # Check if the image exists
+                    if [[ "$(sudo podman images -q ${QUAY_BENCHMARK_RUNNER_REPOSITORY} 2> /dev/null)" != "" ]]; then
+
+                        # Get containers using the image
+                        containers=$(sudo podman ps -a --filter ancestor=${QUAY_BENCHMARK_RUNNER_REPOSITORY} -q)
+
+                        if [[ "$containers" != "" ]]; then
+                            echo "Stopping and removing containers using the image..."
+                            sudo podman stop $containers
+                            sudo podman rm -f $containers
+                        fi
+
+                        # Now remove the image
+                        sudo podman rmi -f $(sudo podman images -q ${QUAY_BENCHMARK_RUNNER_REPOSITORY} 2> /dev/null)
+                    fi
+                '''
+            }
+        }
+        failure {
+            script {
+                msg = "Build error for ${env.JOB_NAME} ${env.BUILD_NUMBER} (${env.BUILD_URL})"
+                emailext body: """\
+                    Jenkins job: ${env.BUILD_URL}\nSee the console output for more details:  ${env.BUILD_URL}consoleFull\n\n
+                """, subject: msg, to: "${CONTACT_EMAIL1}"
+            }
+        }
+        success {
+            echo 'Triggering 02-PerfCI-Chaos-Operators-Deployment'
+            build job: '02-PerfCI-Chaos-Operators-Deployment', wait: false
+        }
+    }
+}

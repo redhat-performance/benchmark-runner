@@ -3,12 +3,15 @@ pipeline {
         label 'PerfCi'
     }
     environment {
+        INSTALL_OCP_RESOURCES = 'True'
+        CNV_NIGHTLY_CHANNEL = 'False' // CNV Stable Operator
+        CNV_VERSION = '4.14'
+        LSO_VERSION = '4.14'
+        ODF_VERSION = '4.14'
         CONTACT_EMAIL1 = credentials('perfci_contact_email1')
         PROVISION_USER = credentials('perfci_provision_user')
         PROVISION_IP = credentials('perfci_provision_ip')
         WORKER_DISK_IDS = credentials('perfci_worker_disk_ids')
-        CNV_VERSION = credentials('perfci_cnv_version')
-        ODF_VERSION = credentials('perfci_odf_version')
         EXPECTED_NODES = credentials('perfci_expected_nodes')
         QUAY_BENCHMARK_RUNNER_REPOSITORY = credentials('perfci_quay_repository')
         KUBEADMIN_PASSWORD = readFile('/home/jenkins/.kube/kubeadmin-password').trim()
@@ -30,11 +33,23 @@ pipeline {
                     // Clean the Jenkins workspace
                         echo "Cleaning Jenkins workspace"
                         deleteDir()
-                    sh '''
-                        if [[ "$(sudo podman images -q ${QUAY_BENCHMARK_RUNNER_REPOSITORY} 2> /dev/null)" != "" ]]; then
-                            sudo podman rmi -f $(sudo podman images -q ${QUAY_BENCHMARK_RUNNER_REPOSITORY} 2> /dev/null)
-                        fi
-                    '''
+                        sh '''
+                            # Check if the image exists
+                            if [[ "$(sudo podman images -q ${QUAY_BENCHMARK_RUNNER_REPOSITORY} 2> /dev/null)" != "" ]]; then
+
+                                # Get containers using the image
+                                containers=$(sudo podman ps -a --filter ancestor=${QUAY_BENCHMARK_RUNNER_REPOSITORY} -q)
+
+                                if [[ "$containers" != "" ]]; then
+                                    echo "Stopping and removing containers using the image..."
+                                    sudo podman stop $containers
+                                    sudo podman rm -f $containers
+                                fi
+
+                                # Now remove the image
+                                sudo podman rmi -f $(sudo podman images -q ${QUAY_BENCHMARK_RUNNER_REPOSITORY} 2> /dev/null)
+                            fi
+                        '''
                 }
             }
         }
@@ -65,26 +80,6 @@ END
             }
         }
 
-        stage('CNV Nightly Registered') {
-            steps {
-                script {
-                    sh "sudo mkdir -p ${WORKSPACE}/perfci/cnv_nightly"
-                    withCredentials([file(credentialsId: 'perfci_cnv_nightly_registered_file', variable: 'CNV_NIGHTLY_REGISTERED_FILE')]) {
-                        sh "yes | sudo cp ${CNV_NIGHTLY_REGISTERED_FILE} ${WORKSPACE}/perfci/cnv_nightly/registered.sh"
-                    }
-                    withCredentials([file(credentialsId: 'perfci_cnv_nightly_catalog_source_file', variable: 'CNV_NIGHTLY_CATALOG_SOURCE_FILE')]) {
-                        sh "yes | sudo cp ${CNV_NIGHTLY_CATALOG_SOURCE_FILE} ${WORKSPACE}/perfci/cnv_nightly/catalog_source.yaml"
-                    }
-                    sh 'sudo chown jenkins:jenkins $WORKSPACE/perfci/cnv_nightly/registered.sh'
-                    sh 'sudo chmod +x $WORKSPACE/perfci/cnv_nightly/registered.sh'
-                    sh 'sudo $WORKSPACE/perfci/cnv_nightly/./registered.sh'
-                    sh 'sudo sed -i "s/{{ cnv_version }}/$CNV_VERSION/g" $WORKSPACE/perfci/cnv_nightly/catalog_source.yaml'
-                    sh 'sudo chown jenkins:jenkins $WORKSPACE/perfci/cnv_nightly/catalog_source.yaml'
-                    sh 'oc apply -f $WORKSPACE/perfci/cnv_nightly/catalog_source.yaml'
-                }
-            }
-        }
-
         stage('Operators Deployment') {
         steps {
             script {
@@ -104,12 +99,15 @@ END
                                     withCredentials([file(credentialsId: 'perfci_provision_private_key_file', variable: 'PROVISION_PRIVATE_KEY_FILE')]) {
                                         withCredentials([string(credentialsId: 'perfci_worker_disk_ids', variable: 'WORKER_DISK_IDS')]) {
                                                 withCredentials([string(credentialsId: 'perfci_expected_nodes', variable: 'EXPECTED_NODES')]) {
+                                                    // boolean value w/o ''
                                                     sh """
                                                         sudo podman run --rm \
-                                                            -e INSTALL_OCP_RESOURCES=True \
+                                                            -e INSTALL_OCP_RESOURCES=${INSTALL_OCP_RESOURCES}  \
                                                             -e INSTALL_RESOURCES_LIST='${resource}' \
                                                             -e EXPECTED_NODES='${EXPECTED_NODES}' \
+                                                            -e CNV_NIGHTLY_CHANNEL=${CNV_NIGHTLY_CHANNEL} \
                                                             -e CNV_VERSION='${CNV_VERSION}' \
+                                                            -e LSO_VERSION='${LSO_VERSION}' \
                                                             -e ODF_VERSION='${ODF_VERSION}' \
                                                             -e NUM_ODF_DISK='${NUM_ODF_DISK}' \
                                                             -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' \
@@ -123,7 +121,7 @@ END
                                                             -e log_level='INFO' \
                                                             -v '${PRIVATE_KEY_PATH}:${CONTAINER_PRIVATE_KEY_PATH}' \
                                                             -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
-                                                            --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}'
+                                                            --privileged ${QUAY_BENCHMARK_RUNNER_REPOSITORY}
                                                     """
                                                 }
                                             }
@@ -145,7 +143,19 @@ END
         always {
             script {
                 sh '''
+                    # Check if the image exists
                     if [[ "$(sudo podman images -q ${QUAY_BENCHMARK_RUNNER_REPOSITORY} 2> /dev/null)" != "" ]]; then
+
+                        # Get containers using the image
+                        containers=$(sudo podman ps -a --filter ancestor=${QUAY_BENCHMARK_RUNNER_REPOSITORY} -q)
+
+                        if [[ "$containers" != "" ]]; then
+                            echo "Stopping and removing containers using the image..."
+                            sudo podman stop $containers
+                            sudo podman rm -f $containers
+                        fi
+
+                        # Now remove the image
                         sudo podman rmi -f $(sudo podman images -q ${QUAY_BENCHMARK_RUNNER_REPOSITORY} 2> /dev/null)
                     fi
                 '''
@@ -160,8 +170,8 @@ END
             }
         }
         success {
-            echo 'Triggering PerfCI-Workloads-Deployment pipeline'
-            build job: 'PerfCI-Workloads-Deployment', wait: false
+            echo 'Triggering 03-PerfCI-Choas-Windows-VMs-Deployment pipeline'
+            build job: '03-PerfCI-Choas-Windows-VMs-Deployment', wait: false
         }
     }
 }
