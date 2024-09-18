@@ -3,10 +3,10 @@ pipeline {
         label 'PerfCi'
     }
     environment {
-        UPGRADE_OCP_VERSION = '4.16.6'
-        LSO_VERSION = '4.16'
-        ODF_VERSION = '4.16'
-        CNV_VERSION = '4.16'
+        UPGRADE_OCP_VERSION = '4.15.23'
+        LSO_VERSION = '4.15'
+        ODF_VERSION = '4.15'
+        CNV_VERSION = '4.15'
         CONTACT_EMAIL1 = credentials('perfci_contact_email1')
         PROVISION_PRIVATE_KEY_FILE = credentials('perfci_provision_private_key_file')
         PROVISION_IP = credentials('perfci_provision_ip')
