@@ -15,6 +15,39 @@ concurrency:
 
 jobs:
 
+  test_bump_version:
+    name: bump_version
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ '3.12' ]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install latest benchmark-runner
+        run: |
+          python -m pip install --upgrade pip
+          pip install benchmark-runner wheel
+
+      - name: 🎁 Bump Version
+        run: |
+          pip install setuptools bumpversion
+          version=$(python3 setup.py --version)
+          git config --global user.email "${{ secrets.EMAIL }}"
+          git config --global user.name  "${{ secrets.USER_NAME }}"
+          git config pull.rebase false  # merge
+          bumpversion patch
+          git commit .bumpversion.cfg setup.py -m "bump version to exist version v$version"
+          git push
+          git push --tags
+
+
   unittest:
     # run all python versions, in other jobs run the latest python
     name: unittest
