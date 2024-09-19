@@ -391,15 +391,14 @@ jobs:
         if: steps.json_check_changes.outputs.changes == 'true'
         run: |
           git checkout main
-          git config --global user.email "${{ secrets.EMAIL }}"
-          git config --global user.name  "${{ secrets.USER_NAME }}"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
           git config pull.rebase false  # merge
 
           git add "$GITHUB_WORKSPACE"/benchmark_runner/grafana/perf/dashboard.json
           git commit -m "Update grafana json file"
 
-          git pull https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} main
-          git push https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} main
+          git push
 
       - name: Check if adding new products versions in main.libsonnet
         id: libsonnet_check_changes
@@ -410,11 +409,10 @@ jobs:
         if: steps.libsonnet_check_changes.outputs.changes == 'true'
         run: |
           git checkout main
-          git config --global user.email "${{ secrets.EMAIL }}"
-          git config --global user.name  "${{ secrets.USER_NAME }}"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
           git config pull.rebase false  # merge
           git add "$GITHUB_WORKSPACE"/benchmark_runner/grafana/perf/jsonnet/main.libsonnet
           git commit -m "Update grafana json file"
 
-          git pull https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} main
-          git push https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} main
+          git push
