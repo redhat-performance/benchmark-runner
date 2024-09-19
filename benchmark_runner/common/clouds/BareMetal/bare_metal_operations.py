@@ -101,7 +101,7 @@ class BareMetalOperations:
         """
         current_wait_time = 0
         logger.info(f'Waiting until the upgrade to version {self._upgrade_ocp_version} starts...')
-        oc.wait_for_upgrade_start(upgrade_version=self._upgrade_ocp_version)
+        oc.wait_for_ocp_upgrade_start(upgrade_version=self._upgrade_ocp_version)
         while self._provision_timeout <= 0 or current_wait_time <= self._provision_timeout and oc.upgrade_in_progress():
             logger.info(f'Waiting till OCP upgrade complete, waiting {int(current_wait_time / 60)} minutes')
             # sleep for x seconds

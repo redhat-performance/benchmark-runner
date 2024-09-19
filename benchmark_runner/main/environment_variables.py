@@ -88,6 +88,8 @@ class EnvironmentVariables:
         self._environment_variables_dict['delete_all'] = EnvironmentVariables.get_boolean_from_environment('DELETE_ALL', True)
         # Verification only, without running or deleting any resources, default False
         self._environment_variables_dict['verification_only'] = EnvironmentVariables.get_boolean_from_environment('VERIFICATION_ONLY', False)
+        # Verification while upgrade, e.g. 4.15.23
+        self._environment_variables_dict['wait_for_upgrade_version'] = EnvironmentVariables.get_boolean_from_environment('WAIT_FOR_UPGRADE_VERSION', '')
 
         # default parameter - change only if needed
         # Parameters below related to 'run_workload()'
@@ -196,6 +198,12 @@ class EnvironmentVariables:
         self._environment_variables_dict['secret_access_key'] = EnvironmentVariables.get_env('IBM_SECRET_ACCESS_KEY', '')
         self._environment_variables_dict['bucket'] = EnvironmentVariables.get_env('IBM_BUCKET', '')
         self._environment_variables_dict['key'] = EnvironmentVariables.get_env('IBM_KEY', '')
+
+        # Google drive
+        self._environment_variables_dict['google_drive_path'] = EnvironmentVariables.get_env('GOOGLE_DRIVE_PATH', '')
+        self._environment_variables_dict['credentials_path'] = EnvironmentVariables.get_env('CREDENTIALS_PATH', '')
+        self._environment_variables_dict['token_path'] = EnvironmentVariables.get_env('TOKEN_PATH', '')
+        self._environment_variables_dict['shared_drive_id'] = EnvironmentVariables.get_env('SHARED_DRIVE_ID', '')
 
         # Grafana
         self._environment_variables_dict['grafana_url'] = EnvironmentVariables.get_env('GRAFANA_URL', '')
