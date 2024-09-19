@@ -1,7 +1,7 @@
 
 # https://crontab.guru/
 # Deploy OCP SNO Performance environment using Assisted Installer - run on Thursday
-name: Deploy Assisted Installer Perf Env Weekly CI
+name: Deploy Assisted installer Perf Env Weekly CI
 
 on:
   schedule:
@@ -72,14 +72,49 @@ jobs:
           GITHUB_REPOSITORY_SHORT: ${{ secrets.GIT_REPOSITORY_SHORT }}
           CONTAINER_PRIVATE_KEY_PATH: ${{ secrets.CONTAINER_PRIVATE_KEY_PATH }}
           RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-        uses: nick-fields/retry@v3
-        with:
-          timeout_seconds: 3600
-          max_attempts: 3
-          retry_on: error
-          command: |
-            build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
-            build_version="$(cut -d'=' -f2 <<<"$build")"
-            echo '>>>>>>>>>>>>>>>>>>>>>>>>>> OCP start step: ${{ matrix.step }} >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
-            podman run --rm -e OCP_ENV_FLAVOR="PERF" -e IBM_API_KEY="$IBM_API_KEY" -e GITHUB_TOKEN="$GITHUB_TOKEN" -e INSTALL_OCP_VERSION="$INSTALL_OCP_VERSION" -e INSTALL_STEP="${{ matrix.step }}" -e WORKER_IDS="$WORKER_IDS" -e PROVISION_IP="$PROVISION_IP" -e CONTAINER_PRIVATE_KEY_PATH="$CONTAINER_PRIVATE_KEY_PATH" -e PROVISION_USER="$PROVISION_USER" -e PROVISION_PORT="$PROVISION_PORT" -e PROVISION_KUBEADMIN_PASSWORD_PATH="$PROVISION_KUBEADMIN_PASSWORD_PATH" -e PROVISION_KUBECONFIG_PATH="$PROVISION_KUBECONFIG_PATH" -e PROVISION_INSTALLER_PATH="$PROVISION_INSTALLER_PATH" -e PROVISION_INSTALLER_CMD="$PROVISION_INSTALLER_CMD" -e PROVISION_INSTALLER_LOG="$PROVISION_INSTALLER_LOG" -e GITHUB_REPOSITORY_SHORT="$GITHUB_REPOSITORY_SHORT" -e PROVISION_TIMEOUT="3600" -e log_level="INFO" -v "$PROVISION_PRIVATE_KEY_PATH":"$CONTAINER_PRIVATE_KEY_PATH" -v "/$RUNNER_PATH/.ssh/config":"/$PROVISION_USER/.ssh/config" --privileged "${{ secrets.QUAY_BENCHMARK_RUNNER_REPOSITORY }}"
-            echo '>>>>>>>>>>>>>>>>>>>>>>>>>> OCP end step: ${{ matrix.step }}   >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
+        run: |
+          # Retry function
+          retry() {
+            local max_attempts=3
+            local count=0
+            until [ $count -ge $max_attempts ]
+            do
+              podman run --rm \
+                -e OCP_ENV_FLAVOR="PERF" \
+                -e IBM_API_KEY="$IBM_API_KEY" \
+                -e GITHUB_TOKEN="$GITHUB_TOKEN" \
+                -e INSTALL_OCP_VERSION="$INSTALL_OCP_VERSION" \
+                -e INSTALL_STEP="${{ matrix.step }}" \
+                -e WORKER_IDS="$WORKER_IDS" \
+                -e PROVISION_IP="$PROVISION_IP" \
+                -e CONTAINER_PRIVATE_KEY_PATH="$CONTAINER_PRIVATE_KEY_PATH" \
+                -e PROVISION_USER="$PROVISION_USER" \
+                -e PROVISION_PORT="$PROVISION_PORT" \
+                -e PROVISION_KUBEADMIN_PASSWORD_PATH="$PROVISION_KUBEADMIN_PASSWORD_PATH" \
+                -e PROVISION_KUBECONFIG_PATH="$PROVISION_KUBECONFIG_PATH" \
+                -e PROVISION_INSTALLER_PATH="$PROVISION_INSTALLER_PATH" \
+                -e PROVISION_INSTALLER_CMD="$PROVISION_INSTALLER_CMD" \
+                -e PROVISION_INSTALLER_LOG="$PROVISION_INSTALLER_LOG" \
+                -e GITHUB_REPOSITORY_SHORT="$GITHUB_REPOSITORY_SHORT" \
+                -e PROVISION_TIMEOUT="3600" \
+                -e log_level="INFO" \
+                -v "$PROVISION_PRIVATE_KEY_PATH":"$CONTAINER_PRIVATE_KEY_PATH" \
+                -v "/$RUNNER_PATH/.ssh/config":"/$PROVISION_USER/.ssh/config" \
+                --privileged "${{ secrets.QUAY_BENCHMARK_RUNNER_REPOSITORY }}"
+
+              if [ $? -eq 0 ]; then
+                return 0
+              fi
+
+              count=$((count + 1))
+              echo "Retrying ($count/$max_attempts)..."
+              sleep 10
+            done
+            return 1
+          }
+
+          build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
+          build_version="$(cut -d'=' -f2 <<<"$build")"
+          echo '>>>>>>>>>>>>>>>>>>>>>>>>>> OCP start step: ${{ matrix.step }} >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
+          retry
+          echo '>>>>>>>>>>>>>>>>>>>>>>>>>> OCP end step: ${{ matrix.step }}   >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
