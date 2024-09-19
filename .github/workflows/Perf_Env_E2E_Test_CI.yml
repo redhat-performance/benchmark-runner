@@ -84,7 +84,6 @@ jobs:
           QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
           QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
           IBM_API_KEY: ${{ secrets.IBM_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
           WORKER_IDS: ${{ secrets.PERF_WORKER_IDS }}
           PROVISION_IP: ${{ secrets.PERF_PROVISION_IP }}
           PROVISION_USER: ${{ secrets.PERF_PROVISION_USER }}
@@ -126,7 +125,6 @@ jobs:
           QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
           QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
           IBM_API_KEY: ${{ secrets.IBM_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
           WORKER_IDS: ${{ secrets.PERF_WORKER_IDS }}
           PROVISION_IP: ${{ secrets.PERF_PROVISION_IP }}
           PROVISION_USER: ${{ secrets.PERF_PROVISION_USER }}
