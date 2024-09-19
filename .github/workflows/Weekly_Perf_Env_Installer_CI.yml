@@ -73,48 +73,36 @@ jobs:
           CONTAINER_PRIVATE_KEY_PATH: ${{ secrets.CONTAINER_PRIVATE_KEY_PATH }}
           RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
         run: |
-          # Retry function
-          retry() {
-            local max_attempts=3
-            local count=0
-            until [ $count -ge $max_attempts ]
-            do
-              podman run --rm \
-                -e OCP_ENV_FLAVOR="PERF" \
-                -e IBM_API_KEY="$IBM_API_KEY" \
-                -e GITHUB_TOKEN="$GITHUB_TOKEN" \
-                -e INSTALL_OCP_VERSION="$INSTALL_OCP_VERSION" \
-                -e INSTALL_STEP="${{ matrix.step }}" \
-                -e WORKER_IDS="$WORKER_IDS" \
-                -e PROVISION_IP="$PROVISION_IP" \
-                -e CONTAINER_PRIVATE_KEY_PATH="$CONTAINER_PRIVATE_KEY_PATH" \
-                -e PROVISION_USER="$PROVISION_USER" \
-                -e PROVISION_PORT="$PROVISION_PORT" \
-                -e PROVISION_KUBEADMIN_PASSWORD_PATH="$PROVISION_KUBEADMIN_PASSWORD_PATH" \
-                -e PROVISION_KUBECONFIG_PATH="$PROVISION_KUBECONFIG_PATH" \
-                -e PROVISION_INSTALLER_PATH="$PROVISION_INSTALLER_PATH" \
-                -e PROVISION_INSTALLER_CMD="$PROVISION_INSTALLER_CMD" \
-                -e PROVISION_INSTALLER_LOG="$PROVISION_INSTALLER_LOG" \
-                -e GITHUB_REPOSITORY_SHORT="$GITHUB_REPOSITORY_SHORT" \
-                -e PROVISION_TIMEOUT="3600" \
-                -e log_level="INFO" \
-                -v "$PROVISION_PRIVATE_KEY_PATH":"$CONTAINER_PRIVATE_KEY_PATH" \
-                -v "/$RUNNER_PATH/.ssh/config":"/$PROVISION_USER/.ssh/config" \
-                --privileged "${{ secrets.QUAY_BENCHMARK_RUNNER_REPOSITORY }}"
-
-              if [ $? -eq 0 ]; then
-                return 0
-              fi
-
-              count=$((count + 1))
-              echo "Retrying ($count/$max_attempts)..."
-              sleep 10
-            done
-            return 1
-          }
-
           build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
           build_version="$(cut -d'=' -f2 <<<"$build")"
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>> OCP start step: ${{ matrix.step }} >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
-          retry
+          podman run --rm -e OCP_ENV_FLAVOR="PERF" -e IBM_API_KEY="$IBM_API_KEY" -e GITHUB_TOKEN="$GITHUB_TOKEN" -e INSTALL_OCP_VERSION="$INSTALL_OCP_VERSION" -e INSTALL_STEP="${{ matrix.step }}" -e WORKER_IDS="$WORKER_IDS" -e PROVISION_IP="$PROVISION_IP" -e CONTAINER_PRIVATE_KEY_PATH="$CONTAINER_PRIVATE_KEY_PATH" -e CONTAINER_PRIVATE_KEY_PATH="$CONTAINER_PRIVATE_KEY_PATH" -e PROVISION_USER="$PROVISION_USER" -e PROVISION_PORT="$PROVISION_PORT" -e PROVISION_KUBEADMIN_PASSWORD_PATH="$PROVISION_KUBEADMIN_PASSWORD_PATH" -e PROVISION_KUBECONFIG_PATH="$PROVISION_KUBECONFIG_PATH" -e PROVISION_INSTALLER_PATH="$PROVISION_INSTALLER_PATH" -e PROVISION_INSTALLER_CMD="$PROVISION_INSTALLER_CMD" -e PROVISION_INSTALLER_LOG="$PROVISION_INSTALLER_LOG" -e GITHUB_REPOSITORY_SHORT="$GITHUB_REPOSITORY_SHORT" -e PROVISION_TIMEOUT="3600" -e log_level="INFO" -v "$PROVISION_PRIVATE_KEY_PATH":"$CONTAINER_PRIVATE_KEY_PATH" -v "/$RUNNER_PATH/.ssh/config":"/$PROVISION_USER/.ssh/config" --privileged "${{ secrets.QUAY_BENCHMARK_RUNNER_REPOSITORY }}"
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>> OCP end step: ${{ matrix.step }}   >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
+      - name: ▶ Rerun OCP assisted install after failure
+        env:
+          INSTALL_OCP_VERSION: "latest-4.16"
+          OCP_CLIENT_VERSION: "4.16.0"
+          IBM_API_KEY: ${{ secrets.IBM_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+          WORKER_IDS: ${{ secrets.PERF_WORKER_IDS }}
+          PROVISION_IP: ${{ secrets.PERF_PROVISION_IP }}
+          PROVISION_USER: ${{ secrets.PERF_PROVISION_USER }}
+          PROVISION_PORT: ${{ secrets.PERF_PROVISION_PORT }}
+          PROVISION_KUBEADMIN_PASSWORD_PATH: ${{ secrets.PERF_PROVISION_KUBEADMIN_PASSWORD_PATH }}
+          PROVISION_KUBECONFIG_PATH: ${{ secrets.PERF_PROVISION_KUBECONFIG_PATH }}
+          PROVISION_INSTALLER_PATH: ${{ secrets.PERF_PROVISION_INSTALLER_PATH }}
+          PROVISION_INSTALLER_CMD: ${{ secrets.PERF_PROVISION_INSTALLER_CMD }}
+          PROVISION_INSTALLER_LOG: ${{ secrets.PERF_PROVISION_INSTALLER_LOG }}
+          GITHUB_REPOSITORY_SHORT: ${{ secrets.GIT_REPOSITORY_SHORT }}
+          CONTAINER_PRIVATE_KEY_PATH: ${{ secrets.CONTAINER_PRIVATE_KEY_PATH }}
+          RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+        if: ${{ failure() }}
+        run: |
+          build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
+          build_version="$(cut -d'=' -f2 <<<"$build")"
+          echo '>>>>>>>>>>>>>>>>>>>>>>>>>> OCP start step: run_ibm_ocp_installer >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
+          podman run --rm -e OCP_ENV_FLAVOR="PERF" -e IBM_API_KEY="$IBM_API_KEY" -e GITHUB_TOKEN="$GITHUB_TOKEN" -e INSTALL_OCP_VERSION="$INSTALL_OCP_VERSION" -e INSTALL_STEP="run_ibm_ocp_installer" -e WORKER_IDS="$WORKER_IDS" -e PROVISION_IP="$PROVISION_IP" -e CONTAINER_PRIVATE_KEY_PATH="$CONTAINER_PRIVATE_KEY_PATH" -e CONTAINER_PRIVATE_KEY_PATH="$CONTAINER_PRIVATE_KEY_PATH" -e PROVISION_USER="$PROVISION_USER" -e PROVISION_PORT="$PROVISION_PORT" -e PROVISION_KUBEADMIN_PASSWORD_PATH="$PROVISION_KUBEADMIN_PASSWORD_PATH" -e PROVISION_KUBECONFIG_PATH="$PROVISION_KUBECONFIG_PATH" -e PROVISION_INSTALLER_PATH="$PROVISION_INSTALLER_PATH" -e PROVISION_INSTALLER_CMD="$PROVISION_INSTALLER_CMD" -e PROVISION_INSTALLER_LOG="$PROVISION_INSTALLER_LOG" -e GITHUB_REPOSITORY_SHORT="$GITHUB_REPOSITORY_SHORT" -e PROVISION_TIMEOUT="3600" -e log_level="INFO" -v "$PROVISION_PRIVATE_KEY_PATH":"$CONTAINER_PRIVATE_KEY_PATH" -v "/$RUNNER_PATH/.ssh/config":"/$PROVISION_USER/.ssh/config" --privileged "${{ secrets.QUAY_BENCHMARK_RUNNER_REPOSITORY }}"
+          echo '>>>>>>>>>>>>>>>>>>>>>>>>>> OCP end step: run_ibm_ocp_installer  >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
+          echo '>>>>>>>>>>>>>>>>>>>>>>>>>> OCP start step: verify_ibm_install_complete >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
+          podman run --rm -e OCP_ENV_FLAVOR="PERF" -e IBM_API_KEY="$IBM_API_KEY" -e GITHUB_TOKEN="$GITHUB_TOKEN" -e INSTALL_OCP_VERSION="$INSTALL_OCP_VERSION" -e INSTALL_STEP="verify_ibm_install_complete" -e WORKER_IDS="$WORKER_IDS" -e PROVISION_IP="$PROVISION_IP" -e CONTAINER_PRIVATE_KEY_PATH="$CONTAINER_PRIVATE_KEY_PATH" -e CONTAINER_PRIVATE_KEY_PATH="$CONTAINER_PRIVATE_KEY_PATH" -e PROVISION_USER="$PROVISION_USER" -e PROVISION_PORT="$PROVISION_PORT" -e PROVISION_KUBEADMIN_PASSWORD_PATH="$PROVISION_KUBEADMIN_PASSWORD_PATH" -e PROVISION_KUBECONFIG_PATH="$PROVISION_KUBECONFIG_PATH" -e PROVISION_INSTALLER_PATH="$PROVISION_INSTALLER_PATH" -e PROVISION_INSTALLER_CMD="$PROVISION_INSTALLER_CMD" -e PROVISION_INSTALLER_LOG="$PROVISION_INSTALLER_LOG" -e GITHUB_REPOSITORY_SHORT="$GITHUB_REPOSITORY_SHORT" -e PROVISION_TIMEOUT="3600" -e log_level="INFO" -v "$PROVISION_PRIVATE_KEY_PATH":"$CONTAINER_PRIVATE_KEY_PATH" --privileged "${{ secrets.QUAY_BENCHMARK_RUNNER_REPOSITORY }}"
+          echo '>>>>>>>>>>>>>>>>>>>>>>>>>> OCP end step: verify_ibm_install_complete >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
