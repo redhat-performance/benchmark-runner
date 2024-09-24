@@ -19,6 +19,7 @@ from benchmark_runner.common.prometheus.prometheus_snapshot_exceptions import Pr
 from benchmark_runner.common.template_operations.template_operations import TemplateOperations
 from benchmark_runner.common.clouds.IBM.ibm_operations import IBMOperations
 from benchmark_runner.common.prometheus.prometheus_metrics_operations import PrometheusMetricsOperation
+from benchmark_runner.common.google_drive.google_drive_operations import GoogleDriveOperations
 
 
 class WorkloadsOperations:
@@ -59,6 +60,8 @@ class WorkloadsOperations:
         self._redis = self._environment_variables_dict.get('redis', '')
         self._threads_limit = self._environment_variables_dict.get('threads_limit', '')
         self._kata_thread_pool_size = self._environment_variables_dict.get('kata_thread_pool_size', '')
+        self._cnv_version = self._environment_variables_dict.get('cnv_version', '')
+        self._odf_version = self._environment_variables_dict.get('odf_version', '')
         if self._scale:
             self._scale = int(self._scale)
             self._scale_nodes = self._environment_variables_dict.get('scale_nodes', '')
@@ -101,9 +104,19 @@ class WorkloadsOperations:
         self._windows_url = self._environment_variables_dict.get('windows_url', '')
         self._delete_all = self._environment_variables_dict.get('delete_all', '')
         self._verification_only = self._environment_variables_dict.get('verification_only', '')
+        self._wait_for_upgrade_version = self._environment_variables_dict.get('wait_for_upgrade_version', '')
         if self._windows_url:
             file_name = os.path.basename(self._windows_url)
             self._windows_os = os.path.splitext(file_name)[0]
+        # google drive
+        self._google_drive_path = self._environment_variables_dict.get('google_drive_path', '')
+        self._credentials_path = self._environment_variables_dict.get('credentials_path', '')
+        self._token_path = self._environment_variables_dict.get('token_path', '')
+        self._shared_drive_id = self._environment_variables_dict.get('shared_drive_id', '')
+        self._google_drive_operation = GoogleDriveOperations(google_drive_path=self._google_drive_path,
+                                                             credentials_path=self._credentials_path,
+                                                             token_path=self._token_path,
+                                                             shared_drive_id=self._shared_drive_id)
 
     def _get_workload_file_name(self, workload):
         """
@@ -337,8 +350,35 @@ class WorkloadsOperations:
         upload_file = f"{workload_file_name}.tar.gz"
         s3operations.upload_file(file_name_path=tar_run_artifacts_path,
                                  bucket=self._environment_variables_dict.get('bucket', ''),
-                                 key=run_artifacts_hierarchy,
+                                 key=str(run_artifacts_hierarchy),
                                  upload_file=upload_file)
+
+    def get_run_artifacts_google_drive(self):
+        """
+        This method returns google drive run artifacts folder path
+        :return:
+        """
+        workload = self._workload.replace('_', '-')
+        run_artifacts_hierarchy = self._get_run_artifacts_hierarchy(workload_name=workload)
+        return self._google_drive_operation.get_drive_folder_url(folder_path=run_artifacts_hierarchy, parent_folder_id=self._shared_drive_id)
+
+    @logger_time_stamp
+    def upload_run_artifacts_to_google_drive(self):
+        """
+        This method uploads log to google drive
+        :return:
+        """
+        workload = self._workload.replace('_', '-')
+        tar_run_artifacts_path = self.__make_run_artifacts_tarfile(workload)
+        run_artifacts_hierarchy = self._get_run_artifacts_hierarchy(workload_name=workload)
+
+        # change workload to key convention
+        workload_file_name = self._get_workload_file_name(workload)
+        upload_file = f"{workload_file_name}.tar.gz"
+        self._google_drive_operation.upload_file_to_folder(file_path=tar_run_artifacts_path,
+                                                           folder_path=str(run_artifacts_hierarchy),
+                                                           parent_folder_id=self._shared_drive_id)
+
 
     def __get_metadata(self, kind: str = None, status: str = None, result: dict = None) -> dict:
         """
@@ -350,6 +390,7 @@ class WorkloadsOperations:
         """
         date_format = '%Y_%m_%d'
         metadata = {'ocp_version': self._oc.get_ocp_server_version(),
+                    'previous_ocp_version': self._oc.get_previous_ocp_version(),
                     'cnv_version': self._oc.get_cnv_version(),
                     'kata_version': self._oc.get_kata_operator_version(),
                     'kata_rpm_version': self._oc.get_kata_rpm_version(node=self._pin_node1),

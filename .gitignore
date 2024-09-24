@@ -221,6 +221,10 @@ terraform.tfstate
 /benchmark_runner/main/perf_key.txt
 /venv.sh
 
+# Google drive credentials
+/benchmark_runner/main/credentials.json
+/benchmark_runner/main/token.json
+
 # Emacs autosave and backup files
 *~
 **/#*#

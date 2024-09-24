@@ -67,7 +67,7 @@ class BootstormVM(WorkloadsOperations):
         self._bootstorm_start_time[vm_name] = time.time()
 
     @logger_time_stamp
-    def _ssh_vm(self, vm_name: str):
+    def _wait_ssh_vm(self, vm_name: str):
             """
             Verify ssh into VM and return vm node in success or False if failed
             @return:
@@ -109,15 +109,18 @@ class BootstormVM(WorkloadsOperations):
 
     def _finalize_vm(self):
         self._status = 'complete' if self._data_dict else 'failed'
-        # prometheus queries
-        self._prometheus_metrics_operation.finalize_prometheus()
-        metric_results = self._prometheus_metrics_operation.run_prometheus_queries()
-        prometheus_result = self._prometheus_metrics_operation.parse_prometheus_metrics(data=metric_results)
         # update total vm run time
         if not self._verification_only:
+            # prometheus queries
+            self._prometheus_metrics_operation.finalize_prometheus()
+            metric_results = self._prometheus_metrics_operation.run_prometheus_queries()
+            prometheus_result = self._prometheus_metrics_operation.parse_prometheus_metrics(data=metric_results)
             total_run_time = self._get_bootstorm_vm_total_run_time()
             self._data_dict.update({'total_run_time': total_run_time})
-        self._data_dict.update(prometheus_result)
+            self._data_dict.update(prometheus_result)
+        # Google drive run_artifacts_url folder path
+        if self.get_run_artifacts_google_drive():
+            self._data_dict.update({'run_artifacts_url': self.get_run_artifacts_google_drive()})
         if self._es_host:
             # upload several run results
             self._upload_to_elasticsearch(index=self._es_index, kind=self._kind, status=self._status,
@@ -135,7 +138,7 @@ class BootstormVM(WorkloadsOperations):
         self._set_bootstorm_vm_first_run_time()
         self._set_bootstorm_vm_start_time(vm_name=self._vm_name)
         self._virtctl.start_vm_sync(vm_name=self._vm_name)
-        self.vm_node = self._ssh_vm(vm_name=self._vm_name)
+        self.vm_node = self._wait_ssh_vm(vm_name=self._vm_name)
         self._data_dict = self._get_bootstorm_vm_elapsed_time(vm_name=self._vm_name, vm_node=self.vm_node)
         self._data_dict['run_artifacts_url'] = os.path.join(self._run_artifacts_url,
                                                             f'{self._get_run_artifacts_hierarchy(workload_name=self._workload_name, is_file=True)}-{self._time_stamp_format}.tar.gz')
@@ -144,29 +147,80 @@ class BootstormVM(WorkloadsOperations):
             yaml=os.path.join(f'{self._run_artifacts_path}', f'{self._name}.yaml'),
             vm_name=self._vm_name)
 
+    def _verify_single_vm(self, vm_name):
+        """
+        This method verifies the SSH status of a single VM.
+        :param vm_name: The name of the VM to verify.
+        """
+        vm_ssh = 0
+        self._virtctl.expose_vm(vm_name=vm_name)
+        vm_node = self._oc.get_vm_node(vm_name=vm_name)
+        if vm_node:
+            node_ip = self._oc.get_nodes_addresses()[vm_node]
+            vm_node_port = self._oc.get_exposed_vm_port(vm_name=vm_name)
+            ssh_status = self._oc.get_vm_ssh_status(vm_name=vm_name, node_ip=node_ip, vm_node_port=vm_node_port)
+            vm_ssh = 1 if ssh_status == 'True' else 0
+            self._data_dict = {
+                'vm_name': vm_name,
+                'node': vm_node,
+                'vm_ssh': vm_ssh,
+                'ssh_status': ssh_status,
+                'run_artifacts_url': os.path.join(
+                    self._run_artifacts_url,
+                    f"{self._get_run_artifacts_hierarchy(workload_name=self._workload_name, is_file=True)}-{self._time_stamp_format}.tar.gz"
+                )
+            }
+        self._finalize_vm()
+        return vm_ssh
+
     def _verify_vm_ssh(self):
         """
-        This method verifies each VM ssh login
+        This method verifies each VM ssh login while upgrade or for all VMs
         :return:
         """
         try:
             vm_names = self._oc._get_all_vm_names()
             if not vm_names:
                 raise MissingVMs
-            for vm_name in vm_names:
-                vm_node = self._ssh_vm(vm_name)
-                self._data_dict = {
-                    'vm_name': vm_name,
-                    'node': vm_node,
-                    'vm_ssh': int(bool(vm_node)),
-                    'run_artifacts_url': os.path.join(
-                        self._run_artifacts_url,
-                        f"{self._get_run_artifacts_hierarchy(workload_name=self._workload_name, is_file=True)}-{self._time_stamp_format}.tar.gz"
-                    )
-                }
-                self._finalize_vm()
+
+            upgrade_done = True
+            failure = False
+            if self._wait_for_upgrade_version:
+                upgrade_done = self._oc.get_cluster_status() == f'Cluster version is {self._wait_for_upgrade_version}'
+                current_wait_time = 0
+
+                while (self._timeout <= 0 or current_wait_time <= self._timeout) and not upgrade_done:
+                    for vm_name in vm_names:
+                        vm_ssh = self._verify_single_vm(vm_name)
+                        if not vm_ssh:
+                            failure = True
+                        upgrade_done = self._oc.get_cluster_status() == f'Cluster version is {self._wait_for_upgrade_version}'
+
+                    current_wait_time += self._oc.SHORT_TIMEOUT # Increment the wait time
+            else:
+                # If _wait_for_upgrade_version is empty, verify VM SSH without waiting for upgrade
+                for vm_name in vm_names:
+                    vm_ssh = self._verify_single_vm(vm_name)
+                    if not vm_ssh:
+                        failure = True
+
+            if self._wait_for_upgrade_version:
+                logger.info(f'Cluster is upgraded to: {self._wait_for_upgrade_version}')
+            if failure:
+                self._oc.generate_cnv_must_gather(destination_path=self._run_artifacts_path, cnv_version=self._cnv_version)
+                self._oc.generate_odf_must_gather(destination_path=self._run_artifacts_path, odf_version=self._odf_version)
+                # google drive
+                if self._shared_drive_id:
+                    self.upload_run_artifacts_to_google_drive()
+                # s3
+                elif self._endpoint_url and not self._shared_drive_id:
+                    self.upload_run_artifacts_to_s3()
+                # local
+                else:
+                    self._save_artifacts_local = True
+
         except Exception as err:
-            # save run artifacts logs
+            # Save run artifacts logs
             self.save_error_logs()
             raise err
 
@@ -179,7 +233,7 @@ class BootstormVM(WorkloadsOperations):
             self._set_bootstorm_vm_start_time(vm_name=f'{self._workload_name}-{self._trunc_uuid}-{vm_num}')
             self._virtctl.start_vm_async(vm_name=f'{self._workload_name}-{self._trunc_uuid}-{vm_num}')
             self._virtctl.wait_for_vm_status(vm_name=vm_name, status=VMStatus.Running)
-            vm_node = self._ssh_vm(vm_name)
+            vm_node = self._wait_ssh_vm(vm_name)
             self._data_dict = self._get_bootstorm_vm_elapsed_time(vm_name=vm_name, vm_node=vm_node)
             self._data_dict['run_artifacts_url'] = os.path.join(self._run_artifacts_url, f'{self._get_run_artifacts_hierarchy(workload_name=self._workload_name, is_file=True)}-scale-{self._time_stamp_format}.tar.gz')
             self._finalize_vm()

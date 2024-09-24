@@ -1,6 +1,7 @@
 
 import os
 import ast
+import shutil
 import time
 from enum import Enum
 from typeguard import typechecked
@@ -50,6 +51,14 @@ class OC(SSH):
         """
         return self.run(f"{self.__cli} get clusterversion version -o jsonpath='{{.status.desired.version}}'")
 
+    def get_previous_ocp_version(self):
+        """
+        This method returns the previous OpenShift server version from the history.
+        :return: Previous OpenShift server version as a string
+        """
+        # Run the `oc` command to get the ClusterVersion history and extract the previous version
+        return self.run(f"{self.__cli} get clusterversion version -o jsonpath='{{.status.history[1].version}}'")
+
     def upgrade_ocp(self, upgrade_ocp_version: str):
         """
         This method upgrades OCP version with conditional handling for specific versions.
@@ -76,7 +85,7 @@ class OC(SSH):
         return status == 'True'
 
     @logger_time_stamp
-    def wait_for_upgrade_start(self, upgrade_version: str, timeout: int = SHORT_TIMEOUT):
+    def wait_for_ocp_upgrade_start(self, upgrade_version: str, timeout: int = SHORT_TIMEOUT):
         """
         This method waits for ocp upgrade to start
         :param upgrade_version:
@@ -1155,6 +1164,21 @@ class OC(SSH):
             current_wait_time += OC.SLEEP_TIME
         raise VMStateTimeout(vm_name=vm_name, state='ssh')
 
+    def get_vm_ssh_status(self, vm_name: str = '', node_ip: str = '', vm_node_port: str = ''):
+        """
+        This method
+        :param vm_name:
+        :param node_ip:
+        :param vm_node_port:
+        :return:
+        """
+        ssh_vm = f"ssh -o 'BatchMode=yes' -o ConnectTimeout=1 root@{node_ip} -p {vm_node_port}"
+        check_ssh_vm = f"""if [ "$(ssh -o 'BatchMode=yes' -o ConnectTimeout=1 root@{node_ip} -p {vm_node_port} 2>&1|egrep 'denied|verification failed')" ]; then echo 'True'; else echo 'False'; fi"""
+        if self.run(check_ssh_vm) == 'True':
+            return 'True'
+        else:
+            return self.run(ssh_vm)
+
     @logger_time_stamp
     def get_vm_node(self, vm_name: str, namespace: str = environment_variables.environment_variables_dict['namespace']):
         """
@@ -1285,6 +1309,7 @@ class OC(SSH):
             current_wait_time += OC.SLEEP_TIME
         raise VMDeleteTimeout(vm_name)
 
+    @typechecked
     @logger_time_stamp
     def wait_for_vm_log_completed(self, vm_name: str = '', end_stamp: str = '', output_filename: str = '',
                                   timeout: int = int(environment_variables.environment_variables_dict['timeout']),
@@ -1314,6 +1339,7 @@ class OC(SSH):
                     current_wait_time += sleep_time
         raise VMNotCompletedTimeout(workload=vm_name)
 
+    @typechecked
     @logger_time_stamp
     def extract_vm_results(self, vm_name: str = '', start_stamp: str = '', end_stamp: str = '', output_filename: str = ''):
         """
@@ -1348,3 +1374,59 @@ class OC(SSH):
                             # filter the data, placed after the first :
                             results_list.append(line.strip().split(':')[data_index:])
         return results_list
+
+    @typechecked
+    @logger_time_stamp
+    def generate_odf_must_gather(self, destination_path: str = '/tmp', odf_version: str = None):
+        """
+        Generates ODF must-gather logs based on the ODF version and stores it in the destination path.
+
+        :param destination_path: The directory where the must-gather logs will be stored. Default is '/tmp'.
+        :param odf_version: The version of ODF for which to generate the must-gather logs, Default is None.
+        :return: The result of the run command.
+        :raises: RuntimeError if the command fails.
+        """
+        if not odf_version:
+            raise ValueError("ODF version must be provided")
+
+        folder_path = os.path.join(destination_path, f"odf-must-gather-rhel9-v{odf_version}")
+
+        try:
+            command = (f"oc adm must-gather --image=registry.redhat.io/odf4/odf-must-gather-rhel9:v{odf_version} "
+                       f"--dest-dir={folder_path}")
+            self.run(command)
+        except Exception as e:
+            if os.path.exists(folder_path):
+                try:
+                    shutil.rmtree(folder_path)
+                except Exception as remove_error:
+                    raise RuntimeError(f"Failed to remove folder {folder_path}: {remove_error}")
+            raise RuntimeError(f"Failed to generate ODF must-gather logs for version {odf_version}: {e}")
+
+    @typechecked
+    @logger_time_stamp
+    def generate_cnv_must_gather(self, destination_path: str = '/tmp', cnv_version: str = None):
+        """
+        Generates CNV must-gather logs based on the CNV version and stores it in the destination path.
+
+        :param destination_path: The directory where the must-gather logs will be stored. Default is '/tmp'.
+        :param cnv_version: The version of CNV for which to generate the must-gather logs, Default is None.
+        :return: The result of the run command.
+        :raises: RuntimeError if the command fails.
+        """
+        if not cnv_version:
+            raise ValueError("CNV version must be provided")
+
+        folder_path = os.path.join(destination_path, f"cnv-must-gather-rhel9-v{cnv_version}")
+
+        try:
+            command = (f"oc adm must-gather --image=registry.redhat.io/container-native-virtualization/"
+                       f"cnv-must-gather-rhel9:v{cnv_version} --dest-dir={folder_path}")
+            self.run(command)
+        except Exception as e:
+            if os.path.exists(folder_path):
+                try:
+                    shutil.rmtree(folder_path)
+                except Exception as remove_error:
+                    raise RuntimeError(f"Failed to remove folder {folder_path}: {remove_error}")
+            raise RuntimeError(f"Failed to generate CNV must-gather logs for version {cnv_version}: {e}")
