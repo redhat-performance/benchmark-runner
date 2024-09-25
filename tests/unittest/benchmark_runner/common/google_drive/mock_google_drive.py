@@ -21,7 +21,7 @@ def mock_google_drive(func):
         # Patch the GoogleDriveOperations to use the mock service
         with patch('benchmark_runner.common.google_drive.google_drive_operations.GoogleDriveOperations.authenticate', return_value=None):
             with patch('benchmark_runner.common.google_drive.google_drive_operations.build', return_value=mock_service):
-                google_drive_operations = GoogleDriveOperations(google_drive_path='google_drive_path', credentials_path='credentials.json', token_path='token.json', shared_drive_id='shared_drive_id')
+                google_drive_operations = GoogleDriveOperations(google_drive_path='google_drive_path', google_drive_credentials='google_drive_credentials', google_drive_token='google_drive_token', google_drive_shared_drive_id='google_drive_shared_drive_id')
                 google_drive_operations.service = mock_service
 
                 return func(google_drive_operations, mock_service, *args, **kwargs)

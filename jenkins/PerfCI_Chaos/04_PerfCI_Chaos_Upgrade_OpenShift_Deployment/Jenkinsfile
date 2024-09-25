@@ -7,6 +7,7 @@ pipeline {
         LSO_VERSION = '4.15'
         ODF_VERSION = '4.15'
         CNV_VERSION = '4.15'
+        WAIT_FOR_UPGRADE_VERSION = '4.15.23'
         CONTACT_EMAIL1 = credentials('perfci_contact_email1')
         PROVISION_PRIVATE_KEY_FILE = credentials('perfci_provision_private_key_file')
         PROVISION_IP = credentials('perfci_provision_ip')
@@ -39,6 +40,10 @@ pipeline {
         IBM_SECRET_ACCESS_KEY = credentials('perfci_ibm_secret_access_key')
         IBM_BUCKET = credentials('perfci_ibm_bucket')
         IBM_KEY = credentials('perfci_ibm_key')
+        GOOGLE_DRIVE_PATH = credentials('perfci_google_drive_path')
+        GOOGLE_DRIVE_CREDENTIALS = credentials('perfci_google_drive_credentials')
+        GOOGLE_DRIVE_TOKEN = credentials('perfci_google_drive_token')
+        GOOGLE_DRIVE_SHARED_DRIVE_ID = credentials('perfci_google_drive_shared_drive_id')
         RUN_ARTIFACTS_URL = credentials('perfci_run_artifacts_url')
         REDIS = credentials('perfci_redis')
         WORKER_DISK_IDS = credentials('perfci_worker_disk_ids')
@@ -212,6 +217,7 @@ END
                                     sh """
                                         sudo podman run --rm -t \
                                         -e WORKLOAD='${workload}' \
+                                        -e WAIT_FOR_UPGRADE_VERSION='${WAIT_FOR_UPGRADE_VERSION}' \
                                         -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' \
                                         -e PIN_NODE_BENCHMARK_OPERATOR='${PIN_NODE_BENCHMARK_OPERATOR}' \
                                         -e PIN_NODE1='${PIN_NODE1}' \
@@ -224,6 +230,10 @@ END
                                         -e IBM_SECRET_ACCESS_KEY='${IBM_SECRET_ACCESS_KEY}' \
                                         -e IBM_BUCKET='${IBM_BUCKET}' \
                                         -e IBM_KEY='${IBM_KEY}' \
+                                        -e GOOGLE_DRIVE_PATH='${GOOGLE_DRIVE_PATH}' \
+                                        -e GOOGLE_DRIVE_CREDENTIALS='${GOOGLE_DRIVE_CREDENTIALS}' \
+                                        -e GOOGLE_DRIVE_TOKEN='${GOOGLE_DRIVE_TOKEN}' \
+                                        -e GOOGLE_DRIVE_SHARED_DRIVE_ID='${GOOGLE_DRIVE_SHARED_DRIVE_ID}' \
                                         -e RUN_ARTIFACTS_URL='${RUN_ARTIFACTS_URL}' \
                                         -e BUILD_VERSION='${build_version}' \
                                         -e RUN_TYPE='${RUN_TYPE}' \
@@ -265,7 +275,7 @@ END
                  }
                 }
             }
-        } // WORKLOADS Deployment
+        } // WORKLOADS Verifications
     }
         }
     } // stages

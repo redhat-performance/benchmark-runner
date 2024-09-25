@@ -210,10 +210,10 @@ class BootstormVM(WorkloadsOperations):
                 self._oc.generate_cnv_must_gather(destination_path=self._run_artifacts_path, cnv_version=self._cnv_version)
                 self._oc.generate_odf_must_gather(destination_path=self._run_artifacts_path, odf_version=self._odf_version)
                 # google drive
-                if self._shared_drive_id:
+                if self._google_drive_shared_drive_id:
                     self.upload_run_artifacts_to_google_drive()
                 # s3
-                elif self._endpoint_url and not self._shared_drive_id:
+                elif self._endpoint_url and not self._google_drive_shared_drive_id:
                     self.upload_run_artifacts_to_s3()
                 # local
                 else:

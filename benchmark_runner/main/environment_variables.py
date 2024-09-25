@@ -201,9 +201,9 @@ class EnvironmentVariables:
 
         # Google drive
         self._environment_variables_dict['google_drive_path'] = EnvironmentVariables.get_env('GOOGLE_DRIVE_PATH', '')
-        self._environment_variables_dict['credentials_path'] = EnvironmentVariables.get_env('CREDENTIALS_PATH', '')
-        self._environment_variables_dict['token_path'] = EnvironmentVariables.get_env('TOKEN_PATH', '')
-        self._environment_variables_dict['shared_drive_id'] = EnvironmentVariables.get_env('SHARED_DRIVE_ID', '')
+        self._environment_variables_dict['google_drive_credentials'] = EnvironmentVariables.get_env('GOOGLE_DRIVE_CREDENTIALS', '')
+        self._environment_variables_dict['google_drive_token'] = EnvironmentVariables.get_env('GOOGLE_DRIVE_TOKEN', '')
+        self._environment_variables_dict['google_drive_shared_drive_id'] = EnvironmentVariables.get_env('GOOGLE_DRIVE_SHARED_DRIVE_ID', '')
 
         # Grafana
         self._environment_variables_dict['grafana_url'] = EnvironmentVariables.get_env('GRAFANA_URL', '')

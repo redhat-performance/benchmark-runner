@@ -110,13 +110,14 @@ class WorkloadsOperations:
             self._windows_os = os.path.splitext(file_name)[0]
         # google drive
         self._google_drive_path = self._environment_variables_dict.get('google_drive_path', '')
-        self._credentials_path = self._environment_variables_dict.get('credentials_path', '')
-        self._token_path = self._environment_variables_dict.get('token_path', '')
-        self._shared_drive_id = self._environment_variables_dict.get('shared_drive_id', '')
-        self._google_drive_operation = GoogleDriveOperations(google_drive_path=self._google_drive_path,
-                                                             credentials_path=self._credentials_path,
-                                                             token_path=self._token_path,
-                                                             shared_drive_id=self._shared_drive_id)
+        self._google_drive_credentials = self._environment_variables_dict.get('google_drive_credentials', '')
+        self._google_drive_token = self._environment_variables_dict.get('google_drive_token', '')
+        self._google_drive_shared_drive_id = self._environment_variables_dict.get('google_drive_shared_drive_id', '')
+        if self._google_drive_path:
+            self._google_drive_operation = GoogleDriveOperations(google_drive_path=self._google_drive_path,
+                                                                 google_drive_credentials=self._google_drive_credentials,
+                                                                 google_drive_token=self._google_drive_token,
+                                                                 google_drive_shared_drive_id=self._google_drive_shared_drive_id)
 
     def _get_workload_file_name(self, workload):
         """
@@ -360,7 +361,7 @@ class WorkloadsOperations:
         """
         workload = self._workload.replace('_', '-')
         run_artifacts_hierarchy = self._get_run_artifacts_hierarchy(workload_name=workload)
-        return self._google_drive_operation.get_drive_folder_url(folder_path=run_artifacts_hierarchy, parent_folder_id=self._shared_drive_id)
+        return self._google_drive_operation.get_drive_folder_url(folder_path=run_artifacts_hierarchy, parent_folder_id=self._google_drive_shared_drive_id)
 
     @logger_time_stamp
     def upload_run_artifacts_to_google_drive(self):
@@ -377,7 +378,7 @@ class WorkloadsOperations:
         upload_file = f"{workload_file_name}.tar.gz"
         self._google_drive_operation.upload_file_to_folder(file_path=tar_run_artifacts_path,
                                                            folder_path=str(run_artifacts_hierarchy),
-                                                           parent_folder_id=self._shared_drive_id)
+                                                           parent_folder_id=self._google_drive_shared_drive_id)
 
 
     def __get_metadata(self, kind: str = None, status: str = None, result: dict = None) -> dict:
