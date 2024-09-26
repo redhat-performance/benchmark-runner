@@ -260,7 +260,7 @@ class EnvironmentVariables:
         # IBM data
         self._environment_variables_dict['ibm_api_key'] = EnvironmentVariables.get_env('IBM_API_KEY', '')
         # GitHub token
-        self._environment_variables_dict['github_token'] = EnvironmentVariables.get_env('GITHUB_TOKEN', '')
+        self._environment_variables_dict['git_token'] = EnvironmentVariables.get_env('GIT_TOKEN', '')
         self._environment_variables_dict['worker_ids'] = EnvironmentVariables.get_env(f'WORKER_IDS', "")
         self._environment_variables_dict['provision_ip'] = EnvironmentVariables.get_env(f'PROVISION_IP', '')
         # Placed on secret only

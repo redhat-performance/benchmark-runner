@@ -13,8 +13,8 @@ class GitHubOperations:
 
     def __init__(self):
         self.__environment_variables_dict = environment_variables.environment_variables_dict
-        github_token = self.__environment_variables_dict.get('github_token', '')
-        self.g = Github(github_token)
+        git_token = self.__environment_variables_dict.get('git_token', '')
+        self.g = Github(git_token)
         self.repo = self.g.get_repo(self.__environment_variables_dict.get('github_repository_short', ''))
 
     @typechecked
