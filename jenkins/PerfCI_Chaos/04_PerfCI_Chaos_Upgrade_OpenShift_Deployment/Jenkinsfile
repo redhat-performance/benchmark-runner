@@ -56,7 +56,7 @@ pipeline {
         CONTAINER_KUBECONFIG_PATH = '/home/jenkins/.kube/config'
         WORKER_DISK_PREFIX = 'wwn-0x'
         SAVE_ARTIFACTS_LOCAL = 'False'
-        ENABLE_PROMETHEUS_SNAPSHOT = 'True'
+        ENABLE_PROMETHEUS_SNAPSHOT = 'False'
         DELETE_ALL = 'False' // Not delete the running Windows11 VMs
         VERIFICATION_ONLY = 'True'
         RUN_TYPE = 'perf_ci'
