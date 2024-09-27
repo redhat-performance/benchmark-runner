@@ -119,7 +119,7 @@ class BootstormVM(WorkloadsOperations):
             self._data_dict.update({'total_run_time': total_run_time})
             self._data_dict.update(prometheus_result)
         # Google drive run_artifacts_url folder path
-        if self.get_run_artifacts_google_drive():
+        if self._google_drive_path and self.get_run_artifacts_google_drive():
             self._data_dict.update({'run_artifacts_url': self.get_run_artifacts_google_drive()})
         if self._es_host:
             # upload several run results
