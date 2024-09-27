@@ -92,5 +92,4 @@ class IBMOperations(BareMetalOperations):
         logger.info(f'Starting OCP assisted installer, Start time: {datetime.now().strftime(datetime_format)}')
         # Must add -t otherwise remote ssh of ansible will not end
         self._ssh.run(cmd=f"ssh -t provision \"{self.__ibm_login_cmd()};{self._install_ocp_cmd()}\" ")
-        self._wait_for_install_complete()
         logger.info(f'OpenShift cluster {self._get_installation_version()} version is installed successfully, End time: {datetime.now().strftime(datetime_format)}')
