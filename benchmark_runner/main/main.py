@@ -4,6 +4,11 @@ from enum import Enum
 from multiprocessing import set_start_method
 import platform
 
+# @todo paramiko==3.4.1/3.5.0 cause to "RunCommandError: Cannot run shell command: SSH session not active"
+import warnings
+from cryptography.utils import CryptographyDeprecationWarning
+warnings.filterwarnings("ignore", category=CryptographyDeprecationWarning)
+
 from benchmark_runner.main.environment_variables import *
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 from benchmark_runner.benchmark_operator.benchmark_operator_workloads import BenchmarkOperatorWorkloads
