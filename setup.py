@@ -60,7 +60,7 @@ setup(
         'openshift-client==1.0.17',  # clusterbuster && prometheus metrics
         'prometheus-api-client==0.5.1',  # clusterbuster && prometheus metrics
         'pandas',  # required latest
-        'paramiko==3.5.0',
+        'paramiko==3.4.0',
         'PyGitHub==1.55',  # update secrets
         'PyYAML==6.0.1',
         'setuptools',  # for python3.12
