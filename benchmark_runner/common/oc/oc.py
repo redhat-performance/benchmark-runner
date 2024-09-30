@@ -1387,7 +1387,9 @@ class OC(SSH):
         :raises: RuntimeError if the command fails.
         """
         if not odf_version:
-            raise ValueError("ODF version must be provided")
+            odf_version = ".".join(self.get_odf_version().split(".")[:2])
+            if not odf_version:
+                raise ValueError("ODF version must be provided")
 
         folder_path = os.path.join(destination_path, f"odf-must-gather-rhel9-v{odf_version}")
 
@@ -1415,7 +1417,9 @@ class OC(SSH):
         :raises: RuntimeError if the command fails.
         """
         if not cnv_version:
-            raise ValueError("CNV version must be provided")
+            cnv_version = ".".join(self.get_cnv_version().split(".")[:2])
+            if not cnv_version:
+                raise ValueError("CNV version must be provided")
 
         folder_path = os.path.join(destination_path, f"cnv-must-gather-rhel9-v{cnv_version}")
 
