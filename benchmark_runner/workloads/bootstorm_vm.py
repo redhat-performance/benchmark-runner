@@ -196,7 +196,9 @@ class BootstormVM(WorkloadsOperations):
                             failure = True
                         upgrade_done = self._oc.get_cluster_status() == f'Cluster version is {self._wait_for_upgrade_version}'
 
-                    current_wait_time += self._oc.SHORT_TIMEOUT # Increment the wait time
+                    # Sleep 1 sec between each cycle
+                    time.sleep(1)
+                    current_wait_time += 1  # Increment the wait time
             else:
                 # If _wait_for_upgrade_version is empty, verify VM SSH without waiting for upgrade
                 for vm_name in vm_names:
