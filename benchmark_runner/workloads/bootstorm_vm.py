@@ -147,29 +147,49 @@ class BootstormVM(WorkloadsOperations):
             yaml=os.path.join(f'{self._run_artifacts_path}', f'{self._name}.yaml'),
             vm_name=self._vm_name)
 
-    def _verify_single_vm(self, vm_name):
+    def _verify_single_vm(self, vm_name, retries=5, delay=10):
         """
-        This method verifies the SSH status of a single VM.
+        Verifies the SSH status of a single VM with retry mechanism and logging.
         :param vm_name: The name of the VM to verify.
+        :param retries: Number of retry attempts.
+        :param delay: Time to wait (in seconds) between retries.
         """
         vm_ssh = 0
         self._virtctl.expose_vm(vm_name=vm_name)
-        vm_node = self._oc.get_vm_node(vm_name=vm_name)
-        if vm_node:
-            node_ip = self._oc.get_nodes_addresses()[vm_node]
-            vm_node_port = self._oc.get_exposed_vm_port(vm_name=vm_name)
-            ssh_status = self._oc.get_vm_ssh_status(vm_name=vm_name, node_ip=node_ip, vm_node_port=vm_node_port)
-            vm_ssh = 1 if ssh_status == 'True' else 0
-            self._data_dict = {
-                'vm_name': vm_name,
-                'node': vm_node,
-                'vm_ssh': vm_ssh,
-                'ssh_status': ssh_status,
-                'run_artifacts_url': os.path.join(
-                    self._run_artifacts_url,
-                    f"{self._get_run_artifacts_hierarchy(workload_name=self._workload_name, is_file=True)}-{self._time_stamp_format}.tar.gz"
-                )
-            }
+
+        for attempt in range(retries):
+            try:
+                vm_node = self._oc.get_vm_node(vm_name)
+                node_ip = self._oc.get_nodes_addresses().get(vm_node)
+
+                if node_ip:
+                    vm_node_port = self._oc.get_exposed_vm_port(vm_name)
+                    ssh_status = self._oc.get_vm_ssh_status(vm_name, node_ip, vm_node_port)
+                    vm_ssh = 1 if ssh_status == 'True' else 0
+
+                    # Log success and store relevant data
+                    logger.info(f"VM {vm_name} verified successfully on node {vm_node} (SSH status: {ssh_status}).")
+
+                    self._data_dict = {
+                        'vm_name': vm_name,
+                        'node': vm_node,
+                        'vm_ssh': vm_ssh,
+                        'ssh_status': ssh_status,
+                        'run_artifacts_url': os.path.join(
+                            self._run_artifacts_url,
+                            f"{self._get_run_artifacts_hierarchy(self._workload_name, True)}-{self._time_stamp_format}.tar.gz"
+                        )
+                    }
+                    break  # Exit loop on success
+                else:
+                    logger.info(f"Attempt {attempt + 1}/{retries}: Node IP for VM {vm_name} not found. Retrying...")
+
+            except Exception as e:
+                logger.info(f"Attempt {attempt + 1}/{retries} failed for VM {vm_name}: {e}")
+
+            # Sleep for 10 seconds before retrying
+            time.sleep(delay)
+
         self._finalize_vm()
         return vm_ssh
 
