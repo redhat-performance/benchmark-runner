@@ -60,8 +60,6 @@ class WorkloadsOperations:
         self._redis = self._environment_variables_dict.get('redis', '')
         self._threads_limit = self._environment_variables_dict.get('threads_limit', '')
         self._kata_thread_pool_size = self._environment_variables_dict.get('kata_thread_pool_size', '')
-        self._cnv_version = self._environment_variables_dict.get('cnv_version', '')
-        self._odf_version = self._environment_variables_dict.get('odf_version', '')
         if self._scale:
             self._scale = int(self._scale)
             self._scale_nodes = self._environment_variables_dict.get('scale_nodes', '')
