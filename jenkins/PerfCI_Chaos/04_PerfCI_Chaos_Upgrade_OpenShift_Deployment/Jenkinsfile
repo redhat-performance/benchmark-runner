@@ -211,6 +211,8 @@ END
                                     sh """
                                         sudo podman run --rm -t \
                                         -e WORKLOAD='${workload}' \
+                                        -e ODF_VERSION="${ODF_VERSION}" \
+                                        -e CNV_VERSION="${CNV_VERSION}" \
                                         -e WAIT_FOR_UPGRADE_VERSION='${WAIT_FOR_UPGRADE_VERSION}' \
                                         -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' \
                                         -e PIN_NODE_BENCHMARK_OPERATOR='${PIN_NODE_BENCHMARK_OPERATOR}' \
