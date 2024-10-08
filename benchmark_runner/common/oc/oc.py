@@ -1407,7 +1407,7 @@ class OC(SSH):
             odf_version = ".".join(self.get_odf_version().split(".")[:2])
             if not odf_version:
                 raise ValueError("ODF version must be provided")
-
+        logger.info(f'odf version: {odf_version}')
         folder_path = os.path.join(destination_path, f"odf-must-gather-rhel9-v{odf_version}")
 
         try:
@@ -1437,6 +1437,7 @@ class OC(SSH):
             cnv_version = ".".join(self.get_cnv_version().split(".")[:2])
             if not cnv_version:
                 raise ValueError("CNV version must be provided")
+        logger.info(f'cnv version: {cnv_version}')
 
         folder_path = os.path.join(destination_path, f"cnv-must-gather-rhel9-v{cnv_version}")
 

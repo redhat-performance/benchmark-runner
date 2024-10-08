@@ -229,8 +229,8 @@ class BootstormVM(WorkloadsOperations):
             if self._wait_for_upgrade_version:
                 logger.info(f'Cluster is upgraded to: {self._wait_for_upgrade_version}')
             if failure:
-                self._oc.generate_cnv_must_gather(destination_path=self._run_artifacts_path)
-                self._oc.generate_odf_must_gather(destination_path=self._run_artifacts_path)
+                self._oc.generate_cnv_must_gather(destination_path=self._run_artifacts_path, cnv_version=self._cnv_version)
+                self._oc.generate_odf_must_gather(destination_path=self._run_artifacts_path, odf_version=self._odf_version)
                 # google drive
                 if self._google_drive_shared_drive_id:
                     self.upload_run_artifacts_to_google_drive()
