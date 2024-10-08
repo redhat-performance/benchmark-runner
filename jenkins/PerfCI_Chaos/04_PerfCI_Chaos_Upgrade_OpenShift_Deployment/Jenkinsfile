@@ -151,8 +151,6 @@ END
                                                             --privileged "${QUAY_BENCHMARK_RUNNER_REPOSITORY}"
 
                                                     """
-                                                   // Set the flag to indicate that upgrade steps are completed
-                                                   currentBuild.description = "UpgradeStageCompleted"
                                                 }
                                             }
                                         }
@@ -172,12 +170,8 @@ END
                     def WINDOWS_URL = ''
                     def SCALE = ''
                     def workload_name = ''
-                    def retryCount = 3 // Number of retries per workload
-                    // while
-                    while (currentBuild.description != "UpgradeStageCompleted") {
                     for (workload in workloads) {
-                        boolean success = false
-                        for (int i = 0; i < retryCount && !success; i++) {
+                            boolean success = false
                             try {
                                 // workload full name
                                 workload_name = workload
@@ -264,14 +258,12 @@ END
                                 } else {
                                     echo "Reached maximum retry attempts for workload ${workload}. Moving to the next workload..."
                                 }
-                            }
                         }
                         if (!success) {
                             echo "Workload ${workload} failed after ${retryCount} retries."
                         }
                         // sleep 10 sec between each VMs validation interation
                         sleep(time: 10, unit: 'SECONDS')
-                    } // while
                  }
                 }
             }
