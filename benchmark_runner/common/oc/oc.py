@@ -411,11 +411,28 @@ class OC(SSH):
 
     def get_odf_disk_count(self):
         """
-        This method returns odf disk count
-        :return:
+        This method returns the ODF disk count.
+        :return: ODF disk count or -1 if the count cannot be retrieved
         """
         if self.is_odf_installed():
-            return int(self.run(f"{self.__cli} get --no-headers pod -n openshift-storage | grep osd | grep -cv prepare"))
+            try:
+                # Run the command to get ODF disk count
+                disk_count_str = self.run(
+                    f"{self.__cli} get --no-headers pod -n openshift-storage | grep osd | grep -cv prepare")
+                disk_count = int(disk_count_str)
+                return disk_count
+            except ValueError as e:
+                # Log the error and return -1 as a fallback
+                logger.error(f"Error converting ODF disk count to integer: {e}")
+                return -1
+            except Exception as e:
+                # Handle any other unexpected errors
+                logger.error(f"Unexpected error while getting ODF disk count: {e}")
+                return -1
+        else:
+            # If ODF is not installed, return -1
+            logger.info("ODF is not installed.")
+            return -1
 
     def is_kata_installed(self):
         """
