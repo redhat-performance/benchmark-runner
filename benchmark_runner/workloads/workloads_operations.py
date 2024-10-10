@@ -118,6 +118,7 @@ class WorkloadsOperations:
                                                                  google_drive_credentials=self._google_drive_credentials,
                                                                  google_drive_token=self._google_drive_token,
                                                                  google_drive_shared_drive_id=self._google_drive_shared_drive_id)
+        self._upgrade_ocp_version = self._environment_variables_dict.get('upgrade_ocp_version', '')
 
     def _get_workload_file_name(self, workload):
         """
@@ -380,7 +381,6 @@ class WorkloadsOperations:
                                                            folder_path=str(run_artifacts_hierarchy),
                                                            parent_folder_id=self._google_drive_shared_drive_id)
 
-
     def __get_metadata(self, kind: str = None, status: str = None, result: dict = None) -> dict:
         """
         This method returns metadata for a run, optionally updates by runtime kind
@@ -391,7 +391,7 @@ class WorkloadsOperations:
         """
         date_format = '%Y_%m_%d'
         metadata = {'ocp_version': self._oc.get_ocp_server_version(),
-                    'previous_ocp_version': self._oc.get_previous_ocp_version(),
+                    'previous_ocp_version': self._oc.get_previous_ocp_version() if self._upgrade_ocp_version else '',
                     'cnv_version': self._oc.get_cnv_version(),
                     'kata_version': self._oc.get_kata_operator_version(),
                     'kata_rpm_version': self._oc.get_kata_rpm_version(node=self._pin_node1),
