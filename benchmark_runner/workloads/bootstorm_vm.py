@@ -68,21 +68,21 @@ class BootstormVM(WorkloadsOperations):
 
     @logger_time_stamp
     def _wait_ssh_vm(self, vm_name: str):
-            """
-            Verify ssh into VM and return vm node in success or False if failed
-            @return:
-            """
-            self._virtctl.expose_vm(vm_name=vm_name)
-            # wait till vm ssh login
-            if self._oc.get_vm_node(vm_name=vm_name):
-                vm_node = self._oc.get_vm_node(vm_name=vm_name)
-                if vm_node:
-                    node_ip = self._oc.get_nodes_addresses()[vm_node]
-                    vm_node_port = self._oc.get_exposed_vm_port(vm_name=vm_name)
-                    if self._oc.wait_for_vm_ssh(vm_name=vm_name, node_ip=node_ip, vm_node_port=vm_node_port):
-                        logger.info(f"Successfully ssh into VM: '{vm_name}' in Node: '{vm_node}' ")
-                    return vm_node
-            return False
+        """
+        This method verifies ssh into VM and return vm node in success or False if failed
+        @return:
+        """
+        self._virtctl.expose_vm(vm_name=vm_name)
+        # wait till vm ssh login
+        if self._oc.get_vm_node(vm_name=vm_name):
+            vm_node = self._oc.get_vm_node(vm_name=vm_name)
+            if vm_node:
+                node_ip = self._oc.get_nodes_addresses()[vm_node]
+                vm_node_port = self._oc.get_exposed_vm_port(vm_name=vm_name)
+                if self._oc.wait_for_vm_ssh(vm_name=vm_name, node_ip=node_ip, vm_node_port=vm_node_port):
+                    logger.info(f"Successfully ssh into VM: '{vm_name}' in Node: '{vm_node}' ")
+                return vm_node
+        return False
 
     @logger_time_stamp
     def _get_bootstorm_vm_elapsed_time(self, vm_name: str, vm_node: str) -> dict:
@@ -149,54 +149,53 @@ class BootstormVM(WorkloadsOperations):
 
     def _verify_single_vm(self, vm_name, retries=5, delay=10):
         """
-        Verifies the SSH status of a single VM with retry mechanism and logging.
+        This method verifies the virtctl status of a single VM using a retry mechanism
         :param vm_name: The name of the VM to verify.
         :param retries: Number of retry attempts.
         :param delay: Time to wait (in seconds) between retries.
+        @return: virtctl_status 'True' if successful, or an error message if it fails
         """
-        vm_ssh = 0
-        self._virtctl.expose_vm(vm_name=vm_name)
-
+        virtctl_status = None
         for attempt in range(retries):
             try:
-                vm_node = self._oc.get_vm_node(vm_name)
-                node_ip = self._oc.get_nodes_addresses().get(vm_node)
+                virtctl_status = self._oc.get_virtctl_vm_status(vm_name)
 
-                if node_ip:
-                    vm_node_port = self._oc.get_exposed_vm_port(vm_name)
-                    ssh_status = self._oc.get_vm_ssh_status(vm_name, node_ip, vm_node_port)
-                    vm_ssh = 1 if ssh_status == 'True' else 0
-
+                if virtctl_status == "True":
                     # Log success and store relevant data
-                    logger.info(f"VM {vm_name} verified successfully on node {vm_node} (SSH status: {ssh_status}).")
-
-                    self._data_dict = {
-                        'vm_name': vm_name,
-                        'node': vm_node,
-                        'vm_ssh': vm_ssh,
-                        'ssh_status': ssh_status,
-                        'run_artifacts_url': os.path.join(
-                            self._run_artifacts_url,
-                            f"{self._get_run_artifacts_hierarchy(self._workload_name, True)}-{self._time_stamp_format}.tar.gz"
-                        )
-                    }
+                    logger.info(f"VM {vm_name} verified successfully (virtctl SSH status: { virtctl_status}).")
                     break  # Exit loop on success
                 else:
-                    logger.info(f"Attempt {attempt + 1}/{retries}: Node IP for VM {vm_name} not found. Retrying...")
+                    logger.info(f"Attempt {attempt + 1}/{retries}: VM {vm_name} not reachable via Virtctl SSH. Retrying...")
 
             except Exception as e:
-                logger.info(f"Attempt {attempt + 1}/{retries} failed for VM {vm_name}: {e}")
+                logger.info(f"Attempt {attempt + 1}/{retries} failed for Virtctl SSH VM {vm_name}: {e}")
 
-            # Sleep for 10 seconds before retrying
+            # Sleep before retrying
             time.sleep(delay)
 
-        self._finalize_vm()
-        return vm_ssh
+        # Final update to self._data_dict after all attempts
+        vm_node = self._oc.get_vm_node(vm_name)  # Get the node again in case it changed
+        self._data_dict = {
+            'vm_name': vm_name,
+            'node': vm_node,
+            'virtctl_vm': 1 if virtctl_status == 'True' else 0, # int value for Grafana
+            'virtctl_status': virtctl_status,
+            'run_artifacts_url': os.path.join(
+                self._run_artifacts_url,
+                f"{self._get_run_artifacts_hierarchy(self._workload_name, True)}-{self._time_stamp_format}.tar.gz"
+            )
+        }
 
-    def _verify_vm_ssh(self):
+        if virtctl_status != "True":
+            logger.info(f"All attempts failed for VM {vm_name}. Final SSH status: {self._data_dict['virtctl_status']}")
+
+        self._finalize_vm()
+        return virtctl_status
+
+    def _verify_virtctl_vm(self):
         """
-        This method verifies each VM ssh login while upgrade or for all VMs
-        :return:
+        This method verifies the virtctl SSH login for each VM, either during the upgrade or once for each VM.
+        It prepares the data for ElasticSearch, generates a must-gather in case of an error, and uploads it to Google Drive
         """
         try:
             vm_names = self._oc._get_all_vm_names()
@@ -211,8 +210,8 @@ class BootstormVM(WorkloadsOperations):
 
                 while (self._timeout <= 0 or current_wait_time <= self._timeout) and not upgrade_done:
                     for vm_name in vm_names:
-                        vm_ssh = self._verify_single_vm(vm_name)
-                        if not vm_ssh:
+                        virtctl_status = self._verify_single_vm(vm_name)
+                        if virtctl_status!='True':
                             failure = True
                         upgrade_done = self._oc.get_cluster_status() == f'Cluster version is {self._wait_for_upgrade_version}'
 
@@ -222,8 +221,8 @@ class BootstormVM(WorkloadsOperations):
             else:
                 # If _wait_for_upgrade_version is empty, verify VM SSH without waiting for upgrade
                 for vm_name in vm_names:
-                    vm_ssh = self._verify_single_vm(vm_name)
-                    if not vm_ssh:
+                    virtctl_status = self._verify_single_vm(vm_name)
+                    if virtctl_status!='True':
                         failure = True
 
             if self._wait_for_upgrade_version:
@@ -326,7 +325,7 @@ class BootstormVM(WorkloadsOperations):
     def run_vm_workload(self):
         # verification only w/o running or deleting any resource
         if self._verification_only:
-            self._verify_vm_ssh()
+            self._verify_virtctl_vm()
         else:
             if not self._scale:
                 self._run_vm()

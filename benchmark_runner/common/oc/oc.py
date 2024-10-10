@@ -1181,20 +1181,34 @@ class OC(SSH):
             current_wait_time += OC.SLEEP_TIME
         raise VMStateTimeout(vm_name=vm_name, state='ssh')
 
-    def get_vm_ssh_status(self, vm_name: str = '', node_ip: str = '', vm_node_port: str = ''):
+    def get_vm_ssh_status(self, node_ip: str = '', vm_node_port: str = ''):
         """
-        This method
-        :param vm_name:
+        This method returns True when the VM is active and an error message when it is not, using SSH protocol
+        SSh VM by node ip and exposed node port
         :param node_ip:
         :param vm_node_port:
         :return:
         """
-        ssh_vm = f"ssh -o 'BatchMode=yes' -o ConnectTimeout=1 root@{node_ip} -p {vm_node_port}"
-        check_ssh_vm = f"""if [ "$(ssh -o 'BatchMode=yes' -o ConnectTimeout=1 root@{node_ip} -p {vm_node_port} 2>&1|egrep 'denied|verification failed')" ]; then echo 'True'; else echo 'False'; fi"""
-        if self.run(check_ssh_vm) == 'True':
+        ssh_vm_cmd = f"ssh -o 'BatchMode=yes' -o ConnectTimeout=1 root@{node_ip} -p {vm_node_port}"
+        check_ssh_vm_cmd = f"""if [ "$(ssh -o 'BatchMode=yes' -o ConnectTimeout=1 root@{node_ip} -p {vm_node_port} 2>&1|egrep 'denied|verification failed')" ]; then echo 'True'; else echo 'False'; fi"""
+        if self.run(check_ssh_vm_cmd) == 'True':
             return 'True'
         else:
-            return self.run(ssh_vm)
+            return self.run(ssh_vm_cmd)
+
+    def get_virtctl_vm_status(self, vm_name: str = '', namespace: str = environment_variables.environment_variables_dict['namespace']):
+        """
+        This method returns True when the VM is active and an error message when it is not, using virtctl protocol
+        :param vm_name:
+        :param namespace:
+        :return: virtctl_status 'True' if successful, or an error message if it fails.
+        """
+        virtctl_vm_cmd = f"virtctl ssh --local-ssh=true --local-ssh-opts='-o BatchMode=yes' --local-ssh-opts='-o PasswordAuthentication=no' --local-ssh-opts='-o ConnectTimeout=2' root@{vm_name} -n {namespace}"
+        check_virtctl_vm_cmd = f"virtctl ssh --local-ssh=true --local-ssh-opts='-o BatchMode=yes' --local-ssh-opts='-o PasswordAuthentication=no' --local-ssh-opts='-o ConnectTimeout=2' root@{vm_name} -n {namespace} 2>&1 |egrep 'denied|verification failed'  && echo 'True' || echo 'False'"
+        if 'True' in self.run(check_virtctl_vm_cmd):
+            return 'True'
+        else:
+            return self.run(virtctl_vm_cmd)
 
     @logger_time_stamp
     def get_vm_node(self, vm_name: str, namespace: str = environment_variables.environment_variables_dict['namespace']):
