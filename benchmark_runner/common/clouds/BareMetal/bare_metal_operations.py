@@ -230,24 +230,32 @@ class BareMetalOperations:
         self._ssh.run(f"ssh -t provision \"{self._install_ocp_cmd()}\" ")
         logger.info(f'OpenShift cluster {self._get_installation_version()} version is installed successfully, End time: {datetime.now().strftime(datetime_format)}')
 
-    @logger_time_stamp
-    def run_ocp_upgrade(self, oc: OC):
+    def is_ocp_already_upgraded(self, oc: OC):
         """
-        This method runs ocp upgrade
-        @param oc:
-        :return: True if installation success and raise exception if installation failed
+        This method checks if Openshift cluster is already upgraded
+        @return:
         """
         if f'Cluster version is {self._upgrade_ocp_version}' == oc.get_cluster_status():
             logger.info(f'Cluster is already upgraded to: {self._upgrade_ocp_version}')
+            return True
         else:
-            logger.info(f'Starting OCP upgrade, Start time: {datetime.now().strftime(datetime_format)}')
-            logger.info(f'Stop OCP healthcheck')
-            oc.healthcheck(action='stop')
-            oc.upgrade_ocp(upgrade_ocp_version=self._upgrade_ocp_version)
-            self.verify_upgrade_complete(oc=oc)
-            logger.info(f'Resume OCP healthcheck')
-            oc.healthcheck(action='resume')
-            logger.info(f'Ending OCP upgrade, End time: {datetime.now().strftime(datetime_format)}')
+            return False
+
+    @logger_time_stamp
+    def run_ocp_upgrade(self, oc: OC):
+        """
+        This method runs OpenShift upgrade
+        @param oc:
+        :return:
+        """
+        logger.info(f'Starting OCP upgrade, Start time: {datetime.now().strftime(datetime_format)}')
+        logger.info(f'Stop OCP healthcheck')
+        oc.healthcheck(action='stop')
+        oc.upgrade_ocp(upgrade_ocp_version=self._upgrade_ocp_version)
+        self.verify_upgrade_complete(oc=oc)
+        logger.info(f'Resume OCP healthcheck')
+        oc.healthcheck(action='resume')
+        logger.info(f'Ending OCP upgrade, End time: {datetime.now().strftime(datetime_format)}')
 
     @logger_time_stamp
     def verify_install_complete(self):
