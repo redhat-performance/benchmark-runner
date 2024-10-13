@@ -161,7 +161,7 @@ class OC(SSH):
         This method returns cnv version
         :return:
         """
-        return self.run(f"{self.__cli} get csv -n openshift-cnv $({self.__cli} get csv -n openshift-cnv --no-headers | awk '{{ print $1; }}') -o jsonpath='{{.spec.version}}'")
+        return self.run(f"{self.__cli} get csv -n openshift-cnv -o json | jq -r '.items[] | select(.metadata.name | startswith(\"kubevirt-hyperconverged-operator\")) | .spec.version'")
 
     def get_odf_version(self):
         """
