@@ -11,7 +11,7 @@ from benchmark_runner.common.oc.oc_exceptions import (PodNotCreateTimeout, PodNo
     PodNotCompletedTimeout, PodTerminateTimeout, PodNameNotExist, LoginFailed, VMNotCreateTimeout, VMDeleteTimeout, \
     YAMLNotExist, VMNameNotExist, VMNotInitializedTimeout, VMNotReadyTimeout, VMStateTimeout, VMNotCompletedTimeout, \
     ExecFailed, PodFailed, DVStatusTimeout, CSVNotCreateTimeout, UpgradeNotStartTimeout, OperatorInstallationTimeout, \
-    OperatorUpgradeTimeout, ODFHealthCheckTimeout)
+    OperatorUpgradeTimeout, ODFHealthCheckTimeout, NodeNotReady)
 from benchmark_runner.common.ssh.ssh import SSH
 from benchmark_runner.main.environment_variables import environment_variables
 
@@ -375,7 +375,6 @@ class OC(SSH):
         else:
             raise PodNotReadyTimeout(label)
 
-
     def wait_for_odf_healthcheck(self, pod_name: str, namespace: str,
                                  timeout: int = SHORT_TIMEOUT):
         """
@@ -457,6 +456,33 @@ class OC(SSH):
         :return:
         """
         return self.run(fr""" {self.__cli} get nodes -l node-role.kubernetes.io/worker= -o jsonpath="{{range .items[*]}}{{.metadata.name}}{{'\n'}}{{end}}" """)
+
+    @staticmethod
+    @typechecked
+    def check_node_status(nodes_list: list):
+        """
+        This method check node status
+        @param nodes_list:
+        @return: True when all nodes in ready status
+        """
+        # Check if any node is not in 'Ready' status
+        for node in nodes_list:
+            node_name, node_status = node.split()
+            if node_status != 'Ready':
+                raise NodeNotReady(node_name, node_status)
+
+        # If no nodes are found in a non-ready state
+        return True
+
+    def verify_nodes_ready(self):
+        """
+        This method verifies that all nodes are in 'Ready' status.
+        If any node is not ready, it raises an error with the node name and its status.
+        @return: True is all in 'Ready' status
+        """
+        # Get the node name and status for all nodes
+        nodes_list = self.run(f"{self.__cli} get nodes --no-headers | awk '{{print $1, $2}}'").splitlines()
+        return self.check_node_status(nodes_list)
 
     def delete_available_released_pv(self):
         """

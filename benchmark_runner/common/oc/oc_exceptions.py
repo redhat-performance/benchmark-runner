@@ -164,3 +164,10 @@ class ODFHealthCheckTimeout(OCError):
     def __init__(self):
         self.message = f"ODF health check timeout"
         super(ODFHealthCheckTimeout, self).__init__(self.message)
+
+
+class NodeNotReady(OCError):
+    """This exception returns node not ready timeout error"""
+    def __init__(self, node_name, node_status):
+        self.message = f"Node {node_name} is not ready. Current status: {node_status}"
+        super(NodeNotReady, self).__init__(self.message)
