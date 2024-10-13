@@ -4,7 +4,7 @@ from os import path
 from setuptools import setup, find_packages
 
 
-__version__ = '1.0.679'  # update also .bumpversion.cfg
+__version__ = '1.0.680'  # update also .bumpversion.cfg
 
 
 here = path.abspath(path.dirname(__file__))
