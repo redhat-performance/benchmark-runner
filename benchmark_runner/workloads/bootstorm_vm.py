@@ -187,7 +187,15 @@ class BootstormVM(WorkloadsOperations):
         }
 
         if virtctl_status != "True":
-            logger.info(f"All attempts failed for VM {vm_name}. Final SSH status: {self._data_dict['virtctl_status']}")
+            logger.info(
+                f"All attempts failed for VM {vm_name}. Final SSH status: {self._data_dict.get('virtctl_status', 'No status available')}")
+            error_log_path = f"{self._run_artifacts_path}/{vm_name}_error.log"
+
+            # Retrieve the status or use a default message
+            status_message = self._data_dict.get('virtctl_status') or "No status available"
+
+            with open(error_log_path, "w") as error_log_file:
+                error_log_file.write(str(status_message))  # Convert to string just in case
 
         self._finalize_vm()
         return virtctl_status
