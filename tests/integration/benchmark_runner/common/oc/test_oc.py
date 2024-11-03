@@ -234,11 +234,11 @@ def test_collect_prometheus():
         assert tarfile.is_tarfile(tarball)
 
 
-def test_verify_nodes_ready():
+def test_wait_for_nodes_ready():
     """
-    This method test nodes are ready
+    This method waits till nodes are ready
     @return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.login()
-    assert oc.verify_nodes_ready()
+    assert oc.wait_for_node_ready()
