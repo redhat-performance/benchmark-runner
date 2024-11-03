@@ -102,7 +102,7 @@ class EnvironmentVariables:
                                                          'hammerdb_pod_mssql', 'hammerdb_vm_mssql', 'hammerdb_kata_mssql',
                                                          'hammerdb_pod_mssql_lso', 'hammerdb_vm_mssql_lso', 'hammerdb_kata_mssql_lso',
                                                          'vdbench_pod', 'vdbench_kata', 'vdbench_vm',
-                                                         'clusterbuster', 'bootstorm_vm', 'windows_vm']
+                                                         'clusterbuster', 'bootstorm_vm', 'windows_vm', 'krknhub']
         # Workloads namespaces
         self._environment_variables_dict['workload_namespaces'] = {
             'stressng': 'benchmark-operator',
@@ -111,7 +111,8 @@ class EnvironmentVariables:
             'vdbench': 'benchmark-runner',
             'clusterbuster': 'clusterbuster',
             'bootstorm': 'benchmark-runner',
-            'windows': 'benchmark-runner'
+            'windows': 'benchmark-runner',
+            'krknhub': 'krknhub',
         }
 
         # Update namespace
@@ -189,6 +190,12 @@ class EnvironmentVariables:
         # CLUSTRBUSTER data
         self._environment_variables_dict['clusterbuster_workload'] = EnvironmentVariables.get_env('CLUSTERBUSTER_WORKLOAD', '')
         self._environment_variables_dict['clusterbuster_uuid'] = EnvironmentVariables.get_env('CLUSTERBUSTER_UUID', '')
+
+        # KRKN HUB data: Chaos testing
+        # For more details, see the documentation: https://github.com/krkn-chaos/krkn-hub?tab=readme-ov-file#supported-chaos-scenarios.
+        self._environment_variables_dict['krknhub_workload'] = EnvironmentVariables.get_env('KRKNHUB_WORKLOAD', '')
+        # e.g. "export CLOUD_TYPE='test'; export BMC_USER='user'"
+        self._environment_variables_dict['krknhub_environment_variables'] = EnvironmentVariables.get_env('KRKNHUB_ENVIRONMENT_VARIABLES', '')
 
         # IBM data
         self._environment_variables_dict['region_name'] = EnvironmentVariables.get_env('IBM_REGION_NAME', '')
