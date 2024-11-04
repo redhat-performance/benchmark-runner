@@ -457,32 +457,61 @@ class OC(SSH):
         """
         return self.run(fr""" {self.__cli} get nodes -l node-role.kubernetes.io/worker= -o jsonpath="{{range .items[*]}}{{.metadata.name}}{{'\n'}}{{end}}" """)
 
-    @staticmethod
     @typechecked
-    def check_node_status(nodes_list: list):
+    def wait_for_node_ready(self, node: str = None, wait_time: int = None, timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
         """
-        This method check node status
-        @param nodes_list:
-        @return: True when all nodes in ready status
+        This method waits until all nodes are in 'Ready' status or specific node
+        @param node: wait for specific node to be ready, when None check all nodes
+        @param wait_time: wait time between each loop
+        @param timeout: Maximum wait time in seconds, negative value means no timeout (default set in environment variables)
+        @return: True if all nodes are in 'Ready' status within the timeout period
+        @raises: NodeNotReady if one or more nodes are not ready within the timeout
         """
-        # Check if any node is not in 'Ready' status
-        for node in nodes_list:
-            node_name, node_status = node.split()
+        wait_time = wait_time or OC.SHORT_TIMEOUT
+        nodes_status = None
+        current_wait_time = 0
+        while timeout <= 0 or current_wait_time < timeout:
+            nodes_status = self.check_node_status(node=node)
+            if nodes_status is True:
+                return True
+            logger.info(f"Waiting for '{nodes_status}' to reach 'Ready' status")
+            time.sleep(wait_time)
+            current_wait_time += wait_time
+        logger.info(f"oc get nodes:\n{self.run('oc get nodes')}")
+        raise NodeNotReady(nodes_status=nodes_status)
+
+    @typechecked
+    def check_node_status(self, node: str = None):
+        """
+        This method checks the status of all nodes or a specific node.
+        @param node: The name of a specific node to check for "Ready" status; if None, check all nodes.
+        @return: True if all nodes are in 'Ready' status, or a dictionary of nodes that are not in 'Ready' status.
+        """
+        not_ready_nodes = {}
+
+        for node_state in self.get_node_status():
+            node_name, node_status = node_state.split()
+
+            # If a specific node is given, only check that node
+            if node and node != node_name:
+                continue
+
             if node_status != 'Ready':
-                raise NodeNotReady(node_name, node_status)
+                not_ready_nodes[node_name] = node_status
+                # If checking a specific node and it's not ready, no need to check further
+                if node:
+                    break
 
-        # If no nodes are found in a non-ready state
-        return True
+        return True if not not_ready_nodes else not_ready_nodes
 
-    def verify_nodes_ready(self):
+    def get_node_status(self) -> list:
         """
-        This method verifies that all nodes are in 'Ready' status.
-        If any node is not ready, it raises an error with the node name and its status.
-        @return: True is all in 'Ready' status
+        This method returns node status list
+        @return:
         """
         # Get the node name and status for all nodes
         nodes_list = self.run(f"{self.__cli} get nodes --no-headers | awk '{{print $1, $2}}'").splitlines()
-        return self.check_node_status(nodes_list)
+        return nodes_list
 
     def delete_available_released_pv(self):
         """

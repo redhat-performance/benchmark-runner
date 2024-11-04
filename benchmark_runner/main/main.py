@@ -175,7 +175,7 @@ def upgrade_ocp_bare_metal(step: str):
     elif step == 'verify_bare_metal_upgrade_complete':
         if bare_metal_operations.is_cluster_upgraded(oc, cnv_version=cnv_version, odf_version=odf_version, lso_version=lso_version):
             bare_metal_operations.verify_cluster_is_up(oc)
-            oc.verify_nodes_ready()
+            oc.wait_for_node_ready()
         else:
             error_message = f'OCP {upgrade_ocp_version} upgrade failed'
             logger.error(error_message)
@@ -200,7 +200,7 @@ def install_resources():
     logger.info(f'Start Bare-Metal OpenShift resources installation')
     oc = bare_metal_operations.oc_login()
     bare_metal_operations.verify_cluster_is_up(oc)
-    oc.verify_nodes_ready()
+    oc.wait_for_node_ready()
     bare_metal_operations.install_ocp_resources(resources=resources)
     bare_metal_operations.disconnect_from_provisioner()
     logger.info(f'End Bare-Metal OpenShift resources installation')
