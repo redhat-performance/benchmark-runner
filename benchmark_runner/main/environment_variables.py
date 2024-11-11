@@ -86,6 +86,8 @@ class EnvironmentVariables:
         self._environment_variables_dict['windows_url'] = EnvironmentVariables.get_env('WINDOWS_URL', '')
         # Delete all resources before and after the run, default True
         self._environment_variables_dict['delete_all'] = EnvironmentVariables.get_boolean_from_environment('DELETE_ALL', True)
+        # Run RunStrategy: Always can be set to True or False (default: False). Set it to True for VMs that need to start in a running state
+        self._environment_variables_dict['run_strategy'] = EnvironmentVariables.get_boolean_from_environment('RUN_STRATEGY', False)
         # Verification only, without running or deleting any resources, default False
         self._environment_variables_dict['verification_only'] = EnvironmentVariables.get_boolean_from_environment('VERIFICATION_ONLY', False)
         # Verification while upgrade, e.g. 4.15.23

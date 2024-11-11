@@ -119,6 +119,7 @@ class WorkloadsOperations:
                                                                  google_drive_token=self._google_drive_token,
                                                                  google_drive_shared_drive_id=self._google_drive_shared_drive_id)
         self._upgrade_ocp_version = self._environment_variables_dict.get('upgrade_ocp_version', '')
+        self._run_strategy = self._environment_variables_dict.get('run_strategy', '')
 
     def _get_workload_file_name(self, workload):
         """

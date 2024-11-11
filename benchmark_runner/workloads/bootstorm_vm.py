@@ -101,7 +101,9 @@ class BootstormVM(WorkloadsOperations):
         """
         try:
             self._oc.create_async(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self._name}_{vm_num}.yaml'))
-            self._oc.wait_for_vm_status(vm_name=f'{self._workload_name}-{self._trunc_uuid}-{vm_num}', status=VMStatus.Stopped)
+            # run_strategy run immediately the vm
+            if not self._run_strategy:
+                self._oc.wait_for_vm_status(vm_name=f'{self._workload_name}-{self._trunc_uuid}-{vm_num}', status=VMStatus.Stopped)
         except Exception as err:
             # save run artifacts logs
             self.save_error_logs()
@@ -260,7 +262,9 @@ class BootstormVM(WorkloadsOperations):
         try:
             vm_name = f'{self._workload_name}-{self._trunc_uuid}-{vm_num}'
             self._set_bootstorm_vm_start_time(vm_name=f'{self._workload_name}-{self._trunc_uuid}-{vm_num}')
-            self._virtctl.start_vm_async(vm_name=f'{self._workload_name}-{self._trunc_uuid}-{vm_num}')
+            # run_strategy run immediately the vm
+            if not self._run_strategy:
+                self._virtctl.start_vm_async(vm_name=f'{self._workload_name}-{self._trunc_uuid}-{vm_num}')
             self._virtctl.wait_for_vm_status(vm_name=vm_name, status=VMStatus.Running)
             vm_node = self._wait_ssh_vm(vm_name)
             self._data_dict = self._get_bootstorm_vm_elapsed_time(vm_name=vm_name, vm_node=vm_node)

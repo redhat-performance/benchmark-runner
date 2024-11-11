@@ -44,6 +44,7 @@ pipeline {
         SAVE_ARTIFACTS_LOCAL = 'False'
         ENABLE_PROMETHEUS_SNAPSHOT = 'True'
         DELETE_ALL = 'False' // Not delete the running Windows11 VMs
+        RUN_STRATEGY = 'True' // runStrategy: Always for NHC/ SNR operators
         RUN_TYPE = 'perf_ci'
         PROVISION_PORT = 22
         NUM_ODF_DISK = 6
@@ -212,6 +213,7 @@ END
                                         -e THREADS_LIMIT='${THREADS_LIMIT}' \
                                         -e WINDOWS_URL='${WINDOWS_URL}'  \
                                         -e DELETE_ALL=${DELETE_ALL} \
+                                        -e RUN_STRATEGY=${RUN_STRATEGY} \
                                         -e LSO_NODE='${LSO_NODE}'  \
                                         -e TIMEOUT='${TIMEOUT}' \
                                         -e log_level='INFO' \
