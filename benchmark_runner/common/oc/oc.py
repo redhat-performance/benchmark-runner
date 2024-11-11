@@ -359,14 +359,13 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def wait_for_patch(self, pod_name: str, label: str, label_uuid: bool, namespace: str, timeout: int = SHORT_TIMEOUT):
+    def wait_for_patch(self, pod_name: str, label: str, label_uuid: bool, namespace: str):
         """
         This method waits for patch, needs to wait that pod is created and then wait for ready
         @param pod_name:
         @param label:
         @param label_uuid:
         @param namespace:
-        @param timeout:
         @return:
         """
         self.wait_for_pod_create(pod_name=pod_name, namespace=namespace)
@@ -375,8 +374,10 @@ class OC(SSH):
         else:
             raise PodNotReadyTimeout(label)
 
+    @typechecked
+    @logger_time_stamp
     def wait_for_odf_healthcheck(self, pod_name: str, namespace: str,
-                                 timeout: int = SHORT_TIMEOUT):
+                                 timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
         """
         This method waits for patch, needs to wait that pod is created and then wait for ready
         @param pod_name:
