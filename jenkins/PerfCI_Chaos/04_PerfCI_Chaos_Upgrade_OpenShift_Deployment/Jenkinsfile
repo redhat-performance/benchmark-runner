@@ -61,7 +61,7 @@ pipeline {
         VERIFICATION_ONLY = 'True'
         RUN_TYPE = 'perf_ci'
         NUM_ODF_DISK = 6
-        WINDOWS_SCALE = 50
+        WINDOWS_SCALE = 40
         THREADS_LIMIT = 20
         PROVISION_TIMEOUT = 7200
         TIMEOUT = 7200

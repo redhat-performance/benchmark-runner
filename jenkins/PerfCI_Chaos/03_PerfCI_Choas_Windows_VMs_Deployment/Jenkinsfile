@@ -50,7 +50,7 @@ pipeline {
         NUM_ODF_DISK = 6
         VDBENCH_SCALE = 2
         BOOTSTORM_SCALE = 80
-        WINDOWS_SCALE = 50
+        WINDOWS_SCALE = 40
         THREADS_LIMIT= 20
         PROVISION_TIMEOUT = 3600
         TIMEOUT = 8000
