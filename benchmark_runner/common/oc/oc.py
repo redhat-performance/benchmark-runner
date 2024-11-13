@@ -379,22 +379,28 @@ class OC(SSH):
     def wait_for_odf_healthcheck(self, pod_name: str, namespace: str,
                                  timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
         """
-        This method waits for patch, needs to wait that pod is created and then wait for ready
-        @param pod_name:
-        @param namespace:
-        @param timeout:
-        @return:
+        This method waits for the ODF health check by ensuring the pod is created and reaches the 'HEALTH_OK' status.
+
+        @param pod_name: Name of the pod to check health.
+        @param namespace: Namespace where the pod is located.
+        @param timeout: Timeout in seconds for waiting. If set to 0 or negative, wait indefinitely.
+        @return: True if health check passes within the timeout.
+        @raise ODFHealthCheckTimeout: If health check fails within the timeout.
         """
         current_wait_time = 0
         health_check = f"{self.__cli} -n {namespace} rsh {self._get_pod_name(pod_name=pod_name, namespace=namespace)} ceph health"
-        while timeout <= 0 or current_wait_time <= timeout and 'HEALTH_OK' != self.run(health_check).strip():
-            # sleep for x seconds
+
+        while timeout <= 0 or current_wait_time <= timeout:
+            if 'HEALTH_OK' == self.run(health_check).strip():
+                return True
+
+            # Sleep for a defined interval and update the wait time
             time.sleep(OC.SLEEP_TIME)
             current_wait_time += OC.SLEEP_TIME
-        if 'HEALTH_OK' == self.run(health_check).strip():
-            return True
-        else:
-            raise ODFHealthCheckTimeout()
+
+        # Raise exception if health check fails within the timeout
+        raise ODFHealthCheckTimeout(
+            message=f"Health check failed for pod '{pod_name}' in namespace '{namespace}' after {timeout} seconds.")
 
     @typechecked
     @logger_time_stamp
@@ -471,7 +477,7 @@ class OC(SSH):
         wait_time = wait_time or OC.SHORT_TIMEOUT
         nodes_status = None
         current_wait_time = 0
-        while timeout <= 0 or current_wait_time < timeout:
+        while timeout <= 0 or current_wait_time <= timeout:
             nodes_status = self.check_node_status(node=node)
             if nodes_status is True:
                 return True
