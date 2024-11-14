@@ -161,6 +161,13 @@ class OperatorUpgradeTimeout(OCError):
 
 class ODFHealthCheckTimeout(OCError):
     """This exception return odf healthcheck timeout error"""
-    def __init__(self):
-        self.message = f"ODF health check timeout"
+    def __init__(self, message: str):
+        self.message = message
         super(ODFHealthCheckTimeout, self).__init__(self.message)
+
+
+class NodeNotReady(OCError):
+    """This exception indicates a node not ready due to a timeout error"""
+    def __init__(self, nodes_status: dict):
+        self.message = f"Node not ready: {nodes_status}"
+        super(NodeNotReady, self).__init__(self.message)

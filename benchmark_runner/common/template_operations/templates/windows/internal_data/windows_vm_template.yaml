@@ -12,7 +12,11 @@ metadata:
   {%- endif %}
   namespace: {{ namespace }}
 spec:
+  {% if run_strategy -%}
+  runStrategy: Always
+  {%- else -%}
   running: false
+  {%- endif %}
   template:
     metadata:
       labels:

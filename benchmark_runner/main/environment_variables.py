@@ -86,8 +86,12 @@ class EnvironmentVariables:
         self._environment_variables_dict['windows_url'] = EnvironmentVariables.get_env('WINDOWS_URL', '')
         # Delete all resources before and after the run, default True
         self._environment_variables_dict['delete_all'] = EnvironmentVariables.get_boolean_from_environment('DELETE_ALL', True)
+        # Run RunStrategy: Always can be set to True or False (default: False). Set it to True for VMs that need to start in a running state
+        self._environment_variables_dict['run_strategy'] = EnvironmentVariables.get_boolean_from_environment('RUN_STRATEGY', False)
         # Verification only, without running or deleting any resources, default False
         self._environment_variables_dict['verification_only'] = EnvironmentVariables.get_boolean_from_environment('VERIFICATION_ONLY', False)
+        # Verification while upgrade, e.g. 4.15.23
+        self._environment_variables_dict['wait_for_upgrade_version'] = EnvironmentVariables.get_env('WAIT_FOR_UPGRADE_VERSION', '')
 
         # default parameter - change only if needed
         # Parameters below related to 'run_workload()'
@@ -100,7 +104,7 @@ class EnvironmentVariables:
                                                          'hammerdb_pod_mssql', 'hammerdb_vm_mssql', 'hammerdb_kata_mssql',
                                                          'hammerdb_pod_mssql_lso', 'hammerdb_vm_mssql_lso', 'hammerdb_kata_mssql_lso',
                                                          'vdbench_pod', 'vdbench_kata', 'vdbench_vm',
-                                                         'clusterbuster', 'bootstorm_vm', 'windows_vm']
+                                                         'clusterbuster', 'bootstorm_vm', 'windows_vm', 'krknhub']
         # Workloads namespaces
         self._environment_variables_dict['workload_namespaces'] = {
             'stressng': 'benchmark-operator',
@@ -109,7 +113,8 @@ class EnvironmentVariables:
             'vdbench': 'benchmark-runner',
             'clusterbuster': 'clusterbuster',
             'bootstorm': 'benchmark-runner',
-            'windows': 'benchmark-runner'
+            'windows': 'benchmark-runner',
+            'krknhub': 'krknhub',
         }
 
         # Update namespace
@@ -188,6 +193,12 @@ class EnvironmentVariables:
         self._environment_variables_dict['clusterbuster_workload'] = EnvironmentVariables.get_env('CLUSTERBUSTER_WORKLOAD', '')
         self._environment_variables_dict['clusterbuster_uuid'] = EnvironmentVariables.get_env('CLUSTERBUSTER_UUID', '')
 
+        # KRKN HUB data: Chaos testing
+        # For more details, see the documentation: https://github.com/krkn-chaos/krkn-hub?tab=readme-ov-file#supported-chaos-scenarios.
+        self._environment_variables_dict['krknhub_workload'] = EnvironmentVariables.get_env('KRKNHUB_WORKLOAD', '')
+        # e.g. "export CLOUD_TYPE='test'; export BMC_USER='user'"
+        self._environment_variables_dict['krknhub_environment_variables'] = EnvironmentVariables.get_env('KRKNHUB_ENVIRONMENT_VARIABLES', '')
+
         # IBM data
         self._environment_variables_dict['region_name'] = EnvironmentVariables.get_env('IBM_REGION_NAME', '')
         # None(default) - must for unittest
@@ -196,6 +207,12 @@ class EnvironmentVariables:
         self._environment_variables_dict['secret_access_key'] = EnvironmentVariables.get_env('IBM_SECRET_ACCESS_KEY', '')
         self._environment_variables_dict['bucket'] = EnvironmentVariables.get_env('IBM_BUCKET', '')
         self._environment_variables_dict['key'] = EnvironmentVariables.get_env('IBM_KEY', '')
+
+        # Google drive
+        self._environment_variables_dict['google_drive_path'] = EnvironmentVariables.get_env('GOOGLE_DRIVE_PATH', '')
+        self._environment_variables_dict['google_drive_credentials'] = EnvironmentVariables.get_env('GOOGLE_DRIVE_CREDENTIALS', '')
+        self._environment_variables_dict['google_drive_token'] = EnvironmentVariables.get_env('GOOGLE_DRIVE_TOKEN', '')
+        self._environment_variables_dict['google_drive_shared_drive_id'] = EnvironmentVariables.get_env('GOOGLE_DRIVE_SHARED_DRIVE_ID', '')
 
         # Grafana
         self._environment_variables_dict['grafana_url'] = EnvironmentVariables.get_env('GRAFANA_URL', '')
@@ -252,7 +269,7 @@ class EnvironmentVariables:
         # IBM data
         self._environment_variables_dict['ibm_api_key'] = EnvironmentVariables.get_env('IBM_API_KEY', '')
         # GitHub token
-        self._environment_variables_dict['github_token'] = EnvironmentVariables.get_env('GITHUB_TOKEN', '')
+        self._environment_variables_dict['git_token'] = EnvironmentVariables.get_env('GIT_TOKEN', '')
         self._environment_variables_dict['worker_ids'] = EnvironmentVariables.get_env(f'WORKER_IDS', "")
         self._environment_variables_dict['provision_ip'] = EnvironmentVariables.get_env(f'PROVISION_IP', '')
         # Placed on secret only
