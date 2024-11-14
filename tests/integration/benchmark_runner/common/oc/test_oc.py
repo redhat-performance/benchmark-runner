@@ -232,3 +232,13 @@ def test_collect_prometheus():
         time.sleep(10)
         tarball = snapshot.retrieve_snapshot(post_wait_time=1)
         assert tarfile.is_tarfile(tarball)
+
+
+def test_wait_for_nodes_ready():
+    """
+    This method waits till nodes are ready
+    @return:
+    """
+    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
+    oc.login()
+    assert oc.wait_for_node_ready()

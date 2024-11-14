@@ -1,0 +1,41 @@
+---
+apiVersion: remediation.medik8s.io/v1alpha1
+kind: NodeHealthCheck
+metadata:
+  name: chaos-nodehealthcheck
+spec:
+  minHealthy: 1
+  remediationTemplate:
+    apiVersion: self-node-remediation.medik8s.io/v1alpha1
+    name: self-node-remediation-automatic-strategy-template
+    namespace: openshift-workload-availability
+    kind: SelfNodeRemediationTemplate
+  selector:
+    matchExpressions:
+      - key: node-role.kubernetes.io/worker
+        operator: Exists
+  unhealthyConditions:
+    - type: Ready
+      status: "False"
+      duration: 20s
+    - type: Ready
+      status: Unknown
+      duration: 20s
+
+---
+apiVersion: v1
+items:
+  - apiVersion: self-node-remediation.medik8s.io/v1alpha1
+    kind: SelfNodeRemediationTemplate
+    metadata:
+      annotations:
+        remediation.medik8s.io/multiple-templates-support: "true"
+      name: self-node-remediation-automatic-strategy-template
+      namespace: openshift-workload-availability
+    spec:
+      template:
+        spec:
+          remediationStrategy: OutOfServiceTaint
+kind: List
+metadata:
+  resourceVersion: ""

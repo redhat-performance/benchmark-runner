@@ -8,6 +8,7 @@ from benchmark_runner.common.ocp_resources.create_lso import CreateLSO
 from benchmark_runner.common.ocp_resources.create_odf import CreateODF
 from benchmark_runner.common.ocp_resources.create_kata import CreateKata
 from benchmark_runner.common.ocp_resources.create_cnv import CreateCNV
+from benchmark_runner.common.ocp_resources.create_nhc_snr import CreateNHCSNR
 from benchmark_runner.common.ocp_resources.create_custom import CreateCustom
 from benchmark_runner.common.ocp_resources.migrate_infra import MigrateInfra
 
@@ -27,7 +28,7 @@ class CreateOCPResource:
         if self.__worker_disk_ids:
             if self.__worker_disk_ids:
                 # Solved GitHub Actions issue that env variable detect as string instead of dict/ list -skip for Jenkins
-                if self.__environment_variables_dict.get('github_token', ''):
+                if self.__environment_variables_dict.get('git_token', ''):
                     self.__worker_disk_ids = self.__worker_disk_ids.replace('"', '')
                 self.__worker_disk_ids = ast.literal_eval(self.__worker_disk_ids)
 
@@ -91,6 +92,9 @@ class CreateOCPResource:
         elif 'cnv' == resource:
             create_cnv = CreateCNV(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files)
             create_cnv.create_cnv()
+        elif 'nhc_snr' == resource:
+            create_nhc_snr = CreateNHCSNR(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files)
+            create_nhc_snr.create_nhc_snr()
         elif 'infra' == resource:
             create_infra = MigrateInfra(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files)
             create_infra.migrate_infra()

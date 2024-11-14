@@ -1,6 +1,7 @@
 
 import os
 import ast
+import shutil
 import time
 from enum import Enum
 from typeguard import typechecked
@@ -10,7 +11,7 @@ from benchmark_runner.common.oc.oc_exceptions import (PodNotCreateTimeout, PodNo
     PodNotCompletedTimeout, PodTerminateTimeout, PodNameNotExist, LoginFailed, VMNotCreateTimeout, VMDeleteTimeout, \
     YAMLNotExist, VMNameNotExist, VMNotInitializedTimeout, VMNotReadyTimeout, VMStateTimeout, VMNotCompletedTimeout, \
     ExecFailed, PodFailed, DVStatusTimeout, CSVNotCreateTimeout, UpgradeNotStartTimeout, OperatorInstallationTimeout, \
-    OperatorUpgradeTimeout, ODFHealthCheckTimeout)
+    OperatorUpgradeTimeout, ODFHealthCheckTimeout, NodeNotReady)
 from benchmark_runner.common.ssh.ssh import SSH
 from benchmark_runner.main.environment_variables import environment_variables
 
@@ -50,6 +51,14 @@ class OC(SSH):
         """
         return self.run(f"{self.__cli} get clusterversion version -o jsonpath='{{.status.desired.version}}'")
 
+    def get_previous_ocp_version(self):
+        """
+        This method returns the previous OpenShift server version from the history.
+        :return: Previous OpenShift server version as a string
+        """
+        # Run the `oc` command to get the ClusterVersion history and extract the previous version
+        return self.run(f"{self.__cli} get clusterversion version -o jsonpath='{{.status.history[1].version}}'")
+
     def upgrade_ocp(self, upgrade_ocp_version: str):
         """
         This method upgrades OCP version with conditional handling for specific versions.
@@ -76,7 +85,7 @@ class OC(SSH):
         return status == 'True'
 
     @logger_time_stamp
-    def wait_for_upgrade_start(self, upgrade_version: str, timeout: int = SHORT_TIMEOUT):
+    def wait_for_ocp_upgrade_start(self, upgrade_version: str, timeout: int = SHORT_TIMEOUT):
         """
         This method waits for ocp upgrade to start
         :param upgrade_version:
@@ -152,7 +161,7 @@ class OC(SSH):
         This method returns cnv version
         :return:
         """
-        return self.run(f"{self.__cli} get csv -n openshift-cnv $({self.__cli} get csv -n openshift-cnv --no-headers | awk '{{ print $1; }}') -o jsonpath='{{.spec.version}}'")
+        return self.run(f"{self.__cli} get csv -n openshift-cnv -o json | jq -r '.items[] | select(.metadata.name | startswith(\"kubevirt-hyperconverged-operator\")) | .spec.version'")
 
     def get_odf_version(self):
         """
@@ -350,14 +359,13 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def wait_for_patch(self, pod_name: str, label: str, label_uuid: bool, namespace: str, timeout: int = SHORT_TIMEOUT):
+    def wait_for_patch(self, pod_name: str, label: str, label_uuid: bool, namespace: str):
         """
         This method waits for patch, needs to wait that pod is created and then wait for ready
         @param pod_name:
         @param label:
         @param label_uuid:
         @param namespace:
-        @param timeout:
         @return:
         """
         self.wait_for_pod_create(pod_name=pod_name, namespace=namespace)
@@ -366,26 +374,33 @@ class OC(SSH):
         else:
             raise PodNotReadyTimeout(label)
 
-
+    @typechecked
+    @logger_time_stamp
     def wait_for_odf_healthcheck(self, pod_name: str, namespace: str,
-                                 timeout: int = SHORT_TIMEOUT):
+                                 timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
         """
-        This method waits for patch, needs to wait that pod is created and then wait for ready
-        @param pod_name:
-        @param namespace:
-        @param timeout:
-        @return:
+        This method waits for the ODF health check by ensuring the pod is created and reaches the 'HEALTH_OK' status.
+
+        @param pod_name: Name of the pod to check health.
+        @param namespace: Namespace where the pod is located.
+        @param timeout: Timeout in seconds for waiting. If set to 0 or negative, wait indefinitely.
+        @return: True if health check passes within the timeout.
+        @raise ODFHealthCheckTimeout: If health check fails within the timeout.
         """
         current_wait_time = 0
         health_check = f"{self.__cli} -n {namespace} rsh {self._get_pod_name(pod_name=pod_name, namespace=namespace)} ceph health"
-        while timeout <= 0 or current_wait_time <= timeout and 'HEALTH_OK' != self.run(health_check).strip():
-            # sleep for x seconds
+
+        while timeout <= 0 or current_wait_time <= timeout:
+            if 'HEALTH_OK' == self.run(health_check).strip():
+                return True
+
+            # Sleep for a defined interval and update the wait time
             time.sleep(OC.SLEEP_TIME)
             current_wait_time += OC.SLEEP_TIME
-        if 'HEALTH_OK' == self.run(health_check).strip():
-            return True
-        else:
-            raise ODFHealthCheckTimeout()
+
+        # Raise exception if health check fails within the timeout
+        raise ODFHealthCheckTimeout(
+            message=f"Health check failed for pod '{pod_name}' in namespace '{namespace}' after {timeout} seconds.")
 
     @typechecked
     @logger_time_stamp
@@ -402,11 +417,28 @@ class OC(SSH):
 
     def get_odf_disk_count(self):
         """
-        This method returns odf disk count
-        :return:
+        This method returns the ODF disk count.
+        :return: ODF disk count or -1 if the count cannot be retrieved
         """
         if self.is_odf_installed():
-            return int(self.run(f"{self.__cli} get --no-headers pod -n openshift-storage | grep osd | grep -cv prepare"))
+            try:
+                # Run the command to get ODF disk count
+                disk_count_str = self.run(
+                    f"{self.__cli} get --no-headers pod -n openshift-storage | grep osd | grep -cv prepare")
+                disk_count = int(disk_count_str)
+                return disk_count
+            except ValueError as e:
+                # Log the error and return -1 as a fallback
+                logger.error(f"Error converting ODF disk count to integer: {e}")
+                return -1
+            except Exception as e:
+                # Handle any other unexpected errors
+                logger.error(f"Unexpected error while getting ODF disk count: {e}")
+                return -1
+        else:
+            # If ODF is not installed, return -1
+            logger.info("ODF is not installed.")
+            return -1
 
     def is_kata_installed(self):
         """
@@ -431,6 +463,62 @@ class OC(SSH):
         :return:
         """
         return self.run(fr""" {self.__cli} get nodes -l node-role.kubernetes.io/worker= -o jsonpath="{{range .items[*]}}{{.metadata.name}}{{'\n'}}{{end}}" """)
+
+    @typechecked
+    def wait_for_node_ready(self, node: str = None, wait_time: int = None, timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
+        """
+        This method waits until all nodes are in 'Ready' status or specific node
+        @param node: wait for specific node to be ready, when None check all nodes
+        @param wait_time: wait time between each loop
+        @param timeout: Maximum wait time in seconds, negative value means no timeout (default set in environment variables)
+        @return: True if all nodes are in 'Ready' status within the timeout period
+        @raises: NodeNotReady if one or more nodes are not ready within the timeout
+        """
+        wait_time = wait_time or OC.SHORT_TIMEOUT
+        nodes_status = None
+        current_wait_time = 0
+        while timeout <= 0 or current_wait_time <= timeout:
+            nodes_status = self.check_node_status(node=node)
+            if nodes_status is True:
+                return True
+            logger.info(f"Waiting for '{nodes_status}' to reach 'Ready' status")
+            time.sleep(wait_time)
+            current_wait_time += wait_time
+        logger.info(f"oc get nodes:\n{self.run('oc get nodes')}")
+        raise NodeNotReady(nodes_status=nodes_status)
+
+    @typechecked
+    def check_node_status(self, node: str = None):
+        """
+        This method checks the status of all nodes or a specific node.
+        @param node: The name of a specific node to check for "Ready" status; if None, check all nodes.
+        @return: True if all nodes are in 'Ready' status, or a dictionary of nodes that are not in 'Ready' status.
+        """
+        not_ready_nodes = {}
+
+        for node_state in self.get_node_status():
+            node_name, node_status = node_state.split()
+
+            # If a specific node is given, only check that node
+            if node and node != node_name:
+                continue
+
+            if node_status != 'Ready':
+                not_ready_nodes[node_name] = node_status
+                # If checking a specific node and it's not ready, no need to check further
+                if node:
+                    break
+
+        return True if not not_ready_nodes else not_ready_nodes
+
+    def get_node_status(self) -> list:
+        """
+        This method returns node status list
+        @return:
+        """
+        # Get the node name and status for all nodes
+        nodes_list = self.run(f"{self.__cli} get nodes --no-headers | awk '{{print $1, $2}}'").splitlines()
+        return nodes_list
 
     def delete_available_released_pv(self):
         """
@@ -1155,6 +1243,35 @@ class OC(SSH):
             current_wait_time += OC.SLEEP_TIME
         raise VMStateTimeout(vm_name=vm_name, state='ssh')
 
+    def get_vm_ssh_status(self, node_ip: str = '', vm_node_port: str = ''):
+        """
+        This method returns True when the VM is active and an error message when it is not, using SSH protocol
+        SSh VM by node ip and exposed node port
+        :param node_ip:
+        :param vm_node_port:
+        :return:
+        """
+        ssh_vm_cmd = f"ssh -o 'BatchMode=yes' -o ConnectTimeout=1 root@{node_ip} -p {vm_node_port}"
+        check_ssh_vm_cmd = f"""if [ "$(ssh -o 'BatchMode=yes' -o ConnectTimeout=1 root@{node_ip} -p {vm_node_port} 2>&1|egrep 'denied|verification failed')" ]; then echo 'True'; else echo 'False'; fi"""
+        if self.run(check_ssh_vm_cmd) == 'True':
+            return 'True'
+        else:
+            return self.run(ssh_vm_cmd)
+
+    def get_virtctl_vm_status(self, vm_name: str = '', namespace: str = environment_variables.environment_variables_dict['namespace']):
+        """
+        This method returns True when the VM is active and an error message when it is not, using virtctl protocol
+        :param vm_name:
+        :param namespace:
+        :return: virtctl_status 'True' if successful, or an error message if it fails.
+        """
+        virtctl_vm_cmd = f"virtctl ssh --local-ssh=true --local-ssh-opts='-o BatchMode=yes' --local-ssh-opts='-o PasswordAuthentication=no' --local-ssh-opts='-o ConnectTimeout=2' root@{vm_name} -n {namespace}"
+        check_virtctl_vm_cmd = f"virtctl ssh --local-ssh=true --local-ssh-opts='-o BatchMode=yes' --local-ssh-opts='-o PasswordAuthentication=no' --local-ssh-opts='-o ConnectTimeout=2' root@{vm_name} -n {namespace} 2>&1 |egrep 'denied|verification failed'  && echo 'True' || echo 'False'"
+        if 'True' in self.run(check_virtctl_vm_cmd):
+            return 'True'
+        else:
+            return self.run(virtctl_vm_cmd)
+
     @logger_time_stamp
     def get_vm_node(self, vm_name: str, namespace: str = environment_variables.environment_variables_dict['namespace']):
         """
@@ -1285,6 +1402,7 @@ class OC(SSH):
             current_wait_time += OC.SLEEP_TIME
         raise VMDeleteTimeout(vm_name)
 
+    @typechecked
     @logger_time_stamp
     def wait_for_vm_log_completed(self, vm_name: str = '', end_stamp: str = '', output_filename: str = '',
                                   timeout: int = int(environment_variables.environment_variables_dict['timeout']),
@@ -1314,6 +1432,7 @@ class OC(SSH):
                     current_wait_time += sleep_time
         raise VMNotCompletedTimeout(workload=vm_name)
 
+    @typechecked
     @logger_time_stamp
     def extract_vm_results(self, vm_name: str = '', start_stamp: str = '', end_stamp: str = '', output_filename: str = ''):
         """
@@ -1348,3 +1467,64 @@ class OC(SSH):
                             # filter the data, placed after the first :
                             results_list.append(line.strip().split(':')[data_index:])
         return results_list
+
+    @typechecked
+    @logger_time_stamp
+    def generate_odf_must_gather(self, destination_path: str = '/tmp', odf_version: str = None):
+        """
+        Generates ODF must-gather logs based on the ODF version and stores it in the destination path.
+
+        :param destination_path: The directory where the must-gather logs will be stored. Default is '/tmp'.
+        :param odf_version: The version of ODF for which to generate the must-gather logs, Default is None.
+        :return: The result of the run command.
+        :raises: RuntimeError if the command fails.
+        """
+        if not odf_version:
+            odf_version = ".".join(self.get_odf_version().split(".")[:2])
+            if not odf_version:
+                raise ValueError("ODF version must be provided")
+        logger.info(f'odf version: {odf_version}')
+        folder_path = os.path.join(destination_path, f"odf-must-gather-rhel9-v{odf_version}")
+
+        try:
+            command = (f"oc adm must-gather --image=registry.redhat.io/odf4/odf-must-gather-rhel9:v{odf_version} "
+                       f"--dest-dir={folder_path}")
+            self.run(command)
+        except Exception as e:
+            if os.path.exists(folder_path):
+                try:
+                    shutil.rmtree(folder_path)
+                except Exception as remove_error:
+                    raise RuntimeError(f"Failed to remove folder {folder_path}: {remove_error}")
+            raise RuntimeError(f"Failed to generate ODF must-gather logs for version {odf_version}: {e}")
+
+    @typechecked
+    @logger_time_stamp
+    def generate_cnv_must_gather(self, destination_path: str = '/tmp', cnv_version: str = None):
+        """
+        Generates CNV must-gather logs based on the CNV version and stores it in the destination path.
+
+        :param destination_path: The directory where the must-gather logs will be stored. Default is '/tmp'.
+        :param cnv_version: The version of CNV for which to generate the must-gather logs, Default is None.
+        :return: The result of the run command.
+        :raises: RuntimeError if the command fails.
+        """
+        if not cnv_version:
+            cnv_version = ".".join(self.get_cnv_version().split(".")[:2])
+            if not cnv_version:
+                raise ValueError("CNV version must be provided")
+        logger.info(f'cnv version: {cnv_version}')
+
+        folder_path = os.path.join(destination_path, f"cnv-must-gather-rhel9-v{cnv_version}")
+
+        try:
+            command = (f"oc adm must-gather --image=registry.redhat.io/container-native-virtualization/"
+                       f"cnv-must-gather-rhel9:v{cnv_version} --dest-dir={folder_path}")
+            self.run(command)
+        except Exception as e:
+            if os.path.exists(folder_path):
+                try:
+                    shutil.rmtree(folder_path)
+                except Exception as remove_error:
+                    raise RuntimeError(f"Failed to remove folder {folder_path}: {remove_error}")
+            raise RuntimeError(f"Failed to generate CNV must-gather logs for version {cnv_version}: {e}")

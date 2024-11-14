@@ -4,6 +4,11 @@ from enum import Enum
 from multiprocessing import set_start_method
 import platform
 
+# @todo paramiko==3.4.1/3.5.0 cause to "RunCommandError: Cannot run shell command: SSH session not active"
+import warnings
+from cryptography.utils import CryptographyDeprecationWarning
+warnings.filterwarnings("ignore", category=CryptographyDeprecationWarning)
+
 from benchmark_runner.main.environment_variables import *
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 from benchmark_runner.benchmark_operator.benchmark_operator_workloads import BenchmarkOperatorWorkloads
@@ -13,6 +18,8 @@ from benchmark_runner.common.clouds.Azure.azure_operations import AzureOperation
 from benchmark_runner.common.clouds.IBM.ibm_operations import IBMOperations
 from benchmark_runner.common.clouds.BareMetal.bare_metal_operations import BareMetalOperations
 from benchmark_runner.clusterbuster.clusterbuster_workloads import ClusterBusterWorkloads
+from benchmark_runner.krkn_hub.krknhub_workloads import KrknHubWorkloads
+
 
 # logger
 log_level = os.environ.get('log_level', 'INFO').upper()
@@ -25,6 +32,7 @@ SYSTEM_EXIT_UNKNOWN_EXECUTION_TYPE = 2
 benchmark_operator_workload = None
 benchmark_runner_workload = None
 clusterbuster_workload = None
+krknhub_workload = None
 
 environment_variables_dict = environment_variables.environment_variables_dict
 # environment variables data
@@ -41,11 +49,14 @@ install_ocp_resources = environment_variables_dict.get('install_ocp_resources', 
 run_type = environment_variables_dict.get('run_type', '')
 
 is_benchmark_operator_workload = 'benchmark-operator' in (
-environment_variables.get_workload_namespace(workload), environment_variables_dict.get("runner_type"))
+    environment_variables.get_workload_namespace(workload), environment_variables_dict.get("runner_type"))
 is_benchmark_runner_workload = 'benchmark-runner' in (
-environment_variables.get_workload_namespace(workload), environment_variables_dict.get("runner_type"))
+    environment_variables.get_workload_namespace(workload), environment_variables_dict.get("runner_type"))
 is_clusterbuster_workload = 'clusterbuster' in (
-environment_variables.get_workload_namespace(workload), environment_variables_dict.get("runner_type"))
+    environment_variables.get_workload_namespace(workload), environment_variables_dict.get("runner_type"))
+is_krknhub_workload = 'krknhub' in (
+    environment_variables.get_workload_namespace(workload), environment_variables_dict.get("runner_type"))
+
 # workload name validation
 if workload and not ci_status:
     if workload not in environment_variables.workloads_list:
@@ -59,6 +70,8 @@ if workload and not ci_status:
             f'Invalid run type: {run_type} \n, choose one from the list: {environment_variables.run_types_list}')
     if is_clusterbuster_workload:
         clusterbuster_workload = ClusterBusterWorkloads()
+    elif is_krknhub_workload:
+        krknhub_workload = KrknHubWorkloads()
     elif is_benchmark_operator_workload:
         benchmark_operator_workload = BenchmarkOperatorWorkloads()
     elif is_benchmark_runner_workload:
@@ -79,13 +92,13 @@ def azure_cluster_operations(cluster_operation: str):
     @return:
     """
     azure_operation = AzureOperations(
-                                      azure_clientid=environment_variables_dict.get('azure_clientid', ''),
-                                      azure_secret=environment_variables_dict.get('azure_secret', ''),
-                                      azure_tenantid=environment_variables_dict.get('azure_tenantid', ''),
-                                      azure_subscriptionid=environment_variables_dict.get('azure_subscriptionid', ''),
-                                      azure_resource_group_name=environment_variables_dict.get('azure_resource_group_name', ''),
-                                      kubeadmin_password=environment_variables_dict.get('kubeadmin_password', '')
-                                      )
+        azure_clientid=environment_variables_dict.get('azure_clientid', ''),
+        azure_secret=environment_variables_dict.get('azure_secret', ''),
+        azure_tenantid=environment_variables_dict.get('azure_tenantid', ''),
+        azure_subscriptionid=environment_variables_dict.get('azure_subscriptionid', ''),
+        azure_resource_group_name=environment_variables_dict.get('azure_resource_group_name', ''),
+        kubeadmin_password=environment_variables_dict.get('kubeadmin_password', '')
+    )
     azure_vm_name = (environment_variables_dict.get('azure_vm_name', ''))
     if cluster_operation == ClusterOperation.START.value:
         logger.info('Start cluster with verification')
@@ -154,13 +167,15 @@ def upgrade_ocp_bare_metal(step: str):
     bare_metal_operations.connect_to_provisioner()
     oc = bare_metal_operations.oc_login()
     if step == 'run_bare_metal_ocp_upgrade':
-        bare_metal_operations.run_ocp_upgrade(oc)
-        # The LSO/ODF upgrade must be run manually after the OCP upgrade for the channel version; it won't upgrade automatically.
-        bare_metal_operations.install_ocp_resources(resources=['lso'], upgrade_version=lso_version)
-        bare_metal_operations.install_ocp_resources(resources=['odf'], upgrade_version=odf_version)
+        if not bare_metal_operations.is_ocp_already_upgraded(oc):
+            bare_metal_operations.run_ocp_upgrade(oc)
+            # The LSO/ODF upgrade must be run manually after the OCP upgrade for the channel version; it won't upgrade automatically.
+            bare_metal_operations.install_ocp_resources(resources=['lso'], upgrade_version=lso_version)
+            bare_metal_operations.install_ocp_resources(resources=['odf'], upgrade_version=odf_version)
     elif step == 'verify_bare_metal_upgrade_complete':
         if bare_metal_operations.is_cluster_upgraded(oc, cnv_version=cnv_version, odf_version=odf_version, lso_version=lso_version):
             bare_metal_operations.verify_cluster_is_up(oc)
+            oc.wait_for_node_ready()
         else:
             error_message = f'OCP {upgrade_ocp_version} upgrade failed'
             logger.error(error_message)
@@ -185,6 +200,7 @@ def install_resources():
     logger.info(f'Start Bare-Metal OpenShift resources installation')
     oc = bare_metal_operations.oc_login()
     bare_metal_operations.verify_cluster_is_up(oc)
+    oc.wait_for_node_ready()
     bare_metal_operations.install_ocp_resources(resources=resources)
     bare_metal_operations.disconnect_from_provisioner()
     logger.info(f'End Bare-Metal OpenShift resources installation')
@@ -230,6 +246,7 @@ def run_benchmark_runner_workload():
     # benchmark-runner node selector
     return benchmark_runner_workload.run()
 
+
 @logger_time_stamp
 def run_clusterbuster_workload():
     """
@@ -238,6 +255,16 @@ def run_clusterbuster_workload():
     """
     # benchmark-runner node selector
     return clusterbuster_workload.run()
+
+
+@logger_time_stamp
+def run_krknhub_workload():
+    """
+    This method runs krknhub workload
+    :return:
+    """
+    # run krknhub
+    return krknhub_workload.run()
 
 
 @logger_time_stamp
@@ -285,6 +312,8 @@ def main():
         success = run_benchmark_runner_workload()
     elif is_clusterbuster_workload:
         success = run_clusterbuster_workload()
+    elif is_krknhub_workload:
+        success = run_krknhub_workload()
     else:
         logger.error(f"empty workload, choose one from the list: {environment_variables.workloads_list}")
         raise SystemExit(SYSTEM_EXIT_UNKNOWN_EXECUTION_TYPE)

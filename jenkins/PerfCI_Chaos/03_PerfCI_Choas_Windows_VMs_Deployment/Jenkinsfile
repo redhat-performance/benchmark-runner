@@ -18,6 +18,10 @@ pipeline {
         IBM_SECRET_ACCESS_KEY = credentials('perfci_ibm_secret_access_key')
         IBM_BUCKET = credentials('perfci_ibm_bucket')
         IBM_KEY = credentials('perfci_ibm_key')
+        GOOGLE_DRIVE_PATH = credentials('perfci_google_drive_path')
+        GOOGLE_DRIVE_CREDENTIALS = credentials('perfci_google_drive_credentials')
+        GOOGLE_DRIVE_TOKEN = credentials('perfci_google_drive_token')
+        GOOGLE_DRIVE_SHARED_DRIVE_ID = credentials('perfci_google_drive_shared_drive_id')
         RUN_ARTIFACTS_URL = credentials('perfci_run_artifacts_url')
         REDIS = credentials('perfci_redis')
         WORKER_DISK_IDS = credentials('perfci_worker_disk_ids')
@@ -40,12 +44,13 @@ pipeline {
         SAVE_ARTIFACTS_LOCAL = 'False'
         ENABLE_PROMETHEUS_SNAPSHOT = 'True'
         DELETE_ALL = 'False' // Not delete the running Windows11 VMs
+        RUN_STRATEGY = 'True' // runStrategy: Always for NHC/ SNR operators
         RUN_TYPE = 'perf_ci'
         PROVISION_PORT = 22
         NUM_ODF_DISK = 6
         VDBENCH_SCALE = 2
         BOOTSTORM_SCALE = 80
-        WINDOWS_SCALE = 50
+        WINDOWS_SCALE = 40
         THREADS_LIMIT= 20
         PROVISION_TIMEOUT = 3600
         TIMEOUT = 8000
@@ -191,6 +196,10 @@ END
                                         -e IBM_SECRET_ACCESS_KEY='${IBM_SECRET_ACCESS_KEY}' \
                                         -e IBM_BUCKET='${IBM_BUCKET}' \
                                         -e IBM_KEY='${IBM_KEY}' \
+                                        -e GOOGLE_DRIVE_PATH='${GOOGLE_DRIVE_PATH}' \
+                                        -e GOOGLE_DRIVE_CREDENTIALS='${GOOGLE_DRIVE_CREDENTIALS}' \
+                                        -e GOOGLE_DRIVE_TOKEN='${GOOGLE_DRIVE_TOKEN}' \
+                                        -e GOOGLE_DRIVE_SHARED_DRIVE_ID='${GOOGLE_DRIVE_SHARED_DRIVE_ID}' \
                                         -e RUN_ARTIFACTS_URL='${RUN_ARTIFACTS_URL}' \
                                         -e BUILD_VERSION='${build_version}' \
                                         -e RUN_TYPE='${RUN_TYPE}' \
@@ -204,6 +213,7 @@ END
                                         -e THREADS_LIMIT='${THREADS_LIMIT}' \
                                         -e WINDOWS_URL='${WINDOWS_URL}'  \
                                         -e DELETE_ALL=${DELETE_ALL} \
+                                        -e RUN_STRATEGY=${RUN_STRATEGY} \
                                         -e LSO_NODE='${LSO_NODE}'  \
                                         -e TIMEOUT='${TIMEOUT}' \
                                         -e log_level='INFO' \

@@ -4,7 +4,7 @@ from os import path
 from setuptools import setup, find_packages
 
 
-__version__ = '1.0.658'  # update also .bumpversion.cfg
+__version__ = '1.0.696'  # update also .bumpversion.cfg
 
 
 here = path.abspath(path.dirname(__file__))
@@ -29,7 +29,6 @@ setup(
     classifiers=[
         'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
@@ -60,7 +59,7 @@ setup(
         'openshift-client==1.0.17',  # clusterbuster && prometheus metrics
         'prometheus-api-client==0.5.1',  # clusterbuster && prometheus metrics
         'pandas',  # required latest
-        'paramiko==3.4.1',
+        'paramiko==3.4.0',
         'PyGitHub==1.55',  # update secrets
         'PyYAML==6.0.1',
         'setuptools',  # for python3.12
