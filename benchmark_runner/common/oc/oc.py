@@ -914,8 +914,9 @@ class OC(SSH):
         current_wait_time = 0
 
         while timeout <= 0 or current_wait_time <= timeout:
-            upgrade_versions = self.run(
-                f"{self.__cli} get csv -n {namespace} -o custom-columns=:.spec.version --no-headers").splitlines()
+            #  Filter out node-healthcheck-operator and self-node-remediation during CSV verification because they exist in all namespaces
+            upgrade_versions = self.run(f"{self.__cli} get csv -n {namespace} -o json | jq -r '.items[] | select(.metadata.name | test(\"node-healthcheck-operator|self-node-remediation\") | not) | .spec.version'".splitlines()
+).splitlines()
             count_upgrade_version = sum(1 for actual_upgrade_version in upgrade_versions if
                                         '.'.join(actual_upgrade_version.split('.')[0:2]) == upgrade_version)
 
