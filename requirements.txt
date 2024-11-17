@@ -4,7 +4,7 @@ boto3==1.33.13
 botocore==1.33.13
 cryptography==43.0.1
 elasticsearch==7.16.1
-elasticsearch_dsl==7.4.0
+elasticsearch-dsl==7.4.0
 google-api-python-client==2.135.0
 google-auth==2.30.0
 google-auth-httplib2==0.2.0
