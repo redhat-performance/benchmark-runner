@@ -208,10 +208,10 @@ class EnvironmentVariables:
         self._environment_variables_dict['bucket'] = EnvironmentVariables.get_env('IBM_BUCKET', '')
         self._environment_variables_dict['key'] = EnvironmentVariables.get_env('IBM_KEY', '')
 
-        # Google drive
+        # Google drive, use file for credentials (jenkins limitation)
         self._environment_variables_dict['google_drive_path'] = EnvironmentVariables.get_env('GOOGLE_DRIVE_PATH', '')
-        self._environment_variables_dict['google_drive_credentials'] = EnvironmentVariables.get_env('GOOGLE_DRIVE_CREDENTIALS', '')
-        self._environment_variables_dict['google_drive_token'] = EnvironmentVariables.get_env('GOOGLE_DRIVE_TOKEN', '')
+        self._environment_variables_dict['google_drive_credentials_file'] = EnvironmentVariables.get_env('GOOGLE_DRIVE_CREDENTIALS_FILE', '')
+        self._environment_variables_dict['google_drive_token_file'] = EnvironmentVariables.get_env('GOOGLE_DRIVE_TOKEN_FILE', '')
         self._environment_variables_dict['google_drive_shared_drive_id'] = EnvironmentVariables.get_env('GOOGLE_DRIVE_SHARED_DRIVE_ID', '')
 
         # Grafana
