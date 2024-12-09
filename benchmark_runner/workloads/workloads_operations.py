@@ -110,13 +110,13 @@ class WorkloadsOperations:
             self._windows_os = os.path.splitext(file_name)[0]
         # google drive
         self._google_drive_path = self._environment_variables_dict.get('google_drive_path', '')
-        self._google_drive_credentials = self._environment_variables_dict.get('google_drive_credentials', '')
-        self._google_drive_token = self._environment_variables_dict.get('google_drive_token', '')
+        self._google_drive_credentials_file = self._environment_variables_dict.get('google_drive_credentials_file', '')
+        self._google_drive_token_file = self._environment_variables_dict.get('google_drive_token_file', '')
         self._google_drive_shared_drive_id = self._environment_variables_dict.get('google_drive_shared_drive_id', '')
         if self._google_drive_path:
             self._google_drive_operation = GoogleDriveOperations(google_drive_path=self._google_drive_path,
-                                                                 google_drive_credentials=self._google_drive_credentials,
-                                                                 google_drive_token=self._google_drive_token,
+                                                                 google_drive_credentials_file=self._google_drive_credentials_file,
+                                                                 google_drive_token_file=self._google_drive_token_file,
                                                                  google_drive_shared_drive_id=self._google_drive_shared_drive_id)
         self._upgrade_ocp_version = self._environment_variables_dict.get('upgrade_ocp_version', '')
         self._run_strategy = self._environment_variables_dict.get('run_strategy', '')

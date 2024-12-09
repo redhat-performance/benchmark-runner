@@ -1,6 +1,5 @@
 
 import os
-import json
 
 from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
@@ -20,40 +19,32 @@ class GoogleDriveOperations:
     1. credentials.json - Obtain from the "Google Cloud Console" under "APIs & Services" > "Credentials" > "Create Credentials" and select "OAuth 2.0 Client ID".
     2. token.json - This is generated automatically. If a browser is not available, copy the token from a machine with a browser.
     """
-    def __init__(self, google_drive_path: str, google_drive_credentials: str, google_drive_token: str, google_drive_shared_drive_id: str):
+    def __init__(self, google_drive_path: str, google_drive_token_file: str, google_drive_credentials_file: str, google_drive_shared_drive_id: str):
         """
         Initializes GoogleDriveOperations with authentication.
         """
-        self._google_drive_path = google_drive_path
-        self._google_drive_credentials = google_drive_credentials
-        self._google_drive_token = google_drive_token
+        self._google_drive_token = google_drive_token_file  # Read token from file
+        self._google_drive_credentials = google_drive_credentials_file  # Read credentials from file
         self._google_drive_shared_drive_id = google_drive_shared_drive_id
+        self._google_drive_path = google_drive_path
         self.creds = self.authenticate()
         self.service = build('drive', 'v3', credentials=self.creds)
 
     def authenticate(self):
-        """
-        Authenticates and returns credentials using token or interactive login.
-        :return: Credentials object
-        """
         creds = None
-
-        # Load credentials from the token string if it exists
-        if self._google_drive_token:
-            creds = Credentials.from_authorized_user_info(json.loads(self._google_drive_token), SCOPES)
-
-        # Check if the credentials are invalid or expired
+        # Load credentials from token.json if it exists
+        if os.path.exists(self._google_drive_token):
+            creds = Credentials.from_authorized_user_file(self._google_drive_token, SCOPES)
+        # If credentials are not valid or do not exist, authenticate
         if not creds or not creds.valid:
             if creds and creds.expired and creds.refresh_token:
                 creds.refresh(Request())
             else:
-                # Load client secrets from the credentials string and run the local server for auth
-                flow = InstalledAppFlow.from_client_config(json.loads(self._google_drive_credentials), SCOPES)
+                flow = InstalledAppFlow.from_client_secrets_file(self._google_drive_credentials, SCOPES)
                 creds = flow.run_local_server(port=0)
-
-            # Save the new token to the variable as a string
-            self._google_drive_token = creds.to_json()
-
+            # Save the credentials for the next run
+            with open(self._google_drive_credentials, 'w') as token_file:
+                token_file.write(creds.to_json())
         return creds
 
     def list_folders_and_files_in_shared_drive(self, shared_drive_id):
