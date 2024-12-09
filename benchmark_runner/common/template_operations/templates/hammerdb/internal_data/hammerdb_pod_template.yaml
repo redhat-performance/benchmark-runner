@@ -21,8 +21,8 @@ spec:
     args:
       {%- if kind == 'kata' %}
       runtime_class: kata
-      job_timeout: 5400
       {%- endif %}
+      job_timeout: {{ timeout }}
       pin: {{ pin }} # enable for nodeSelector
       pin_node: "{{ pin_node1 }}"
       resources: {{ resources }} # enable for resources requests/limits

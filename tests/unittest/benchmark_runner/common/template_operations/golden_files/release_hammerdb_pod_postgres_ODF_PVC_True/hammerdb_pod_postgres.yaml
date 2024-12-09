@@ -19,6 +19,7 @@ spec:
   workload:
     name: hammerdb
     args:
+      job_timeout: 3600
       pin: True # enable for nodeSelector
       pin_node: "pin-node-1"
       resources: True # enable for resources requests/limits
