@@ -21,6 +21,9 @@ pipeline {
         GOOGLE_DRIVE_PATH = credentials('perfci_google_drive_path')
         GOOGLE_DRIVE_CREDENTIALS_FILE = credentials('perfci_google_drive_credentials_file')
         GOOGLE_DRIVE_TOKEN_FILE = credentials('perfci_google_drive_token_file')
+        CREDENTIALS_FILE = credentials('perfci_credentials_file')
+        TOKEN_FILE = credentials('perfci_token_file')
+        DESTINATION_PATH = credentials('perfci_destination_path')
         GOOGLE_DRIVE_SHARED_DRIVE_ID = credentials('perfci_google_drive_shared_drive_id')
         RUN_ARTIFACTS_URL = credentials('perfci_run_artifacts_url')
         REDIS = credentials('perfci_redis')
@@ -106,6 +109,33 @@ END
                     '''
                     sh 'sudo chmod 600 $CONFIG_PATH'
                 }
+            }
+        }
+
+        stage('Prepare Google credential files') {
+            steps {
+                    script {
+                        // Assign the file path to the environment variable
+                        env.GOOGLE_DRIVE_CREDENTIALS = "${env.WORKSPACE}/${CREDENTIALS_FILE}"
+                        env.GOOGLE_DRIVE_TOKEN = "${env.WORKSPACE}/${TOKEN_FILE}"
+
+                        sh """
+                        echo "Checking if ${env.GOOGLE_DRIVE_CREDENTIALS} exists..."
+                        if [[ -f "${env.GOOGLE_DRIVE_CREDENTIALS}" ]]; then
+                            echo "File exists. Deleting it..."
+                            rm -f "${env.GOOGLE_DRIVE_CREDENTIALS}"
+                        fi
+                        echo "Checking if ${env.GOOGLE_DRIVE_TOKEN} exists..."
+                        if [[ -f "${env.GOOGLE_DRIVE_TOKEN}" ]]; then
+                            echo "File exists. Deleting it..."
+                            rm -f "${env.GOOGLE_DRIVE_TOKEN}"
+                        fi
+
+                        echo "Copying secret file to the temporary local file..."
+                        cp "$GOOGLE_DRIVE_CREDENTIALS_FILE" "${env.GOOGLE_DRIVE_CREDENTIALS}"
+                        cp "$GOOGLE_DRIVE_TOKEN_FILE" "${env.GOOGLE_DRIVE_TOKEN}"
+                        """
+                    }
             }
         }
 
@@ -197,8 +227,8 @@ END
                                         -e IBM_BUCKET='${IBM_BUCKET}' \
                                         -e IBM_KEY='${IBM_KEY}' \
                                         -e GOOGLE_DRIVE_PATH='${GOOGLE_DRIVE_PATH}' \
-                                        -e GOOGLE_DRIVE_CREDENTIALS_FILE='${GOOGLE_DRIVE_CREDENTIALS_FILE}' \
-                                        -e GOOGLE_DRIVE_TOKEN_FILE='${GOOGLE_DRIVE_TOKEN_FILE}' \
+                                        -e GOOGLE_DRIVE_CREDENTIALS_FILE='${DESTINATION_PATH}/${CREDENTIALS_FILE}' \
+                                        -e GOOGLE_DRIVE_TOKEN_FILE='${DESTINATION_PATH}/${TOKEN_FILE}' \
                                         -e GOOGLE_DRIVE_SHARED_DRIVE_ID='${GOOGLE_DRIVE_SHARED_DRIVE_ID}' \
                                         -e RUN_ARTIFACTS_URL='${RUN_ARTIFACTS_URL}' \
                                         -e BUILD_VERSION='${build_version}' \
@@ -218,6 +248,7 @@ END
                                         -e TIMEOUT='${TIMEOUT}' \
                                         -e log_level='INFO' \
                                         -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
+                                        -v '${WORKSPACE}:${DESTINATION_PATH}' \
                                         --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}'
                                     """
                                     success = true
