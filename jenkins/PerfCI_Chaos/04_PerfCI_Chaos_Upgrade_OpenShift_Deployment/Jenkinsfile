@@ -43,9 +43,9 @@ pipeline {
         GOOGLE_DRIVE_PATH = credentials('perfci_google_drive_path')
         GOOGLE_DRIVE_CREDENTIALS_FILE = credentials('perfci_google_drive_credentials_file')
         GOOGLE_DRIVE_TOKEN_FILE = credentials('perfci_google_drive_token_file')
-        CREDENTIALS_FILE = credentials('perfci_credentials_file')
-        TOKEN_FILE = credentials('perfci_token_file')
-        DESTINATION_PATH = credentials('perfci_destination_path')
+        GOOGLE_CREDENTIALS_FILE = 'credentials.json'
+        GOOGLE_TOKEN_FILE = 'token.json'
+        GOOGLE_DESTINATION_PATH = '/tmp'
         GOOGLE_DRIVE_SHARED_DRIVE_ID = credentials('perfci_google_drive_shared_drive_id')
         RUN_ARTIFACTS_URL = credentials('perfci_run_artifacts_url')
         REDIS = credentials('perfci_redis')
@@ -68,6 +68,7 @@ pipeline {
         THREADS_LIMIT = 20
         PROVISION_TIMEOUT = 7200
         TIMEOUT = 7200
+        WORKSPACE_PATH = "${env.WORKSPACE}/workspace/${env.JOB_NAME}/"
     }
 
     stages {
@@ -113,30 +114,27 @@ END
             }
         }
 
-        stage('Prepare Google credential files') {
+        stage('Prepare Google Credential Files') {
             steps {
-                    script {
-                        // Assign the file path to the environment variable
-                        env.GOOGLE_DRIVE_CREDENTIALS = "${env.WORKSPACE}/${CREDENTIALS_FILE}"
-                        env.GOOGLE_DRIVE_TOKEN = "${env.WORKSPACE}/${TOKEN_FILE}"
-
-                        sh """
-                        echo "Checking if ${env.GOOGLE_DRIVE_CREDENTIALS} exists..."
-                        if [[ -f "${env.GOOGLE_DRIVE_CREDENTIALS}" ]]; then
-                            echo "File exists. Deleting it..."
-                            rm -f "${env.GOOGLE_DRIVE_CREDENTIALS}"
-                        fi
-                        echo "Checking if ${env.GOOGLE_DRIVE_TOKEN} exists..."
-                        if [[ -f "${env.GOOGLE_DRIVE_TOKEN}" ]]; then
-                            echo "File exists. Deleting it..."
-                            rm -f "${env.GOOGLE_DRIVE_TOKEN}"
-                        fi
-
-                        echo "Copying secret file to the temporary local file..."
-                        cp "$GOOGLE_DRIVE_CREDENTIALS_FILE" "${env.GOOGLE_DRIVE_CREDENTIALS}"
-                        cp "$GOOGLE_DRIVE_TOKEN_FILE" "${env.GOOGLE_DRIVE_TOKEN}"
-                        """
+                script {
+                    // Create a unique temp directory
+                    env.TEMP_DIR = sh(script: "umask 77; mktemp -d -p '${env.WORKSPACE_PATH}'", returnStdout: true).trim()
+                    if (!env.TEMP_DIR) {
+                        error "Failed to create temporary directory!"
                     }
+
+                    // Set file paths
+                    env.GOOGLE_DRIVE_CREDENTIALS = "${env.TEMP_DIR}/${GOOGLE_CREDENTIALS_FILE}"
+                    env.GOOGLE_DRIVE_TOKEN = "${env.TEMP_DIR}/${GOOGLE_TOKEN_FILE}"
+
+                    // Prepare credential files
+                    sh """
+                        set -e
+                        umask 77
+                        cp '${GOOGLE_DRIVE_CREDENTIALS_FILE}' '${env.GOOGLE_DRIVE_CREDENTIALS}' || error "Failed to copy ${GOOGLE_DRIVE_CREDENTIALS_FILE}"
+                        cp '${GOOGLE_DRIVE_TOKEN_FILE}' '${env.GOOGLE_DRIVE_TOKEN}' || error "Failed to copy ${GOOGLE_DRIVE_TOKEN_FILE}"
+                    """
+                }
             }
         }
 
@@ -256,8 +254,8 @@ END
                                         -e IBM_BUCKET='${IBM_BUCKET}' \
                                         -e IBM_KEY='${IBM_KEY}' \
                                         -e GOOGLE_DRIVE_PATH='${GOOGLE_DRIVE_PATH}' \
-                                        -e GOOGLE_DRIVE_CREDENTIALS_FILE='${DESTINATION_PATH}/${CREDENTIALS_FILE}' \
-                                        -e GOOGLE_DRIVE_TOKEN_FILE='${DESTINATION_PATH}/${TOKEN_FILE}' \
+                                        -e GOOGLE_DRIVE_CREDENTIALS_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_CREDENTIALS_FILE}' \
+                                        -e GOOGLE_DRIVE_TOKEN_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_TOKEN_FILE}' \
                                         -e GOOGLE_DRIVE_SHARED_DRIVE_ID='${GOOGLE_DRIVE_SHARED_DRIVE_ID}' \
                                         -e RUN_ARTIFACTS_URL='${RUN_ARTIFACTS_URL}' \
                                         -e BUILD_VERSION='${build_version}' \
@@ -277,7 +275,7 @@ END
                                         -e TIMEOUT='${TIMEOUT}' \
                                         -e log_level='INFO' \
                                         -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
-                                        -v '${WORKSPACE}:${DESTINATION_PATH}' \
+                                        -v '${TEMP_DIR}:${GOOGLE_DESTINATION_PATH}' \
                                         --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}'
                                     """
                                     success = true
@@ -322,6 +320,13 @@ END
 
                         # Now remove the image
                         sudo podman rmi -f $(sudo podman images -q ${QUAY_BENCHMARK_RUNNER_REPOSITORY} 2> /dev/null)
+                    fi
+                    # Clean up the virtual environment
+                    rm -rf venv
+                    # Clean temp dir
+                    if [ -d "${TEMP_DIR}" ]; then
+                        sudo rm -rf "${TEMP_DIR}"
+                        echo "Temporary directory '${TEMP_DIR}' deleted."
                     fi
                 '''
             }
