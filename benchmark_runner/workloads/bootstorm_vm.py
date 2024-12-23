@@ -205,15 +205,17 @@ class BootstormVM(WorkloadsOperations):
     def _verify_virtctl_vm(self):
         """
         This method verifies the virtctl SSH login for each VM, either during the upgrade or once for each VM.
-        It prepares the data for ElasticSearch, generates a must-gather in case of an error, and uploads it to Google Drive
+        It prepares the data for ElasticSearch, generates a must-gather in case of an error, and uploads it to Google Drive.
         """
         try:
             vm_names = self._oc._get_all_vm_names()
             if not vm_names:
-                raise MissingVMs
+                raise MissingVMs("No VM names were retrieved from the cluster.")
 
             upgrade_done = True
             failure = False
+            failure_vms = []  # List to store failed VM names
+
             if self._wait_for_upgrade_version:
                 upgrade_done = self._oc.get_cluster_status() == f'Cluster version is {self._wait_for_upgrade_version}'
                 current_wait_time = 0
@@ -221,9 +223,11 @@ class BootstormVM(WorkloadsOperations):
                 while (self._timeout <= 0 or current_wait_time <= self._timeout) and not upgrade_done:
                     for vm_name in vm_names:
                         virtctl_status = self._verify_single_vm(vm_name)
-                        if virtctl_status!='True':
+                        if virtctl_status != 'True':
                             failure = True
-                        upgrade_done = self._oc.get_cluster_status() == f'Cluster version is {self._wait_for_upgrade_version}'
+                            if vm_name not in failure_vms:
+                                failure_vms.append(vm_name)
+                    upgrade_done = self._oc.get_cluster_status() == f'Cluster version is {self._wait_for_upgrade_version}'
 
                     # Sleep 1 sec between each cycle
                     time.sleep(1)
@@ -232,23 +236,30 @@ class BootstormVM(WorkloadsOperations):
                 # If _wait_for_upgrade_version is empty, verify VM SSH without waiting for upgrade
                 for vm_name in vm_names:
                     virtctl_status = self._verify_single_vm(vm_name)
-                    if virtctl_status!='True':
+                    if virtctl_status != 'True':
                         failure = True
+                        if vm_name not in failure_vms:
+                            failure_vms.append(vm_name)
 
             if self._wait_for_upgrade_version:
                 logger.info(f'Cluster is upgraded to: {self._wait_for_upgrade_version}')
+
             if failure:
-                self._oc.generate_cnv_must_gather(destination_path=self._run_artifacts_path, cnv_version=self._cnv_version)
-                self._oc.generate_odf_must_gather(destination_path=self._run_artifacts_path, odf_version=self._odf_version)
-                # google drive
+                self._oc.generate_cnv_must_gather(destination_path=self._run_artifacts_path,
+                                                  cnv_version=self._cnv_version)
+                self._oc.generate_odf_must_gather(destination_path=self._run_artifacts_path,
+                                                  odf_version=self._odf_version)
+                # Upload artifacts
                 if self._google_drive_shared_drive_id:
                     self.upload_run_artifacts_to_google_drive()
-                # s3
                 elif self._endpoint_url and not self._google_drive_shared_drive_id:
                     self.upload_run_artifacts_to_s3()
-                # local
                 else:
                     self._save_artifacts_local = True
+
+                # Raise an error with details of failed VMs
+                raise RuntimeError(
+                    f"Failed to verify virtctl SSH login for the following VMs: {', '.join(failure_vms)}")
 
         except Exception as err:
             # Save run artifacts logs
