@@ -40,7 +40,7 @@ spec:
         sockets: {{ sockets }}
         cores: 1
         threads: 1
-        image: quay.io/kubevirt/fedora-container-disk-images:34
+        image: quay.io/ebattat/fedora37-container-disk:latest
         limits:
           memory: {{ limits_memory }}
         requests:
