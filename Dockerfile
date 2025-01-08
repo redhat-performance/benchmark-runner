@@ -27,7 +27,7 @@ RUN wget https://www.python.org/ftp/python/${python_full_version}/Python-${pytho
 RUN python3.12 -m pip install --upgrade pip && python3.12 -m pip install --upgrade benchmark-runner
 
 # install oc/kubectl client tools for OpenShift/Kubernetes
-ARG OCP_CLIENT_VERSION="4.16.0"
+ARG OCP_CLIENT_VERSION="4.17.11"
 RUN  curl -L "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${OCP_CLIENT_VERSION}/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz" -o "/tmp/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz" \
      && tar -xzvf /tmp/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz -C /tmp/ \
      && mv /tmp/kubectl /usr/local/bin/kubectl \
@@ -35,7 +35,7 @@ RUN  curl -L "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${OCP_CL
      && rm -rf /tmp/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz /tmp/kubectl /tmp/oc
 
 # Install virtctl for VNC
-ARG virtctl_version="1.2.0"
+ARG virtctl_version="1.4.0"
 RUN curl -L "https://github.com/kubevirt/kubevirt/releases/download/v${virtctl_version}/virtctl-v${virtctl_version}-linux-amd64" -o /usr/local/bin/virtctl \
     && chmod +x /usr/local/bin/virtctl
 
