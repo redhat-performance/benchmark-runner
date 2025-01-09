@@ -203,15 +203,19 @@ class OC(SSH):
 
     def get_free_disk_id(self, node: str = None):
         """
-        This method returns free disk per node  [workers disk ids - workers pv disk ids]
+        This method returns a free disk ID for a given node (or all nodes if no node is specified).
+        It identifies the disk by comparing workers' disk IDs with PV disk IDs.
         """
         workers_disk_ids = self.get_worker_disk_ids(node)
         workers_pv_disk_ids = self.get_pv_disk_ids()
-        free_disk_id = f'{self.__worker_disk_prefix}{[disk_id for disk_id in workers_disk_ids if disk_id not in workers_pv_disk_ids][0]}'
-        if free_disk_id:
-            return free_disk_id
+
+        # Find free disk IDs
+        free_disks = [disk_id for disk_id in workers_disk_ids if disk_id not in workers_pv_disk_ids]
+
+        if free_disks:
+            return f'{self.__worker_disk_prefix}{free_disks[0]}'
         else:
-            raise ValueError('Missing free disk id')
+            raise ValueError('No free disk IDs available. All worker disks are already in use.')
 
     @typechecked
     def run_debug_node(self, node: str, cmd: str):
