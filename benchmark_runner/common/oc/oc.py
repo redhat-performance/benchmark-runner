@@ -533,8 +533,8 @@ class OC(SSH):
             if pv_status == 'Available' or pv_status == 'Released':
                 available_pv = self.run(fr"{self.__cli} get pv -o jsonpath={{.items[{ind}].metadata.name}}")
                 logger.info(f'Delete {pv_status} pv {available_pv}')
-                self.run(fr"{self.__cli} delete localvolume -n openshift-local-storage local-disks")
-                self.run(fr"{self.__cli} delete pv {available_pv}")
+                self.run(fr"{self.__cli} delete localvolume -n openshift-local-storage local-disks --wait=false")
+                self.run(fr"{self.__cli} delete pv {available_pv} --wait=false")
 
     def clear_node_caches(self):
         """
@@ -612,7 +612,7 @@ class OC(SSH):
         :return:
         """
         if os.path.isfile(yaml):
-            return self.run(f'{self.__cli} delete -f {yaml}')
+            return self.run(f'{self.__cli} delete -f {yaml} --wait=false')
         else:
             raise YAMLNotExist(yaml)
 
