@@ -165,10 +165,15 @@ class OC(SSH):
 
     def get_odf_version(self):
         """
-        This method returns odf version
-        :return:
+        This method returns the ODF version by extracting it from the csv name.
+        :return: ODF version as a string (e.g., '4.17.2')
         """
-        return self.run(f"{self.__cli} get csv -n openshift-storage -o jsonpath='{{.items[0].spec.labels.full_version}}'")
+        # OCP 4.16 and below
+        if self.get_ocp_major_version() <= 4 and self.get_ocp_minor_version() <= 16:
+            command = f"{self.__cli} get csv -n openshift-storage -o jsonpath='{{.items[0].spec.labels.full_version}}'"
+        else:
+            command = f"{self.__cli} get csv -n openshift-storage -o jsonpath='{{range .items[*]}}{{.metadata.name}}{{\"\\n\"}}{{end}}' | grep odf-operator | sed -E 's/odf-operator.v([0-9]+\\.[0-9]+\\.[0-9]+)-rhodf/\\1/'"
+        return self.run(command)
 
     def remove_lso_path(self):
         """
