@@ -76,6 +76,7 @@ class BenchmarkOperatorWorkloadsOperations:
         self._prometheus_metrics_operation = PrometheusMetricsOperation()
         # Extract lso id for LSO workload
         if '_lso' in self._environment_variables_dict.get('workload'):
+            self._oc.delete_available_released_pv()
             # Update lso_disk_id only if both worker_disk_ids and a free disk exist
             if self._environment_variables_dict.get('worker_disk_ids', '') and self._oc.get_free_disk_id(
                     node=self._environment_variables_dict['lso_node']):
