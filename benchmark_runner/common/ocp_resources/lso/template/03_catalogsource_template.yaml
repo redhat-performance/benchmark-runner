@@ -1,0 +1,13 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  name: redhat-operators-v{{ lso_version | replace('.', '') }}
+  namespace: openshift-marketplace
+spec:
+  displayName: Red Hat Operators v{{ lso_version | replace('.', '') }}
+  image: registry.redhat.io/redhat/redhat-operator-index:v{{ lso_version }}
+  publisher: Red Hat
+  sourceType: grpc
+  updateStrategy:
+    registryPoll:
+      interval: 30m0s
