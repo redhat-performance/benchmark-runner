@@ -9,6 +9,7 @@ pipeline {
         WORKER_DISK_IDS = credentials('perfci_worker_disk_ids')
         CNV_VERSION = credentials('perfci_cnv_version')
         ODF_VERSION = credentials('perfci_odf_version')
+        LSO_VERSION = credentials('perfci_lso_version')
         EXPECTED_NODES = credentials('perfci_expected_nodes')
         QUAY_BENCHMARK_RUNNER_REPOSITORY = credentials('perfci_quay_repository')
         KUBEADMIN_PASSWORD = readFile('/home/jenkins/.kube/kubeadmin-password').trim()
@@ -122,6 +123,7 @@ END
                                                             -e INSTALL_RESOURCES_LIST='${resource}' \
                                                             -e EXPECTED_NODES='${EXPECTED_NODES}' \
                                                             -e CNV_VERSION='${CNV_VERSION}' \
+                                                            -e LSO_VERSION='${LSO_VERSION}' \
                                                             -e ODF_VERSION='${ODF_VERSION}' \
                                                             -e NUM_ODF_DISK='${NUM_ODF_DISK}' \
                                                             -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' \
