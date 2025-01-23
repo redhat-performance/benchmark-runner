@@ -26,16 +26,15 @@ class CreateNHCSNR(CreateOCPResourceOperations):
             logger.info(f'run {resource}')
             self.__oc.create_async(yaml=os.path.join(self.__path, resource))
 
-            if '03_subscription.yaml' in resource:
-                # verify once after create all resource files
+            if '03_nhc_subscription.yaml' in resource:
                 self.wait_for_ocp_resource_create(operator='nhc',
                                                   verify_cmd="oc get csv -n openshift-workload-availability -o jsonpath='{.items[0].status.phase}'",
                                                   status='Succeeded')
+            if '04_snr_subscription.yaml' in resource:
                 self.wait_for_ocp_resource_create(operator='snr',
                                                   verify_cmd="oc get csv -n openshift-workload-availability -o jsonpath='{.items[1].status.phase}'",
                                                   status='Succeeded')
-            # SNR is automatically enabled when NHC is enabled
-            if '04_nhc_snr.yaml' in resource:
+            if '05_nhc_snr.yaml' in resource:
                 # Verify NHC is enabled
                 self.wait_for_ocp_resource_create(operator='nhc',
                                                   verify_cmd="oc get nhc -A -o jsonpath='{range .items[*]}{.status.phase}{\"\\n\"}{end}'",
