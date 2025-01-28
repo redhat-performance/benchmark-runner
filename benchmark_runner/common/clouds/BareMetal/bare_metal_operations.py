@@ -56,6 +56,7 @@ class BareMetalOperations:
         self._ssh = SSH()
         self._cli = self._environment_variables_dict.get('cli', '')
         self._upgrade_ocp_version = self._environment_variables_dict.get('upgrade_ocp_version', '')
+        self._upgrade_channel = self._environment_variables_dict.get('upgrade_channel', '')
 
     def _get_kubeadmin_password(self):
         """
@@ -251,7 +252,7 @@ class BareMetalOperations:
         logger.info(f'Starting OCP upgrade, Start time: {datetime.now().strftime(datetime_format)}')
         logger.info(f'Stop OCP healthcheck')
         oc.healthcheck(action='stop')
-        oc.upgrade_ocp(upgrade_ocp_version=self._upgrade_ocp_version)
+        oc.upgrade_ocp(upgrade_ocp_version=self._upgrade_ocp_version, upgrade_channel=self._upgrade_channel)
         self.verify_upgrade_complete(oc=oc)
         logger.info(f'Resume OCP healthcheck')
         oc.healthcheck(action='resume')
