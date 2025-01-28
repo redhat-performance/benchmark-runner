@@ -59,11 +59,12 @@ class OC(SSH):
         # Run the `oc` command to get the ClusterVersion history and extract the previous version
         return self.run(f"{self.__cli} get clusterversion version -o jsonpath='{{.status.history[1].version}}'")
 
-    def upgrade_ocp(self, upgrade_ocp_version: str):
+    def upgrade_ocp(self, upgrade_ocp_version: str, upgrade_channel: str = 'stable'):
         """
         This method upgrades OCP version with conditional handling for specific versions.
 
         @param upgrade_ocp_version: Version to upgrade to
+        @param upgrade_channel: upgrade channel candidate or stable, default stable
         @return:
         """
         ocp_channel = '.'.join(upgrade_ocp_version.split('.')[:2])
@@ -72,8 +73,8 @@ class OC(SSH):
         if ocp_channel == "4.16":
             patch_command = f"{self.__cli} -n openshift-config patch cm admin-acks --patch '{{\"data\":{{\"ack-4.15-kube-1.29-api-removals-in-4.16\":\"true\"}}}}' --type=merge"
             self.run(patch_command)
-
-        upgrade_command = f"{self.__cli} adm upgrade ; sleep 10; {self.__cli} adm upgrade channel stable-{ocp_channel}; sleep 10; {self.__cli} adm upgrade --to={upgrade_ocp_version};"
+        upgrade_command = f"{self.__cli} adm upgrade ; sleep 10; {self.__cli} adm upgrade channel {upgrade_channel}-{ocp_channel}; sleep 10; {self.__cli} adm upgrade --to={upgrade_ocp_version};"
+        logger.info(upgrade_command)
         self.run(upgrade_command)
 
     def upgrade_in_progress(self):
