@@ -26,13 +26,6 @@ data:
         effect: "NoSchedule"
       nodeSelector:
         node-role.kubernetes.io/infra: ""
-    grafana:
-      tolerations:
-      - key: "node-role.kubernetes.io/master"
-        operator: "Exists"
-        effect: "NoSchedule"
-      nodeSelector:
-        node-role.kubernetes.io/infra: ""
     k8sPrometheusAdapter:
       tolerations:
       - key: "node-role.kubernetes.io/master"
