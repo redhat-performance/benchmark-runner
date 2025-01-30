@@ -90,10 +90,6 @@ class EnvironmentVariables:
         self._environment_variables_dict['run_strategy'] = EnvironmentVariables.get_boolean_from_environment('RUN_STRATEGY', False)
         # Verification only, without running or deleting any resources, default False
         self._environment_variables_dict['verification_only'] = EnvironmentVariables.get_boolean_from_environment('VERIFICATION_ONLY', False)
-        # Verification while upgrade, e.g. 4.15.23
-        self._environment_variables_dict['wait_for_upgrade_version'] = EnvironmentVariables.get_env('WAIT_FOR_UPGRADE_VERSION', '')
-        # candidate/ stable (default)
-        self._environment_variables_dict['upgrade_channel'] = EnvironmentVariables.get_env('UPGRADE_CHANNEL', '')
 
         # default parameter - change only if needed
         # Parameters below related to 'run_workload()'
@@ -233,6 +229,8 @@ class EnvironmentVariables:
         self._environment_variables_dict['upgrade_ocp_version'] = EnvironmentVariables.get_env('UPGRADE_OCP_VERSION','')
         # There are 2 options: run_bare_metal_ocp_upgrade/ verify_bare_metal_upgrade_complete
         self._environment_variables_dict['upgrade_step'] = EnvironmentVariables.get_env('UPGRADE_STEP', '')
+        # candidate/ stable (default)
+        self._environment_variables_dict['upgrade_channel'] = EnvironmentVariables.get_env('UPGRADE_CHANNEL', '')
 
         # SNO or empty for regular
         self._environment_variables_dict['cluster_type'] = EnvironmentVariables.get_env('CLUSTER_TYPE', '')

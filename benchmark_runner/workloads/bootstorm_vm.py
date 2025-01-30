@@ -216,8 +216,8 @@ class BootstormVM(WorkloadsOperations):
             failure = False
             failure_vms = []  # List to store failed VM names
 
-            if self._wait_for_upgrade_version:
-                upgrade_done = self._oc.get_cluster_status() == f'Cluster version is {self._wait_for_upgrade_version}'
+            if self._upgrade_ocp_version:
+                upgrade_done = self._oc.get_cluster_status() == f'Cluster version is {self._upgrade_ocp_version}'
                 current_wait_time = 0
 
                 while (self._timeout <= 0 or current_wait_time <= self._timeout) and not upgrade_done:
@@ -227,13 +227,13 @@ class BootstormVM(WorkloadsOperations):
                             failure = True
                             if vm_name not in failure_vms:
                                 failure_vms.append(vm_name)
-                    upgrade_done = self._oc.get_cluster_status() == f'Cluster version is {self._wait_for_upgrade_version}'
+                    upgrade_done = self._oc.get_cluster_status() == f'Cluster version is {self._upgrade_ocp_version}'
 
                     # Sleep 1 sec between each cycle
                     time.sleep(1)
                     current_wait_time += 1  # Increment the wait time
             else:
-                # If _wait_for_upgrade_version is empty, verify VM SSH without waiting for upgrade
+                # If _upgrade_ocp_version is empty, verify VM SSH without waiting for upgrade
                 for vm_name in vm_names:
                     virtctl_status = self._verify_single_vm(vm_name)
                     if virtctl_status != 'True':
@@ -241,8 +241,8 @@ class BootstormVM(WorkloadsOperations):
                         if vm_name not in failure_vms:
                             failure_vms.append(vm_name)
 
-            if self._wait_for_upgrade_version:
-                logger.info(f'Cluster is upgraded to: {self._wait_for_upgrade_version}')
+            if self._upgrade_ocp_version:
+                logger.info(f'Cluster is upgraded to: {self._upgrade_ocp_version}')
 
             if failure:
                 self._oc.generate_cnv_must_gather(destination_path=self._run_artifacts_path,
