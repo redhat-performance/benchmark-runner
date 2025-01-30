@@ -23,7 +23,7 @@ class CreateLSO(CreateOCPResourceOperations):
         :return:
         """
         if upgrade_version:
-            self.__oc.apply_async(yaml=os.path.join(self.__path, '03_subscription.yaml'))
+            self.__oc.apply_async(yaml=os.path.join(self.__path, '04_subscription.yaml'))
             logger.info(f'Wait till LSO upgrade to version: {upgrade_version}')
             self.verify_csv_installation(namespace='openshift-local-storage', operator='lso', upgrade_version=upgrade_version)
         else:
