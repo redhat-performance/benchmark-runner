@@ -3,12 +3,11 @@ pipeline {
         label 'PerfCi'
     }
     environment {
-        UPGRADE_OCP_VERSION = '4.15.23'
-        LSO_VERSION = '4.15'
-        ODF_VERSION = '4.15'
-        CNV_VERSION = '4.15'
-        WAIT_FOR_UPGRADE_VERSION = '4.15.23'
-        UPGRADE_CHANNEL = 'candidate'
+        UPGRADE_OCP_VERSION = credentials('perfci_upgrade_target_ocp_version')
+        CNV_VERSION = credentials('perfci_upgrade_target_cnv_version')
+        LSO_VERSION = credentials('perfci_upgrade_target_lso_version')
+        ODF_VERSION = credentials('perfci_upgrade_target_odf_version')
+        UPGRADE_CHANNEL = credentials('perfci_upgrade_channel') // stable (default)/candidate
         CONTACT_EMAIL1 = credentials('perfci_contact_email1')
         PROVISION_PRIVATE_KEY_FILE = credentials('perfci_provision_private_key_file')
         PROVISION_IP = credentials('perfci_provision_ip')
@@ -241,7 +240,7 @@ END
                                         -e WORKLOAD='${workload}' \
                                         -e ODF_VERSION="${ODF_VERSION}" \
                                         -e CNV_VERSION="${CNV_VERSION}" \
-                                        -e WAIT_FOR_UPGRADE_VERSION='${WAIT_FOR_UPGRADE_VERSION}' \
+                                        -e UPGRADE_OCP_VERSION='${UPGRADE_OCP_VERSION}' \
                                         -e UPGRADE_CHANNEL='${UPGRADE_CHANNEL}' \
                                         -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' \
                                         -e PIN_NODE_BENCHMARK_OPERATOR='${PIN_NODE_BENCHMARK_OPERATOR}' \

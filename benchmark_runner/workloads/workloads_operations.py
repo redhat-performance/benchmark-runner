@@ -104,7 +104,6 @@ class WorkloadsOperations:
         self._windows_url = self._environment_variables_dict.get('windows_url', '')
         self._delete_all = self._environment_variables_dict.get('delete_all', '')
         self._verification_only = self._environment_variables_dict.get('verification_only', '')
-        self._wait_for_upgrade_version = self._environment_variables_dict.get('wait_for_upgrade_version', '')
         if self._windows_url:
             file_name = os.path.basename(self._windows_url)
             self._windows_os = os.path.splitext(file_name)[0]
