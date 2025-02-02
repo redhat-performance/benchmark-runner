@@ -257,8 +257,8 @@ class BootstormVM(WorkloadsOperations):
                 else:
                     self._save_artifacts_local = True
 
-                # Raise an error with details of failed VMs
-                raise RuntimeError(
+                # Error log with details of failed VM, for catching all vm errors
+                logger.error(
                     f"Failed to verify virtctl SSH login for the following VMs: {', '.join(failure_vms)}")
 
         except Exception as err:
