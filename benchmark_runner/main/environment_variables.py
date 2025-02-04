@@ -229,6 +229,7 @@ class EnvironmentVariables:
         self._environment_variables_dict['upgrade_ocp_version'] = EnvironmentVariables.get_env('UPGRADE_OCP_VERSION','')
         # There are 2 options: run_bare_metal_ocp_upgrade/ verify_bare_metal_upgrade_complete
         self._environment_variables_dict['upgrade_step'] = EnvironmentVariables.get_env('UPGRADE_STEP', '')
+        self._environment_variables_dict['wait_for_upgrade_version'] = EnvironmentVariables.get_env('WAIT_FOR_UPGRADE_VERSION', '')
         # candidate/ stable (default)
         self._environment_variables_dict['upgrade_channel'] = EnvironmentVariables.get_env('UPGRADE_CHANNEL', '')
 
