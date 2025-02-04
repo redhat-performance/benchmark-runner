@@ -158,8 +158,10 @@ END
                                             withCredentials([string(credentialsId: 'perfci_provision_user', variable: 'PROVISION_USER')]) {
                                                 withCredentials([file(credentialsId: 'perfci_provision_private_key_file', variable: 'PROVISION_PRIVATE_KEY_FILE')]) {
                                                     sh """
-                                                        sudo podman run --rm -e UPGRADE_OCP_VERSION="${UPGRADE_OCP_VERSION}" \
+                                                        sudo podman run --rm \
+                                                            -e UPGRADE_OCP_VERSION="${UPGRADE_OCP_VERSION}" \
                                                             -e UPGRADE_STEP="${upgrade_step}" \
+                                                            -e UPGRADE_CHANNEL='${UPGRADE_CHANNEL}' \
                                                             -e LSO_VERSION="${LSO_VERSION}" \
                                                             -e ODF_VERSION="${ODF_VERSION}" \
                                                             -e CNV_VERSION="${CNV_VERSION}" \
@@ -233,7 +235,7 @@ END
                                     SCALE = ""
                                 }
 
-                                // Create a stage for each workload
+                                // Windows11 VMs workload Verifications
                                 stage(workload_name) {
                                     // boolean value w/o ''
                                     sh """
@@ -242,7 +244,6 @@ END
                                         -e ODF_VERSION="${ODF_VERSION}" \
                                         -e CNV_VERSION="${CNV_VERSION}" \
                                         -e WAIT_FOR_UPGRADE_VERSION='${WAIT_FOR_UPGRADE_VERSION}' \
-                                        -e UPGRADE_CHANNEL='${UPGRADE_CHANNEL}' \
                                         -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' \
                                         -e PIN_NODE_BENCHMARK_OPERATOR='${PIN_NODE_BENCHMARK_OPERATOR}' \
                                         -e PIN_NODE1='${PIN_NODE1}' \
