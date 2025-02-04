@@ -3,7 +3,7 @@ pipeline {
         label 'PerfCi'
     }
     environment {
-        INSTALL_OCP_VERSION = '4.14.23'
+        INSTALL_OCP_VERSION = credentials('perfci_upgrade_current_ocp_version')
         CONTACT_EMAIL1 = credentials('perfci_contact_email1')
         PROVISION_PRIVATE_KEY_FILE = credentials('perfci_provision_private_key_file')
         PROVISION_IP = credentials('perfci_provision_ip')
