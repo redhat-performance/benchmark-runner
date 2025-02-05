@@ -217,6 +217,7 @@ class BootstormVM(WorkloadsOperations):
             failure_vms = []  # List to store failed VM names
 
             if self._wait_for_upgrade_version:
+                logger.info(f"wait for ocp upgrade version: {self._wait_for_upgrade_version}")
                 upgrade_done = self._oc.get_cluster_status() == f'Cluster version is {self._wait_for_upgrade_version}'
                 current_wait_time = 0
 
