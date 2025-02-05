@@ -1,6 +1,8 @@
 
 import os
+import time
 
+from googleapiclient.errors import HttpError
 from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
 from googleapiclient.http import MediaFileUpload
@@ -137,34 +139,40 @@ class GoogleDriveOperations:
             logger.error(f"Error creating folder '{folder_name}': {e}")
             return None
 
-    def _find_folder_id(self, parent_folder_id, folder_name):
+    def _find_folder_id(self, parent_folder_id, folder_name, max_retries=3, delay=5):
         """
-        Helper method to find the folder ID by name within a specified parent folder.
+        Finds a folder ID by name within a specified parent folder, with retry handling.
+
         :param parent_folder_id: The ID of the parent folder to search within.
         :param folder_name: The name of the folder to find.
+        :param max_retries: The maximum number of retry attempts.
+        :param delay: The delay (in seconds) between retries.
         :return: The ID of the folder if found, otherwise None.
         """
-        page_token = None
-        while True:
-            results = self.service.files().list(
-                q=f"'{parent_folder_id}' in parents and trashed = false and mimeType = 'application/vnd.google-apps.folder'",
-                includeItemsFromAllDrives=True,
-                supportsAllDrives=True,
-                pageSize=100,
-                fields="nextPageToken, files(id, name)",
-                pageToken=page_token
-            ).execute()
+        for attempt in range(max_retries):
+            try:
+                response = self.service.files().list(
+                    q=f"'{parent_folder_id}' in parents and name='{folder_name}' and mimeType='application/vnd.google-apps.folder' and trashed=false",
+                    supportsAllDrives=True,
+                    includeItemsFromAllDrives=True,
+                    pageSize=100,
+                    fields="files(id, name)"
+                ).execute()
+                folders = response.get('files', [])
+                if folders:
+                    return folders[0]['id']
+            except HttpError as e:
+                if e.resp.status in [403, 404]:  # Permanent errors (e.g., permission denied)
+                    logger.error(f"Permission error or folder not found: {e}")
+                    break  # No point in retrying
+                if attempt < max_retries - 1:
+                    logger.warning(f"Attempt {attempt + 1} failed with error {e}. Retrying in {delay} seconds...")
+                    time.sleep(delay)
+                else:
+                    logger.error(f"Failed after {max_retries} attempts: {e}")
+                    raise
 
-            items = results.get('files', [])
-            for item in items:
-                if item['name'] == folder_name:
-                    return item['id']
-
-            page_token = results.get('nextPageToken', None)
-            if page_token is None:
-                break
-
-        return None
+        return None  # Explicit return if folder is not found
 
     def get_folder_id_by_path(self, folder_path, parent_folder_id):
         """
