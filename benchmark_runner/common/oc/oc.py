@@ -33,7 +33,6 @@ class OC(SSH):
 
     def __init__(self, kubeadmin_password: str = ''):
         super().__init__()
-        self.__kubeadmin_password = kubeadmin_password
         self.__environment_variables_dict = environment_variables.environment_variables_dict
         self._run_artifacts = self.__environment_variables_dict.get('run_artifacts_path', '')
         self.__elasticsearch_url = self.__environment_variables_dict.get('elasticsearch_url', '')
@@ -43,6 +42,10 @@ class OC(SSH):
         self.__worker_disk_ids = self.__environment_variables_dict.get('worker_disk_ids', '')
         if self.__worker_disk_ids:
             self.__worker_disk_ids = ast.literal_eval(self.__worker_disk_ids)
+        if kubeadmin_password:
+            self.__kubeadmin_password = kubeadmin_password
+        else:
+            self.__kubeadmin_password = self.__environment_variables_dict.get('kubeadmin_password', '')
 
     def get_ocp_server_version(self):
         """
