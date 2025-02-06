@@ -23,16 +23,10 @@ class BareMetalOperations:
     SHORT_TIMEOUT = 600
 
     @typechecked
-    def __init__(self, user: str):
+    def __init__(self, user: str = None):
         self._environment_variables_dict = environment_variables.environment_variables_dict
-        self._user = user
         self._ocp_env_flavor = self._environment_variables_dict.get('ocp_env_flavor', '')
         self._create_pod_ci_cmd = self._environment_variables_dict.get('create_pod_ci_cmd', '')
-        self._provision_kubeadmin_password_path = self._environment_variables_dict.get('provision_kubeadmin_password_path', '')
-        self._provision_kubeconfig_path = self._environment_variables_dict.get('provision_kubeconfig_path', '')
-        self._provision_installer_path = self._environment_variables_dict.get('provision_installer_path', '')
-        self._provision_installer_cmd = self._environment_variables_dict.get('provision_installer_cmd', '')
-        self._provision_installer_log = self._environment_variables_dict.get('provision_installer_log', '')
         self._install_ocp_version = self._environment_variables_dict.get('install_ocp_version', '')
         self._cluster_type = self._environment_variables_dict.get('cluster_type', '')
         self._expected_nodes = self._environment_variables_dict.get('expected_nodes', '')
@@ -41,22 +35,30 @@ class BareMetalOperations:
             self._expected_nodes = ast.literal_eval(self._expected_nodes)
         self._ocp_version_build = self._environment_variables_dict.get('ocp_version_build', '')
         self._num_odf_disks = int(self._environment_variables_dict.get('num_odf_disk', 1))
-        self._provision_ip = self._environment_variables_dict.get('provision_ip', '')
-        self._provision_port = int(self._environment_variables_dict.get('provision_port', ''))
-        self._provision_timeout = int(self._environment_variables_dict.get('provision_timeout', ''))
-        self._container_private_key_path = self._environment_variables_dict.get('container_private_key_path', '')
-        self._connection_data = ConnectionData(host_name=self._provision_ip,
-                                                user_name=self._user,
-                                                port=self._provision_port,
-                                                timeout=self._provision_timeout,
-                                                ssh_key=self._container_private_key_path)
-        self._remote_ssh = RemoteSsh(self._connection_data)
-        if self._environment_variables_dict.get('github_repository_short', ''):
-            self._github_operations = GitHubOperations()
         self._ssh = SSH()
         self._cli = self._environment_variables_dict.get('cli', '')
         self._upgrade_ocp_version = self._environment_variables_dict.get('upgrade_ocp_version', '')
         self._upgrade_channel = self._environment_variables_dict.get('upgrade_channel', '')
+        self._timeout = int(self._environment_variables_dict.get('timeout', ''))
+        if user:
+            self._user = user
+            self._provision_kubeadmin_password_path = self._environment_variables_dict.get('provision_kubeadmin_password_path', '')
+            self._provision_kubeconfig_path = self._environment_variables_dict.get('provision_kubeconfig_path', '')
+            self._provision_installer_path = self._environment_variables_dict.get('provision_installer_path', '')
+            self._provision_installer_cmd = self._environment_variables_dict.get('provision_installer_cmd', '')
+            self._provision_installer_log = self._environment_variables_dict.get('provision_installer_log', '')
+            self._provision_ip = self._environment_variables_dict.get('provision_ip', '')
+            self._provision_port = int(self._environment_variables_dict.get('provision_port', ''))
+            self._provision_timeout = int(self._environment_variables_dict.get('provision_timeout', ''))
+            self._container_private_key_path = self._environment_variables_dict.get('container_private_key_path', '')
+            self._connection_data = ConnectionData(host_name=self._provision_ip,
+                                                    user_name=self._user,
+                                                    port=self._provision_port,
+                                                    timeout=self._provision_timeout,
+                                                    ssh_key=self._container_private_key_path)
+            self._remote_ssh = RemoteSsh(self._connection_data)
+            if self._environment_variables_dict.get('github_repository_short', ''):
+                self._github_operations = GitHubOperations()
 
     def _get_kubeadmin_password(self):
         """
@@ -103,7 +105,7 @@ class BareMetalOperations:
         current_wait_time = 0
         logger.info(f'Waiting until the upgrade to version {self._upgrade_ocp_version} starts...')
         oc.wait_for_ocp_upgrade_start(upgrade_version=self._upgrade_ocp_version)
-        while self._provision_timeout <= 0 or current_wait_time <= self._provision_timeout and oc.upgrade_in_progress():
+        while self._timeout <= 0 or current_wait_time <= self._timeout and oc.upgrade_in_progress():
             logger.info(f'Waiting till OCP upgrade complete, waiting {int(current_wait_time / 60)} minutes')
             # sleep for x seconds
             time.sleep(sleep_time)
@@ -302,12 +304,16 @@ class BareMetalOperations:
         raise OCPUpgradeFailed(status=oc.get_cluster_status())
 
     @logger_time_stamp
-    def oc_login(self):
+    def oc_login(self, kubeadmin_password: str):
         """
         This method login to the cluster with new credentials
+        :param kubeadmin_password
         :return:
         """
-        oc = OC(kubeadmin_password=self._get_kubeadmin_password())
+        if kubeadmin_password:
+            oc = OC(kubeadmin_password=kubeadmin_password)
+        else:
+            oc = OC(kubeadmin_password=self._get_kubeadmin_password())
         oc.login()
         return oc
 
