@@ -7,26 +7,20 @@ pipeline {
         CNV_VERSION = credentials('perfci_upgrade_target_cnv_version')
         LSO_VERSION = credentials('perfci_upgrade_target_lso_version')
         ODF_VERSION = credentials('perfci_upgrade_target_odf_version')
+        PROVISION_USER = credentials('perfci_provision_user')
+        PROVISION_IP = credentials('perfci_provision_ip')
         WAIT_FOR_UPGRADE_VERSION = credentials('perfci_upgrade_target_ocp_version')
         UPGRADE_CHANNEL = credentials('perfci_upgrade_channel') // stable (default)/candidate
         CONTACT_EMAIL1 = credentials('perfci_contact_email1')
-        PROVISION_PRIVATE_KEY_FILE = credentials('perfci_provision_private_key_file')
-        PROVISION_IP = credentials('perfci_provision_ip')
-        PROVISION_USER = credentials('perfci_provision_user')
         CLUSTER_TYPE = credentials('perfci_cluster_type')
         EXPECTED_NODES = credentials('perfci_expected_nodes')
         OCP_CLIENT_VERSION = credentials('perfci_ocp_client_version')
         QUAY_BENCHMARK_RUNNER_REPOSITORY = credentials('perfci_quay_repository')
         WORKSPACE = '/home/jenkins'
-        PROVISION_PORT = 22
         KUBEADMIN_PASSWORD_PATH = '/home/jenkins/.kube/kubeadmin-password'
         KUBECONFIG_PATH = '/root/.kube/config'
-        PROVISION_INSTALLER_PATH = '/root/jetlag/./run_jetlag.sh'
-        PROVISION_INSTALLER_CMD = 'pushd /root/jetlag;/root/jetlag/./run_jetlag.sh 1>/dev/null 2>&1;popd'
-        PROVISION_INSTALLER_LOG = 'tail -100 /root/jetlag/jetlag.log'
         PRIVATE_KEY_PATH = '/home/jenkins/.ssh/provision_private_key'
         CONFIG_PATH = '/home/jenkins/.ssh/config'
-        CONTAINER_PRIVATE_KEY_PATH = '/root/.ssh/provision_private_key'
         CONTAINER_CONFIG_PATH = '/root/.ssh/config'
         ANSIBLE_TMP_PATH = '/root/.ansible/tmp/'
         SCALE_NODES = credentials('perfci_scale_nodes')
@@ -57,7 +51,6 @@ pipeline {
         WINDOWS_SERVER_2022_URL = credentials('perfci_windows_server_2022_url')
         LSO_NODE = credentials('perfci_lso_node')
         KUBEADMIN_PASSWORD = readFile('/home/jenkins/.kube/kubeadmin-password').trim()
-        CONTAINER_KUBECONFIG_PATH = '/home/jenkins/.kube/config'
         WORKER_DISK_PREFIX = 'wwn-0x'
         SAVE_ARTIFACTS_LOCAL = 'False'
         ENABLE_PROMETHEUS_SNAPSHOT = 'False'
@@ -154,9 +147,6 @@ END
                                     echo "Running deployment for ${upgrade_step}"
                                     // deployment code
                                     script {
-                                        withCredentials([string(credentialsId: 'perfci_provision_ip', variable: 'PROVISION_IP')]) {
-                                            withCredentials([string(credentialsId: 'perfci_provision_user', variable: 'PROVISION_USER')]) {
-                                                withCredentials([file(credentialsId: 'perfci_provision_private_key_file', variable: 'PROVISION_PRIVATE_KEY_FILE')]) {
                                                     sh """
                                                         sudo podman run --rm \
                                                             -e UPGRADE_OCP_VERSION="${UPGRADE_OCP_VERSION}" \
@@ -166,24 +156,13 @@ END
                                                             -e ODF_VERSION="${ODF_VERSION}" \
                                                             -e CNV_VERSION="${CNV_VERSION}" \
                                                             -e EXPECTED_NODES='${EXPECTED_NODES}' \
-                                                            -e PROVISION_IP="${PROVISION_IP}" \
-                                                            -e PROVISION_USER="${PROVISION_USER}" \
-                                                            -e PROVISION_PORT="${PROVISION_PORT}" \
                                                             -e KUBEADMIN_PASSWORD="${KUBEADMIN_PASSWORD}" \
                                                             -e KUBECONFIG_PATH="${KUBECONFIG_PATH}" \
-                                                            -e PROVISION_INSTALLER_PATH="${PROVISION_INSTALLER_PATH}" \
-                                                            -e PROVISION_INSTALLER_CMD="${PROVISION_INSTALLER_CMD}" \
-                                                            -e PROVISION_INSTALLER_LOG="${PROVISION_INSTALLER_LOG}" \
-                                                            -e CONTAINER_PRIVATE_KEY_PATH="${CONTAINER_PRIVATE_KEY_PATH}" \
-                                                            -e PROVISION_TIMEOUT="${PROVISION_TIMEOUT}" \
-                                                            -e log_level="INFO" -v "${PRIVATE_KEY_PATH}":"${CONTAINER_PRIVATE_KEY_PATH}" \
+                                                            -e TIMEOUT="${TIMEOUT}" \
                                                             -v "${KUBECONFIG_PATH}":"${KUBECONFIG_PATH}" \
                                                             --privileged "${QUAY_BENCHMARK_RUNNER_REPOSITORY}"
 
                                                     """
-                                                }
-                                            }
-                                        }
                                     }
                                 }
                             }

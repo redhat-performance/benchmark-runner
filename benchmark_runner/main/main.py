@@ -42,6 +42,7 @@ azure_cluster_operation = environment_variables_dict.get('azure_cluster_operatio
 ci_status = environment_variables_dict.get('ci_status', '')
 install_ocp_version = environment_variables_dict.get('install_ocp_version', '')
 upgrade_ocp_version = environment_variables_dict.get('upgrade_ocp_version', '')
+kubeadmin_password = environment_variables_dict.get('kubeadmin_password', '')
 odf_version = environment_variables_dict.get('odf_version', '')
 lso_version = environment_variables_dict.get('lso_version', '')
 cnv_version = environment_variables_dict.get('cnv_version', '')
@@ -163,9 +164,8 @@ def upgrade_ocp_bare_metal(step: str):
     This method runs Bare Metal OCP upgrade
     :return:
     """
-    bare_metal_operations = BareMetalOperations(user=provision_user)
-    bare_metal_operations.connect_to_provisioner()
-    oc = bare_metal_operations.oc_login()
+    bare_metal_operations = BareMetalOperations()
+    oc = bare_metal_operations.oc_login(kubeadmin_password=kubeadmin_password)
     if step == 'run_bare_metal_ocp_upgrade':
         if not bare_metal_operations.is_ocp_already_upgraded(oc):
             bare_metal_operations.run_ocp_upgrade(oc)
@@ -180,7 +180,7 @@ def upgrade_ocp_bare_metal(step: str):
             error_message = f'OCP {upgrade_ocp_version} upgrade failed'
             logger.error(error_message)
             raise RuntimeError(error_message)
-    bare_metal_operations.disconnect_from_provisioner()
+
 
 
 @logger_time_stamp
