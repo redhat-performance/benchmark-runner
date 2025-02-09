@@ -127,6 +127,7 @@ END
                                                             -e ODF_VERSION='${ODF_VERSION}' \
                                                             -e NUM_ODF_DISK='${NUM_ODF_DISK}' \
                                                             -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' \
+                                                            -e KUBECONFIG_PATH='${KUBECONFIG_PATH}' \
                                                             -e PROVISION_IP='${PROVISION_IP}' \
                                                             -e CONTAINER_PRIVATE_KEY_PATH='${CONTAINER_PRIVATE_KEY_PATH}' \
                                                             -e PROVISION_USER='${PROVISION_USER}' \
