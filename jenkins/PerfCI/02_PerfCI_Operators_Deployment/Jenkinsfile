@@ -15,6 +15,7 @@ pipeline {
         KUBEADMIN_PASSWORD = readFile('/home/jenkins/.kube/kubeadmin-password').trim()
         KUBEADMIN_PASSWORD_PATH = '/home/jenkins/.kube/kubeadmin-password'
         KUBECONFIG_PATH = '/root/.kube/config'
+        LOCAL_KUBECONFIG_PATH = '/home/jenkins/.kube/config'
         PRIVATE_KEY_PATH = '/home/jenkins/.ssh/provision_private_key'
         CONFIG_PATH = '/home/jenkins/.ssh/config'
         WORKSPACE = '/home/jenkins'
@@ -137,7 +138,7 @@ END
                                                             -e PROVISION_TIMEOUT='${PROVISION_TIMEOUT}' \
                                                             -e log_level='INFO' \
                                                             -v '${PRIVATE_KEY_PATH}:${CONTAINER_PRIVATE_KEY_PATH}' \
-                                                            -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
+                                                            -v '${LOCAL_KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
                                                             --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}'
                                                     """
                                                 }
