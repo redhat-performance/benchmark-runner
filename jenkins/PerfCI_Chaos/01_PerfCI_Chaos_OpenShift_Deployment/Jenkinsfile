@@ -148,7 +148,7 @@ END
                                                         -e CONTAINER_PRIVATE_KEY_PATH="${CONTAINER_PRIVATE_KEY_PATH}" \
                                                         -e PROVISION_TIMEOUT="${PROVISION_TIMEOUT}" \
                                                         -e log_level="INFO" -v "${PRIVATE_KEY_PATH}":"${CONTAINER_PRIVATE_KEY_PATH}" \
-                                                        -v "${LOCAL_KUBECONFIG_PATH}":"${KUBECONFIG_PATH}" \
+                                                        -v "${LOCAL_KUBECONFIG_PATH}":"${KUBECONFIG_PATH}:ro" \
                                                         --privileged "${QUAY_BENCHMARK_RUNNER_REPOSITORY}"
                                                 """
                                             }
