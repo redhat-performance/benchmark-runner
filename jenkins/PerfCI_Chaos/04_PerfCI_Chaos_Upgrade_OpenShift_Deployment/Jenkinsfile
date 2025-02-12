@@ -160,7 +160,7 @@ END
                                                             -e KUBEADMIN_PASSWORD="${KUBEADMIN_PASSWORD}" \
                                                             -e KUBECONFIG_PATH='${KUBECONFIG_PATH}' \
                                                             -e TIMEOUT="${TIMEOUT}" \
-                                                            -v "${LOCAL_KUBECONFIG_PATH}":"${KUBECONFIG_PATH}" \
+                                                            -v "${LOCAL_KUBECONFIG_PATH}":"${KUBECONFIG_PATH}:ro" \
                                                             --privileged "${QUAY_BENCHMARK_RUNNER_REPOSITORY}"
 
                                                     """
@@ -258,7 +258,7 @@ END
                                         -e LSO_NODE='${LSO_NODE}'  \
                                         -e TIMEOUT='${TIMEOUT}' \
                                         -e log_level='INFO' \
-                                        -v '${LOCAL_KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
+                                        -v '${LOCAL_KUBECONFIG_PATH}:${KUBECONFIG_PATH}:ro' \
                                         -v '${TEMP_DIR}:${GOOGLE_DESTINATION_PATH}' \
                                         --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}'
                                     """

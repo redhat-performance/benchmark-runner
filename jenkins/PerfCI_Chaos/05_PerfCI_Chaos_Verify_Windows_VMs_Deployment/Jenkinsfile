@@ -221,7 +221,7 @@ END
                                         -e LSO_NODE='${LSO_NODE}'  \
                                         -e TIMEOUT='${TIMEOUT}' \
                                         -e log_level='INFO' \
-                                        -v '${LOCAL_KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
+                                        -v '${LOCAL_KUBECONFIG_PATH}:${KUBECONFIG_PATH}:ro' \
                                         -v '${TEMP_DIR}:${GOOGLE_DESTINATION_PATH}' \
                                         --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}'
                                     """
@@ -264,7 +264,7 @@ END
         }
         failure {
             script {
-                sh """ sudo podman run --rm -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' -e KUBECONFIG_PATH='${KUBECONFIG_PATH}' -e ELASTICSEARCH='${ELASTICSEARCH}' -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' -e CI_STATUS=''failed'' -e RUN_TYPE='${RUN_TYPE}' -e log_level='INFO' -v '${LOCAL_KUBECONFIG_PATH}:${KUBECONFIG_PATH}' --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}' """
+                sh """ sudo podman run --rm -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' -e KUBECONFIG_PATH='${KUBECONFIG_PATH}' -e ELASTICSEARCH='${ELASTICSEARCH}' -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' -e CI_STATUS=''failed'' -e RUN_TYPE='${RUN_TYPE}' -e log_level='INFO' -v '${LOCAL_KUBECONFIG_PATH}:${KUBECONFIG_PATH}:ro' --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}' """
                 msg = "Build error for ${env.JOB_NAME} ${env.BUILD_NUMBER} (${env.BUILD_URL})"
                 emailext body: """\
                     Jenkins job: ${env.BUILD_URL}\nSee the console output for more details:  ${env.BUILD_URL}consoleFull\n\n
