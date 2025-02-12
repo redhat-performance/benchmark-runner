@@ -19,7 +19,6 @@ pipeline {
         WORKSPACE = '/home/jenkins'
         KUBEADMIN_PASSWORD_PATH = '/home/jenkins/.kube/kubeadmin-password'
         KUBECONFIG_PATH = '/root/.kube/config'
-        LOCAL_KUBECONFIG_PATH = '/home/jenkins/.kube/config'
         PRIVATE_KEY_PATH = '/home/jenkins/.ssh/provision_private_key'
         CONFIG_PATH = '/home/jenkins/.ssh/config'
         CONTAINER_CONFIG_PATH = '/root/.ssh/config'
@@ -160,7 +159,7 @@ END
                                                             -e KUBEADMIN_PASSWORD="${KUBEADMIN_PASSWORD}" \
                                                             -e KUBECONFIG_PATH='${KUBECONFIG_PATH}' \
                                                             -e TIMEOUT="${TIMEOUT}" \
-                                                            -v "${LOCAL_KUBECONFIG_PATH}":"${KUBECONFIG_PATH}:ro" \
+                                                            -v "${KUBECONFIG_PATH}":"${KUBECONFIG_PATH}" \
                                                             --privileged "${QUAY_BENCHMARK_RUNNER_REPOSITORY}"
 
                                                     """
@@ -258,7 +257,7 @@ END
                                         -e LSO_NODE='${LSO_NODE}'  \
                                         -e TIMEOUT='${TIMEOUT}' \
                                         -e log_level='INFO' \
-                                        -v '${LOCAL_KUBECONFIG_PATH}:${KUBECONFIG_PATH}:ro' \
+                                        -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
                                         -v '${TEMP_DIR}:${GOOGLE_DESTINATION_PATH}' \
                                         --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}'
                                     """
