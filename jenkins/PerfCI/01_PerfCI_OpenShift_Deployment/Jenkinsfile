@@ -16,7 +16,6 @@ pipeline {
         PROVISION_PORT = 22
         KUBEADMIN_PASSWORD_PATH = '/root/.kube/kubeadmin-password'
         KUBECONFIG_PATH = '/root/.kube/config'
-        LOCAL_KUBECONFIG_PATH = '/home/jenkins/.kube/config'
         PROVISION_INSTALLER_PATH = '/root/jetlag/./run_jetlag.sh'
         PROVISION_INSTALLER_CMD = 'pushd /root/jetlag;/root/jetlag/./run_jetlag.sh 1>/dev/null 2>&1;popd'
         PROVISION_INSTALLER_LOG = 'tail -100 /root/jetlag/jetlag.log'
@@ -145,7 +144,7 @@ END
                                                         -e CONTAINER_PRIVATE_KEY_PATH="${CONTAINER_PRIVATE_KEY_PATH}" \
                                                         -e PROVISION_TIMEOUT="${PROVISION_TIMEOUT}" \
                                                         -e log_level="INFO" -v "${PRIVATE_KEY_PATH}":"${CONTAINER_PRIVATE_KEY_PATH}" \
-                                                        -v "${LOCAL_KUBECONFIG_PATH}":"${KUBECONFIG_PATH}:ro" \
+                                                        -v "${KUBECONFIG_PATH}":"${KUBECONFIG_PATH}" \
                                                         --privileged "${QUAY_BENCHMARK_RUNNER_REPOSITORY}"
                                                 """
                                             }
