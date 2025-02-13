@@ -7,8 +7,8 @@ class OCError(Exception):
 
 class LoginFailed(OCError):
     """This exception return login failed error"""
-    def __init__(self):
-        self.message = f'Login error, check credentials'
+    def __init__(self, msg):
+        self.message = msg
         super(LoginFailed, self).__init__(self.message)
 
 
