@@ -31,6 +31,8 @@ class OC(SSH):
     SHORT_TIMEOUT = 600
     # sleep time between checks is 5 sec
     SLEEP_TIME = 3
+    RETRIES = 10
+    DELAY = 30
 
     def __init__(self, kubeadmin_password: str = ''):
         super().__init__()
@@ -49,20 +51,33 @@ class OC(SSH):
             self.__kubeadmin_password = self.__environment_variables_dict.get('kubeadmin_password', '')
         self.__kubeconfig_path = self.__environment_variables_dict.get('kubeconfig_path', '')
 
+    def _ocp_server_version(self, jsonpath: str):
+        """
+        This method returns the OCP server version with retries.
+        :return: OCP server version as string.
+        """
+        for attempt in range(self.RETRIES):
+            try:
+                version = self.run(f"{self.__cli} get clusterversion version -o jsonpath={{{jsonpath}}}")
+                return version
+            except Exception as err:
+                logger.info(f"Attempt {attempt + 1}/{self.RETRIES}: Failed to fetch OCP version. Error: {err}")
+                time.sleep(self.DELAY)
+        raise Exception("Failed to retrieve OCP server version after multiple attempts.")
+
     def get_ocp_server_version(self):
         """
-        This method returns ocp server version
-        :return:
+        This method returns the OCP server version with retries.
+        :return: OCP server version as string.
         """
-        return self.run(f"{self.__cli} get clusterversion version -o jsonpath='{{.status.desired.version}}'")
+        return self._ocp_server_version(jsonpath='.status.desired.version')
 
     def get_previous_ocp_version(self):
         """
-        This method returns the previous OpenShift server version from the history.
-        :return: Previous OpenShift server version as a string
+        This method returns the previous OpenShift server version from the history with retries.
+        :return: Previous OCP server version as string.
         """
-        # Run the `oc` command to get the ClusterVersion history and extract the previous version
-        return self.run(f"{self.__cli} get clusterversion version -o jsonpath='{{.status.history[1].version}}'")
+        return self._ocp_server_version(jsonpath='.status.history[1].version')
 
     def upgrade_ocp(self, upgrade_ocp_version: str, upgrade_channel: str = 'stable'):
         """
@@ -734,15 +749,21 @@ class OC(SSH):
     @logger_time_stamp
     def login(self):
         """
-        This method logs in to the cluster
-        :return:
+        Logs in to the cluster with retries.
         """
-        try:
-            if self.__kubeadmin_password and self.__kubeadmin_password != '':
-                self.run(f'{self.__cli} login {self.get_kube_api_server()} -u kubeadmin -p {self.__kubeadmin_password}', is_check=True)
-        except Exception as err:
-            raise LoginFailed
-        return True
+        for attempt in range(self.RETRIES):
+            try:
+                if self.__kubeadmin_password and self.__kubeadmin_password.strip():
+                    self.run(
+                        f'{self.__cli} login {self.get_kube_api_server()} -u kubeadmin -p {self.__kubeadmin_password}',
+                        is_check=True)
+                    return True  # Success
+            except Exception as err:
+                logger.info(f"Login attempt {attempt + 1} failed: {err}")
+                if attempt < self.RETRIES - 1:
+                    time.sleep(self.DELAY)
+                else:
+                    raise LoginFailed(msg="Login failed after multiple attempts")
 
     @typechecked
     @logger_time_stamp
