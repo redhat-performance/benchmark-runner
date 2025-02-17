@@ -391,7 +391,6 @@ class WorkloadsOperations:
         :return:
         """
         date_format = '%Y_%m_%d'
-        self._oc.login()
         metadata = {'ocp_version': self._oc.get_ocp_server_version(),
                     'previous_ocp_version': self._oc.get_previous_ocp_version() if self._upgrade_ocp_version else '',
                     'cnv_version': self._oc.get_cnv_version(),
