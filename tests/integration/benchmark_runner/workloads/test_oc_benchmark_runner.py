@@ -27,7 +27,6 @@ def __delete_test_objects(workloads: list, kind: str):
     This method deletes logs and YAML files if they exist
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
     for workload in workloads:
         workload_name = f'{workload}-{kind}'
         workload_yaml = f'{workload}_{kind}.yaml'
@@ -50,7 +49,6 @@ def before_after_each_test_fixture():
     # before all test: setup
     test_environment_variable['namespace'] = 'benchmark-runner'
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
     oc.delete_namespace(namespace=test_environment_variable['namespace'])
     kinds = ('pod', 'vm')
     for kind in kinds:
@@ -72,7 +70,6 @@ def test_benchmark_runner_bootstorm_vm_create_start_running_delete():
     """
     vm_name = 'bootstorm-vm-72e726b0'
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
     assert oc.create_async(yaml=os.path.join(f'{templates_path}', 'bootstorm_vm.yaml'))
     assert oc.wait_for_vm_status(vm_name=vm_name, status=VMStatus.Stopped, namespace=test_environment_variable['namespace'])
     virtctl = Virtctl()
@@ -87,7 +84,6 @@ def test_benchmark_runner_vdbench_pod_create_initialized_ready_complete_delete()
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
     assert oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', 'vdbench_pod.yaml'), pod_name='vdbench-pod', namespace=test_environment_variable['namespace'])
     assert oc.wait_for_initialized(label='app=vdbench', label_uuid=False, namespace=test_environment_variable['namespace'])
     assert oc.wait_for_ready(label='app=vdbench', label_uuid=False, namespace=test_environment_variable['namespace'])
@@ -101,7 +97,6 @@ def test_benchmark_runner_vdbench_vm_create_ready_complete_delete():
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
     vm_name = 'vdbench-vm'
     assert oc.create_vm_sync(yaml=os.path.join(f'{templates_path}', 'vdbench_vm.yaml'),
                             vm_name=vm_name, namespace=test_environment_variable['namespace'])
@@ -119,7 +114,6 @@ def test_benchmark_runner_vdbench_kata_create_initialized_ready_complete_delete(
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
     assert oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', 'vdbench_kata.yaml'), pod_name='vdbench-kata', namespace=test_environment_variable['namespace'])
     assert oc.wait_for_initialized(label='app=vdbench', label_uuid=False, namespace=test_environment_variable['namespace'])
     assert oc.wait_for_ready(label='app=vdbench', label_uuid=False, namespace=test_environment_variable['namespace'])

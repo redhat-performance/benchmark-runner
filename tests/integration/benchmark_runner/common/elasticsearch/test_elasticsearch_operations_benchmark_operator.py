@@ -28,7 +28,6 @@ def __delete_pod_yamls():
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable.get('kubeadmin_password', ''))
-    oc.login()
     if oc.pod_exists(pod_name='uperf-pod-workload', namespace=test_environment_variable.get('namespace', '')):
         oc.delete_pod_sync(yaml=os.path.join(f'{templates_path}', 'uperf_pod.yaml'), pod_name='uperf-pod-workload')
     if os.path.isfile(os.path.join(f'{templates_path}', 'uperf_pod.yaml')):
@@ -45,7 +44,7 @@ def before_after_all_tests_fixture():
 
     # delete benchmark-operator pod if exist
     benchmark_operator = BenchmarkOperatorWorkloadsOperations()
-    benchmark_operator.set_login(kubeadmin_password=test_environment_variable['kubeadmin_password'])
+    benchmark_operator.get_oc(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     benchmark_operator.make_undeploy_benchmark_controller_manager_if_exist(runner_path=test_environment_variable.get('runner_path', ''))
     benchmark_operator.make_deploy_benchmark_controller_manager(runner_path=test_environment_variable.get('runner_path', ''))
     yield
@@ -73,7 +72,6 @@ def test_verify_elasticsearch_data_uploaded_uperf_pod():
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
     try:
         workload = 'uperf-pod'
         oc.create_pod_sync(yaml=os.path.join(templates_path, 'uperf_pod.yaml'), pod_name='uperf-client')

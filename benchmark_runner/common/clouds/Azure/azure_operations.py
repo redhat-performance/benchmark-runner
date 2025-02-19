@@ -76,13 +76,12 @@ class AzureOperations:
         return vm_instance
 
     @logger_time_stamp
-    def oc_login(self):
+    def get_oc(self):
         """
         This method login to the cluster with new credentials
         :return:
         """
         oc = OC(kubeadmin_password=self.__kubeadmin_password)
-        oc.login()
         return oc
 
     def verify_sno_cluster_is_up(self):
@@ -90,7 +89,7 @@ class AzureOperations:
         This method verifies sno cluster is up and running
         @return:
         """
-        master_nodes = self.oc_login().get_master_nodes()
+        master_nodes = self.get_oc().get_master_nodes()
         if len(master_nodes.split()) == 1:
             return True
         else:

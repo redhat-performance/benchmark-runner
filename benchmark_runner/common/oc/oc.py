@@ -50,6 +50,9 @@ class OC(SSH):
         else:
             self.__kubeadmin_password = self.__environment_variables_dict.get('kubeadmin_password', '')
         self.__kubeconfig_path = self.__environment_variables_dict.get('kubeconfig_path', '')
+        self._is_logged_in = False  # Shared across all instances
+        # singleton login
+        self.__login()
 
     def _ocp_server_version(self, jsonpath: str):
         """
@@ -747,23 +750,31 @@ class OC(SSH):
             return f"Error: {str(e)}"
 
     @logger_time_stamp
-    def login(self):
+    def __login(self):
         """
-        Logs in to the cluster with retries.
+        Logs in to the cluster with retries, ensuring only a single login per execution.
         """
+        if self._is_logged_in:
+            logger.info("Already logged in. Skipping login.")
+            return True  # Avoid redundant login attempts
+
         for attempt in range(self.RETRIES):
             try:
                 if self.__kubeadmin_password and self.__kubeadmin_password.strip():
                     self.run(
                         f'{self.__cli} login {self.get_kube_api_server()} -u kubeadmin -p {self.__kubeadmin_password}',
-                        is_check=True)
-                    return True  # Success
+                        is_check=True
+                    )
+                    self._is_logged_in = True  # Mark as logged in globally
+                    break  # Exit loop upon success
             except Exception as err:
-                logger.info(f"Login attempt {attempt + 1} failed: {err}")
+                logger.warning(f"Login attempt {attempt + 1} failed: {err}")
                 if attempt < self.RETRIES - 1:
                     time.sleep(self.DELAY)
                 else:
-                    raise LoginFailed(msg="Login failed after multiple attempts")
+                    raise LoginFailed("Login failed after multiple attempts")
+
+        return self._is_logged_in  # Ensure return after loop
 
     @typechecked
     @logger_time_stamp

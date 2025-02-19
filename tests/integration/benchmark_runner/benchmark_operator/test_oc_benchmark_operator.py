@@ -29,7 +29,6 @@ def __delete_test_objects(workload: str, kind: str):
     This method deletes objects and YAML files if they exist
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
     workload_name = f'{workload}-{kind}-workload'
     workload_yaml = f'{workload}_{kind}.yaml'
     if oc.pod_exists(pod_name=workload_name, namespace=test_environment_variable['namespace']):
@@ -46,7 +45,7 @@ def before_after_all_tests_fixture():
     """
     print('Deploy benchmark-operator pod')
     benchmark_operator = BenchmarkOperatorWorkloadsOperations()
-    benchmark_operator.set_login(kubeadmin_password=test_environment_variable['kubeadmin_password'])
+    benchmark_operator.get_oc(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     benchmark_operator.make_undeploy_benchmark_controller_manager_if_exist(runner_path=test_environment_variable['runner_path'])
     benchmark_operator.make_deploy_benchmark_controller_manager(runner_path=test_environment_variable['runner_path'])
     yield
@@ -79,7 +78,6 @@ def test_oc_get_pod_name_and_is_pod_exist():
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
     assert oc._get_pod_name(pod_name='benchmark-controller-manager', namespace=test_environment_variable['namespace'])
     assert oc.pod_exists(pod_name='benchmark-controller-manager', namespace=test_environment_variable['namespace'])
 
@@ -90,7 +88,6 @@ def test_yaml_file_not_exist_error():
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
     with pytest.raises(YAMLNotExist) as err:
         oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', f'{TESTED_WORKLOAD}1.yaml'), pod_name=f'{TESTED_WORKLOAD}-pod-workload', timeout=1)
 
@@ -101,7 +98,6 @@ def test_create_sync_pod_timeout_error():
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
     with pytest.raises(PodNotCreateTimeout) as err:
         oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', f'{TESTED_WORKLOAD}_pod.yaml'), pod_name=f'{TESTED_WORKLOAD}-pod-workload', timeout=1)
 
@@ -112,7 +108,6 @@ def test_delete_sync_pod_timeout_error():
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
     oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', f'{TESTED_WORKLOAD}_pod.yaml'), pod_name=f'{TESTED_WORKLOAD}-pod-workload')
     with pytest.raises(PodTerminateTimeout) as err:
         oc.delete_pod_sync(yaml=os.path.join(f'{templates_path}', f'{TESTED_WORKLOAD}_pod.yaml'), pod_name=f'{TESTED_WORKLOAD}-pod-workload', timeout=1)
@@ -124,7 +119,6 @@ def test_get_long_short_uuid():
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
     oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', f'{TESTED_WORKLOAD}_pod.yaml'), pod_name=f'{TESTED_WORKLOAD}-pod-workload')
     assert len(oc.get_long_uuid(workload=f'{TESTED_WORKLOAD}-pod')) == 36
     assert len(oc._OC__get_short_uuid(workload=f'{TESTED_WORKLOAD}-pod')) == 8
@@ -138,7 +132,6 @@ def test_wait_for_pod_create_initialized_ready_completed_system_metrics_deleted(
     """
     workload = f'{TESTED_WORKLOAD}-pod'
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
     assert oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', f'{TESTED_WORKLOAD}_pod.yaml'), pod_name=f'{workload}-workload')
     assert oc.wait_for_initialized(label=f'app={TESTED_WORKLOAD}_workload', workload=workload)
     assert oc.wait_for_ready(label=f'app={TESTED_WORKLOAD}_workload', workload=workload)
@@ -158,7 +151,6 @@ def test_wait_for_kata_create_initialized_ready_completed_system_metrics_deleted
     """
     workload = f'{TESTED_WORKLOAD}-kata'
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
     assert oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', f'{TESTED_WORKLOAD}_kata.yaml'), pod_name=f'{workload}-workload')
     assert oc.wait_for_initialized(label=f'app={TESTED_WORKLOAD}_workload', workload=workload)
     assert oc.wait_for_ready(label=f'app={TESTED_WORKLOAD}_workload', workload=workload)
@@ -178,7 +170,6 @@ def test_create_sync_vm_timeout_error():
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
     with pytest.raises(VMNotCreateTimeout) as err:
         oc.create_vm_sync(yaml=os.path.join(f'{templates_path}', f'{TESTED_WORKLOAD}_vm.yaml'), vm_name=f'{TESTED_WORKLOAD}-vm-workload', timeout=1)
 
@@ -190,7 +181,6 @@ def test_oc_get_vm_name_and_is_vm_exist():
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
     oc.create_async(yaml=os.path.join(f'{templates_path}', f'{TESTED_WORKLOAD}_vm.yaml'))
     # wait 60 sec till vm will be created
     time.sleep(60)
@@ -205,7 +195,6 @@ def test_wait_for_vm_created():
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
     oc.create_async(yaml=os.path.join(f'{templates_path}', f'{TESTED_WORKLOAD}_vm.yaml'))
     assert oc.wait_for_vm_create(vm_name=f'{TESTED_WORKLOAD}-vm-workload')
 
@@ -218,7 +207,6 @@ def test_vm_create_initialized_ready_completed_system_metrics_deleted():
     """
     workload = f'{TESTED_WORKLOAD}-vm'
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
     assert oc.create_vm_sync(yaml=os.path.join(f'{templates_path}', f'{TESTED_WORKLOAD}_vm.yaml'), vm_name=f'{workload}-workload')
     assert oc.get_vm()
     assert oc.wait_for_initialized(label=f'app={TESTED_WORKLOAD}_workload', workload=workload)
