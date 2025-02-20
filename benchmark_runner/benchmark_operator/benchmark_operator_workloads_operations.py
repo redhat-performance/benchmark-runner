@@ -67,8 +67,8 @@ class BenchmarkOperatorWorkloadsOperations:
                                                            timeout=self._timeout)
         # Generate template class
         self._template = TemplateOperations(workload=self._workload)
-        # set oc login
-        self._oc = self.set_login(kubeadmin_password=self._kubeadmin_password)
+        # get oc instance
+        self._oc = self.get_oc(kubeadmin_password=self._kubeadmin_password)
         self._virtctl = Virtctl()
         # PrometheusSnapshot
         if self._enable_prometheus_snapshot:
@@ -87,14 +87,13 @@ class BenchmarkOperatorWorkloadsOperations:
         else:
             self._lso_disk_id = None
 
-    def set_login(self, kubeadmin_password: str = ''):
+    def get_oc(self, kubeadmin_password: str = ''):
         """
-        This method sets oc login
+        This method returns oc instance
         :param kubeadmin_password:
         :return:
         """
         self._oc = OC(kubeadmin_password=kubeadmin_password)
-        self._oc.login()
         return self._oc
 
     @logger_time_stamp
@@ -162,13 +161,6 @@ class BenchmarkOperatorWorkloadsOperations:
         if self._oc.pod_exists(pod_name='benchmark-controller-manager'):
             logger.info('make undeploy benchmark operator running pod')
             self.make_undeploy_benchmark_controller_manager(runner_path=runner_path)
-
-    @logger_time_stamp
-    def login(self):
-        """
-        This method logs in to the cluster
-        """
-        self._oc.login()
 
     @logger_time_stamp
     def tear_down_pod_after_error(self, yaml: str, pod_name: str):

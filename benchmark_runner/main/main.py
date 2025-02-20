@@ -165,7 +165,7 @@ def upgrade_ocp_bare_metal(step: str):
     :return:
     """
     bare_metal_operations = BareMetalOperations()
-    oc = bare_metal_operations.oc_login(kubeadmin_password=kubeadmin_password)
+    oc = bare_metal_operations.get_oc(kubeadmin_password=kubeadmin_password)
     if step == 'run_bare_metal_ocp_upgrade':
         if not bare_metal_operations.is_ocp_already_upgraded(oc):
             bare_metal_operations.run_ocp_upgrade(oc)
@@ -198,7 +198,7 @@ def install_resources():
     except (ValueError, SyntaxError):
         resources = [install_resources_list]
     logger.info(f'Start Bare-Metal OpenShift resources installation')
-    oc = bare_metal_operations.oc_login()
+    oc = bare_metal_operations.get_oc()
     bare_metal_operations.verify_cluster_is_up(oc)
     oc.wait_for_node_ready()
     bare_metal_operations.install_ocp_resources(resources=resources)
