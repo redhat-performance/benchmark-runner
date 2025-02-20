@@ -11,13 +11,21 @@ from tests.integration.benchmark_runner.test_environment_variables import *
 from benchmark_runner.common.prometheus.prometheus_snapshot import PrometheusSnapshot
 
 
+def test_login_singleton():
+    """
+    This method test login singleton
+    :return:
+    """
+    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
+    assert oc._is_logged_in
+
+
 def test_oc_get_ocp_server_version():
     """
     This method gets ocp server version
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
     assert oc.get_ocp_server_version()
 
 
@@ -27,7 +35,6 @@ def test_get_ocp_major_version():
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
     assert oc.get_ocp_major_version()
 
 
@@ -37,7 +44,6 @@ def test_get_ocp_minor_version():
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
     assert oc.get_ocp_minor_version()
 
 
@@ -48,7 +54,6 @@ def test_oc_get_kata_operator_version():
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
     assert oc.get_kata_operator_version()
 
 
@@ -59,7 +64,6 @@ def test_oc_get_kata_rpm_version():
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
     assert oc.get_kata_rpm_version(node=test_environment_variable['pin_node1'])
     assert len(oc.get_kata_rpm_version(node=test_environment_variable['pin_node1']).split('.')) == 3
 
@@ -70,7 +74,6 @@ def test_oc_get_cnv_version():
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
     assert oc.get_cnv_version()
 
 
@@ -81,7 +84,6 @@ def test_oc_get_odf_version():
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
     assert oc.get_odf_version()
 
 
@@ -92,7 +94,6 @@ def test_oc_get_pv_disk_ids():
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
     assert len(oc.get_pv_disk_ids()) > 1
     assert oc.get_pv_disk_ids()
 
@@ -110,7 +111,6 @@ def test_oc_get_free_disk_id():
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
     with mock.patch.object(OC, 'get_worker_disk_ids', new=mock_get_worker_disk_ids):
         assert oc.get_free_disk_id(node=test_environment_variable['pin_node1'])
 
@@ -122,7 +122,6 @@ def test_oc_get_odf_disk_count():
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
     odf_disk_count = oc.get_odf_disk_count()
     assert (odf_disk_count is None or odf_disk_count > 0)
 
@@ -133,17 +132,7 @@ def test_oc_get_master_nodes():
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
     assert oc.get_master_nodes()
-
-
-def test_login():
-    """
-    This method test login
-    :return:
-    """
-    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    assert oc.login()
 
 
 def test_oc_get_pod_name():
@@ -170,7 +159,6 @@ def test_get_prom_token():
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
     assert oc.get_prom_token()
 
 
@@ -180,7 +168,6 @@ def test_is_cnv_installed():
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
     assert oc.is_cnv_installed()
 
 
@@ -191,7 +178,6 @@ def test_is_kata_installed():
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
     assert oc.is_kata_installed()
 
 
@@ -202,7 +188,6 @@ def test_is_odf_installed():
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
     assert oc.is_odf_installed()
 
 
@@ -213,7 +198,6 @@ def test_oc_exec():
     """
     test_message = "I am here"
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
     answer = oc.exec(pod_name="prometheus-k8s-0", namespace="openshift-monitoring", container='prometheus',
                      command=f'echo "{test_message}"')
     assert answer == test_message
@@ -225,7 +209,6 @@ def test_collect_prometheus():
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
     with tempfile.TemporaryDirectory() as dirname:
         snapshot = PrometheusSnapshot(oc=oc, artifacts_path=dirname, verbose=True)
         snapshot.prepare_for_snapshot(pre_wait_time=1)
@@ -240,5 +223,4 @@ def test_wait_for_nodes_ready():
     @return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
     assert oc.wait_for_node_ready()

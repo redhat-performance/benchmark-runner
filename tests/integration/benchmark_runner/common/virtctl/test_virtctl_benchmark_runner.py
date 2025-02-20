@@ -25,7 +25,6 @@ def __delete_test_objects(workload: str, kind: str = 'vm'):
     Delete objects and YAML files if they exist
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
     # revert bach to default namespace
     workload_name = f'{workload}-{kind}'
     workload_yaml = f'{workload}_{kind}.yaml'
@@ -47,7 +46,6 @@ def before_after_each_test_fixture():
     # before all test: setup
     test_environment_variable['namespace'] = 'benchmark-runner'
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
     oc.delete_namespace(namespace=test_environment_variable['namespace'])
     __generate_yamls(workload='vdbench')
     yield
@@ -67,7 +65,6 @@ def test_benchmark_runner_vm_create_ready_stop_start_expose_delete():
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    oc.login()
     virtctl = Virtctl()
     vm_name = 'vdbench-vm'
     assert oc.create_vm_sync(yaml=os.path.join(f'{templates_path}', 'vdbench_vm.yaml'), vm_name=vm_name, namespace=test_environment_variable['namespace'], timeout=600)

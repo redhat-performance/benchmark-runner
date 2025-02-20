@@ -304,7 +304,7 @@ class BareMetalOperations:
         raise OCPUpgradeFailed(status=oc.get_cluster_status())
 
     @logger_time_stamp
-    def oc_login(self, kubeadmin_password: str = ''):
+    def get_oc(self, kubeadmin_password: str = ''):
         """
         This method login to the cluster with new credentials
         :param kubeadmin_password, default empty
@@ -314,7 +314,6 @@ class BareMetalOperations:
             oc = OC(kubeadmin_password=kubeadmin_password)
         else:
             oc = OC(kubeadmin_password=self._get_kubeadmin_password())
-        oc.login()
         return oc
 
     @staticmethod

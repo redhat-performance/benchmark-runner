@@ -90,10 +90,9 @@ class WorkloadsOperations:
         # Generate templates class
         self._template = TemplateOperations(workload=self._workload)
 
-        # set oc login
+        # get oc instance
         if WorkloadsOperations.oc is None:
-            WorkloadsOperations.oc = self.set_login(kubeadmin_password=self._kubeadmin_password)
-        self._oc = WorkloadsOperations.oc
+            self._oc = self.get_oc(kubeadmin_password=self._kubeadmin_password)
         self._virtctl = Virtctl()
 
         # Prometheus Snapshot
@@ -131,14 +130,13 @@ class WorkloadsOperations:
         else:
             return f'{workload}-{self._time_stamp_format}'
 
-    def set_login(self, kubeadmin_password: str = ''):
+    def get_oc(self, kubeadmin_password: str = ''):
         """
-        This method sets login
+        This method returns oc instance
         :param kubeadmin_password:
         :return: oc instance
         """
         self._oc = OC(kubeadmin_password=kubeadmin_password)
-        self._oc.login()
         return self._oc
 
     @logger_time_stamp

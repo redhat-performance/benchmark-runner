@@ -21,7 +21,6 @@ class CreateOCPResource:
         self.__dir_path = f'{os.path.dirname(os.path.realpath(__file__))}'
         self.__environment_variables_dict = environment_variables.environment_variables_dict
         self.__oc = OC(kubeadmin_password=self.__environment_variables_dict.get('kubeadmin_password', ''))
-        self.__oc.login()
         self.__oc.populate_additional_template_variables(self.__environment_variables_dict)
         self.__worker_disk_prefix = self.__environment_variables_dict.get('worker_disk_prefix', '')
         self.__worker_disk_ids = self.__environment_variables_dict.get('worker_disk_ids', '')
