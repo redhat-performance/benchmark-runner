@@ -735,6 +735,20 @@ class OC(SSH):
         self.run(f"{self.__cli} get events -A > '{output_filename}' ")
         return output_filename
 
+    def get_kube_api_server(self):
+        try:
+            with open(self.__kubeconfig_path, "r") as f:
+                config = yaml.safe_load(f)
+
+            # Extract the API server URL from the clusters section
+            return config["clusters"][0]["cluster"]["server"]
+        except FileNotFoundError:
+            return "Kubeconfig file not found."
+        except KeyError:
+            return "Invalid kubeconfig format. Could not find API server."
+        except Exception as e:
+            return f"Error: {str(e)}"
+
     @logger_time_stamp
     def __login(self):
         """
@@ -748,7 +762,7 @@ class OC(SSH):
             try:
                 if self.__kubeadmin_password and self.__kubeadmin_password.strip():
                     self.run(
-                        f'{self.__cli} login -u kubeadmin -p {self.__kubeadmin_password}',
+                        f'{self.__cli} login {self.get_kube_api_server()} -u kubeadmin -p {self.__kubeadmin_password}',
                         is_check=True
                     )
                     self._is_logged_in = True  # Mark as logged in globally
