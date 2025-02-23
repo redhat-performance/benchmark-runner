@@ -11,15 +11,6 @@ from tests.integration.benchmark_runner.test_environment_variables import *
 from benchmark_runner.common.prometheus.prometheus_snapshot import PrometheusSnapshot
 
 
-def test_login_singleton():
-    """
-    This method test login singleton
-    :return:
-    """
-    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    assert oc._is_logged_in
-
-
 def test_oc_get_ocp_server_version():
     """
     This method gets ocp server version

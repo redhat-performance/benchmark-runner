@@ -137,7 +137,6 @@ END
                                                         -e INSTALL_STEP="${install_step}" -e PROVISION_IP="${PROVISION_IP}" \
                                                         -e PROVISION_USER="${PROVISION_USER}" -e PROVISION_PORT="${PROVISION_PORT}" \
                                                         -e KUBEADMIN_PASSWORD_PATH="${KUBEADMIN_PASSWORD_PATH}" \
-                                                        -e KUBECONFIG_PATH="${KUBECONFIG_PATH}" \
                                                         -e PROVISION_INSTALLER_PATH="${PROVISION_INSTALLER_PATH}" \
                                                         -e PROVISION_INSTALLER_CMD="${PROVISION_INSTALLER_CMD}" \
                                                         -e PROVISION_INSTALLER_LOG="${PROVISION_INSTALLER_LOG}" \

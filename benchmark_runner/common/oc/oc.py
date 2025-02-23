@@ -1,6 +1,5 @@
 
 import os
-import yaml
 import ast
 import shutil
 import time
@@ -9,12 +8,13 @@ from typeguard import typechecked
 
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 from benchmark_runner.common.oc.oc_exceptions import (PodNotCreateTimeout, PodNotInitializedTimeout, PodNotReadyTimeout, \
-    PodNotCompletedTimeout, PodTerminateTimeout, PodNameNotExist, LoginFailed, VMNotCreateTimeout, VMDeleteTimeout, \
+    PodNotCompletedTimeout, PodTerminateTimeout, PodNameNotExist, VMNotCreateTimeout, VMDeleteTimeout, \
     YAMLNotExist, VMNameNotExist, VMNotInitializedTimeout, VMNotReadyTimeout, VMStateTimeout, VMNotCompletedTimeout, \
     ExecFailed, PodFailed, DVStatusTimeout, CSVNotCreateTimeout, UpgradeNotStartTimeout, OperatorInstallationTimeout, \
     OperatorUpgradeTimeout, ODFHealthCheckTimeout, NodeNotReady)
 from benchmark_runner.common.ssh.ssh import SSH
 from benchmark_runner.main.environment_variables import environment_variables
+from benchmark_runner.common.oc.singleton_oc_login import SingletonOCLogin
 
 
 class VMStatus(Enum):
@@ -40,19 +40,18 @@ class OC(SSH):
         self._run_artifacts = self.__environment_variables_dict.get('run_artifacts_path', '')
         self.__elasticsearch_url = self.__environment_variables_dict.get('elasticsearch_url', '')
         self.__kata_csv = self.__environment_variables_dict.get('kata_csv', '')
-        self.__cli = self.__environment_variables_dict.get('cli', '')
         self.__worker_disk_prefix = self.__environment_variables_dict.get('worker_disk_prefix', '')
         self.__worker_disk_ids = self.__environment_variables_dict.get('worker_disk_ids', '')
         if self.__worker_disk_ids:
             self.__worker_disk_ids = ast.literal_eval(self.__worker_disk_ids)
+        self._cli = self.__environment_variables_dict.get('cli', '')
         if kubeadmin_password:
-            self.__kubeadmin_password = kubeadmin_password
+            self._kubeadmin_password = kubeadmin_password
         else:
-            self.__kubeadmin_password = self.__environment_variables_dict.get('kubeadmin_password', '')
-        self.__kubeconfig_path = self.__environment_variables_dict.get('kubeconfig_path', '')
-        self._is_logged_in = False  # Shared across all instances
-        # singleton login
-        self.__login()
+            self._kubeadmin_password = self.__environment_variables_dict.get('kubeadmin_password', '')
+        self._kubeconfig_path = self.__environment_variables_dict.get('kubeconfig_path', '')
+        # Singleton Login class
+        SingletonOCLogin(self)
 
     def _ocp_server_version(self, jsonpath: str):
         """
@@ -61,7 +60,7 @@ class OC(SSH):
         """
         for attempt in range(self.RETRIES):
             try:
-                version = self.run(f"{self.__cli} get clusterversion version -o jsonpath={{{jsonpath}}}")
+                version = self.run(f"{self._cli} get clusterversion version -o jsonpath={{{jsonpath}}}")
                 return version
             except Exception as err:
                 logger.info(f"Attempt {attempt + 1}/{self.RETRIES}: Failed to fetch OCP version. Error: {err}")
@@ -94,9 +93,9 @@ class OC(SSH):
 
         # see: https://access.redhat.com/articles/7031404
         if ocp_channel == "4.16":
-            patch_command = f"{self.__cli} -n openshift-config patch cm admin-acks --patch '{{\"data\":{{\"ack-4.15-kube-1.29-api-removals-in-4.16\":\"true\"}}}}' --type=merge"
+            patch_command = f"{self._cli} -n openshift-config patch cm admin-acks --patch '{{\"data\":{{\"ack-4.15-kube-1.29-api-removals-in-4.16\":\"true\"}}}}' --type=merge"
             self.run(patch_command)
-        upgrade_command = f"{self.__cli} adm upgrade ; sleep 10; {self.__cli} adm upgrade channel {upgrade_channel}-{ocp_channel}; sleep 10; {self.__cli} adm upgrade --to={upgrade_ocp_version};"
+        upgrade_command = f"{self._cli} adm upgrade ; sleep 10; {self._cli} adm upgrade channel {upgrade_channel}-{ocp_channel}; sleep 10; {self._cli} adm upgrade --to={upgrade_ocp_version};"
         logger.info(upgrade_command)
         self.run(upgrade_command)
 
@@ -105,7 +104,7 @@ class OC(SSH):
         This method returns True when an upgrade is in progress and False when it is not.
         @return: bool
         """
-        status = self.run(f"{self.__cli} get clusterversion version -o jsonpath='{{.status.conditions[?(@.type==\"Progressing\")].status}}'")
+        status = self.run(f"{self._cli} get clusterversion version -o jsonpath='{{.status.conditions[?(@.type==\"Progressing\")].status}}'")
         return status == 'True'
 
     @logger_time_stamp
@@ -131,14 +130,14 @@ class OC(SSH):
         This method returns upgrade version
         @return:
         """
-        return self.run(f"{self.__cli} get clusterversion version -o jsonpath='{{.status.desired.version}}'")
+        return self.run(f"{self._cli} get clusterversion version -o jsonpath='{{.status.desired.version}}'")
 
     def get_cluster_status(self):
         """
         This method returns the STATUS from the 'oc get clusterversion' command.
         @return: str - The current status of the cluster version.
         """
-        return self.run(f"{self.__cli} get clusterversion version -o jsonpath='{{.status.conditions[?(@.type==\"Progressing\")].message}}'")
+        return self.run(f"{self._cli} get clusterversion version -o jsonpath='{{.status.conditions[?(@.type==\"Progressing\")].message}}'")
 
     def get_operator_version(self, namespace):
         """
@@ -146,7 +145,7 @@ class OC(SSH):
         @param namespace: str - The namespace to search for the operator version.
         @return: major version
         """
-        version = self.run(f"{self.__cli} get csv -n {namespace} -o jsonpath='{{.items[0].spec.version}}'")
+        version = self.run(f"{self._cli} get csv -n {namespace} -o jsonpath='{{.items[0].spec.version}}'")
         return '.'.join(version.split('.')[:2])
 
     def wait_for_operator_installation(self, operator: str, version: str, namespace: str, timeout: int = SHORT_TIMEOUT):
@@ -176,16 +175,16 @@ class OC(SSH):
         @return:
         """
         if action == 'stop':
-            self.run(f"{self.__cli} -n openshift-machine-api annotate mhc $({self.__cli} get machinehealthcheck -n openshift-machine-api -o jsonpath='{{.items[0].metadata.name}}') cluster.x-k8s.io/paused=\"\"")
+            self.run(f"{self._cli} -n openshift-machine-api annotate mhc $({self._cli} get machinehealthcheck -n openshift-machine-api -o jsonpath='{{.items[0].metadata.name}}') cluster.x-k8s.io/paused=\"\"")
         elif action == 'resume':
-            self.run(f"{self.__cli} -n openshift-machine-api annotate mhc $({self.__cli} get machinehealthcheck -n openshift-machine-api -o jsonpath='{{.items[0].metadata.name}}') cluster.x-k8s.io/paused-")
+            self.run(f"{self._cli} -n openshift-machine-api annotate mhc $({self._cli} get machinehealthcheck -n openshift-machine-api -o jsonpath='{{.items[0].metadata.name}}') cluster.x-k8s.io/paused-")
 
     def get_cnv_version(self):
         """
         This method returns cnv version
         :return:
         """
-        return self.run(f"{self.__cli} get csv -n openshift-cnv -o json | jq -r '.items[] | select(.metadata.name | startswith(\"kubevirt-hyperconverged-operator\")) | .spec.version'")
+        return self.run(f"{self._cli} get csv -n openshift-cnv -o json | jq -r '.items[] | select(.metadata.name | startswith(\"kubevirt-hyperconverged-operator\")) | .spec.version'")
 
     def get_odf_version(self):
         """
@@ -194,9 +193,9 @@ class OC(SSH):
         """
         # OCP 4.16 and below
         if self.get_ocp_major_version() <= 4 and self.get_ocp_minor_version() <= 16:
-            command = f"{self.__cli} get csv -n openshift-storage -o jsonpath='{{.items[0].spec.labels.full_version}}'"
+            command = f"{self._cli} get csv -n openshift-storage -o jsonpath='{{.items[0].spec.labels.full_version}}'"
         else:
-            command = f"{self.__cli} get csv -n openshift-storage -o jsonpath='{{range .items[*]}}{{.metadata.name}}{{\"\\n\"}}{{end}}' | grep odf-operator | sed -E 's/odf-operator.v([0-9]+\\.[0-9]+\\.[0-9]+)-rhodf/\\1/'"
+            command = f"{self._cli} get csv -n openshift-storage -o jsonpath='{{range .items[*]}}{{.metadata.name}}{{\"\\n\"}}{{end}}' | grep odf-operator | sed -E 's/odf-operator.v([0-9]+\\.[0-9]+\\.[0-9]+)-rhodf/\\1/'"
         return self.run(command)
 
     def remove_lso_path(self):
@@ -204,7 +203,7 @@ class OC(SSH):
         The method removes lso path on each node
         @return:
         """
-        self.run(fr"""{self.__cli} get nodes -l node-role.kubernetes.io/worker= -o jsonpath="{{range .items[*]}}{{.metadata.name}}{{'\\n'}}{{end}}" |  xargs -I{{}} {self.__cli} debug node/{{}} -- chroot /host sh -c "rm -rfv /mnt/local-storage/local-sc/" """)
+        self.run(fr"""{self._cli} get nodes -l node-role.kubernetes.io/worker= -o jsonpath="{{range .items[*]}}{{.metadata.name}}{{'\\n'}}{{end}}" |  xargs -I{{}} {self._cli} debug node/{{}} -- chroot /host sh -c "rm -rfv /mnt/local-storage/local-sc/" """)
 
     def get_worker_disk_ids(self, node: str = None):
         """
@@ -227,7 +226,7 @@ class OC(SSH):
         This method returns list of pv disk ids
         """
         pv_ids = self.run(
-            f"{self.__cli} get pv -o jsonpath='{{range .items[*]}}{{.metadata.annotations.storage\\.openshift\\.com/device-id}}{{\"\\n\"}}{{end}}'")
+            f"{self._cli} get pv -o jsonpath='{{range .items[*]}}{{.metadata.annotations.storage\\.openshift\\.com/device-id}}{{\"\\n\"}}{{end}}'")
         return [pv[len(self.__worker_disk_prefix):] for pv in pv_ids.split()]
 
     def get_free_disk_id(self, node: str = None):
@@ -254,14 +253,14 @@ class OC(SSH):
         :param: cmd
         :return:
         """
-        self.run(f"{self.__cli} debug node/{node} --no-tty=true -- chroot /host sh -c '{cmd}'")
+        self.run(f"{self._cli} debug node/{node} --no-tty=true -- chroot /host sh -c '{cmd}'")
 
     def get_kata_operator_version(self):
         """
         This method returns kata operator version
         :return:
         """
-        return self.run(f"{self.__cli} get csv -n openshift-sandboxed-containers-operator $({self.__cli} get csv -n openshift-sandboxed-containers-operator --no-headers | awk '{{ print $1; }}') -o jsonpath='{{.spec.version}}'")
+        return self.run(f"{self._cli} get csv -n openshift-sandboxed-containers-operator $({self._cli} get csv -n openshift-sandboxed-containers-operator --no-headers | awk '{{ print $1; }}') -o jsonpath='{{.spec.version}}'")
 
     @typechecked
     def get_kata_rpm_version(self, node: str):
@@ -270,21 +269,21 @@ class OC(SSH):
         @param: node
         :return:
         """
-        kata_rpm_version = self.run(f"{self.__cli} debug node/{node} -- chroot /host rpm -q --queryformat='%{{VERSION}}-%{{RELEASE}}' kata-containers 2>/dev/null")
+        kata_rpm_version = self.run(f"{self._cli} debug node/{node} -- chroot /host rpm -q --queryformat='%{{VERSION}}-%{{RELEASE}}' kata-containers 2>/dev/null")
         return '.'.join(kata_rpm_version.split('.')[:3])
 
     def _get_kata_default_channel(self):
         """
         This method retrieves the default channel for Kata
         """
-        return self.run(f"{self.__cli} get packagemanifest -n openshift-marketplace sandboxed-containers-operator -o jsonpath='{{.status.defaultChannel}}'")
+        return self.run(f"{self._cli} get packagemanifest -n openshift-marketplace sandboxed-containers-operator -o jsonpath='{{.status.defaultChannel}}'")
 
     def _get_kata_default_channel_field(self, channel_field: str):
         """
         This method retrieves a field from the packagemanifest for the default Kata channel
         """
         default_channel = f'"{self._get_kata_default_channel()}"'
-        command = f"{self.__cli} get packagemanifest -n openshift-marketplace sandboxed-containers-operator -ojson | jq -r '[foreach .status.channels[] as $channel ([[],[]];0;(if ($channel.name == {default_channel}) then $channel.{channel_field} else null end))] | flatten | map (select (. != null))[]'"
+        command = f"{self._cli} get packagemanifest -n openshift-marketplace sandboxed-containers-operator -ojson | jq -r '[foreach .status.channels[] as $channel ([[],[]];0;(if ($channel.name == {default_channel}) then $channel.{channel_field} else null end))] | flatten | map (select (. != null))[]'"
         return self.run(command)
 
     def _get_kata_csv(self):
@@ -297,7 +296,7 @@ class OC(SSH):
         """
         This method retrieves the catalog source of the sandboxed containers operator for installation"
         """
-        return self.run(f"{self.__cli} get packagemanifest -n openshift-marketplace sandboxed-containers-operator -o jsonpath='{{.status.catalogSource}}'")
+        return self.run(f"{self._cli} get packagemanifest -n openshift-marketplace sandboxed-containers-operator -o jsonpath='{{.status.catalogSource}}'")
 
     def _get_kata_channel(self):
         """
@@ -317,14 +316,14 @@ class OC(SSH):
         @param thread_pool_size:
         @return:
         """
-        self.run(fr"""{self.__cli} get nodes -l node-role.kubernetes.io/worker= -o jsonpath="{{range .items[*]}}{{.metadata.name}}{{'\\n'}}{{end}}" |  xargs -I{{}} {self.__cli} debug node/{{}} -- chroot /host sh -c "mkdir -p /etc/kata-containers; cp /usr/share/kata-containers/defaults/configuration.toml /etc/kata-containers/; sed -i 's/thread-pool-size=1/thread-pool-size={thread_pool_size}/' /etc/kata-containers/configuration.toml" """)
+        self.run(fr"""{self._cli} get nodes -l node-role.kubernetes.io/worker= -o jsonpath="{{range .items[*]}}{{.metadata.name}}{{'\\n'}}{{end}}" |  xargs -I{{}} {self._cli} debug node/{{}} -- chroot /host sh -c "mkdir -p /etc/kata-containers; cp /usr/share/kata-containers/defaults/configuration.toml /etc/kata-containers/; sed -i 's/thread-pool-size=1/thread-pool-size={thread_pool_size}/' /etc/kata-containers/configuration.toml" """)
 
     def delete_kata_threads_pool(self):
         """
         This method deletes kata thread-pool-size from every worker node
         @return:
         """
-        self.run(fr"""{self.__cli} get nodes -l node-role.kubernetes.io/worker= -o jsonpath="{{range .items[*]}}{{.metadata.name}}{{'\\n'}}{{end}}" |  xargs -I{{}} {self.__cli} debug node/{{}} -- chroot /host sh -c "rm -f /etc/kata-containers/configuration.toml" """)
+        self.run(fr"""{self._cli} get nodes -l node-role.kubernetes.io/worker= -o jsonpath="{{range .items[*]}}{{.metadata.name}}{{'\\n'}}{{end}}" |  xargs -I{{}} {self._cli} debug node/{{}} -- chroot /host sh -c "rm -f /etc/kata-containers/configuration.toml" """)
 
     @typechecked
     def populate_additional_template_variables(self, env: dict):
@@ -344,7 +343,7 @@ class OC(SSH):
         This method checks if cnv operator is installed
         :return:
         """
-        verify_cmd = f"{self.__cli} get csv -n openshift-cnv -o jsonpath='{{.items[0].status.phase}}'"
+        verify_cmd = f"{self._cli} get csv -n openshift-cnv -o jsonpath='{{.items[0].status.phase}}'"
         if 'Succeeded' in self.run(verify_cmd):
             return True
         return False
@@ -354,7 +353,7 @@ class OC(SSH):
         This method checks if odf operator is installed
         :return:
         """
-        verify_cmd = f"{self.__cli} get csv -n openshift-storage -o jsonpath='{{.items[0].status.phase}}'"
+        verify_cmd = f"{self._cli} get csv -n openshift-storage -o jsonpath='{{.items[0].status.phase}}'"
         if 'Succeeded' in self.run(verify_cmd):
             return True
         return False
@@ -367,7 +366,7 @@ class OC(SSH):
         :return:
         """
         namespace = f'-n {namespace}' if namespace else ''
-        verify_cmd = f"{self.__cli} get dv {namespace} -o jsonpath='{{.items[].status.phase}}'"
+        verify_cmd = f"{self._cli} get dv {namespace} -o jsonpath='{{.items[].status.phase}}'"
         if status in self.run(verify_cmd):
             return True
         return False
@@ -421,7 +420,7 @@ class OC(SSH):
         @raise ODFHealthCheckTimeout: If health check fails within the timeout.
         """
         current_wait_time = 0
-        health_check = f"{self.__cli} -n {namespace} rsh {self._get_pod_name(pod_name=pod_name, namespace=namespace)} ceph health"
+        health_check = f"{self._cli} -n {namespace} rsh {self._get_pod_name(pod_name=pod_name, namespace=namespace)} ceph health"
 
         while timeout <= 0 or current_wait_time <= timeout:
             if 'HEALTH_OK' == self.run(health_check).strip():
@@ -444,7 +443,7 @@ class OC(SSH):
         """
         # apply patch
         self.run(
-            f"{self.__cli} patch storagecluster ocs-storagecluster -n {namespace} --type json --patch '[{{ \"op\": \"replace\", \"path\": \"/spec/enableCephTools\", \"value\": true }}]'")
+            f"{self._cli} patch storagecluster ocs-storagecluster -n {namespace} --type json --patch '[{{ \"op\": \"replace\", \"path\": \"/spec/enableCephTools\", \"value\": true }}]'")
         self.wait_for_patch(pod_name='rook-ceph-tools', label='app=rook-ceph-tools', label_uuid=False, namespace=namespace)
         return self.wait_for_odf_healthcheck(pod_name='rook-ceph-tools', namespace=namespace)
 
@@ -457,7 +456,7 @@ class OC(SSH):
             try:
                 # Run the command to get ODF disk count
                 disk_count_str = self.run(
-                    f"{self.__cli} get --no-headers pod -n openshift-storage | grep osd | grep -cv prepare")
+                    f"{self._cli} get --no-headers pod -n openshift-storage | grep osd | grep -cv prepare")
                 disk_count = int(disk_count_str)
                 return disk_count
             except ValueError as e:
@@ -478,7 +477,7 @@ class OC(SSH):
         This method checks if kata operator is installed
         :return:
         """
-        verify_cmd = f"{self.__cli} get csv -n openshift-sandboxed-containers-operator -o jsonpath='{{.items[0].status.phase}}'"
+        verify_cmd = f"{self._cli} get csv -n openshift-sandboxed-containers-operator -o jsonpath='{{.items[0].status.phase}}'"
         if 'Succeeded' in self.run(verify_cmd):
             return True
         return False
@@ -488,14 +487,14 @@ class OC(SSH):
         This method returns master nodes
         :return:
         """
-        return self.run(fr""" {self.__cli} get nodes -l node-role.kubernetes.io/master= -o jsonpath="{{range .items[*]}}{{.metadata.name}}{{'\n'}}{{end}}" """)
+        return self.run(fr""" {self._cli} get nodes -l node-role.kubernetes.io/master= -o jsonpath="{{range .items[*]}}{{.metadata.name}}{{'\n'}}{{end}}" """)
 
     def get_worker_nodes(self):
         """
         This method returns worker nodes
         :return:
         """
-        return self.run(fr""" {self.__cli} get nodes -l node-role.kubernetes.io/worker= -o jsonpath="{{range .items[*]}}{{.metadata.name}}{{'\n'}}{{end}}" """)
+        return self.run(fr""" {self._cli} get nodes -l node-role.kubernetes.io/worker= -o jsonpath="{{range .items[*]}}{{.metadata.name}}{{'\n'}}{{end}}" """)
 
     @typechecked
     def wait_for_node_ready(self, node: str = None, wait_time: int = None, timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
@@ -550,26 +549,26 @@ class OC(SSH):
         @return:
         """
         # Get the node name and status for all nodes
-        nodes_list = self.run(f"{self.__cli} get nodes --no-headers | awk '{{print $1, $2}}'").splitlines()
+        nodes_list = self.run(f"{self._cli} get nodes --no-headers | awk '{{print $1, $2}}'").splitlines()
         return nodes_list
 
     def delete_available_released_pv(self):
         """
         This method deletes available or released pv because that avoid launching new pv
         """
-        pv_status_list = self.run(fr"{self.__cli} get pv -o jsonpath={{..status.phase}}").split()
+        pv_status_list = self.run(fr"{self._cli} get pv -o jsonpath={{..status.phase}}").split()
         for ind, pv_status in enumerate(pv_status_list):
             if pv_status == 'Available' or pv_status == 'Released':
-                available_pv = self.run(fr"{self.__cli} get pv -o jsonpath={{.items[{ind}].metadata.name}}")
+                available_pv = self.run(fr"{self._cli} get pv -o jsonpath={{.items[{ind}].metadata.name}}")
                 logger.info(f'Delete {pv_status} pv {available_pv}')
-                self.run(fr"{self.__cli} delete localvolume -n openshift-local-storage local-disks --wait=false")
-                self.run(fr"{self.__cli} delete pv {available_pv} --wait=false")
+                self.run(fr"{self._cli} delete localvolume -n openshift-local-storage local-disks --wait=false")
+                self.run(fr"{self._cli} delete pv {available_pv} --wait=false")
 
     def clear_node_caches(self):
         """
         This method clears the node's buffer cache
         """
-        return self.run(fr""" {self.__cli} get nodes -l node-role.kubernetes.io/worker= -o jsonpath="{{range .items[*]}}{{.metadata.name}}{{'\n'}}{{end}}" |  xargs -I{{}} {self.__cli} debug node/{{}} -- chroot /host sh -c "sync; echo 3 > /proc/sys/vm/drop_caches" """)
+        return self.run(fr""" {self._cli} get nodes -l node-role.kubernetes.io/worker= -o jsonpath="{{range .items[*]}}{{.metadata.name}}{{'\n'}}{{end}}" |  xargs -I{{}} {self._cli} debug node/{{}} -- chroot /host sh -c "sync; echo 3 > /proc/sys/vm/drop_caches" """)
 
     def __get_short_uuid(self, workload: str):
         """
@@ -601,8 +600,8 @@ class OC(SSH):
         @param namespace:
         @return:
         """
-        return self.run(f"{self.__cli} create serviceaccount -n {namespace} {namespace}; "
-                        f"{self.__cli} adm policy add-scc-to-user -n {namespace} privileged -z {namespace}")
+        return self.run(f"{self._cli} create serviceaccount -n {namespace} {namespace}; "
+                        f"{self._cli} adm policy add-scc-to-user -n {namespace} privileged -z {namespace}")
 
     @typechecked
     @logger_time_stamp
@@ -614,7 +613,7 @@ class OC(SSH):
         :return:
         """
         if os.path.isfile(yaml):
-            return self.run(f'{self.__cli} create -f {yaml}', is_check=is_check)
+            return self.run(f'{self._cli} create -f {yaml}', is_check=is_check)
         else:
             raise YAMLNotExist(yaml)
 
@@ -628,7 +627,7 @@ class OC(SSH):
         :return:
         """
         if os.path.isfile(yaml):
-            return self.run(f'{self.__cli} apply -f {yaml}', is_check=is_check)
+            return self.run(f'{self._cli} apply -f {yaml}', is_check=is_check)
         else:
             raise YAMLNotExist(yaml)
 
@@ -641,7 +640,7 @@ class OC(SSH):
         :return:
         """
         if os.path.isfile(yaml):
-            return self.run(f'{self.__cli} delete -f {yaml} --wait=false')
+            return self.run(f'{self._cli} delete -f {yaml} --wait=false')
         else:
             raise YAMLNotExist(yaml)
 
@@ -656,7 +655,7 @@ class OC(SSH):
         """
         try:
             namespace = f'-n {namespace}' if namespace else ''
-            return self.run(f'{self.__cli} get {namespace} pods -o name | grep {pod_name}')
+            return self.run(f'{self._cli} get {namespace} pods -o name | grep {pod_name}')
         except Exception as err:
             raise PodNameNotExist(pod_name=pod_name)
 
@@ -669,7 +668,7 @@ class OC(SSH):
         :return:
         """
         namespace = f'-n {namespace}' if namespace else ''
-        result = self.run(f'{self.__cli} get {namespace} pods -o name | grep {pod_name}')
+        result = self.run(f'{self._cli} get {namespace} pods -o name | grep {pod_name}')
         if pod_name in result:
             return True
         else:
@@ -684,7 +683,7 @@ class OC(SSH):
         :return:
         """
         namespace = f'-n {namespace}' if namespace else ''
-        result = self.run(f"{self.__cli} get {namespace} pod -l={label_name} -o jsonpath='{{.items}}'")
+        result = self.run(f"{self._cli} get {namespace} pod -l={label_name} -o jsonpath='{{.items}}'")
         if result != '[]':
             return True
         else:
@@ -697,7 +696,7 @@ class OC(SSH):
         :return:
         """
         long_uuid = self.run(
-            f"{self.__cli} -n {environment_variables.environment_variables_dict['namespace']} get benchmark/{workload} -o jsonpath={{.status.uuid}}")
+            f"{self._cli} -n {environment_variables.environment_variables_dict['namespace']} get benchmark/{workload} -o jsonpath={{.status.uuid}}")
         return long_uuid
 
     def get_ocp_major_version(self):
@@ -721,9 +720,9 @@ class OC(SSH):
         """
         # OCP 4.10 and below
         if self.get_ocp_major_version() <= 4 and self.get_ocp_minor_version() <= 10:
-            prom_token = self.run(f"{self.__cli} -n openshift-monitoring sa get-token prometheus-k8s")
+            prom_token = self.run(f"{self._cli} -n openshift-monitoring sa get-token prometheus-k8s")
         else:
-            prom_token = self.run(f"{self.__cli} sa new-token -n openshift-monitoring prometheus-k8s 2>/dev/null")
+            prom_token = self.run(f"{self._cli} sa new-token -n openshift-monitoring prometheus-k8s 2>/dev/null")
         return prom_token
 
     def collect_events(self):
@@ -732,49 +731,8 @@ class OC(SSH):
         :return: output_filename
         """
         output_filename = os.path.join(self._run_artifacts, f'events.log')
-        self.run(f"{self.__cli} get events -A > '{output_filename}' ")
+        self.run(f"{self._cli} get events -A > '{output_filename}' ")
         return output_filename
-
-    def get_kube_api_server(self):
-        try:
-            with open(self.__kubeconfig_path, "r") as f:
-                config = yaml.safe_load(f)
-
-            # Extract the API server URL from the clusters section
-            return config["clusters"][0]["cluster"]["server"]
-        except FileNotFoundError:
-            return "Kubeconfig file not found."
-        except KeyError:
-            return "Invalid kubeconfig format. Could not find API server."
-        except Exception as e:
-            return f"Error: {str(e)}"
-
-    @logger_time_stamp
-    def __login(self):
-        """
-        Logs in to the cluster with retries, ensuring only a single login per execution.
-        """
-        if self._is_logged_in:
-            logger.info("Already logged in. Skipping login.")
-            return True  # Avoid redundant login attempts
-
-        for attempt in range(self.RETRIES):
-            try:
-                if self.__kubeadmin_password and self.__kubeadmin_password.strip():
-                    self.run(
-                        f'{self.__cli} login {self.get_kube_api_server()} -u kubeadmin -p {self.__kubeadmin_password}',
-                        is_check=True
-                    )
-                    self._is_logged_in = True  # Mark as logged in globally
-                    return True  # Success
-            except Exception as err:
-                logger.warning(f"Login attempt {attempt + 1} failed: {err}")
-                if attempt < self.RETRIES - 1:
-                    time.sleep(self.DELAY)
-                else:
-                    raise LoginFailed("Login failed after multiple attempts")
-
-        return self._is_logged_in  # Ensure return after loop
 
     @typechecked
     @logger_time_stamp
@@ -788,11 +746,11 @@ class OC(SSH):
         """
         if database:
             return self.run(
-                f"{self.__cli} get pods -n '{database}-db'" + " --no-headers | awk '{ print $1; }' | grep " + database,
+                f"{self._cli} get pods -n '{database}-db'" + " --no-headers | awk '{ print $1; }' | grep " + database,
                 is_check=True).rstrip().decode('ascii')
         else:
             namespace = f'-n {namespace}' if namespace else ''
-            return self.run(f"{self.__cli} get pods {namespace} --no-headers | awk '{{ print $1; }}' | grep -w '{label}'", is_check=True).rstrip().decode('ascii')
+            return self.run(f"{self._cli} get pods {namespace} --no-headers | awk '{{ print $1; }}' | grep -w '{label}'", is_check=True).rstrip().decode('ascii')
 
     @typechecked
     @logger_time_stamp
@@ -809,12 +767,12 @@ class OC(SSH):
         else:
             output_filename = os.path.join(self._run_artifacts, pod_name)
         if database:
-            self.run(f"{self.__cli} logs -n '{database}-db' {pod_name} > '{output_filename}' ")
+            self.run(f"{self._cli} logs -n '{database}-db' {pod_name} > '{output_filename}' ")
         # manager logs of benchmark-controller-manager
         elif 'benchmark-controller-manager' in pod_name:
-            self.run(f"{self.__cli} logs -n {environment_variables.environment_variables_dict['namespace']} {pod_name} manager > '{output_filename}' ")
+            self.run(f"{self._cli} logs -n {environment_variables.environment_variables_dict['namespace']} {pod_name} manager > '{output_filename}' ")
         else:
-            self.run(f"{self.__cli} logs -n {environment_variables.environment_variables_dict['namespace']} {pod_name} > '{output_filename}' ")
+            self.run(f"{self._cli} logs -n {environment_variables.environment_variables_dict['namespace']} {pod_name} > '{output_filename}' ")
         return output_filename
 
     def describe_pod(self, pod_name: str, namespace: str = ''):
@@ -825,7 +783,7 @@ class OC(SSH):
         :return: output_filename
         """
         output_filename = os.path.join(self._run_artifacts, f'describe-{pod_name}')
-        self.run(f"{self.__cli} describe pod -n {namespace} {pod_name} > '{output_filename}' ")
+        self.run(f"{self._cli} describe pod -n {namespace} {pod_name} > '{output_filename}' ")
         return output_filename
 
     @logger_time_stamp
@@ -834,7 +792,7 @@ class OC(SSH):
         This method retrieves information on benchmark-runner pods in oc get pod format
         :return:
         """
-        return self.run(f'{self.__cli} get pods', is_check=True)
+        return self.run(f'{self._cli} get pods', is_check=True)
 
     @typechecked
     @logger_time_stamp
@@ -922,7 +880,7 @@ class OC(SSH):
         :param namespace:
         :return:
         """
-        self.run(f'{self.__cli} delete ns {namespace}')
+        self.run(f'{self._cli} delete ns {namespace}')
 
     @typechecked
     @logger_time_stamp
@@ -943,11 +901,11 @@ class OC(SSH):
             namespace = f'-n {namespace}' if namespace else ''
             if label_uuid:
                 result = self.run(
-                    f"{self.__cli} {namespace} wait --for=condition={status} pod -l {label}-{self.__get_short_uuid(workload=workload)} --timeout={timeout}s",
+                    f"{self._cli} {namespace} wait --for=condition={status} pod -l {label}-{self.__get_short_uuid(workload=workload)} --timeout={timeout}s",
                     is_check=True)
             else:
                 return self.run(
-                    f"{self.__cli} {namespace} wait --for=condition={status} pod -l {label} --timeout={timeout}s",
+                    f"{self._cli} {namespace} wait --for=condition={status} pod -l {label} --timeout={timeout}s",
                     is_check=True)
             if 'met' in result.decode("utf-8"):
                 return True
@@ -976,7 +934,7 @@ class OC(SSH):
 
         while timeout <= 0 or current_wait_time <= timeout:
             #  Filter out node-healthcheck-operator and self-node-remediation during CSV verification because they exist in all namespaces
-            upgrade_versions = self.run(f"{self.__cli} get csv -n {namespace} -o json | jq -r '.items[] | select(.metadata.name | test(\"node-healthcheck-operator|self-node-remediation\") | not) | .spec.version'".splitlines()
+            upgrade_versions = self.run(f"{self._cli} get csv -n {namespace} -o json | jq -r '.items[] | select(.metadata.name | test(\"node-healthcheck-operator|self-node-remediation\") | not) | .spec.version'".splitlines()
 ).splitlines()
             count_upgrade_version = sum(1 for actual_upgrade_version in upgrade_versions if
                                         '.'.join(actual_upgrade_version.split('.')[0:2]) == upgrade_version)
@@ -1007,7 +965,7 @@ class OC(SSH):
         current_wait_time = 0
 
         while timeout <= 0 or current_wait_time <= timeout:
-            csv_names = self.run(f"{self.__cli} get csv -n {namespace} -o jsonpath={{$.items[*].metadata.name}}")
+            csv_names = self.run(f"{self._cli} get csv -n {namespace} -o jsonpath={{$.items[*].metadata.name}}")
             if csv_names and len(csv_names.split()) >= csv_num:
                 return csv_names
 
@@ -1037,11 +995,11 @@ class OC(SSH):
             namespace = f'-n {namespace}' if namespace else ''
             if label_uuid:
                 result = self.run(
-                    f"{self.__cli} {namespace} wait --for=condition={status} {run_type} -l {label}-{self.__get_short_uuid(workload=workload)} --timeout={timeout}s",
+                    f"{self._cli} {namespace} wait --for=condition={status} {run_type} -l {label}-{self.__get_short_uuid(workload=workload)} --timeout={timeout}s",
                     is_check=True)
             else:
                 result = self.run(
-                    f"{self.__cli} {namespace} wait --for=condition={status} {run_type} -l {label} --timeout={timeout}s",
+                    f"{self._cli} {namespace} wait --for=condition={status} {run_type} -l {label} --timeout={timeout}s",
                     is_check=True)
             if 'met' in result.decode("utf-8"):
                 return True
@@ -1064,7 +1022,7 @@ class OC(SSH):
         try:
             namespace = f'-n {namespace}' if namespace else ''
             container = f'-c {container}' if container else ''
-            return self.run(f'{self.__cli} exec {namespace} {pod_name} {container} -- {command}')
+            return self.run(f'{self._cli} exec {namespace} {pod_name} {container} -- {command}')
         except Exception as err:
             raise ExecFailed(command, pod_name, err)
 
@@ -1082,7 +1040,7 @@ class OC(SSH):
         if self.pod_exists(pod_name, namespace):
             try:
                 namespace = f'-n {namespace}' if namespace else ''
-                self.run(f'{self.__cli} delete pod {namespace} {pod_name} timeout={timeout}')
+                self.run(f'{self._cli} delete pod {namespace} {pod_name} timeout={timeout}')
             except Exception as err:
                 raise PodTerminateTimeout(pod_name)
 
@@ -1102,7 +1060,7 @@ class OC(SSH):
         current_wait_time = 0
         namespace = f'-n {namespace}' if namespace else ''
         while timeout <= 0 or current_wait_time <= timeout:
-            answer = self.run(f'{self.__cli} get pod {namespace} {pod_name} --no-headers -ocustom-columns=Status:status.phase 2>/dev/null')
+            answer = self.run(f'{self._cli} get pod {namespace} {pod_name} --no-headers -ocustom-columns=Status:status.phase 2>/dev/null')
             if answer == 'Running':
                 return
             elif answer == 'Error':
@@ -1132,15 +1090,15 @@ class OC(SSH):
             while current_wait_time <= timeout:
                 if label_uuid and job:
                     result = self.run(
-                        f"{self.__cli} {namespace} wait --for=condition=complete -l {label}-{self.__get_short_uuid(workload=workload)} jobs --timeout={OC.SHORT_TIMEOUT}s")
+                        f"{self._cli} {namespace} wait --for=condition=complete -l {label}-{self.__get_short_uuid(workload=workload)} jobs --timeout={OC.SHORT_TIMEOUT}s")
                     if 'met' in result:
                         return True
                     result = self.run(
-                        f"{self.__cli} {namespace} wait --for=condition=failed -l {label}-{self.__get_short_uuid(workload=workload)} jobs --timeout={OC.SLEEP_TIME}s")
+                        f"{self._cli} {namespace} wait --for=condition=failed -l {label}-{self.__get_short_uuid(workload=workload)} jobs --timeout={OC.SLEEP_TIME}s")
                     if 'met' in result:
                         return False
                 if not job:
-                    result = self.run(f"{self.__cli} get pod -l {label}" + " -n benchmark-runner --no-headers | awk '{ print $3; }'")
+                    result = self.run(f"{self._cli} get pod -l {label}" + " -n benchmark-runner --no-headers | awk '{ print $3; }'")
                     if 'Completed' in result:
                         return True
             # sleep for x seconds
@@ -1157,7 +1115,7 @@ class OC(SSH):
         :return: output_filename
         """
         output_filename = os.path.join(self._run_artifacts, f'describe-{vm_name}')
-        self.run(f"{self.__cli} describe vmi -n {namespace} {vm_name} > '{output_filename}' ")
+        self.run(f"{self._cli} describe vmi -n {namespace} {vm_name} > '{output_filename}' ")
         return output_filename
 
     @typechecked
@@ -1170,7 +1128,7 @@ class OC(SSH):
         """
         try:
             namespace = f'-n {namespace}' if namespace else ''
-            return self.run(f'{self.__cli} get {namespace} vmi -o name | grep {vm_name}', is_check=True)
+            return self.run(f'{self._cli} get {namespace} vmi -o name | grep {vm_name}', is_check=True)
         except Exception as err:
             raise VMNameNotExist(vm_name=vm_name)
 
@@ -1183,7 +1141,7 @@ class OC(SSH):
         :return: list of VM names or an empty list if an error occurs
         """
         namespace_option = f'-n {namespace}' if namespace else ''
-        command = f"{self.__cli} get {namespace_option} vm -o jsonpath='{{.items[*].metadata.name}}'"
+        command = f"{self._cli} get {namespace_option} vm -o jsonpath='{{.items[*].metadata.name}}'"
         try:
             vm_names = self.run(command)
             return vm_names.split() if vm_names else []
@@ -1199,7 +1157,7 @@ class OC(SSH):
         :return: True or False
         """
         namespace = f'-n {namespace}' if namespace else ''
-        result = self.run(f'{self.__cli} get {namespace} vmi -o name | grep {vm_name}')
+        result = self.run(f'{self._cli} get {namespace} vmi -o name | grep {vm_name}')
         if vm_name in result:
             return True
         else:
@@ -1217,9 +1175,9 @@ class OC(SSH):
         if label:
             namespace = f'-n {namespace}' if namespace else ''
             return self.run(
-                cmd=f"{self.__cli} get vmi {namespace} --no-headers | awk '{{ print $1; }}' | grep -w '{label}'", is_check=True).rstrip().decode('ascii')
+                cmd=f"{self._cli} get vmi {namespace} --no-headers | awk '{{ print $1; }}' | grep -w '{label}'", is_check=True).rstrip().decode('ascii')
         else:
-            return self.run(f'{self.__cli} get vmi', is_check=True)
+            return self.run(f'{self._cli} get vmi', is_check=True)
 
     @logger_time_stamp
     def __verify_vm_log_complete(self, vm_name: str, timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
@@ -1248,7 +1206,7 @@ class OC(SSH):
         @return:
         """
         namespace = f'-n {namespace}' if namespace else ''
-        return self.run(cmd=f"{self.__cli} get service {vm_name} {namespace} -o jsonpath={{.spec.ports[].nodePort}}")
+        return self.run(cmd=f"{self._cli} get service {vm_name} {namespace} -o jsonpath={{.spec.ports[].nodePort}}")
 
     @logger_time_stamp
     def get_nodes_addresses(self):
@@ -1256,7 +1214,7 @@ class OC(SSH):
         This method returns dictionary of nodes and corresponding IP addresses, e.g. {node1:ip1, node2:ip2, node3:ip3 }
         :return:
         """
-        node_ips = self.run(f"{self.__cli} get node -o jsonpath='{{$.items[*].status.addresses[*].address}}'")
+        node_ips = self.run(f"{self._cli} get node -o jsonpath='{{$.items[*].status.addresses[*].address}}'")
         node_ips_list = node_ips.split()
         return dict([(k, v) for k, v in zip(node_ips_list[1::2], node_ips_list[::2])])
 
@@ -1275,7 +1233,7 @@ class OC(SSH):
         current_wait_time = 0
         namespace = f'-n {namespace}' if namespace else ''
         while timeout <= 0 or current_wait_time <= timeout:
-            check_vm_status = f"{self.__cli} get vm {vm_name} {namespace} -o jsonpath={{.status.printableStatus}}"
+            check_vm_status = f"{self._cli} get vm {vm_name} {namespace} -o jsonpath={{.status.printableStatus}}"
             result = self.run(check_vm_status)
             if result == status.name:
                 return True
@@ -1343,7 +1301,7 @@ class OC(SSH):
         :return:
         """
         namespace = f'-n {namespace}' if namespace else ''
-        command = f"{self.__cli} get vmi {vm_name} {namespace} -o jsonpath={{.metadata.labels.'kubevirt\\.io/nodeName'}}"
+        command = f"{self._cli} get vmi {vm_name} {namespace} -o jsonpath={{.metadata.labels.'kubevirt\\.io/nodeName'}}"
 
         try:
             result = self.run(command)
@@ -1419,7 +1377,7 @@ class OC(SSH):
         :return:
         """
         namespace = f'-n {namespace}' if namespace else ''
-        self.run(f"{self.__cli} delete vm --all --grace-period 0 {namespace}")
+        self.run(f"{self._cli} delete vm --all --grace-period 0 {namespace}")
 
     @logger_time_stamp
     def wait_for_vm_completed(self, workload: str = '', vm_name: str = '',
@@ -1436,7 +1394,7 @@ class OC(SSH):
         namespace = f'-n {namespace}' if namespace else ''
         while timeout <= 0 or current_wait_time <= timeout:
             if self.run(
-                    f"{self.__cli} {namespace} get benchmark {workload} -o jsonpath={{.status.complete}}") == 'true':
+                    f"{self._cli} {namespace} get benchmark {workload} -o jsonpath={{.status.complete}}") == 'true':
                 return True
             # sleep for x seconds
             time.sleep(OC.SLEEP_TIME)
