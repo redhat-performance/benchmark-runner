@@ -50,7 +50,6 @@ class EnvironmentVariables:
         # dynamic parameters - configure for local run
         self._environment_variables_dict['workload'] = EnvironmentVariables.get_env('WORKLOAD', '')
         self._environment_variables_dict['kubeadmin_password'] = EnvironmentVariables.get_env('KUBEADMIN_PASSWORD', '')
-        self._environment_variables_dict['kubeconfig_path'] = EnvironmentVariables.get_env('KUBECONFIG_PATH', '')
 
         # PIN=node selector
         self._environment_variables_dict['pin_node_benchmark_operator'] = EnvironmentVariables.get_env('PIN_NODE_BENCHMARK_OPERATOR', '')

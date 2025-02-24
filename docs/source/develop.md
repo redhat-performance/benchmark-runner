@@ -127,13 +127,13 @@ any template .yaml files.
 11. Update the golden unit test files as described [above](#add-new-workload-modify-parameters-to-workload-or-change-parameters-for-any-ci-job)
 12. For test and debug workload, need to configure [benchmark_runner/main/environment_variables.py](benchmark_runner/main/environment_variables.py).  You may alternatively set these variables in the environment or pass command line options, which in all cases are `--lowercase-option` where the name of the environment variable is lower cased.  For example:
    ```
-   python3 benchmark_runner/main/main.py --runner-path=/parent/of/benchmark-runner --workload=stressng_pod --kubeadmin-password=password --kubeconfig-path=/root/.kube/config --pin-node-benchmark-operator=worker-0 --pin-node1=worker-1 --pin-node2=worker-2 --elasticsearch=elasticsearch_port --elasticsearch-port=80
+   python3 benchmark_runner/main/main.py --runner-path=/parent/of/benchmark-runner --workload=stressng_pod --kubeadmin-password=password --pin-node-benchmark-operator=worker-0 --pin-node1=worker-1 --pin-node2=worker-2 --elasticsearch=elasticsearch_port --elasticsearch-port=80
    ```
    or
    ```
-	RUNNER_PATH=/parent/of/benchmark-runner WORKLOAD=stressng_pod KUBEADMIN_PASSWORD=password KUBECONFIG_PATH=/root/.kube/config PIN_NODE_BENCHMARK_OPERATOR=worker-0 PIN_NODE1=worker-1 PIN_NODE2=worker-2 ELASTICSEARCH=elasticsearch_port ELASTICSEARCH_PORT=80 python3 benchmark_runner/main/main.py
+	RUNNER_PATH=/parent/of/benchmark-runner WORKLOAD=stressng_pod KUBEADMIN_PASSWORD=password PIN_NODE_BENCHMARK_OPERATOR=worker-0 PIN_NODE1=worker-1 PIN_NODE2=worker-2 ELASTICSEARCH=elasticsearch_port ELASTICSEARCH_PORT=80 python3 benchmark_runner/main/main.py
    ```
-13. Fill parameters: workload, kubeadmin_password, kubeconfig_path, pin_node_benchmark_operator, pin_node1, pin_node2, elasticsearch, elasticsearch_port
+13. Fill parameters: workload, kubeadmin_password, pin_node_benchmark_operator, pin_node1, pin_node2, elasticsearch, elasticsearch_port
 14. Run [/benchmark_runner/main/main.py](/benchmark_runner/main/main.py)  and verify that the workload runs correctly.
 15. The workload can be monitored and checked through 'current run' folder inside the run workload flavor (default flavor: 'test_ci')
 16. Open Kibana url and verify workload index populate with data:
@@ -217,12 +217,11 @@ virtual environment:
             2. `runner_path` = path to local cloned benchmark-operator (e.g. /home/user/)
                 1. git clone -b v1.0.3 https://github.com/cloud-bulldozer/benchmark-operator  (inside 'runner_path')
             3. `kubeadmin_password`
-            4. `kubeconfig_path` = config path inside container
-            5. `pin_node_benchmark_operator` - benchmark-operator node selector
-            6. `pin_node1` - workload first node selector
-            7. `pin_node2` - workload second node selector (for workload with client server e.g. uperf)
-            8. `elasticsearch` - elasticsearch url without http prefix
-            9. `elasticsearch_port` - elasticsearch port
+            4. `pin_node_benchmark_operator` - benchmark-operator node selector
+            5. `pin_node1` - workload first node selector
+            6. `pin_node2` - workload second node selector (for workload with client server e.g. uperf)
+            7. `elasticsearch` - elasticsearch url without http prefix
+            8. `elasticsearch_port` - elasticsearch port
         2. Run [/benchmark_runner/main/main.py](/benchmark_runner/main/main.py)
         3. Verify that benchmark-runner run the workload
     2. Run workload through integration/unittest tests [using pytest]
@@ -230,10 +229,9 @@ virtual environment:
             1. `runner_path` = path to local cloned benchmark-operator (e.g. /home/user/)
                 1. git clone -b v1.0.3 https://github.com/cloud-bulldozer/benchmark-operator (inside 'runner_path')
             2. `kubeadmin_password`
-            3. `kubeconfig_path` = config path inside container
-            4. `pin_node1` - workload first node selector
-            5. `elasticsearch` - elasticsearch url without http prefix
-            6. `elasticsearch_port` - elasticsearch port
+            3. `pin_node1` - workload first node selector
+            4. `elasticsearch` - elasticsearch url without http prefix
+            5. `elasticsearch_port` - elasticsearch port
         2. Run the selected test using pytest [/tests/integration/benchmark_runner/common/oc/test_oc.py](/tests/integration/benchmark_runner/common/oc/test_oc.py)
             1. Enable pytest in Pycharm: Configure pytest in Pycharm -> File -> settings -> tools -> Python integrated tools -> Testing -> pytest -> ok), and run the selected test
             2. Run pytest through terminal: python -m pytest -v tests/ (pip install pytest)

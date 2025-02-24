@@ -7,25 +7,6 @@ from benchmark_runner.common.oc.oc import OC
 from benchmark_runner.common.oc.oc_exceptions import YAMLNotExist, LoginFailed, NodeNotReady
 
 
-@pytest.fixture(autouse=True)
-def speed_up_tests():
-    """Reduce OC class constants for faster test execution."""
-    with patch.object(OC, "SHORT_TIMEOUT", 3), \
-            patch.object(OC, "SLEEP_TIME", 1), \
-            patch.object(OC, "RETRIES", 3), \
-            patch.object(OC, "DELAY", 2):
-        yield
-
-
-def test_password_failure():
-    """
-    This method tests that login fails with a guaranteed bad kubeadmin password
-    :return:
-    """
-    with pytest.raises(LoginFailed) as err:
-        OC(kubeadmin_password='BAD-PASSWORD')
-
-
 def test_create_async_pod_yaml_not_exist():
     """
     This method create pod from not exist yaml

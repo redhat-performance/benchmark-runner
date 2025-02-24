@@ -162,7 +162,7 @@ END
                                     // bootstorm_vm_scale: no need redis for synchronization but need SCALE and THREADS_LIMIT
                                     if (workload == "bootstorm_vm_scale") {
                                         // Warm-up: Pull the Fedora image from quay.io for each node
-                                        sh """ sudo podman run --rm -t -e WORKLOAD='${WORKLOAD}' -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' -e KUBECONFIG_PATH='${KUBECONFIG_PATH}' -e RUN_TYPE='${RUN_TYPE}' -e SCALE='1' -e SCALE_NODES='${SCALE_NODES}' -e TIMEOUT='${TIMEOUT}' -e log_level='INFO' -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}' """
+                                        sh """ sudo podman run --rm -t -e WORKLOAD='${WORKLOAD}' -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' -e RUN_TYPE='${RUN_TYPE}' -e SCALE='1' -e SCALE_NODES='${SCALE_NODES}' -e TIMEOUT='${TIMEOUT}' -e log_level='INFO' -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}' """
                                         SCALE = BOOTSTORM_SCALE
                                     }
 
@@ -188,7 +188,6 @@ END
                                         sudo podman run --rm -t \
                                             -e WORKLOAD='${WORKLOAD}' \
                                             -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' \
-                                            -e KUBECONFIG_PATH='${KUBECONFIG_PATH}' \
                                             -e RUN_TYPE='${RUN_TYPE}' \
                                             -e SCALE='1' \
                                             -e SCALE_NODES='${SCALE_NODES}' \
@@ -212,7 +211,6 @@ END
                                         sudo podman run --rm -t \
                                         -e WORKLOAD='${workload}' \
                                         -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' \
-                                        -e KUBECONFIG_PATH='${KUBECONFIG_PATH}' \
                                         -e PIN_NODE_BENCHMARK_OPERATOR='${PIN_NODE_BENCHMARK_OPERATOR}' \
                                         -e PIN_NODE1='${PIN_NODE1}' \
                                         -e PIN_NODE2='${PIN_NODE2}' \
@@ -288,7 +286,7 @@ END
         }
         failure {
             script {
-                sh """ sudo podman run --rm -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' -e KUBECONFIG_PATH='${KUBECONFIG_PATH}' -e ELASTICSEARCH='${ELASTICSEARCH}' -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' -e CI_STATUS=''failed'' -e RUN_TYPE='${RUN_TYPE}' -e log_level='INFO' -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}' """
+                sh """ sudo podman run --rm -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' -e ELASTICSEARCH='${ELASTICSEARCH}' -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' -e CI_STATUS=''failed'' -e RUN_TYPE='${RUN_TYPE}' -e log_level='INFO' -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}' """
                 msg = "Build error for ${env.JOB_NAME} ${env.BUILD_NUMBER} (${env.BUILD_URL})"
                 emailext body: """\
                     Jenkins job: ${env.BUILD_URL}\nSee the console output for more details:  ${env.BUILD_URL}consoleFull\n\n

@@ -157,7 +157,6 @@ END
                                                             -e CNV_VERSION="${CNV_VERSION}" \
                                                             -e EXPECTED_NODES='${EXPECTED_NODES}' \
                                                             -e KUBEADMIN_PASSWORD="${KUBEADMIN_PASSWORD}" \
-                                                            -e KUBECONFIG_PATH="${KUBECONFIG_PATH}" \
                                                             -e TIMEOUT="${TIMEOUT}" \
                                                             -v "${KUBECONFIG_PATH}":"${KUBECONFIG_PATH}" \
                                                             --privileged "${QUAY_BENCHMARK_RUNNER_REPOSITORY}"
@@ -224,7 +223,6 @@ END
                                         -e CNV_VERSION="${CNV_VERSION}" \
                                         -e WAIT_FOR_UPGRADE_VERSION='${WAIT_FOR_UPGRADE_VERSION}' \
                                         -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' \
-                                        -e KUBECONFIG_PATH='${KUBECONFIG_PATH}' \
                                         -e PIN_NODE_BENCHMARK_OPERATOR='${PIN_NODE_BENCHMARK_OPERATOR}' \
                                         -e PIN_NODE1='${PIN_NODE1}' \
                                         -e PIN_NODE2='${PIN_NODE2}' \
