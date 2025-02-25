@@ -1,8 +1,5 @@
 FROM quay.io/centos/centos:stream9
 
-# benchmark-runner latest version
-ARG VERSION
-
 # Update and use not only best candidate packages (avoiding failures)
 RUN dnf update -y --nobest
 
@@ -26,8 +23,8 @@ RUN wget https://www.python.org/ftp/python/${python_full_version}/Python-${pytho
 # install & run benchmark-runner (--no-cache-dir for take always the latest)
 RUN python3.12 -m pip install --upgrade pip && python3.12 -m pip install --upgrade benchmark-runner
 
-# Must update every OCP version !!!
-ARG OCP_CLIENT_VERSION="4.18.0-rc.9"
+# OCP client version passed dynamically
+ARG OCP_CLIENT_VERSION
 RUN  curl -L "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${OCP_CLIENT_VERSION}/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz" -o "/tmp/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz" \
      && tar -xzvf /tmp/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz -C /tmp/ \
      && mv /tmp/kubectl /usr/local/bin/kubectl \

@@ -77,11 +77,11 @@ jobs:
           sudo tee -a /etc/hosts <<< "$OCP_HOSTS" > /dev/null
       - name: ☉ install ${{ matrix.resource }} Operator
         env:
-          CNV_VERSION: "4.17"
-          ODF_VERSION: "4.17"
-          LSO_VERSION: "4.17"
-          NUM_ODF_DISK: "0"
-          KATA_CSV: ""
+          CNV_VERSION: ${{ secrets.PERF_CNV_VERSION }}
+          ODF_VERSION: ${{ secrets.PERF_ODF_VERSION}}
+          LSO_VERSION: ${{ secrets.PERF_LSO_VERSION }}
+          NUM_ODF_DISK: ${{ secrets.PERF_NUM_ODF_DISK }}
+          KATA_CSV: ${{ secrets.PERF_KATA_VERSION }}
           QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
           QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
           IBM_API_KEY: ${{ secrets.IBM_API_KEY }}
