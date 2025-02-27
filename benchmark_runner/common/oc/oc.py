@@ -699,19 +699,30 @@ class OC(SSH):
             f"{self._cli} -n {environment_variables.environment_variables_dict['namespace']} get benchmark/{workload} -o jsonpath={{.status.uuid}}")
         return long_uuid
 
+    def _get_ocp_version_part(self, index):
+        """
+        This method retrieves a specific part (major/minor) of the OCP version with retries.
+        @param index: int - 0 for major version, 1 for minor version.
+        @return: int
+        """
+        for attempt in range(self.RETRIES):
+            try:
+                version_str = self.get_ocp_server_version().split('.')[index]
+                return int(version_str)
+            except (ValueError, IndexError):
+                if attempt < self.RETRIES - 1:
+                    logger.info('Retries to get OCP version')
+                    time.sleep(self.DELAY)  # Wait before retrying
+                else:
+                    raise RuntimeError(f"Failed to retrieve OCP version part {index} after {self.RETRIES} attempts.")
+
     def get_ocp_major_version(self):
-        """
-        This method returns ocp major version
-        @return:
-        """
-        return int(self.get_ocp_server_version().split('.')[0])
+        """Returns the OCP major version."""
+        return self._get_ocp_version_part(0)
 
     def get_ocp_minor_version(self):
-        """
-        This method returns ocp minor version
-        @return:
-        """
-        return int(self.get_ocp_server_version().split('.')[1])
+        """Returns the OCP minor version."""
+        return self._get_ocp_version_part(1)
 
     def get_prom_token(self):
         """
