@@ -1,0 +1,46 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: bootstorm-vm-deadbeef
+  namespace: benchmark-runner
+  labels:
+    app: bootstorm-deadbeef
+    type: bootstorm-vm-deadbeef
+    benchmark-uuid: deadbeef-0123-3210-cdef-01234567890abcdef
+    benchmark-runner-workload: bootstorm
+spec:
+  running: false
+  template:
+    metadata:
+     labels:
+        kubevirt.io/vm: bootstorm
+    spec:
+      domain:
+        cpu:
+          sockets: 1
+          cores: 1
+          threads: 1
+        devices:
+          disks:
+          - disk:
+              bus: virtio
+            name: containerdisk
+          - disk:
+              bus: virtio
+            name: cloudinitdisk
+        resources:
+          requests:
+            memory: 512Mi
+          limits:
+            memory: 512Mi
+      terminationGracePeriodSeconds: 180
+      volumes:
+      - containerDisk:
+          image: quay.io/ebattat/fedora37-container-disk:latest
+        name: containerdisk
+      - cloudInitNoCloud:
+          userData: |-
+            #cloud-config
+            password: fedora
+            chpasswd: { expire: False }
+        name: cloudinitdisk

@@ -148,8 +148,8 @@ class EnvironmentVariables:
         # CI status update once at the end of CI pass/failed
         self._environment_variables_dict['ci_status'] = EnvironmentVariables.get_env('CI_STATUS', '')
         # Valid run types
-        self._environment_variables_dict['run_types'] = ['test_ci', 'func_ci', 'perf_ci', 'release']
-        # Run type test_ci/func_ci/perf_ci, default test_ci same environment as func_ci
+        self._environment_variables_dict['run_types'] = ['test_ci', 'func_ci', 'perf_ci', 'release', 'chaos_ci']
+        # Run type test_ci/ func_ci/ perf_ci/ chaos_ci, default test_ci same environment as func_ci
         self._environment_variables_dict['run_type'] = EnvironmentVariables.get_env('RUN_TYPE', 'test_ci')
         self._environment_variables_dict['runner_type'] = EnvironmentVariables.get_env('RUNNER_TYPE')
         self._environment_variables_dict['config_from_args'] = EnvironmentVariables.get_boolean_from_environment('CONFIG_FROM_ARGS', False)
