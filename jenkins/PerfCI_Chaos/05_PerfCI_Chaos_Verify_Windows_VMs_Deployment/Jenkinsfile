@@ -47,7 +47,7 @@ pipeline {
         ENABLE_PROMETHEUS_SNAPSHOT = 'False'
         DELETE_ALL = 'False' // Not delete the running Windows11 VMs
         VERIFICATION_ONLY = 'True'
-        RUN_TYPE = 'test_ci'
+        RUN_TYPE = 'chaos_ci'
         PROVISION_PORT = 22
         NUM_ODF_DISK = 6
         WINDOWS_SCALE = 40

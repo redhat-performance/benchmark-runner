@@ -1,0 +1,100 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: mssql-db
+---
+#This is a tweak of the restricted scc, to allow fsGroup to be specified in a deployment
+# workaround for kata virtiofsd permission error in ODF 4.10.5
+apiVersion: security.openshift.io/v1
+metadata:
+  name: mssqldbscc
+kind: SecurityContextConstraints
+fsGroup:
+  type: RunAsAny
+runAsUser:
+  type: MustRunAsRange
+seLinuxContext:
+  type: MustRunAs
+users:
+- system:serviceaccount:mssql-db:default
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+    name: mssql-persistent-storage
+    namespace: mssql-db
+spec:
+    storageClassName: ocs-storagecluster-ceph-rbd
+    accessModes: [ "ReadWriteOnce" ]
+    volumeMode: Filesystem
+    resources:
+      requests:
+        storage: 10Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mssql-deployment
+  namespace: mssql-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mssql
+  template:
+    metadata:
+      labels:
+        app: mssql
+        type: mssql-database-server
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: "pin-node-2"
+      runtimeClassName: kata
+      # workaround for kata virtiofsd permission error in ODF 4.10.5
+      securityContext:
+        fsGroup: 0
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: mssql
+        # mcr.microsoft.com/mssql/rhel/server:2019-latest - rate limit issue
+        image: quay.io/ebattat/server:2019-latest
+        imagePullPolicy: "IfNotPresent"
+        ports:
+        - containerPort: 1433
+        resources:
+          requests:
+            cpu: 10m
+            memory: 16Gi
+          limits:
+            cpu: 4
+            memory: 16Gi
+        env:
+          - name: MSSQL_PID
+            value: "Enterprise"
+          - name: ACCEPT_EULA
+            value: "Y"
+          - name: MSSQL_SA_PASSWORD
+            value: "s3curePasswordString"
+        securityContext:
+          allowPrivilegeEscalation: true
+        volumeMounts:
+          - name: mssql-persistent-storage
+            mountPath: /var/opt/mssql
+            readOnly: false
+      volumes:
+        - name: mssql-persistent-storage
+          persistentVolumeClaim:
+            claimName: mssql-persistent-storage
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mssql-deployment
+  namespace: mssql-db
+spec:
+  selector:
+    app: mssql
+  ports:
+    - protocol: TCP
+      port: 1433
+      targetPort: 1433

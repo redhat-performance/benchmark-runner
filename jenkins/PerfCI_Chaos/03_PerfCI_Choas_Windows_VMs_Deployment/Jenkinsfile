@@ -46,7 +46,7 @@ pipeline {
         ENABLE_PROMETHEUS_SNAPSHOT = 'True'
         DELETE_ALL = 'False' // Not delete the running Windows11 VMs
         RUN_STRATEGY = 'True' // runStrategy: Always for NHC/ SNR operators
-        RUN_TYPE = 'perf_ci'
+        RUN_TYPE = 'chaos_ci'
         PROVISION_PORT = 22
         NUM_ODF_DISK = 6
         VDBENCH_SCALE = 2

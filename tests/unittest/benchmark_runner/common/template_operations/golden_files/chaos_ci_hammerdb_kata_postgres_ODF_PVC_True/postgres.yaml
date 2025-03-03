@@ -1,0 +1,124 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: postgres-db
+---
+#This is a tweak of the restricted scc, to allow fsGroup to be specified in a deployment
+# workaround for kata virtiofsd permission error in ODF 4.10.5
+apiVersion: security.openshift.io/v1
+metadata:
+  name: postgresdbscc
+kind: SecurityContextConstraints
+fsGroup:
+  type: RunAsAny
+runAsUser:
+  type: MustRunAsRange
+seLinuxContext:
+  type: MustRunAs
+users:
+- system:serviceaccount:postgres-db:default
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+    name: postgres-persistent-storage
+    namespace: postgres-db
+spec:
+    storageClassName: ocs-storagecluster-ceph-rbd
+    accessModes: [ "ReadWriteOnce" ]
+    volumeMode: Filesystem
+    resources:
+      requests:
+        storage: 10Gi
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-custom-config
+  namespace: postgres-db
+data:
+  custom.pg_hba.conf: |
+    # TYPE  DATABASE        USER            ADDRESS                 METHOD
+    # "local" is for Unix domain socket connections only
+    local   all             all                                     trust
+    # IPv4 local connections:
+    host    all             all             all            trust
+  custom.perf.conf: |
+    autovacuum = 'off'
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+  namespace: postgres-db
+spec:
+  selector:
+    matchLabels:
+      app: postgres
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: postgres
+        type: postgres-database-server
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: "pin-node-2"
+      runtimeClassName: kata
+      # workaround for kata virtiofsd permission error in ODF 4.10.5
+      securityContext:
+        fsGroup: 0
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: postgres
+          # docker.io/centos/postgresql-10-centos8:latest - rate limit issue
+          image: quay.io/ebattat/postgresql-10-centos8:latest
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 5432
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Gi
+            limits:
+              cpu: 4
+              memory: 16Gi
+          env:
+            - name: POSTGRESQL_USER
+              value: "test"
+            - name: POSTGRESQL_PASSWORD
+              value: "test"
+            - name: POSTGRESQL_DATABASE
+              value: "test"
+            - name: POSTGRESQL_ADMIN_PASSWORD
+              value: "postgres"
+          volumeMounts:
+            - name: postgres-custom-config
+              mountPath: /var/lib/pgsql/data/pg_hba.conf
+              subPath: custom.pg_hba.conf #should be the name used in the ConfigMap
+            - name: postgres-custom-config
+              mountPath: /opt/app-root/src/postgresql-cfg/perf.conf
+              subPath: custom.perf.conf #should be the name used in the ConfigMap
+            - name: postgres-persistent-storage
+              mountPath: /var/lib/pgsql/data
+              readOnly: false
+      volumes:
+        - name: postgres-custom-config
+          configMap:
+            name: postgres-custom-config
+        - name: postgres-persistent-storage
+          persistentVolumeClaim:
+            claimName: postgres-persistent-storage
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-deployment
+  namespace: postgres-db
+spec:
+  selector:
+    app: postgres
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432

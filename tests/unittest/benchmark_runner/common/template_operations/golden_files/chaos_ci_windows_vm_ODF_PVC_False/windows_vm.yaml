@@ -1,0 +1,102 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name:  windows-vm-deadbeef
+  labels:
+    kubevirt.io/vm: windows-vm-deadbeef
+  namespace: benchmark-runner
+spec:
+  running: false
+  template:
+    metadata:
+      labels:
+        kubevirt.io/vm: windows-vm-deadbeef
+    spec:
+      terminationGracePeriodSeconds: 0
+      evictionStrategy: LiveMigrate
+      domain:
+        firmware:
+          bootloader:
+            efi:
+              secureBoot: false
+        clock:
+          timer:
+            hpet:
+              present: false
+            hyperv: {}
+            pit:
+              tickPolicy: delay
+            rtc:
+              tickPolicy: catchup
+          utc: {}
+        cpu:
+          cores: 1
+          model: host-passthrough
+          sockets: 1
+          threads: 1
+        devices:
+          blockMultiQueue: false
+          disks:
+          - disk:
+              bus: virtio
+            name: windows-vm-root-disk-deadbeef
+            dedicatedIOThread: false
+          interfaces:
+          - masquerade: {}
+            model: virtio
+            name: nic-0
+            networkInterfaceMultiqueue: true
+            tpm: { }
+        features:
+          acpi: {}
+          apic: {}
+          hyperv:
+            frequencies: {}
+            ipi: {}
+            reenlightenment: {}
+            tlbflush: {}
+            relaxed: {}
+            reset: {}
+            runtime: {}
+            spinlocks:
+              spinlocks: 8191
+            synic: {}
+            synictimer:
+                direct: {}
+            vapic: {}
+            vpindex: {}
+          smm: {}
+        machine:
+          type: q35
+        resources:
+          requests:
+            cpu: 1
+            memory: 2G
+          limits:
+            cpu: 1
+            memory: 2G
+      networks:
+      - name: nic-0
+        pod: {}
+      volumes:
+      - dataVolume:
+          name: windows-vm-root-disk-deadbeef
+        name: windows-vm-root-disk-deadbeef
+  dataVolumeTemplates:
+  - metadata:
+      annotations:
+        descheduler.alpha.kubernetes.io/evict: "true"
+      name: windows-vm-root-disk-deadbeef
+    spec:
+      pvc:
+        accessModes:
+        - ReadWriteMany
+        resources:
+          requests:
+            storage: 70Gi
+        volumeMode: Block
+        storageClassName: ocs-storagecluster-ceph-rbd-virtualization
+      source:
+        pvc:
+          namespace: benchmark-runner
+          name: windows-clone-dv

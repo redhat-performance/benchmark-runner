@@ -1,0 +1,109 @@
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: vdbench-pod-pvc-claim
+  namespace: benchmark-runner
+spec:
+  storageClassName: ocs-storagecluster-ceph-rbd
+  accessModes: [ "ReadWriteOnce" ]
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: vdbench-kata-deadbeef
+  namespace: benchmark-runner
+  annotations:
+    io.katacontainers.config.hypervisor.virtio_fs_extra_args: '["-o","allow_direct_io"]'
+  labels:
+    app: vdbench-deadbeef
+    type: vdbench-kata-deadbeef
+    benchmark-uuid: deadbeef-0123-3210-cdef-01234567890abcdef
+    benchmark-runner-workload: vdbench
+spec:
+  selector:
+    matchLabels:
+      app: vdbench
+  nodeSelector:
+    kubernetes.io/hostname: pin-node-1
+  runtimeClassName: kata
+  containers:
+    - name: vdbench-pod
+      image: quay.io/ebattat/centos-stream8-vdbench5.04.07-pod:v1.0.13
+      imagePullPolicy: "IfNotPresent"
+      resources:
+        requests:
+          cpu: 10m
+          memory: 4Gi
+        limits:
+          cpu: 2
+          # Remove memory limit for Kata pods due to
+          # https://github.com/kata-containers/kata-containers/issues/6129
+      volumeMounts:
+        - name: vdbench-pod-pvc-claim
+          mountPath: "/workload"
+      env:
+        - name: BLOCK_SIZES
+          value: "64,oltp1"
+        - name: IO_OPERATION
+          value: "write,oltp1"
+        - name: IO_THREADS
+          value: "16,3"
+        - name: FILES_IO #How file IO will be done
+          value: "random,oltp1"
+        - name: IO_RATE # an integer or "max"
+          value: "max,max"
+        - name: MIX_PRECENTAGE # used for mixed workload 0-100
+          value:
+        #global settings
+        - name: DURATION
+          value: "20"
+        - name: PAUSE #pause after every test in sec
+          value: "0"
+        - name: WARMUP # warmup before any test in sec
+          value: "20"
+        - name: FILES_SELECTION #This parameter allows you to select directories and files for processing either sequential/random
+          value: "random"
+        - name: COMPRESSION_RATIO #ratio is 1:X e.g 2 = 50% compressible
+          value: "2"
+        - name: RUN_FILLUP # will it run a fillup before testing starts yes/no
+          value: "yes"
+        - name: LOGS_DIR # logs directory
+          value: "/workload/"
+        #data set settings
+        - name: DIRECTORIES #how many directories to create
+          value: "100"
+        - name: FILES_PER_DIRECTORY
+          value: "10"
+        - name: SIZE_PER_FILE # size in MB
+          value: "5"
+        #state-signals
+        - name: REDIS_HOST
+          value: ""
+        - name: WORKLOAD_METHOD
+          value: "/vdbench/vdbench_runner.sh"
+        - name: TIMEOUT
+          value: "3600"
+      command: ["/bin/bash"]
+      args: ["-c", "$WORKLOAD_METHOD"]
+  restartPolicy: "Never"
+  spec:
+    pvc:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 10Gi
+          Reclaim Policy: Delete
+      storageClassName: ocs-storagecluster-ceph-rbd
+    source:
+      blank: {}
+  volumes:
+    - name: vdbench-pod-pvc-claim
+      namespace: benchmark-runner
+      persistentVolumeClaim:
+        claimName: vdbench-pod-pvc-claim

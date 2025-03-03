@@ -392,8 +392,9 @@ class BootstormVM(WorkloadsOperations):
         """
         try:
             self._initialize_run()
-            if self._run_type == 'test_ci':
-                self._es_index = 'bootstorm-test-ci-results'
+            if self._run_type in ('test_ci', 'chaos_ci'):
+                # ElasticSearch name convention must be with '-'
+                self._es_index = f"bootstorm-{self._run_type.replace('_', '-')}-results"
             else:
                 self._es_index = 'bootstorm-results'
             self.run_vm_workload()
