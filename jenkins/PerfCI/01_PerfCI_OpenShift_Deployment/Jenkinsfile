@@ -115,6 +115,24 @@ END
             }
         }
 
+        stage('Ensure Kube Config Exists') {
+            steps {
+                script {
+                    def status = sh(script: '''
+                        if [ ! -f "$KUBECONFIG_PATH" ]; then
+                            sudo mkdir -p $(dirname "$KUBECONFIG_PATH")
+                            sudo touch "$KUBECONFIG_PATH"
+                            sudo chmod 600 "$KUBECONFIG_PATH"
+                        fi
+                    ''', returnStatus: true)
+
+                    if (status != 0) {
+                        error("Failed to create or modify $KUBECONFIG_PATH")
+                    }
+                }
+            }
+        }
+
         stage('OpenShift Deployment') {
             steps {
                 script {
