@@ -224,6 +224,8 @@ class EnvironmentVariables:
         self._environment_variables_dict['install_ocp_version'] = EnvironmentVariables.get_env('INSTALL_OCP_VERSION', '')
         # There are 4 options: run_bare_metal_ocp_installer/ verify_bare_metal_install_complete/ run_ibm_ocp_installer/ verify_ibm_install_complete
         self._environment_variables_dict['install_step'] = EnvironmentVariables.get_env('INSTALL_STEP', '')
+        # ga/dev/ci, default ga
+        self._environment_variables_dict['ocp_build'] = EnvironmentVariables.get_env('OCP_BUILD', 'ga')
 
         # MANDATORY for OCP upgrade: Specify the version as '4.15.22'. Ensure that the upgrade version is stable by checking: https://github.com/openshift/cincinnati-graph-data/tree/master/channels )
         self._environment_variables_dict['upgrade_ocp_version'] = EnvironmentVariables.get_env('UPGRADE_OCP_VERSION','')
@@ -286,6 +288,7 @@ class EnvironmentVariables:
         self._environment_variables_dict['provision_installer_path'] = EnvironmentVariables.get_env(f'PROVISION_INSTALLER_PATH', '')
         self._environment_variables_dict['provision_installer_cmd'] = EnvironmentVariables.get_env(f'PROVISION_INSTALLER_CMD', '')
         self._environment_variables_dict['provision_installer_log'] = EnvironmentVariables.get_env(f'PROVISION_INSTALLER_LOG', '')
+        self._environment_variables_dict['installer_var_path'] = EnvironmentVariables.get_env(f'INSTALLER_VAR_PATH', '')
 
         # timeout 0<=: forever, >0: second (installer)
         self._environment_variables_dict['provision_timeout'] = EnvironmentVariables.get_env(f'PROVISION_TIMEOUT', '10800')

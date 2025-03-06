@@ -4,6 +4,7 @@ pipeline {
     }
     environment {
         INSTALL_OCP_VERSION = credentials('perfci_upgrade_current_ocp_version')
+        OCP_BUILD = credentials('perfci_upgrade_current_ocp_build')
         CONTACT_EMAIL1 = credentials('perfci_contact_email1')
         PROVISION_PRIVATE_KEY_FILE = credentials('perfci_provision_private_key_file')
         PROVISION_IP = credentials('perfci_provision_ip')
@@ -19,6 +20,7 @@ pipeline {
         PROVISION_INSTALLER_PATH = '/root/jetlag/./run_jetlag.sh'
         PROVISION_INSTALLER_CMD = 'pushd /root/jetlag;/root/jetlag/./run_jetlag.sh 1>/dev/null 2>&1;popd'
         PROVISION_INSTALLER_LOG = 'tail -100 /root/jetlag/jetlag.log'
+        INSTALLER_VAR_PATH = '/root/jetlag/ansible/vars'
         PRIVATE_KEY_PATH = '/home/jenkins/.ssh/provision_private_key'
         CONFIG_PATH = '/home/jenkins/.ssh/config'
         CONTAINER_PRIVATE_KEY_PATH = '/root/.ssh/provision_private_key'
@@ -152,6 +154,7 @@ END
                                             withCredentials([file(credentialsId: 'perfci_provision_private_key_file', variable: 'PROVISION_PRIVATE_KEY_FILE')]) {
                                                 sh """
                                                     sudo podman run --rm -e INSTALL_OCP_VERSION="${INSTALL_OCP_VERSION}" \
+                                                        -e OCP_BUILD="${OCP_BUILD}" \
                                                         -e INSTALL_STEP="${install_step}" \
                                                         -e EXPECTED_NODES='${EXPECTED_NODES}' \
                                                         -e PROVISION_IP="${PROVISION_IP}" \
@@ -161,6 +164,7 @@ END
                                                         -e PROVISION_INSTALLER_PATH="${PROVISION_INSTALLER_PATH}" \
                                                         -e PROVISION_INSTALLER_CMD="${PROVISION_INSTALLER_CMD}" \
                                                         -e PROVISION_INSTALLER_LOG="${PROVISION_INSTALLER_LOG}" \
+                                                        -e INSTALLER_VAR_PATH="${INSTALLER_VAR_PATH}" \
                                                         -e CONTAINER_PRIVATE_KEY_PATH="${CONTAINER_PRIVATE_KEY_PATH}" \
                                                         -e PROVISION_TIMEOUT="${PROVISION_TIMEOUT}" \
                                                         -e log_level="INFO" -v "${PRIVATE_KEY_PATH}":"${CONTAINER_PRIVATE_KEY_PATH}" \
