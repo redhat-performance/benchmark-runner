@@ -10,7 +10,7 @@ google-auth==2.30.0
 google-auth-httplib2==0.2.0
 google-auth-oauthlib==1.2.0
 ipywidgets==8.0.6
-jinja2==3.1.5
+jinja2==3.1.6
 myst-parser==1.0.0
 openshift-client==1.0.17
 pandas

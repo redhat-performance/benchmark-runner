@@ -54,7 +54,7 @@ setup(
         'google-auth-oauthlib==1.2.0',  # for Google Drive
         'google-api-python-client==2.135.0',  # for Google Drive
         'ipywidgets==8.0.6',  # for jupyterlab widgets
-        'jinja2==3.1.5',  # for yaml templates and df.style
+        'jinja2==3.1.6',  # for yaml templates and df.style
         'myst-parser==1.0.0',  # readthedocs
         'openshift-client==1.0.17',  # clusterbuster && prometheus metrics
         'prometheus-api-client==0.5.1',  # clusterbuster && prometheus metrics
