@@ -28,6 +28,8 @@ class BareMetalOperations:
         self._ocp_env_flavor = self._environment_variables_dict.get('ocp_env_flavor', '')
         self._create_pod_ci_cmd = self._environment_variables_dict.get('create_pod_ci_cmd', '')
         self._install_ocp_version = self._environment_variables_dict.get('install_ocp_version', '')
+        self._ocp_build = self._environment_variables_dict.get('ocp_build', '')
+        self._installer_var_path = self._environment_variables_dict.get('installer_var_path', '')
         self._cluster_type = self._environment_variables_dict.get('cluster_type', '')
         self._expected_nodes = self._environment_variables_dict.get('expected_nodes', '')
         if self._expected_nodes:
@@ -197,14 +199,22 @@ class BareMetalOperations:
         if self.LATEST in self._install_ocp_version:
             self._install_ocp_version = self._get_installation_version()
         openshift_version_data = self._install_ocp_version.split('.')
-        self._remote_ssh.replace_parameter(remote_path='/root/jetlag/ansible/vars',
+        self._remote_ssh.replace_parameter(remote_path=self._installer_var_path,
                                             file_name=file_name,
                                             parameter='ocp_release_image:',
                                             value=fr'quay.io\/openshift-release-dev\/ocp-release:{self._install_ocp_version}-x86_64')
-        self._remote_ssh.replace_parameter(remote_path='/root/jetlag/ansible/vars',
+        self._remote_ssh.replace_parameter(remote_path=self._installer_var_path,
                                             file_name=file_name,
                                             parameter='openshift_version:',
                                             value=f'"{openshift_version_data[0]}.{openshift_version_data[1]}"')
+        self._remote_ssh.replace_parameter(remote_path=self._installer_var_path,
+                                            file_name=file_name,
+                                            parameter='ocp_version:',
+                                            value=f'"{openshift_version_data[0]}.{openshift_version_data[1]}"')
+        self._remote_ssh.replace_parameter(remote_path=self._installer_var_path,
+                                            file_name=file_name,
+                                            parameter='ocp_build:',
+                                            value=f'"{self._ocp_build}"')
 
     def update_provision_config(self):
         """
