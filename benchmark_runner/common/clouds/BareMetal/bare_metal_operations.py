@@ -210,7 +210,7 @@ class BareMetalOperations:
         self._remote_ssh.replace_parameter(remote_path=self._installer_var_path,
                                             file_name=file_name,
                                             parameter='ocp_version:',
-                                            value=f'"{openshift_version_data[0]}.{openshift_version_data[1]}"')
+                                            value=f'"{self._install_ocp_version}"')
         self._remote_ssh.replace_parameter(remote_path=self._installer_var_path,
                                             file_name=file_name,
                                             parameter='ocp_build:',
