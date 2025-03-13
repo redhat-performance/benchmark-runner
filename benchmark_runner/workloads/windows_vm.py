@@ -25,8 +25,8 @@ class WindowsVM(BootstormVM):
         :return:
         """
         try:
-            if self._run_type == 'test_ci':
-                self._es_index = 'windows-test-ci-results'
+            if self._run_type in ('test_ci', 'chaos_ci'):
+                self._es_index = f"windows-{self._run_type.replace('_', '-')}-results"
             else:
                 self._es_index = 'windows-results'
             self._initialize_run()
