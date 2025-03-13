@@ -151,6 +151,7 @@ END
                                                         sudo podman run --rm \
                                                             -e UPGRADE_OCP_VERSION="${UPGRADE_OCP_VERSION}" \
                                                             -e UPGRADE_STEP="${upgrade_step}" \
+                                                            -e RUN_TYPE="${RUN_TYPE} \
                                                             -e UPGRADE_CHANNEL='${UPGRADE_CHANNEL}' \
                                                             -e LSO_VERSION="${LSO_VERSION}" \
                                                             -e ODF_VERSION="${ODF_VERSION}" \
