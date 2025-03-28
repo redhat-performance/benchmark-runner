@@ -24,7 +24,7 @@ spec:
     #minSize: 0Ti   # <-- Uncomment and modify to limit the minimum size of disk used
     #maxSize: 0Ti   # <-- Uncomment and modify to limit the maximum size of disk used
     # Bare-Metal servers
-    {%- if num_odf_disk == 6 %}
+    {%- if num_odf_disk == 7 %}
     models:
       - PERC H730P Adp
     vendors:

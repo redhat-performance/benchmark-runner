@@ -57,7 +57,7 @@ pipeline {
         DELETE_ALL = 'False' // Not delete the running Windows11 VMs
         VERIFICATION_ONLY = 'True'
         RUN_TYPE = 'chaos_ci'
-        NUM_ODF_DISK = 6
+        NUM_ODF_DISK = 7
         WINDOWS_SCALE = 40
         THREADS_LIMIT = 20
         PROVISION_TIMEOUT = 7200

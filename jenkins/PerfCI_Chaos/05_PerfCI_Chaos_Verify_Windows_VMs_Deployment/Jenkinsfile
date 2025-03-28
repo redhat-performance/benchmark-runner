@@ -49,7 +49,7 @@ pipeline {
         VERIFICATION_ONLY = 'True'
         RUN_TYPE = 'chaos_ci'
         PROVISION_PORT = 22
-        NUM_ODF_DISK = 6
+        NUM_ODF_DISK = 7
         WINDOWS_SCALE = 40
         THREADS_LIMIT= 20
         PROVISION_TIMEOUT = 3600

@@ -260,7 +260,7 @@ class EnvironmentVariables:
         # custom kata version, if empty fetch auto latest version
         self._environment_variables_dict['kata_csv'] = EnvironmentVariables.get_env('KATA_CSV', '')
         # number of odf disk for discovery
-        self._environment_variables_dict['num_odf_disk'] = EnvironmentVariables.get_env('NUM_ODF_DISK', 4)
+        self._environment_variables_dict['num_odf_disk'] = EnvironmentVariables.get_env('NUM_ODF_DISK', 7)
         self._environment_variables_dict['worker_disk_ids'] = EnvironmentVariables.get_env('WORKER_DISK_IDS', "")
         self._environment_variables_dict['worker_disk_prefix'] = EnvironmentVariables.get_env('WORKER_DISK_PREFIX', '')
         # install resources list "[ 'lso', 'odf', 'cnv', 'infra', 'custom' ]"

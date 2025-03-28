@@ -23,7 +23,7 @@ pipeline {
         CONTAINER_PRIVATE_KEY_PATH = '/root/.ssh/provision_private_key'
         WORKER_DISK_PREFIX = 'wwn-0x'
         PROVISION_PORT = 22
-        NUM_ODF_DISK = 6
+        NUM_ODF_DISK = 7
         PROVISION_TIMEOUT = 3600
     }
     stages {

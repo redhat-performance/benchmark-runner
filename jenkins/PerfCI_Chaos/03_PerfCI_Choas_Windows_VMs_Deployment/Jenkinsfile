@@ -48,7 +48,7 @@ pipeline {
         RUN_STRATEGY = 'True' // runStrategy: Always for NHC/ SNR operators
         RUN_TYPE = 'chaos_ci'
         PROVISION_PORT = 22
-        NUM_ODF_DISK = 6
+        NUM_ODF_DISK = 7
         VDBENCH_SCALE = 2
         BOOTSTORM_SCALE = 80
         WINDOWS_SCALE = 40
