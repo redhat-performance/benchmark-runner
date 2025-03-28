@@ -42,7 +42,7 @@ class CreateODF(CreateOCPResourceOperations):
                         for node, disk_ids in self.__worker_disk_ids.items():
                             for disk_id in disk_ids:
                                 disk = f'/dev/disk/by-id/{self.__worker_disk_prefix}{disk_id}'
-                                delete_node_disk += f"""sudo sgdisk --zap-all {disk}; sudo wipefs -a {disk}; sudo dd if=/dev/zero of='{disk}' bs=1M count=100 oflag=direct,dsync; sudo blkdiscard {disk}; sudo partprobe {disk};"""
+                                delete_node_disk += f"""sudo mkfs.ext4 -F {disk}; sudo sgdisk --zap-all {disk}; sudo wipefs -a {disk}; sudo dd if=/dev/zero of='{disk}' bs=20M count=100 oflag=direct,dsync;"""
                                 logger.info(f'{node}: {delete_node_disk}')
                                 self.__oc.run(cmd=f'chmod +x {os.path.join(self.__path, resource)}; {self.__path}/./{resource} "{node}" "{delete_node_disk}"')
                                 delete_node_disk = ''
