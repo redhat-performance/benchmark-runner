@@ -18,6 +18,11 @@ metadata:
     benchmark-uuid: {{uuid }}
     benchmark-runner-workload: bootstorm
 spec:
+  {% if run_strategy -%}
+  runStrategy: Always
+  {%- else -%}
+  running: false
+  {%- endif %}
   running: false
   template:
     metadata:
