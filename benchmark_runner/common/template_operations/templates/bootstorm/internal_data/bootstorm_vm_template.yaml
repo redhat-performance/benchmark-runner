@@ -23,7 +23,6 @@ spec:
   {%- else -%}
   running: false
   {%- endif %}
-  running: false
   template:
     metadata:
      labels:
