@@ -398,8 +398,9 @@ class BootstormVM(WorkloadsOperations):
             else:
                 self._es_index = 'bootstorm-results'
             self.run_vm_workload()
-            # delete namespace
-            self._oc.delete_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'namespace.yaml'))
+            if self._delete_all:
+                # delete namespace
+                self._oc.delete_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'namespace.yaml'))
         except ElasticSearchDataNotUploaded as err:
             self._oc.delete_vm_sync(
                 yaml=os.path.join(f'{self._run_artifacts_path}', f'{self._name}.yaml'),
