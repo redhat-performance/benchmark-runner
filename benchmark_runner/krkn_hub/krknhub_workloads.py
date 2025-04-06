@@ -15,6 +15,7 @@ class KrknHubWorkloads(WorkloadsOperations):
         # environment variables
         self.__namespace = self._environment_variables_dict.get('namespace', '')
         self.__krknhub_workload = self._environment_variables_dict.get('krknhub_workload', '')
+        self.__provision_kubeconfig_path = self._environment_variables_dict.get('provision_kubeconfig_path', '')
         self.__krknhub_environment_variables = self._environment_variables_dict.get('krknhub_environment_variables', '')
         self.__ssh = SSH()
         self.__krknhub_pod_name = 'bm'
@@ -53,7 +54,7 @@ class KrknHubWorkloads(WorkloadsOperations):
         """
         logger.info(f'run krkn-hub: {self.__krknhub_workload}')
         pod_log_path = f'{self._run_artifacts_path}/{self.__krknhub_workload}_pod.log'
-        workload_command = f'{self.__krknhub_environment_variables}; podman run --rm --name={self.__krknhub_pod_name} --net=host --env-host=true -v /root/.kube/config:/home/krkn/.kube/config:Z quay.io/krkn-chaos/krkn-hub:{self.__krknhub_workload} > {pod_log_path}'
+        workload_command = f'{self.__krknhub_environment_variables}; chmod 644 {self.__provision_kubeconfig_path} ; podman run --rm --name={self.__krknhub_pod_name} --net=host --env-host=true -v {self.__provision_kubeconfig_path}:/home/krkn/.kube/config:Z quay.io/krkn-chaos/krkn-hub:{self.__krknhub_workload} > {pod_log_path}'
         logger.info(workload_command)
         self.__ssh.run(workload_command)
 
