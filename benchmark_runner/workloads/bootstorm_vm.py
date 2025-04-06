@@ -1,7 +1,7 @@
 
 import os
 import time
-from multiprocessing import Process
+from multiprocessing import Process, Manager
 
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 from benchmark_runner.common.elasticsearch.elasticsearch_exceptions import ElasticSearchDataNotUploaded
@@ -162,7 +162,7 @@ class BootstormVM(WorkloadsOperations):
             try:
                 virtctl_status = self._oc.get_virtctl_vm_status(vm_name)
 
-                if virtctl_status == "True":
+                if str(virtctl_status).lower() == "true":
                     # Log success and store relevant data
                     logger.info(f"VM {vm_name} verified successfully (virtctl SSH status: { virtctl_status}).")
                     break  # Exit loop on success
@@ -173,22 +173,25 @@ class BootstormVM(WorkloadsOperations):
                 logger.info(f"Attempt {attempt + 1}/{retries} failed for Virtctl SSH VM {vm_name}: {e}")
 
             # Sleep before retrying
-            time.sleep(delay)
+            if attempt < retries - 1:
+                time.sleep(delay)
+
 
         # Final update to self._data_dict after all attempts
         vm_node = self._oc.get_vm_node(vm_name)  # Get the node again in case it changed
         self._data_dict = {
             'vm_name': vm_name,
             'node': vm_node,
-            'virtctl_vm': 1 if virtctl_status == 'True' else 0, # int value for Grafana
+            'virtctl_vm': 1 if str(virtctl_status).lower() == "true" else 0, # int value for Grafana
             'virtctl_status': virtctl_status,
+            'verify_after_test': self._verify_after_test,
             'run_artifacts_url': os.path.join(
                 self._run_artifacts_url,
                 f"{self._get_run_artifacts_hierarchy(self._workload_name, True)}-{self._time_stamp_format}.tar.gz"
             )
         }
 
-        if virtctl_status != "True":
+        if str(virtctl_status).lower() != "true":
             logger.info(
                 f"All attempts failed for VM {vm_name}. Final SSH status: {self._data_dict.get('virtctl_status', 'No status available')}")
             error_log_path = f"{self._run_artifacts_path}/{vm_name}_error.log"
@@ -196,76 +199,109 @@ class BootstormVM(WorkloadsOperations):
             # Retrieve the status or use a default message
             status_message = self._data_dict.get('virtctl_status') or "No status available"
 
-            with open(error_log_path, "w") as error_log_file:
-                error_log_file.write(str(status_message))  # Convert to string just in case
+            try:
+                with open(error_log_path, "w") as error_log_file:
+                    error_log_file.write(str(status_message))
+            except Exception as write_err:
+                logger.error(f"Failed to write error log for {vm_name}: {write_err}")
 
         self._finalize_vm()
         return virtctl_status
 
-    def _verify_virtctl_vm(self):
+    def _verify_single_vm_wrapper(self, vm_name, return_dict):
         """
-        This method verifies the virtctl SSH login for each VM, either during the upgrade or once for each VM.
-        It prepares the data for ElasticSearch, generates a must-gather in case of an error, and uploads it to Google Drive.
+        This method verifies single vm and update vm status in return_dict
+        :param vm_name:
+        :param return_dict:
+        :return:
         """
-        try:
-            vm_names = self._oc._get_all_vm_names()
-            if not vm_names:
-                raise MissingVMs("No VM names were retrieved from the cluster.")
+        status = self._verify_single_vm(vm_name)
+        return_dict[vm_name] = status
 
-            upgrade_done = True
-            failure = False
-            failure_vms = []  # List to store failed VM names
+    def _verify_vms_in_parallel(self, vm_names):
+        """
+        This method verifies vms in parallel
+        :param vm_names:
+        :return:
+        """
+        failure_vms = []
+        manager = Manager()
+        return_dict = manager.dict()
 
-            if self._wait_for_upgrade_version:
-                logger.info(f"wait for ocp upgrade version: {self._wait_for_upgrade_version}")
-                upgrade_done = self._oc.get_cluster_status() == f'Cluster version is {self._wait_for_upgrade_version}'
-                current_wait_time = 0
+        # Split vm_names according to self._threads_limit
+        for i in range(0, len(vm_names), self._threads_limit):
+            bulk = vm_names[i:i + self._threads_limit]
+            processes = []
 
-                while (self._timeout <= 0 or current_wait_time <= self._timeout) and not upgrade_done:
-                    for vm_name in vm_names:
-                        virtctl_status = self._verify_single_vm(vm_name)
-                        if virtctl_status != 'True':
-                            failure = True
-                            if vm_name not in failure_vms:
-                                failure_vms.append(vm_name)
+            for vm_name in bulk:
+                p = Process(target=self._verify_single_vm_wrapper, args=(vm_name, return_dict))
+                p.start()
+                processes.append(p)
+
+            for p in processes:
+                p.join()
+
+        # After all processes are done, collect failures
+        for vm_name, status in return_dict.items():
+            if str(status).lower() != 'true':
+                failure_vms.append(vm_name)
+        return failure_vms
+
+    def _verify_virtctl_vms(self, delay=10):
+            """
+            This method verifies the virtctl SSH login for each VM, either during the upgrade or once for each VM.
+            It prepares the data for ElasticSearch, generates a must-gather in case of an error, and uploads it to Google Drive.
+            :param delay: delay between each iteration
+            """
+            try:
+                vm_names = self._oc._get_all_vm_names()
+                if not vm_names:
+                    raise MissingVMs("No VM names were retrieved from the cluster.")
+
+                upgrade_done = True
+                failure_vms = []  # List to store failed VM names
+
+                if self._wait_for_upgrade_version:
+                    logger.info(f"wait for ocp upgrade version: {self._wait_for_upgrade_version}")
                     upgrade_done = self._oc.get_cluster_status() == f'Cluster version is {self._wait_for_upgrade_version}'
+                    start_time = time.time()
 
-                    # Sleep 1 sec between each cycle
-                    time.sleep(1)
-                    current_wait_time += 1  # Increment the wait time
-            else:
-                # If _wait_for_upgrade_version is empty, verify VM SSH without waiting for upgrade
-                for vm_name in vm_names:
-                    virtctl_status = self._verify_single_vm(vm_name)
-                    if virtctl_status != 'True':
-                        failure = True
-                        if vm_name not in failure_vms:
-                            failure_vms.append(vm_name)
+                    while (self._timeout <= 0 or time.time() - start_time <= self._timeout) and not upgrade_done:
+                        failure_vms = self._verify_vms_in_parallel(vm_names)
+                        upgrade_done = self._oc.get_cluster_status() == f'Cluster version is {self._wait_for_upgrade_version}'
 
-            if self._wait_for_upgrade_version:
-                logger.info(f'Cluster is upgraded to: {self._wait_for_upgrade_version}')
+                        if upgrade_done:
+                            break
 
-            if failure:
-                self._oc.generate_cnv_must_gather(destination_path=self._run_artifacts_path,
-                                                  cnv_version=self._cnv_version)
-                self._oc.generate_odf_must_gather(destination_path=self._run_artifacts_path,
-                                                  odf_version=self._odf_version)
-                # Upload artifacts
-                if self._google_drive_shared_drive_id:
-                    self.upload_run_artifacts_to_google_drive()
-                elif self._endpoint_url and not self._google_drive_shared_drive_id:
-                    self.upload_run_artifacts_to_s3()
+                        # Sleep between each cycle
+                        time.sleep(delay)
                 else:
-                    self._save_artifacts_local = True
+                    failure_vms = self._verify_vms_in_parallel(vm_names)
 
-                # Error log with details of failed VM, for catching all vm errors
-                logger.error(
-                    f"Failed to verify virtctl SSH login for the following VMs: {', '.join(failure_vms)}")
+                if self._wait_for_upgrade_version:
+                    logger.info(f'Cluster is upgraded to: {self._wait_for_upgrade_version}')
 
-        except Exception as err:
-            # Save run artifacts logs
-            self.save_error_logs()
-            raise err
+                if failure_vms:
+                    self._oc.generate_cnv_must_gather(destination_path=self._run_artifacts_path,
+                                                      cnv_version=self._cnv_version)
+                    self._oc.generate_odf_must_gather(destination_path=self._run_artifacts_path,
+                                                      odf_version=self._odf_version)
+                    # Upload artifacts
+                    if self._google_drive_shared_drive_id:
+                        self.upload_run_artifacts_to_google_drive()
+                    elif self._endpoint_url and not self._google_drive_shared_drive_id:
+                        self.upload_run_artifacts_to_s3()
+                    else:
+                        self._save_artifacts_local = True
+
+                    # Error log with details of failed VM, for catching all vm errors
+                    logger.error(
+                        f"Failed to verify virtctl SSH login for the following VMs: {', '.join(failure_vms)}")
+
+            except Exception as err:
+                # Save run artifacts logs
+                self.save_error_logs()
+                raise err
 
     def _run_vm_scale(self, vm_num: str):
         """
@@ -349,7 +385,7 @@ class BootstormVM(WorkloadsOperations):
     def run_vm_workload(self):
         # verification only w/o running or deleting any resource
         if self._verification_only:
-            self._verify_virtctl_vm()
+            self._verify_virtctl_vms()
         else:
             if not self._scale:
                 self._run_vm()
