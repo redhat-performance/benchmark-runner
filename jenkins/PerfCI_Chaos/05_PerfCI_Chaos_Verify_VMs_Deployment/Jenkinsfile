@@ -1,0 +1,144 @@
+pipeline {
+    agent {
+        label 'PerfCi'
+    }
+    environment {
+        CONTACT_EMAIL = credentials('perfci_contact_email')
+        ELASTICSEARCH = credentials('perfci_elasticsearch')
+        ELASTICSEARCH_PORT = credentials('perfci_elasticsearch_port')
+        SCALE_NODES = credentials('perfci_scale_nodes')
+        GOOGLE_DRIVE_PATH = credentials('perfci_google_drive_path')
+        GOOGLE_DRIVE_CREDENTIALS_FILE = credentials('perfci_google_drive_credentials_file')
+        GOOGLE_DRIVE_TOKEN_FILE = credentials('perfci_google_drive_token_file')
+        GOOGLE_DRIVE_SHARED_DRIVE_ID = credentials('perfci_google_drive_shared_drive_id')
+        GOOGLE_CREDENTIALS_FILE = 'credentials.json'
+        GOOGLE_TOKEN_FILE = 'token.json'
+        GOOGLE_DESTINATION_PATH = '/tmp'
+        QUAY_BENCHMARK_RUNNER_REPOSITORY = credentials('perfci_quay_repository')
+        KUBEADMIN_PASSWORD = readFile('/home/jenkins/.kube/kubeadmin-password').trim()
+        KUBEADMIN_PASSWORD_PATH = '/home/jenkins/.kube/kubeadmin-password'
+        KUBECONFIG_PATH = '/root/.kube/config'
+        DELETE_ALL = 'False' // Not delete the running Windows11 VMs
+        VERIFICATION_ONLY = 'True'
+        RUN_TYPE = 'chaos_ci'
+        BOOTSTORM_SCALE = 120
+        THREADS_LIMIT= 20
+        TIMEOUT = 7200
+        WORKSPACE='/home/jenkins'
+        WORKSPACE_PATH = "${env.WORKSPACE}/workspace/${env.JOB_NAME}/"
+    }
+    stages {
+        stage('Cleanup') {
+            steps {
+                script {
+                        // Clean the Jenkins workspace
+                        echo "Cleaning Jenkins workspace"
+                        deleteDir()
+                        sh '''
+                            # Check if the image exists
+                            if [[ "$(sudo podman images -q ${QUAY_BENCHMARK_RUNNER_REPOSITORY} 2> /dev/null)" != "" ]]; then
+
+                                # Get containers using the image
+                                containers=$(sudo podman ps -a --filter ancestor=${QUAY_BENCHMARK_RUNNER_REPOSITORY} -q)
+
+                                if [[ "$containers" != "" ]]; then
+                                    echo "Stopping and removing containers using the image..."
+                                    sudo podman stop $containers
+                                    sudo podman rm -f $containers
+                                fi
+
+                                # Now remove the image
+                                sudo podman rmi -f $(sudo podman images -q ${QUAY_BENCHMARK_RUNNER_REPOSITORY} 2> /dev/null)
+                            fi
+                        '''
+                }
+            }
+        }
+
+        stage('Prepare Google Credential Files') {
+            steps {
+                script {
+                    // Create a unique temp directory
+                    env.TEMP_DIR = sh(script: "umask 77; mktemp -d -p '${env.WORKSPACE_PATH}'", returnStdout: true).trim()
+                    if (!env.TEMP_DIR) {
+                        error "Failed to create temporary directory!"
+                    }
+
+                    // Set file paths
+                    env.GOOGLE_DRIVE_CREDENTIALS = "${env.TEMP_DIR}/${GOOGLE_CREDENTIALS_FILE}"
+                    env.GOOGLE_DRIVE_TOKEN = "${env.TEMP_DIR}/${GOOGLE_TOKEN_FILE}"
+
+                    // Prepare credential files
+                    sh """
+                        set -e
+                        umask 77
+                        cp '${GOOGLE_DRIVE_CREDENTIALS_FILE}' '${env.GOOGLE_DRIVE_CREDENTIALS}' || error "Failed to copy ${GOOGLE_DRIVE_CREDENTIALS_FILE}"
+                        cp '${GOOGLE_DRIVE_TOKEN_FILE}' '${env.GOOGLE_DRIVE_TOKEN}' || error "Failed to copy ${GOOGLE_DRIVE_TOKEN_FILE}"
+                    """
+                }
+            }
+        }
+
+        stage('Fedora Verifications') {
+                steps {
+                    script {
+                            sh """
+                                sudo podman run --rm -t \
+                                -e WORKLOAD='bootstorm_vm' \
+                                -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' \
+                                -e ELASTICSEARCH='${ELASTICSEARCH}' \
+                                -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' \
+                                -e GOOGLE_DRIVE_PATH='${GOOGLE_DRIVE_PATH}' \
+                                -e GOOGLE_DRIVE_CREDENTIALS_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_CREDENTIALS_FILE}' \
+                                -e GOOGLE_DRIVE_TOKEN_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_TOKEN_FILE}' \
+                                -e GOOGLE_DRIVE_SHARED_DRIVE_ID='${GOOGLE_DRIVE_SHARED_DRIVE_ID}' \
+                                -e RUN_TYPE='${RUN_TYPE}' \
+                                -e SCALE='${BOOTSTORM_SCALE}' \
+                                -e SCALE_NODES='${SCALE_NODES}' \
+                                -e THREADS_LIMIT='${THREADS_LIMIT}' \
+                                -e DELETE_ALL=${DELETE_ALL} \
+                                -e VERIFICATION_ONLY=${VERIFICATION_ONLY} \
+                                -e TIMEOUT='${TIMEOUT}' \
+                                -e log_level='INFO' \
+                                -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
+                                -v '${TEMP_DIR}:${GOOGLE_DESTINATION_PATH}' \
+                                --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}'
+                                """
+                    }
+                }
+            } // Fedora Verifications
+
+    } // stages
+
+    post {
+        always {
+            script {
+                sh '''
+                    sudo podman ps -a --filter "name=benchmark-runner" -q | xargs -r podman rm -f
+                    # Clean up the virtual environment
+                    rm -rf venv
+                    # Clean temp dir
+                    if [[ -d "${TEMP_DIR}" ]]; then
+                        sudo rm -rf "${TEMP_DIR}"
+                        echo "Temporary directory '${TEMP_DIR}' deleted."
+                    fi
+                '''
+            }
+        }
+        failure {
+            script {
+                sh """ sudo podman run --rm -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' -e ELASTICSEARCH='${ELASTICSEARCH}' -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' -e CI_STATUS='failed' -e RUN_TYPE='${RUN_TYPE}' -e log_level='INFO' -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}' """
+                msg = "Build error for ${env.JOB_NAME} ${env.BUILD_NUMBER} (${env.BUILD_URL})"
+                emailext body: """\
+                    Jenkins job: ${env.BUILD_URL}\nSee the console output for more details:  ${env.BUILD_URL}consoleFull\n\n
+                """, subject: msg, to: "${CONTACT_EMAIL}"
+            }
+        }
+        success {
+            script {
+                echo 'Triggering 06-PerfCI-Chaos-Testing-Deployment pipeline'
+                //build job: '06-PerfCI-Chaos-Testing-Deployment', wait: false
+            }
+        }
+    }
+}
