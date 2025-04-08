@@ -242,7 +242,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
       + stateTimeline.fieldConfig.withOverrides([
         stateTimeline.fieldOverride.byName.new('Ci Status')
-              + g.panel.table.fieldOverride.byName.withProperty('color', {"mode": "continuous-GrYlRd"})
+              + g.panel.table.fieldOverride.byName.withProperty('color', {"mode": "continuous-RdYlGr"})
       ])
 
       + stateTimeline.gridPos.withH(6)
@@ -286,7 +286,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
           + elasticsearch.withMetrics([
             elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('ci_minutes_time')
             + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('1')
-            + elasticsearch.metrics.MetricAggregationWithSettings.Max.settings.withScript('Integer.parseInt(\"0\"+doc["ocp_version.keyword"].value.replace(\".\",\"\").replace(\"r\",\"\").replace(\"c\",\"\").replace(\"f\",\"\").replace(\"-\",\"\").replace(\"e\",\"1\").replace(\"c\",\"\").replace(\"r\",\"\"))')
+            + elasticsearch.metrics.MetricAggregationWithSettings.Max.settings.withScript('Integer.parseInt(\"0\"+doc["ocp_version.keyword"].value.replace(\".\",\"\").replace(\"r\",\"\").replace(\"c\",\"\").replace(\"f\",\"\").replace(\"-\",\"\").replace(\"e\",\"\").replace(\"c\",\"\").replace(\"r\",\"\"))')
             + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max')
 
           ])
