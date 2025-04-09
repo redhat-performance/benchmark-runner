@@ -17,7 +17,7 @@ from benchmark_runner.common.clouds.shared.s3.s3_operations import S3Operations
 from benchmark_runner.common.prometheus.prometheus_snapshot import PrometheusSnapshot
 from benchmark_runner.common.prometheus.prometheus_snapshot_exceptions import PrometheusSnapshotError
 from benchmark_runner.common.template_operations.template_operations import TemplateOperations
-from benchmark_runner.common.clouds.IBM.ibm_operations import IBMOperations
+from benchmark_runner.common.clouds.BareMetal.bare_metal_operations import BareMetalOperations
 from benchmark_runner.common.prometheus.prometheus_metrics_operations import PrometheusMetricsOperation
 from benchmark_runner.common.google_drive.google_drive_operations import GoogleDriveOperations
 
@@ -390,7 +390,7 @@ class WorkloadsOperations:
         """
         date_format = '%Y_%m_%d'
         metadata = {'ocp_version': self._oc.get_ocp_server_version(),
-                    'previous_ocp_version': self._oc.get_previous_ocp_version() if self._upgrade_ocp_version else '',
+                    'previous_ocp_version': '' if len(self._oc.get_previous_ocp_version()) > 10 else self._oc.get_previous_ocp_version(),
                     'cnv_version': self._oc.get_cnv_version(),
                     'kata_version': self._oc.get_kata_operator_version(),
                     'kata_rpm_version': self._oc.get_kata_rpm_version(node=self._pin_node1),
@@ -455,15 +455,15 @@ class WorkloadsOperations:
         """
         if self._run_type == 'test_ci':
             es_index = 'ci-status-test'
+        elif self._run_type == 'chaos_ci':
+            es_index = 'ci-status-chaos'
         else:
             es_index = 'ci-status'
         status_dict = {'failed': 0, 'pass': 1}
         metadata = self.__get_metadata()
         if ocp_resource_install_minutes_time != 0:
-            ibm_operations = IBMOperations(user=self._environment_variables_dict.get('provision_user', ''))
-            ibm_operations.ibm_connect()
-            ocp_install_minutes_time = ibm_operations.get_ocp_install_time()
-            ibm_operations.ibm_disconnect()
+            bm_operations = BareMetalOperations(user=self._environment_variables_dict.get('provision_user', ''))
+            ocp_install_minutes_time = bm_operations.get_ocp_install_time()
         metadata.update({'status': status, 'status#': status_dict[status], 'ci_minutes_time': ci_minutes_time, 'benchmark_runner_id': benchmark_runner_id, 'benchmark_operator_id': benchmark_operator_id, 'benchmark_wrapper_id': benchmark_wrapper_id, 'ocp_install_minutes_time': ocp_install_minutes_time, 'ocp_resource_install_minutes_time': ocp_resource_install_minutes_time})
         self._es_operations.upload_to_elasticsearch(index=es_index, data=metadata)
 
