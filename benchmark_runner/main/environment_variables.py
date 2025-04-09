@@ -90,6 +90,8 @@ class EnvironmentVariables:
         self._environment_variables_dict['run_strategy'] = EnvironmentVariables.get_boolean_from_environment('RUN_STRATEGY', False)
         # Verification only, without running or deleting any resources, default False
         self._environment_variables_dict['verification_only'] = EnvironmentVariables.get_boolean_from_environment('VERIFICATION_ONLY', False)
+        # verify after test
+        self._environment_variables_dict['verify_after_test'] = EnvironmentVariables.get_env('VERIFY_AFTER_TEST', '')
 
         # default parameter - change only if needed
         # Parameters below related to 'run_workload()'
