@@ -1832,7 +1832,7 @@
                      {
                         "id": "color",
                         "value": {
-                           "mode": "continuous-GrYlRd"
+                           "mode": "continuous-RdYlGr"
                         }
                      }
                   ]
@@ -1887,7 +1887,7 @@
                      "field": "ci_minutes_time",
                      "id": "1",
                      "settings": {
-                        "script": "Integer.parseInt(\"0\"+doc[\"ocp_version.keyword\"].value.replace(\".\",\"\").replace(\"r\",\"\").replace(\"c\",\"\").replace(\"f\",\"\").replace(\"-\",\"\").replace(\"e\",\"1\").replace(\"c\",\"\").replace(\"r\",\"\"))"
+                        "script": "Integer.parseInt(\"0\"+doc[\"ocp_version.keyword\"].value.replace(\".\",\"\").replace(\"r\",\"\").replace(\"c\",\"\").replace(\"f\",\"\").replace(\"-\",\"\").replace(\"e\",\"\").replace(\"c\",\"\").replace(\"r\",\"\"))"
                      },
                      "type": "max"
                   }
