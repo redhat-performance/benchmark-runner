@@ -92,7 +92,9 @@ class BootstormVM(WorkloadsOperations):
         """
         if vm_node:
             delta = round((time.time() - self._bootstorm_start_time[vm_name]) * self.MILLISECONDS, 3)
-            return {'vm_name': vm_name, 'node': vm_node, 'bootstorm_time': delta, 'vm_ssh': int(bool(vm_node)),}
+            data = {'vm_name': vm_name, 'node': vm_node, 'bootstorm_time': delta, 'vm_ssh': int(bool(vm_node)),}
+            logger.info(data)
+            return data
         return {}
 
     def _create_vm_scale(self, vm_num: str):
