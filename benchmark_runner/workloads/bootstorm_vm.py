@@ -113,13 +113,14 @@ class BootstormVM(WorkloadsOperations):
         self._status = 'complete' if self._data_dict else 'failed'
         # update total vm run time
         if not self._verification_only:
-            # prometheus queries
-            self._prometheus_metrics_operation.finalize_prometheus()
-            metric_results = self._prometheus_metrics_operation.run_prometheus_queries()
-            prometheus_result = self._prometheus_metrics_operation.parse_prometheus_metrics(data=metric_results)
+            if self._enable_prometheus_snapshot:
+                # prometheus queries
+                self._prometheus_metrics_operation.finalize_prometheus()
+                metric_results = self._prometheus_metrics_operation.run_prometheus_queries()
+                self._prometheus_result = self._prometheus_metrics_operation.parse_prometheus_metrics(data=metric_results)
+                self._data_dict.update(self._prometheus_result)
             total_run_time = self._get_bootstorm_vm_total_run_time()
             self._data_dict.update({'total_run_time': total_run_time})
-            self._data_dict.update(prometheus_result)
         # Google drive run_artifacts_url folder path
         if self._google_drive_path and self.get_run_artifacts_google_drive():
             self._data_dict.update({'run_artifacts_url': self.get_run_artifacts_google_drive()})
@@ -372,7 +373,8 @@ class BootstormVM(WorkloadsOperations):
         """
         Initialize prometheus start time, vm name, kind and create benchmark-runner namespace for bootstorm vms
         """
-        self._prometheus_metrics_operation.init_prometheus()
+        if self._enable_prometheus_snapshot:
+            self._prometheus_metrics_operation.init_prometheus()
         self._name = self._workload
         self._workload_name = self._workload.replace('_', '-')
         self._vm_name = f'{self._workload_name}-{self._trunc_uuid}'

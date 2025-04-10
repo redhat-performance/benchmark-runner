@@ -70,10 +70,11 @@ class BenchmarkOperatorWorkloadsOperations:
         # get oc instance
         self._oc = self.get_oc(kubeadmin_password=self._kubeadmin_password)
         self._virtctl = Virtctl()
+        self._prometheus_result = {}
         # PrometheusSnapshot
         if self._enable_prometheus_snapshot:
             self._snapshot = PrometheusSnapshot(oc=self._oc, artifacts_path=self._run_artifacts_path, verbose=True)
-        self._prometheus_metrics_operation = PrometheusMetricsOperation()
+            self._prometheus_metrics_operation = PrometheusMetricsOperation()
         # Extract lso id for LSO workload
         if '_lso' in self._environment_variables_dict.get('workload'):
             self._oc.delete_available_released_pv()
