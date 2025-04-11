@@ -5,7 +5,7 @@ template_data:
     pin_node: {{ pin_node1 }}
     odf_pvc: {{ odf_pvc }}
     uuid: {{ uuid }}
-    fedora_container_disk: quay.io/ebattat/fedora37-container-disk:latest
+    fedora_container_disk: {{ fedora_container_disk }}
   run_type:
     perf_ci:
       limits_memory: 512Mi
