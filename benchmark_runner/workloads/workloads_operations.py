@@ -96,6 +96,7 @@ class WorkloadsOperations:
         self._virtctl = Virtctl()
 
         # Prometheus Snapshot
+        self._prometheus_result = {}
         if self._enable_prometheus_snapshot:
             self._snapshot = PrometheusSnapshot(oc=self._oc, artifacts_path=self._run_artifacts_path, verbose=True)
         self._prometheus_snap_interval = self._environment_variables_dict.get('prometheus_snap_interval', '')
