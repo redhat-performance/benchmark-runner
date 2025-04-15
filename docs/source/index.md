@@ -36,4 +36,5 @@ grafana
 prometheus
 customworkload
 develop
+scaleVM
 ```

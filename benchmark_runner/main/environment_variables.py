@@ -82,6 +82,8 @@ class EnvironmentVariables:
         # prometheus snap interval
         self._environment_variables_dict['prometheus_snap_interval'] = EnvironmentVariables.get_env('PROMETHEUS_SNAP_INTERVAL', '30')
 
+        # fedora container disk qcow2 image on quay.io
+        self._environment_variables_dict['fedora_container_disk'] = EnvironmentVariables.get_env('FEDORA_CONTAINER_DISK','quay.io/ebattat/fedora37-container-disk:latest')
         # windows url
         self._environment_variables_dict['windows_url'] = EnvironmentVariables.get_env('WINDOWS_URL', '')
         # Delete all resources before and after the run, default True
