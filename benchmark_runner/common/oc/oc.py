@@ -1559,3 +1559,17 @@ class OC(SSH):
                 except Exception as remove_error:
                     raise RuntimeError(f"Failed to remove folder {folder_path}: {remove_error}")
             raise RuntimeError(f"Failed to generate CNV must-gather logs for version {cnv_version}: {e}")
+
+    def save_to_yaml(self, vm_name, output_dir='/tmp', namespace: str = environment_variables.environment_variables_dict['namespace']):
+        """
+        This method save pod and vm into yaml per namespace
+        :param vm_name:
+        :param namespace:
+        :param output_dir:
+        :return:
+        """
+        self.run(f"oc get vmi {vm_name} -n {namespace} -o yaml > '{output_dir}/{vm_name}.yaml'")
+        pod_name = self.run(
+            f'oc get pod -n {namespace} -o jsonpath="{{.items[?(@.metadata.generateName==\'virt-launcher-{vm_name}-\')].metadata.name}}"'
+        )
+        self.run(f"oc get pod {pod_name} -n {namespace} -o yaml > '{output_dir}/{pod_name}.yaml'")
