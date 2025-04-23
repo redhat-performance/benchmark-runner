@@ -187,7 +187,7 @@ class BootstormVM(WorkloadsOperations):
             'node': vm_node,
             'virtctl_vm': 1 if str(virtctl_status).lower() == "true" else 0, # int value for Grafana
             'virtctl_status': virtctl_status,
-            'verify_after_test': self._verify_after_test,
+            'test_name': self._test_name,
             'run_artifacts_url': os.path.join(
                 self._run_artifacts_url,
                 f"{self._get_run_artifacts_hierarchy(self._workload_name, True)}-{self._time_stamp_format}.tar.gz"
