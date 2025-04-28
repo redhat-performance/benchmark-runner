@@ -104,7 +104,7 @@ class WorkloadsOperations:
         self._windows_url = self._environment_variables_dict.get('windows_url', '')
         self._delete_all = self._environment_variables_dict.get('delete_all', '')
         self._verification_only = self._environment_variables_dict.get('verification_only', '')
-        self._verify_after_test = self._environment_variables_dict.get('verify_after_test', '')
+        self._test_name = self._environment_variables_dict.get('test_name', '')
         self._wait_for_upgrade_version = self._environment_variables_dict.get('wait_for_upgrade_version', '')
         if self._windows_url:
             file_name = os.path.basename(self._windows_url)
@@ -120,6 +120,8 @@ class WorkloadsOperations:
                                                                  google_drive_token_file=self._google_drive_token_file,
                                                                  google_drive_shared_drive_id=self._google_drive_shared_drive_id)
         self._upgrade_ocp_version = self._environment_variables_dict.get('upgrade_ocp_version', '')
+        self._upgrade_masters_duration_seconds = self._environment_variables_dict.get('upgrade_masters_duration_seconds', '0')
+        self._upgrade_workers_duration_seconds = self._environment_variables_dict.get('upgrade_workers_duration_seconds', '0')
         self._run_strategy = self._environment_variables_dict.get('run_strategy', '')
 
     def _get_workload_file_name(self, workload):
@@ -466,7 +468,7 @@ class WorkloadsOperations:
         if ocp_resource_install_minutes_time != 0:
             bm_operations = BareMetalOperations(user=self._environment_variables_dict.get('provision_user', ''))
             ocp_install_minutes_time = bm_operations.get_ocp_install_time()
-        metadata.update({'status': status, 'status#': status_dict[status], 'ci_minutes_time': ci_minutes_time, 'benchmark_runner_id': benchmark_runner_id, 'benchmark_operator_id': benchmark_operator_id, 'benchmark_wrapper_id': benchmark_wrapper_id, 'ocp_install_minutes_time': ocp_install_minutes_time, 'ocp_resource_install_minutes_time': ocp_resource_install_minutes_time})
+        metadata.update({'status': status, 'status#': status_dict[status], 'ci_minutes_time': ci_minutes_time, 'benchmark_runner_id': benchmark_runner_id, 'benchmark_operator_id': benchmark_operator_id, 'benchmark_wrapper_id': benchmark_wrapper_id, 'ocp_install_minutes_time': ocp_install_minutes_time, 'ocp_resource_install_minutes_time': ocp_resource_install_minutes_time, 'upgrade_masters_duration_seconds': int(self._upgrade_masters_duration_seconds), 'upgrade_workers_duration_seconds': int(self._upgrade_workers_duration_seconds)})
         self._es_operations.upload_to_elasticsearch(index=es_index, data=metadata)
 
     @logger_time_stamp

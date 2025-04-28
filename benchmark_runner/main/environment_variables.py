@@ -92,8 +92,8 @@ class EnvironmentVariables:
         self._environment_variables_dict['run_strategy'] = EnvironmentVariables.get_boolean_from_environment('RUN_STRATEGY', False)
         # Verification only, without running or deleting any resources, default False
         self._environment_variables_dict['verification_only'] = EnvironmentVariables.get_boolean_from_environment('VERIFICATION_ONLY', False)
-        # verify after test
-        self._environment_variables_dict['verify_after_test'] = EnvironmentVariables.get_env('VERIFY_AFTER_TEST', '')
+        # test name
+        self._environment_variables_dict['test_name'] = EnvironmentVariables.get_env('TEST_NAME', '')
 
         # default parameter - change only if needed
         # Parameters below related to 'run_workload()'
@@ -238,6 +238,11 @@ class EnvironmentVariables:
         self._environment_variables_dict['wait_for_upgrade_version'] = EnvironmentVariables.get_env('WAIT_FOR_UPGRADE_VERSION', '')
         # candidate/ stable (default)
         self._environment_variables_dict['upgrade_channel'] = EnvironmentVariables.get_env('UPGRADE_CHANNEL', '')
+        # upgrade masters duration seconds
+        self._environment_variables_dict['upgrade_masters_duration_seconds'] = EnvironmentVariables.get_env('UPGRADE_MASTERS_DURATION_SECONDS', '')
+        # upgrade workers duration seconds
+        self._environment_variables_dict['upgrade_workers_duration_seconds'] = EnvironmentVariables.get_env('UPGRADE_WORKERS_DURATION_SECONDS', '')
+
 
         # SNO or empty for regular
         self._environment_variables_dict['cluster_type'] = EnvironmentVariables.get_env('CLUSTER_TYPE', '')
