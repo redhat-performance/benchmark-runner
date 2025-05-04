@@ -314,12 +314,18 @@ class WorkloadsOperations:
 
     def __make_run_artifacts_tarfile(self, workload: str):
         """
-        This method compresses the log file and returns the compressed path
-        :return:
+        This method compresses the run artifacts directory and returns the compressed file path.
+        :param workload: The name of the workload used to name the archive contents.
+        :return: Path to the created tar.gz file.
         """
-        tar_run_artifacts_path = f"{self._run_artifacts_path}.tar.gz"
+        if self._test_name:
+            tar_run_artifacts_path = f"{self._run_artifacts_path}_{self._test_name}.tar.gz"
+        else:
+            tar_run_artifacts_path = f"{self._run_artifacts_path}.tar.gz"
         with tarfile.open(tar_run_artifacts_path, mode='w:gz') as archive:
             workload_file_name = self._get_workload_file_name(workload)
+            if self._test_name:
+                workload_file_name= f'{workload_file_name}_{self._test_name}'
             archive.add(self._run_artifacts_path, arcname=workload_file_name, recursive=True)
         return tar_run_artifacts_path
 
