@@ -92,15 +92,29 @@ class GoogleDriveOperations:
     def create_folder_at_path(self, folder_path, parent_folder_id):
         """
         Creates folders along a specified path in Google Drive and returns the ID of the last folder.
+        If the entire path already exists, it reuses it.
+
         :param folder_path: The path of folders to create, e.g., '2024/09/15/10'.
         :param parent_folder_id: The ID of the parent folder where the path starts.
         :return: The ID of the last folder in the path if successful, otherwise None.
         """
-        for folder_name in folder_path.split('/'):
+        # ✅ Check if the full path already exists
+        existing_folder_id = self.get_folder_id_by_path(folder_path, parent_folder_id)
+        if existing_folder_id:
+            logger.info(f"Folder already exists at path: '{folder_path}', ID: {existing_folder_id}")
+            return existing_folder_id
+
+        # 🔁 Otherwise, create folders as needed
+        original_path = folder_path  # Save original path for logging
+        for folder_name in folder_path.strip('/').split('/'):
             parent_folder_id = self._find_or_create_folder(folder_name, parent_folder_id)
             if not parent_folder_id:
+                logger.error(f"Failed to create or find folder '{folder_name}' in path '{original_path}'")
                 return None
+
+        logger.info(f"Created folder path '{original_path}' with final folder ID: {parent_folder_id}")
         return parent_folder_id
+
 
     def _find_or_create_folder(self, folder_name, parent_folder_id):
         """
@@ -348,18 +362,30 @@ class GoogleDriveOperations:
 
     def upload_file_to_folder(self, file_path: str, folder_path: str, parent_folder_id: str):
         """
-        This method uploads file into google drive folder_path and return the folder url
-        @param file_path: the file path to upload to google drive
-        @param folder_path: google drive folder path
+        This method uploads file into Google Drive folder_path and returns the folder URL.
+        @param file_path: the file path to upload to Google Drive
+        @param folder_path: Google Drive folder path
         @param parent_folder_id: the base drive folder
-        @return:the folder url
+        @return: the folder URL
         """
+        # Check if the folder already exists
         folder_id = self.get_folder_id_by_path(
             folder_path=folder_path,
             parent_folder_id=parent_folder_id)
-        # new path
+
+        # If folder doesn't exist, create it
         if not folder_id:
             folder_id = self.create_folder_at_path(
                 folder_path=folder_path,
                 parent_folder_id=parent_folder_id)
+
+            # After creating, re-check to ensure we have the correct folder ID
+            folder_id = self.get_folder_id_by_path(
+                folder_path=folder_path,
+                parent_folder_id=parent_folder_id)
+
+        if not folder_id:
+            raise RuntimeError(f"Failed to create or retrieve folder: {folder_path}")
+
+        # Proceed with file upload
         return self.upload_file(file_path=file_path, shared_drive_id=folder_id)
