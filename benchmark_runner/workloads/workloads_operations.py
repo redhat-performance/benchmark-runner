@@ -425,6 +425,8 @@ class WorkloadsOperations:
             metadata.update({'vm_os_version': 'fedora37'})
         if 'windows' in self._workload:
             metadata.update({'vm_os_version': self._windows_os})
+        if self._test_name:
+            metadata.update({'test_name': self._test_name})
         if result:
             metadata.update(result)
 
