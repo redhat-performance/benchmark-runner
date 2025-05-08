@@ -44,6 +44,12 @@ class KrknHubWorkloads(WorkloadsOperations):
         """
         if self._enable_prometheus_snapshot:
             self.end_prometheus()
+        if self._google_drive_shared_drive_id:
+            self.upload_run_artifacts_to_google_drive()
+        elif self._endpoint_url:
+            self.upload_run_artifacts_to_s3()
+        else:
+            self._save_artifacts_local = True
         self.delete_all()
 
     @logger_time_stamp
