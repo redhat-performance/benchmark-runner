@@ -123,15 +123,15 @@ class BootstormVM(WorkloadsOperations):
                 self._data_dict.update(self._prometheus_result)
             total_run_time = self._get_bootstorm_vm_total_run_time()
             self._data_dict.update({'total_run_time': total_run_time})
-            # Google drive run_artifacts_url folder path
-            if self._google_drive_path and self.get_run_artifacts_google_drive():
-                self._data_dict.update({'run_artifacts_url': self.get_run_artifacts_google_drive()})
-            if self._es_host:
-                # upload several run results
-                self._upload_to_elasticsearch(index=self._es_index, kind=self._kind, status=self._status,
-                                              result=self._data_dict)
-                # verify that data upload to elastic search according to unique uuid
-                self._verify_elasticsearch_data_uploaded(index=self._es_index, uuid=self._uuid)
+        # Google drive run_artifacts_url folder path
+        if self._google_drive_path and self.get_run_artifacts_google_drive():
+            self._data_dict.update({'run_artifacts_url': self.get_run_artifacts_google_drive()})
+        if self._es_host:
+            # upload several run results
+            self._upload_to_elasticsearch(index=self._es_index, kind=self._kind, status=self._status,
+                                          result=self._data_dict)
+            # verify that data upload to elastic search according to unique uuid
+            self._verify_elasticsearch_data_uploaded(index=self._es_index, uuid=self._uuid)
 
     def _run_vm(self):
         """
@@ -292,19 +292,19 @@ class BootstormVM(WorkloadsOperations):
                                                       odf_version=self._odf_version)
                     # Error log with details of failed VM, for catching all vm errors
                     logger.error(f"Failed to verify virtctl SSH login for the following VMs: {', '.join(failure_vms)}")
-                # Upload artifacts
-                if self._google_drive_shared_drive_id:
-                    self.upload_run_artifacts_to_google_drive()
-                elif self._endpoint_url and not self._google_drive_shared_drive_id:
-                    self.upload_run_artifacts_to_s3()
-                else:
-                    self._save_artifacts_local = True
-                if self._es_host:
-                    self._data_dict.update({'run_artifacts_url': self.get_run_artifacts_google_drive()})
-                    # upload several run results
-                    self._upload_to_elasticsearch(index=self._es_index, kind=self._kind, status=self._status,result=self._data_dict)
-                    # verify that data upload to elastic search according to unique uuid
-                    self._verify_elasticsearch_data_uploaded(index=self._es_index, uuid=self._uuid)
+                    # Upload artifacts
+                    if self._google_drive_shared_drive_id:
+                        self.upload_run_artifacts_to_google_drive()
+                    elif self._endpoint_url:
+                        self.upload_run_artifacts_to_s3()
+                    else:
+                        self._save_artifacts_local = True
+                    if self._es_host:
+                        self._data_dict.update({'run_artifacts_url': self.get_run_artifacts_google_drive(), 'failure_vms': failure_vms, 'verification_failure': True})
+                        # upload several run results
+                        self._upload_to_elasticsearch(index=self._es_index, kind=self._kind, status=self._status,result=self._data_dict)
+                        # verify that data upload to elastic search according to unique uuid
+                        self._verify_elasticsearch_data_uploaded(index=self._es_index, uuid=self._uuid)
 
             except Exception as err:
                 # Save run artifacts logs
