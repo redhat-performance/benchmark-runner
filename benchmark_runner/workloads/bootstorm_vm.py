@@ -123,9 +123,6 @@ class BootstormVM(WorkloadsOperations):
                 self._data_dict.update(self._prometheus_result)
             total_run_time = self._get_bootstorm_vm_total_run_time()
             self._data_dict.update({'total_run_time': total_run_time})
-        # Google drive run_artifacts_url folder path
-        if self._google_drive_path and self.get_run_artifacts_google_drive():
-            self._data_dict.update({'run_artifacts_url': self.get_run_artifacts_google_drive()})
         if self._es_host:
             # upload several run results
             self._upload_to_elasticsearch(index=self._es_index, kind=self._kind, status=self._status,
@@ -178,7 +175,6 @@ class BootstormVM(WorkloadsOperations):
             # Sleep before retrying
             if attempt < retries - 1:
                 time.sleep(delay)
-
 
         # Final update to self._data_dict after all attempts
         vm_node = self._oc.get_vm_node(vm_name)  # Get the node again in case it changed
