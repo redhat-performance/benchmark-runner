@@ -1289,9 +1289,27 @@ class OC(SSH):
         else:
             return self.run(ssh_vm_cmd)
 
-    def get_virtctl_vm_status(self, vm_name: str = '', namespace: str = environment_variables.environment_variables_dict['namespace']):
+    def wait_for_vm_access(self, vm_name: str = '', namespace: str = environment_variables.environment_variables_dict['namespace'],
+                        timeout: int = SHORT_TIMEOUT):
         """
-        This method returns True when the VM is active and an error message when it is not, using virtctl protocol
+        This method waits for VM to be accessible via virtctl ssh
+        :param vm_name:
+        :param timeout:
+        :return:
+        """
+        current_wait_time = 0
+        while timeout <= 0 or current_wait_time <= timeout:
+            check_virtctl_vm_cmd = f"virtctl ssh --local-ssh=true --local-ssh-opts='-o BatchMode=yes' --local-ssh-opts='-o PasswordAuthentication=no' --local-ssh-opts='-o ConnectTimeout=2' root@{vm_name} -n {namespace} 2>&1 |egrep 'denied|verification failed'  && echo 'True' || echo 'False'"
+            if 'True' in self.run(check_virtctl_vm_cmd):
+                return 'True'
+            # sleep for x seconds
+            time.sleep(OC.SLEEP_TIME)
+            current_wait_time += OC.SLEEP_TIME
+        raise VMStateTimeout(vm_name=vm_name, state='virtctl')
+
+    def get_vm_access(self, vm_name: str = '', namespace: str = environment_variables.environment_variables_dict['namespace']):
+        """
+        This method returns True when the VM is access and an error message when it is not, using virtctl protocol
         :param vm_name:
         :param namespace:
         :return: virtctl_status 'True' if successful, or an error message if it fails.
@@ -1312,7 +1330,7 @@ class OC(SSH):
         :return:
         """
         namespace = f'-n {namespace}' if namespace else ''
-        command = f"{self._cli} get vmi {vm_name} {namespace} -o jsonpath={{.metadata.labels.'kubevirt\\.io/nodeName'}}"
+        command = f"{self._cli} get vmi {vm_name} {namespace} -o jsonpath=\"{{.status.nodeName}}\""
 
         try:
             result = self.run(command)
