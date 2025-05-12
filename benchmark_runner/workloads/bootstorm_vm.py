@@ -67,6 +67,19 @@ class BootstormVM(WorkloadsOperations):
         self._bootstorm_start_time[vm_name] = time.time()
 
     @logger_time_stamp
+    def _wait_vm_access(self, vm_name: str):
+        """
+        This method verifies virtctl into VM and return vm node in success or False if failed
+        @return:
+        """
+        if self._oc.get_vm_node(vm_name=vm_name):
+            vm_node = self._oc.get_vm_node(vm_name=vm_name)
+            if self._oc.wait_for_vm_access(vm_name=vm_name):
+                logger.info(f"Successfully virtctl into VM: '{vm_name}' in node {vm_node} ")
+            return vm_node
+        return False
+
+    @logger_time_stamp
     def _wait_ssh_vm(self, vm_name: str):
         """
         This method verifies ssh into VM and return vm node in success or False if failed
@@ -92,7 +105,7 @@ class BootstormVM(WorkloadsOperations):
         """
         if vm_node:
             delta = round((time.time() - self._bootstorm_start_time[vm_name]) * self.MILLISECONDS, 3)
-            data = {'vm_name': vm_name, 'node': vm_node, 'bootstorm_time': delta, 'vm_ssh': int(bool(vm_node)),}
+            data = {'vm_name': vm_name, 'node': vm_node, 'bootstorm_time': delta, 'access_vm': int(bool(vm_node)),}
             logger.info(data)
             return data
         return {}
@@ -143,7 +156,7 @@ class BootstormVM(WorkloadsOperations):
         self._set_bootstorm_vm_first_run_time()
         self._set_bootstorm_vm_start_time(vm_name=self._vm_name)
         self._virtctl.start_vm_sync(vm_name=self._vm_name)
-        self.vm_node = self._wait_ssh_vm(vm_name=self._vm_name)
+        self.vm_node = self._wait_vm_access(vm_name=self._vm_name)
         self._data_dict = self._get_bootstorm_vm_elapsed_time(vm_name=self._vm_name, vm_node=self.vm_node)
         self._data_dict['run_artifacts_url'] = os.path.join(self._run_artifacts_url,
                                                             f'{self._get_run_artifacts_hierarchy(workload_name=self._workload_name, is_file=True)}-{self._time_stamp_format}.tar.gz')
@@ -158,16 +171,16 @@ class BootstormVM(WorkloadsOperations):
         :param vm_name: The name of the VM to verify.
         :param retries: Number of retry attempts.
         :param delay: Time to wait (in seconds) between retries.
-        @return: virtctl_status 'True' if successful, or an error message if it fails
+        @return: access_status 'True' if successful, or an error message if it fails
         """
-        virtctl_status = None
+        access_status = None
         for attempt in range(retries):
             try:
-                virtctl_status = self._oc.get_virtctl_vm_status(vm_name)
+                access_status = self._oc.get_vm_access(vm_name)
 
-                if str(virtctl_status).lower() == "true":
+                if str(access_status).lower() == "true":
                     # Log success and store relevant data
-                    logger.info(f"VM {vm_name} verified successfully (virtctl SSH status: { virtctl_status}).")
+                    logger.info(f"VM {vm_name} verified successfully (virtctl SSH status: {access_status}).")
                     break  # Exit loop on success
                 else:
                     logger.info(f"Attempt {attempt + 1}/{retries}: VM {vm_name} not reachable via Virtctl SSH. Retrying...")
@@ -185,8 +198,8 @@ class BootstormVM(WorkloadsOperations):
         self._data_dict = {
             'vm_name': vm_name,
             'node': vm_node,
-            'virtctl_vm': 1 if str(virtctl_status).lower() == "true" else 0, # int value for Grafana
-            'virtctl_status': virtctl_status,
+            'access_vm': 1 if str(access_status).lower() == "true" else 0, # int value for Grafana
+            'access_status': access_status,
             'test_name': self._test_name,
             'run_artifacts_url': os.path.join(
                 self._run_artifacts_url,
@@ -194,13 +207,13 @@ class BootstormVM(WorkloadsOperations):
             )
         }
 
-        if str(virtctl_status).lower() != "true":
+        if str(access_status).lower() != "true":
             logger.info(
-                f"All attempts failed for VM {vm_name}. Final SSH status: {self._data_dict.get('virtctl_status', 'No status available')}")
+                f"All attempts failed for VM {vm_name}. Final SSH status: {self._data_dict.get('access_status', 'No status available')}")
             error_log_path = f"{self._run_artifacts_path}/{vm_name}_error.log"
 
             # Retrieve the status or use a default message
-            status_message = self._data_dict.get('virtctl_status') or "No status available"
+            status_message = self._data_dict.get('access_status') or "No status available"
 
             try:
                 with open(error_log_path, "w") as error_log_file:
@@ -209,7 +222,7 @@ class BootstormVM(WorkloadsOperations):
                 logger.error(f"Failed to write error log for {vm_name}: {write_err}")
 
         self._finalize_vm()
-        return virtctl_status
+        return access_status
 
     def _verify_single_vm_wrapper(self, vm_name, return_dict):
         """
@@ -251,7 +264,7 @@ class BootstormVM(WorkloadsOperations):
                 failure_vms.append(vm_name)
         return failure_vms
 
-    def _verify_virtctl_vms(self, delay=10):
+    def _verify_vms_access(self, delay=10):
             """
             This method verifies the virtctl SSH login for each VM, either during the upgrade or once for each VM.
             It prepares the data for ElasticSearch, generates a must-gather in case of an error, and uploads it to Google Drive.
@@ -322,7 +335,7 @@ class BootstormVM(WorkloadsOperations):
             if not self._run_strategy:
                 self._virtctl.start_vm_async(vm_name=f'{self._workload_name}-{self._trunc_uuid}-{vm_num}')
             self._virtctl.wait_for_vm_status(vm_name=vm_name, status=VMStatus.Running)
-            vm_node = self._wait_ssh_vm(vm_name)
+            vm_node = self._wait_vm_access(vm_name)
             self._data_dict = self._get_bootstorm_vm_elapsed_time(vm_name=vm_name, vm_node=vm_node)
             self._data_dict['run_artifacts_url'] = os.path.join(self._run_artifacts_url, f'{self._get_run_artifacts_hierarchy(workload_name=self._workload_name, is_file=True)}-scale-{self._time_stamp_format}.tar.gz')
             self._finalize_vm()
@@ -394,7 +407,7 @@ class BootstormVM(WorkloadsOperations):
     def run_vm_workload(self):
         # verification only w/o running or deleting any resource
         if self._verification_only:
-            self._verify_virtctl_vms()
+            self._verify_vms_access()
         else:
             if not self._scale:
                 self._run_vm()
