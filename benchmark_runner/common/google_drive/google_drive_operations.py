@@ -9,7 +9,7 @@ from googleapiclient.http import MediaFileUpload
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
 from benchmark_runner.common.logger.logger_time_stamp import logger  # Added logger import
-from google_drive_exceptions import FolderNotCreated
+from benchmark_runner.common.google_drive.google_drive_exceptions import FolderNotCreated
 # Define the scope
 SCOPES = ['https://www.googleapis.com/auth/drive']
 
