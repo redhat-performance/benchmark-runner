@@ -1229,6 +1229,10 @@ class OC(SSH):
         node_ips_list = node_ips.split()
         return dict([(k, v) for k, v in zip(node_ips_list[1::2], node_ips_list[::2])])
 
+    def get_vm_status(self, vm_name, namespace: str = environment_variables.environment_variables_dict['namespace']):
+        namespace = f'-n {namespace}' if namespace else ''
+        return self.run(f"{self._cli} get vm {vm_name} {namespace}")
+
     @logger_time_stamp
     def wait_for_vm_status(self, vm_name: str = '', status: VMStatus = VMStatus.Stopped,
                            namespace: str = environment_variables.environment_variables_dict['namespace'],
@@ -1586,8 +1590,26 @@ class OC(SSH):
         :param output_dir:
         :return:
         """
-        self.run(f"oc get vmi {vm_name} -n {namespace} -o yaml > '{output_dir}/{vm_name}.yaml'")
+        self.run(f"oc get vmi '{vm_name}' -n '{namespace}' -o yaml > '{output_dir}/{vm_name}.yaml'")
         pod_name = self.run(
-            f'oc get pod -n {namespace} -o jsonpath="{{.items[?(@.metadata.generateName==\'virt-launcher-{vm_name}-\')].metadata.name}}"'
+            f"oc get pod -n '{namespace}' -o jsonpath=\"{{.items[?(@.metadata.generateName=='virt-launcher-{vm_name}-')].metadata.name}}\""
         )
-        self.run(f"oc get pod {pod_name} -n {namespace} -o yaml > '{output_dir}/{pod_name}.yaml'")
+        self.run(f"oc get pod '{pod_name}' -n '{namespace}' -o yaml > '{output_dir}/{pod_name}.yaml'")
+
+    def save_describe_yml(self, vm_name, vm_access, output_dir='/tmp', namespace: str = environment_variables.environment_variables_dict['namespace']):
+        """
+        This method save pod and vm into yaml per namespace
+        :param vm_name:
+        :param vm_access: True is vm accessible
+        :param namespace:
+        :param output_dir:
+        :return:
+        """
+        if vm_access:
+            self.run(f"oc describe vmi '{vm_name}' -n '{namespace}' > '{output_dir}/describe_vmi_{vm_name}.yaml'")
+            pod_name = self.run(
+                f'oc get pod -n {namespace} -o jsonpath="{{.items[?(@.metadata.generateName==\'virt-launcher-{vm_name}-\')].metadata.name}}"'
+            )
+            self.run(f"oc describe pod '{pod_name}' -n '{namespace}' > '{output_dir}/describe_pod_{pod_name}.yaml'")
+        else:
+            self.run(f"oc describe vm '{vm_name}' -n '{namespace}' > '{output_dir}/describe_vm_{vm_name}.yaml'")
