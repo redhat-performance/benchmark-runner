@@ -373,6 +373,15 @@ class WorkloadsOperations:
         run_artifacts_hierarchy = self._get_run_artifacts_hierarchy(workload_name=workload)
         return self._google_drive_operation.get_drive_folder_url(folder_path=run_artifacts_hierarchy, parent_folder_id=self._google_drive_shared_drive_id)
 
+    def create_run_artifacts_google_drive(self):
+        """
+        This method creates google drive run artifacts folder path
+        :return:
+        """
+        workload = self._workload.replace('_', '-')
+        run_artifacts_hierarchy = self._get_run_artifacts_hierarchy(workload_name=workload)
+        self._google_drive_operation.create_drive_folder_url(folder_path=run_artifacts_hierarchy, parent_folder_id=self._google_drive_shared_drive_id)
+
     @logger_time_stamp
     def upload_run_artifacts_to_google_drive(self):
         """
@@ -524,6 +533,8 @@ class WorkloadsOperations:
         self._template.generate_yamls(scale=str(self._scale), scale_nodes=self._scale_node_list, redis=self._redis, thread_limit=self._threads_limit)
         if self._enable_prometheus_snapshot:
             self.start_prometheus()
+        if self._google_drive_path:
+            self.create_run_artifacts_google_drive()
 
     def finalize_workload(self):
         """
@@ -535,6 +546,8 @@ class WorkloadsOperations:
             self.end_prometheus()
         if self._endpoint_url:
             self.upload_run_artifacts_to_s3()
+        elif self._google_drive_path:
+            self.upload_run_artifacts_to_google_drive()
         if not self._save_artifacts_local:
             self.delete_local_artifacts()
         if self._delete_all:

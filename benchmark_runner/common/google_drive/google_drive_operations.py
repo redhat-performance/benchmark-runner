@@ -9,7 +9,7 @@ from googleapiclient.http import MediaFileUpload
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
 from benchmark_runner.common.logger.logger_time_stamp import logger  # Added logger import
-
+from google_drive_exceptions import FolderNotCreated
 # Define the scope
 SCOPES = ['https://www.googleapis.com/auth/drive']
 
@@ -241,16 +241,44 @@ class GoogleDriveOperations:
             # Folder exists, return the folder URL
             folder_url = f"{self._google_drive_path}/{folder_id}"
             return folder_url
-        else:
-            # If folder does not exist, create it along the path
-            folder_id = self.create_folder_at_path(folder_path, parent_folder_id)
+
+    def create_drive_folder_url(self, folder_path, parent_folder_id, retries=3, delay=5):
+        """
+         Create folder if it doesn't exist. Retries in case of failure.
+        :param folder_path: The full folder path to retrieve or create.
+        :param parent_folder_id: The starting parent folder ID.
+        :param retries: Number of retry attempts on failure.
+        :param delay: Initial delay between retries in seconds.
+        :return: The Google Drive URL for the folder, or None on failure.
+        """
+        attempt = 1
+        while attempt <= retries:
+            folder_id = self.get_folder_id_by_path(folder_path, parent_folder_id)
             if folder_id:
-                # Return the newly created folder's URL
-                folder_url = f"{self._google_drive_path}/{folder_id}"
-                return folder_url
-            else:
-                logger.error(f"Unable to create or find the folder path: {folder_path}")
-                return None
+                logger.debug(f"Folder already exists: {folder_path}")
+                break
+
+            logger.warning(f"Folder not found. Attempting to create it (Attempt {attempt}/{retries}).")
+            try:
+                folder_id = self.create_folder_at_path(folder_path, parent_folder_id)
+                if folder_id:
+                    logger.info(f"Successfully created folder: {folder_path}")
+                    break
+            except Exception as e:
+                logger.error(f"Failed to create folder on attempt {attempt} due to: {e}")
+                raise FolderNotCreated(folder_path)
+
+            if attempt < retries:
+                wait_time = delay * (2 ** (attempt - 1))
+                logger.warning(f"Retrying in {wait_time} seconds...")
+                time.sleep(wait_time)
+
+            attempt += 1
+
+        if not folder_id:
+            error_msg = f"Unable to create or find the folder path after {retries} attempts: {folder_path}"
+            logger.error(error_msg)
+            raise FolderNotCreated(folder_path)
 
     def list_files_in_folder(self, folder_id, level=0):
         """

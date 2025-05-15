@@ -137,7 +137,7 @@ class BootstormVM(WorkloadsOperations):
             total_run_time = self._get_bootstorm_vm_total_run_time()
             self._data_dict.update({'total_run_time': total_run_time})
         # Google drive run_artifacts_url folder path
-        if self._google_drive_path and self.get_run_artifacts_google_drive():
+        if self._google_drive_path:
             self._data_dict.update({'run_artifacts_url': self.get_run_artifacts_google_drive()})
         if self._es_host:
             # upload several run results
@@ -191,7 +191,6 @@ class BootstormVM(WorkloadsOperations):
             # Sleep before retrying
             if attempt < retries - 1:
                 time.sleep(delay)
-
 
         # Final update to self._data_dict after all attempts
         vm_node = self._oc.get_vm_node(vm_name)  # Get the node again in case it changed
@@ -265,64 +264,64 @@ class BootstormVM(WorkloadsOperations):
         return failure_vms
 
     def _verify_vms_access(self, delay=10):
-            """
-            This method verifies the virtctl SSH login for each VM, either during the upgrade or once for each VM.
-            It prepares the data for ElasticSearch, generates a must-gather in case of an error, and uploads it to Google Drive.
-            :param delay: delay between each iteration
-            """
-            try:
-                vm_names = self._oc._get_all_vm_names()
-                if not vm_names:
-                    raise MissingVMs("No VM names were retrieved from the cluster.")
+        """
+        This method verifies the virtctl SSH login for each VM, either during the upgrade or once for each VM.
+        It prepares the data for ElasticSearch, generates a must-gather in case of an error, and uploads it to Google Drive.
+        :param delay: delay between each iteration
+        """
+        try:
+            vm_names = self._oc._get_all_vm_names()
+            if not vm_names:
+                raise MissingVMs("No VM names were retrieved from the cluster.")
 
-                upgrade_done = True
-                failure_vms = []  # List to store failed VM names
+            upgrade_done = True
+            failure_vms = []  # List to store failed VM names
 
-                if self._wait_for_upgrade_version:
-                    logger.info(f"wait for ocp upgrade version: {self._wait_for_upgrade_version}")
-                    upgrade_done = self._oc.get_cluster_status() == f'Cluster version is {self._wait_for_upgrade_version}'
-                    start_time = time.time()
+            if self._wait_for_upgrade_version:
+                logger.info(f"wait for ocp upgrade version: {self._wait_for_upgrade_version}")
+                upgrade_done = self._oc.get_cluster_status() == f'Cluster version is {self._wait_for_upgrade_version}'
+                start_time = time.time()
 
-                    while (self._timeout <= 0 or time.time() - start_time <= self._timeout) and not upgrade_done:
-                        failure_vms = self._verify_vms_in_parallel(vm_names)
-                        upgrade_done = self._oc.get_cluster_status() == f'Cluster version is {self._wait_for_upgrade_version}'
-
-                        if upgrade_done:
-                            break
-
-                        # Sleep between each cycle
-                        time.sleep(delay)
-                else:
+                while (self._timeout <= 0 or time.time() - start_time <= self._timeout) and not upgrade_done:
                     failure_vms = self._verify_vms_in_parallel(vm_names)
+                    upgrade_done = self._oc.get_cluster_status() == f'Cluster version is {self._wait_for_upgrade_version}'
 
-                if self._wait_for_upgrade_version:
-                    logger.info(f'Cluster is upgraded to: {self._wait_for_upgrade_version}')
+                    if upgrade_done:
+                        break
 
-                if failure_vms:
-                    self._oc.generate_cnv_must_gather(destination_path=self._run_artifacts_path,
-                                                      cnv_version=self._cnv_version)
-                    self._oc.generate_odf_must_gather(destination_path=self._run_artifacts_path,
-                                                      odf_version=self._odf_version)
-                    # Error log with details of failed VM, for catching all vm errors
-                    logger.error(f"Failed to verify virtctl SSH login for the following VMs: {', '.join(failure_vms)}")
-                    # Upload artifacts
-                    if self._google_drive_shared_drive_id:
-                        self.upload_run_artifacts_to_google_drive()
-                    elif self._endpoint_url:
-                        self.upload_run_artifacts_to_s3()
-                    else:
-                        self._save_artifacts_local = True
-                    if self._es_host:
-                        self._data_dict.update({'run_artifacts_url': self.get_run_artifacts_google_drive(), 'failure_vms': failure_vms, 'verification_failure': True})
-                        # upload several run results
-                        self._upload_to_elasticsearch(index=self._es_index, kind=self._kind, status=self._status,result=self._data_dict)
-                        # verify that data upload to elastic search according to unique uuid
-                        self._verify_elasticsearch_data_uploaded(index=self._es_index, uuid=self._uuid)
+                    # Sleep between each cycle
+                    time.sleep(delay)
+            else:
+                failure_vms = self._verify_vms_in_parallel(vm_names)
 
-            except Exception as err:
-                # Save run artifacts logs
-                self.save_error_logs()
-                raise err
+            if self._wait_for_upgrade_version:
+                logger.info(f'Cluster is upgraded to: {self._wait_for_upgrade_version}')
+
+            if failure_vms:
+                self._oc.generate_cnv_must_gather(destination_path=self._run_artifacts_path,
+                                                 cnv_version=self._cnv_version)
+                self._oc.generate_odf_must_gather(destination_path=self._run_artifacts_path,
+                                                 odf_version=self._odf_version)
+                # Error log with details of failed VM, for catching all vm errors
+                logger.error(f"Failed to verify virtctl SSH login for the following VMs: {', '.join(failure_vms)}")
+            # Upload artifacts in validation
+            if self._google_drive_shared_drive_id:
+                self.upload_run_artifacts_to_google_drive()
+            elif self._endpoint_url:
+                self.upload_run_artifacts_to_s3()
+            else:
+                self._save_artifacts_local = True
+            if self._es_host:
+                self._data_dict.update({'run_artifacts_url': self.get_run_artifacts_google_drive(), 'failure_vms': failure_vms, 'verification_failure': True})
+                # upload several run results
+                self._upload_to_elasticsearch(index=self._es_index, kind=self._kind, status=self._status,result=self._data_dict)
+                # verify that data upload to elastic search according to unique uuid
+                self._verify_elasticsearch_data_uploaded(index=self._es_index, uuid=self._uuid)
+
+        except Exception as err:
+            # Save run artifacts logs
+            self.save_error_logs()
+            raise err
 
     def _run_vm_scale(self, vm_num: str):
         """
