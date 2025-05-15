@@ -69,7 +69,7 @@ class BootstormVM(WorkloadsOperations):
     @logger_time_stamp
     def _wait_vm_access(self, vm_name: str):
         """
-        This method verifies virtctl into VM and return vm node in success or False if failed
+        This method waits for VM access and returns the VM node on success, or False if it fails
         @return:
         """
         if self._oc.get_vm_node(vm_name=vm_name):
@@ -165,9 +165,9 @@ class BootstormVM(WorkloadsOperations):
             yaml=os.path.join(f'{self._run_artifacts_path}', f'{self._name}.yaml'),
             vm_name=self._vm_name)
 
-    def _verify_single_vm(self, vm_name, retries=5, delay=10):
+    def _verify_single_vm_access(self, vm_name, retries=5, delay=10):
         """
-        This method verifies the virtctl status of a single VM using a retry mechanism
+        This method verifies single vm access using a retry mechanism
         :param vm_name: The name of the VM to verify.
         :param retries: Number of retry attempts.
         :param delay: Time to wait (in seconds) between retries.
@@ -216,27 +216,29 @@ class BootstormVM(WorkloadsOperations):
 
             try:
                 with open(error_log_path, "w") as error_log_file:
-                    error_log_file.write(str(status_message))
+                    error_log_file.write(self._oc.get_vm_status(vm_name=vm_name) + "\n\n")
+                    error_log_file.write(str(status_message) + "\n")
             except Exception as write_err:
                 logger.error(f"Failed to write error log for {vm_name}: {write_err}")
 
         self._finalize_vm()
         return access_status
 
-    def _verify_single_vm_wrapper(self, vm_name, return_dict):
+    def _verify_single_vm_access_wrapper(self, vm_name, return_dict):
         """
-        This method verifies single vm and update vm status in return_dict
+        This method verifies access to a single VM, saves its YAML files, and updates the VM status in return_dict
         :param vm_name:
         :param return_dict:
         :return:
         """
         self._oc.save_to_yaml(vm_name, output_dir=self._run_artifacts_path)
-        status = self._verify_single_vm(vm_name)
-        return_dict[vm_name] = status
+        vm_access = self._verify_single_vm_access(vm_name)
+        self._oc.save_describe_yml(vm_name, str(vm_access).lower() == 'true', output_dir=self._run_artifacts_path)
+        return_dict[vm_name] = vm_access
 
-    def _verify_vms_in_parallel(self, vm_names):
+    def _verify_vms_access_in_parallel(self, vm_names):
         """
-        This method verifies vms in parallel
+        This method verifies VM access in parallel
         :param vm_names:
         :return:
         """
@@ -250,7 +252,7 @@ class BootstormVM(WorkloadsOperations):
             processes = []
 
             for vm_name in bulk:
-                p = Process(target=self._verify_single_vm_wrapper, args=(vm_name, return_dict))
+                p = Process(target=self._verify_single_vm_access_wrapper, args=(vm_name, return_dict))
                 p.start()
                 processes.append(p)
 
@@ -265,14 +267,14 @@ class BootstormVM(WorkloadsOperations):
 
     def _verify_vms_access(self, delay=10):
         """
-        This method verifies the virtctl SSH login for each VM, either during the upgrade or once for each VM.
+        This method verifies access for each VM
         It prepares the data for ElasticSearch, generates a must-gather in case of an error, and uploads it to Google Drive.
         :param delay: delay between each iteration
         """
         try:
             vm_names = self._oc._get_all_vm_names()
             if not vm_names:
-                raise MissingVMs("No VM names were retrieved from the cluster.")
+                raise MissingVMs()
 
             upgrade_done = True
             failure_vms = []  # List to store failed VM names
@@ -283,7 +285,7 @@ class BootstormVM(WorkloadsOperations):
                 start_time = time.time()
 
                 while (self._timeout <= 0 or time.time() - start_time <= self._timeout) and not upgrade_done:
-                    failure_vms = self._verify_vms_in_parallel(vm_names)
+                    failure_vms = self._verify_vms_access_in_parallel(vm_names)
                     upgrade_done = self._oc.get_cluster_status() == f'Cluster version is {self._wait_for_upgrade_version}'
 
                     if upgrade_done:
@@ -292,16 +294,14 @@ class BootstormVM(WorkloadsOperations):
                     # Sleep between each cycle
                     time.sleep(delay)
             else:
-                failure_vms = self._verify_vms_in_parallel(vm_names)
+                failure_vms = self._verify_vms_access_in_parallel(vm_names)
 
             if self._wait_for_upgrade_version:
                 logger.info(f'Cluster is upgraded to: {self._wait_for_upgrade_version}')
 
             if failure_vms:
-                self._oc.generate_cnv_must_gather(destination_path=self._run_artifacts_path,
-                                                 cnv_version=self._cnv_version)
-                self._oc.generate_odf_must_gather(destination_path=self._run_artifacts_path,
-                                                 odf_version=self._odf_version)
+                self._oc.generate_cnv_must_gather(destination_path=self._run_artifacts_path, cnv_version=self._cnv_version)
+                self._oc.generate_odf_must_gather(destination_path=self._run_artifacts_path, odf_version=self._odf_version)
                 # Error log with details of failed VM, for catching all vm errors
                 logger.error(f"Failed to verify virtctl SSH login for the following VMs: {', '.join(failure_vms)}")
             # Upload artifacts in validation
