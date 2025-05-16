@@ -1,3 +1,11 @@
+
+def upgradeMasterStartTime
+def upgradeMastersEndTime
+def upgradeMastersDurationInSeconds = ''
+def upgradeWorkersStartTime
+def upgradeWorkersEndTime
+def upgradeWorkersDurationInSeconds = ''
+
 pipeline {
     agent {
         label 'PerfCi'
@@ -21,12 +29,7 @@ pipeline {
         KUBECONFIG_PATH = '/root/.kube/config'
         PRIVATE_KEY_PATH = '/home/jenkins/.ssh/provision_private_key'
         CONFIG_PATH = '/home/jenkins/.ssh/config'
-        CONTAINER_CONFIG_PATH = '/root/.ssh/config'
-        ANSIBLE_TMP_PATH = '/root/.ansible/tmp/'
         SCALE_NODES = credentials('perfci_scale_nodes')
-        PIN_NODE_BENCHMARK_OPERATOR = credentials('perfci_pin_node_benchmark_operator')
-        PIN_NODE1 = credentials('perfci_pin_node1')
-        PIN_NODE2 = credentials('perfci_pin_node2')
         ELASTICSEARCH = credentials('perfci_elasticsearch')
         ELASTICSEARCH_PORT = credentials('perfci_elasticsearch_port')
         IBM_REGION_NAME = credentials('perfci_ibm_region_name')
@@ -43,28 +46,22 @@ pipeline {
         GOOGLE_DESTINATION_PATH = '/tmp'
         GOOGLE_DRIVE_SHARED_DRIVE_ID = credentials('perfci_google_drive_shared_drive_id')
         RUN_ARTIFACTS_URL = credentials('perfci_run_artifacts_url')
-        REDIS = credentials('perfci_redis')
-        WORKER_DISK_IDS = credentials('perfci_worker_disk_ids')
-        WINDOWS10_URL = credentials('perfci_windows10_url')
-        WINDOWS11_URL = credentials('perfci_windows11_url')
-        WINDOWS_SERVER_2019_URL = credentials('perfci_windows_server_2019_url')
-        WINDOWS_SERVER_2022_URL = credentials('perfci_windows_server_2022_url')
-        LSO_NODE = credentials('perfci_lso_node')
         KUBEADMIN_PASSWORD = readFile('/home/jenkins/.kube/kubeadmin-password').trim()
-        WORKER_DISK_PREFIX = 'wwn-0x'
+        PROVISION_KUBECONFIG_PATH = '/root/.kube/config' // required for krknhub
         SAVE_ARTIFACTS_LOCAL = 'False'
         ENABLE_PROMETHEUS_SNAPSHOT = 'False'
-        DELETE_ALL = 'False' // Not delete the running Windows11 VMs
+        DELETE_ALL = 'False' // Not delete the running VMs
         VERIFICATION_ONLY = 'True'
         RUN_TYPE = 'chaos_ci'
-        NUM_ODF_DISK = 6
-        WINDOWS_SCALE = 40
+        BOOTSTORM_SCALE = 120
         THREADS_LIMIT = 20
-        PROVISION_TIMEOUT = 7200
         TIMEOUT = 7200
         WORKSPACE_PATH = "${env.WORKSPACE}/workspace/${env.JOB_NAME}/"
+        KRKNHUB_MASTERS_CPU_HOG_ENVIRONMENT_VARIABLES = credentials('perfci_krknhub_masters_cpu_hog')
+        KRKNHUB_MASTER_0_NODE_FAILURE_ENVIRONMENT_VARIABLES = credentials('perfci_krknhub_master_0_node_failure')
+        KRKNHUB_WORKERS_CPU_HOG_ENVIRONMENT_VARIABLES = credentials('perfci_krknhub_workers_cpu_hog')
+        KRKNHUB_WORKER_0_NODE_FAILURE_ENVIRONMENT_VARIABLES = credentials('perfci_krknhub_worker_0_node_failure')
     }
-
     stages {
         stage('Cleanup') {
             steps {
@@ -132,156 +129,409 @@ END
             }
         }
 
-        stage('OpenShift Upgrade AND Verifications') {
+        stage('Upgrade Masters & Chaos') {
             parallel {
-                stage('Upgrade Steps') {
-                    steps {
-                        script {
-                            def upgrade_steps = ['run_bare_metal_ocp_upgrade', 'verify_bare_metal_upgrade_complete']
+                stage('Upgrade Masters') {
+                            steps {
+                                script {
+                                    upgradeMasterStartTime = System.currentTimeMillis()
 
-                            for (upgrade_step in upgrade_steps) {
-                                echo "Run OpenShift Deployment for ${upgrade_step}"
+                                    echo "Running deployment for run_bare_metal_ocp_upgrade"
 
-                                // Create a stage for each resource
-                                stage("${upgrade_step} Deployment") {
-                                    echo "Running deployment for ${upgrade_step}"
-                                    // deployment code
-                                    script {
-                                                    sh """
-                                                        sudo podman run --rm \
-                                                            -e UPGRADE_OCP_VERSION="${UPGRADE_OCP_VERSION}" \
-                                                            -e UPGRADE_STEP="${upgrade_step}" \
-                                                            -e RUN_TYPE="${RUN_TYPE}" \
-                                                            -e UPGRADE_CHANNEL="${UPGRADE_CHANNEL}" \
-                                                            -e LSO_VERSION="${LSO_VERSION}" \
-                                                            -e ODF_VERSION="${ODF_VERSION}" \
-                                                            -e CNV_VERSION="${CNV_VERSION}" \
-                                                            -e EXPECTED_NODES='${EXPECTED_NODES}' \
-                                                            -e KUBEADMIN_PASSWORD="${KUBEADMIN_PASSWORD}" \
-                                                            -e TIMEOUT="${TIMEOUT}" \
-                                                            -v "${KUBECONFIG_PATH}":"${KUBECONFIG_PATH}" \
-                                                            --privileged "${QUAY_BENCHMARK_RUNNER_REPOSITORY}"
+                                    sh """
+                                        sudo podman run --rm \
+                                            -e UPGRADE_OCP_VERSION="${UPGRADE_OCP_VERSION}" \
+                                            -e UPGRADE_STEP='run_bare_metal_ocp_upgrade' \
+                                            -e RUN_TYPE="${RUN_TYPE}" \
+                                            -e UPGRADE_CHANNEL="${UPGRADE_CHANNEL}" \
+                                            -e LSO_VERSION="${LSO_VERSION}" \
+                                            -e ODF_VERSION="${ODF_VERSION}" \
+                                            -e CNV_VERSION="${CNV_VERSION}" \
+                                            -e EXPECTED_NODES='${EXPECTED_NODES}' \
+                                            -e KUBEADMIN_PASSWORD="${KUBEADMIN_PASSWORD}" \
+                                            -e TIMEOUT="${TIMEOUT}" \
+                                            -v "${KUBECONFIG_PATH}":"${KUBECONFIG_PATH}" \
+                                            --privileged "${QUAY_BENCHMARK_RUNNER_REPOSITORY}"
+                                    """
 
-                                                    """
-                                    }
+                                    upgradeMastersEndTime = System.currentTimeMillis()
+                                    def durationInSeconds = (upgradeMastersEndTime - upgradeMasterStartTime) / 1000
+                                    upgradeMastersDurationInSeconds = "${durationInSeconds}"
                                 }
                             }
-                        }
-                    }
-                }
+                } // Upgrade Masters
 
             // Parallel stage
-            stage('WORKLOADS Verifications') {
-            steps {
-                script {
-                    def workloads =  [ 'windows_vm_scale_windows11' ]
-                    def build_version = sh(script: 'curl -s "https://pypi.org/pypi/benchmark-runner/json" | jq -r .info.version', returnStdout: true).trim()
-                    def WINDOWS_URL = ''
-                    def SCALE = ''
-                    def workload_name = ''
-                    for (workload in workloads) {
-                            boolean success = false
-                            try {
-                                // workload full name
-                                workload_name = workload
-                                // Parse the workload name
-                                def parts = "${workload}".split("_")
-                                def WORKLOAD = parts[0] + "_" + parts[1]
-                                def RUN = parts.size() >= 3 ? parts[2] : ""
-                                if (RUN == "scale") {
+            stage('Masters Chaos & verifications') {
+            stages {
 
-                                    if (WORKLOAD == "windows_vm") {
-                                        switch (workload) {
-                                            case "windows_vm_scale_windows10":
-                                                WINDOWS_URL = WINDOWS10_URL
-                                                break
-                                            case "windows_vm_scale_windows11":
-                                                WINDOWS_URL = WINDOWS11_URL
-                                                break
-                                            case "windows_vm_scale_windows_server_2019":
-                                                WINDOWS_URL = WINDOWS_SERVER_2019_URL
-                                                break
-                                            case "windows_vm_scale_windows_server_2022":
-                                                WINDOWS_URL = WINDOWS_SERVER_2022_URL
-                                                break
-                                            default:
-                                                error "Unknown Windows scale workload ${workload}"
-                                        }
-                                        SCALE = WINDOWS_SCALE
-                                    }
-                                  workload = WORKLOAD
-                                } else {
-                                    SCALE = ""
-                                }
-
-                                // Windows11 VMs workload Verifications
-                                stage(workload_name) {
-                                    // boolean value w/o ''
-                                    sh """
-                                        sudo podman run --rm -t \
-                                        -e WORKLOAD='${workload}' \
-                                        -e ODF_VERSION="${ODF_VERSION}" \
-                                        -e CNV_VERSION="${CNV_VERSION}" \
-                                        -e WAIT_FOR_UPGRADE_VERSION='${WAIT_FOR_UPGRADE_VERSION}' \
-                                        -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' \
-                                        -e PIN_NODE_BENCHMARK_OPERATOR='${PIN_NODE_BENCHMARK_OPERATOR}' \
-                                        -e PIN_NODE1='${PIN_NODE1}' \
-                                        -e PIN_NODE2='${PIN_NODE2}' \
-                                        -e ELASTICSEARCH='${ELASTICSEARCH}' \
-                                        -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' \
-                                        -e IBM_REGION_NAME='${IBM_REGION_NAME}' \
-                                        -e IBM_ENDPOINT_URL='${IBM_ENDPOINT_URL}' \
-                                        -e IBM_ACCESS_KEY_ID='${IBM_ACCESS_KEY_ID}' \
-                                        -e IBM_SECRET_ACCESS_KEY='${IBM_SECRET_ACCESS_KEY}' \
-                                        -e IBM_BUCKET='${IBM_BUCKET}' \
-                                        -e IBM_KEY='${IBM_KEY}' \
-                                        -e GOOGLE_DRIVE_PATH='${GOOGLE_DRIVE_PATH}' \
-                                        -e GOOGLE_DRIVE_CREDENTIALS_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_CREDENTIALS_FILE}' \
-                                        -e GOOGLE_DRIVE_TOKEN_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_TOKEN_FILE}' \
-                                        -e GOOGLE_DRIVE_SHARED_DRIVE_ID='${GOOGLE_DRIVE_SHARED_DRIVE_ID}' \
-                                        -e RUN_ARTIFACTS_URL='${RUN_ARTIFACTS_URL}' \
-                                        -e BUILD_VERSION='${build_version}' \
-                                        -e RUN_TYPE='${RUN_TYPE}' \
-                                        -e SAVE_ARTIFACTS_LOCAL=${SAVE_ARTIFACTS_LOCAL} \
-                                        -e ENABLE_PROMETHEUS_SNAPSHOT=${ENABLE_PROMETHEUS_SNAPSHOT} \
-                                        -e WORKER_DISK_IDS='${WORKER_DISK_IDS}' \
-                                        -e WORKER_DISK_PREFIX='${WORKER_DISK_PREFIX}' \
-                                        -e SCALE='${SCALE}' \
-                                        -e SCALE_NODES='${SCALE_NODES}' \
-                                        -e REDIS='${REDIS}' \
-                                        -e THREADS_LIMIT='${THREADS_LIMIT}' \
-                                        -e WINDOWS_URL='${WINDOWS_URL}'  \
-                                        -e DELETE_ALL=${DELETE_ALL} \
-                                        -e VERIFICATION_ONLY=${VERIFICATION_ONLY} \
-                                        -e LSO_NODE='${LSO_NODE}'  \
-                                        -e TIMEOUT='${TIMEOUT}' \
-                                        -e log_level='INFO' \
-                                        -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
-                                        -v '${TEMP_DIR}:${GOOGLE_DESTINATION_PATH}' \
-                                        --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}'
-                                    """
-                                    success = true
-                                }
-                            } catch (Exception e) {
-                                echo "Error occurred in workload ${workload}: ${e.message}"
-                                if (i < retryCount - 1) {
-                                    echo "Retrying..."
-                                    sleep(time: 120, unit: 'SECONDS') // Sleep for 2 minutes between retries
-                                } else {
-                                    echo "Reached maximum retry attempts for workload ${workload}. Moving to the next workload..."
-                                }
-                        }
-                        if (!success) {
-                            echo "Workload ${workload} failed after ${retryCount} retries."
-                        }
-                        // sleep 10 sec between each VMs validation interation
-                        sleep(time: 10, unit: 'SECONDS')
-                 }
+            stage('Wait before Chaos begins') {
+                steps {
+                    script {
+                        echo 'Waiting 10 minutes (600 seconds) for upgrade to begin...'
+                        sleep(time: 10, unit: 'MINUTES')
+                    }
                 }
             }
-        } // WORKLOADS Verifications
-    }
-        }
+
+            stage('KrknHub: master-node-failure') {
+              steps {
+                  script {
+                      // boolean value w/o ''
+                      sh """
+                          sudo podman run --rm -t \
+                          -e WORKLOAD='krknhub' \
+                          -e KRKNHUB_WORKLOAD='node-scenarios' \
+                          -e TEST_NAME='master-node-failure' \
+                          -e KRKNHUB_ENVIRONMENT_VARIABLES='${KRKNHUB_MASTER_0_NODE_FAILURE_ENVIRONMENT_VARIABLES}' \
+                          -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' \
+                          -e PROVISION_KUBECONFIG_PATH='${PROVISION_KUBECONFIG_PATH}' \
+                          -e ELASTICSEARCH='${ELASTICSEARCH}' \
+                          -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' \
+                          -e IBM_REGION_NAME='${IBM_REGION_NAME}' \
+                          -e IBM_ENDPOINT_URL='${IBM_ENDPOINT_URL}' \
+                          -e IBM_ACCESS_KEY_ID='${IBM_ACCESS_KEY_ID}' \
+                          -e IBM_SECRET_ACCESS_KEY='${IBM_SECRET_ACCESS_KEY}' \
+                          -e IBM_BUCKET='${IBM_BUCKET}' \
+                          -e IBM_KEY='${IBM_KEY}' \
+                          -e GOOGLE_DRIVE_PATH='${GOOGLE_DRIVE_PATH}' \
+                          -e GOOGLE_DRIVE_CREDENTIALS_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_CREDENTIALS_FILE}' \
+                          -e GOOGLE_DRIVE_TOKEN_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_TOKEN_FILE}' \
+                          -e GOOGLE_DRIVE_SHARED_DRIVE_ID='${GOOGLE_DRIVE_SHARED_DRIVE_ID}' \
+                          -e RUN_ARTIFACTS_URL='${RUN_ARTIFACTS_URL}' \
+                          -e RUN_TYPE='${RUN_TYPE}' \
+                          -e SAVE_ARTIFACTS_LOCAL=${SAVE_ARTIFACTS_LOCAL} \
+                          -e TIMEOUT='${TIMEOUT}' \
+                          -e log_level='INFO' \
+                          -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
+                          -v '${TEMP_DIR}:${GOOGLE_DESTINATION_PATH}' \
+                          --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}'
+                      """
+                 }
+              }
+            } // KrknHub: master-node-failure
+
+        stage('Fedora Verifications - after master-node-failure') {
+                steps {
+                    script {
+                            sh """
+                                sudo podman run --rm -t \
+                                -e WORKLOAD='bootstorm_vm' \
+                                -e TEST_NAME='master-node-failure' \
+                                -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' \
+                                -e ELASTICSEARCH='${ELASTICSEARCH}' \
+                                -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' \
+                                -e IBM_REGION_NAME='${IBM_REGION_NAME}' \
+                                -e IBM_ENDPOINT_URL='${IBM_ENDPOINT_URL}' \
+                                -e IBM_ACCESS_KEY_ID='${IBM_ACCESS_KEY_ID}' \
+                                -e IBM_SECRET_ACCESS_KEY='${IBM_SECRET_ACCESS_KEY}' \
+                                -e IBM_BUCKET='${IBM_BUCKET}' \
+                                -e IBM_KEY='${IBM_KEY}' \
+                                -e GOOGLE_DRIVE_PATH='${GOOGLE_DRIVE_PATH}' \
+                                -e GOOGLE_DRIVE_CREDENTIALS_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_CREDENTIALS_FILE}' \
+                                -e GOOGLE_DRIVE_TOKEN_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_TOKEN_FILE}' \
+                                -e GOOGLE_DRIVE_SHARED_DRIVE_ID='${GOOGLE_DRIVE_SHARED_DRIVE_ID}' \
+                                -e RUN_ARTIFACTS_URL='${RUN_ARTIFACTS_URL}' \
+                                -e RUN_TYPE='${RUN_TYPE}' \
+                                -e SAVE_ARTIFACTS_LOCAL=${SAVE_ARTIFACTS_LOCAL} \
+                                -e SCALE='${BOOTSTORM_SCALE}' \
+                                -e SCALE_NODES='${SCALE_NODES}' \
+                                -e THREADS_LIMIT='${THREADS_LIMIT}' \
+                                -e DELETE_ALL=${DELETE_ALL} \
+                                -e VERIFICATION_ONLY=${VERIFICATION_ONLY} \
+                                -e TIMEOUT='${TIMEOUT}' \
+                                -e log_level='INFO' \
+                                -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
+                                -v '${TEMP_DIR}:${GOOGLE_DESTINATION_PATH}' \
+                                --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}'
+                                """
+                    }
+                }
+            } // Fedora Verifications - after master-node-failure
+
+            stage('KrknHub - master-node-cpu-hog') {
+              steps {
+                  script {
+                      // boolean value w/o ''
+                      sh """
+                          sudo podman run --rm -t \
+                          -e WORKLOAD='krknhub' \
+                          -e KRKNHUB_WORKLOAD='node-cpu-hog' \
+                          -e TEST_NAME='master-node-cpu-hog' \
+                          -e KRKNHUB_ENVIRONMENT_VARIABLES='${KRKNHUB_MASTERS_CPU_HOG_ENVIRONMENT_VARIABLES}' \
+                          -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' \
+                          -e PROVISION_KUBECONFIG_PATH='${PROVISION_KUBECONFIG_PATH}' \
+                          -e ELASTICSEARCH='${ELASTICSEARCH}' \
+                          -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' \
+                          -e IBM_REGION_NAME='${IBM_REGION_NAME}' \
+                          -e IBM_ENDPOINT_URL='${IBM_ENDPOINT_URL}' \
+                          -e IBM_ACCESS_KEY_ID='${IBM_ACCESS_KEY_ID}' \
+                          -e IBM_SECRET_ACCESS_KEY='${IBM_SECRET_ACCESS_KEY}' \
+                          -e IBM_BUCKET='${IBM_BUCKET}' \
+                          -e IBM_KEY='${IBM_KEY}' \
+                          -e GOOGLE_DRIVE_PATH='${GOOGLE_DRIVE_PATH}' \
+                          -e GOOGLE_DRIVE_CREDENTIALS_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_CREDENTIALS_FILE}' \
+                          -e GOOGLE_DRIVE_TOKEN_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_TOKEN_FILE}' \
+                          -e GOOGLE_DRIVE_SHARED_DRIVE_ID='${GOOGLE_DRIVE_SHARED_DRIVE_ID}' \
+                          -e RUN_ARTIFACTS_URL='${RUN_ARTIFACTS_URL}' \
+                          -e RUN_TYPE='${RUN_TYPE}' \
+                          -e SAVE_ARTIFACTS_LOCAL=${SAVE_ARTIFACTS_LOCAL} \
+                          -e TIMEOUT='${TIMEOUT}' \
+                          -e log_level='INFO' \
+                          -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
+                          -v '${TEMP_DIR}:${GOOGLE_DESTINATION_PATH}' \
+                          --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}'
+                      """
+                 }
+              }
+            } // KrknHub - master-node-cpu-hog
+
+            stage('Fedora Verifications - after master-node-cpu-hog') {
+                steps {
+                    script {
+                            sh """
+                                sudo podman run --rm -t \
+                                -e WORKLOAD='bootstorm_vm' \
+                                -e TEST_NAME='master-node-cpu-hog' \
+                                -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' \
+                                -e ELASTICSEARCH='${ELASTICSEARCH}' \
+                                -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' \
+                                -e IBM_REGION_NAME='${IBM_REGION_NAME}' \
+                                -e IBM_ENDPOINT_URL='${IBM_ENDPOINT_URL}' \
+                                -e IBM_ACCESS_KEY_ID='${IBM_ACCESS_KEY_ID}' \
+                                -e IBM_SECRET_ACCESS_KEY='${IBM_SECRET_ACCESS_KEY}' \
+                                -e IBM_BUCKET='${IBM_BUCKET}' \
+                                -e IBM_KEY='${IBM_KEY}' \
+                                -e GOOGLE_DRIVE_PATH='${GOOGLE_DRIVE_PATH}' \
+                                -e GOOGLE_DRIVE_CREDENTIALS_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_CREDENTIALS_FILE}' \
+                                -e GOOGLE_DRIVE_TOKEN_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_TOKEN_FILE}' \
+                                -e GOOGLE_DRIVE_SHARED_DRIVE_ID='${GOOGLE_DRIVE_SHARED_DRIVE_ID}' \
+                                -e RUN_ARTIFACTS_URL='${RUN_ARTIFACTS_URL}' \
+                                -e RUN_TYPE='${RUN_TYPE}' \
+                                -e SAVE_ARTIFACTS_LOCAL=${SAVE_ARTIFACTS_LOCAL} \
+                                -e SCALE='${BOOTSTORM_SCALE}' \
+                                -e SCALE_NODES='${SCALE_NODES}' \
+                                -e THREADS_LIMIT='${THREADS_LIMIT}' \
+                                -e DELETE_ALL=${DELETE_ALL} \
+                                -e VERIFICATION_ONLY=${VERIFICATION_ONLY} \
+                                -e TIMEOUT='${TIMEOUT}' \
+                                -e log_level='INFO' \
+                                -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
+                                -v '${TEMP_DIR}:${GOOGLE_DESTINATION_PATH}' \
+                                --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}'
+                                """
+                    }
+                }
+            } // Fedora Verifications - after master-node-cpu-hog
+
+
+       } // serial stages
+       } // Masters Chaos & verifications
+      } //parallel
+     } // Upgrade Masters & Chaos
+
+
+            stage('Upgrade Workers & Chaos') {
+            parallel {
+                stage('Upgrade Workers') {
+                            steps {
+                                script {
+                                    upgradeWorkersStartTime = System.currentTimeMillis()
+
+                                    echo "Running deployment for verify_bare_metal_upgrade_complete"
+
+                                    sh """
+                                        sudo podman run --rm \
+                                            -e UPGRADE_OCP_VERSION="${UPGRADE_OCP_VERSION}" \
+                                            -e UPGRADE_STEP='verify_bare_metal_upgrade_complete' \
+                                            -e RUN_TYPE="${RUN_TYPE}" \
+                                            -e UPGRADE_CHANNEL="${UPGRADE_CHANNEL}" \
+                                            -e LSO_VERSION="${LSO_VERSION}" \
+                                            -e ODF_VERSION="${ODF_VERSION}" \
+                                            -e CNV_VERSION="${CNV_VERSION}" \
+                                            -e EXPECTED_NODES='${EXPECTED_NODES}' \
+                                            -e KUBEADMIN_PASSWORD="${KUBEADMIN_PASSWORD}" \
+                                            -e TIMEOUT="${TIMEOUT}" \
+                                            -v "${KUBECONFIG_PATH}":"${KUBECONFIG_PATH}" \
+                                            --privileged "${QUAY_BENCHMARK_RUNNER_REPOSITORY}"
+                                    """
+
+                                    upgradeWorkersEndTime = System.currentTimeMillis()
+                                    def durationInSeconds = (upgradeWorkersEndTime - upgradeWorkersStartTime) / 1000
+                                    upgradeWorkersDurationInSeconds = "${durationInSeconds}"
+                                }
+                            }
+                        }// Upgrade Workers
+
+            // Parallel stage
+            stage('Workers Chaos & verifications') {
+            stages {
+
+            stage('Wait before Chaos begins') {
+                steps {
+                    script {
+                        echo 'Waiting 10 minutes (600 seconds) for upgrade to begin...'
+                        sleep(time: 10, unit: 'MINUTES')
+                    }
+                }
+            }
+
+            stage('KrknHub - worker-node-failure') {
+              steps {
+                  script {
+                      // boolean value w/o ''
+                      sh """
+                          sudo podman run --rm -t \
+                          -e WORKLOAD='krknhub' \
+                          -e KRKNHUB_WORKLOAD='node-scenarios' \
+                          -e TEST_NAME='worker-node-failure' \
+                          -e KRKNHUB_ENVIRONMENT_VARIABLES='${KRKNHUB_WORKER_0_NODE_FAILURE_ENVIRONMENT_VARIABLES}' \
+                          -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' \
+                          -e PROVISION_KUBECONFIG_PATH='${PROVISION_KUBECONFIG_PATH}' \
+                          -e ELASTICSEARCH='${ELASTICSEARCH}' \
+                          -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' \
+                          -e IBM_REGION_NAME='${IBM_REGION_NAME}' \
+                          -e IBM_ENDPOINT_URL='${IBM_ENDPOINT_URL}' \
+                          -e IBM_ACCESS_KEY_ID='${IBM_ACCESS_KEY_ID}' \
+                          -e IBM_SECRET_ACCESS_KEY='${IBM_SECRET_ACCESS_KEY}' \
+                          -e IBM_BUCKET='${IBM_BUCKET}' \
+                          -e IBM_KEY='${IBM_KEY}' \
+                          -e GOOGLE_DRIVE_PATH='${GOOGLE_DRIVE_PATH}' \
+                          -e GOOGLE_DRIVE_CREDENTIALS_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_CREDENTIALS_FILE}' \
+                          -e GOOGLE_DRIVE_TOKEN_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_TOKEN_FILE}' \
+                          -e GOOGLE_DRIVE_SHARED_DRIVE_ID='${GOOGLE_DRIVE_SHARED_DRIVE_ID}' \
+                          -e RUN_ARTIFACTS_URL='${RUN_ARTIFACTS_URL}' \
+                          -e RUN_TYPE='${RUN_TYPE}' \
+                          -e SAVE_ARTIFACTS_LOCAL=${SAVE_ARTIFACTS_LOCAL} \
+                          -e TIMEOUT='${TIMEOUT}' \
+                          -e log_level='INFO' \
+                          -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
+                          -v '${TEMP_DIR}:${GOOGLE_DESTINATION_PATH}' \
+                          --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}'
+                      """
+                 }
+              }
+            } // KrknHub - worker-node-failure
+
+        stage('Fedora Verifications - after worker-node-failure') {
+                steps {
+                    script {
+                            sh """
+                                sudo podman run --rm -t \
+                                -e WORKLOAD='bootstorm_vm' \
+                                -e TEST_NAME='worker-node-failure' \
+                                -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' \
+                                -e ELASTICSEARCH='${ELASTICSEARCH}' \
+                                -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' \
+                                -e IBM_REGION_NAME='${IBM_REGION_NAME}' \
+                                -e IBM_ENDPOINT_URL='${IBM_ENDPOINT_URL}' \
+                                -e IBM_ACCESS_KEY_ID='${IBM_ACCESS_KEY_ID}' \
+                                -e IBM_SECRET_ACCESS_KEY='${IBM_SECRET_ACCESS_KEY}' \
+                                -e IBM_BUCKET='${IBM_BUCKET}' \
+                                -e IBM_KEY='${IBM_KEY}' \
+                                -e GOOGLE_DRIVE_PATH='${GOOGLE_DRIVE_PATH}' \
+                                -e GOOGLE_DRIVE_CREDENTIALS_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_CREDENTIALS_FILE}' \
+                                -e GOOGLE_DRIVE_TOKEN_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_TOKEN_FILE}' \
+                                -e GOOGLE_DRIVE_SHARED_DRIVE_ID='${GOOGLE_DRIVE_SHARED_DRIVE_ID}' \
+                                -e RUN_ARTIFACTS_URL='${RUN_ARTIFACTS_URL}' \
+                                -e RUN_TYPE='${RUN_TYPE}' \
+                                -e SAVE_ARTIFACTS_LOCAL=${SAVE_ARTIFACTS_LOCAL} \
+                                -e SCALE='${BOOTSTORM_SCALE}' \
+                                -e SCALE_NODES='${SCALE_NODES}' \
+                                -e THREADS_LIMIT='${THREADS_LIMIT}' \
+                                -e DELETE_ALL=${DELETE_ALL} \
+                                -e VERIFICATION_ONLY=${VERIFICATION_ONLY} \
+                                -e TIMEOUT='${TIMEOUT}' \
+                                -e log_level='INFO' \
+                                -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
+                                -v '${TEMP_DIR}:${GOOGLE_DESTINATION_PATH}' \
+                                --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}'
+                                """
+                    }
+                }
+            } // Fedora Verifications - after worker-node-failure
+
+            stage('KrknHub - worker-node-cpu-hog') {
+              steps {
+                  script {
+                      // boolean value w/o ''
+                      sh """
+                          sudo podman run --rm -t \
+                          -e WORKLOAD='krknhub' \
+                          -e KRKNHUB_WORKLOAD='node-cpu-hog' \
+                          -e TEST_NAME='worker-node-cpu-hog' \
+                          -e KRKNHUB_ENVIRONMENT_VARIABLES='${KRKNHUB_WORKERS_CPU_HOG_ENVIRONMENT_VARIABLES}' \
+                          -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' \
+                          -e PROVISION_KUBECONFIG_PATH='${PROVISION_KUBECONFIG_PATH}' \
+                          -e ELASTICSEARCH='${ELASTICSEARCH}' \
+                          -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' \
+                          -e IBM_REGION_NAME='${IBM_REGION_NAME}' \
+                          -e IBM_ENDPOINT_URL='${IBM_ENDPOINT_URL}' \
+                          -e IBM_ACCESS_KEY_ID='${IBM_ACCESS_KEY_ID}' \
+                          -e IBM_SECRET_ACCESS_KEY='${IBM_SECRET_ACCESS_KEY}' \
+                          -e IBM_BUCKET='${IBM_BUCKET}' \
+                          -e IBM_KEY='${IBM_KEY}' \
+                          -e GOOGLE_DRIVE_PATH='${GOOGLE_DRIVE_PATH}' \
+                          -e GOOGLE_DRIVE_CREDENTIALS_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_CREDENTIALS_FILE}' \
+                          -e GOOGLE_DRIVE_TOKEN_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_TOKEN_FILE}' \
+                          -e GOOGLE_DRIVE_SHARED_DRIVE_ID='${GOOGLE_DRIVE_SHARED_DRIVE_ID}' \
+                          -e RUN_ARTIFACTS_URL='${RUN_ARTIFACTS_URL}' \
+                          -e RUN_TYPE='${RUN_TYPE}' \
+                          -e SAVE_ARTIFACTS_LOCAL=${SAVE_ARTIFACTS_LOCAL} \
+                          -e TIMEOUT='${TIMEOUT}' \
+                          -e log_level='INFO' \
+                          -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
+                          -v '${TEMP_DIR}:${GOOGLE_DESTINATION_PATH}' \
+                          --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}'
+                      """
+                 }
+              }
+            } // KrknHub - worker-node-cpu-hog
+
+            stage('Fedora Verifications - after worker-node-cpu-hog') {
+                steps {
+                    script {
+                            sh """
+                                sudo podman run --rm -t \
+                                -e WORKLOAD='bootstorm_vm' \
+                                -e TEST_NAME='worker-node-cpu-hog' \
+                                -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' \
+                                -e ELASTICSEARCH='${ELASTICSEARCH}' \
+                                -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' \
+                                -e IBM_REGION_NAME='${IBM_REGION_NAME}' \
+                                -e IBM_ENDPOINT_URL='${IBM_ENDPOINT_URL}' \
+                                -e IBM_ACCESS_KEY_ID='${IBM_ACCESS_KEY_ID}' \
+                                -e IBM_SECRET_ACCESS_KEY='${IBM_SECRET_ACCESS_KEY}' \
+                                -e IBM_BUCKET='${IBM_BUCKET}' \
+                                -e IBM_KEY='${IBM_KEY}' \
+                                -e GOOGLE_DRIVE_PATH='${GOOGLE_DRIVE_PATH}' \
+                                -e GOOGLE_DRIVE_CREDENTIALS_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_CREDENTIALS_FILE}' \
+                                -e GOOGLE_DRIVE_TOKEN_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_TOKEN_FILE}' \
+                                -e GOOGLE_DRIVE_SHARED_DRIVE_ID='${GOOGLE_DRIVE_SHARED_DRIVE_ID}' \
+                                -e RUN_ARTIFACTS_URL='${RUN_ARTIFACTS_URL}' \
+                                -e RUN_TYPE='${RUN_TYPE}' \
+                                -e SAVE_ARTIFACTS_LOCAL=${SAVE_ARTIFACTS_LOCAL} \
+                                -e SCALE='${BOOTSTORM_SCALE}' \
+                                -e SCALE_NODES='${SCALE_NODES}' \
+                                -e THREADS_LIMIT='${THREADS_LIMIT}' \
+                                -e DELETE_ALL=${DELETE_ALL} \
+                                -e VERIFICATION_ONLY=${VERIFICATION_ONLY} \
+                                -e TIMEOUT='${TIMEOUT}' \
+                                -e log_level='INFO' \
+                                -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
+                                -v '${TEMP_DIR}:${GOOGLE_DESTINATION_PATH}' \
+                                --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}'
+                                """
+                    }
+                }
+            } // Fedora Verifications - after worker-node-cpu-hog
+
+
+       } // serial stages
+       } // Workers Chaos & verifications
+      } //parallel
+     } // Upgrade Workers & Chaos
+
     } // stages
 
     post {
@@ -306,7 +556,7 @@ END
                     # Clean up the virtual environment
                     rm -rf venv
                     # Clean temp dir
-                    if [ -d "${TEMP_DIR}" ]; then
+                    if [[ -d "${TEMP_DIR}" ]]; then
                         sudo rm -rf "${TEMP_DIR}"
                         echo "Temporary directory '${TEMP_DIR}' deleted."
                     fi
@@ -320,10 +570,12 @@ END
                     Jenkins job: ${env.BUILD_URL}\nSee the console output for more details:  ${env.BUILD_URL}consoleFull\n\n
                 """, subject: msg, to: "${CONTACT_EMAIL1}"
             }
+            sh """ sudo podman run --rm -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' -e ELASTICSEARCH='${ELASTICSEARCH}' -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' -e CI_STATUS='failed' -e UPGRADE_MASTERS_DURATION_SECONDS='${upgradeMastersDurationInSeconds}' -e UPGRADE_WORKERS_DURATION_SECONDS='${upgradeWorkersDurationInSeconds}' -e RUN_TYPE='${RUN_TYPE}' -e log_level='INFO' -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}' """
         }
         success {
-            echo 'Triggering 05-PerfCI-Chaos-Verify-Windows-VMs-Deployment pipeline'
-            build job: '05-PerfCI-Chaos-Verify-Windows-VMs-Deployment', wait: false
+            sh """ sudo podman run --rm -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' -e ELASTICSEARCH='${ELASTICSEARCH}' -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' -e CI_STATUS='pass' -e UPGRADE_MASTERS_DURATION_SECONDS='${upgradeMastersDurationInSeconds}' -e UPGRADE_WORKERS_DURATION_SECONDS='${upgradeWorkersDurationInSeconds}' -e RUN_TYPE='${RUN_TYPE}' -e log_level='INFO' -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}' """
+            echo 'Triggering 05-PerfCI-Chaos-Verify-VMs-Deployment pipeline'
+            build job: '05-PerfCI-Chaos-Verify-VMs-Deployment', wait: false
         }
     }
 }

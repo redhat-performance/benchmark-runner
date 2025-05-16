@@ -170,8 +170,8 @@ END
             }
         }
         success {
-            echo 'Triggering 03-PerfCI-Choas-Windows-VMs-Deployment pipeline'
-            build job: '03-PerfCI-Choas-Windows-VMs-Deployment', wait: false
+            echo 'Triggering 03-PerfCI-Choas-VMs-Deployment pipeline'
+            build job: '03-PerfCI-Choas-VMs-Deployment', wait: false
         }
     }
 }
