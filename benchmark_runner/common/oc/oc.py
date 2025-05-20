@@ -148,7 +148,7 @@ class OC(SSH):
         version = self.run(f"{self._cli} get csv -n {namespace} -o jsonpath='{{.items[0].spec.version}}'")
         return '.'.join(version.split('.')[:2])
 
-    def wait_for_operator_installation(self, operator: str, version: str, namespace: str, timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
+    def wait_for_operator_installation(self, operator: str, version: str, namespace: str, timeout: int =  SHORT_TIMEOUT):
         """
         This method waits till operator version is installed successfully
         @param operator:
