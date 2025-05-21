@@ -23,7 +23,7 @@ RUN wget https://www.python.org/ftp/python/${python_full_version}/Python-${pytho
 # install & run benchmark-runner (--no-cache-dir for take always the latest)
 RUN python3.12 -m pip install --upgrade pip && python3.12 -m pip install --upgrade benchmark-runner
 
-# OCP client version passed dynamically
+# Passed dynamically
 ARG OCP_CLIENT_VERSION
 RUN  curl -L "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${OCP_CLIENT_VERSION}/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz" -o "/tmp/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz" \
      && tar -xzvf /tmp/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz -C /tmp/ \
@@ -31,9 +31,9 @@ RUN  curl -L "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${OCP_CL
      && mv /tmp/oc /usr/local/bin/oc \
      && rm -rf /tmp/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz /tmp/kubectl /tmp/oc
 
-# Install virtctl for VNC
-ARG virtctl_version="1.4.0"
-RUN curl -L "https://github.com/kubevirt/kubevirt/releases/download/v${virtctl_version}/virtctl-v${virtctl_version}-linux-amd64" -o /usr/local/bin/virtctl \
+# Passed dynamically
+ARG VIRTCTL_VERSION
+RUN curl -L "https://github.com/kubevirt/kubevirt/releases/download/v${VIRTCTL_VERSION}/virtctl-v${VIRTCTL_VERSION}-linux-amd64" -o /usr/local/bin/virtctl \
     && chmod +x /usr/local/bin/virtctl
 
 # Activate root alias
@@ -57,6 +57,6 @@ COPY benchmark_runner/main/main.py /benchmark_runner/main/main.py
 
 CMD [ "python3.12", "/benchmark_runner/main/main.py"]
 
-# oc: https://www.ibm.com/docs/en/fci/6.5.1?topic=steps-setting-up-installation-server
-# sudo podman build -t quay.io/benchmark-runner/benchmark-runner:latest . --no-cache
+# How to build the Dockerfile ?
+# sudo podman build --build-arg OCP_CLIENT_VERSION=$OCP_CLIENT_VERSION--build-arg VIRTCTL_VERSION=$VIRTCTL_VERSION-t quay.io/benchmark-runner/benchmark-runner:latest . --no-cache
 # sudo podman run --rm -it -v /root/.kube/:/root/.kube/ -v /etc/hosts:/etc/hosts --privileged quay.io/benchmark-runner/benchmark-runner:latest /bin/bash
