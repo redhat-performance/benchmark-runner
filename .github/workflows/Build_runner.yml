@@ -97,8 +97,8 @@ jobs:
         run: |
           pip install setuptools
           version=$(python3 setup.py --version)
-          sudo docker build --build-arg VERSION=$version -t ${{ secrets.QUAY_PRIVATE_BENCHMARK_RUNNER_REPOSITORY }}:v$version .
-          sudo docker build --build-arg VERSION=latest -t ${{ secrets.QUAY_PRIVATE_BENCHMARK_RUNNER_REPOSITORY }}:latest .
+          sudo docker build --build-arg OCP_CLIENT_VERSION=${{ secrets.PERF_OCP_CLIENT_VERSION }} --build-arg VIRTCTL_VERSION=${{ secrets.PERF_VIRTCTL_VERSION }} -t ${{ secrets.QUAY_PRIVATE_BENCHMARK_RUNNER_REPOSITORY }}:v$version .
+          sudo docker build --build-arg OCP_CLIENT_VERSION=${{ secrets.PERF_OCP_CLIENT_VERSION }} --build-arg VIRTCTL_VERSION=${{ secrets.PERF_VIRTCTL_VERSION }} -t ${{ secrets.QUAY_PRIVATE_BENCHMARK_RUNNER_REPOSITORY }}:latest .
           sudo docker login quay.io -u ${{ secrets.QUAY_ROBOT_USER }} -p ${{ secrets.QUAY_ROBOT_PASSWORD }}
           sudo docker push ${{ secrets.QUAY_PRIVATE_BENCHMARK_RUNNER_REPOSITORY }}:v$version
           sudo docker push ${{ secrets.QUAY_PRIVATE_BENCHMARK_RUNNER_REPOSITORY }}:latest
@@ -117,7 +117,7 @@ jobs:
           python-version: 3.12
       - name: ⌛ Build and Upload 🐋 to quay.io
         run: |
-          sudo docker build --build-arg VERSION=latest -t ${{ secrets.QUAY_BENCHMARK_RUNNER_REPOSITORY }}:latest .
+          sudo docker build --build-arg OCP_CLIENT_VERSION=${{ secrets.PERF_OCP_CLIENT_VERSION }} --build-arg VIRTCTL_VERSION=${{ secrets.PERF_VIRTCTL_VERSION }} -t ${{ secrets.QUAY_BENCHMARK_RUNNER_REPOSITORY }}:latest .
           sudo docker login quay.io -u ${{ secrets.QUAY_ROBOT_BENCHMARK_RUNNER_USER }} -p ${{ secrets.QUAY_ROBOT_BENCHMARK_RUNNER_PASSWORD }}
           sudo docker push ${{ secrets.QUAY_BENCHMARK_RUNNER_REPOSITORY }}:latest
           echo '⌛ Wait 30 sec till image will be updated in quay.io'
