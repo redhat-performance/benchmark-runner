@@ -5,7 +5,6 @@ from multiprocessing import Process, Manager
 
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 from benchmark_runner.common.elasticsearch.elasticsearch_exceptions import ElasticSearchDataNotUploaded
-from benchmark_runner.workloads.workloads_exceptions import MissingVMs
 from benchmark_runner.workloads.workloads_operations import WorkloadsOperations
 from benchmark_runner.common.oc.oc import VMStatus
 
@@ -274,7 +273,7 @@ class BootstormVM(WorkloadsOperations):
         try:
             vm_names = self._oc._get_all_vm_names()
             if not vm_names:
-                raise MissingVMs()
+                logger.info("No running VMs")
 
             upgrade_done = True
             failure_vms = []  # List to store failed VM names
