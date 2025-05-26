@@ -216,7 +216,8 @@ class BootstormVM(WorkloadsOperations):
 
             try:
                 with open(error_log_path, "w") as error_log_file:
-                    error_log_file.write(self._oc.get_vm_status(vm_name=vm_name) + "\n\n")
+                    error_log_file.write(self._oc.get_vm_status(vm_name=vm_name) + "\n")
+                    error_log_file.write("Running node: " + self._oc.get_vm_node(vm_name=vm_name) + "\n\n")
                     error_log_file.write(str(status_message) + "\n")
             except Exception as write_err:
                 logger.error(f"Failed to write error log for {vm_name}: {write_err}")
