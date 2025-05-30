@@ -236,12 +236,16 @@ class BootstormVM(WorkloadsOperations):
         self._oc.save_describe_yml(vm_name, str(vm_access).lower() == 'true', output_dir=self._run_artifacts_path)
         return_dict[vm_name] = vm_access
 
-    def _verify_vms_access_in_parallel(self, vm_names):
+    def _verify_vms_access_in_parallel(self, vm_names: list):
         """
-        This method verifies VM access in parallel
-        :param vm_names:
-        :return:
+        Verifies access to a list of VMs in parallel using subprocesses.
+
+        :param vm_names: List of VM names to verify.
+        :return: List of VM names that failed the access verification.
         """
+        if not vm_names:
+            return []
+
         failure_vms = []
         manager = Manager()
         return_dict = manager.dict()
@@ -265,17 +269,15 @@ class BootstormVM(WorkloadsOperations):
                 failure_vms.append(vm_name)
         return failure_vms
 
-    def _verify_vms_access(self, delay=10):
+    def _verify_vms_access(self, vm_names: list, delay=10):
         """
         This method verifies access for each VM
         It prepares the data for ElasticSearch, generates a must-gather in case of an error, and uploads it to Google Drive.
         :param delay: delay between each iteration
         """
         try:
-            vm_names = self._oc._get_all_vm_names()
             if not vm_names:
-                logger.info("No running VMs")
-
+                return []
             upgrade_done = True
             failure_vms = []  # List to store failed VM names
 
@@ -406,7 +408,11 @@ class BootstormVM(WorkloadsOperations):
     def run_vm_workload(self):
         # verification only w/o running or deleting any resource
         if self._verification_only:
-            self._verify_vms_access()
+            vm_names = self._oc._get_all_vm_names()
+            if vm_names:
+                self._verify_vms_access(vm_names)
+            else:
+                logger.info("No running VMs")
         else:
             if not self._scale:
                 self._run_vm()
