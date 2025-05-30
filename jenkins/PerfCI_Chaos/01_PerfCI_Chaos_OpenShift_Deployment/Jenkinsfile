@@ -5,7 +5,7 @@ pipeline {
     environment {
         INSTALL_OCP_VERSION = credentials('perfci_upgrade_current_ocp_version')
         OCP_BUILD = credentials('perfci_upgrade_current_ocp_build')
-        CONTACT_EMAIL1 = credentials('perfci_contact_email1')
+        CONTACT_EMAIL = credentials('perfci_contact_email')
         PROVISION_PRIVATE_KEY_FILE = credentials('perfci_provision_private_key_file')
         PROVISION_IP = credentials('perfci_provision_ip')
         PROVISION_USER = credentials('perfci_provision_user')
@@ -210,7 +210,7 @@ END
                 msg = "Build error for ${env.JOB_NAME} ${env.BUILD_NUMBER} (${env.BUILD_URL})"
                 emailext body: """\
                     Jenkins job: ${env.BUILD_URL}\nSee the console output for more details:  ${env.BUILD_URL}consoleFull\n\n
-                """, subject: msg, to: "${CONTACT_EMAIL1}"
+                """, subject: msg, to: "${CONTACT_EMAIL}"
             }
         }
         success {

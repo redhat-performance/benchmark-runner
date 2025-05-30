@@ -1,0 +1,126 @@
+pipeline {
+    agent {
+        label 'PerfCi'
+    }
+    environment {
+        CONTACT_EMAIL = credentials('perfci_contact_email')
+        ELASTICSEARCH = credentials('perfci_elasticsearch')
+        ELASTICSEARCH_PORT = credentials('perfci_elasticsearch_port')
+        QUAY_BENCHMARK_RUNNER_REPOSITORY = credentials('perfci_quay_repository')
+        KUBEADMIN_PASSWORD = readFile('/home/jenkins/.kube/kubeadmin-password').trim()
+        KUBECONFIG_PATH = '/root/.kube/config'
+        SCALE_NODES = credentials('perfci_scale_nodes')
+        DELETE_ALL = 'False' // Not delete the running VMs
+        RUN_STRATEGY = 'True' // runStrategy: Always for NHC/ SNR operators
+        RUN_TYPE = 'chaos_ci'
+        BOOTSTORM_SCALE = 120
+        THREADS_LIMIT= 20
+        TIMEOUT = 7200
+    }
+    stages {
+        stage('Cleanup') {
+            steps {
+                script {
+                        // Clean the Jenkins workspace
+                        echo "Cleaning Jenkins workspace"
+                        deleteDir()
+                        sh '''
+                            # Check if the image exists
+                            if [[ -n "$(sudo podman images -q "${QUAY_BENCHMARK_RUNNER_REPOSITORY}" 2> /dev/null)" ]]; then
+
+
+                                # Get containers using the image
+                                containers=$(sudo podman ps -a --filter ancestor="${QUAY_BENCHMARK_RUNNER_REPOSITORY}" -q)
+
+                                if [[ "$containers" != "" ]]; then
+                                    echo "Stopping and removing containers using the image..."
+                                    sudo podman stop $containers
+                                    sudo podman rm -f $containers
+                                fi
+
+                                # Now remove the image
+                                sudo podman rmi -f $(sudo podman images -q "${QUAY_BENCHMARK_RUNNER_REPOSITORY}" 2> /dev/null)
+                            fi
+                        '''
+                }
+            }
+        }
+
+        // Pulling fedora quay.io image per worker node
+        stage('Pulling Fedora image') {
+            steps {
+                script {
+                    sh """
+                        sudo podman run --rm -t \
+                        -e WORKLOAD='bootstorm_vm' \
+                        -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' \
+                        -e SCALE='1' \
+                        -e SCALE_NODES='${SCALE_NODES}' \
+                        -e THREADS_LIMIT='${THREADS_LIMIT}' \
+                        -e TIMEOUT='${TIMEOUT}' \
+                        -e log_level='INFO' \
+                        -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
+                        --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}'
+                        """
+                } //script
+            }
+        } // Pulling Fedora image
+
+        stage('Fedora Deployment') {
+            steps {
+                script {
+                    sh """
+                        sudo podman run --rm -t \
+                        -e WORKLOAD='bootstorm_vm' \
+                        -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' \
+                        -e ELASTICSEARCH='${ELASTICSEARCH}' \
+                        -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' \
+                        -e RUN_TYPE='${RUN_TYPE}' \
+                        -e SCALE='${BOOTSTORM_SCALE}' \
+                        -e SCALE_NODES='${SCALE_NODES}' \
+                        -e THREADS_LIMIT='${THREADS_LIMIT}' \
+                        -e DELETE_ALL=${DELETE_ALL} \
+                        -e RUN_STRATEGY=${RUN_STRATEGY} \
+                        -e TIMEOUT='${TIMEOUT}' \
+                        -e log_level='INFO' \
+                        -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
+                        --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}'
+                        """
+                } //script
+            }
+        } // Fedora Deployment
+
+    } // stages
+
+    post {
+        always {
+            script {
+                sh '''
+                    sudo podman ps -a --filter "name=benchmark-runner" -q | xargs -r podman rm -f
+                    # Clean up the virtual environment
+                    rm -rf venv
+                    # Clean temp dir
+                    if [[ -d "${TEMP_DIR}" ]]; then
+                        sudo rm -rf "${TEMP_DIR}"
+                        echo "Temporary directory '${TEMP_DIR}' deleted."
+                    fi
+                '''
+            }
+        }
+        failure {
+            script {
+                sh """ sudo podman run --rm -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' -e ELASTICSEARCH='${ELASTICSEARCH}' -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' -e CI_STATUS='failed' -e RUN_TYPE='${RUN_TYPE}' -e log_level='INFO' -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}' """
+                msg = "Build error for ${env.JOB_NAME} ${env.BUILD_NUMBER} (${env.BUILD_URL})"
+                emailext body: """\
+                    Jenkins job: ${env.BUILD_URL}\nSee the console output for more details:  ${env.BUILD_URL}consoleFull\n\n
+                """, subject: msg, to: "${CONTACT_EMAIL}"
+            }
+        }
+        success {
+            script {
+                echo 'Triggering 04-PerfCI-Chaos-Upgrade-OpenShift-Deployment pipeline'
+                build job: '04-PerfCI-Chaos-Upgrade-OpenShift-Deployment', wait: false
+            }
+        }
+    }
+}
