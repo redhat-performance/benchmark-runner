@@ -3,7 +3,7 @@ pipeline {
         label 'PerfCi'
     }
     environment {
-        CONTACT_EMAIL1 = credentials('perfci_contact_email1')
+        CONTACT_EMAIL = credentials('perfci_contact_email')
         ELASTICSEARCH = credentials('perfci_elasticsearch')
         ELASTICSEARCH_PORT = credentials('perfci_elasticsearch_port')
         GRAFANA_URL = credentials('perfci_grafana_url')
@@ -215,7 +215,7 @@ pipeline {
                 msg = "Build error for ${env.JOB_NAME} ${env.BUILD_NUMBER} (${env.BUILD_URL})"
                 emailext body: """\
                     Jenkins job: ${env.BUILD_URL}\nSee the console output for more details:  ${env.BUILD_URL}consoleFull\n\n
-                """, subject: msg, to: "${CONTACT_EMAIL1}"
+                """, subject: msg, to: "${CONTACT_EMAIL}"
             }
         }
         success {
