@@ -166,7 +166,7 @@ class BootstormVM(WorkloadsOperations):
 
     def _verify_single_vm_access(self, vm_name, retries=5, delay=10):
         """
-        This method verifies single vm access using a retry mechanism
+        This method verifies access to a single VM using a retry mechanism, and saves the error and YAML file in case of failure
         :param vm_name: The name of the VM to verify.
         :param retries: Number of retry attempts.
         :param delay: Time to wait (in seconds) between retries.
@@ -214,8 +214,11 @@ class BootstormVM(WorkloadsOperations):
             status_message = self._data_dict.get('access_status') or "No status available"
 
             try:
+                self._oc.save_to_yaml(vm_name, str(access_status).lower() == 'true', output_dir=self._run_artifacts_path)
+                self._oc.save_describe_yaml(vm_name, str(access_status).lower() == 'true', output_dir=self._run_artifacts_path)
                 with open(error_log_path, "w") as error_log_file:
                     error_log_file.write(self._oc.get_vm_status(vm_name=vm_name) + "\n")
+                    error_log_file.write("VM Status: " + access_status + "\n")
                     error_log_file.write("Running node: " + self._oc.get_vm_node(vm_name=vm_name) + "\n\n")
                     error_log_file.write(str(status_message) + "\n")
             except Exception as write_err:
@@ -231,9 +234,7 @@ class BootstormVM(WorkloadsOperations):
         :param return_dict:
         :return:
         """
-        self._oc.save_to_yaml(vm_name, output_dir=self._run_artifacts_path)
         vm_access = self._verify_single_vm_access(vm_name)
-        self._oc.save_describe_yml(vm_name, str(vm_access).lower() == 'true', output_dir=self._run_artifacts_path)
         return_dict[vm_name] = vm_access
 
     def _verify_vms_access_in_parallel(self, vm_names: list):
