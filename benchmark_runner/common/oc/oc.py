@@ -1582,21 +1582,24 @@ class OC(SSH):
                     raise RuntimeError(f"Failed to remove folder {folder_path}: {remove_error}")
             raise RuntimeError(f"Failed to generate CNV must-gather logs for version {cnv_version}: {e}")
 
-    def save_to_yaml(self, vm_name, output_dir='/tmp', namespace: str = environment_variables.environment_variables_dict['namespace']):
+    def save_to_yaml(self, vm_name, vm_access, output_dir='/tmp', namespace: str = environment_variables.environment_variables_dict['namespace']):
         """
         This method save pod and vm into yaml per namespace
         :param vm_name:
+        :param vm_access: True is vm accessible, if not there is no pod launcher
         :param namespace:
         :param output_dir:
         :return:
         """
-        self.run(f"oc get vmi '{vm_name}' -n '{namespace}' -o yaml > '{output_dir}/{vm_name}.yaml'")
-        pod_name = self.run(
-            f"oc get pod -n '{namespace}' -o jsonpath=\"{{.items[?(@.metadata.generateName=='virt-launcher-{vm_name}-')].metadata.name}}\""
-        )
-        self.run(f"oc get pod '{pod_name}' -n '{namespace}' -o yaml > '{output_dir}/{pod_name}.yaml'")
+        self.run(f"oc get vm '{vm_name}' -n '{namespace}' -o yaml > '{output_dir}/vm-{vm_name}.yaml'")
+        if vm_access:
+            self.run(f"oc get vmi '{vm_name}' -n '{namespace}' -o yaml > '{output_dir}/vmi-{vm_name}.yaml'")
+            pod_name = self.run(
+                f"oc get pod -n '{namespace}' -o jsonpath=\"{{.items[?(@.metadata.generateName=='virt-launcher-{vm_name}-')].metadata.name}}\""
+            )
+            self.run(f"oc get pod '{pod_name}' -n '{namespace}' -o yaml > '{output_dir}/{pod_name}.yaml'")
 
-    def save_describe_yml(self, vm_name, vm_access, output_dir='/tmp', namespace: str = environment_variables.environment_variables_dict['namespace']):
+    def save_describe_yaml(self, vm_name, vm_access, output_dir='/tmp', namespace: str = environment_variables.environment_variables_dict['namespace']):
         """
         This method save pod and vm into yaml per namespace
         :param vm_name:
@@ -1605,11 +1608,10 @@ class OC(SSH):
         :param output_dir:
         :return:
         """
+        self.run(f"oc describe vm '{vm_name}' -n '{namespace}' > '{output_dir}/describe-vm-{vm_name}.yaml'")
         if vm_access:
-            self.run(f"oc describe vmi '{vm_name}' -n '{namespace}' > '{output_dir}/describe_vmi_{vm_name}.yaml'")
+            self.run(f"oc describe vmi '{vm_name}' -n '{namespace}' > '{output_dir}/describe-vmi-{vm_name}.yaml'")
             pod_name = self.run(
                 f'oc get pod -n {namespace} -o jsonpath="{{.items[?(@.metadata.generateName==\'virt-launcher-{vm_name}-\')].metadata.name}}"'
             )
-            self.run(f"oc describe pod '{pod_name}' -n '{namespace}' > '{output_dir}/describe_pod_{pod_name}.yaml'")
-        else:
-            self.run(f"oc describe vm '{vm_name}' -n '{namespace}' > '{output_dir}/describe_vm_{vm_name}.yaml'")
+            self.run(f"oc describe pod '{pod_name}' -n '{namespace}' > '{output_dir}/describe-pod-{pod_name}.yaml'")
