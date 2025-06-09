@@ -26,6 +26,30 @@ class UpdateGrafanaLatestValueMappings:
         self.main_libsonnet_path = main_libsonnet_path
         self.value_mappings = self.get_value_mappings()
 
+    @staticmethod
+    def _normalize_version_for_grafana(version: str) -> str:
+        """
+        Normalizes a version string for Grafana, then strips all non-digit characters.
+
+        Examples:
+            '4.14.0-ec.2' -> '414002'
+            '4.15.0-rc.3' -> '415013'
+            '4.15.5' -> '4155'
+
+        Returns:
+            A normalized numeric string, replacing '-ec.' with '0' and '-rc.' with '1' if present;
+            otherwise returns the version string with all non-digit characters removed.
+        """
+        qualifiers = {'-ec.': '0', '-rc.': '1'}
+        for qualifier, replacement in qualifiers.items():
+            if qualifier in version:
+                replaced = version.replace(qualifier, replacement)
+                digits_only = ''.join(c for c in replaced if c.isdigit())
+                return digits_only
+
+        # No qualifier found; return only digits from the original version
+        return ''.join(c for c in version if c.isdigit())
+
     def get_last_elasticsearch_versions(self, last_es_fetch_days=LAST_ES_FETCH_DAYS):
         """
         This method fetches new versions from ElasticSearch
@@ -42,10 +66,11 @@ class UpdateGrafanaLatestValueMappings:
         display_versions = ['ocp_version', 'cnv_version', 'kata_version', 'kata_rpm_version', 'odf_version']
         for id in ids:
             data = self.elasticsearch.get_elasticsearch_index_by_id(index='ci-status', id=id)
-            for version, value in data['_source'].items():
-                if version in display_versions and value not in new_versions.values() and len(value) < self.MAX_VERSION_LEN:
-                    # Display only numbers in the Grafana panel, removing characters
-                    new_versions[value.translate(str.maketrans('', '', '.-rcef'))] = value
+            for resource, version in data['_source'].items():
+                if resource in display_versions and version not in new_versions.values() and len(version) < self.MAX_VERSION_LEN:
+                    # Normalize version for Grafana panel if it contains non-digit characters
+                    normalized = self._normalize_version_for_grafana(version)
+                    new_versions[normalized] = version
 
         return new_versions
 
@@ -88,9 +113,11 @@ class UpdateGrafanaLatestValueMappings:
         max_index, max_key = sorted_mapping[-1][1]['index'], sorted_mapping[-1][0]
 
         num = 1
-        for key, value in last_versions.items():
-            if not self.value_mappings.get(key):
-                self.value_mappings[key] = {"index": int(max_index) + num, "text": value}
+        for version_key, version in last_versions.items():
+            if not self.value_mappings.get(version_key) or self.value_mappings[version_key]['text'] != version:
+                # Normalize version for Grafana panel
+                normalized = self._normalize_version_for_grafana(version)
+                self.value_mappings[normalized] = {"index": int(max_index) + num, "text": version}
                 num += 1
 
     def update_main_libsonnet(self):
