@@ -8,7 +8,7 @@ pipeline {
         CNV_VERSION = credentials('perfci_upgrade_current_cnv_version')
         LSO_VERSION = credentials('perfci_upgrade_current_lso_version')
         ODF_VERSION = credentials('perfci_upgrade_current_odf_version')
-        CONTACT_EMAIL1 = credentials('perfci_contact_email1')
+        CONTACT_EMAIL = credentials('perfci_contact_email')
         PROVISION_USER = credentials('perfci_provision_user')
         PROVISION_IP = credentials('perfci_provision_ip')
         WORKER_DISK_IDS = credentials('perfci_worker_disk_ids')
@@ -166,12 +166,12 @@ END
                 msg = "Build error for ${env.JOB_NAME} ${env.BUILD_NUMBER} (${env.BUILD_URL})"
                 emailext body: """\
                     Jenkins job: ${env.BUILD_URL}\nSee the console output for more details:  ${env.BUILD_URL}consoleFull\n\n
-                """, subject: msg, to: "${CONTACT_EMAIL1}"
+                """, subject: msg, to: "${CONTACT_EMAIL}"
             }
         }
         success {
-            echo 'Triggering 03-PerfCI-Choas-Windows-VMs-Deployment pipeline'
-            build job: '03-PerfCI-Choas-Windows-VMs-Deployment', wait: false
+            echo 'Triggering 03-PerfCI-Chaos-VMs-Deployment pipeline'
+            build job: '03-PerfCI-Chaos-VMs-Deployment', wait: false
         }
     }
 }
