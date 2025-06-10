@@ -92,6 +92,8 @@ class EnvironmentVariables:
         self._environment_variables_dict['run_strategy'] = EnvironmentVariables.get_boolean_from_environment('RUN_STRATEGY', False)
         # Verification only, without running or deleting any resources, default False
         self._environment_variables_dict['verification_only'] = EnvironmentVariables.get_boolean_from_environment('VERIFICATION_ONLY', False)
+        # Collect CNV/ODF must-gather logs in case of VM verification failure (default: False).
+        self._environment_variables_dict['must_gather_log'] = EnvironmentVariables.get_boolean_from_environment('MUST_GATHER_LOG', False)
         # test name
         self._environment_variables_dict['test_name'] = EnvironmentVariables.get_env('TEST_NAME', '')
 
