@@ -34,6 +34,9 @@ pipeline {
         PROVISION_KUBECONFIG_PATH = '/root/.kube/config' // required for krknhub
         DELETE_ALL = 'False' // Not delete the running VMs
         VERIFICATION_ONLY = 'True'
+        MUST_GATHER_LOG = 'True'
+        SAVE_ARTIFACTS_LOCAL = 'False'
+        LOCAL_LOG_PATH = '/tmp/benchmark-runner-run-artifacts' // set SAVE_ARTIFACTS_LOCAL = 'True'
         RUN_TYPE = 'chaos_ci'
         BOOTSTORM_SCALE = 120
         THREADS_LIMIT = 20
@@ -150,8 +153,10 @@ pipeline {
                           -e GOOGLE_DRIVE_TOKEN_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_TOKEN_FILE}' \
                           -e GOOGLE_DRIVE_SHARED_DRIVE_ID='${GOOGLE_DRIVE_SHARED_DRIVE_ID}' \
                           -e RUN_TYPE='${RUN_TYPE}' \
+                          -e SAVE_ARTIFACTS_LOCAL=${SAVE_ARTIFACTS_LOCAL} \
                           -e TIMEOUT='${TIMEOUT}' \
                           -e log_level='INFO' \
+                          -v '${LOCAL_LOG_PATH}:${LOCAL_LOG_PATH}' \
                           -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
                           -v '${TEMP_DIR}:${GOOGLE_DESTINATION_PATH}' \
                           --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}'
@@ -180,8 +185,11 @@ pipeline {
                                 -e THREADS_LIMIT='${THREADS_LIMIT}' \
                                 -e DELETE_ALL=${DELETE_ALL} \
                                 -e VERIFICATION_ONLY=${VERIFICATION_ONLY} \
+                                -e MUST_GATHER_LOG=${MUST_GATHER_LOG} \
+                                -e SAVE_ARTIFACTS_LOCAL=${SAVE_ARTIFACTS_LOCAL} \
                                 -e TIMEOUT='${TIMEOUT}' \
                                 -e log_level='INFO' \
+                                -v '${LOCAL_LOG_PATH}:${LOCAL_LOG_PATH}' \
                                 -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
                                 -v '${TEMP_DIR}:${GOOGLE_DESTINATION_PATH}' \
                                 --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}'
@@ -209,8 +217,10 @@ pipeline {
                           -e GOOGLE_DRIVE_TOKEN_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_TOKEN_FILE}' \
                           -e GOOGLE_DRIVE_SHARED_DRIVE_ID='${GOOGLE_DRIVE_SHARED_DRIVE_ID}' \
                           -e RUN_TYPE='${RUN_TYPE}' \
+                          -e SAVE_ARTIFACTS_LOCAL=${SAVE_ARTIFACTS_LOCAL} \
                           -e TIMEOUT='${TIMEOUT}' \
                           -e log_level='INFO' \
+                          -v '${LOCAL_LOG_PATH}:${LOCAL_LOG_PATH}' \
                           -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
                           -v '${TEMP_DIR}:${GOOGLE_DESTINATION_PATH}' \
                           --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}'
@@ -239,8 +249,11 @@ pipeline {
                                 -e THREADS_LIMIT='${THREADS_LIMIT}' \
                                 -e DELETE_ALL=${DELETE_ALL} \
                                 -e VERIFICATION_ONLY=${VERIFICATION_ONLY} \
+                                -e MUST_GATHER_LOG=${MUST_GATHER_LOG} \
+                                -e SAVE_ARTIFACTS_LOCAL=${SAVE_ARTIFACTS_LOCAL} \
                                 -e TIMEOUT='${TIMEOUT}' \
                                 -e log_level='INFO' \
+                                -v '${LOCAL_LOG_PATH}:${LOCAL_LOG_PATH}' \
                                 -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
                                 -v '${TEMP_DIR}:${GOOGLE_DESTINATION_PATH}' \
                                 --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}'
@@ -320,8 +333,10 @@ pipeline {
                           -e GOOGLE_DRIVE_TOKEN_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_TOKEN_FILE}' \
                           -e GOOGLE_DRIVE_SHARED_DRIVE_ID='${GOOGLE_DRIVE_SHARED_DRIVE_ID}' \
                           -e RUN_TYPE='${RUN_TYPE}' \
+                          -e SAVE_ARTIFACTS_LOCAL=${SAVE_ARTIFACTS_LOCAL} \
                           -e TIMEOUT='${TIMEOUT}' \
                           -e log_level='INFO' \
+                          -v '${LOCAL_LOG_PATH}:${LOCAL_LOG_PATH}' \
                           -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
                           -v '${TEMP_DIR}:${GOOGLE_DESTINATION_PATH}' \
                           --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}'
@@ -350,8 +365,11 @@ pipeline {
                                 -e THREADS_LIMIT='${THREADS_LIMIT}' \
                                 -e DELETE_ALL=${DELETE_ALL} \
                                 -e VERIFICATION_ONLY=${VERIFICATION_ONLY} \
+                                -e MUST_GATHER_LOG=${MUST_GATHER_LOG} \
+                                -e SAVE_ARTIFACTS_LOCAL=${SAVE_ARTIFACTS_LOCAL} \
                                 -e TIMEOUT='${TIMEOUT}' \
                                 -e log_level='INFO' \
+                                -v '${LOCAL_LOG_PATH}:${LOCAL_LOG_PATH}' \
                                 -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
                                 -v '${TEMP_DIR}:${GOOGLE_DESTINATION_PATH}' \
                                 --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}'
@@ -379,8 +397,10 @@ pipeline {
                           -e GOOGLE_DRIVE_TOKEN_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_TOKEN_FILE}' \
                           -e GOOGLE_DRIVE_SHARED_DRIVE_ID='${GOOGLE_DRIVE_SHARED_DRIVE_ID}' \
                           -e RUN_TYPE='${RUN_TYPE}' \
+                          -e SAVE_ARTIFACTS_LOCAL=${SAVE_ARTIFACTS_LOCAL} \
                           -e TIMEOUT='${TIMEOUT}' \
                           -e log_level='INFO' \
+                          -v '${LOCAL_LOG_PATH}:${LOCAL_LOG_PATH}' \
                           -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
                           -v '${TEMP_DIR}:${GOOGLE_DESTINATION_PATH}' \
                           --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}'
@@ -409,8 +429,11 @@ pipeline {
                                 -e THREADS_LIMIT='${THREADS_LIMIT}' \
                                 -e DELETE_ALL=${DELETE_ALL} \
                                 -e VERIFICATION_ONLY=${VERIFICATION_ONLY} \
+                                -e MUST_GATHER_LOG=${MUST_GATHER_LOG} \
+                                -e SAVE_ARTIFACTS_LOCAL=${SAVE_ARTIFACTS_LOCAL} \
                                 -e TIMEOUT='${TIMEOUT}' \
                                 -e log_level='INFO' \
+                                -v '${LOCAL_LOG_PATH}:${LOCAL_LOG_PATH}' \
                                 -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
                                 -v '${TEMP_DIR}:${GOOGLE_DESTINATION_PATH}' \
                                 --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}'
