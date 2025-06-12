@@ -101,11 +101,24 @@ class OC(SSH):
 
     def upgrade_in_progress(self):
         """
-        This method returns True when an upgrade is in progress and False when it is not.
+        This method returns True if an upgrade is in progress and False otherwise, with retries on transient failures.
         @return: bool
         """
-        status = self.run(f"{self._cli} get clusterversion version -o jsonpath='{{.status.conditions[?(@.type==\"Progressing\")].status}}'")
-        return status == 'True'
+        for i in range(1, self.RETRIES + 1):
+            try:
+                status = self.run(
+                    f"{self._cli} get clusterversion version "
+                    "-o jsonpath='{{.status.conditions[?(@.type==\"Progressing\")].status}}'"
+                ).strip()
+                return status == 'True'
+            except Exception as e:
+                logger.warning(f"[upgrade_in_progress] attempt {i}/{self.RETRIES} failed: {e}")
+                time.sleep(self.DELAY)
+        # Final attempt (will bubble if it fails)
+        return self.run(
+            f"{self._cli} get clusterversion version "
+            "-o jsonpath='{{.status.conditions[?(@.type==\"Progressing\")].status}}'"
+        ).strip() == 'True'
 
     @logger_time_stamp
     def wait_for_ocp_upgrade_start(self, upgrade_version: str, timeout: int = SHORT_TIMEOUT):
