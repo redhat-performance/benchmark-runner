@@ -123,16 +123,19 @@ class OC(SSH):
     @logger_time_stamp
     def wait_for_ocp_upgrade_start(self, upgrade_version: str, timeout: int = SHORT_TIMEOUT):
         """
-        This method waits for ocp upgrade to start
-        :param upgrade_version:
-        :param timeout:
-        :return:
+        This method waits for the OCP upgrade to start.
+        :param upgrade_version: The target OCP version.
+        :param timeout: Timeout in seconds (waits indefinitely if <= 0).
+        :return: True if upgrade starts within timeout, else raises UpgradeNotStartTimeout.
         """
         current_wait_time = 0
-        while timeout <= 0 or current_wait_time <= timeout and not self.upgrade_in_progress():
-            # sleep for x seconds
+        while timeout <= 0 or current_wait_time <= timeout:
+            if self.upgrade_in_progress():
+                return True
             time.sleep(OC.SLEEP_TIME)
             current_wait_time += OC.SLEEP_TIME
+
+        # Final check after timeout
         if self.upgrade_in_progress():
             return True
         else:
