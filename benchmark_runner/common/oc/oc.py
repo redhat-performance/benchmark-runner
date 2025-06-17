@@ -1536,6 +1536,29 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
+    def generate_must_gather(self, destination_path: str = '/tmp'):
+        """
+        Generates OpenShift must-gather and stores it in the destination path.
+
+        :param destination_path: The directory where the must-gather logs will be stored. Default is '/tmp'.
+        :return: The result of the run command.
+        :raises: RuntimeError if the command fails.
+        """
+        folder_path = os.path.join(destination_path, "must-gather")
+
+        try:
+            command = f'oc adm must-gather --dest-dir={folder_path}'
+            self.run(command)
+        except Exception as e:
+            if os.path.exists(folder_path):
+                try:
+                    shutil.rmtree(folder_path)
+                except Exception as remove_error:
+                    raise RuntimeError(f"Failed to remove folder {folder_path}: {remove_error}")
+            raise RuntimeError(f"Failed to generate OCP must-gather logs for version: {e}")
+
+    @typechecked
+    @logger_time_stamp
     def generate_odf_must_gather(self, destination_path: str = '/tmp', odf_version: str = None):
         """
         Generates ODF must-gather logs based on the ODF version and stores it in the destination path.
