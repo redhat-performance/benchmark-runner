@@ -42,6 +42,8 @@ class BareMetalOperations:
         self._upgrade_ocp_version = self._environment_variables_dict.get('upgrade_ocp_version', '')
         self._upgrade_channel = self._environment_variables_dict.get('upgrade_channel', '')
         self._timeout = int(self._environment_variables_dict.get('timeout', ''))
+        self._must_gather_log = self._environment_variables_dict.get('must_gather_log', '')
+        self._run_artifacts_path = self._environment_variables_dict.get('run_artifacts_path', '')
         if user:
             self._user = user
             self._provision_kubeadmin_password_path = self._environment_variables_dict.get('provision_kubeadmin_password_path', '')
@@ -116,6 +118,8 @@ class BareMetalOperations:
             logger.info(f"OCP successfully upgraded to {oc.get_upgrade_version()}")
             return True
         else:
+            if self._must_gather_log:
+                oc.generate_must_gather(destination_path=self._run_artifacts_path)
             raise OCPUpgradeFailed(status=oc.get_cluster_status())
 
     def _install_ocp_cmd(self):
