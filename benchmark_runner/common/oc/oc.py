@@ -89,8 +89,9 @@ class OC(SSH):
         @param upgrade_channel: upgrade channel candidate or stable, default stable
         @return:
         """
+        # default stable
+        upgrade_channel = upgrade_channel or 'stable'
         ocp_channel = '.'.join(upgrade_ocp_version.split('.')[:2])
-
         # see: https://access.redhat.com/articles/7031404
         if ocp_channel == "4.16":
             patch_command = f"{self._cli} -n openshift-config patch cm admin-acks --patch '{{\"data\":{{\"ack-4.15-kube-1.29-api-removals-in-4.16\":\"true\"}}}}' --type=merge"
@@ -101,38 +102,37 @@ class OC(SSH):
 
     def upgrade_in_progress(self):
         """
-        This method returns True if an upgrade is in progress and False otherwise, with retries on transient failures.
-        @return: bool
+        Checks whether an OpenShift upgrade is in progress by inspecting the 'Progressing' status condition.
+        Retries on transient failures.
+
+        @return: bool - True if upgrade is in progress, False otherwise.
         """
         for i in range(1, self.RETRIES + 1):
             try:
-                status = self.run(
-                    f"{self._cli} get clusterversion version "
-                    "-o jsonpath='{{.status.conditions[?(@.type==\"Progressing\")].status}}'"
-                ).strip()
+                status = self.run(f"{self._cli} get clusterversion version -o jsonpath='{{.status.conditions[?(@.type==\"Progressing\")].status}}'").strip()
                 return status == 'True'
             except Exception as e:
                 logger.warning(f"[upgrade_in_progress] attempt {i}/{self.RETRIES} failed: {e}")
                 time.sleep(self.DELAY)
-        # Final attempt (will bubble if it fails)
-        return self.run(
-            f"{self._cli} get clusterversion version "
-            "-o jsonpath='{{.status.conditions[?(@.type==\"Progressing\")].status}}'"
-        ).strip() == 'True'
+
+        return False
 
     @logger_time_stamp
     def wait_for_ocp_upgrade_start(self, upgrade_version: str, timeout: int = SHORT_TIMEOUT):
         """
-        This method waits for ocp upgrade to start
-        :param upgrade_version:
-        :param timeout:
-        :return:
+        This method waits for the OCP upgrade to start.
+        :param upgrade_version: The target OCP version.
+        :param timeout: Timeout in seconds (waits indefinitely if <= 0).
+        :return: True if upgrade starts within timeout, else raises UpgradeNotStartTimeout.
         """
         current_wait_time = 0
-        while timeout <= 0 or current_wait_time <= timeout and not self.upgrade_in_progress():
-            # sleep for x seconds
+        while timeout <= 0 or current_wait_time <= timeout:
+            if self.upgrade_in_progress():
+                return True
             time.sleep(OC.SLEEP_TIME)
             current_wait_time += OC.SLEEP_TIME
+
+        # Final check after timeout
         if self.upgrade_in_progress():
             return True
         else:
