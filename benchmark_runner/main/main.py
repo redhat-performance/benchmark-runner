@@ -169,9 +169,10 @@ def upgrade_ocp_bare_metal(step: str):
     if step == 'run_bare_metal_ocp_upgrade':
         if not bare_metal_operations.is_ocp_already_upgraded(oc):
             bare_metal_operations.run_ocp_upgrade(oc)
-            # The LSO/ODF upgrade must be run manually after the OCP upgrade for the channel version; it won't upgrade automatically.
-            bare_metal_operations.install_ocp_resources(resources=['lso'], upgrade_version=lso_version)
-            bare_metal_operations.install_ocp_resources(resources=['odf'], upgrade_version=odf_version)
+            # Manual LSO/ODF upgrade works up to version 4.17
+            if '.'.join(upgrade_ocp_version.split('.')[:2]) <= "4.17":
+                bare_metal_operations.install_ocp_resources(resources=['lso'], upgrade_version=lso_version)
+                bare_metal_operations.install_ocp_resources(resources=['odf'], upgrade_version=odf_version)
     elif step == 'verify_bare_metal_upgrade_complete':
         if bare_metal_operations.is_cluster_upgraded(oc, cnv_version=cnv_version, odf_version=odf_version, lso_version=lso_version):
             bare_metal_operations.verify_cluster_is_up(oc)
