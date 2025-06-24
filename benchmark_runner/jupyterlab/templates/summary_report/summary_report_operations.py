@@ -246,7 +246,7 @@ class SummaryReportOperations:
         @return:
         """
         geometric_mean_df = pd.DataFrame(geometric_mean_data)
-        self.median_indices = geometric_mean_df.groupby(['metric', 'ocp_version']).apply(self.__get_median)
+        self.median_indices = geometric_mean_df.drop(columns=['metric', 'ocp_version']).groupby([geometric_mean_df['metric'], geometric_mean_df['ocp_version']], group_keys=False).apply(self.__get_median)
         geometric_mean_df = geometric_mean_df.loc[self.median_indices['median_result']]
         return self.__calc_percentage(geometric_mean_df, complementary)
 
