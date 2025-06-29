@@ -1,21 +1,9 @@
 
-def upgradeMasterStartTime
-def upgradeMastersEndTime
-def upgradeMastersDurationInSeconds = ''
-def upgradeWorkersStartTime
-def upgradeWorkersEndTime
-def upgradeWorkersDurationInSeconds = ''
-
 pipeline {
     agent {
         label 'PerfCi'
     }
     environment {
-        UPGRADE_OCP_VERSION = credentials('perfci_upgrade_target_ocp_version')
-        CNV_VERSION = credentials('perfci_upgrade_target_cnv_version')
-        LSO_VERSION = credentials('perfci_upgrade_target_lso_version')
-        ODF_VERSION = credentials('perfci_upgrade_target_odf_version')
-        UPGRADE_CHANNEL = credentials('perfci_upgrade_channel') // stable (default)/candidate
         CONTACT_EMAIL = credentials('perfci_contact_email')
         EXPECTED_NODES = credentials('perfci_expected_nodes')
         SCALE_NODES = credentials('perfci_scale_nodes')
@@ -35,7 +23,7 @@ pipeline {
         DELETE_ALL = 'False' // Not delete the running VMs
         VERIFICATION_ONLY = 'True'
         MUST_GATHER_LOG = 'True'
-        SAVE_ARTIFACTS_LOCAL = 'False'
+        SAVE_ARTIFACTS_LOCAL = 'True'
         LOCAL_LOG_PATH = '/tmp/benchmark-runner-run-artifacts' // set SAVE_ARTIFACTS_LOCAL = 'True'
         RUN_TYPE = 'chaos_ci'
         BOOTSTORM_SCALE = 120
@@ -89,116 +77,7 @@ pipeline {
             }
         }
 
-        stage('Upgrade Masters & Chaos') {
-            parallel {
-                stage('Upgrade Masters') {
-                            steps {
-                                script {
-                                    upgradeMasterStartTime = System.currentTimeMillis()
-
-                                    echo "Running deployment for run_bare_metal_ocp_upgrade"
-
-                                    sh """
-                                        sudo podman run --rm \
-                                            -e UPGRADE_OCP_VERSION="${UPGRADE_OCP_VERSION}" \
-                                            -e UPGRADE_STEP='run_bare_metal_ocp_upgrade' \
-                                            -e RUN_TYPE="${RUN_TYPE}" \
-                                            -e UPGRADE_CHANNEL="${UPGRADE_CHANNEL}" \
-                                            -e LSO_VERSION="${LSO_VERSION}" \
-                                            -e ODF_VERSION="${ODF_VERSION}" \
-                                            -e CNV_VERSION="${CNV_VERSION}" \
-                                            -e EXPECTED_NODES='${EXPECTED_NODES}' \
-                                            -e KUBEADMIN_PASSWORD="${KUBEADMIN_PASSWORD}" \
-                                            -e TIMEOUT="${TIMEOUT}" \
-                                            -v "${KUBECONFIG_PATH}":"${KUBECONFIG_PATH}" \
-                                            --privileged "${QUAY_BENCHMARK_RUNNER_REPOSITORY}"
-                                    """
-
-                                    upgradeMastersEndTime = System.currentTimeMillis()
-                                    def durationInSeconds = (upgradeMastersEndTime - upgradeMasterStartTime) / 1000
-                                    upgradeMastersDurationInSeconds = "${durationInSeconds}"
-                                }
-                            }
-                } // Upgrade Masters
-
-            // Parallel stage
-            stage('Masters Chaos & verifications') {
-            stages {
-
-            stage('Wait before Chaos begins') {
-                steps {
-                    script {
-                        echo 'Waiting 10 minutes (600 seconds) for upgrade to begin...'
-                        sleep(time: 10, unit: 'MINUTES')
-                    }
-                }
-            }
-
-            stage('KrknHub: master-node-failure') {
-              steps {
-                  script {
-                      // boolean value w/o ''
-                      sh """
-                          sudo podman run --rm -t \
-                          -e WORKLOAD='krknhub' \
-                          -e KRKNHUB_WORKLOAD='node-scenarios' \
-                          -e TEST_NAME='master-node-failure' \
-                          -e KRKNHUB_ENVIRONMENT_VARIABLES='${KRKNHUB_MASTER_0_NODE_FAILURE_ENVIRONMENT_VARIABLES}' \
-                          -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' \
-                          -e PROVISION_KUBECONFIG_PATH='${PROVISION_KUBECONFIG_PATH}' \
-                          -e ELASTICSEARCH='${ELASTICSEARCH}' \
-                          -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' \
-                          -e GOOGLE_DRIVE_PATH='${GOOGLE_DRIVE_PATH}' \
-                          -e GOOGLE_DRIVE_CREDENTIALS_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_CREDENTIALS_FILE}' \
-                          -e GOOGLE_DRIVE_TOKEN_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_TOKEN_FILE}' \
-                          -e GOOGLE_DRIVE_SHARED_DRIVE_ID='${GOOGLE_DRIVE_SHARED_DRIVE_ID}' \
-                          -e RUN_TYPE='${RUN_TYPE}' \
-                          -e SAVE_ARTIFACTS_LOCAL=${SAVE_ARTIFACTS_LOCAL} \
-                          -e TIMEOUT='${TIMEOUT}' \
-                          -e log_level='INFO' \
-                          -v '${LOCAL_LOG_PATH}:${LOCAL_LOG_PATH}' \
-                          -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
-                          -v '${TEMP_DIR}:${GOOGLE_DESTINATION_PATH}' \
-                          --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}'
-                      """
-                 }
-              }
-            } // KrknHub: master-node-failure
-
-        stage('Fedora Verifications - after master-node-failure') {
-                steps {
-                    script {
-                            sh """
-                                sudo podman run --rm -t \
-                                -e WORKLOAD='bootstorm_vm' \
-                                -e TEST_NAME='master-node-failure' \
-                                -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' \
-                                -e ELASTICSEARCH='${ELASTICSEARCH}' \
-                                -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' \
-                                -e GOOGLE_DRIVE_PATH='${GOOGLE_DRIVE_PATH}' \
-                                -e GOOGLE_DRIVE_CREDENTIALS_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_CREDENTIALS_FILE}' \
-                                -e GOOGLE_DRIVE_TOKEN_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_TOKEN_FILE}' \
-                                -e GOOGLE_DRIVE_SHARED_DRIVE_ID='${GOOGLE_DRIVE_SHARED_DRIVE_ID}' \
-                                -e RUN_TYPE='${RUN_TYPE}' \
-                                -e SCALE='${BOOTSTORM_SCALE}' \
-                                -e SCALE_NODES='${SCALE_NODES}' \
-                                -e THREADS_LIMIT='${THREADS_LIMIT}' \
-                                -e DELETE_ALL=${DELETE_ALL} \
-                                -e VERIFICATION_ONLY=${VERIFICATION_ONLY} \
-                                -e MUST_GATHER_LOG=${MUST_GATHER_LOG} \
-                                -e SAVE_ARTIFACTS_LOCAL=${SAVE_ARTIFACTS_LOCAL} \
-                                -e TIMEOUT='${TIMEOUT}' \
-                                -e log_level='INFO' \
-                                -v '${LOCAL_LOG_PATH}:${LOCAL_LOG_PATH}' \
-                                -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
-                                -v '${TEMP_DIR}:${GOOGLE_DESTINATION_PATH}' \
-                                --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}'
-                                """
-                    }
-                }
-            } // Fedora Verifications - after master-node-failure
-
-            stage('KrknHub - master-node-cpu-hog') {
+        stage('KrknHub - master-node-cpu-hog-before-upgrade') {
               steps {
                   script {
                       // boolean value w/o ''
@@ -206,7 +85,7 @@ pipeline {
                           sudo podman run --rm -t \
                           -e WORKLOAD='krknhub' \
                           -e KRKNHUB_WORKLOAD='node-cpu-hog' \
-                          -e TEST_NAME='master-node-cpu-hog' \
+                          -e TEST_NAME='master-node-cpu-hog-before-upgrade' \
                           -e KRKNHUB_ENVIRONMENT_VARIABLES='${KRKNHUB_MASTER_1_CPU_HOG_ENVIRONMENT_VARIABLES}' \
                           -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' \
                           -e PROVISION_KUBECONFIG_PATH='${PROVISION_KUBECONFIG_PATH}' \
@@ -227,15 +106,15 @@ pipeline {
                       """
                  }
               }
-            } // KrknHub - master-node-cpu-hog
+            } // KrknHub - master-node-cpu-hog-before-upgrade
 
-            stage('Fedora Verifications - after master-node-cpu-hog') {
+            stage('Fedora Verifications - after master-node-cpu-hog-before-upgrade') {
                 steps {
                     script {
                             sh """
                                 sudo podman run --rm -t \
                                 -e WORKLOAD='bootstorm_vm' \
-                                -e TEST_NAME='master-node-cpu-hog' \
+                                -e TEST_NAME='master-node-cpu-hog-before-upgrade' \
                                 -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' \
                                 -e ELASTICSEARCH='${ELASTICSEARCH}' \
                                 -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' \
@@ -260,61 +139,9 @@ pipeline {
                                 """
                     }
                 }
-            } // Fedora Verifications - after master-node-cpu-hog
+            } // Fedora Verifications - after master-node-cpu-hog-before-upgrade
 
-
-       } // serial stages
-       } // Masters Chaos & verifications
-      } //parallel
-     } // Upgrade Masters & Chaos
-
-
-            stage('Upgrade Workers & Chaos') {
-            parallel {
-                stage('Upgrade Workers') {
-                            steps {
-                                script {
-                                    upgradeWorkersStartTime = System.currentTimeMillis()
-
-                                    echo "Running deployment for verify_bare_metal_upgrade_complete"
-
-                                    sh """
-                                        sudo podman run --rm \
-                                            -e UPGRADE_OCP_VERSION="${UPGRADE_OCP_VERSION}" \
-                                            -e UPGRADE_STEP='verify_bare_metal_upgrade_complete' \
-                                            -e RUN_TYPE="${RUN_TYPE}" \
-                                            -e UPGRADE_CHANNEL="${UPGRADE_CHANNEL}" \
-                                            -e LSO_VERSION="${LSO_VERSION}" \
-                                            -e ODF_VERSION="${ODF_VERSION}" \
-                                            -e CNV_VERSION="${CNV_VERSION}" \
-                                            -e EXPECTED_NODES='${EXPECTED_NODES}' \
-                                            -e KUBEADMIN_PASSWORD="${KUBEADMIN_PASSWORD}" \
-                                            -e TIMEOUT="${TIMEOUT}" \
-                                            -v "${KUBECONFIG_PATH}":"${KUBECONFIG_PATH}" \
-                                            --privileged "${QUAY_BENCHMARK_RUNNER_REPOSITORY}"
-                                    """
-
-                                    upgradeWorkersEndTime = System.currentTimeMillis()
-                                    def durationInSeconds = (upgradeWorkersEndTime - upgradeWorkersStartTime) / 1000
-                                    upgradeWorkersDurationInSeconds = "${durationInSeconds}"
-                                }
-                            }
-                        }// Upgrade Workers
-
-            // Parallel stage
-            stage('Workers Chaos & verifications') {
-            stages {
-
-            stage('Wait before Chaos begins') {
-                steps {
-                    script {
-                        echo 'Waiting 10 minutes (600 seconds) for upgrade to begin...'
-                        sleep(time: 10, unit: 'MINUTES')
-                    }
-                }
-            }
-
-            stage('KrknHub - worker-node-failure') {
+        stage('KrknHub: master-node-failure-before-upgrade') {
               steps {
                   script {
                       // boolean value w/o ''
@@ -322,8 +149,8 @@ pipeline {
                           sudo podman run --rm -t \
                           -e WORKLOAD='krknhub' \
                           -e KRKNHUB_WORKLOAD='node-scenarios' \
-                          -e TEST_NAME='worker-node-failure' \
-                          -e KRKNHUB_ENVIRONMENT_VARIABLES='${KRKNHUB_WORKER_0_NODE_FAILURE_ENVIRONMENT_VARIABLES}' \
+                          -e TEST_NAME='master-node-failure-before-upgrade' \
+                          -e KRKNHUB_ENVIRONMENT_VARIABLES='${KRKNHUB_MASTER_0_NODE_FAILURE_ENVIRONMENT_VARIABLES}' \
                           -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' \
                           -e PROVISION_KUBECONFIG_PATH='${PROVISION_KUBECONFIG_PATH}' \
                           -e ELASTICSEARCH='${ELASTICSEARCH}' \
@@ -343,15 +170,15 @@ pipeline {
                       """
                  }
               }
-            } // KrknHub - worker-node-failure
+            } // KrknHub: master-node-failure-before-upgrade
 
-        stage('Fedora Verifications - after worker-node-failure') {
+        stage('Fedora Verifications - after master-node-failure-before-upgrade') {
                 steps {
                     script {
                             sh """
                                 sudo podman run --rm -t \
                                 -e WORKLOAD='bootstorm_vm' \
-                                -e TEST_NAME='worker-node-failure' \
+                                -e TEST_NAME='master-node-failure-before-upgrade' \
                                 -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' \
                                 -e ELASTICSEARCH='${ELASTICSEARCH}' \
                                 -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' \
@@ -376,9 +203,9 @@ pipeline {
                                 """
                     }
                 }
-            } // Fedora Verifications - after worker-node-failure
+            } // Fedora Verifications - after master-node-failure-before-upgrade
 
-            stage('KrknHub - worker-node-cpu-hog') {
+            stage('KrknHub - worker-node-cpu-hog-before-upgrade') {
               steps {
                   script {
                       // boolean value w/o ''
@@ -386,7 +213,7 @@ pipeline {
                           sudo podman run --rm -t \
                           -e WORKLOAD='krknhub' \
                           -e KRKNHUB_WORKLOAD='node-cpu-hog' \
-                          -e TEST_NAME='worker-node-cpu-hog' \
+                          -e TEST_NAME='worker-node-cpu-hog-before-upgrade' \
                           -e KRKNHUB_ENVIRONMENT_VARIABLES='${KRKNHUB_WORKER_1_CPU_HOG_ENVIRONMENT_VARIABLES}' \
                           -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' \
                           -e PROVISION_KUBECONFIG_PATH='${PROVISION_KUBECONFIG_PATH}' \
@@ -407,15 +234,15 @@ pipeline {
                       """
                  }
               }
-            } // KrknHub - worker-node-cpu-hog
+            } // KrknHub - worker-node-cpu-hog-before-upgrade
 
-            stage('Fedora Verifications - after worker-node-cpu-hog') {
+            stage('Fedora Verifications - after worker-node-cpu-hog-before-upgrade') {
                 steps {
                     script {
                             sh """
                                 sudo podman run --rm -t \
                                 -e WORKLOAD='bootstorm_vm' \
-                                -e TEST_NAME='worker-node-cpu-hog' \
+                                -e TEST_NAME='worker-node-cpu-hog-before-upgrade' \
                                 -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' \
                                 -e ELASTICSEARCH='${ELASTICSEARCH}' \
                                 -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' \
@@ -440,13 +267,72 @@ pipeline {
                                 """
                     }
                 }
-            } // Fedora Verifications - after worker-node-cpu-hog
+            } // Fedora Verifications - after worker-node-cpu-hog-before-upgrade
 
+            stage('KrknHub - worker-node-failure-before-upgrade') {
+              steps {
+                  script {
+                      // boolean value w/o ''
+                      sh """
+                          sudo podman run --rm -t \
+                          -e WORKLOAD='krknhub' \
+                          -e KRKNHUB_WORKLOAD='node-scenarios' \
+                          -e TEST_NAME='worker-node-failure-before-upgrade' \
+                          -e KRKNHUB_ENVIRONMENT_VARIABLES='${KRKNHUB_WORKER_0_NODE_FAILURE_ENVIRONMENT_VARIABLES}' \
+                          -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' \
+                          -e PROVISION_KUBECONFIG_PATH='${PROVISION_KUBECONFIG_PATH}' \
+                          -e ELASTICSEARCH='${ELASTICSEARCH}' \
+                          -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' \
+                          -e GOOGLE_DRIVE_PATH='${GOOGLE_DRIVE_PATH}' \
+                          -e GOOGLE_DRIVE_CREDENTIALS_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_CREDENTIALS_FILE}' \
+                          -e GOOGLE_DRIVE_TOKEN_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_TOKEN_FILE}' \
+                          -e GOOGLE_DRIVE_SHARED_DRIVE_ID='${GOOGLE_DRIVE_SHARED_DRIVE_ID}' \
+                          -e RUN_TYPE='${RUN_TYPE}' \
+                          -e SAVE_ARTIFACTS_LOCAL=${SAVE_ARTIFACTS_LOCAL} \
+                          -e TIMEOUT='${TIMEOUT}' \
+                          -e log_level='INFO' \
+                          -v '${LOCAL_LOG_PATH}:${LOCAL_LOG_PATH}' \
+                          -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
+                          -v '${TEMP_DIR}:${GOOGLE_DESTINATION_PATH}' \
+                          --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}'
+                      """
+                 }
+              }
+            } // KrknHub - worker-node-failure-before-upgrade
 
-       } // serial stages
-       } // Workers Chaos & verifications
-      } //parallel
-     } // Upgrade Workers & Chaos
+        stage('Fedora Verifications - after worker-node-failure-before-upgrade') {
+                steps {
+                    script {
+                            sh """
+                                sudo podman run --rm -t \
+                                -e WORKLOAD='bootstorm_vm' \
+                                -e TEST_NAME='worker-node-failure-before-upgrade' \
+                                -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' \
+                                -e ELASTICSEARCH='${ELASTICSEARCH}' \
+                                -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' \
+                                -e GOOGLE_DRIVE_PATH='${GOOGLE_DRIVE_PATH}' \
+                                -e GOOGLE_DRIVE_CREDENTIALS_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_CREDENTIALS_FILE}' \
+                                -e GOOGLE_DRIVE_TOKEN_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_TOKEN_FILE}' \
+                                -e GOOGLE_DRIVE_SHARED_DRIVE_ID='${GOOGLE_DRIVE_SHARED_DRIVE_ID}' \
+                                -e RUN_TYPE='${RUN_TYPE}' \
+                                -e SCALE='${BOOTSTORM_SCALE}' \
+                                -e SCALE_NODES='${SCALE_NODES}' \
+                                -e THREADS_LIMIT='${THREADS_LIMIT}' \
+                                -e DELETE_ALL=${DELETE_ALL} \
+                                -e VERIFICATION_ONLY=${VERIFICATION_ONLY} \
+                                -e MUST_GATHER_LOG=${MUST_GATHER_LOG} \
+                                -e SAVE_ARTIFACTS_LOCAL=${SAVE_ARTIFACTS_LOCAL} \
+                                -e TIMEOUT='${TIMEOUT}' \
+                                -e log_level='INFO' \
+                                -v '${LOCAL_LOG_PATH}:${LOCAL_LOG_PATH}' \
+                                -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
+                                -v '${TEMP_DIR}:${GOOGLE_DESTINATION_PATH}' \
+                                --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}'
+                                """
+                    }
+                }
+            } // Fedora Verifications - after worker-node-failure-before-upgrade
+
 
     } // stages
 
@@ -486,12 +372,12 @@ pipeline {
                     Jenkins job: ${env.BUILD_URL}\nSee the console output for more details:  ${env.BUILD_URL}consoleFull\n\n
                 """, subject: msg, to: "${CONTACT_EMAIL}"
             }
-            sh """ sudo podman run --rm -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' -e ELASTICSEARCH='${ELASTICSEARCH}' -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' -e CI_STATUS='failed' -e UPGRADE_MASTERS_DURATION_SECONDS='${upgradeMastersDurationInSeconds}' -e UPGRADE_WORKERS_DURATION_SECONDS='${upgradeWorkersDurationInSeconds}' -e RUN_TYPE='${RUN_TYPE}' -e log_level='INFO' -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}' """
+            sh """ sudo podman run --rm -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' -e ELASTICSEARCH='${ELASTICSEARCH}' -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' -e CI_STATUS='failed' -e RUN_TYPE='${RUN_TYPE}' -e log_level='INFO' -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}' """
         }
         success {
-            sh """ sudo podman run --rm -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' -e ELASTICSEARCH='${ELASTICSEARCH}' -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' -e CI_STATUS='pass' -e UPGRADE_MASTERS_DURATION_SECONDS='${upgradeMastersDurationInSeconds}' -e UPGRADE_WORKERS_DURATION_SECONDS='${upgradeWorkersDurationInSeconds}' -e RUN_TYPE='${RUN_TYPE}' -e log_level='INFO' -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}' """
-            echo 'Triggering 05-PerfCI-Chaos-Verify-VMs-Deployment pipeline'
-            build job: '05-PerfCI-Chaos-Verify-VMs-Deployment', wait: false
+            sh """ sudo podman run --rm -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' -e ELASTICSEARCH='${ELASTICSEARCH}' -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' -e CI_STATUS='pass' -e RUN_TYPE='${RUN_TYPE}' -e log_level='INFO' -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}' """
+            echo 'Triggering 05-PerfCI-Chaos-Upgrade-OpenShift-Deployment pipeline'
+            build job: '05-PerfCI-Chaos-Upgrade-OpenShift-Deployment', wait: false
         }
     }
 }
