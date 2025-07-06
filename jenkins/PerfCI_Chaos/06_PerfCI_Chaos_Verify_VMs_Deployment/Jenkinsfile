@@ -136,8 +136,8 @@ pipeline {
         }
         success {
             script {
-                echo 'Triggering 06-PerfCI-Chaos-Testing-Deployment pipeline'
-                //build job: '06-PerfCI-Chaos-Testing-Deployment', wait: false
+                echo 'Triggering 07-PerfCI-Chaos-Testing-Deployment pipeline'
+                //build job: '07-PerfCI-Chaos-Testing-Deployment', wait: false
             }
         }
     }

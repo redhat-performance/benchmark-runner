@@ -118,8 +118,8 @@ pipeline {
         }
         success {
             script {
-                echo 'Triggering 04-PerfCI-Chaos-Upgrade-OpenShift-Deployment pipeline'
-                build job: '04-PerfCI-Chaos-Upgrade-OpenShift-Deployment', wait: false
+                echo 'Triggering 04-PerfCI-Chaos-Testing-Deployment pipeline'
+                build job: '04-PerfCI-Chaos-Testing-Deployment', wait: false
             }
         }
     }
