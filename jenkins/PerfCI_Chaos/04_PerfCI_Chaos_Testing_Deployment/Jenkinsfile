@@ -5,7 +5,6 @@ pipeline {
     }
     environment {
         CONTACT_EMAIL = credentials('perfci_contact_email')
-        EXPECTED_NODES = credentials('perfci_expected_nodes')
         SCALE_NODES = credentials('perfci_scale_nodes')
         QUAY_BENCHMARK_RUNNER_REPOSITORY = credentials('perfci_quay_repository')
         KUBECONFIG_PATH = '/root/.kube/config'
@@ -375,7 +374,6 @@ pipeline {
             sh """ sudo podman run --rm -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' -e ELASTICSEARCH='${ELASTICSEARCH}' -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' -e CI_STATUS='failed' -e RUN_TYPE='${RUN_TYPE}' -e log_level='INFO' -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}' """
         }
         success {
-            sh """ sudo podman run --rm -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' -e ELASTICSEARCH='${ELASTICSEARCH}' -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' -e CI_STATUS='pass' -e RUN_TYPE='${RUN_TYPE}' -e log_level='INFO' -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}' """
             echo 'Triggering 05-PerfCI-Chaos-Upgrade-OpenShift-Deployment pipeline'
             build job: '05-PerfCI-Chaos-Upgrade-OpenShift-Deployment', wait: false
         }
