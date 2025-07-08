@@ -288,24 +288,34 @@ class BareMetalOperations:
         else:
             return True
 
-    def is_cluster_upgraded(self, oc: OC, cnv_version: str, odf_version: str, lso_version: str):
+    def is_cluster_upgraded(self, oc: OC, cnv_version: str = None, odf_version: str = None,
+                            lso_version: str = None) -> bool:
         """
-        This method checks if cluster/operators upgraded successfully
-        @param oc:
-        @param cnv_version:
-        @param odf_version:
-        @param lso_version:
-        @return:
+        Checks if the cluster and the specified operators were successfully upgraded.
+
+        :param oc: OC client instance
+        :param cnv_version: (Optional) Target CNV operator version
+        :param odf_version: (Optional) Target ODF operator version
+        :param lso_version: (Optional) Target LSO operator version
+        :return: True if the upgrade (cluster + specified operators) is successful, otherwise False
         """
-        # check cluster version upgrade
-        if oc.get_upgrade_version() == self._upgrade_ocp_version:
-            lso_upgraded = oc.wait_for_operator_installation(operator='lso', version=lso_version, namespace='openshift-local-storage')
-            odf_upgraded = oc.wait_for_operator_installation(operator='odf', version=odf_version, namespace='openshift-storage')
-            cnv_upgraded = oc.wait_for_operator_installation(operator='cnv', version=cnv_version, namespace='openshift-cnv')
-            # check operators versions upgrade
-            if cnv_upgraded and lso_upgraded and odf_upgraded:
-                return True
-        return False
+        if oc.get_upgrade_version() != self._upgrade_ocp_version:
+            return False
+
+        # Operator details mapping
+        operators_to_check = {
+            "cnv": (cnv_version, "openshift-cnv"),
+            "odf": (odf_version, "openshift-storage"),
+            "lso": (lso_version, "openshift-local-storage"),
+        }
+
+        upgrade_checks = [
+            oc.wait_for_operator_installation(operator=op, version=ver, namespace=ns)
+            for op, (ver, ns) in operators_to_check.items()
+            if ver  # only include if a version was specified
+        ]
+
+        return all(upgrade_checks) if upgrade_checks else True
 
     @logger_time_stamp
     def verify_upgrade_complete(self, oc: OC):
