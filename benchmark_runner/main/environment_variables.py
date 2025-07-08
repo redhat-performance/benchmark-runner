@@ -88,8 +88,10 @@ class EnvironmentVariables:
         self._environment_variables_dict['windows_url'] = EnvironmentVariables.get_env('WINDOWS_URL', '')
         # Delete all resources before and after the run, default True
         self._environment_variables_dict['delete_all'] = EnvironmentVariables.get_boolean_from_environment('DELETE_ALL', True)
-        # Run RunStrategy: Always can be set to True or False (default: False). Set it to True for VMs that need to start in a running state
+        # RunStrategy: Always can be set to True or False, default: False. Set it to True for VMs that need to start in a running state
         self._environment_variables_dict['run_strategy'] = EnvironmentVariables.get_boolean_from_environment('RUN_STRATEGY', False)
+        # Creating VMs only without deletion, default False (when True: configure RUN_STRATEGY: True/ DELETE_ALL: False)
+        self._environment_variables_dict['create_vms_only'] = EnvironmentVariables.get_boolean_from_environment('CREATE_VMS_ONLY', False)
         # Verification only, without running or deleting any resources, default False
         self._environment_variables_dict['verification_only'] = EnvironmentVariables.get_boolean_from_environment('VERIFICATION_ONLY', False)
         # Collect CNV/ODF must-gather logs in case of VM verification failure (default: False).

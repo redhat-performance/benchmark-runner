@@ -102,6 +102,7 @@ class WorkloadsOperations:
             self._prometheus_snap_interval = self._environment_variables_dict.get('prometheus_snap_interval', '')
             self._prometheus_metrics_operation = PrometheusMetricsOperation()
         self._windows_url = self._environment_variables_dict.get('windows_url', '')
+        self._create_vms_only = self._environment_variables_dict.get('create_vms_only', '')
         self._delete_all = self._environment_variables_dict.get('delete_all', '')
         self._verification_only = self._environment_variables_dict.get('verification_only', '')
         self._must_gather_log = self._environment_variables_dict.get('must_gather_log', '')

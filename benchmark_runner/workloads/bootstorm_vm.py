@@ -422,8 +422,11 @@ class BootstormVM(WorkloadsOperations):
             # scale
             else:
                 first_run_time_updated = False
-                # Run VMs only
-                if not self._delete_all:
+                # Create VMs
+                if self._create_vms_only:
+                    steps = (self._create_vm_scale, )
+                # Run VMs without deleting
+                elif not self._delete_all:
                     steps = (self._create_vm_scale, self._run_vm_scale)
                 else:
                     steps = (self._create_vm_scale, self._run_vm_scale, self._stop_vm_scale,
