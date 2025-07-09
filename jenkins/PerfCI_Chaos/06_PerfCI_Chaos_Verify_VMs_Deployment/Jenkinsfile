@@ -86,6 +86,7 @@ pipeline {
                                 sudo podman run --rm -t \
                                 -e WORKLOAD='bootstorm_vm' \
                                 -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' \
+                                -e TEST_NAME='vms-verification-after-upgrade' \
                                 -e ELASTICSEARCH='${ELASTICSEARCH}' \
                                 -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' \
                                 -e GOOGLE_DRIVE_PATH='${GOOGLE_DRIVE_PATH}' \
