@@ -11,7 +11,7 @@ pipeline {
         KUBECONFIG_PATH = '/root/.kube/config'
         SCALE_NODES = credentials('perfci_scale_nodes')
         DELETE_ALL = 'False' // Not delete the running VMs
-        RUN_STRATEGY = 'True' // runStrategy: Always for NHC/ SNR operators
+        RUN_STRATEGY = 'True' // runStrategy: Always for NHC/ FAR operators
         RUN_TYPE = 'chaos_ci'
         BOOTSTORM_SCALE = 120
         THREADS_LIMIT= 20

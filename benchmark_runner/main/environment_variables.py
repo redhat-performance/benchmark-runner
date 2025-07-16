@@ -4,6 +4,8 @@ import time
 import datetime
 import argparse
 from uuid import uuid4
+from ast import literal_eval
+
 from benchmark_runner.main.environment_variables_exceptions import ParseFailed
 
 
@@ -247,7 +249,6 @@ class EnvironmentVariables:
         # upgrade workers duration seconds
         self._environment_variables_dict['upgrade_workers_duration_seconds'] = EnvironmentVariables.get_env('UPGRADE_WORKERS_DURATION_SECONDS', '')
 
-
         # SNO or empty for regular
         self._environment_variables_dict['cluster_type'] = EnvironmentVariables.get_env('CLUSTER_TYPE', '')
         # For SNO: choose 1 master, dictionary: {'master': ['master-0', 'master-1', 'master-2'], 'worker': ['worker-0', 'worker-1', 'worker-2' ] }
@@ -276,8 +277,12 @@ class EnvironmentVariables:
         self._environment_variables_dict['num_odf_disk'] = EnvironmentVariables.get_env('NUM_ODF_DISK', 4)
         self._environment_variables_dict['worker_disk_ids'] = EnvironmentVariables.get_env('WORKER_DISK_IDS', "")
         self._environment_variables_dict['worker_disk_prefix'] = EnvironmentVariables.get_env('WORKER_DISK_PREFIX', '')
-        # install resources list "[ 'lso', 'odf', 'cnv', 'infra', 'custom' ]"
+        # install resources list "[ 'lso', 'odf', 'cnv', 'infra', 'custom', 'kata', 'nhc_far' ]"
         self._environment_variables_dict['install_resources_list'] = EnvironmentVariables.get_env('INSTALL_RESOURCES_LIST', "")
+        # for 'nhc_far' operator
+        self._environment_variables_dict['bmc_user'] = EnvironmentVariables.get_env('BMC_USER', '')
+        self._environment_variables_dict['bmc_password'] = EnvironmentVariables.get_env('BMC_PASSWORD', '')
+        self._environment_variables_dict['bmc_ips'] = literal_eval(EnvironmentVariables.get_env('BMC_IPS', "{}"))
 
         # Parameters below related to 'install_ocp()' and 'install_resource()'
         # Mandatory: OCP environment flavor PERF or FUNC for updating GitHub secrets

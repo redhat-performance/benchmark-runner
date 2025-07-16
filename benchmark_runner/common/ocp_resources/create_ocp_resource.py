@@ -8,7 +8,7 @@ from benchmark_runner.common.ocp_resources.create_lso import CreateLSO
 from benchmark_runner.common.ocp_resources.create_odf import CreateODF
 from benchmark_runner.common.ocp_resources.create_kata import CreateKata
 from benchmark_runner.common.ocp_resources.create_cnv import CreateCNV
-from benchmark_runner.common.ocp_resources.create_nhc_snr import CreateNHCSNR
+from benchmark_runner.common.ocp_resources.create_nhc_far import CreateNHCFAR
 from benchmark_runner.common.ocp_resources.create_custom import CreateCustom
 from benchmark_runner.common.ocp_resources.migrate_infra import MigrateInfra
 
@@ -91,9 +91,9 @@ class CreateOCPResource:
         elif 'cnv' == resource:
             create_cnv = CreateCNV(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files)
             create_cnv.create_cnv()
-        elif 'nhc_snr' == resource:
-            create_nhc_snr = CreateNHCSNR(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files)
-            create_nhc_snr.create_nhc_snr()
+        elif 'nhc_far' == resource:
+            create_nhc_far = CreateNHCFAR(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files)
+            create_nhc_far.create_nhc_far()
         elif 'infra' == resource:
             create_infra = MigrateInfra(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files)
             create_infra.migrate_infra()
