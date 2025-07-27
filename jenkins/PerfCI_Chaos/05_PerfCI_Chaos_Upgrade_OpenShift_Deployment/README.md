@@ -47,18 +47,18 @@ To run the OpenShift Upgrade & Chaos Testing pipeline successfully, configure th
 | `WORKSPACE_PATH`                                | Full Jenkins job workspace path (e.g., `${env.WORKSPACE}/workspace/${env.JOB_NAME}/`).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 
 ## 🔧 Optional Environment Variables
-| Variable                         | Description                                                                            |
-|----------------------------------| -------------------------------------------------------------------------------------- |
-| `CONTACT_EMAIL`                  | Jenkins job notification email (sent on job success or failure).                       |
-| `ELASTICSEARCH`                  | Elasticsearch server URL.                                                              |
-| `ELASTICSEARCH_PORT`             | Port number used by the Elasticsearch server.                                          |
-| `GOOGLE_DRIVE_PATH`              | Base URL of the Google Drive folder (e.g., `https://drive.google.com/drive/folders/`). |
-| `GOOGLE_DRIVE_CREDENTIALS_FILE`  | Content of the Google Drive service account credentials JSON file.                     |
-| `GOOGLE_DRIVE_TOKEN_FILE`        | Content of the Google Drive OAuth token JSON file.                                     |
-| `GOOGLE_CREDENTIALS_FILE`        | File name of the credentials JSON (e.g., `credentials.json`).                          |
-| `GOOGLE_TOKEN_FILE`              | File name of the token JSON (e.g., `token.json`).                                      |
-| `GOOGLE_DESTINATION_PATH`        | Local path where logs or files are temporarily stored (e.g., `/tmp`).                  |
-| `GOOGLE_DRIVE_SHARED_DRIVE_ID`   | ID of the root Google Drive folder (Shared Drive) where all logs are saved.            |
+| Variable                  | Description                                                                            |
+|---------------------------| -------------------------------------------------------------------------------------- |
+| `CONTACT_EMAIL`           | Jenkins job notification email (sent on job success or failure).                       |
+| `DESTINATION_PATH`        | Local path where logs or files are temporarily stored (e.g., `/tmp`).                  |
+| `ELASTICSEARCH`           | Elasticsearch server URL.                                                              |
+| `ELASTICSEARCH_PORT`      | Port number used by the Elasticsearch server.                                          |
+| `GOOGLE_DRIVE_PATH`       | Base URL of the Google Drive folder (e.g., `https://drive.google.com/drive/folders/`). |
+| `GOOGLE_DRIVE_CREDENTIALS_FILE` | Content of the Google Drive service account credentials JSON file.                     |
+| `GOOGLE_DRIVE_TOKEN_FILE` | Content of the Google Drive OAuth token JSON file.                                     |
+| `GOOGLE_CREDENTIALS_FILE` | File name of the credentials JSON (e.g., `credentials.json`).                          |
+| `GOOGLE_TOKEN_FILE`       | File name of the token JSON (e.g., `token.json`).                                      |
+| `GOOGLE_DRIVE_SHARED_DRIVE_ID` | ID of the root Google Drive folder (Shared Drive) where all logs are saved.            |
 
 ---
 

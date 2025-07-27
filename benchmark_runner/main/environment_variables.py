@@ -204,6 +204,7 @@ class EnvironmentVariables:
         self._environment_variables_dict['krknhub_workload'] = EnvironmentVariables.get_env('KRKNHUB_WORKLOAD', '')
         # e.g. "export CLOUD_TYPE='test'; export BMC_USER='user'"
         self._environment_variables_dict['krknhub_environment_variables'] = EnvironmentVariables.get_env('KRKNHUB_ENVIRONMENT_VARIABLES', '')
+        self._environment_variables_dict['krknhub_yaml_file_path'] = EnvironmentVariables.get_env('KRKNHUB_YAML_FILE_PATH', '')
 
         # IBM data
         self._environment_variables_dict['region_name'] = EnvironmentVariables.get_env('IBM_REGION_NAME', '')
