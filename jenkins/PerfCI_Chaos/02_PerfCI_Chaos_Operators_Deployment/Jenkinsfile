@@ -84,7 +84,7 @@ END
         steps {
             script {
                 // cnv first for “-virtualization” storage class name for Win bootstorm
-                def resources = ['cnv', 'lso', 'odf', 'nhc_snr', 'infra', 'custom']
+                def resources = ['cnv', 'lso', 'odf', 'nhc_far', 'infra', 'custom']
 
                 for (resource in resources) {
                     echo "Run Operator Deployment for ${resource}"

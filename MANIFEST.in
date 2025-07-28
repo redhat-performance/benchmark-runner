@@ -34,8 +34,8 @@ include benchmark_runner/common/ocp_resources/cnv/template/*.sh
 include benchmark_runner/common/ocp_resources/cnv/template/*.yaml
 include benchmark_runner/common/ocp_resources/custom/template/*.sh
 include benchmark_runner/common/ocp_resources/custom/template/*.yaml
-include benchmark_runner/common/ocp_resources/nhc_snr/template/*.sh
-include benchmark_runner/common/ocp_resources/nhc_snr/template/*.yaml
+include benchmark_runner/common/ocp_resources/nhc_far/template/*.sh
+include benchmark_runner/common/ocp_resources/nhc_far/template/*.yaml
 
 # ocp assisted installer (jetlag)
 include benchmark_runner/common/assisted_installer/jetlag/run_jetlag.sh

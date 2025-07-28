@@ -1,0 +1,60 @@
+---
+apiVersion: fence-agents-remediation.medik8s.io/v1alpha1
+kind: FenceAgentsRemediationTemplate
+metadata:
+  name: nhc-remediation-far
+  namespace: openshift-workload-availability
+spec:
+  template:
+    spec:
+      nodeparameters:
+        '--ip':
+          master-0: {{ bmc_ips['master-0'] }}
+          master-1: {{ bmc_ips['master-1'] }}
+          master-2: {{ bmc_ips['master-2'] }}
+          worker-0: {{ bmc_ips['worker-0'] }}
+          worker-1: {{ bmc_ips['worker-1'] }}
+          worker-2: {{ bmc_ips['worker-2'] }}
+        '--username':
+          master-0: {{ bmc_user }}
+          master-1: {{ bmc_user }}
+          master-2: {{ bmc_user }}
+          worker-0: {{ bmc_user }}
+          worker-1: {{ bmc_user }}
+          worker-2: {{ bmc_user }}
+        '--password':
+          master-0: {{ bmc_password }}
+          master-1: {{ bmc_password }}
+          master-2: {{ bmc_password }}
+          worker-0: {{ bmc_password }}
+          worker-1: {{ bmc_password }}
+          worker-2: {{ bmc_password }}
+      sharedparameters:
+        '--lanplus': ''
+      agent: fence_ipmilan
+
+---
+apiVersion: remediation.medik8s.io/v1alpha1
+kind: NodeHealthCheck
+metadata:
+  name: nhc-remediation-far
+spec:
+  minHealthy: 2
+  remediationTemplate:
+    apiVersion: fence-agents-remediation.medik8s.io/v1alpha1
+    kind: FenceAgentsRemediationTemplate
+    name: nhc-remediation-far
+    namespace: openshift-workload-availability
+  selector:
+    matchExpressions:
+    - key: node-role.kubernetes.io/worker
+      operator: Exists
+    - key: node-role.kubernetes.io/master
+      operator: Exists
+  unhealthyConditions:
+  - duration: 300s
+    status: "False"
+    type: Ready
+  - duration: 300s
+    status: Unknown
+    type: Ready
