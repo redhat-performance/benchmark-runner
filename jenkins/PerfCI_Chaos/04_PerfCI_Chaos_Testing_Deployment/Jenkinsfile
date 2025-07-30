@@ -15,8 +15,12 @@ pipeline {
         GOOGLE_DRIVE_TOKEN_FILE = credentials('perfci_google_drive_token_file')
         GOOGLE_CREDENTIALS_FILE = 'credentials.json'
         GOOGLE_TOKEN_FILE = 'token.json'
-        GOOGLE_DESTINATION_PATH = '/tmp'
+        DESTINATION_PATH = '/tmp'
         GOOGLE_DRIVE_SHARED_DRIVE_ID = credentials('perfci_google_drive_shared_drive_id')
+        TWO_MASTERS_OUTAGE_FILE_PATH = credentials('perfci_two_masters_outage_file_path')
+        THREE_MASTERS_OUTAGE_FILE_PATH = credentials('perfci_three_masters_outage_file_path')
+        TWO_MASTERS_OUTAGE_FILE_NAME = 'two-master-outage.yml'
+        THREE_MASTERS_OUTAGE_FILE_NAME = 'three-master-outage.yml'
         KUBEADMIN_PASSWORD = readFile('/home/jenkins/.kube/kubeadmin-password').trim()
         PROVISION_KUBECONFIG_PATH = '/root/.kube/config' // required for krknhub
         DELETE_ALL = 'False' // Not delete the running VMs
@@ -52,7 +56,7 @@ pipeline {
             }
         }
 
-        stage('Prepare Google Credential Files') {
+        stage('Prepare Krknhub & Google Credential Files') {
             steps {
                 script {
                     // Create a unique temp directory
@@ -64,6 +68,8 @@ pipeline {
                     // Set file paths
                     env.GOOGLE_DRIVE_CREDENTIALS = "${env.TEMP_DIR}/${GOOGLE_CREDENTIALS_FILE}"
                     env.GOOGLE_DRIVE_TOKEN = "${env.TEMP_DIR}/${GOOGLE_TOKEN_FILE}"
+                    env.TWO_MASTERS_OUTAGE = "${env.TEMP_DIR}/${TWO_MASTERS_OUTAGE_FILE_NAME}"
+                    env.THREE_MASTERS_OUTAGE = "${env.TEMP_DIR}/${THREE_MASTERS_OUTAGE_FILE_NAME}"
 
                     // Prepare credential files
                     sh """
@@ -71,6 +77,8 @@ pipeline {
                         umask 77
                         cp '${GOOGLE_DRIVE_CREDENTIALS_FILE}' '${env.GOOGLE_DRIVE_CREDENTIALS}' || error "Failed to copy ${GOOGLE_DRIVE_CREDENTIALS_FILE}"
                         cp '${GOOGLE_DRIVE_TOKEN_FILE}' '${env.GOOGLE_DRIVE_TOKEN}' || error "Failed to copy ${GOOGLE_DRIVE_TOKEN_FILE}"
+                        cp '${TWO_MASTERS_OUTAGE_FILE_PATH}' '${env.TWO_MASTERS_OUTAGE}' || error "Failed to copy ${TWO_MASTERS_OUTAGE_FILE_PATH}"
+                        cp '${THREE_MASTERS_OUTAGE_FILE_PATH}' '${env.THREE_MASTERS_OUTAGE}' || error "Failed to copy ${TWO_MASTERS_OUTAGE_FILE_PATH}"
                     """
                 }
             }
@@ -91,8 +99,8 @@ pipeline {
                           -e ELASTICSEARCH='${ELASTICSEARCH}' \
                           -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' \
                           -e GOOGLE_DRIVE_PATH='${GOOGLE_DRIVE_PATH}' \
-                          -e GOOGLE_DRIVE_CREDENTIALS_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_CREDENTIALS_FILE}' \
-                          -e GOOGLE_DRIVE_TOKEN_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_TOKEN_FILE}' \
+                          -e GOOGLE_DRIVE_CREDENTIALS_FILE='${DESTINATION_PATH}/${GOOGLE_CREDENTIALS_FILE}' \
+                          -e GOOGLE_DRIVE_TOKEN_FILE='${DESTINATION_PATH}/${GOOGLE_TOKEN_FILE}' \
                           -e GOOGLE_DRIVE_SHARED_DRIVE_ID='${GOOGLE_DRIVE_SHARED_DRIVE_ID}' \
                           -e RUN_TYPE='${RUN_TYPE}' \
                           -e SAVE_ARTIFACTS_LOCAL=${SAVE_ARTIFACTS_LOCAL} \
@@ -100,14 +108,14 @@ pipeline {
                           -e log_level='INFO' \
                           -v '${LOCAL_LOG_PATH}:${LOCAL_LOG_PATH}' \
                           -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
-                          -v '${TEMP_DIR}:${GOOGLE_DESTINATION_PATH}' \
+                          -v '${TEMP_DIR}:${DESTINATION_PATH}' \
                           --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}'
                       """
                  }
               }
             } // KrknHub - master-node-cpu-hog-before-upgrade
 
-            stage('Fedora Verifications - after master-node-cpu-hog-before-upgrade') {
+        stage('Fedora Verifications - after master-node-cpu-hog-before-upgrade') {
                 steps {
                     script {
                             sh """
@@ -118,8 +126,8 @@ pipeline {
                                 -e ELASTICSEARCH='${ELASTICSEARCH}' \
                                 -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' \
                                 -e GOOGLE_DRIVE_PATH='${GOOGLE_DRIVE_PATH}' \
-                                -e GOOGLE_DRIVE_CREDENTIALS_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_CREDENTIALS_FILE}' \
-                                -e GOOGLE_DRIVE_TOKEN_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_TOKEN_FILE}' \
+                                -e GOOGLE_DRIVE_CREDENTIALS_FILE='${DESTINATION_PATH}/${GOOGLE_CREDENTIALS_FILE}' \
+                                -e GOOGLE_DRIVE_TOKEN_FILE='${DESTINATION_PATH}/${GOOGLE_TOKEN_FILE}' \
                                 -e GOOGLE_DRIVE_SHARED_DRIVE_ID='${GOOGLE_DRIVE_SHARED_DRIVE_ID}' \
                                 -e RUN_TYPE='${RUN_TYPE}' \
                                 -e SCALE='${BOOTSTORM_SCALE}' \
@@ -133,7 +141,7 @@ pipeline {
                                 -e log_level='INFO' \
                                 -v '${LOCAL_LOG_PATH}:${LOCAL_LOG_PATH}' \
                                 -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
-                                -v '${TEMP_DIR}:${GOOGLE_DESTINATION_PATH}' \
+                                -v '${TEMP_DIR}:${DESTINATION_PATH}' \
                                 --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}'
                                 """
                     }
@@ -155,8 +163,8 @@ pipeline {
                           -e ELASTICSEARCH='${ELASTICSEARCH}' \
                           -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' \
                           -e GOOGLE_DRIVE_PATH='${GOOGLE_DRIVE_PATH}' \
-                          -e GOOGLE_DRIVE_CREDENTIALS_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_CREDENTIALS_FILE}' \
-                          -e GOOGLE_DRIVE_TOKEN_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_TOKEN_FILE}' \
+                          -e GOOGLE_DRIVE_CREDENTIALS_FILE='${DESTINATION_PATH}/${GOOGLE_CREDENTIALS_FILE}' \
+                          -e GOOGLE_DRIVE_TOKEN_FILE='${DESTINATION_PATH}/${GOOGLE_TOKEN_FILE}' \
                           -e GOOGLE_DRIVE_SHARED_DRIVE_ID='${GOOGLE_DRIVE_SHARED_DRIVE_ID}' \
                           -e RUN_TYPE='${RUN_TYPE}' \
                           -e SAVE_ARTIFACTS_LOCAL=${SAVE_ARTIFACTS_LOCAL} \
@@ -164,7 +172,7 @@ pipeline {
                           -e log_level='INFO' \
                           -v '${LOCAL_LOG_PATH}:${LOCAL_LOG_PATH}' \
                           -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
-                          -v '${TEMP_DIR}:${GOOGLE_DESTINATION_PATH}' \
+                          -v '${TEMP_DIR}:${DESTINATION_PATH}' \
                           --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}'
                       """
                  }
@@ -182,8 +190,8 @@ pipeline {
                                 -e ELASTICSEARCH='${ELASTICSEARCH}' \
                                 -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' \
                                 -e GOOGLE_DRIVE_PATH='${GOOGLE_DRIVE_PATH}' \
-                                -e GOOGLE_DRIVE_CREDENTIALS_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_CREDENTIALS_FILE}' \
-                                -e GOOGLE_DRIVE_TOKEN_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_TOKEN_FILE}' \
+                                -e GOOGLE_DRIVE_CREDENTIALS_FILE='${DESTINATION_PATH}/${GOOGLE_CREDENTIALS_FILE}' \
+                                -e GOOGLE_DRIVE_TOKEN_FILE='${DESTINATION_PATH}/${GOOGLE_TOKEN_FILE}' \
                                 -e GOOGLE_DRIVE_SHARED_DRIVE_ID='${GOOGLE_DRIVE_SHARED_DRIVE_ID}' \
                                 -e RUN_TYPE='${RUN_TYPE}' \
                                 -e SCALE='${BOOTSTORM_SCALE}' \
@@ -197,14 +205,142 @@ pipeline {
                                 -e log_level='INFO' \
                                 -v '${LOCAL_LOG_PATH}:${LOCAL_LOG_PATH}' \
                                 -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
-                                -v '${TEMP_DIR}:${GOOGLE_DESTINATION_PATH}' \
+                                -v '${TEMP_DIR}:${DESTINATION_PATH}' \
                                 --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}'
                                 """
                     }
                 }
             } // Fedora Verifications - after master-node-failure-before-upgrade
 
-            stage('KrknHub - worker-node-cpu-hog-before-upgrade') {
+        stage('KrknHub: two-masters-node-failure-before-upgrade') {
+              steps {
+                  script {
+                      // boolean value w/o ''
+                      sh """
+                          sudo podman run --rm -t \
+                          -e WORKLOAD='krknhub' \
+                          -e KRKNHUB_WORKLOAD='node-scenarios' \
+                          -e TEST_NAME='two-masters-node-failure-before-upgrade' \
+                          -e KRKNHUB_YAML_FILE_PATH=${DESTINATION_PATH}/${TWO_MASTERS_OUTAGE_FILE_NAME}' \
+                          -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' \
+                          -e PROVISION_KUBECONFIG_PATH='${PROVISION_KUBECONFIG_PATH}' \
+                          -e ELASTICSEARCH='${ELASTICSEARCH}' \
+                          -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' \
+                          -e GOOGLE_DRIVE_PATH='${GOOGLE_DRIVE_PATH}' \
+                          -e GOOGLE_DRIVE_CREDENTIALS_FILE='${DESTINATION_PATH}/${GOOGLE_CREDENTIALS_FILE}' \
+                          -e GOOGLE_DRIVE_TOKEN_FILE='${DESTINATION_PATH}/${GOOGLE_TOKEN_FILE}' \
+                          -e GOOGLE_DRIVE_SHARED_DRIVE_ID='${GOOGLE_DRIVE_SHARED_DRIVE_ID}' \
+                          -e RUN_TYPE='${RUN_TYPE}' \
+                          -e SAVE_ARTIFACTS_LOCAL=${SAVE_ARTIFACTS_LOCAL} \
+                          -e TIMEOUT='${TIMEOUT}' \
+                          -e log_level='INFO' \
+                          -v '${LOCAL_LOG_PATH}:${LOCAL_LOG_PATH}' \
+                          -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
+                          -v '${TEMP_DIR}:${DESTINATION_PATH}' \
+                          --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}'
+                      """
+                 }
+              }
+            } // KrknHub: two-masters-node-failure-before-upgrade
+
+        stage('Fedora Verifications - after two-masters-node-failure-before-upgrade') {
+                steps {
+                    script {
+                            sh """
+                                sudo podman run --rm -t \
+                                -e WORKLOAD='bootstorm_vm' \
+                                -e TEST_NAME='two-masters-node-failure-before-upgrade' \
+                                -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' \
+                                -e ELASTICSEARCH='${ELASTICSEARCH}' \
+                                -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' \
+                                -e GOOGLE_DRIVE_PATH='${GOOGLE_DRIVE_PATH}' \
+                                -e GOOGLE_DRIVE_CREDENTIALS_FILE='${DESTINATION_PATH}/${GOOGLE_CREDENTIALS_FILE}' \
+                                -e GOOGLE_DRIVE_TOKEN_FILE='${DESTINATION_PATH}/${GOOGLE_TOKEN_FILE}' \
+                                -e GOOGLE_DRIVE_SHARED_DRIVE_ID='${GOOGLE_DRIVE_SHARED_DRIVE_ID}' \
+                                -e RUN_TYPE='${RUN_TYPE}' \
+                                -e SCALE='${BOOTSTORM_SCALE}' \
+                                -e SCALE_NODES='${SCALE_NODES}' \
+                                -e THREADS_LIMIT='${THREADS_LIMIT}' \
+                                -e DELETE_ALL=${DELETE_ALL} \
+                                -e VERIFICATION_ONLY=${VERIFICATION_ONLY} \
+                                -e MUST_GATHER_LOG=${MUST_GATHER_LOG} \
+                                -e SAVE_ARTIFACTS_LOCAL=${SAVE_ARTIFACTS_LOCAL} \
+                                -e TIMEOUT='${TIMEOUT}' \
+                                -e log_level='INFO' \
+                                -v '${LOCAL_LOG_PATH}:${LOCAL_LOG_PATH}' \
+                                -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
+                                -v '${TEMP_DIR}:${DESTINATION_PATH}' \
+                                --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}'
+                                """
+                    }
+                }
+            } // Fedora Verifications - after two-masters-node-failure-before-upgrade
+
+        stage('KrknHub: three-masters-node-failure-before-upgrade') {
+              steps {
+                  script {
+                      // boolean value w/o ''
+                      sh """
+                          sudo podman run --rm -t \
+                          -e WORKLOAD='krknhub' \
+                          -e KRKNHUB_WORKLOAD='node-scenarios' \
+                          -e TEST_NAME='three-masters-node-failure-before-upgrade' \
+                          -e KRKNHUB_YAML_FILE_PATH=${DESTINATION_PATH}/${THREE_MASTERS_OUTAGE_FILE_NAME}' \
+                          -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' \
+                          -e PROVISION_KUBECONFIG_PATH='${PROVISION_KUBECONFIG_PATH}' \
+                          -e ELASTICSEARCH='${ELASTICSEARCH}' \
+                          -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' \
+                          -e GOOGLE_DRIVE_PATH='${GOOGLE_DRIVE_PATH}' \
+                          -e GOOGLE_DRIVE_CREDENTIALS_FILE='${DESTINATION_PATH}/${GOOGLE_CREDENTIALS_FILE}' \
+                          -e GOOGLE_DRIVE_TOKEN_FILE='${DESTINATION_PATH}/${GOOGLE_TOKEN_FILE}' \
+                          -e GOOGLE_DRIVE_SHARED_DRIVE_ID='${GOOGLE_DRIVE_SHARED_DRIVE_ID}' \
+                          -e RUN_TYPE='${RUN_TYPE}' \
+                          -e SAVE_ARTIFACTS_LOCAL=${SAVE_ARTIFACTS_LOCAL} \
+                          -e TIMEOUT='${TIMEOUT}' \
+                          -e log_level='INFO' \
+                          -v '${LOCAL_LOG_PATH}:${LOCAL_LOG_PATH}' \
+                          -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
+                          -v '${TEMP_DIR}:${DESTINATION_PATH}' \
+                          --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}'
+                      """
+                 }
+              }
+            } // KrknHub: three-masters-node-failure-before-upgrade
+
+        stage('Fedora Verifications - after three-masters-node-failure-before-upgrade') {
+                steps {
+                    script {
+                            sh """
+                                sudo podman run --rm -t \
+                                -e WORKLOAD='bootstorm_vm' \
+                                -e TEST_NAME='three-masters-node-failure-before-upgrade' \
+                                -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' \
+                                -e ELASTICSEARCH='${ELASTICSEARCH}' \
+                                -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' \
+                                -e GOOGLE_DRIVE_PATH='${GOOGLE_DRIVE_PATH}' \
+                                -e GOOGLE_DRIVE_CREDENTIALS_FILE='${DESTINATION_PATH}/${GOOGLE_CREDENTIALS_FILE}' \
+                                -e GOOGLE_DRIVE_TOKEN_FILE='${DESTINATION_PATH}/${GOOGLE_TOKEN_FILE}' \
+                                -e GOOGLE_DRIVE_SHARED_DRIVE_ID='${GOOGLE_DRIVE_SHARED_DRIVE_ID}' \
+                                -e RUN_TYPE='${RUN_TYPE}' \
+                                -e SCALE='${BOOTSTORM_SCALE}' \
+                                -e SCALE_NODES='${SCALE_NODES}' \
+                                -e THREADS_LIMIT='${THREADS_LIMIT}' \
+                                -e DELETE_ALL=${DELETE_ALL} \
+                                -e VERIFICATION_ONLY=${VERIFICATION_ONLY} \
+                                -e MUST_GATHER_LOG=${MUST_GATHER_LOG} \
+                                -e SAVE_ARTIFACTS_LOCAL=${SAVE_ARTIFACTS_LOCAL} \
+                                -e TIMEOUT='${TIMEOUT}' \
+                                -e log_level='INFO' \
+                                -v '${LOCAL_LOG_PATH}:${LOCAL_LOG_PATH}' \
+                                -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
+                                -v '${TEMP_DIR}:${DESTINATION_PATH}' \
+                                --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}'
+                                """
+                    }
+                }
+            } // Fedora Verifications - after three-masters-node-failure-before-upgrade
+
+        stage('KrknHub - worker-node-cpu-hog-before-upgrade') {
               steps {
                   script {
                       // boolean value w/o ''
@@ -219,8 +355,8 @@ pipeline {
                           -e ELASTICSEARCH='${ELASTICSEARCH}' \
                           -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' \
                           -e GOOGLE_DRIVE_PATH='${GOOGLE_DRIVE_PATH}' \
-                          -e GOOGLE_DRIVE_CREDENTIALS_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_CREDENTIALS_FILE}' \
-                          -e GOOGLE_DRIVE_TOKEN_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_TOKEN_FILE}' \
+                          -e GOOGLE_DRIVE_CREDENTIALS_FILE='${DESTINATION_PATH}/${GOOGLE_CREDENTIALS_FILE}' \
+                          -e GOOGLE_DRIVE_TOKEN_FILE='${DESTINATION_PATH}/${GOOGLE_TOKEN_FILE}' \
                           -e GOOGLE_DRIVE_SHARED_DRIVE_ID='${GOOGLE_DRIVE_SHARED_DRIVE_ID}' \
                           -e RUN_TYPE='${RUN_TYPE}' \
                           -e SAVE_ARTIFACTS_LOCAL=${SAVE_ARTIFACTS_LOCAL} \
@@ -228,14 +364,14 @@ pipeline {
                           -e log_level='INFO' \
                           -v '${LOCAL_LOG_PATH}:${LOCAL_LOG_PATH}' \
                           -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
-                          -v '${TEMP_DIR}:${GOOGLE_DESTINATION_PATH}' \
+                          -v '${TEMP_DIR}:${DESTINATION_PATH}' \
                           --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}'
                       """
                  }
               }
             } // KrknHub - worker-node-cpu-hog-before-upgrade
 
-            stage('Fedora Verifications - after worker-node-cpu-hog-before-upgrade') {
+        stage('Fedora Verifications - after worker-node-cpu-hog-before-upgrade') {
                 steps {
                     script {
                             sh """
@@ -246,8 +382,8 @@ pipeline {
                                 -e ELASTICSEARCH='${ELASTICSEARCH}' \
                                 -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' \
                                 -e GOOGLE_DRIVE_PATH='${GOOGLE_DRIVE_PATH}' \
-                                -e GOOGLE_DRIVE_CREDENTIALS_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_CREDENTIALS_FILE}' \
-                                -e GOOGLE_DRIVE_TOKEN_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_TOKEN_FILE}' \
+                                -e GOOGLE_DRIVE_CREDENTIALS_FILE='${DESTINATION_PATH}/${GOOGLE_CREDENTIALS_FILE}' \
+                                -e GOOGLE_DRIVE_TOKEN_FILE='${DESTINATION_PATH}/${GOOGLE_TOKEN_FILE}' \
                                 -e GOOGLE_DRIVE_SHARED_DRIVE_ID='${GOOGLE_DRIVE_SHARED_DRIVE_ID}' \
                                 -e RUN_TYPE='${RUN_TYPE}' \
                                 -e SCALE='${BOOTSTORM_SCALE}' \
@@ -261,14 +397,14 @@ pipeline {
                                 -e log_level='INFO' \
                                 -v '${LOCAL_LOG_PATH}:${LOCAL_LOG_PATH}' \
                                 -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
-                                -v '${TEMP_DIR}:${GOOGLE_DESTINATION_PATH}' \
+                                -v '${TEMP_DIR}:${DESTINATION_PATH}' \
                                 --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}'
                                 """
                     }
                 }
             } // Fedora Verifications - after worker-node-cpu-hog-before-upgrade
 
-            stage('KrknHub - worker-node-failure-before-upgrade') {
+        stage('KrknHub - worker-node-failure-before-upgrade') {
               steps {
                   script {
                       // boolean value w/o ''
@@ -283,8 +419,8 @@ pipeline {
                           -e ELASTICSEARCH='${ELASTICSEARCH}' \
                           -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' \
                           -e GOOGLE_DRIVE_PATH='${GOOGLE_DRIVE_PATH}' \
-                          -e GOOGLE_DRIVE_CREDENTIALS_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_CREDENTIALS_FILE}' \
-                          -e GOOGLE_DRIVE_TOKEN_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_TOKEN_FILE}' \
+                          -e GOOGLE_DRIVE_CREDENTIALS_FILE='${DESTINATION_PATH}/${GOOGLE_CREDENTIALS_FILE}' \
+                          -e GOOGLE_DRIVE_TOKEN_FILE='${DESTINATION_PATH}/${GOOGLE_TOKEN_FILE}' \
                           -e GOOGLE_DRIVE_SHARED_DRIVE_ID='${GOOGLE_DRIVE_SHARED_DRIVE_ID}' \
                           -e RUN_TYPE='${RUN_TYPE}' \
                           -e SAVE_ARTIFACTS_LOCAL=${SAVE_ARTIFACTS_LOCAL} \
@@ -292,7 +428,7 @@ pipeline {
                           -e log_level='INFO' \
                           -v '${LOCAL_LOG_PATH}:${LOCAL_LOG_PATH}' \
                           -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
-                          -v '${TEMP_DIR}:${GOOGLE_DESTINATION_PATH}' \
+                          -v '${TEMP_DIR}:${DESTINATION_PATH}' \
                           --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}'
                       """
                  }
@@ -310,8 +446,8 @@ pipeline {
                                 -e ELASTICSEARCH='${ELASTICSEARCH}' \
                                 -e ELASTICSEARCH_PORT='${ELASTICSEARCH_PORT}' \
                                 -e GOOGLE_DRIVE_PATH='${GOOGLE_DRIVE_PATH}' \
-                                -e GOOGLE_DRIVE_CREDENTIALS_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_CREDENTIALS_FILE}' \
-                                -e GOOGLE_DRIVE_TOKEN_FILE='${GOOGLE_DESTINATION_PATH}/${GOOGLE_TOKEN_FILE}' \
+                                -e GOOGLE_DRIVE_CREDENTIALS_FILE='${DESTINATION_PATH}/${GOOGLE_CREDENTIALS_FILE}' \
+                                -e GOOGLE_DRIVE_TOKEN_FILE='${DESTINATION_PATH}/${GOOGLE_TOKEN_FILE}' \
                                 -e GOOGLE_DRIVE_SHARED_DRIVE_ID='${GOOGLE_DRIVE_SHARED_DRIVE_ID}' \
                                 -e RUN_TYPE='${RUN_TYPE}' \
                                 -e SCALE='${BOOTSTORM_SCALE}' \
@@ -325,7 +461,7 @@ pipeline {
                                 -e log_level='INFO' \
                                 -v '${LOCAL_LOG_PATH}:${LOCAL_LOG_PATH}' \
                                 -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' \
-                                -v '${TEMP_DIR}:${GOOGLE_DESTINATION_PATH}' \
+                                -v '${TEMP_DIR}:${DESTINATION_PATH}' \
                                 --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}'
                                 """
                     }
