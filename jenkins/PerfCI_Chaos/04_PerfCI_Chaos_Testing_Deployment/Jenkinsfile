@@ -221,7 +221,7 @@ pipeline {
                           -e WORKLOAD='krknhub' \
                           -e KRKNHUB_WORKLOAD='node-scenarios' \
                           -e TEST_NAME='two-masters-node-failure-before-upgrade' \
-                          -e KRKNHUB_YAML_FILE_PATH=${DESTINATION_PATH}/${TWO_MASTERS_OUTAGE_FILE_NAME}' \
+                          -e KRKNHUB_YAML_FILE_PATH='${DESTINATION_PATH}/${TWO_MASTERS_OUTAGE_FILE_NAME}' \
                           -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' \
                           -e PROVISION_KUBECONFIG_PATH='${PROVISION_KUBECONFIG_PATH}' \
                           -e ELASTICSEARCH='${ELASTICSEARCH}' \
@@ -285,7 +285,7 @@ pipeline {
                           -e WORKLOAD='krknhub' \
                           -e KRKNHUB_WORKLOAD='node-scenarios' \
                           -e TEST_NAME='three-masters-node-failure-before-upgrade' \
-                          -e KRKNHUB_YAML_FILE_PATH=${DESTINATION_PATH}/${THREE_MASTERS_OUTAGE_FILE_NAME}' \
+                          -e KRKNHUB_YAML_FILE_PATH='${DESTINATION_PATH}/${THREE_MASTERS_OUTAGE_FILE_NAME}' \
                           -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' \
                           -e PROVISION_KUBECONFIG_PATH='${PROVISION_KUBECONFIG_PATH}' \
                           -e ELASTICSEARCH='${ELASTICSEARCH}' \
