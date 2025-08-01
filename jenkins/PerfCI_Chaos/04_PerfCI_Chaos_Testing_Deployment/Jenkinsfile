@@ -19,8 +19,8 @@ pipeline {
         GOOGLE_DRIVE_SHARED_DRIVE_ID = credentials('perfci_google_drive_shared_drive_id')
         TWO_MASTERS_OUTAGE_FILE_PATH = credentials('perfci_two_masters_outage_file_path')
         THREE_MASTERS_OUTAGE_FILE_PATH = credentials('perfci_three_masters_outage_file_path')
-        TWO_MASTERS_OUTAGE_FILE_NAME = 'two-master-outage.yml'
-        THREE_MASTERS_OUTAGE_FILE_NAME = 'three-master-outage.yml'
+        TWO_MASTERS_OUTAGE_FILE_NAME = 'two-masters-outage.yml'
+        THREE_MASTERS_OUTAGE_FILE_NAME = 'three-masters-outage.yml'
         KUBEADMIN_PASSWORD = readFile('/home/jenkins/.kube/kubeadmin-password').trim()
         PROVISION_KUBECONFIG_PATH = '/root/.kube/config' // required for krknhub
         DELETE_ALL = 'False' // Not delete the running VMs
