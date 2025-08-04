@@ -14,6 +14,9 @@ pipeline {
         WORKER_DISK_IDS = credentials('perfci_worker_disk_ids')
         EXPECTED_NODES = credentials('perfci_expected_nodes')
         QUAY_BENCHMARK_RUNNER_REPOSITORY = credentials('perfci_quay_repository')
+        BMC_USER = credentials('perfci_bmc_user')
+        BMC_PASSWORD = credentials('perfci_bmc_password')
+        BMC_IPS = credentials('perfci_bmc_ips')
         KUBEADMIN_PASSWORD = readFile('/home/jenkins/.kube/kubeadmin-password').trim()
         KUBEADMIN_PASSWORD_PATH = '/home/jenkins/.kube/kubeadmin-password'
         KUBECONFIG_PATH = '/root/.kube/config'
@@ -117,6 +120,9 @@ END
                                                             -e PROVISION_PORT='${PROVISION_PORT}' \
                                                             -e WORKER_DISK_IDS='${WORKER_DISK_IDS}' \
                                                             -e WORKER_DISK_PREFIX='${WORKER_DISK_PREFIX}' \
+                                                            -e BMC_USER='${BMC_USER}' \
+                                                            -e BMC_PASSWORD='${BMC_PASSWORD}' \
+                                                            -e BMC_IPS='${BMC_IPS}' \
                                                             -e PROVISION_TIMEOUT='${PROVISION_TIMEOUT}' \
                                                             -e log_level='INFO' \
                                                             -v '${PRIVATE_KEY_PATH}:${CONTAINER_PRIVATE_KEY_PATH}' \
