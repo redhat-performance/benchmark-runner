@@ -199,6 +199,20 @@ class OC(SSH):
         """
         return self.run(f"{self._cli} get csv -n openshift-cnv -o json | jq -r '.items[] | select(.metadata.name | startswith(\"kubevirt-hyperconverged-operator\")) | .spec.version'")
 
+    def get_nhc_version(self):
+        """
+        This method returns Node Health Check Operator version
+        :return:
+        """
+        return self.run(f"""{self._cli} get csv -n openshift-workload-availability -o json | jq -r '.items[] | select(.metadata.name | startswith("node-healthcheck-operator")) | .spec.version'""")
+
+    def get_far_version(self):
+        """
+        This method returns Fence Agents Remediation Operator version
+        :return:
+        """
+        return self.run(f"""{self._cli} get csv -n openshift-workload-availability -o json | jq -r '.items[] | select(.metadata.name | startswith("fence-agents-remediation")) | .spec.version'""")
+
     def get_odf_version(self):
         """
         This method returns the ODF version by extracting it from the csv name.
