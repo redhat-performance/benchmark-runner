@@ -249,6 +249,8 @@ class EnvironmentVariables:
         self._environment_variables_dict['upgrade_masters_duration_seconds'] = EnvironmentVariables.get_env('UPGRADE_MASTERS_DURATION_SECONDS', '')
         # upgrade workers duration seconds
         self._environment_variables_dict['upgrade_workers_duration_seconds'] = EnvironmentVariables.get_env('UPGRADE_WORKERS_DURATION_SECONDS', '')
+        # Skip the all namespaces operators list
+        self._environment_variables_dict['skip_all_namespaces_operators_list'] = EnvironmentVariables.get_env('SKIP_ALL_NAMESPACES_OPERATORS_LIST', "[ 'node-healthcheck-operator', 'self-node-remediation', 'fence-agents-remediation' ]")
 
         # SNO or empty for regular
         self._environment_variables_dict['cluster_type'] = EnvironmentVariables.get_env('CLUSTER_TYPE', '')
