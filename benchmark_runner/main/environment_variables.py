@@ -249,6 +249,8 @@ class EnvironmentVariables:
         self._environment_variables_dict['upgrade_masters_duration_seconds'] = EnvironmentVariables.get_env('UPGRADE_MASTERS_DURATION_SECONDS', '')
         # upgrade workers duration seconds
         self._environment_variables_dict['upgrade_workers_duration_seconds'] = EnvironmentVariables.get_env('UPGRADE_WORKERS_DURATION_SECONDS', '')
+        # Exclude the default operator list from CSV operator verification during upgrade
+        self._environment_variables_dict['exclude_default_operators'] = literal_eval(EnvironmentVariables.get_env('EXCLUDE_DEFAULT_OPERATORS', "[]"))
 
         # SNO or empty for regular
         self._environment_variables_dict['cluster_type'] = EnvironmentVariables.get_env('CLUSTER_TYPE', '')

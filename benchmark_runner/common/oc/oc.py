@@ -42,6 +42,8 @@ class OC(SSH):
         self.__kata_csv = self.__environment_variables_dict.get('kata_csv', '')
         self.__worker_disk_prefix = self.__environment_variables_dict.get('worker_disk_prefix', '')
         self.__worker_disk_ids = self.__environment_variables_dict.get('worker_disk_ids', '')
+        self.__exclude_default_operators = self.__environment_variables_dict.get('exclude_default_operators', '')
+        self.__exclude_operators_pattern = "|".join(self.__exclude_default_operators)
         if self.__worker_disk_ids:
             self.__worker_disk_ids = ast.literal_eval(self.__worker_disk_ids)
         self._cli = self.__environment_variables_dict.get('cli', '')
@@ -957,8 +959,8 @@ class OC(SSH):
         current_wait_time = 0
 
         while timeout <= 0 or current_wait_time <= timeout:
-            #  Filter out node-healthcheck-operator and self-node-remediation during CSV verification because they exist in all namespaces
-            upgrade_versions = self.run(f"{self._cli} get csv -n {namespace} -o json | jq -r '.items[] | select(.metadata.name | test(\"node-healthcheck-operator|self-node-remediation\") | not) | .spec.version'".splitlines()
+            #  Filter out default operators during CSV verification because they exist in all namespaces
+            upgrade_versions = self.run(f"{self._cli} get csv -n {namespace} -o json | jq -r '.items[] | select(.metadata.name | test(\"{self.__exclude_operators_pattern}\") | not) | .spec.version'".splitlines()
 ).splitlines()
             count_upgrade_version = sum(1 for actual_upgrade_version in upgrade_versions if
                                         '.'.join(actual_upgrade_version.split('.')[0:2]) == upgrade_version)
