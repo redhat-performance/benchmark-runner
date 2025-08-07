@@ -413,6 +413,8 @@ class WorkloadsOperations:
         metadata = {'ocp_version': self._oc.get_ocp_server_version(),
                     'previous_ocp_version': '' if len(self._oc.get_previous_ocp_version()) > 10 else self._oc.get_previous_ocp_version(),
                     'cnv_version': self._oc.get_cnv_version(),
+                    'nhc_version': self._oc.get_nhc_version(),
+                    'far_version': self._oc.get_far_version(),
                     'kata_version': self._oc.get_kata_operator_version(),
                     'kata_rpm_version': self._oc.get_kata_rpm_version(node=self._pin_node1),
                     'odf_version': self._oc.get_odf_version(),
