@@ -47,6 +47,7 @@ pipeline {
         KRKNHUB_MASTER_0_NODE_FAILURE_ENVIRONMENT_VARIABLES = credentials('perfci_krknhub_master_0_node_failure')
         KRKNHUB_WORKER_1_CPU_HOG_ENVIRONMENT_VARIABLES = credentials('perfci_krknhub_worker_1_cpu_hog')
         KRKNHUB_WORKER_0_NODE_FAILURE_ENVIRONMENT_VARIABLES = credentials('perfci_krknhub_worker_0_node_failure')
+        SKIP_ALL_NAMESPACES_OPERATORS_LIST = "[ 'node-healthcheck-operator', 'self-node-remediation', 'fence-agents-remediation' ]"
     }
     stages {
         stage('Cleanup') {
@@ -107,6 +108,7 @@ pipeline {
                                             -e LSO_VERSION="${LSO_VERSION}" \
                                             -e ODF_VERSION="${ODF_VERSION}" \
                                             -e CNV_VERSION="${CNV_VERSION}" \
+                                            -e SKIP_ALL_NAMESPACES_OPERATORS_LIST="${SKIP_ALL_NAMESPACES_OPERATORS_LIST}" \
                                             -e EXPECTED_NODES='${EXPECTED_NODES}' \
                                             -e KUBEADMIN_PASSWORD="${KUBEADMIN_PASSWORD}" \
                                             -e TIMEOUT="${TIMEOUT}" \
