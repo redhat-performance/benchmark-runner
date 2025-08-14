@@ -302,16 +302,16 @@ class BareMetalOperations:
         if oc.get_upgrade_version() != self._upgrade_ocp_version:
             return False
 
-        # Operator details mapping
+        # Operator details mapping: short_key -> (version, namespace, operator_name_prefix)
         operators_to_check = {
-            "cnv": (cnv_version, "openshift-cnv"),
-            "odf": (odf_version, "openshift-storage"),
-            "lso": (lso_version, "openshift-local-storage"),
+            "cnv": (cnv_version, "openshift-cnv", "kubevirt-hyperconverged-operator"),
+            "odf": (odf_version, "openshift-storage", "odf-operator"),
+            "lso": (lso_version, "openshift-local-storage", "local-storage-operator"),
         }
 
         upgrade_checks = [
-            oc.wait_for_operator_installation(operator=op, version=ver, namespace=ns)
-            for op, (ver, ns) in operators_to_check.items()
+            oc.wait_for_operator_installation(operator_name=operator_name, version=ver, namespace=ns)
+            for _, (ver, ns, operator_name) in operators_to_check.items()
             if ver  # only include if a version was specified
         ]
 

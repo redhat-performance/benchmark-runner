@@ -154,34 +154,39 @@ class OC(SSH):
         """
         return self.run(f"{self._cli} get clusterversion version -o jsonpath='{{.status.conditions[?(@.type==\"Progressing\")].message}}'")
 
-    def get_operator_version(self, namespace):
+    def get_operator_version(self, namespace: str, operator_name: str = None):
         """
         This method returns the operator version from the specified namespace.
         @param namespace: str - The namespace to search for the operator version.
+        @param operator_name: str - The name of the operator to search for.
         @return: major version
         """
-        version = self.run(f"{self._cli} get csv -n {namespace} -o jsonpath='{{.items[0].spec.version}}'")
+        cmd = (
+            f"""{self._cli} get csv -n {namespace} -o json | """
+            f"""jq -r '.items[] | select(.metadata.name | startswith("{operator_name}")) | .spec.version'"""
+        )
+        version = self.run(cmd)
         return '.'.join(version.split('.')[:2])
 
-    def wait_for_operator_installation(self, operator: str, version: str, namespace: str, timeout: int =  SHORT_TIMEOUT):
+    def wait_for_operator_installation(self, operator_name: str, version: str, namespace: str, timeout: int =  SHORT_TIMEOUT):
         """
         This method waits till operator version is installed successfully
-        @param operator:
+        @param operator_name:
         @param version:
         @param timeout:
         @param namespace:
         @return:
         """
         current_wait_time = 0
-        while timeout <= 0 or current_wait_time <= timeout and not self.get_operator_version(namespace) == version:
+        while timeout <= 0 or current_wait_time <= timeout and not self.get_operator_version(namespace, operator_name) == version:
             # sleep for x seconds
             time.sleep(OC.SLEEP_TIME)
             current_wait_time += OC.SLEEP_TIME
-        if self.get_operator_version(namespace) == version:
-            logger.info(f'{operator} operator version: {version} in namespace: {namespace} has been installed successfully')
+        if self.get_operator_version(namespace, operator_name) == version:
+            logger.info(f'{operator_name} operator version: {version} in namespace: {namespace} has been installed successfully')
             return True
         else:
-            raise OperatorInstallationTimeout(operator=operator, version=version, namespace=namespace)
+            raise OperatorInstallationTimeout(operator=operator_name, version=version, namespace=namespace)
 
     def healthcheck(self, action: str):
         """
