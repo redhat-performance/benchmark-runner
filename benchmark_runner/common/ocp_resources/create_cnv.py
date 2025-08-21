@@ -42,18 +42,18 @@ class CreateCNV(CreateOCPResourceOperations):
                     if cnv_nightly_channel:
                         # wait till get the patch
                         self.wait_for_ocp_resource_create(operator=resource,
-                                                          verify_cmd="oc get InstallPlan -n openshift-cnv -o jsonpath={.items[0].metadata.name}",
+                                                          verify_cmd = """oc get installplan -n openshift-cnv -o json | jq -r '.items[] | select(.spec.clusterServiceVersionNames[] | startswith("kubevirt-hyperconverged-operator")) | select(.status.phase=="Complete") | .metadata.name' | tail -n1""",
                                                           status="install-")
                         self.apply_patch(namespace='openshift-cnv', operator='cnv')
                     # stable channel
                     else:
                         self.wait_for_ocp_resource_create(operator='cnv',
-                                                          verify_cmd="oc get csv -n openshift-cnv -o jsonpath='{.items[0].status.phase}'",
+                                                          verify_cmd="""oc get csv -n openshift-cnv -o json | jq -r '.items[] | select(.metadata.name | startswith("kubevirt-hyperconverged-operator")) | .status.phase'""",
                                                           status='Succeeded')
                 # for second script wait for refresh status
                 if '02_hyperconverge.yaml' in resource:
                     # Wait that till succeeded
                     self.wait_for_ocp_resource_create(operator='cnv',
-                                                      verify_cmd="oc get csv -n openshift-cnv -o jsonpath='{.items[0].status.phase}'",
+                                                      verify_cmd = """oc get csv -n openshift-cnv -o json | jq -r '.items[] | select(.metadata.name | startswith("kubevirt-hyperconverged-operator")) | .status.phase'""",
                                                       status='Succeeded')
         return True

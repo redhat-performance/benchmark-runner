@@ -161,14 +161,11 @@ class OC(SSH):
         @param operator_name: str - The name of the operator to search for.
         @return: major version
         """
-        cmd = (
-            f"""{self._cli} get csv -n {namespace} -o json | """
-            f"""jq -r '.items[] | select(.metadata.name | startswith("{operator_name}")) | .spec.version'"""
-        )
+        cmd = f"""{self._cli} get csv -n {namespace} -o json | jq -r '.items[] | select(.metadata.name | startswith("{operator_name}")) | .spec.version'"""
         version = self.run(cmd)
         return '.'.join(version.split('.')[:2])
 
-    def wait_for_operator_installation(self, operator_name: str, version: str, namespace: str, timeout: int =  SHORT_TIMEOUT):
+    def wait_for_operator_installation(self, operator_name: str, version: str, namespace: str, timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
         """
         This method waits till operator version is installed successfully
         @param operator_name:
