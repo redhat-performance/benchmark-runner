@@ -58,5 +58,5 @@ COPY benchmark_runner/main/main.py /benchmark_runner/main/main.py
 CMD [ "python3.12", "/benchmark_runner/main/main.py"]
 
 # How to build the Dockerfile ?
-# sudo podman build --build-arg OCP_CLIENT_VERSION=$OCP_CLIENT_VERSION--build-arg VIRTCTL_VERSION=$VIRTCTL_VERSION-t quay.io/benchmark-runner/benchmark-runner:latest . --no-cache
+# sudo podman build --build-arg OCP_CLIENT_VERSION=$OCP_CLIENT_VERSION--build-arg VIRTCTL_VERSION=$VIRTCTL_VERSION -t quay.io/benchmark-runner/benchmark-runner:latest . --no-cache
 # sudo podman run --rm -it -v /root/.kube/:/root/.kube/ -v /etc/hosts:/etc/hosts --privileged quay.io/benchmark-runner/benchmark-runner:latest /bin/bash

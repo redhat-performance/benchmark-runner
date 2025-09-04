@@ -42,7 +42,7 @@ class CreateCNV(CreateOCPResourceOperations):
                     if cnv_nightly_channel:
                         # wait till get the patch
                         self.wait_for_ocp_resource_create(operator=resource,
-                                                          verify_cmd = """oc get installplan -n openshift-cnv -o json | jq -r '.items[] | select(.spec.clusterServiceVersionNames[] | startswith("kubevirt-hyperconverged-operator")) | select(.status.phase=="Complete") | .metadata.name' | tail -n1""",
+                                                          verify_cmd="oc get installplan -n openshift-cnv -o json | jq -r '.items[] | select(.spec.clusterServiceVersionNames[] | startswith(\"kubevirt-hyperconverged-operator\")) | .metadata.name'",
                                                           status="install-")
                         self.apply_patch(namespace='openshift-cnv', operator='cnv')
                     # stable channel
