@@ -5,7 +5,7 @@ name: Deploy Assisted installer Perf Env Weekly CI
 
 on:
   schedule:
-    - cron: '0 4 * * 4' # run on Thursday at 4 AM UTC/ 0 AM EDT
+    - cron: '0 4 * * 5' # run on Friday at 4 AM UTC/ 0 AM EDT
   workflow_dispatch:
 
 # Ensures that only one deploy task per branch/environment will run at a time.
