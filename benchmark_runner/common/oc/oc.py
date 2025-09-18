@@ -52,6 +52,10 @@ class OC(SSH):
         else:
             self._kubeadmin_password = self.__environment_variables_dict.get('kubeadmin_password', '')
         self._kubeconfig_path = self.__environment_variables_dict.get('kubeconfig_path', '')
+        self._must_gather_log = self.__environment_variables_dict.get('must_gather_log', '')
+        self._run_artifacts_path = self.__environment_variables_dict.get('run_artifacts_path', '')
+        self._cnv_version = self.__environment_variables_dict.get('cnv_version', '')
+        self._odf_version = self.__environment_variables_dict.get('odf_version', '')
         # Singleton Login class
         SingletonOCLogin(self)
 
@@ -548,6 +552,9 @@ class OC(SSH):
             time.sleep(wait_time)
             current_wait_time += wait_time
         logger.info(f"oc get nodes:\n{self.run('oc get nodes')}")
+        if self._must_gather_log:
+            self.generate_must_gather(run_artifacts_path=self._run_artifacts_path, cnv_version=self._cnv_version,
+                                          odf_version=self._odf_version)
         raise NodeNotReady(nodes_status=nodes_status)
 
     @typechecked
@@ -1554,7 +1561,7 @@ class OC(SSH):
 
     @typechecked
     @logger_time_stamp
-    def generate_must_gather(self, destination_path: str = '/tmp'):
+    def generate_ocp_must_gather(self, destination_path: str = '/tmp'):
         """
         Generates OpenShift must-gather and stores it in the destination path.
 
@@ -1635,6 +1642,14 @@ class OC(SSH):
                 except Exception as remove_error:
                     raise RuntimeError(f"Failed to remove folder {folder_path}: {remove_error}")
             raise RuntimeError(f"Failed to generate CNV must-gather logs for version {cnv_version}: {e}")
+
+    def generate_must_gather(self, run_artifacts_path, cnv_version, odf_version):
+        """
+        This method generates must gather and saves it in the run artifacts path
+        """
+        self.generate_ocp_must_gather(destination_path=run_artifacts_path)
+        self.generate_cnv_must_gather(destination_path=run_artifacts_path, cnv_version=cnv_version)
+        self.generate_odf_must_gather(destination_path=run_artifacts_path, odf_version=odf_version)
 
     def save_to_yaml(self, vm_name, vm_access, output_dir='/tmp', namespace: str = environment_variables.environment_variables_dict['namespace']):
         """

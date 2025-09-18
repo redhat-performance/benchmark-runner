@@ -304,9 +304,7 @@ class BootstormVM(WorkloadsOperations):
 
             if failure_vms:
                 if self._must_gather_log:
-                    self._oc.generate_must_gather(destination_path=self._run_artifacts_path)
-                    self._oc.generate_cnv_must_gather(destination_path=self._run_artifacts_path, cnv_version=self._cnv_version)
-                    self._oc.generate_odf_must_gather(destination_path=self._run_artifacts_path, odf_version=self._odf_version)
+                    self._oc.generate_must_gather(destination_path=self._run_artifacts_path, cnv_version=self._cnv_version, odf_version=self._odf_version)
                 # Error log with details of failed VM, for catching all vm errors
                 logger.error(f"Failed to verify virtctl SSH login for the following VMs: {', '.join(failure_vms)}")
             # Upload artifacts in validation
