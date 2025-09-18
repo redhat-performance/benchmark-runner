@@ -119,7 +119,7 @@ class BareMetalOperations:
             return True
         else:
             if self._must_gather_log:
-                oc.generate_must_gather(destination_path=self._run_artifacts_path)
+                oc.generate_ocp_must_gather(destination_path=self._run_artifacts_path)
             raise OCPUpgradeFailed(status=oc.get_cluster_status())
 
     def _install_ocp_cmd(self):
