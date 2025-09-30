@@ -462,7 +462,7 @@ class BenchmarkOperatorWorkloadsOperations:
         :return:
         """
         workload_name = self._workload.split('_')
-        if workload_name[0] in self._workloads_odf_pvc:
+        if workload_name[0] in self._workloads_odf_pvc and '_lso' not in self._workload:
             if not self._oc.is_odf_installed():
                 raise ODFNotInstalled(workload=self._workload)
 
