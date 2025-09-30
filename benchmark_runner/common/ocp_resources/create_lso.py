@@ -10,11 +10,13 @@ class CreateLSO(CreateOCPResourceOperations):
     """
     This class is created Local Storage operator
     """
-    def __init__(self, oc: OC, path: str, resource_list: list):
+    def __init__(self, oc: OC, path: str, resource_list: list, lso_node: str, lso_disk_id: str):
         super().__init__(oc)
         self.__oc = oc
         self.__path = path
         self.__resource_list = resource_list
+        self.__lso_node = lso_node
+        self.__lso_disk_id = lso_disk_id
 
     @logger_time_stamp
     def create_lso(self, upgrade_version: str):
@@ -29,7 +31,15 @@ class CreateLSO(CreateOCPResourceOperations):
         else:
             for resource in self.__resource_list:
                 logger.info(f'run {resource}')
-                self.__oc.create_async(yaml=os.path.join(self.__path, resource))
+                if resource.endswith('.sh'):
+                    if '01_delete_disks.sh' == resource and self.__lso_disk_id:
+                        disk = f'/dev/disk/by-id/{self.__lso_disk_id}'
+                        delete_node_disk = f"""sudo mkfs.ext4 -F {disk}; sudo sgdisk --zap-all {disk}; sudo wipefs -a {disk}; sudo dd if=/dev/zero of='{disk}' bs=20M count=100 oflag=direct,dsync;"""
+                        logger.info(f'{self.__lso_node}: {delete_node_disk}')
+                        self.__oc.run(cmd=f'chmod +x {os.path.join(self.__path, resource)}; {self.__path}/./{resource} "{self.__lso_node}" "{delete_node_disk}"')
+                    else:
+                        logger.info(f'run {resource}')
+                        self.__oc.create_async(yaml=os.path.join(self.__path, resource))
 
             # verify once after create all resource files
             self.wait_for_ocp_resource_create(operator='lso',
