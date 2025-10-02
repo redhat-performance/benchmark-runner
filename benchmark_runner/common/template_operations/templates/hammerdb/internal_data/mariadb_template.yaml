@@ -33,7 +33,7 @@ spec:
         - key: kubernetes.io/hostname
           operator: In
           values:
-          - {{ pin_node2 }}
+          - {{ lso_node }}
   storageClassDevices:
     - storageClassName: local-sc
       volumeMode: Filesystem
