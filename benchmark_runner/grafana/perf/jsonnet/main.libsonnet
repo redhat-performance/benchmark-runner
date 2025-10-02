@@ -286,7 +286,8 @@ g.dashboard.new('PerfCI-Regression-Summary')
           + elasticsearch.withMetrics([
             elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('ci_minutes_time')
             + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('1')
-            + elasticsearch.metrics.MetricAggregationWithSettings.Max.settings.withScript('Integer.parseInt(\"0\"+doc["ocp_version.keyword"].value.replace(\".\",\"\").replace(\"r\",\"1\").replace(\"e\",\"0\").replace(\"c\",\"\").replace(\"f\",\"\").replace(\"-\",\"\"))')
+            // Convert OCP version string (like 4.20.0-rc.2) to an integer for numeric display in Grafana metrics
+            + elasticsearch.metrics.MetricAggregationWithSettings.Max.settings.withScript('Integer.parseInt(\"0\"+doc[\"ocp_version.keyword\"].value.replace(\".\",\"\").replace(\"-rc.\",\"0\").replace(\"-ec.\",\"0\").replace(\"-fc.\",\"0\").replace(\"-e\",\"0\").replace(\"-f\",\"0\").replace(\"r\",\"\").replace(\"c\",\"\").replace(\"e\",\"\").replace(\"f\",\"\").replace(\"-\",\"\") )')
             + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max')
 
           ])
