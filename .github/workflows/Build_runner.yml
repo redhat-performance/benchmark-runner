@@ -26,10 +26,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Set up Python 3.12
+    - name: Set up Python 3.13
       uses: actions/setup-python@v5
       with:
-        python-version: 3.12
+        python-version: 3.13
     - name: 🔨 Build and publish distribution 📦 to PyPI
       env:
         TWINE_USERNAME: __token__
@@ -46,10 +46,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Set up Python 3.12
+    - name: Set up Python 3.13
       uses: actions/setup-python@v5
       with:
-        python-version: 3.12
+        python-version: 3.13
     - name: Validate upload to PyPI
       env:
         TWINE_USERNAME: __token__
@@ -89,10 +89,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python 3.12
+      - name: Set up Python 3.13
         uses: actions/setup-python@v5
         with:
-          python-version: 3.12
+          python-version: 3.13
       - name: ⌛ Build and Upload 🐋 to quay.io
         run: |
           pip install setuptools
@@ -111,10 +111,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python 3.12
+      - name: Set up Python 3.13
         uses: actions/setup-python@v5
         with:
-          python-version: 3.12
+          python-version: 3.13
       - name: ⌛ Build and Upload 🐋 to quay.io
         run: |
           sudo docker build --build-arg OCP_CLIENT_VERSION=${{ secrets.PERF_OCP_CLIENT_VERSION }} --build-arg VIRTCTL_VERSION=${{ secrets.PERF_VIRTCTL_VERSION }} -t ${{ secrets.QUAY_BENCHMARK_RUNNER_REPOSITORY }}:latest .
@@ -129,10 +129,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python 3.12
+      - name: Set up Python 3.13
         uses: actions/setup-python@v5
         with:
-          python-version: 3.12
+          python-version: 3.13
       - name: ⚙ Set START CI TIME
         run: echo "START_CI=${{ needs.test.outputs.start_time_output }}" >> "$GITHUB_ENV"
       - name: Install latest benchmark-runner

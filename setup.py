@@ -34,6 +34,7 @@ setup(
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
         'Programming Language :: Python :: 3.12',
+        'Programming Language :: Python :: 3.13',
     ],
 
     zip_safe=False,
@@ -62,7 +63,7 @@ setup(
         'paramiko==3.4.0',
         'PyGitHub==1.55',  # update secrets
         'PyYAML==6.0.1',
-        'setuptools',  # for python3.12
+        'setuptools',  # for python3.13
         'sphinx==5.0.0',  # readthedocs
         'sphinx-rtd-theme==1.0.0',  # readthedocs
         'tenacity==8.0.1',  # retry decorator
