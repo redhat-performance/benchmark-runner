@@ -16,6 +16,7 @@ pipeline {
         GIT_TOKEN = credentials('perfci_git_token')
         GIT_REPOSITORY = credentials('perfci_git_repository')
         QUAY_BENCHMARK_RUNNER_REPOSITORY = credentials('perfci_quay_repository')
+        RUN_ARTIFACTS_PATH = "/tmp/benchmark-runner-run-artifacts"
     }
 
     stages {
@@ -23,6 +24,10 @@ pipeline {
             steps {
                 script {
                     try {
+                        // Delete only the workspace-local artifact folder (safe)
+                        sh "sudo rm -rf ${env.RUN_ARTIFACTS_PATH}"
+                        // Recreate artifact folder with Jenkins user permissions
+                        sh "mkdir -p ${env.RUN_ARTIFACTS_PATH}"
                         // Clean the Jenkins workspace
                         echo "Cleaning Jenkins workspace"
                         sh '[ -d ${WORKSPACE} ] && sudo rm -rf ${WORKSPACE}'
@@ -77,7 +82,7 @@ pipeline {
         stage('Update latest product versions in main.libsonnet') {
             steps {
                 script {
-                        sh """ PYTHONPATH="${WORKSPACE}" sudo python3 "${WORKSPACE}"/benchmark_runner/grafana/update_versions_main_libsonnet.py --elasticsearch=${ELASTICSEARCH} --elasticsearch_port='${ELASTICSEARCH_PORT}' --main_libsonnet_path='${MAIN_LIBSONNET_PATH}' """
+                        sh """ PYTHONPATH="${WORKSPACE}" python3 "${WORKSPACE}"/benchmark_runner/grafana/update_versions_main_libsonnet.py --elasticsearch=${ELASTICSEARCH} --elasticsearch_port='${ELASTICSEARCH_PORT}' --main_libsonnet_path='${MAIN_LIBSONNET_PATH}' """
                     }
             }
         }
@@ -151,7 +156,7 @@ pipeline {
                             if (CHANGES_DASHBOARD.toBoolean()) {
                                 sh '''
                                     cp -p benchmark_runner/grafana/perf/dashboard.json benchmark_runner/grafana/perf/dashboard_backup.json;
-                                    PYTHONPATH="${WORKSPACE}" sudo python3 benchmark_runner/grafana/update_grafana_dashboard.py --grafana_url="${GRAFANA_URL}" --grafana_api_key="${GRAFANA_API_KEY}" --grafana_json_path="${GRAFANA_JSON_PATH}" --grafana_folder_name="${GRAFANA_FOLDER_NAME}";
+                                    PYTHONPATH="${WORKSPACE}" python3 benchmark_runner/grafana/update_grafana_dashboard.py --grafana_url="${GRAFANA_URL}" --grafana_api_key="${GRAFANA_API_KEY}" --grafana_json_path="${GRAFANA_JSON_PATH}" --grafana_folder_name="${GRAFANA_FOLDER_NAME}";
                                     cp -p benchmark_runner/grafana/perf/dashboard_backup.json benchmark_runner/grafana/perf/dashboard.json;
                                 '''
                                 sh 'git add benchmark_runner/grafana/perf/dashboard.json'
