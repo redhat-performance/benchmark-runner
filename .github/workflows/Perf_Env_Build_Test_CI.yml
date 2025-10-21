@@ -302,8 +302,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install benchmark-runner wheel
       - name: 🎁 Bump Version
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           pip install setuptools bumpversion
           version=$(python3 setup.py --version)
@@ -313,8 +311,8 @@ jobs:
           bumpversion patch
           # GITHUB_REPOSITORY already taken => GIT_REPOSITORY
           git commit .bumpversion.cfg setup.py -m 'bump version to exist version v'$version
-          git push origin HEAD
-          git push origin --tags
+          git push
+          git push --tag
 
   e2e:
     name: e2e
