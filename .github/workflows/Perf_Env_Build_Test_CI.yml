@@ -286,13 +286,17 @@ jobs:
 
   bump_version:
     name: bump_version
-    needs: [unittest, integration_test, pypi_upload, pypi_validate, private_quay_upload, public_quay_upload ]
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: [ '3.12' ]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@main
+        with:
+          repository: redhat-performance/benchmark-runner
+          path: benchmark-runner
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
