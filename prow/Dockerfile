@@ -4,7 +4,7 @@ ARG python_full_version=3.12.3
 ARG OCP_CLIENT_VERSION=4.19.1
 ARG VIRTCTL_VERSION=1.5.0
 
-RUN dnf update -y --nobest \
+RUN dnf clean all && dnf --refresh update -y --nobest \
     && dnf group install -y "Development Tools" \
     && dnf install -y podman jq openssl-devel bzip2-devel wget libffi-devel hostname bc procps-ng \
     && wget https://www.python.org/ftp/python/${python_full_version}/Python-${python_full_version}.tgz \

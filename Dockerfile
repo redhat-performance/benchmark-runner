@@ -1,7 +1,7 @@
 FROM quay.io/centos/centos:stream9
 
 # Update and use not only best candidate packages (avoiding failures)
-RUN dnf update -y --nobest
+RUN dnf clean all && dnf --refresh update -y --nobest
 
 # Install development tools and necessary dependencies
 RUN dnf group install -y "Development Tools" \
