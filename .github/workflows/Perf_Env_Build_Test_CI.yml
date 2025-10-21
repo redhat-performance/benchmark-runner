@@ -311,8 +311,8 @@ jobs:
           bumpversion patch
           # GITHUB_REPOSITORY already taken => GIT_REPOSITORY
           git commit .bumpversion.cfg setup.py -m 'bump version to exist version v'$version
-          git push
-          git push --tag
+          git push origin HEAD
+          git push origin --tags
 
   e2e:
     name: e2e
