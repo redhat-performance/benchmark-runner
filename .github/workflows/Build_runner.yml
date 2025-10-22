@@ -19,6 +19,7 @@ concurrency:
   group: performance-environment
   cancel-in-progress: false
 
+permissions: write-all
 jobs:
 
   pypi_upload:
@@ -125,37 +126,40 @@ jobs:
 
   bump_version:
     name: bump_version
-    needs: [pypi_upload, pypi_validate, private_quay_upload, public_quay_upload]
+    needs: [unittest, integration_test, pypi_upload, pypi_validate, private_quay_upload, public_quay_upload ]
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ '3.12' ]
     steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python 3.12
+      - uses: actions/checkout@main
+        with:
+          repository: redhat-performance/benchmark-runner
+          fetch-depth: 0
+          token: ${{ secrets.AUTOPUSH }}
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
-          python-version: 3.12
-      - name: ⚙ Set START CI TIME
-        run: echo "START_CI=${{ needs.test.outputs.start_time_output }}" >> "$GITHUB_ENV"
+          python-version: ${{ matrix.python-version }}
       - name: Install latest benchmark-runner
         run: |
           python -m pip install --upgrade pip
-          pip install benchmark-runner
-      - name: ⚙️ Set Kubeconfig
-        env:
-          KUBECONFIG: ${{ secrets.PERF_KUBECONFIG }}
-          RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-        run: |
-          mkdir -p "$RUNNER_PATH/.kube/"
-          echo "$KUBECONFIG" > "$RUNNER_PATH/.kube/config"
-          echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
+          pip install benchmark-runner wheel
       - name: 🎁 Bump Version
         run: |
           pip install setuptools bumpversion
           version=$(python3 setup.py --version)
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
           git config pull.rebase false  # merge (the default strategy)
           bumpversion patch
+      - name: 🎁 Push Version
+        env:
+          GITHUB_TOKEN: ${{ secrets.AUTOPUSH }}
+        run: |
+          git config user.name 'Eli Battat'
+          git config user.email 'ebattat@redhat.com'
           # GITHUB_REPOSITORY already taken => GIT_REPOSITORY
           git commit .bumpversion.cfg setup.py -m 'bump version to exist version v'$version
-          git push
-          git push --tag
+          git push origin HEAD
+          git push origin --tags
