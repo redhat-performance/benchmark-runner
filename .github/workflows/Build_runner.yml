@@ -126,7 +126,7 @@ jobs:
 
   bump_version:
     name: bump_version
-    needs: [unittest, integration_test, pypi_upload, pypi_validate, private_quay_upload, public_quay_upload ]
+    needs: [pypi_upload, pypi_validate, private_quay_upload, public_quay_upload]
     runs-on: ubuntu-latest
     strategy:
       matrix:
