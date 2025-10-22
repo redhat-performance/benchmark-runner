@@ -4,9 +4,10 @@
 name: Perf Env Build Test CI
 
 on:
-  push:
-    branches: [ main ]
-  workflow_dispatch:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
 
 # Ensures that only one deploy task per branch/environment will run at a time.
 concurrency:
@@ -15,9 +16,9 @@ concurrency:
 
 permissions: write-all
 jobs:
-
   unittest:
     # run all python versions, in other jobs run the latest python
+    if: github.event.pull_request.merged == true
     name: unittest
     runs-on: ubuntu-latest
     strategy:
