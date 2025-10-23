@@ -146,9 +146,11 @@ class EnvironmentVariables:
             else:
                 self._environment_variables_dict['storage_type'] = 'ephemeral'
 
-        # LSO Disk id - auto-detect when located on worker-2
+        # LSO Disk id - auto-detect when located on worker-2, put only the id not full ( i.e. /dev/disk/by-id/{{ lso_disk_id }} )
         self._environment_variables_dict['lso_disk_id'] = EnvironmentVariables.get_env('LSO_DISK_ID', '')
         self._environment_variables_dict['lso_node'] = EnvironmentVariables.get_env('LSO_NODE', '')
+        # Ceph version required for disk cleanup, using default 19
+        self._environment_variables_dict['ceph_version'] = EnvironmentVariables.get_env('CEPH_VERSION', '19')
         # Workloads that required ODF
         self._environment_variables_dict['workloads_odf_pvc'] = ['vdbench', 'hammerdb']
         # This parameter get from Test_CI.yml file
