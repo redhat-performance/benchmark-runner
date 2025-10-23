@@ -4,10 +4,8 @@
 name: Perf Env Build Test CI
 
 on:
-  pull_request:
-    types: [ closed ]
-    branches:
-      - main
+  push:
+    branches: [ main ]
   workflow_dispatch:
 
 # Ensures that only one deploy task per branch/environment will run at a time.
@@ -20,6 +18,7 @@ jobs:
 
   bump_version_test:
     name: bump_version_test
+    if: github.actor != 'github-actions[bot]'  # Skip auto-merge pushes
     runs-on: ubuntu-latest
     strategy:
       matrix:
