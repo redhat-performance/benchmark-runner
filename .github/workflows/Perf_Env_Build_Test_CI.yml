@@ -43,8 +43,8 @@ jobs:
           pip install setuptools bumpversion
 
           # Configure Git
-          git config --global user.email "ebattat@redhat.com"
-          git config --global user.name "Eli Battat"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
           git config pull.rebase false  # merge strategy
 
           # Set remote with your PAT
