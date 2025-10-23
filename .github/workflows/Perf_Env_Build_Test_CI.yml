@@ -49,7 +49,7 @@ jobs:
           # Use your PAT instead of the default GitHub token
           git remote set-url origin https://x-access-token:${AUTOPUSH}@github.com/${GITHUB_REPOSITORY}.git
 
-          bumpversion patch
+          bumpversion patch --no-tag
           git commit .bumpversion.cfg setup.py -m "bump version to exist version v${version}"
           git push origin HEAD
           git push origin --tags
