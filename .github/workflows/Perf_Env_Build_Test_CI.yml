@@ -51,7 +51,7 @@ jobs:
           git remote set-url origin https://x-access-token:${AUTOPUSH}@github.com/${GITHUB_REPOSITORY}.git
 
           # Bump the patch version and commit automatically
-          bumpversion patch
+          bumpversion patch --no-tag
 
           # Push changes and tags directly to the same branch (no PR)
           git push origin HEAD
