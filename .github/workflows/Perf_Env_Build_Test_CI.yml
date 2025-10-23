@@ -468,8 +468,8 @@ jobs:
 
           git commit benchmark_runner/grafana/perf/dashboard.json -m "Update grafana json file [skip ci]"
 
-          git pull https://$GITHUB_TOKEN@${{ secrets.GIT_REPOSITORY}} main
-          git push https://$GITHUB_TOKEN@${{ secrets.GIT_REPOSITORY}} main
+          git pull https://$GITHUB_TOKEN@${{ secrets.GIT_REPOSITORY }} main
+          git push https://$GITHUB_TOKEN@${{ secrets.GIT_REPOSITORY }} main
 
       - name: Check if adding new products versions in main.libsonnet
         id: libsonnet_check_changes
@@ -487,5 +487,5 @@ jobs:
           git config pull.rebase false  # merge
           git commit benchmark_runner/grafana/perf/jsonnet/main.libsonnet -m "Update main.libsonnet file [skip ci]"
 
-          git pull https://$GITHUB_TOKEN@${{ secrets.GIT_REPOSITORY}} main
-          git push https://$GITHUB_TOKEN@${{ secrets.GIT_REPOSITORY}} main
+          git pull https://$GITHUB_TOKEN@${{ secrets.GIT_REPOSITORY }} main
+          git push https://$GITHUB_TOKEN@${{ secrets.GIT_REPOSITORY }} main
