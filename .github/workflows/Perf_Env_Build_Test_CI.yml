@@ -42,14 +42,15 @@ jobs:
         run: |
           pip install setuptools bumpversion
           version=$(python3 setup.py --version)
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git config pull.rebase false  # merge (the default strategy)
 
-          git config --global user.email "ebattat@redhat.com"
-          git config --global user.name "Eli Battat"
-          git config pull.rebase false
-
+          # Use your PAT instead of the default GitHub token
           git remote set-url origin https://x-access-token:${AUTOPUSH}@github.com/${GITHUB_REPOSITORY}.git
 
           bumpversion patch
+          git commit .bumpversion.cfg setup.py -m "bump version to exist version v${version}"
           git push origin HEAD
           git push origin --tags
 
