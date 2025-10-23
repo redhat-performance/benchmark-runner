@@ -47,7 +47,7 @@ jobs:
           git config pull.rebase false  # merge (the default strategy)
 
           # Use your PAT instead of the default GitHub token
-          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/redhat-performance/benchmark-runner"
+          git remote set-url origin https://x-access-token:${AUTOPUSH}@github.com/${GITHUB_REPOSITORY}.git
 
           bumpversion patch
           git commit .bumpversion.cfg setup.py -m "bump version to exist version v${version}"
