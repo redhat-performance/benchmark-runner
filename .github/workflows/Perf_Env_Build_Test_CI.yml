@@ -16,6 +16,44 @@ concurrency:
 permissions: write-all
 jobs:
 
+  bump_version_test:
+    name: bump_version_test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ '3.12' ]
+    steps:
+      - uses: actions/checkout@main
+        with:
+          repository: redhat-performance/benchmark-runner
+          fetch-depth: 0
+          token: ${{ secrets.AUTOPUSH }}
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install latest benchmark-runner
+        run: |
+          python -m pip install --upgrade pip
+          pip install benchmark-runner wheel
+      - name: 🎁 Bump Version
+        env:
+          GITHUB_TOKEN: ${{ secrets.AUTOPUSH }}
+        run: |
+          pip install setuptools bumpversion
+          version=$(python3 setup.py --version)
+          git config --global user.email "ebattat@redhat.com"
+          git config --global user.name "Eli Battat"
+          git config pull.rebase false  # merge (the default strategy)
+
+          # Use your PAT instead of the default GitHub token
+          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}
+
+          bumpversion patch
+          git commit .bumpversion.cfg setup.py -m "bump version to exist version v${version}"
+          git push origin HEAD
+          git push origin --tags
+
   unittest:
     # run all python versions, in other jobs run the latest python
     name: unittest
