@@ -4,10 +4,8 @@
 name: Perf Env Build Test CI
 
 on:
-  pull_request:
-    types: [ closed ]
-    branches:
-      - main
+  push:
+    branches: [ main ]
   workflow_dispatch:
 
 # Ensures that only one deploy task per branch/environment will run at a time.
@@ -52,7 +50,8 @@ jobs:
           git remote set-url origin https://x-access-token:${AUTOPUSH}@github.com/${GITHUB_REPOSITORY}.git
 
           bumpversion patch --no-tag
-          git commit .bumpversion.cfg setup.py -m "bump version to exist version v${version}"
+          # Add [skip ci] to prevent triggering workflow on this commit
+          git commit .bumpversion.cfg setup.py -m "bump version to exist version v${version} [skip ci]"
           git push origin HEAD
           git push origin --tags
 
