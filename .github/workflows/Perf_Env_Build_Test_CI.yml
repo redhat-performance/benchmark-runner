@@ -41,16 +41,19 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.AUTOPUSH }}
         run: |
           pip install setuptools bumpversion
+
           # Configure Git
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
           git config pull.rebase false  # merge strategy
 
+
           # Set remote with your PAT
           git remote set-url origin https://x-access-token:${AUTOPUSH}@github.com/${GITHUB_REPOSITORY}.git
 
           # Bump the patch version and commit automatically
-          bumpversion patch
+          bumpversion patch --no-tag
+
 
           # Push changes and tags directly to the same branch (no PR)
           git push origin HEAD
