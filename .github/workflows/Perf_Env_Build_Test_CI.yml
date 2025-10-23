@@ -47,7 +47,7 @@ jobs:
           git config pull.rebase false  # merge (the default strategy)
 
           # Use your PAT instead of the default GitHub token
-          git remote set-url origin https://x-access-token:${AUTOPUSH}@github.com/${GITHUB_REPOSITORY}.git
+          # git remote set-url origin https://x-access-token:${AUTOPUSH}@github.com/${GITHUB_REPOSITORY}.git
 
           bumpversion patch --no-tag
           # Add [skip ci] to prevent triggering workflow on this commit
