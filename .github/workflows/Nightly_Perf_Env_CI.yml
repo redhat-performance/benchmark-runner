@@ -388,6 +388,8 @@ jobs:
           cp -p "$GITHUB_WORKSPACE"/benchmark_runner/grafana/perf/dashboard_backup.json "$GITHUB_WORKSPACE"/benchmark_runner/grafana/perf/dashboard.json
 
       - name: Commit dashboard.json if any changes are detected
+        env:
+          GITHUB_TOKEN: ${{ secrets.AUTOPUSH }}
         if: steps.json_check_changes.outputs.changes == 'true'
         run: |
           git checkout main
@@ -396,10 +398,10 @@ jobs:
           git config pull.rebase false  # merge
 
           git add "$GITHUB_WORKSPACE"/benchmark_runner/grafana/perf/dashboard.json
-          git commit -m "Update grafana json file"
+          git commit -m "Update grafana json file [skip ci]"
 
-          git pull https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} main
-          git push https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} main
+          git pull https://$GITHUB_TOKEN@${{ secrets.GIT_REPOSITORY}} main
+          git push https://$GITHUB_TOKEN@${{ secrets.GIT_REPOSITORY}} main
 
       - name: Check if adding new products versions in main.libsonnet
         id: libsonnet_check_changes
@@ -407,6 +409,8 @@ jobs:
           git diff --quiet "$GITHUB_WORKSPACE"/benchmark_runner/grafana/perf/jsonnet/main.libsonnet || echo "changes=true" >> "$GITHUB_OUTPUT"
 
       - name: Commit main.libsonnet if any changes to product versions are detected
+        env:
+          GITHUB_TOKEN: ${{ secrets.AUTOPUSH }}
         if: steps.libsonnet_check_changes.outputs.changes == 'true'
         run: |
           git checkout main
@@ -414,7 +418,7 @@ jobs:
           git config --global user.name  "${{ secrets.USER_NAME }}"
           git config pull.rebase false  # merge
           git add "$GITHUB_WORKSPACE"/benchmark_runner/grafana/perf/jsonnet/main.libsonnet
-          git commit -m "Update grafana json file"
+          git commit -m "Update grafana json file [skip ci]"
 
-          git pull https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} main
-          git push https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} main
+          git pull https://$GITHUB_TOKEN@${{ secrets.GIT_REPOSITORY}} main
+          git push https://$GITHUB_TOKEN@${{ secrets.GIT_REPOSITORY}} main
