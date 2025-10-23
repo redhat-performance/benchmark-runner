@@ -400,8 +400,8 @@ jobs:
           git add "$GITHUB_WORKSPACE"/benchmark_runner/grafana/perf/dashboard.json
           git commit -m "Update grafana json file [skip ci]"
 
-          git pull https://$GITHUB_TOKEN@${{ secrets.GIT_REPOSITORY }} main
-          git push https://$GITHUB_TOKEN@${{ secrets.GIT_REPOSITORY }} main
+          git pull https://$GITHUB_TOKEN@${{ secrets.GIT_REPOSITORY }}.git main
+          git push https://$GITHUB_TOKEN@${{ secrets.GIT_REPOSITORY }}.git main
 
       - name: Check if adding new products versions in main.libsonnet
         id: libsonnet_check_changes
