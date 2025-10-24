@@ -15,7 +15,6 @@ concurrency:
 
 permissions: write-all
 jobs:
-
   unittest:
     # run all python versions, in other jobs run the latest python
     name: unittest
@@ -293,7 +292,8 @@ jobs:
       matrix:
         python-version: [ '3.12' ]
     steps:
-      - uses: actions/checkout@main
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
           repository: redhat-performance/benchmark-runner
           fetch-depth: 0
@@ -413,6 +413,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          repository: redhat-performance/benchmark-runner
+          fetch-depth: 0
+          token: ${{ secrets.AUTOPUSH }}
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
@@ -488,4 +492,4 @@ jobs:
           git commit benchmark_runner/grafana/perf/jsonnet/main.libsonnet -m "Update main.libsonnet file [skip ci]"
 
           git pull origin main
-          git push origin mainF
+          git push origin main
