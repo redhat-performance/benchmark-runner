@@ -18,6 +18,7 @@ on:
 concurrency:
   group: performance-environment
 
+permissions: write-all
 jobs:
   initialize_nightly:
     name: initialize perf nightly
@@ -348,6 +349,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          repository: redhat-performance/benchmark-runner
+          fetch-depth: 0
+          token: ${{ secrets.AUTOPUSH }}
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -420,5 +425,5 @@ jobs:
           git add "$GITHUB_WORKSPACE"/benchmark_runner/grafana/perf/jsonnet/main.libsonnet
           git commit -m "Update grafana json file [skip ci]"
 
-          git pull https://$GITHUB_TOKEN@${{ secrets.GIT_REPOSITORY }} main
-          git push https://$GITHUB_TOKEN@${{ secrets.GIT_REPOSITORY }} main
+          git pull origin main
+          git push origin main
