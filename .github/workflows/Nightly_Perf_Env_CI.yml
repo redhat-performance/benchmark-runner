@@ -404,8 +404,8 @@ jobs:
 
           git add "$GITHUB_WORKSPACE"/benchmark_runner/grafana/perf/dashboard.json
           git commit -m "Update grafana json file [skip ci]"
-
-          git pull origin main
+          # Rebase local commit onto latest main to avoid merge commits
+          git pull --rebase origin main
           git push origin main
 
       - name: Check if adding new products versions in main.libsonnet
@@ -424,6 +424,6 @@ jobs:
           git config pull.rebase false  # merge
           git add "$GITHUB_WORKSPACE"/benchmark_runner/grafana/perf/jsonnet/main.libsonnet
           git commit -m "Update grafana json file [skip ci]"
-
-          git pull origin main
+          # Rebase local commit onto latest main to avoid merge commits
+          git pull --rebase origin main
           git push origin main

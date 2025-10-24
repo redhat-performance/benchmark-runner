@@ -157,5 +157,4 @@ jobs:
           bumpversion patch
           # GITHUB_REPOSITORY already taken => GIT_REPOSITORY
           git commit .bumpversion.cfg setup.py -m "bump version to exist version v${version} [skip ci]"
-          git push
-          git push --tags
+          git push origin main
