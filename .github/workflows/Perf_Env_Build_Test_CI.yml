@@ -13,8 +13,8 @@ concurrency:
   group: performance-environment
   cancel-in-progress: false
 
+permissions: write-all
 jobs:
-
   unittest:
     # run all python versions, in other jobs run the latest python
     name: unittest
@@ -292,7 +292,12 @@ jobs:
       matrix:
         python-version: [ '3.13' ]
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          repository: redhat-performance/benchmark-runner
+          fetch-depth: 0
+          token: ${{ secrets.AUTOPUSH }}
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
@@ -302,6 +307,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install benchmark-runner wheel
       - name: 🎁 Bump Version
+        env:
+          GITHUB_TOKEN: ${{ secrets.AUTOPUSH }}
         run: |
           pip install setuptools bumpversion
           version=$(python3 setup.py --version)
@@ -310,9 +317,8 @@ jobs:
           git config pull.rebase false  # merge (the default strategy)
           bumpversion patch
           # GITHUB_REPOSITORY already taken => GIT_REPOSITORY
-          git commit .bumpversion.cfg setup.py -m 'bump version to exist version v'$version
-          git push
-          git push --tag
+          git commit .bumpversion.cfg setup.py -m "bump version to exist version v${version} [skip ci]"
+          git push origin main
 
   e2e:
     name: e2e
@@ -406,6 +412,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          repository: redhat-performance/benchmark-runner
+          fetch-depth: 0
+          token: ${{ secrets.AUTOPUSH }}
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
@@ -450,6 +460,8 @@ jobs:
           cp -p "$GITHUB_WORKSPACE"/benchmark_runner/grafana/perf/dashboard_backup.json "$GITHUB_WORKSPACE"/benchmark_runner/grafana/perf/dashboard.json
 
       - name: Commit dashboard.json if any changes are detected
+        env:
+          GITHUB_TOKEN: ${{ secrets.AUTOPUSH }}
         if: steps.json_check_changes.outputs.changes == 'true'
         run: |
           git checkout main
@@ -457,10 +469,10 @@ jobs:
           git config --global user.name  "${{ secrets.USER_NAME }}"
           git config pull.rebase false  # merge
 
-          git commit benchmark_runner/grafana/perf/dashboard.json -m "Update grafana json file"
-
-          git pull https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} main
-          git push https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} main
+          git commit benchmark_runner/grafana/perf/dashboard.json -m "Update grafana json file [skip ci]"
+          # Rebase local commit onto latest main to avoid merge commits
+          git pull --rebase origin main
+          git push origin main
 
       - name: Check if adding new products versions in main.libsonnet
         id: libsonnet_check_changes
@@ -468,13 +480,15 @@ jobs:
           git diff --quiet "$GITHUB_WORKSPACE"/benchmark_runner/grafana/perf/jsonnet/main.libsonnet || echo "changes=true" >> "$GITHUB_OUTPUT"
 
       - name: Commit main.libsonnet if any changes to product versions are detected
+        env:
+          GITHUB_TOKEN: ${{ secrets.AUTOPUSH }}
         if: steps.libsonnet_check_changes.outputs.changes == 'true'
         run: |
           git checkout main
           git config --global user.email "${{ secrets.EMAIL }}"
           git config --global user.name  "${{ secrets.USER_NAME }}"
           git config pull.rebase false  # merge
-          git commit benchmark_runner/grafana/perf/jsonnet/main.libsonnet -m "Update main.libsonnet file"
-
-          git pull https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} main
-          git push https://${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_REPOSITORY}} main
+          git commit benchmark_runner/grafana/perf/jsonnet/main.libsonnet -m "Update main.libsonnet file [skip ci]"
+          # Rebase local commit onto latest main to avoid merge commits
+          git pull --rebase origin main
+          git push origin main
