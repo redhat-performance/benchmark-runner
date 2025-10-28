@@ -184,11 +184,11 @@ class WorkloadsOperations:
     @logger_time_stamp
     def odf_workload_verification(self):
         """
-        This method verifies whether the ODF operator is installed for ODF workloads and raises an error if it is missing.
+        This method verifies whether the ODF operator is installed for ODF workloads and raises an error if it is missing, skip for LSO workload
         :return:
         """
         workload_name = self._workload.split('_')
-        if workload_name[0] in self._workloads_odf_pvc:
+        if workload_name[0] in self._workloads_odf_pvc and '_lso' not in self._workload:
             if not self._oc.is_odf_installed():
                 raise ODFNotInstalled(workload=self._workload)
 

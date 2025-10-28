@@ -24,6 +24,10 @@ class CreateOCPResource:
         self.__oc.populate_additional_template_variables(self.__environment_variables_dict)
         self.__worker_disk_prefix = self.__environment_variables_dict.get('worker_disk_prefix', '')
         self.__worker_disk_ids = self.__environment_variables_dict.get('worker_disk_ids', '')
+        self.__worker_disk_ids = self.__environment_variables_dict.get('worker_disk_ids', '')
+        self.__lso_disk_id = self.__environment_variables_dict.get('lso_disk_id', '')
+        self.__lso_node = self.__environment_variables_dict.get('lso_node', '')
+        self.__ceph_version = self.__environment_variables_dict.get('ceph_version', '')
         if self.__worker_disk_ids:
             if self.__worker_disk_ids:
                 # Solved GitHub Actions issue that env variable detect as string instead of dict/ list -skip for Jenkins
@@ -80,7 +84,7 @@ class CreateOCPResource:
         self.remove_resource_files(path=os.path.join(self.__dir_path, resource))
         resource_files = self.get_sorted_resources(resource=resource)
         if 'lso' == resource:
-            create_lso = CreateLSO(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files)
+            create_lso = CreateLSO(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files, lso_node=self.__lso_node, lso_disk_id=self.__lso_disk_id, ceph_version=self.__ceph_version)
             create_lso.create_lso(upgrade_version)
         elif 'odf' == resource:
             create_odf = CreateODF(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files, worker_disk_ids=self.__worker_disk_ids, worker_disk_prefix=self.__worker_disk_prefix)
