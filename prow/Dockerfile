@@ -1,6 +1,6 @@
 FROM quay.io/centos/centos:stream9
 
-ARG python_full_version=3.12.3
+ARG python_full_version=3.13.0
 ARG OCP_CLIENT_VERSION=4.19.1
 ARG VIRTCTL_VERSION=1.5.0
 
@@ -12,11 +12,11 @@ RUN dnf update -y --nobest \
     && cd Python-${python_full_version} \
     && ./configure --enable-optimizations \
     && make altinstall \
-    && echo alias python=python3.12 >> ~/.bashrc \
+    && echo alias python=python3.13 >> ~/.bashrc \
     && cd .. \
     && rm -rf Python-${python_full_version} Python-${python_full_version}.tgz \
-    && python3.12 -m pip install --upgrade pip \
-    && python3.12 -m pip install --upgrade benchmark-runner \
+    && python3.13 -m pip install --upgrade pip \
+    && python3.13 -m pip install --upgrade benchmark-runner \
     && curl -L "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${OCP_CLIENT_VERSION}/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz" -o "/tmp/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz" \
     && tar -xzvf /tmp/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz -C /tmp/ \
     && mv /tmp/kubectl /usr/local/bin/kubectl \
