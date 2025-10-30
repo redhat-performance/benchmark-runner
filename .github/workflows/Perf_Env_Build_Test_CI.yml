@@ -469,8 +469,9 @@ jobs:
           git config --global user.name  "${{ secrets.USER_NAME }}"
           git config pull.rebase false  # merge
 
-          # Pull first to avoid unstaged changes error
-          git pull --rebase origin main
+          git stash -u                     # stash other changes
+          git pull --rebase origin main    # update main
+          git stash pop                    # restore stashed changes
 
           git add "$GITHUB_WORKSPACE"/benchmark_runner/grafana/perf/dashboard.json
           git commit -m "Update grafana json file [skip ci]"
@@ -491,8 +492,9 @@ jobs:
           git config --global user.name  "${{ secrets.USER_NAME }}"
           git config pull.rebase false  # merge
 
-          # Pull first to avoid unstaged changes error
-          git pull --rebase origin main
+          git stash -u                     # stash other changes
+          git pull --rebase origin main    # update main
+          git stash pop                    # restore stashed changes
 
           git add "$GITHUB_WORKSPACE"/benchmark_runner/grafana/perf/jsonnet/main.libsonnet
           git commit -m "Update grafana json file [skip ci]"
