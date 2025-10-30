@@ -38,6 +38,9 @@ pipeline {
         KRKNHUB_MASTER_0_NODE_FAILURE_ENVIRONMENT_VARIABLES = credentials('perfci_krknhub_master_0_node_failure')
         KRKNHUB_WORKER_1_CPU_HOG_ENVIRONMENT_VARIABLES = credentials('perfci_krknhub_worker_1_cpu_hog')
         KRKNHUB_WORKER_0_NODE_FAILURE_ENVIRONMENT_VARIABLES = credentials('perfci_krknhub_worker_0_node_failure')
+        NODE_IPMI_DICT = credentials('perfci_node_ipmi_dict')
+        IPMI_PASS = credentials('perfci_ipmi_pass')
+        WAIT = 10
     }
     stages {
         stage('Cleanup') {
@@ -403,6 +406,50 @@ pipeline {
                     }
                 }
             } // Fedora Verifications - after worker-node-failure-before-upgrade
+
+        stage('Check cluster readiness') {
+            steps {
+                sh '''
+                #!/bin/bash
+                set -e
+                START=$(date +%s)
+
+                # Load dictionary from secret
+                eval "$NODE_IPMI_DICT"
+
+                # Wait for nodes to be Ready
+                echo "Checking nodes..."
+                while NODES=$(oc get nodes --no-headers | awk '$2!="Ready"{print $1}'); [[ -n "$NODES" ]]; do
+                    for n in $NODES; do
+                        echo "❌ $n is NotReady, powering on via IPMI..."
+                        ipmitool -I lanplus -H "${NODE_IPMI[$n]}" -U root -P "$IPMI_PASS" chassis power on || true
+                    done
+                    (( $(date +%s) - START > TIMEOUT )) && { echo "❌ Timeout: nodes not ready" ; exit 1; }
+                    sleep $WAIT
+                done
+                echo "✅ All nodes Ready"
+
+                # Wait for cluster operators
+                echo "Checking operators..."
+                while [[ $(oc get co --no-headers | awk '{print $3, $5}' | grep -Evc "True False") -ne 0 ]]; do
+                    (( $(date +%s) - START > TIMEOUT )) && { echo "❌ Timeout: operators not ready"; oc get co; exit 1; }
+                    oc get co
+                    sleep $WAIT
+                done
+                echo "🎉 Cluster Ready!"
+                '''
+            }
+        }
+
+        stage('Wait after Chaos Testing & before OCP Upgrade') {
+            steps {
+                script {
+                    echo "Waiting for ${env.WAIT} minutes..."
+                    sleep time: env.WAIT.toInteger(), unit: 'MINUTES'
+                    echo "Done waiting."
+                }
+            }
+        }
 
 
     } // stages
