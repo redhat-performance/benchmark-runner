@@ -469,9 +469,11 @@ jobs:
           git config --global user.name  "${{ secrets.USER_NAME }}"
           git config pull.rebase false  # merge
 
-          git commit benchmark_runner/grafana/perf/dashboard.json -m "Update grafana json file [skip ci]"
-          # Rebase local commit onto latest main to avoid merge commits
+          # Pull first to avoid unstaged changes error
           git pull --rebase origin main
+
+          git add "$GITHUB_WORKSPACE"/benchmark_runner/grafana/perf/dashboard.json
+          git commit -m "Update grafana json file [skip ci]"
           git push origin main
 
       - name: Check if adding new products versions in main.libsonnet
@@ -488,7 +490,10 @@ jobs:
           git config --global user.email "${{ secrets.EMAIL }}"
           git config --global user.name  "${{ secrets.USER_NAME }}"
           git config pull.rebase false  # merge
-          git commit benchmark_runner/grafana/perf/jsonnet/main.libsonnet -m "Update main.libsonnet file [skip ci]"
-          # Rebase local commit onto latest main to avoid merge commits
+
+          # Pull first to avoid unstaged changes error
           git pull --rebase origin main
+
+          git add "$GITHUB_WORKSPACE"/benchmark_runner/grafana/perf/jsonnet/main.libsonnet
+          git commit -m "Update grafana json file [skip ci]"
           git push origin main
