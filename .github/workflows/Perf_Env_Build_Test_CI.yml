@@ -318,7 +318,8 @@ jobs:
           bumpversion patch
           # GITHUB_REPOSITORY already taken => GIT_REPOSITORY
           git commit .bumpversion.cfg setup.py -m "bump version to exist version v${version} [skip ci]"
-          git push origin main
+          git pull origin HEAD --no-rebase  # fetch & merge remote changes
+          git push origin HEAD
 
   e2e:
     name: e2e
