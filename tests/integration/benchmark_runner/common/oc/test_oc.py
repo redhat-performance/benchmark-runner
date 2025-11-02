@@ -35,7 +35,26 @@ def test_get_ocp_minor_version():
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
+
     assert oc.get_ocp_minor_version()
+
+
+def test_get_virtctl_version():
+    """
+    This method gets virtctl version
+    :return:
+    """
+    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
+    assert oc.get_virtctl_version()
+
+
+def test_is_virtctl_ge():
+    """
+    This method checks if virtctl version is greater or equal to the given version
+    :return:
+    """
+    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
+    assert oc.is_virtctl_ge('0.53.0')
 
 
 @pytest.mark.skip(reason="Disable kata")
