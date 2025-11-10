@@ -42,7 +42,11 @@ spec:
     name: hammerdb
     args:
       pin: {{ pin }} # enable for nodeSelector
+      {%- if storage_type == 'lso' %}
+      pin_node: "{{ lso_node }}"
+      {%- else %}
       pin_node: "{{ pin_node2 }}"
+      {%- endif %}
       db_type: "{{ db_type }}"
       timed_test: true
       test_type: "tpc-c"
