@@ -40,21 +40,21 @@ template_data:
       requests_memory: 16Gi
   extra:
     mariadb:
-      db_image: centos-stream8-mariadb103-container-disk:latest
+      db_image: mariadb10.5-centos9-container-disk:latest
       db_pass: mysql
       db_port: 3306
       db_type: mariadb
       db_user: root
       db_server_pod: mariadb-deployment.mariadb-db
     mssql:
-      db_image: centos-stream8-mssql2019-container-disk:latest
+      db_image: mssql2022-centos9-container-disk:latest
       db_pass: s3curePasswordString
       db_port: 1433
       db_type: mssql
       db_user: SA
       db_server_pod: mssql-deployment.mssql-db
     postgres:
-      db_image: centos-stream8-postgres10-container-disk:latest
+      db_image: postgresql13-centos9-container-disk:latest
       db_pass: postgres
       db_port: 5432
       db_type: pg

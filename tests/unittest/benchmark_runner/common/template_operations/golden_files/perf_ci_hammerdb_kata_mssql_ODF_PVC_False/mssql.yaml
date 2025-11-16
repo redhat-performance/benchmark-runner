@@ -44,7 +44,7 @@ spec:
       containers:
       - name: mssql
         # mcr.microsoft.com/mssql/rhel/server:2019-latest - rate limit issue
-        image: quay.io/ebattat/server:2019-latest
+        image: quay.io/ebattat/mssql2022-rhel9:latest
         imagePullPolicy: "IfNotPresent"
         ports:
         - containerPort: 1433

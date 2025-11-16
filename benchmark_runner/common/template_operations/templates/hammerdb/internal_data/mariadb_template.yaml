@@ -114,7 +114,7 @@ spec:
       containers:
       - name: mariadb
         # docker.io/centos/mariadb-103-centos8:latest - rate limit issue
-        image: quay.io/ebattat/mariadb-103-centos8
+        image: quay.io/ebattat/mariadb10.5-centos9:latest
         imagePullPolicy: "IfNotPresent"
         ports:
         - containerPort: 3306

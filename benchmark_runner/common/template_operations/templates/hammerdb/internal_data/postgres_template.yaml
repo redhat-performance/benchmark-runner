@@ -108,7 +108,7 @@ spec:
       containers:
         - name: postgres
           # docker.io/centos/postgresql-10-centos8:latest - rate limit issue
-          image: quay.io/ebattat/postgresql-10-centos8:latest
+          image: quay.io/ebattat/postgresql13-centos9:latest
           imagePullPolicy: "IfNotPresent"
           ports:
             - containerPort: 5432
