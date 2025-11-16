@@ -1,6 +1,6 @@
 
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from benchmark_runner.main.environment_variables import environment_variables
 from benchmark_runner.common.elasticsearch.elasticsearch_operations import ElasticSearchOperations
@@ -57,7 +57,7 @@ class UpdateGrafanaLatestValueMappings:
         :return:
         """
         new_versions = {}
-        current_datetime = datetime.now()
+        current_datetime = datetime.now(timezone.utc).replace(tzinfo=None)
         start_datetime = current_datetime - timedelta(days=last_es_fetch_days)
 
         ids = self.elasticsearch.get_index_ids_between_dates(index='ci-status', start_datetime=start_datetime,
