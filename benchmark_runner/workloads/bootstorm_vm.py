@@ -315,7 +315,9 @@ class BootstormVM(WorkloadsOperations):
             else:
                 self._save_artifacts_local = True
             if self._es_host:
-                self._data_dict.update({'run_artifacts_url': self.get_run_artifacts_google_drive(), 'failure_vms': failure_vms, 'verification_failure': True})
+                if self._google_drive_shared_drive_id:
+                    self._data_dict.update({'run_artifacts_url': self.get_run_artifacts_google_drive()})
+                self._data_dict.update({'failure_vms': failure_vms, 'verification_failure': True})
                 # upload several run results
                 self._upload_to_elasticsearch(index=self._es_index, kind=self._kind, status=self._status,result=self._data_dict)
                 # verify that data upload to elastic search according to unique uuid
