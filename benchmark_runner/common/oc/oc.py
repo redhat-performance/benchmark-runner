@@ -87,6 +87,23 @@ class OC(SSH):
         """
         return self._ocp_server_version(jsonpath='.status.history[1].version')
 
+    def get_virtctl_version(self):
+        """
+        Returns the virtctl client version as a string.
+        """
+        return self.run('virtctl version | grep "Client Version" | sed -E \'s/.*GitVersion:"([^"]+)".*/\\1/\'').strip()
+
+    def is_virtctl_ge(self, min_version="1.6.0"):
+        """
+        Returns True if virtctl client version >= min_version.
+        Handles pre-release tags like v1.0.0-rc.0.
+        [In virtctl v1.6.0, the SSH command syntax changed from `virtctl ssh user@vmname -n namespace` to `virtctl ssh user@vm/vmname/namespace`]
+        """
+        version = self.get_virtctl_version().lstrip("v").split("-")[0]
+        version_tuple = tuple(map(int, version.split(".")))
+        min_version_tuple = tuple(map(int, min_version.split(".")))
+        return version_tuple >= min_version_tuple
+
     def upgrade_ocp(self, upgrade_ocp_version: str, upgrade_channel: str = 'stable'):
         """
         This method upgrades OCP version with conditional handling for specific versions.
@@ -1331,37 +1348,49 @@ class OC(SSH):
         else:
             return self.run(ssh_vm_cmd)
 
-    def wait_for_vm_access(self, vm_name: str = '', namespace: str = environment_variables.environment_variables_dict['namespace'],
-                        timeout: int = SHORT_TIMEOUT):
+    def _build_virtctl_cmds(self, vm_name: str, namespace: str):
         """
-        This method waits for VM to be accessible via virtctl ssh
-        :param vm_name:
-        :param timeout:
-        :return:
+        Returns a tuple of (virtctl_cmd, check_cmd) for the given VM and namespace,
+        depending on the virtctl version.
         """
-        current_wait_time = 0
-        while timeout <= 0 or current_wait_time <= timeout:
-            check_virtctl_vm_cmd = f"virtctl ssh --local-ssh=true --local-ssh-opts='-o BatchMode=yes' --local-ssh-opts='-o PasswordAuthentication=no' --local-ssh-opts='-o ConnectTimeout=2' root@{vm_name} -n {namespace} 2>&1 |egrep 'denied|verification failed'  && echo 'True' || echo 'False'"
-            if 'True' in self.run(check_virtctl_vm_cmd):
-                return 'True'
-            # sleep for x seconds
+        base = f"virtctl ssh --local-ssh=true --local-ssh-opts='-o BatchMode=yes' " \
+               f"--local-ssh-opts='-o PasswordAuthentication=no' --local-ssh-opts='-o ConnectTimeout=2'"
+
+        if self.is_virtctl_ge(min_version="1.6.0"):
+            virtctl_cmd = f"{base} root@vm/{vm_name}/{namespace}"
+            check_cmd = f"{virtctl_cmd} 2>&1 | egrep 'denied|verification failed' && echo True || echo False"
+        else:
+            virtctl_cmd = f"{base} root@{vm_name} -n {namespace}"
+            check_cmd = f"{virtctl_cmd} 2>&1 | egrep 'denied|verification failed' && echo True || echo False"
+
+        return virtctl_cmd, check_cmd
+
+    def wait_for_vm_access(self, vm_name: str = '',
+                           namespace: str = environment_variables.environment_variables_dict['namespace'],
+                           timeout: int = SHORT_TIMEOUT):
+        """
+        Waits until the VM is accessible via virtctl ssh, or raises VMStateTimeout.
+        """
+        _, check_cmd = self._build_virtctl_cmds(vm_name, namespace)
+        elapsed = 0
+
+        while timeout <= 0 or elapsed <= timeout:
+            if 'True' in self.run(check_cmd):
+                return True
             time.sleep(OC.SLEEP_TIME)
-            current_wait_time += OC.SLEEP_TIME
+            elapsed += OC.SLEEP_TIME
+
         raise VMStateTimeout(vm_name=vm_name, state='virtctl')
 
-    def get_vm_access(self, vm_name: str = '', namespace: str = environment_variables.environment_variables_dict['namespace']):
+    def get_vm_access(self, vm_name: str = '',
+                      namespace: str = environment_variables.environment_variables_dict['namespace']):
         """
-        This method returns True when the VM is access and an error message when it is not, using virtctl protocol
-        :param vm_name:
-        :param namespace:
-        :return: virtctl_status 'True' if successful, or an error message if it fails.
+        Returns True if the VM is accessible via virtctl SSH, or the SSH error output if not.
         """
-        virtctl_vm_cmd = f"virtctl ssh --local-ssh=true --local-ssh-opts='-o BatchMode=yes' --local-ssh-opts='-o PasswordAuthentication=no' --local-ssh-opts='-o ConnectTimeout=2' root@{vm_name} -n {namespace}"
-        check_virtctl_vm_cmd = f"virtctl ssh --local-ssh=true --local-ssh-opts='-o BatchMode=yes' --local-ssh-opts='-o PasswordAuthentication=no' --local-ssh-opts='-o ConnectTimeout=2' root@{vm_name} -n {namespace} 2>&1 |egrep 'denied|verification failed'  && echo 'True' || echo 'False'"
-        if 'True' in self.run(check_virtctl_vm_cmd):
-            return 'True'
-        else:
-            return self.run(virtctl_vm_cmd)
+        virtctl_cmd, check_cmd = self._build_virtctl_cmds(vm_name, namespace)
+        if 'True' in self.run(check_cmd):
+            return True
+        return self.run(virtctl_cmd)
 
     @logger_time_stamp
     def get_vm_node(self, vm_name: str, namespace: str = environment_variables.environment_variables_dict['namespace']):
