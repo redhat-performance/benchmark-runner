@@ -400,10 +400,13 @@ jobs:
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
           git config pull.rebase false  # merge
-          git add "$GITHUB_WORKSPACE"/benchmark_runner/grafana/perf/dashboard.json
+          cd "$GITHUB_WORKSPACE"
+          git stash push --include-untracked -m "temp stash"
+          git add "benchmark_runner/grafana/perf/dashboard.json
           git commit -m "Update grafana json file [skip ci]"
-          git pull origin HEAD --no-rebase  # fetch & merge remote changes
+          git pull origin HEAD --no-rebase
           git push origin HEAD
+          git stash pop || true
 
       - name: Check if adding new products versions in main.libsonnet
         id: libsonnet_check_changes
@@ -417,8 +420,11 @@ jobs:
         run: |
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
-          git config pull.rebase false  # merge
-          git add "$GITHUB_WORKSPACE"/benchmark_runner/grafana/perf/jsonnet/main.libsonnet
-          git commit -m "Update grafana json file [skip ci]"
-          git pull origin HEAD --no-rebase  # fetch & merge remote changes
+          git config pull.rebase false
+          cd "$GITHUB_WORKSPACE"
+          git stash push --include-untracked -m "temp stash"
+          git add benchmark_runner/grafana/perf/jsonnet/main.libsonnet
+          git commit -m "Update grafana json file [skip ci]" || true
+          git pull origin HEAD --no-rebase
           git push origin HEAD
+          git stash pop || true
