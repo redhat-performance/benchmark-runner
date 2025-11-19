@@ -78,7 +78,7 @@ spec:
         sockets: 1
         cores: 4
         threads: 1
-        image: quay.io/cloud-bulldozer/centos-stream8-postgres10-container-disk:latest
+        image: quay.io/ebattat/postgresql13-centos9-container-disk:latest
         limits:
           memory: 16Gi
         requests:
