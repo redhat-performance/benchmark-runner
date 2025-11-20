@@ -401,7 +401,9 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git add "$GITHUB_WORKSPACE"/benchmark_runner/grafana/perf/dashboard.json
           git commit -am "Update grafana json file [skip ci]"
+          git stash --keep-index
           git pull --rebase origin main
+          git stash pop || true
           git push origin HEAD
 
       - name: Check if adding new products versions in main.libsonnet
@@ -418,5 +420,7 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git add "$GITHUB_WORKSPACE"/benchmark_runner/grafana/perf/jsonnet/main.libsonnet
           git commit -am "Update grafana json file [skip ci]"
+          git stash --keep-index
           git pull --rebase origin main
+          git stash pop || true
           git push origin HEAD
