@@ -92,7 +92,7 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
       - name: mssql
-        # mcr.microsoft.com/mssql/rhel/server:2019-latest - rate limit issue
+        # mcr.microsoft.com/mssql/rhel/server:2022-latest - rate limit issue
         image: quay.io/ebattat/mssql2022-rhel9:latest
         imagePullPolicy: "IfNotPresent"
         ports:
