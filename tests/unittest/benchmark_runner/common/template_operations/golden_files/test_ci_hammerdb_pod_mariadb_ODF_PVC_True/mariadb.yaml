@@ -27,16 +27,39 @@ data:
         # use it for options that affect everything
         #
         [client-server]
-        #
-        # include all files from the config directory
-        #
         !includedir /etc/my.cnf.d
         port=3306
         ssl=0
+
         [mysqld]
-        innodb_file_per_table=1
-        innodb_flush_method=O_DIRECT
-        innodb_adaptive_flushing=1
+        key_buffer_size = 1638M
+        max_allowed_packet = 200M
+        table_open_cache = 400
+        sort_buffer_size = 256K
+        read_buffer_size = 16M   # safer per-connection buffer
+        read_rnd_buffer_size = 256K
+        net_buffer_length = 2K
+        thread_stack = 256K
+        myisam_sort_buffer_size = 2M
+        max_connections = 151
+
+        innodb_buffer_pool_size = 8192M
+        innodb_log_file_size = 2457M
+        innodb_log_buffer_size = 2457M
+        innodb_file_per_table = 1
+        innodb_flush_method = O_DIRECT
+        innodb_adaptive_flushing = 1
+
+        [mysqldump]
+        quick
+        max_allowed_packet = 16M
+
+        [mysql]
+        no-auto-rehash
+
+        [myisamchk]
+        key_buffer_size = 8M
+        sort_buffer_size = 8M
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -58,7 +81,7 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
       - name: mariadb
-        # docker.io/centos/mariadb-103-centos8:latest - rate limit issue
+        # quay.io/sclorg/mariadb-105-c9s:latest - rate limit issue
         image: quay.io/ebattat/mariadb10.5-centos9:latest
         imagePullPolicy: "IfNotPresent"
         ports:
