@@ -405,7 +405,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
           g.panel.stateTimeline.new('HammerDB KTPM')
             + stateTimeline.queryOptions.withDatasource('Elasticsearch-hammerdb-results')
-
+            + stateTimeline.withDescription("MSSQL2022 \n\nMariaDB10.5 \n\nPostgreSQL13")
             + stateTimeline.standardOptions.color.withMode('thresholds')
             + stateTimeline.fieldConfig.defaults.custom.withFillOpacity(70)
             + stateTimeline.fieldConfig.defaults.custom.withLineWidth(0)
