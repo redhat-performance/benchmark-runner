@@ -125,6 +125,16 @@ class EnvironmentVariables:
             'krknhub': 'krknhub',
         }
 
+        # Versions
+        self._environment_variables_dict['versions'] = {
+            'mssql': 2022,
+            'postgres': 13,
+            'mariadb': 10.5,
+            'db_vm_os_version': 'centos-stream9',
+            'vm_os_version': 'fedora39',
+            'hammerdb': 4.0
+        }
+
         # Update namespace
         base_workload = self._environment_variables_dict['workload'].split('_')[0]
         if EnvironmentVariables.get_env('NAMESPACE'):
