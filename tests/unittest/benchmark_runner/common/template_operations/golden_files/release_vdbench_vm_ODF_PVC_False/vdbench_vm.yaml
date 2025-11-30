@@ -47,7 +47,7 @@ spec:
       terminationGracePeriodSeconds: 180
       volumes:
         - containerDisk:
-            image: quay.io/ebattat/centos-stream8-container-disk:latest
+            image: quay.io/ebattat/centos-stream9-container-disk:latest
           name: containerdisk
         - cloudInitNoCloud:
             userData: |-
@@ -78,6 +78,6 @@ spec:
                 - export TIMEOUT=3600
                 - export LOGS_DIR=/workload/
                 - echo @@~@@START-WORKLOAD@@~@@
-                - podman run --rm -e BLOCK_SIZES="$BLOCK_SIZES" -e IO_OPERATION="$IO_OPERATION" -e IO_THREADS="$IO_THREADS" -e FILES_IO="$FILES_IO" -e IO_RATE="$IO_RATE" -e MIX_PRECENTAGE="$MIX_PRECENTAGE" -e DURATION="$DURATION" -e PAUSE="$PAUSE" -e WARMUP="$WARMUP" -e FILES_SELECTION="$FILES_SELECTION" -e COMPRESSION_RATIO="$COMPRESSION_RATIO" -e RUN_FILLUP="$RUN_FILLUP" -e DIRECTORIES="$DIRECTORIES" -e FILES_PER_DIRECTORY="$FILES_PER_DIRECTORY" -e SIZE_PER_FILE="$SIZE_PER_FILE" -e REDIS_HOST="$REDIS_HOST" -e LOGS_DIR="$LOGS_DIR" -e TIMEOUT="$TIMEOUT" -v "/workload":"/workload" --privileged quay.io/ebattat/centos-stream8-vdbench5.04.07-pod:v1.0.13 "$WORKLOAD_METHOD"
+                - podman run --rm -e BLOCK_SIZES="$BLOCK_SIZES" -e IO_OPERATION="$IO_OPERATION" -e IO_THREADS="$IO_THREADS" -e FILES_IO="$FILES_IO" -e IO_RATE="$IO_RATE" -e MIX_PRECENTAGE="$MIX_PRECENTAGE" -e DURATION="$DURATION" -e PAUSE="$PAUSE" -e WARMUP="$WARMUP" -e FILES_SELECTION="$FILES_SELECTION" -e COMPRESSION_RATIO="$COMPRESSION_RATIO" -e RUN_FILLUP="$RUN_FILLUP" -e DIRECTORIES="$DIRECTORIES" -e FILES_PER_DIRECTORY="$FILES_PER_DIRECTORY" -e SIZE_PER_FILE="$SIZE_PER_FILE" -e REDIS_HOST="$REDIS_HOST" -e LOGS_DIR="$LOGS_DIR" -e TIMEOUT="$TIMEOUT" -v "/workload":"/workload" --privileged quay.io/ebattat/centos-stream9-vdbench5.04.07-pod:latest "$WORKLOAD_METHOD"
                 - echo @@~@@END-WORKLOAD@@~@@
           name: cloudinitdisk
