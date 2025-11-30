@@ -1,4 +1,4 @@
-wget https://cloud.centos.org/centos/8-stream/x86_64/images/CentOS-Stream-GenericCloud-8-20210603.0.x86_64.qcow2
+wget https://cloud.centos.org/centos/9-stream/x86_64/images/CentOS-Stream-GenericCloud-x86_64-9-20240527.0.x86_64.qcow2
 https://linuxize.com/post/how-to-install-postgresql-on-centos-8/
 # run inside the container disk
 $ dnf -y update
