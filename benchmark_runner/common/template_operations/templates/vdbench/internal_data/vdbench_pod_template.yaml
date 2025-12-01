@@ -96,7 +96,6 @@ spec:
   containers:
     - name: vdbench-pod
       image: {{ vdbench_image }}
-      imagePullPolicy: "IfNotPresent"
       resources:
         requests:
           cpu: {{ requests_cpu }}
@@ -167,7 +166,7 @@ spec:
           value: "{{ timeout }}"
       command: ["/bin/bash"]
       {% if scale -%}
-      args: ["-c", "python3.9 /state_signals_responder.py $REDIS_HOST $WORKLOAD_METHOD $TIMEOUT"]
+      args: ["-c", "python3.12 /state_signals_responder.py $REDIS_HOST $WORKLOAD_METHOD $TIMEOUT"]
       {%- else -%}
       args: ["-c", "$WORKLOAD_METHOD"]
       {%- endif %}
