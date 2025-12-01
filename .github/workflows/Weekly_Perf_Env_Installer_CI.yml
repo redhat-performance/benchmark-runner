@@ -25,9 +25,9 @@ jobs:
        matrix:
           step: [ 'run_ibm_ocp_installer', 'verify_ibm_install_complete' ]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Set up Python 3.13
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.13'
       - name: Install latest benchmark-runner
