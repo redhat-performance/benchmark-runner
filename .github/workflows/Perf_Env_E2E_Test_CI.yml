@@ -38,10 +38,10 @@ jobs:
       install_resource_time_output: ${{ steps.ocp_install_resource_step.outputs.install_resource_time }}
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python 3.13
+      - name: Set up Python 3.14
         uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
+          python-version: '3.14'
       - name: Install latest benchmark-runner
         run: |
           python -m pip install --upgrade pip
