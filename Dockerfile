@@ -8,7 +8,7 @@ RUN dnf group install -y "Development Tools" \
     && dnf install -y podman jq
 
 # Prerequisite for Python installation
-ARG python_full_version=3.13.0
+ARG python_full_version=3.14.0
 RUN dnf install -y openssl-devel bzip2-devel wget libffi-devel
 
 # Install Python
@@ -17,11 +17,11 @@ RUN wget https://www.python.org/ftp/python/${python_full_version}/Python-${pytho
     && cd Python-${python_full_version} \
     && ./configure --enable-optimizations \
     && make altinstall \
-    && echo alias python=python3.13 >> ~/.bashrc \
+    && echo alias python=python3.14 >> ~/.bashrc \
     && rm -rf Python-${python_full_version}.tgz
 
 # install & run benchmark-runner (--no-cache-dir for take always the latest)
-RUN python3.13 -m pip install --upgrade pip && python3.13 -m pip install --upgrade benchmark-runner
+RUN python3.14 -m pip install --upgrade pip && python3.14 -m pip install --upgrade benchmark-runner
 
 # Passed dynamically
 ARG OCP_CLIENT_VERSION
@@ -55,7 +55,7 @@ RUN dnf clean all && rm -rf /var/cache/dnf
 # Add main
 COPY benchmark_runner/main/main.py /benchmark_runner/main/main.py
 
-CMD [ "python3.13", "/benchmark_runner/main/main.py"]
+CMD [ "python3.14", "/benchmark_runner/main/main.py"]
 
 # How to build the Dockerfile ?
 # sudo podman build --build-arg OCP_CLIENT_VERSION=$OCP_CLIENT_VERSION--build-arg VIRTCTL_VERSION=$VIRTCTL_VERSION -t quay.io/benchmark-runner/benchmark-runner:latest . --no-cache
