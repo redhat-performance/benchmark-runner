@@ -23,9 +23,9 @@ jobs:
       matrix:
         python-version: [ '3.10', '3.11', '3.12', '3.13', '3.14' ]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
@@ -91,9 +91,9 @@ jobs:
       matrix:
         python-version: [ '3.14' ]
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
@@ -177,9 +177,9 @@ jobs:
       matrix:
         python-version: [ '3.14' ]
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.python-version }}
     - name: 🔨 Build and publish distribution 📦 to PyPI
@@ -200,9 +200,9 @@ jobs:
       matrix:
         python-version: [ '3.14' ]
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.python-version }}
     - name: Validate upload to PyPI
@@ -246,9 +246,9 @@ jobs:
       matrix:
         python-version: [ '3.14' ]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
       - name: ⌛ Build and Upload 🐋 to quay.io
@@ -271,9 +271,9 @@ jobs:
       matrix:
         python-version: [ '3.14' ]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
       - name: ⌛ Build and Upload 🐋 to quay.io
@@ -293,13 +293,13 @@ jobs:
         python-version: [ '3.14' ]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: redhat-performance/benchmark-runner
           fetch-depth: 0
           token: ${{ secrets.AUTOPUSH }}
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install latest benchmark-runner
@@ -334,9 +334,9 @@ jobs:
           workload: [ 'stressng_pod', 'stressng_vm' ]
           python-version: [ '3.14' ]
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install latest benchmark-runner
@@ -412,13 +412,13 @@ jobs:
         python-version: [ '3.14' ]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: redhat-performance/benchmark-runner
           fetch-depth: 0
           token: ${{ secrets.AUTOPUSH }}
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies

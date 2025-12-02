@@ -21,8 +21,7 @@ spec:
   runtimeClassName: kata
   containers:
     - name: vdbench-pod
-      image: quay.io/ebattat/centos-stream8-vdbench5.04.07-pod:v1.0.13
-      imagePullPolicy: "IfNotPresent"
+      image: quay.io/ebattat/centos-stream9-vdbench5.04.07-pod:latest
       resources:
         requests:
           cpu: 2
