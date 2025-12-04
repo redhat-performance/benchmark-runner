@@ -2412,7 +2412,7 @@
          "panels": [
             {
                "datasource": "Elasticsearch-hammerdb-results",
-               "description": "MSSQL2022 \n\nMariaDB10.5 \n\nPostgreSQL13",
+               "description": "MSSQL2022 \n\nMariaDB10.5 \n\nPostgreSQL13\n\n HammerDB4.0",
                "fieldConfig": {
                   "defaults": {
                      "color": {
