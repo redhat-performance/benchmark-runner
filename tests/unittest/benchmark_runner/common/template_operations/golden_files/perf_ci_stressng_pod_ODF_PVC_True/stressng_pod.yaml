@@ -21,6 +21,7 @@ spec:
     args:
       pin: True # enable for nodeSelector
       pin_node: "pin-node-1"
+      image: "quay.io/benchmark-runner/stressng:latest"
       resources: True # enable for resources requests/limits
       requests_cpu: 60
       requests_memory: 75Gi

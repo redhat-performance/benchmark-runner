@@ -37,6 +37,7 @@ spec:
       pin: True
       pin_server: "pin-node-1"
       pin_client: "pin-node-2"
+      image: "quay.io/benchmark-runner/uperf:latest"
       serviceip: False
       hostnetwork: False
       networkpolicy: False

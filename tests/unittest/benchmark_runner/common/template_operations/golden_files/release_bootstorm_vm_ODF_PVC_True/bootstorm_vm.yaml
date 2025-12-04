@@ -36,7 +36,7 @@ spec:
       terminationGracePeriodSeconds: 180
       volumes:
       - containerDisk:
-          image: quay.io/ebattat/fedora37-container-disk:latest
+          image: quay.io/benchmark-runner/fedora39-container-disk:latest
         name: containerdisk
       - cloudInitNoCloud:
           userData: |-

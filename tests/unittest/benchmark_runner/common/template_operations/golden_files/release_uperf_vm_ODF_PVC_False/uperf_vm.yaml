@@ -45,7 +45,7 @@ spec:
        sockets: 1
        cores: 2
        threads: 1
-       image: quay.io/ebattat/fedora37-container-disk:latest
+       image: quay.io/benchmark-runner/fedora39-container-disk:latest
        limits:
          memory: 1Gi
        requests:

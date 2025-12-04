@@ -6,9 +6,9 @@ sudo podman pod create --name ci_pod  -p 9200:9200 -p 5601:5601 -p 3000:3000 -p 
 sudo podman run --name elasticsearch --pod ci_pod -d -e "discovery.type=single-node" -e "xpack.security.enabled=false" -v "$CI_PATH"/elastic:/usr/share/elasticsearch/data --privileged docker.elastic.co/elasticsearch/elasticsearch:7.16.0
 sudo podman run --name kibana --pod ci_pod -d -e "ELASTICSEARCH_HOSTS=http://localhost:9200" --privileged docker.elastic.co/kibana/kibana:7.16.0
 sudo podman run --name grafana --pod ci_pod -d -v "$CI_PATH"/grafana/grafana.ini:/etc/grafana/grafana.ini  -v "$CI_PATH"/grafana:/var/lib/grafana  --privileged quay.io/mimehta/custom-grafana:latest
-# docker.io/library/nginx:latest - cause to rate limit issue quay.io/ebattat/nginx:latest
+# docker.io/library/nginx:latest - cause to rate limit issue quay.io/benchmark-runner/nginx:latest
 # nginx for Windows image - 8083
-sudo podman run --name win-nginx --pod ci_pod -d -v "$CI_PATH"/windows:/usr/share/nginx/html:ro --privileged quay.io/ebattat/nginx:latest
+sudo podman run --name win-nginx --pod ci_pod -d -v "$CI_PATH"/windows:/usr/share/nginx/html:ro --privileged quay.io/benchmark-runner/nginx:latest
 # flask for download logs from s3 - 4004
 cd "$CI_POD_PATH"/flask
 sudo podman build -t flaskci .
