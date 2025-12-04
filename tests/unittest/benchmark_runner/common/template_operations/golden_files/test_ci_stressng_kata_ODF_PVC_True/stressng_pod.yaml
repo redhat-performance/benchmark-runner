@@ -22,6 +22,7 @@ spec:
       runtime_class: kata
       pin: True # enable for nodeSelector
       pin_node: "pin-node-1"
+      image: "quay.io/benchmark-runner/stressng:latest"
       resources: True # enable for resources requests/limits
       requests_cpu: 10m
       requests_memory: 1Gi

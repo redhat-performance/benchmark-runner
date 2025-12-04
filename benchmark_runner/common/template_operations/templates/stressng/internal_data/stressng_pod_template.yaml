@@ -24,6 +24,7 @@ spec:
       {%- endif %}
       pin: {{ pin }} # enable for nodeSelector
       pin_node: "{{ pin_node }}"
+      image: "quay.io/benchmark-runner/stressng:latest"
       resources: {{ resources }} # enable for resources requests/limits
       requests_cpu: {{ requests_cpu }}
       requests_memory: {{ requests_memory }}

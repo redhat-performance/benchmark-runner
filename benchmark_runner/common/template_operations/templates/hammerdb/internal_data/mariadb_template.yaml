@@ -137,7 +137,7 @@ spec:
       containers:
       - name: mariadb
         # quay.io/sclorg/mariadb-105-c9s:latest - rate limit issue
-        image: quay.io/ebattat/mariadb10.5-centos9:latest
+        image: quay.io/benchmark-runner/mariadb10.5-centos9:latest
         imagePullPolicy: "IfNotPresent"
         ports:
         - containerPort: 3306

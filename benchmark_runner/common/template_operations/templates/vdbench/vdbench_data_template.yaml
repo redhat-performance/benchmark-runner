@@ -5,8 +5,8 @@ template_data:
     pin_node: {{ pin_node1 }}
     odf_pvc: {{ odf_pvc }}
     uuid: {{ uuid }}
-    vdbench_image: quay.io/ebattat/centos-stream9-vdbench5.04.07-pod:latest
-    centos_stream_container_disk: quay.io/ebattat/centos-stream9-container-disk:latest
+    vdbench_image: quay.io/benchmark-runner/centos-stream9-vdbench5.04.07-pod:latest
+    centos_stream_container_disk: quay.io/benchmark-runner/centos-stream9-container-disk:latest
   run_type:
     perf_ci:
       BLOCK_SIZES: oltp1,oltp2,oltphw,odss2,odss128,4_cache,64_cache,4,64,4_cache,64_cache,4,64

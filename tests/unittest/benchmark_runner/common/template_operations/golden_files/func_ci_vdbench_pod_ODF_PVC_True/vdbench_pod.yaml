@@ -31,7 +31,7 @@ spec:
     kubernetes.io/hostname: pin-node-1
   containers:
     - name: vdbench-pod
-      image: quay.io/ebattat/centos-stream9-vdbench5.04.07-pod:latest
+      image: quay.io/benchmark-runner/centos-stream9-vdbench5.04.07-pod:latest
       resources:
         requests:
           cpu: 10m

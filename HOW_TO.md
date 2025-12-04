@@ -164,7 +164,7 @@ any template .yaml files.
    containers:
    - name: vdbench-pod
      namespace: default
-     image: quay.io/ebattat/centos-stream8-vdbench5.04.07-pod:latest
+     image: quay.io/benchmark-runner/centos-stream9-vdbench5.04.07-pod:latest
      imagePullPolicy: "Always"
      volumeMounts:
       - name: vdbench-pvc

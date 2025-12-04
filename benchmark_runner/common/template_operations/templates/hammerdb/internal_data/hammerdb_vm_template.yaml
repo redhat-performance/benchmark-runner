@@ -103,7 +103,7 @@ spec:
         sockets: {{ sockets }}
         cores: {{ cores }}
         threads: 1
-        image: quay.io/ebattat/{{ db_image }}
+        image: quay.io/benchmark-runner/{{ db_image }}
         limits:
           memory: {{ vm_limits_memory }}
         requests:
