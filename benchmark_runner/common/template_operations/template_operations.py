@@ -5,6 +5,8 @@ import yaml
 import sys
 import benchmark_runner
 from multiprocessing import Process
+import multiprocessing
+multiprocessing.set_start_method('fork', force=True)
 
 from jinja2 import Template, TemplateSyntaxError
 from benchmark_runner.common.template_operations.render_yaml_from_template import render_yaml_file

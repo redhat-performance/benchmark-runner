@@ -1,7 +1,7 @@
 
 import ast  # change string list to list
 from enum import Enum
-from multiprocessing import set_start_method
+import multiprocessing
 import platform
 
 # @todo paramiko==3.4.1/3.5.0 cause to "RunCommandError: Cannot run shell command: SSH session not active"
@@ -19,7 +19,6 @@ from benchmark_runner.common.clouds.IBM.ibm_operations import IBMOperations
 from benchmark_runner.common.clouds.BareMetal.bare_metal_operations import BareMetalOperations
 from benchmark_runner.clusterbuster.clusterbuster_workloads import ClusterBusterWorkloads
 from benchmark_runner.krkn_hub.krknhub_workloads import KrknHubWorkloads
-
 
 # logger
 log_level = os.environ.get('log_level', 'INFO').upper()
@@ -326,5 +325,6 @@ def main():
 if __name__ == '__main__':
     # spawn default in mac: https://docs.python.org/3/library/multiprocessing.html#:~:text=The%20default%20on%20Windows%20and%20macOS.
     if 'macos' in platform.platform(terse=True).lower():
-        set_start_method('fork')
+        if multiprocessing.get_start_method(allow_none=True) is None:
+            multiprocessing.set_start_method('fork')
     main()
