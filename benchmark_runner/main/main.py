@@ -326,5 +326,5 @@ if __name__ == '__main__':
     # spawn default in mac: https://docs.python.org/3/library/multiprocessing.html#:~:text=The%20default%20on%20Windows%20and%20macOS.
     if 'macos' in platform.platform(terse=True).lower():
         if multiprocessing.get_start_method(allow_none=True) is None:
-            multiprocessing.set_start_method('fork')
+            multiprocessing.set_start_method('fork', force=True)
     main()
