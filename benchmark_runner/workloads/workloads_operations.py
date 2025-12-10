@@ -125,6 +125,7 @@ class WorkloadsOperations:
         self._upgrade_masters_duration_seconds = self._environment_variables_dict.get('upgrade_masters_duration_seconds', '')
         self._upgrade_workers_duration_seconds = self._environment_variables_dict.get('upgrade_workers_duration_seconds', '')
         self._run_strategy = self._environment_variables_dict.get('run_strategy', '')
+        self._product_versions = self._environment_variables_dict['product_versions']
 
     def _get_workload_file_name(self, workload):
         """
@@ -420,7 +421,7 @@ class WorkloadsOperations:
                     'odf_version': self._oc.get_odf_version(),
                     'runner_version': self._build_version,
                     'version': int(self._build_version.split('.')[-1]),
-                    'vm_os_version': 'centos-stream8',
+                    'vm_os_version':  self._product_versions.get('db_vm_os_version', 'centos-stream9'),
                     'ci_date': datetime.datetime.now().strftime(date_format),
                     'uuid': self._uuid,
                     'pin_node1': self._pin_node1,
