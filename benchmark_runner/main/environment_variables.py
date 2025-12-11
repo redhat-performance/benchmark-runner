@@ -126,7 +126,7 @@ class EnvironmentVariables:
         }
 
         # Versions
-        self._environment_variables_dict['versions'] = {
+        self._environment_variables_dict['product_versions'] = {
             'mssql': 2022,
             'postgres': 13,
             'mariadb': 10.5,
