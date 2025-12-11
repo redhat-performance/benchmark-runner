@@ -160,9 +160,10 @@ class BootstormVM(WorkloadsOperations):
         self._data_dict['run_artifacts_url'] = os.path.join(self._run_artifacts_url,
                                                             f'{self._get_run_artifacts_hierarchy(workload_name=self._workload_name, is_file=True)}-{self._time_stamp_format}.tar.gz')
         self._finalize_vm()
-        self._oc.delete_vm_sync(
-            yaml=os.path.join(f'{self._run_artifacts_path}', f'{self._name}.yaml'),
-            vm_name=self._vm_name)
+        if self._delete_all:
+            self._oc.delete_vm_sync(
+                yaml=os.path.join(f'{self._run_artifacts_path}', f'{self._name}.yaml'),
+                vm_name=self._vm_name)
 
     def _verify_single_vm_access(self, vm_name, retries=5, delay=10):
         """
