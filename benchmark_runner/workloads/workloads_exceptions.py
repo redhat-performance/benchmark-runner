@@ -57,3 +57,15 @@ class MissingVMs(BenchmarkRunnerError):
     def __init__(self):
         self.message = "Missing running VMs"
         super(MissingVMs, self).__init__(self.message)
+
+
+class Windows_HammerDB_NOT_Succeeded(BenchmarkRunnerError):
+    """
+    This class raises an error for missing VMs
+    """
+    def __init__(self, message: str):
+        if message:
+            self.message = message
+        else:
+            self.message = "Windows HammerDB workload did not succeed within the timeout"
+        super(Windows_HammerDB_NOT_Succeeded, self).__init__(self.message)

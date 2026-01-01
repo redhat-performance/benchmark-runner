@@ -4,16 +4,16 @@ metadata:
   annotations:
     cdi.kubevirt.io/storage.deleteAfterCompletion: "false"
   name: windows-clone-dv
-  namespace: benchmark-runner
+  namespace: {{ namespace }}
 spec:
   source:
       http:
-         url: None
+         url: {{ url }}
   pvc:
     accessModes:
       - ReadWriteMany
     resources:
       requests:
-        storage: 71Gi
+        storage: {{ storage }}
     volumeMode: Block
     storageClassName: ocs-storagecluster-ceph-rbd-virtualization
