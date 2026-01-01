@@ -8,12 +8,12 @@ metadata:
 spec:
   source:
       http:
-         url: None
+         url: http://localhost:8083/winmssql2022.qcow2
   pvc:
     accessModes:
       - ReadWriteMany
     resources:
       requests:
-        storage: 70Gi
+        storage: 71Gi
     volumeMode: Block
     storageClassName: ocs-storagecluster-ceph-rbd-virtualization

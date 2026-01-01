@@ -25,6 +25,7 @@ pipeline {
         WINDOWS11_URL = credentials('perfci_windows11_url')
         WINDOWS_SERVER_2019_URL = credentials('perfci_windows_server_2019_url')
         WINDOWS_SERVER_2022_URL = credentials('perfci_windows_server_2022_url')
+        WINDOWS_SERVER_MSSQL_2022_URL = credentials('perfci_windows_server_mssql_2022_url')
         LSO_NODE = credentials('perfci_lso_node')
         QUAY_BENCHMARK_RUNNER_REPOSITORY = credentials('perfci_quay_repository')
         KUBEADMIN_PASSWORD = readFile('/home/jenkins/.kube/kubeadmin-password').trim()
@@ -104,7 +105,7 @@ END
         stage('WORKLOADS Deployment') {
             steps {
                 script {
-                    def workloads =  ['uperf_pod', 'uperf_vm', 'hammerdb_pod_mariadb', 'hammerdb_vm_mariadb','hammerdb_pod_mariadb_lso', 'hammerdb_vm_mariadb_lso', 'hammerdb_pod_postgres', 'hammerdb_vm_postgres', 'hammerdb_pod_postgres_lso', 'hammerdb_vm_postgres_lso', 'hammerdb_pod_mssql', 'hammerdb_vm_mssql', 'hammerdb_pod_mssql_lso', 'hammerdb_vm_mssql_lso', 'vdbench_pod', 'vdbench_vm', 'vdbench_pod_scale', 'vdbench_vm_scale', 'bootstorm_vm_scale', 'windows_vm_scale_windows10', 'windows_vm_scale_windows11', 'windows_vm_scale_windows_server_2019', 'windows_vm_scale_windows_server_2022' ]
+                    def workloads =  ['uperf_pod', 'uperf_vm', 'hammerdb_pod_mariadb', 'hammerdb_vm_mariadb','hammerdb_pod_mariadb_lso', 'hammerdb_vm_mariadb_lso', 'hammerdb_pod_postgres', 'hammerdb_vm_postgres', 'hammerdb_pod_postgres_lso', 'hammerdb_vm_postgres_lso', 'hammerdb_pod_mssql', 'hammerdb_vm_mssql', 'hammerdb_pod_mssql_lso', 'hammerdb_vm_mssql_lso', 'winmssql_vm', 'vdbench_pod', 'vdbench_vm', 'vdbench_pod_scale', 'vdbench_vm_scale', 'bootstorm_vm_scale', 'windows_vm_scale_windows10', 'windows_vm_scale_windows11', 'windows_vm_scale_windows_server_2019', 'windows_vm_scale_windows_server_2022' ]
                     def build_version = sh(script: 'curl -s "https://pypi.org/pypi/benchmark-runner/json" | jq -r .info.version', returnStdout: true).trim()
                     def WINDOWS_URL = ''
                     def SCALE = ''
@@ -131,7 +132,6 @@ END
                                         sh """ sudo podman run --rm -t -e WORKLOAD='${WORKLOAD}' -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' -e RUN_TYPE='${RUN_TYPE}' -e SCALE='1' -e SCALE_NODES='${SCALE_NODES}' -e TIMEOUT='${TIMEOUT}' -e log_level='INFO' -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}' """
                                         SCALE = BOOTSTORM_SCALE
                                     }
-
                                     if (WORKLOAD == "windows_vm") {
                                         switch (workload) {
                                             case "windows_vm_scale_windows10":
@@ -156,6 +156,9 @@ END
                                   workload = WORKLOAD
                                 } else {
                                     SCALE = ""
+                                    if (workload == "winmssql_vm") {
+                                        WINDOWS_URL = WINDOWS_SERVER_MSSQL_2022_URL
+                                    }
                                 }
 
                                 // Create a stage for each workload

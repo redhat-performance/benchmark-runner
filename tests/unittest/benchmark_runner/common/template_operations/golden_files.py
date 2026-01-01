@@ -18,6 +18,7 @@ class GoldenFiles:
         environment_variables.environment_variables_dict['elasticsearch'] = 'elasticsearch.example.com'
         environment_variables.environment_variables_dict['elasticsearch_port'] = '9999'
         environment_variables.environment_variables_dict['elasticsearch_url'] = 'http://elasticsearch.example.com:gol9999'
+        environment_variables.environment_variables_dict['windows_url'] = 'http://localhost:8083/winmssql2022.qcow2'
         environment_variables.environment_variables_dict['pin'] = True
         environment_variables.environment_variables_dict['pin_node1'] = 'pin-node-1'
         environment_variables.environment_variables_dict['pin_node2'] = 'pin-node-2'
@@ -29,7 +30,7 @@ class GoldenFiles:
                                                          'hammerdb_pod_mariadb', 'hammerdb_vm_mariadb', 'hammerdb_kata_mariadb',
                                                          'hammerdb_pod_postgres', 'hammerdb_vm_postgres', 'hammerdb_kata_postgres',
                                                          'hammerdb_pod_mssql', 'hammerdb_vm_mssql', 'hammerdb_kata_mssql',
-                                                         'vdbench_pod', 'vdbench_kata', 'vdbench_vm', 'bootstorm_vm', 'windows_vm']
+                                                         'vdbench_pod', 'vdbench_kata', 'vdbench_vm', 'bootstorm_vm', 'windows_vm', 'winmssql_vm']
 
     def __clear_directory_yaml(self, dir):
         if os.path.isdir(dir):

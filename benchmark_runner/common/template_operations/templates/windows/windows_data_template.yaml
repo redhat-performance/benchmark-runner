@@ -13,11 +13,11 @@ template_data:
       limit_memory: 2G
       limit_cpu: 1
       sockets: 1
-      storage: 70Gi
+      storage: 71Gi
     default:
       requests_memory: 2G
       requests_cpu: 1
       limit_memory: 2G
       limit_cpu: 1
       sockets: 1
-      storage: 70Gi
+      storage: 71Gi

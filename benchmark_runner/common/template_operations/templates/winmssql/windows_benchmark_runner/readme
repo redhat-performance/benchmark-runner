@@ -1,0 +1,97 @@
+# Windows HammerDB Setup
+
+This project automates the execution of HammerDB benchmarks on a Windows Server 2022 virtual machine, analyzes the results, and uploads them to Elasticsearch.
+The entire workflow runs automatically with no manual intervention.
+
+** Need to configure once per environment ElasticSearch host in .env file under c:\tool\hammerdb-4.12\windows_benchmark_runner
+
+## Prerequisites
+- Windows Server 2022 VM (qcow2 image)
+- MSSQL 2022 installed
+- ODBC Driver 18 for MSSQL (`Install-mssql2022-odbc18`)
+- Hammerdb4.12
+
+## Setup Steps
+
+1. **Create Windows Server 2022 VM**
+   You can use Openshift virtualization for create a windows server 2022
+   1.1 Install OpenShift CNV operator: OpenShift -> Ecosystem -> Software catalog -> CNV -> install
+   2.2 Run hyperconverged installer
+   2.3 Open Virtualization: VirtualMachines -> create -> from template -> Microsoft Windows Server 2022 VM
+
+2. **Install SQL Server and ODBC Driver**
+   - Install MSSQL 2022: https://www.microsoft.com/sql-server/sql-server-downloads
+   - Install `Install-mssql2022-odbc18': https://learn.microsoft.com/en-us/sql/connect/odbc/download-odbc-driver-for-sql-server?view=sql-server-ver17
+
+3. **Copy HammerDB**
+   - Download `hammerdb-4.12` (https://npackd.appspot.com/p/hammerdb64/4.12) to:
+     ```
+     c:\tools\hammerdb-4.12
+     ```
+
+4. **Copy Benchmark Runner**
+   - Copy `windows_benchmark_runner` folder to:
+     ```
+     c:\tools\hammerdb-4.12
+     ```
+
+5. **Configure `.env` File**
+   - Place `.env` in:
+     ```
+     c:\tools\hammerdb-4.12\windows_benchmark_runner
+     ```
+   - Configure ElasticSearch host and index.
+
+6. **Create Scheduled Task**
+   **Task Name:** `run_hammerdb` [run_hammerdb.ps1]
+   **Location:** `c:\tools\hammerdb-4.12`
+
+   - **General Tab:**
+     - Name: `run_hammerdb launcher`
+     - Run as: `Administrator`
+     - Select: "Run whether user is logged on or not"
+     - Do **not** check: "Do not store password"
+     - Configure for: Windows Server 2022
+
+   - **Triggers Tab:**
+     - Begin the task: `At Startup`
+
+   - **Actions Tab:**
+     - Action: `Start a program`
+     - Program/script: `powershell.exe`
+     - Add arguments:
+       ```
+       -WindowStyle Hidden -File "c:\tools\hammerdb-4.12\run_hammerdb.ps1"
+       ```
+     - Start in:
+       ```
+       c:\tools\hammerdb-4.12\
+       ```
+
+   - Click **OK** to create the task. Administrator password will be required.
+
+7. **Run Results**
+   - Results are stored in:
+     ```
+     c:\tools\hammerdb-4.12\results
+     ```
+
+8. **Automatic Analysis**
+   - `run_hammerdb.ps1` will analyze logs and upload results to ElasticSearch.
+   - No further manual steps are required after initial setup.
+
+---
+
+9. create qcow2 image from this vm
+    $ virtctl stop $vm
+    [choose 1 volume to export: --volume=windows-vm-root-disk, if there are more than 1 volume]
+    $ virtctl vmexport download vm1-export --vm=$vm --volume=windows-vm-root-disk--output=disk.img.gz
+    $ gunzip disk.img.gz
+    $ qemu-img convert -c -O qcow2 disk.img target.qcow2
+    $ rm -rf disk.img.gz
+
+10. Use a QCOW2 image as a parameter for the running container by sharing it locally via Nginx.
+
+   podman run -it --rm -e WORKLOAD="winmssql_vm" -e KUBEADMIN_PASSWORD="1234" -e RUN_TYPE="perf_ci" -e WINDOWS_URL="http://localhost:8083/winmssql2022.qcow2" -e TIMEOUT='8000' -e SAVE_ARTIFACTS_LOCAL="True" -e log_level=INFO -v /tmp/benchmark-runner-run-artifacts:/tmp/benchmark-runner-run-artifacts -v /root/.kube/config:/root/.kube/config --privileged quay.io/benchmark-runner/benchmark-runner:latest
+
+> **Note:** After initial setup and scheduled task creation, HammerDB runs automatically and uploads results without further manual intervention.

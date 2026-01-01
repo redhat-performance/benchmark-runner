@@ -1,0 +1,19 @@
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
+metadata:
+  annotations:
+    cdi.kubevirt.io/storage.deleteAfterCompletion: "false"
+  name: windows-clone-dv
+  namespace: {{ namespace }}
+spec:
+  source:
+      http:
+         url: {{ url }}
+  pvc:
+    accessModes:
+      - ReadWriteMany
+    resources:
+      requests:
+        storage: {{ storage }}
+    volumeMode: Block
+    storageClassName: ocs-storagecluster-ceph-rbd-virtualization
