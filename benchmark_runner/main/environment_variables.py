@@ -112,7 +112,7 @@ class EnvironmentVariables:
                                                          'hammerdb_pod_mssql', 'hammerdb_vm_mssql', 'hammerdb_kata_mssql',
                                                          'hammerdb_pod_mssql_lso', 'hammerdb_vm_mssql_lso', 'hammerdb_kata_mssql_lso',
                                                          'vdbench_pod', 'vdbench_kata', 'vdbench_vm',
-                                                         'clusterbuster', 'bootstorm_vm', 'windows_vm', 'krknhub']
+                                                         'clusterbuster', 'bootstorm_vm', 'windows_vm', 'winmssql_vm', 'krknhub']
         # Workloads namespaces
         self._environment_variables_dict['workload_namespaces'] = {
             'stressng': 'benchmark-operator',
@@ -122,11 +122,12 @@ class EnvironmentVariables:
             'clusterbuster': 'clusterbuster',
             'bootstorm': 'benchmark-runner',
             'windows': 'benchmark-runner',
+            'winmssql': 'benchmark-runner',
             'krknhub': 'krknhub',
         }
 
         # Versions
-        self._environment_variables_dict['versions'] = {
+        self._environment_variables_dict['product_versions'] = {
             'mssql': 2022,
             'postgres': 13,
             'mariadb': 10.5,

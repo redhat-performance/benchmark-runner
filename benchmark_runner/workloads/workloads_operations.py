@@ -2,10 +2,10 @@
 import ast
 import os
 import time
-import datetime
 import tarfile
 import shutil
 from csv import DictReader
+from datetime import datetime, timezone, timedelta
 
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp
 from benchmark_runner.workloads.workloads_exceptions import ODFNotInstalled, CNVNotInstalled, KataNotInstalled, MissingScaleNodes, MissingRedis
@@ -125,6 +125,7 @@ class WorkloadsOperations:
         self._upgrade_masters_duration_seconds = self._environment_variables_dict.get('upgrade_masters_duration_seconds', '')
         self._upgrade_workers_duration_seconds = self._environment_variables_dict.get('upgrade_workers_duration_seconds', '')
         self._run_strategy = self._environment_variables_dict.get('run_strategy', '')
+        self._product_versions = self._environment_variables_dict['product_versions']
 
     def _get_workload_file_name(self, workload):
         """
@@ -401,7 +402,7 @@ class WorkloadsOperations:
                                                            folder_path=str(run_artifacts_hierarchy),
                                                            parent_folder_id=self._google_drive_shared_drive_id)
 
-    def __get_metadata(self, kind: str = None, status: str = None, result: dict = None) -> dict:
+    def __get_metadata(self, kind: str = None, status: str = None, database: str = None, run_artifacts_url: str = None, prometheus_result: dict = None, result: dict = None) -> dict:
         """
         This method returns metadata for a run, optionally updates by runtime kind
         @param kind: optionally: pod, vm, or kata
@@ -420,8 +421,8 @@ class WorkloadsOperations:
                     'odf_version': self._oc.get_odf_version(),
                     'runner_version': self._build_version,
                     'version': int(self._build_version.split('.')[-1]),
-                    'vm_os_version': 'centos-stream8',
-                    'ci_date': datetime.datetime.now().strftime(date_format),
+                    'vm_os_version': 'centos-stream9',
+                    'ci_date': datetime.now().strftime(date_format),
                     'uuid': self._uuid,
                     'pin_node1': self._pin_node1,
                     'pin_node2': self._pin_node2,
@@ -432,18 +433,41 @@ class WorkloadsOperations:
             metadata.update({'kind': kind})
         if status:
             metadata.update({'run_status': status})
+        if run_artifacts_url:
+            metadata.update({'run_artifacts_url': run_artifacts_url})
+        if prometheus_result:
+            metadata.update(prometheus_result)
         if self._scale:
             metadata.update({'scale': int(self._scale)*len(self._scale_node_list)})
         if 'bootstorm' in self._workload:
             metadata.update({'vm_os_version': 'fedora37'})
-        if 'windows' in self._workload:
+        if 'win' in self._workload:
             metadata.update({'vm_os_version': self._windows_os})
+        # for hammerdb
+        if database == 'mssql':
+            metadata.update({'db_type': 'mssql', 'db_version': self._product_versions.get('mssql', 2022)})
         if self._test_name:
             metadata.update({'test_name': self._test_name})
         if result:
             metadata.update(result)
 
         return metadata
+
+    def _get_index_ids_between_dates(self, index: str):
+        end_datetime = datetime.now(timezone.utc)
+        start_datetime = end_datetime - timedelta(hours=4)
+        return self._es_operations.get_index_ids_between_dates(index=index, start_datetime=start_datetime, end_datetime=end_datetime)
+
+    def _get_index_key_value(self, index: str, key: str):
+        """
+        This method get index key value
+        :param index:
+        :param key:
+        :return:
+        """
+        end_datetime = datetime.now(timezone.utc)
+        start_datetime = end_datetime - timedelta(hours=4)
+        return self._es_operations.get_index_key_value(index=index, key=key, start_datetime=start_datetime, end_datetime=end_datetime)
 
     def _upload_to_elasticsearch(self, index: str, kind: str, status: str, result: dict = None):
         """
@@ -455,6 +479,25 @@ class WorkloadsOperations:
         :return:
         """
         self._es_operations.upload_to_elasticsearch(index=index, data=self.__get_metadata(kind=kind, status=status, result=result))
+
+    @logger_time_stamp
+    def _update_elasticsearch_index(self, index: str, id: str, kind: str, status: str, run_artifacts_url: str, database: str = '', vm_name: str = '', data_updated: bool = False):
+        """
+        This method updates elasticsearch id
+        :param index:
+        :param id:
+        :param kind:
+        :param database:
+        :param status:
+        :param run_artifacts_url:
+        :param data_updated: check if data was updated
+        :return:
+        """
+        metadata = self.__get_metadata(kind=kind, database=database, status=status, run_artifacts_url=run_artifacts_url)
+        if vm_name:
+            metadata.update({'vm_name': vm_name})
+            metadata.update({'data_updated': data_updated})
+        self._es_operations.update_elasticsearch_index(index=index, id=id, metadata=metadata)
 
     def _verify_elasticsearch_data_uploaded(self, index: str, uuid: str):
         """

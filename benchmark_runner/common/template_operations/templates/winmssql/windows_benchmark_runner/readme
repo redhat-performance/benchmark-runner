@@ -1,0 +1,6 @@
+# Windows HammerDB
+
+Required only once for ElasticSearch configuration
+1. Configure .env file with ElasticSearch
+2. Copy windows_benchmark_runner folder into Windows VM under c:\tools\hammerdb-4.12
+3. Verify that Python3 is installed Windows VMs

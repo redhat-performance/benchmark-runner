@@ -6,9 +6,9 @@ from typeguard import typechecked
 from elasticsearch import Elasticsearch
 from elasticsearch.connection import create_ssl_context
 from elasticsearch_dsl import Search
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
-from benchmark_runner.common.elasticsearch.elasticsearch_exceptions import ElasticSearchDataNotUploaded
+from benchmark_runner.common.elasticsearch.elasticsearch_exceptions import ElasticSearchDataNotUploaded, ElasticSearchDataNotFound
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 
 
@@ -100,9 +100,10 @@ class ElasticSearchOperations:
             if uuid:
                 count_hits = 0
                 for row in search_response:
-                    if type(row['uuid']) == str:
-                        # uperf return str
-                        current_uuid = row['uuid']
+                    if not hasattr(row, 'uuid'):
+                        continue
+                    if isinstance(row.uuid, str):
+                        current_uuid = row.uuid
                     else:
                         current_uuid = row['uuid'][0]
                     if current_uuid == uuid:
@@ -154,11 +155,12 @@ class ElasticSearchOperations:
             raise ElasticSearchDataNotUploaded
 
     @typechecked()
-    def upload_to_elasticsearch(self, index: str, data: dict, doc_type: str = '_doc', es_add_items: dict = None, **kwargs):
+    def upload_to_elasticsearch(self, index: str, data: dict, doc_type: str = '_doc', timestamp: datetime = None, es_add_items: dict = None, **kwargs):
         """
         This method uploads json data into elasticsearch
         :param index: index name to be stored in elasticsearch
         :param data: data must be in dictionary i.e. {'key': 'value'}
+        :param timestamp:
         :param doc_type:
         :param es_add_items:
         :return:
@@ -169,7 +171,10 @@ class ElasticSearchOperations:
                 data.update(es_add_items)
 
             # utcnow - solve timestamp issue
-            data['timestamp'] = datetime.now(timezone.utc)  # datetime.utcnow() or datetime.now()
+            if timestamp:
+                data['timestamp'] = timestamp
+            else:
+                data['timestamp'] = datetime.now(timezone.utc)  # datetime.utcnow() or datetime.now()
 
             # Uploads data to elasticsearch server
             try:
@@ -229,32 +234,46 @@ class ElasticSearchOperations:
 
     @typechecked()
     @logger_time_stamp
-    def get_query_data_between_dates(self, start_datetime: datetime, end_datetime: datetime):
+    def get_query_data_between_dates(self, start_datetime: datetime, end_datetime: datetime, size: int = None) -> dict:
         """
-        This method returns the query for fetching data between dates
-        @param start_datetime:
-        @param end_datetime:
-        @return:
+        Returns an Elasticsearch query for fetching data between UTC-aware datetime ranges.
+
+        :param start_datetime: datetime, start of the range (UTC-aware)
+        :param end_datetime: datetime, end of the range (UTC-aware)
+        :param size: Optional[int], max number of rows to return
+        :return: dict, Elasticsearch query
         """
-        if start_datetime and end_datetime:
-            if end_datetime < start_datetime:
-                start_datetime = end_datetime
-            query = {
-                    "bool": {
-                        "filter": {
-                            "range": {
-                                "timestamp": {
-                                    "format": "yyyy-MM-dd HH:mm:ss"
-                                }
+        if not start_datetime or not end_datetime:
+            raise ValueError('Empty parameters: start_datetime / end_datetime')
+
+        # Ensure start_datetime <= end_datetime
+        if end_datetime < start_datetime:
+            start_datetime, end_datetime = end_datetime, start_datetime
+
+        # Convert to ISO 8601 with Z
+        start_iso = start_datetime.replace(microsecond=0).isoformat() + "Z"
+        end_iso = end_datetime.replace(microsecond=0).isoformat() + "Z"
+
+        # Build Elasticsearch query
+        query = {
+            "query": {
+                "bool": {
+                    "filter": {
+                        "range": {
+                            "timestamp": {
+                                "gte": start_iso,
+                                "lte": end_iso
                             }
                         }
                     }
-            }
-            query['bool']['filter']['range']['timestamp']['lte'] = str(end_datetime.replace(microsecond=0))
-            query['bool']['filter']['range']['timestamp']['gte'] = str(start_datetime.replace(microsecond=0))
-            return query
-        else:
-            raise Exception('Empty parameters: start_datetime/ end_datetime')
+                }
+            },
+            "sort": [
+                {"timestamp": {"order": "desc"}}
+            ]
+        }
+
+        return query
 
     @typechecked()
     @logger_time_stamp
@@ -271,7 +290,7 @@ class ElasticSearchOperations:
         if index and start_datetime and end_datetime:
             es_data = []
             query = self.get_query_data_between_dates(start_datetime, end_datetime)
-            response = self.__es.search(index=index, query=query, size=number_of_documents, scroll=scroll_duration)
+            response = self.__es.search(index=index, body=query, size=number_of_documents, scroll=scroll_duration)
             scroll_id = response.get('_scroll_id')
             if response.get('hits').get('hits'):
                 es_data.extend(response.get('hits').get('hits'))
@@ -284,6 +303,73 @@ class ElasticSearchOperations:
             return es_data
         else:
             raise Exception('Empty parameters: index/ start_datetime/ end_datetime')
+
+    @typechecked()
+    @logger_time_stamp
+    def get_index_key_value(
+            self,
+            index: str,
+            key: str,
+            start_datetime: datetime = None,
+            end_datetime: datetime = None
+    ) -> str:
+        """
+        Fetches the most recent value of a specified key from documents
+        in the given Elasticsearch index within the specified time range.
+        If no document contains the key, returns an empty string.
+        """
+
+        if not end_datetime:
+            end_datetime = datetime.now(timezone.utc)
+        if not start_datetime:
+            start_datetime = end_datetime - timedelta(minutes=60)
+
+        docs = self.get_index_data_between_dates(
+            index,
+            start_datetime=start_datetime,
+            end_datetime=end_datetime
+        )
+
+        if not docs:
+            return ''
+
+        # Convert timestamps and keep only docs where the key exists
+        valid_docs = []
+        for doc in docs:
+            ts_str = doc.get('_source', {}).get('timestamp')
+            try:
+                ts_dt = datetime.fromisoformat(ts_str.replace("Z", "+00:00")) if ts_str else None
+            except ValueError:
+                ts_dt = None
+
+            if ts_dt and key in doc.get('_source', {}):
+                doc['_ts_dt'] = ts_dt
+                valid_docs.append(doc)
+
+        if not valid_docs:
+            return ''
+
+        # Sort by timestamp descending and return value from first document
+        latest_doc_with_key = sorted(valid_docs, key=lambda d: d['_ts_dt'], reverse=True)[0]
+        return latest_doc_with_key['_source'][key]
+
+    @typechecked()
+    @logger_time_stamp
+    def get_uuid_for_ids(self, index: str, ids: list[str]) -> dict:
+        """
+        Return a mapping of doc_id -> uuid (or None if missing)
+        """
+        docs = self.__es.mget(
+            index=index,
+            body={"ids": ids}
+        )
+        result = {}
+        for doc in docs["docs"]:
+            if doc.get("found"):
+                result[doc["_id"]] = doc["_source"].get("uuid")
+            else:
+                result[doc["_id"]] = None
+        return result
 
     @typechecked()
     @logger_time_stamp

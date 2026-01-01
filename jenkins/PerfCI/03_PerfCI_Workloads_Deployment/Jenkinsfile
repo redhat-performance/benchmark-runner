@@ -104,7 +104,7 @@ END
         stage('WORKLOADS Deployment') {
             steps {
                 script {
-                    def workloads =  ['uperf_pod', 'uperf_vm', 'hammerdb_pod_mariadb', 'hammerdb_vm_mariadb','hammerdb_pod_mariadb_lso', 'hammerdb_vm_mariadb_lso', 'hammerdb_pod_postgres', 'hammerdb_vm_postgres', 'hammerdb_pod_postgres_lso', 'hammerdb_vm_postgres_lso', 'hammerdb_pod_mssql', 'hammerdb_vm_mssql', 'hammerdb_pod_mssql_lso', 'hammerdb_vm_mssql_lso', 'vdbench_pod', 'vdbench_vm', 'vdbench_pod_scale', 'vdbench_vm_scale', 'bootstorm_vm_scale', 'windows_vm_scale_windows10', 'windows_vm_scale_windows11', 'windows_vm_scale_windows_server_2019', 'windows_vm_scale_windows_server_2022' ]
+                    def workloads =  ['uperf_pod', 'uperf_vm', 'hammerdb_pod_mariadb', 'hammerdb_vm_mariadb','hammerdb_pod_mariadb_lso', 'hammerdb_vm_mariadb_lso', 'hammerdb_pod_postgres', 'hammerdb_vm_postgres', 'hammerdb_pod_postgres_lso', 'hammerdb_vm_postgres_lso', 'hammerdb_pod_mssql', 'hammerdb_vm_mssql', 'hammerdb_pod_mssql_lso', 'hammerdb_vm_mssql_lso', 'winmssql_vm', 'vdbench_pod', 'vdbench_vm', 'vdbench_pod_scale', 'vdbench_vm_scale', 'bootstorm_vm_scale', 'windows_vm_scale_windows10', 'windows_vm_scale_windows11', 'windows_vm_scale_windows_server_2019', 'windows_vm_scale_windows_server_2022' ]
                     def build_version = sh(script: 'curl -s "https://pypi.org/pypi/benchmark-runner/json" | jq -r .info.version', returnStdout: true).trim()
                     def WINDOWS_URL = ''
                     def SCALE = ''
