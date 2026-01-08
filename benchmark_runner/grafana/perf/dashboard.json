@@ -85,7 +85,7 @@
          },
          "id": 2,
          "options": {
-            "content": "![PerfCi](https://www.cielhr.com/wp-content/uploads/2019/10/PerformancewSpace-1080x675.png \"Tooltip Text\")\n",
+            "content": "![PerfCi](https://github.com/redhat-performance/benchmark-runner/blob/main/media/performance.png \"Tooltip Text\")\n",
             "mode": "markdown"
          },
          "pluginVersion": "v10.0.0",
@@ -2510,7 +2510,7 @@
                "pluginVersion": "v10.0.0",
                "targets": [
                   {
-                     "alias": "{{term db_type.keyword}}  : {{term current_worker}} threads : {{term kind.keyword}}:  {{term storage_type.keyword}}",
+                     "alias": "{{term vm_os_version.keyword}}  : {{term db_type.keyword}}  : {{term current_worker}} threads : {{term kind.keyword}}:  {{term storage_type.keyword}}",
                      "bucketAggs": [
                         {
                            "field": "db_type.keyword",
@@ -2557,6 +2557,17 @@
                            "type": "terms"
                         },
                         {
+                           "field": "vm_os_version.keyword",
+                           "id": "7",
+                           "settings": {
+                              "min_doc_count": "1",
+                              "order": "desc",
+                              "orderBy": "_term",
+                              "size": "10"
+                           },
+                           "type": "terms"
+                        },
+                        {
                            "field": "timestamp",
                            "id": "2",
                            "settings": {
@@ -2575,7 +2586,7 @@
                            "type": "max"
                         }
                      ],
-                     "query": "_exists_:tpm AND db_type:$db_type AND current_worker:$current_worker AND kind:$kind AND ocp_version:$ocp_version",
+                     "query": "_exists_:tpm AND db_type:$db_type AND current_worker:$current_worker AND kind:$kind AND ocp_version:$ocp_version AND vm_os_version:$vm_os_version",
                      "refId": "A",
                      "timeField": "timestamp"
                   }
@@ -9902,6 +9913,19 @@
             "refresh": 2,
             "regex": "",
             "sort": 6,
+            "type": "query"
+         },
+         {
+            "allValue": "",
+            "datasource": "Elasticsearch-hammerdb-results",
+            "hide": 0,
+            "includeAll": true,
+            "multi": true,
+            "name": "vm_os_version",
+            "query": "{\"find\":\"terms\",\"field\":\"vm_os_version.keyword\"}",
+            "refresh": 2,
+            "regex": "",
+            "sort": 1,
             "type": "query"
          },
          {
