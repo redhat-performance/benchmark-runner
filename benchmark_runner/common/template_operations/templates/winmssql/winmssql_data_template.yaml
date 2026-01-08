@@ -1,0 +1,23 @@
+metadata:
+  name: windows
+template_data:
+  shared:
+    pin_node: {{ pin_node1 }}
+    odf_pvc: {{ odf_pvc }}
+    uuid: {{ uuid }}
+    url: {{ windows_url }}
+  run_type:
+    perf_ci:
+      requests_memory: 32G
+      requests_cpu: 32
+      limit_memory: 32G
+      limit_cpu: 32
+      sockets: 32
+      storage: 71Gi
+    default:
+      requests_memory: 32G
+      requests_cpu: 32
+      limit_memory: 32G
+      limit_cpu: 32
+      sockets: 32
+      storage: 71Gi

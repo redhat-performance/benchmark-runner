@@ -62,6 +62,15 @@ g.dashboard.new('PerfCI-Regression-Summary')
   + g.dashboard.variable.query.withSort(6)
   + g.dashboard.variable.query.withRefresh(2),
 
+  g.dashboard.variable.query.new('vm_os_version', '{\"find\":\"terms\",\"field\":\"vm_os_version.keyword\"}')
+  + elasticsearch.withDatasource('Elasticsearch-hammerdb-results')
+  + g.query.azureMonitor.withHide(0)
+  + g.dashboard.variable.query.selectionOptions.withIncludeAll(true, '')
+  + g.dashboard.variable.query.selectionOptions.withMulti(true)
+  + g.dashboard.variable.query.withRegex('')
+  + g.dashboard.variable.query.withSort(1)
+  + g.dashboard.variable.query.withRefresh(2),
+
   g.dashboard.variable.query.new('db_type', '{\"find\":\"terms\",\"field\":\"db_type.keyword\"}')
   + elasticsearch.withDatasource('Elasticsearch-hammerdb-results')
   + g.query.azureMonitor.withHide(0)
@@ -171,7 +180,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
       + g.panel.text.withId('187')
 
-      + g.panel.text.options.withContent('![PerfCi](https://www.cielhr.com/wp-content/uploads/2019/10/PerformancewSpace-1080x675.png \"Tooltip Text\")\n')
+      + g.panel.text.options.withContent('![PerfCi](https://github.com/redhat-performance/benchmark-runner/blob/main/media/performance.png \"Tooltip Text\")\n')
       + g.panel.text.options.withMode("markdown")
 
       + g.panel.text.withPluginVersion()
@@ -457,7 +466,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
 
             + g.panel.stateTimeline.withTargets([
-              elasticsearch.withAlias('{{term db_type.keyword}}  : {{term current_worker}} threads : {{term kind.keyword}}:  {{term storage_type.keyword}}')
+              elasticsearch.withAlias('{{term vm_os_version.keyword}}  : {{term db_type.keyword}}  : {{term current_worker}} threads : {{term kind.keyword}}:  {{term storage_type.keyword}}')
 
               + elasticsearch.withBucketAggs([
                 elasticsearch.bucketAggs.Terms.withField('db_type.keyword')
@@ -495,6 +504,14 @@ g.dashboard.new('PerfCI-Regression-Summary')
                 + elasticsearch.bucketAggs.Terms.settings.withSize('10')
                 + elasticsearch.bucketAggs.Terms.withType('terms'),
 
+                elasticsearch.bucketAggs.Terms.withField('vm_os_version.keyword')
+                + elasticsearch.bucketAggs.Terms.withId('7')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
+                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
+                + elasticsearch.bucketAggs.Terms.withType('terms'),
+
                 elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
                 + elasticsearch.bucketAggs.DateHistogram.withId('2')
                 + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
@@ -516,7 +533,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
 
               ])
-              + elasticsearch.withQuery('_exists_:tpm AND db_type:$db_type AND current_worker:$current_worker AND kind:$kind AND ocp_version:$ocp_version')
+              + elasticsearch.withQuery('_exists_:tpm AND db_type:$db_type AND current_worker:$current_worker AND kind:$kind AND ocp_version:$ocp_version AND vm_os_version:$vm_os_version')
               + elasticsearch.withRefId('A')
               + elasticsearch.withTimeField('timestamp')
             ]),

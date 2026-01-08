@@ -93,7 +93,7 @@ spec:
         - ReadWriteMany
         resources:
           requests:
-            storage: 70Gi
+            storage: 71Gi
         volumeMode: Block
         storageClassName: ocs-storagecluster-ceph-rbd-virtualization
       source:
