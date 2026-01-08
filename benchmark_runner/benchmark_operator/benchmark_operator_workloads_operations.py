@@ -87,7 +87,7 @@ class BenchmarkOperatorWorkloadsOperations:
                 self._lso_disk_id = self._environment_variables_dict.get('lso_disk_id', '')
         else:
             self._lso_disk_id = None
-        self._product_versions  = self._environment_variables_dict['product_versions']
+        self._product_versions = self._environment_variables_dict['product_versions']
 
     def get_oc(self, kubeadmin_password: str = ''):
         """
@@ -239,21 +239,21 @@ class BenchmarkOperatorWorkloadsOperations:
         if run_artifacts_url:
             metadata.update({'run_artifacts_url': run_artifacts_url})
         if database:
-            metadata.update({'vm_os_version': self._product_versions .get('db_vm_os_version', 'centos-stream9')})
-            metadata.update({'hammerdb_version': self._product_versions .get('hammerdb', 4.0)})
+            metadata.update({'vm_os_version': self._product_versions.get('db_vm_os_version', 'centos-stream9')})
+            metadata.update({'hammerdb_version': self._product_versions.get('hammerdb', 4.0)})
         else:
-            metadata.update({'vm_os_version': self._product_versions .get('vm_os_version', 'fedora39')})
+            metadata.update({'vm_os_version': self._product_versions.get('vm_os_version', 'fedora39')})
         if uuid:
             metadata.update({'uuid': uuid})
         if prometheus_result:
             metadata.update(prometheus_result)
         # for hammerdb
         if database == 'mssql':
-            metadata.update({'db_version': self._product_versions .get('mssql', 2022)})
+            metadata.update({'db_version': self._product_versions.get('mssql', 2022)})
         elif database == 'postgres':
-            metadata.update({'db_version': self._product_versions .get('postgres', 13)})
+            metadata.update({'db_version': self._product_versions.get('postgres', 13)})
         elif database == 'mariadb':
-            metadata.update({'db_version': self._product_versions .get('mariadb', 10.5)})
+            metadata.update({'db_version': self._product_versions.get('mariadb', 10.5)})
         return metadata
 
     @logger_time_stamp
