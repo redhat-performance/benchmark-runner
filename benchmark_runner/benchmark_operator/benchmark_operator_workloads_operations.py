@@ -87,7 +87,8 @@ class BenchmarkOperatorWorkloadsOperations:
                 self._lso_disk_id = self._environment_variables_dict.get('lso_disk_id', '')
         else:
             self._lso_disk_id = None
-        self._product_versions = self._environment_variables_dict['product_versions']
+        self._product_versions = self._environment_variables_dict.get('product_versions', '')
+        self._storage_type = self._environment_variables_dict.get('storage_type', '')
 
     def get_oc(self, kubeadmin_password: str = ''):
         """

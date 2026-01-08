@@ -125,8 +125,8 @@ class WorkloadsOperations:
         self._upgrade_masters_duration_seconds = self._environment_variables_dict.get('upgrade_masters_duration_seconds', '')
         self._upgrade_workers_duration_seconds = self._environment_variables_dict.get('upgrade_workers_duration_seconds', '')
         self._run_strategy = self._environment_variables_dict.get('run_strategy', '')
-        self._product_versions = self._environment_variables_dict['product_versions']
-        self._storage_type = self._environment_variables_dict['storage_type']
+        self._product_versions = self._environment_variables_dict.get('product_versions', '')
+        self._storage_type = self._environment_variables_dict.get('storage_type', '')
 
     def _get_workload_file_name(self, workload):
         """
