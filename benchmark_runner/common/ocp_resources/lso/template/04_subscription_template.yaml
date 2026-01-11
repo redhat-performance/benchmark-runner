@@ -13,4 +13,3 @@ spec:
   source: redhat-operators-v{{ lso_version | replace('.', '') }}   # <-- Modify the name of the redhat-operators catalogsource if not default
   {%- endif %}
   sourceNamespace: openshift-marketplace
-
