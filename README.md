@@ -70,7 +70,7 @@ Choose one from the following list:
 ** clusterbuster workloads: cpusoaker, files, fio, uperf. for more details [see](https://github.com/RobertKrawitz/OpenShift4-tools)
 ** For windows workloads: need to share windows qcow2 image by nginx
 ** For hammerdb mssql must run only once [permission](https://github.com/redhat-performance/benchmark-runner/blob/main/benchmark_runner/common/ocp_resources/custom/template/02_mssql_patch_template.sh)
-** winmssql_vm: will run hammerdb inside windows server mssql 2022: for more details [see](benchmark_runner/common/template_operations/templates/winmssql/windows_benchmark_runner/readme)
+** winmssql_vm: will run mssql hammerdb inside windows server mssql 2022: for more details [see](benchmark_runner/common/template_operations/templates/winmssql/windows_benchmark_runner/readme)
 
 Not mandatory:
 
