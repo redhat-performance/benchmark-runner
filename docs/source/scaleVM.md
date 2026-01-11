@@ -145,7 +145,7 @@ $ grep bootstorm_time benchmark_runner.log
 
 # 📊 [Optional]: Elasticsearch Integration for Metrics Collection
 
-This document explains how to integrate **Elasticsearch** into your VM scaling process to collect and store performance metrics, including **bootstorm time** and `virtctl` access status. 
+This document explains how to integrate **Elasticsearch** into your VM scaling process to collect and store performance metrics, including **bootstorm time** and `virtctl` access status.
 
 ---
 
