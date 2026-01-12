@@ -423,7 +423,7 @@ class WorkloadsOperations:
                     'runner_version': self._build_version,
                     'version': int(self._build_version.split('.')[-1]),
                     'vm_os_version':  self._product_versions.get('db_vm_os_version', 'centos-stream9'),
-                    'ci_date': datetime.datetime.now().strftime(date_format),
+                    'ci_date': datetime.now().strftime(date_format),
                     'uuid': self._uuid,
                     'pin_node1': self._pin_node1,
                     'pin_node2': self._pin_node2,
