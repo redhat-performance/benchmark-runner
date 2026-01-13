@@ -364,16 +364,24 @@ class ElasticSearchOperations:
 
     @typechecked()
     @logger_time_stamp
-    def get_index_ids_between_dates(self, index: str, start_datetime: datetime = None, end_datetime: datetime = None):
+    def get_index_ids_between_dates(
+            self,
+            index: str,
+            start_datetime: datetime = None,
+            end_datetime: datetime = None,
+            key: str = None,
+    ):
         """
-        This method returns list of index ids between dates
-        @param index:
-        @param start_datetime:
-        @param end_datetime:
-        @return: list of ids
+        This method returns list of index ids between dates.
+        Optionally filters documents by a specific key.
         """
-        es_data = self.get_index_data_between_dates(index=index, start_datetime=start_datetime, end_datetime=end_datetime)
-        ids = [hit["_id"] for hit in es_data]
+        es_data = self.get_index_data_between_dates(index=index, start_datetime=start_datetime,
+                                                    end_datetime=end_datetime)
+        if key is None:
+            ids = [hit["_id"] for hit in es_data]
+        else:
+            ids = [hit["_id"] for hit in es_data if key in hit["_source"]]
+
         return ids
 
     @typechecked()

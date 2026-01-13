@@ -454,10 +454,10 @@ class WorkloadsOperations:
 
         return metadata
 
-    def _get_index_ids_between_dates(self, index: str):
+    def _get_index_ids_between_dates(self, index: str, key:str):
         end_datetime = datetime.now(timezone.utc)
         start_datetime = end_datetime - timedelta(hours=4)
-        return self._es_operations.get_index_ids_between_dates(index=index, start_datetime=start_datetime, end_datetime=end_datetime)
+        return self._es_operations.get_index_ids_between_dates(index=index, key=key, start_datetime=start_datetime, end_datetime=end_datetime)
 
     def _get_latest_resource_with_key(self, index: str, key: str) -> dict:
         """

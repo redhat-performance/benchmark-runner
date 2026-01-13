@@ -74,7 +74,7 @@ class WinMSSQLVM(BootstormVM):
             self._data_dict['run_artifacts_url'] = os.path.join(self._run_artifacts_url,
                                                                 f'{self._get_run_artifacts_hierarchy(workload_name=self._workload_name, is_file=True)}-{self._time_stamp_format}.tar.gz')
             self.wait_for_windows_hammerdb_finished()
-            ids = self._get_index_ids_between_dates(index=self._es_index)
+            ids = self._get_index_ids_between_dates(index=self._es_index, key='status')
             # Adding data_updated=True to stamp that this data is already updated and enrich with new product versions fields
             for id in ids:
                 self._update_elasticsearch_index(index=self._es_index, id=id, kind='vm', status='Succeeded', run_artifacts_url=self._data_dict['run_artifacts_url'], database='mssql', vm_name=f'{self._workload_name}-{self._trunc_uuid}', data_updated=True)
