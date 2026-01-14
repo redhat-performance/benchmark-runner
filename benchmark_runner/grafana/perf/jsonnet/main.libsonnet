@@ -180,7 +180,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
       + g.panel.text.withId('187')
 
-      + g.panel.text.options.withContent('![PerfCi](https://github.com/redhat-performance/benchmark-runner/blob/main/media/performance.png \"Tooltip Text\")\n')
+      + g.panel.text.options.withContent('![PerfCi](https://github.com/redhat-performance/benchmark-runner/blob/main/media/performance.png?raw=true \"Tooltip Text\")\n')
       + g.panel.text.options.withMode("markdown")
 
       + g.panel.text.withPluginVersion()
