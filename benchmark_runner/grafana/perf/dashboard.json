@@ -85,7 +85,7 @@
          },
          "id": 2,
          "options": {
-            "content": "![PerfCi](https://github.com/redhat-performance/benchmark-runner/blob/main/media/performance.png \"Tooltip Text\")\n",
+            "content": "![PerfCi](https://github.com/redhat-performance/benchmark-runner/blob/main/media/performance.png?raw=true \"Tooltip Text\")\n",
             "mode": "markdown"
          },
          "pluginVersion": "v10.0.0",
