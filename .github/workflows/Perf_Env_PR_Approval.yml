@@ -1,0 +1,22 @@
+name: PR Approval
+
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize, labeled]
+    branches: [ main ]
+
+permissions:
+  pull-requests: read
+
+jobs:
+  approve:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for ok-to-test label
+        run: |
+          if [[ "${{ contains(github.event.pull_request.labels.*.name, 'ok-to-test') }}" == "true" ]]; then
+            echo "PR approved for testing ✅"
+          else
+            echo "PR is not approved yet."
+            echo "Add the 'ok-to-test' label to run CI."
+          fi
