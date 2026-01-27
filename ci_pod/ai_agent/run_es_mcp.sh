@@ -1,0 +1,1 @@
+sudo podman run --name elastic-mcp-server --rm -d -e ES_URL='http://localhost:9200' -e ES_DISABLE_AUTH='true' -e ES_ALLOW_INSECURE='true' --cpus=4 --memory=8g -p 127.0.0.1:8084:8080 docker.elastic.co/mcp/elasticsearch http

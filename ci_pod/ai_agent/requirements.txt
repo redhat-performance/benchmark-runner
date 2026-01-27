@@ -1,0 +1,7 @@
+elasticsearch>=8.10.0
+google-genai
+mcp[all]
+nest-asyncio
+python-dotenv
+requests
+streamlit>=1.31.0

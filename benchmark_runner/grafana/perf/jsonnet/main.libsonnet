@@ -30,6 +30,12 @@ g.dashboard.new('PerfCI-Regression-Summary')
   + g.dashboard.link.link.options.withKeepTime(false)
   + g.dashboard.link.link.options.withTargetBlank(true),
 
+  g.dashboard.link.link.new('AI Agent', 'http://cnv-intel-15.perf.eng.bos2.dc.redhat.com:8501/')
+  + g.dashboard.link.link.options.withAsDropdown(false)
+  + g.dashboard.link.link.withIcon('external link')
+  + g.dashboard.link.link.options.withIncludeVars(false)
+  + g.dashboard.link.link.options.withKeepTime(false)
+  + g.dashboard.link.link.options.withTargetBlank(true),
 
 ])
 
