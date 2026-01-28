@@ -21,6 +21,7 @@ cd "$CI_POD_PATH"/jupyterlab
 sudo podman build -t jupyterlab --build-arg JUPYTERLAB_VERSION="$JUPYTERLAB_VERSION" --build-arg MAINTAINER="$MAINTAINER" --build-arg OCP_CLIENT_VERSION="$OCP_CLIENT_VERSION" --build-arg VIRTCTL_VERSION="$VIRTCTL_VERSION" .
 sudo podman run --name jupyterlab --pod ci_pod -d -e JUPYTER_TOKEN="$TOKEN" -v "$CI_PATH"/jupyterLab:/notebooks -v /root/.kube:"$HOME"/.kube --privileged localhost/jupyterlab
 sudo chown jenkins:jenkins "$CI_PATH"/jupyterLab/templates/summary_report/*.html
-
+# Elasticsearch MCP Server for AI Agent - port 8084
+sudo podman run --name elastic-mcp-server --rm -d -e ES_URL='http://localhost:9200' -e ES_DISABLE_AUTH='true' -e ES_ALLOW_INSECURE='true' --cpus=4 --memory=8g -p 127.0.0.1:8084:8080 docker.elastic.co/mcp/elasticsearch http
 echo "pod ci status"
 sudo podman pod ls
