@@ -96,6 +96,7 @@ class SummaryReportOperations:
         self.geometric_mean_data['ocp_version'].append(subset['ocp_version'].iloc[0])
         self.geometric_mean_data['cnv_version'].append(subset['cnv_version'].iloc[0])
         self.geometric_mean_data['odf_version'].append(subset['odf_version'].iloc[0])
+        self.geometric_mean_data['vm_os_version'].append(subset['vm_os_version'].iloc[0])
 
     @typechecked()
     def update_hammerdb_data(self, subset: pd.DataFrame, unique_uuid: str):
@@ -105,7 +106,7 @@ class SummaryReportOperations:
         @param unique_uuid:
         @return:
         """
-        logger.info(subset[['workload', 'db_type', 'ocp_version', 'current_worker', 'tpm']])
+        logger.info(subset[['workload', 'db_type', 'vm_os_version', 'ocp_version', 'current_worker', 'tpm']])
         geometric_mean_result = self.__geometric_mean(subset['tpm'].tolist())
         # Get uuid, ocp_version, cnv_version, odf_version, geometric_mean and append data to result DataFrame
         self.__update_geometric_mean_data(subset, unique_uuid)
@@ -196,7 +197,7 @@ class SummaryReportOperations:
         """
         # Create a DataFrame to store results
         # Initialize common structure
-        common_structure = {'uuid': [], 'ocp_version': [], 'cnv_version': [], 'odf_version': []}
+        common_structure = {'uuid': [], 'ocp_version': [], 'cnv_version': [], 'odf_version': [], 'vm_os_version': []}
 
         if workload in ['hammerdb', 'hammerdb_lso']:
             self.geometric_mean_data = {'workload': workload, **common_structure, 'db_type': [], 'geometric_mean': []}
@@ -229,19 +230,19 @@ class SummaryReportOperations:
         @return:
         """
         # Capture the previous value using shift
-        df['previous_val'] = df.groupby('metric')['geometric_mean'].shift(1)
+        df['previous_val'] = df.groupby(['metric', 'vm_os_version'])['geometric_mean'].shift(1)
 
         # Calculate the percentage result
         if complementary:
-            df['result'] = df.groupby('metric')['geometric_mean'].transform(lambda x: 1 - ((x - x.shift(1)) / x.shift(1)) * 100)
+            df['result'] = df.groupby(['metric', 'vm_os_version'])['geometric_mean'].transform(lambda x: 1 - ((x - x.shift(1)) / x.shift(1)) * 100)
         else:
-            df['result'] = df.groupby('metric')['geometric_mean'].transform(lambda x: ((x - x.shift(1)) / x.shift(1)) * 100)
+            df['result'] = df.groupby(['metric', 'vm_os_version'])['geometric_mean'].transform(lambda x: ((x - x.shift(1)) / x.shift(1)) * 100)
 
         df = df.dropna(subset=['result'])
         df.loc[:, 'result'] = df['result'].round(2)
 
         # Return the raw values ('previous_val' and 'geometric_mean') along with the result
-        return df[['workload', 'metric', 'previous_val', 'geometric_mean', 'result']]
+        return df[['workload', 'metric', 'vm_os_version', 'previous_val', 'geometric_mean', 'result']]
 
     def __calc_workload_precentage_diff(self, workload: str, geometric_mean_data: dict, complementary: bool = False, metric: str = None):
         """
@@ -253,7 +254,7 @@ class SummaryReportOperations:
         @return:
         """
         geometric_mean_df = pd.DataFrame(geometric_mean_data)
-        self.median_indices = geometric_mean_df.drop(columns=['metric', 'ocp_version']).groupby([geometric_mean_df['metric'], geometric_mean_df['ocp_version']], group_keys=False).apply(self.__get_median)
+        self.median_indices = geometric_mean_df.drop(columns=['metric', 'ocp_version']).groupby([geometric_mean_df['metric'], geometric_mean_df['vm_os_version'], geometric_mean_df['ocp_version']], group_keys=False).apply(self.__get_median)
         geometric_mean_df = geometric_mean_df.loc[self.median_indices['median_result']]
         return self.__calc_percentage(geometric_mean_df, complementary)
 
@@ -264,6 +265,7 @@ class SummaryReportOperations:
         """
         # rename db_type to metric to get same columns as other workloads
         self.geometric_mean_data['metric'] = self.geometric_mean_data.pop('db_type')
+
         self.geometric_mean_df = self.__calc_workload_precentage_diff(workload, self.geometric_mean_data, metric='pg')
         # updates metric names
         replace_dict = {'mariadb': f'{self.HAMMERDB_METRIC} (mariadb)', 'mssql': f'{self.HAMMERDB_METRIC} (mssql)', 'pg': f'{self.HAMMERDB_METRIC} (postgresql)'}
@@ -293,16 +295,17 @@ class SummaryReportOperations:
 
     def aggregate_bootstorm_dataframe(self, workload: str):
         """
-        This method aggregates bootstorm dataframe and update metric names
+        This method aggregates bootstorm dataframe and update metric names.
+        Metric shows the run type only; vm_os_version column holds the OS.
         @return:
         """
         self.geometric_mean_df = self.__calc_workload_precentage_diff(workload, self.geometric_mean_data, complementary=True, metric='windows_server_2019')
-        # updates metric names
+        # Set metric to the display name only (OS is in vm_os_version column)
         if workload == 'windows':
             for os in self.BOOTSTORM_WINDOWS:
-                self.geometric_mean_df['metric'] = self.geometric_mean_df['metric'].replace({os: f'{self.BOOTSTORM_WINDOWS_METRIC} ({os})'})
+                self.geometric_mean_df['metric'] = self.geometric_mean_df['metric'].replace({os: self.BOOTSTORM_WINDOWS_METRIC})
         else:
-            self.geometric_mean_df['metric'] = self.geometric_mean_df['metric'].replace({f'{self.BOOTSTORM_FEDORA}': f'{self.BOOTSTORM_FEDORA_METRIC} ({self.BOOTSTORM_FEDORA})'})
+            self.geometric_mean_df['metric'] = self.geometric_mean_df['metric'].replace({self.BOOTSTORM_FEDORA: self.BOOTSTORM_FEDORA_METRIC})
 
     @typechecked()
     def aggregate_workload_dataframe(self, workload: str):

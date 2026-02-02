@@ -233,6 +233,12 @@ class SummaryReportWidgets:
         result_df.loc[result_df['workload'] == 'hammerdb_lso', 'workload'] = 'hammerdb'
         result_df.loc[result_df['workload'] == 'windows', 'workload'] = 'bootstorm'
 
+        # Reorder columns to put vm_os_version after metric
+        cols = list(result_df.columns)
+        if 'vm_os_version' in cols:
+            cols.insert(cols.index('metric') + 1, cols.pop(cols.index('vm_os_version')))
+            result_df = result_df[cols]
+
         return result_df
 
     @staticmethod
@@ -320,13 +326,14 @@ class SummaryReportWidgets:
         records = df.to_dict(orient='records')
 
         for record in records:
-            # 3. Create a stable Metric ID (independent of version)
-            # Example: "hammerdb_tpm_mariadb_odf"
+            # 3. Create a stable Metric ID (independent of version, but includes OS)
+            # Example: "hammerdb_tpm_mssql_centos-stream9_odf"
             clean_metric = str(record['metric']).lower().replace(" ", "_").replace("(", "").replace(")", "")
-            metric_id = f"{record['workload']}_{clean_metric}_{str(record['storage type']).lower()}"
+            vm_os = str(record.get('vm_os_version', '')).lower().replace(" ", "_")
+            metric_id = f"{record['workload']}_{clean_metric}_{vm_os}_{str(record['storage type']).lower()}"
 
             # 4. Create a unique Document ID (specific to this version run)
-            # Example: "4.21.0-rc.2_hammerdb_tpm_mariadb_odf"
+            # Example: "4.21.0-rc.2_hammerdb_tpm_mssql_centos-stream9_odf"
             doc_id = f"{latest_v}_{metric_id}"
 
             # 5. Prepare the AI-friendly document
@@ -335,8 +342,11 @@ class SummaryReportWidgets:
                 "metric_id": metric_id,  # Perfect for fast comparison queries
                 "workload": record['workload'],
                 "metric": record['metric'],
+                "vm_os_version": record.get('vm_os_version'),
                 "storage_type": record['storage type'],
                 "value": record[latest_v],
+                "diff_pct": record.get('Diff %', 0),
+                "status": "improvement" if record.get('Diff %', 0) > 0 else "degradation" if record.get('Diff %', 0) < 0 else "stable",
                 "timestamp": datetime.now(timezone.utc)
             }
 
