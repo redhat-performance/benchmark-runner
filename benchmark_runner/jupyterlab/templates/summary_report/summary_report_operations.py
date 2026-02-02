@@ -135,8 +135,9 @@ class SummaryReportOperations:
         # logger.info(f"Displaying average_latency_df:\n{average_latency_df}")
         # logger.info(f"Displaying average_throughput_df:\n{average_throughput_df}")
         # Calculate geometric mean
-        geo_mean_latency = self.__geometric_mean(average_latency_df['norm_ltcy'])
-        geo_mean_throughput = self.__geometric_mean(average_throughput_df['norm_byte'])
+        # Handle cases where rr or stream might be missing
+        geo_mean_latency = self.__geometric_mean(average_latency_df['norm_ltcy']) if not average_latency_df.empty else 0
+        geo_mean_throughput = self.__geometric_mean(average_throughput_df['norm_byte']) if not average_throughput_df.empty else 0
         self.__update_geometric_mean_data(subset, unique_uuid)
         self.geometric_mean_data_throughput.update(self.geometric_mean_data)
         self.geometric_mean_data_throughput['geometric_mean'].append(geo_mean_throughput)
@@ -222,19 +223,25 @@ class SummaryReportOperations:
     @staticmethod
     def __calc_percentage(df: pd.DataFrame, complementary: bool = False):
         """
-        This method calculates percentage difference
+        This method calculates percentage difference and includes raw values
         @param df:
         @param complementary: calculates the complementary percentage change, meaning it measures the difference from 100%
         @return:
         """
-        # complementary percentage change: e.g. latency
+        # Capture the previous value using shift
+        df['previous_val'] = df.groupby('metric')['geometric_mean'].shift(1)
+
+        # Calculate the percentage result
         if complementary:
             df['result'] = df.groupby('metric')['geometric_mean'].transform(lambda x: 1 - ((x - x.shift(1)) / x.shift(1)) * 100)
         else:
             df['result'] = df.groupby('metric')['geometric_mean'].transform(lambda x: ((x - x.shift(1)) / x.shift(1)) * 100)
+
         df = df.dropna(subset=['result'])
         df.loc[:, 'result'] = df['result'].round(2)
-        return df[['workload', 'metric', 'result']]
+
+        # Return the raw values ('previous_val' and 'geometric_mean') along with the result
+        return df[['workload', 'metric', 'previous_val', 'geometric_mean', 'result']]
 
     def __calc_workload_precentage_diff(self, workload: str, geometric_mean_data: dict, complementary: bool = False, metric: str = None):
         """
@@ -363,7 +370,7 @@ class SummaryReportOperations:
         This method returns comparison details ocp_version, odf_version, cnv_nightly_version, sample_dates and uuid
         @return:
         """
-        df['timestamp'] = pd.to_datetime(df['timestamp'])
+        df['timestamp'] = pd.to_datetime(df['timestamp'], format='ISO8601', utc=True)
         df['date'] = df['timestamp'].dt.date
         aggregated_df = df.groupby('date').agg({
             'ocp_version': 'first',

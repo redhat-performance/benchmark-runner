@@ -1,14 +1,19 @@
 
 import os
 import re
+import logging
 import pandas as pd
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import ipywidgets as widgets
 from IPython.display import display, HTML
 from typeguard import typechecked
 
 from benchmark_runner.common.elasticsearch.elasticsearch_operations import ElasticSearchOperations
 from benchmark_runner.jupyterlab.templates.summary_report.summary_report_operations import SummaryReportOperations
+
+# Configure the logger
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 class SummaryReportWidgets:
@@ -54,17 +59,36 @@ class SummaryReportWidgets:
 
     def version_key(self, version):
         """
-        This method splits the version string into parts and returns the numeric parts
+        This method splits the version string into parts and returns a tuple for proper comparison
         @param version:
         @return:
         """
-        # Split the version string into parts: removing characters from versions like '4.X.0-rc.4' and '4.X.0-ec.4' to enable proper ordering
-        parts = version.replace('-rc.', '-ec.').split('.')
+        # 1. Split into base version and suffix
+        # Example: '4.21.0-rc.2' -> base='4.21.0', suffix='rc.2'
+        if '-' in version:
+            base, suffix = version.split('-', 1)
+        else:
+            base, suffix = version, 'ga'  # GA (General Availability) is the highest
 
-        # Extract the numeric parts and convert them to integers
-        numeric_parts = [int(re.search(r'\d+', part).group()) if re.search(r'\d+', part) else part for part in parts]
+        # 2. Assign weights to suffixes (higher is newer)
+        suffix_weights = {'ga': 3, 'rc': 2, 'ec': 1}
 
-        return numeric_parts
+        # Determine weight and build number
+        weight = 0
+        build_num = 0
+        for s_type, s_weight in suffix_weights.items():
+            if s_type in suffix:
+                weight = s_weight
+                # Extract build number (e.g., '2' from 'rc.2')
+                match = re.search(r'\d+', suffix)
+                build_num = int(match.group()) if match else 0
+                break
+
+        # 3. Convert base version to integers
+        numeric_parts = [int(p) for p in base.split('.')]
+
+        # 4. Return a tuple for proper comparison: (4, 21, 0, weight, build_num)
+        return (*numeric_parts, weight, build_num)
 
     def get_ocp_distinct_list(self):
         """
@@ -186,7 +210,8 @@ class SummaryReportWidgets:
         @return:
         """
         median_geometric_mean_df = self.calc_median_geometric_mean_df(workload, self.get_filtered_df(workload))
-        median_geometric_mean_df.rename(columns={'result': self.get_two_last_major_versions()}, inplace=True)
+        v1, v2 = self.get_two_last_major_versions()
+        median_geometric_mean_df.rename(columns={'previous_val': v1, 'geometric_mean': v2, 'result': self.get_two_last_major_versions()}, inplace=True)
         return median_geometric_mean_df
 
     def analyze_all_workload(self, workloads: list = ['hammerdb', 'hammerdb_lso', 'uperf', 'vdbench', 'vdbench_scale', 'bootstorm', 'windows']):
@@ -236,12 +261,15 @@ class SummaryReportWidgets:
         This method displays a style df with a colors: red/green to positive/negative results
         @return:
         """
+        # Identify the OCP version columns to hide
+        versions_to_hide = list(self.get_two_last_major_versions())
+
         # Convert the last column to numeric values (including handling non-numeric values)
         last_column_name = df.columns[-1]
         df[last_column_name] = pd.to_numeric(df[last_column_name], errors='coerce')
 
-        # align all values to the left
-        styled_df = df.style.set_table_styles([
+        # align all values to the left and hide the version columns
+        styled_df = df.style.hide(versions_to_hide, axis='columns').set_table_styles([
             {'selector': 'th:not(:last-child)', 'props': [('text-align', 'left')]},
             {'selector': 'td:not(:last-child)', 'props': [('text-align', 'left')]}
         ])
@@ -278,3 +306,50 @@ class SummaryReportWidgets:
 
         # Display the HTML-styled DataFrame
         display(HTML(style_html + details_df.to_html(index=False)))
+
+    def upload_report_to_elasticsearch(self, df: pd.DataFrame, index_name: str = "summary-report"):
+        """
+        This method uploads the summary report to Elasticsearch.
+        It uses a unique ID per metric/version to ensure that re-running the report
+        for the same OCP version overrides the previous data.
+        """
+        # 1. Get the latest version from the comparison
+        _, latest_v = self.get_two_last_major_versions()
+
+        # 2. Convert DataFrame to records
+        records = df.to_dict(orient='records')
+
+        for record in records:
+            # 3. Create a stable Metric ID (independent of version)
+            # Example: "hammerdb_tpm_mariadb_odf"
+            clean_metric = str(record['metric']).lower().replace(" ", "_").replace("(", "").replace(")", "")
+            metric_id = f"{record['workload']}_{clean_metric}_{str(record['storage type']).lower()}"
+
+            # 4. Create a unique Document ID (specific to this version run)
+            # Example: "4.21.0-rc.2_hammerdb_tpm_mariadb_odf"
+            doc_id = f"{latest_v}_{metric_id}"
+
+            # 5. Prepare the AI-friendly document
+            diff_val = record.get('Diff %', 0)
+            upload_data = {
+                "ocp_version": latest_v,
+                "metric_id": metric_id,  # Perfect for fast comparison queries
+                "workload": record['workload'],
+                "metric": record['metric'],
+                "storage_type": record['storage type'],
+                "value": record[latest_v],
+                "diff_pct": diff_val,
+                "status": "improvement" if diff_val > 0 else "degradation" if diff_val < 0 else "stable",
+                "timestamp": datetime.now(timezone.utc)
+            }
+
+            # 6. Upload with the unique ID to ensure OVERRIDE
+            try:
+                self.elasticsearch.upload_to_elasticsearch(
+                    index=index_name,
+                    data=upload_data,
+                    id=doc_id
+                )
+                logger.info(f"Successfully synced {record['workload']} to {index_name} for version {latest_v}")
+            except Exception as e:
+                logger.error(f"Failed to upload {doc_id} to {index_name}: {e}")
