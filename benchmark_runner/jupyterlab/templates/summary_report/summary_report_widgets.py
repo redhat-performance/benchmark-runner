@@ -330,7 +330,6 @@ class SummaryReportWidgets:
             doc_id = f"{latest_v}_{metric_id}"
 
             # 5. Prepare the AI-friendly document
-            diff_val = record.get('Diff %', 0)
             upload_data = {
                 "ocp_version": latest_v,
                 "metric_id": metric_id,  # Perfect for fast comparison queries
@@ -338,8 +337,6 @@ class SummaryReportWidgets:
                 "metric": record['metric'],
                 "storage_type": record['storage type'],
                 "value": record[latest_v],
-                "diff_pct": diff_val,
-                "status": "improvement" if diff_val > 0 else "degradation" if diff_val < 0 else "stable",
                 "timestamp": datetime.now(timezone.utc)
             }
 
