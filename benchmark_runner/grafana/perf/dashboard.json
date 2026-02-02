@@ -19,6 +19,16 @@
          "title": "Issues",
          "type": "link",
          "url": "https://docs.google.com/spreadsheets/d/1vZtg0Gj8IxKPGLWAkB4iD1O59u_WA4ky5P7gGX6xW3M/edit#gid=0"
+      },
+      {
+         "asDropdown": false,
+         "icon": "external link",
+         "includeVars": false,
+         "keepTime": false,
+         "targetBlank": true,
+         "title": "AI Agent",
+         "type": "link",
+         "url": "http://cnv-intel-15.perf.eng.bos2.dc.redhat.com:8501/"
       }
    ],
    "liveNow": false,
