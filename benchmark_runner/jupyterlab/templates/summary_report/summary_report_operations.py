@@ -1,5 +1,6 @@
 
 import logging
+import numpy as np
 import pandas as pd
 from functools import reduce
 from datetime import datetime
@@ -137,8 +138,8 @@ class SummaryReportOperations:
         # logger.info(f"Displaying average_throughput_df:\n{average_throughput_df}")
         # Calculate geometric mean
         # Handle cases where rr or stream might be missing
-        geo_mean_latency = self.__geometric_mean(average_latency_df['norm_ltcy']) if not average_latency_df.empty else 0
-        geo_mean_throughput = self.__geometric_mean(average_throughput_df['norm_byte']) if not average_throughput_df.empty else 0
+        geo_mean_latency = self.__geometric_mean(average_latency_df['norm_ltcy']) if not average_latency_df.empty else np.nan
+        geo_mean_throughput = self.__geometric_mean(average_throughput_df['norm_byte']) if not average_throughput_df.empty else np.nan
         self.__update_geometric_mean_data(subset, unique_uuid)
         self.geometric_mean_data_throughput.update(self.geometric_mean_data)
         self.geometric_mean_data_throughput['geometric_mean'].append(geo_mean_throughput)
