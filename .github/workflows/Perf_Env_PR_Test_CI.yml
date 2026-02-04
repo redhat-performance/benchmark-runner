@@ -1,56 +1,63 @@
-# This workflow will install Python dependencies, run tests and lint with a single version of Python
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
-# This is Test PR CI Pipeline against Performance environment when pushing a PR
-
-name: Perf Env PR Test CI
+name: PR CI - Integration/E2E
 
 on:
-  pull_request_target:
-    types: [labeled, synchronize]
-    branches: [ main ]
-  workflow_dispatch:
+  pull_request_review:
+    types: [submitted]
 
-# Ensures that only one deploy task per branch/environment will run at a time.
+# Global lock-down
+permissions:
+  contents: read
+
 concurrency:
   group: performance-environment
   cancel-in-progress: false
 
 jobs:
-  approve: # First step
-    # minimize potential vulnerabilities
-    if: ${{ contains(github.event.pull_request.labels.*.name, 'ok-to-test') }}
+  security-check:
     runs-on: ubuntu-latest
+    if: >
+      github.event.review.state == 'approved' &&
+      (github.event.review.author_association == 'MEMBER' || github.event.review.author_association == 'OWNER')
+    outputs:
+      safe_sha: ${{ steps.verify.outputs.sha }}
     steps:
-      - name: Approve
-        run: echo For security reasons, all pull requests need to be approved first before running any automated CI.
-  unittest:
-    # run all python versions, in other jobs run the latest python
-    name: unittest
-    needs: [approve] # Require the first step to finish
+      - name: Verify Reviewed Commit
+        id: verify
+        run: |
+          REVIEWED_SHA="${{ github.event.review.commit_id }}"
+          CURRENT_SHA="${{ github.event.pull_request.head.sha }}"
+
+          # BLOCKER: If the code changed since the review, fail immediately.
+          if [[ "$REVIEWED_SHA" != "$CURRENT_SHA" ]]; then
+            echo "::error::Security Risk: The reviewed commit ($REVIEWED_SHA) is not the latest commit ($CURRENT_SHA). Re-review required."
+            exit 1
+          fi
+
+          echo "sha=$REVIEWED_SHA" >> $GITHUB_OUTPUT
+
+  integration_test:
+    needs: security-check
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [ '3.10', '3.11', '3.12', '3.13', '3.14' ]
+    # Explicitly use the SHA verified by the Gatekeeper
     steps:
       - uses: actions/checkout@v6
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
-      - name: Set up Python ${{ matrix.python-version }}
+          ref: ${{ needs.security-check.outputs.safe_sha }}
+          persist-credentials: false # Critical: Do not leak write-token to untrusted code
+
+      - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: '3.14'
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install flake8 pytest pytest-cov
           if [[ -f requirements.txt ]]; then pip install -r requirements.txt; fi
           if [[ -f tests_requirements.txt ]]; then pip install -r tests_requirements.txt; fi
-      - name: Lint with flake8
-        run: |
-          # stop the build if there are Python syntax errors or undefined names
-          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-          # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+      # SECRETS ARE SAFE HERE because we verified the SHA
       - name: ⚙️ Set Kubeconfig and hosts
         env:
           KUBECONFIG_CONTENTS: ${{ secrets.PERF_KUBECONFIG }}
@@ -61,7 +68,7 @@ jobs:
           echo "$KUBECONFIG_CONTENTS" > "$RUNNER_PATH/.kube/config"
           echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
           sudo tee -a /etc/hosts <<< "$OCP_HOSTS" > /dev/null
-      - name: 📃 Unittest with pytest
+      - name: 📃 Integration test
         env:
           KUBEADMIN_PASSWORD: ${{ secrets.PERF_KUBEADMIN_PASSWORD }}
           PIN_NODE1: ${{ secrets.PERF_PIN_NODE1 }}
@@ -78,157 +85,53 @@ jobs:
           IBM_BUCKET: ${{ secrets.IBM_BUCKET }}
           IBM_KEY: ${{ secrets.IBM_KEY }}
           RUN_ARTIFACTS_URL: ${{ secrets.PERF_RUN_ARTIFACTS_URL }}
+          GRAFANA_URL: ${{ secrets.PERF_GRAFANA_URL }}
+          GRAFANA_API_KEY: ${{ secrets.PERF_GRAFANA_API_KEY }}
+          GRAFANA_JSON_PATH: ${{ secrets.PERF_GRAFANA_JSON_PATH }}
           OCP_CLIENT_VERSION: ${{ secrets.PERF_OCP_CLIENT_VERSION }}
         run: |
-          # Install Dockerfile content for pytest
-          # install oc/kubectl
           curl -L "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${OCP_CLIENT_VERSION}/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz" -o "$RUNNER_PATH/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz"
           tar -xzvf $RUNNER_PATH/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz -C $RUNNER_PATH/
           rm $RUNNER_PATH/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz
           cp $RUNNER_PATH/kubectl /usr/local/bin/kubectl
           cp $RUNNER_PATH/oc /usr/local/bin/oc
 
-          # clone benchmark-operator v1.0.3
-          git clone -b v1.0.3 https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
-
-          # run pytest - only unittest
-          pytest -v tests/unittest/
-
-  integration_test:
-    name: integration_test
-    needs: [approve, unittest]
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [ '3.14' ]
-    steps:
-    - uses: actions/checkout@v6
-      with:
-        ref: ${{ github.event.pull_request.head.sha }}
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v6
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install flake8 pytest pytest-cov
-        if [[ -f requirements.txt ]]; then pip install -r requirements.txt; fi
-        if [[ -f tests_requirements.txt ]]; then pip install -r tests_requirements.txt; fi
-    - name: Lint with flake8
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: ⚙️ Set Kubeconfig and hosts
-      env:
-        KUBECONFIG_CONTENTS: ${{ secrets.PERF_KUBECONFIG }}
-        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-        OCP_HOSTS: ${{ secrets.PERF_OCP_HOSTS }}
-      run: |
-          mkdir -p "$RUNNER_PATH/.kube/"
-          echo "$KUBECONFIG_CONTENTS" > "$RUNNER_PATH/.kube/config"
-          echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
-          sudo tee -a /etc/hosts <<< "$OCP_HOSTS" > /dev/null
-    - name: 📃 Integration test with pytest
-      env:
-        KUBEADMIN_PASSWORD: ${{ secrets.PERF_KUBEADMIN_PASSWORD }}
-        PIN_NODE1: ${{ secrets.PERF_PIN_NODE1 }}
-        PIN_NODE2: ${{ secrets.PERF_PIN_NODE2 }}
-        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-        ELASTICSEARCH: ${{ secrets.PERF_ELASTICSEARCH }}
-        ELASTICSEARCH_PORT: ${{ secrets.PERF_ELASTICSEARCH_PORT }}
-        ELASTICSEARCH_USER: ${{ secrets.PERF_ELASTICSEARCH_USER }}
-        ELASTICSEARCH_PASSWORD: ${{ secrets.PERF_ELASTICSEARCH_PASSWORD }}
-        IBM_REGION_NAME: ${{ secrets.IBM_REGION_NAME }}
-        IBM_ENDPOINT_URL: ${{ secrets.IBM_ENDPOINT_URL }}
-        IBM_ACCESS_KEY_ID: ${{ secrets.IBM_ACCESS_KEY_ID }}
-        IBM_SECRET_ACCESS_KEY: ${{ secrets.IBM_SECRET_ACCESS_KEY }}
-        IBM_BUCKET: ${{ secrets.IBM_BUCKET }}
-        IBM_KEY: ${{ secrets.IBM_KEY }}
-        RUN_ARTIFACTS_URL: ${{ secrets.PERF_RUN_ARTIFACTS_URL }}
-        GRAFANA_URL: ${{ secrets.PERF_GRAFANA_URL }}
-        GRAFANA_API_KEY: ${{ secrets.PERF_GRAFANA_API_KEY }}
-        GRAFANA_JSON_PATH: ${{ secrets.PERF_GRAFANA_JSON_PATH }}
-        OCP_CLIENT_VERSION: ${{ secrets.PERF_OCP_CLIENT_VERSION }}
-      run: |
-        # Install Dockerfile content for pytest
-        # install oc/kubectl
-        curl -L "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${OCP_CLIENT_VERSION}/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz" -o "$RUNNER_PATH/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz"
-        tar -xzvf $RUNNER_PATH/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz -C $RUNNER_PATH/
-        rm $RUNNER_PATH/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz
-        cp $RUNNER_PATH/kubectl /usr/local/bin/kubectl
-        cp $RUNNER_PATH/oc /usr/local/bin/oc
-
-        # install virtctl for VNC
-        virtctl_version="1.0.0"
-        curl -L "https://github.com/kubevirt/kubevirt/releases/download/v${virtctl_version}/virtctl-v${virtctl_version}-linux-amd64" -o  "$RUNNER_PATH/virtctl"
-        chmod +x $RUNNER_PATH/virtctl
-        cp $RUNNER_PATH/virtctl /usr/local/bin/virtctl
-        rm -rf $RUNNER_PATH/virtctl
-
-        # clone benchmark-operator v1.0.3
-        git clone -b v1.0.3 https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
-
-        # run pytest
-        pytest
+          pytest
 
   e2e:
-   name: e2e
-   needs: [approve, unittest, integration_test]
-   runs-on: ubuntu-latest
-   strategy:
-      matrix:
-        python-version: [ '3.14' ]
-   steps:
-   - uses: actions/checkout@v6
-     with:
-       ref: ${{ github.event.pull_request.head.sha }}
-   - name: Set up Python ${{ matrix.python-version }}
-     uses: actions/setup-python@v6
-     with:
-       python-version: ${{ matrix.python-version }}
-   - name: Install dependencies
-     run: |
-       python -m pip install --upgrade pip
-       pip install flake8 pytest pytest-cov
-       if [[ -f requirements.txt ]]; then pip install -r requirements.txt; fi
-       if [[ -f tests_requirements.txt ]]; then pip install -r tests_requirements.txt; fi
-   - name: ⚙️ Set Kubeconfig and hosts
-     env:
-       KUBECONFIG_CONTENTS: ${{ secrets.PERF_KUBECONFIG }}
-       RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-       OCP_HOSTS: ${{ secrets.PERF_OCP_HOSTS }}
-     run: |
-         mkdir -p "$RUNNER_PATH/.kube/"
-         echo "$KUBECONFIG_CONTENTS" > "$RUNNER_PATH/.kube/config"
-         echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
-         sudo tee -a /etc/hosts <<< "$OCP_HOSTS" > /dev/null
-   - name: 📃 E2E test
-     env:
-       WORKLOAD: "stressng_pod"
-       KUBEADMIN_PASSWORD: ${{ secrets.PERF_KUBEADMIN_PASSWORD }}
-       PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.PERF_PIN_NODE_BENCHMARK_OPERATOR }}
-       PIN_NODE1: ${{ secrets.PERF_PIN_NODE1 }}
-       PIN_NODE2: ${{ secrets.PERF_PIN_NODE2 }}
-       RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
-       ELASTICSEARCH: ${{ secrets.PERF_ELASTICSEARCH }}
-       ELASTICSEARCH_PORT: ${{ secrets.PERF_ELASTICSEARCH_PORT }}
-       ELASTICSEARCH_USER: ${{ secrets.PERF_ELASTICSEARCH_USER }}
-       ELASTICSEARCH_PASSWORD: ${{ secrets.PERF_ELASTICSEARCH_PASSWORD }}
-       OCP_CLIENT_VERSION: ${{ secrets.PERF_OCP_CLIENT_VERSION }}
-     run: |
-       # Install Dockerfile content for pytest
-       # install oc/kubectl
-       curl -L "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${OCP_CLIENT_VERSION}/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz" -o "$RUNNER_PATH/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz"
-       tar -xzvf $RUNNER_PATH/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz -C $RUNNER_PATH/
-       rm $RUNNER_PATH/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz
-       cp $RUNNER_PATH/kubectl /usr/local/bin/kubectl
-       cp $RUNNER_PATH/oc /usr/local/bin/oc
+    needs: [security-check, integration_test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.security-check.outputs.safe_sha }}
+          persist-credentials: false
 
-       # clone benchmark-operator v1.0.3
-       git clone -b v1.0.3 https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
 
-       # run main
-       PYTHONPATH=. python benchmark_runner/main/main.py
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 pytest pytest-cov
+          if [[ -f requirements.txt ]]; then pip install -r requirements.txt; fi
+          if [[ -f tests_requirements.txt ]]; then pip install -r tests_requirements.txt; fi
+
+      - name: 📃 E2E test
+        env:
+          WORKLOAD: "stressng_pod"
+          KUBEADMIN_PASSWORD: ${{ secrets.PERF_KUBEADMIN_PASSWORD }}
+          PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.PERF_PIN_NODE_BENCHMARK_OPERATOR }}
+          PIN_NODE1: ${{ secrets.PERF_PIN_NODE1 }}
+          PIN_NODE2: ${{ secrets.PERF_PIN_NODE2 }}
+          RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+          ELASTICSEARCH: ${{ secrets.PERF_ELASTICSEARCH }}
+          ELASTICSEARCH_PORT: ${{ secrets.PERF_ELASTICSEARCH_PORT }}
+          ELASTICSEARCH_USER: ${{ secrets.PERF_ELASTICSEARCH_USER }}
+          ELASTICSEARCH_PASSWORD: ${{ secrets.PERF_ELASTICSEARCH_PASSWORD }}
+          OCP_CLIENT_VERSION: ${{ secrets.PERF_OCP_CLIENT_VERSION }}
+        run: |
+          git clone -b v1.0.3 https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
+          PYTHONPATH=. python benchmark_runner/main/main.py
