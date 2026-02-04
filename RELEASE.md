@@ -16,7 +16,7 @@ There is a new stable version for Benchmark-Runner, it includes:
 
 2. Support major Benchmark-Operator changes:
 
-* Install using make deploy
+* Install using make deploy  
 * Support benchmark-controller-manager pod
 * Support UUID per workload
 * Support new namespace benchmark-operator instead of my-ripsaw
