@@ -1353,12 +1353,11 @@ class OC(SSH):
         Returns a tuple of (virtctl_cmd, check_cmd) for the given VM and namespace,
         depending on the virtctl version.
         """
-        base = f"virtctl ssh --local-ssh=true --local-ssh-opts='-o BatchMode=yes' " \
-               f"--local-ssh-opts='-o PasswordAuthentication=no' --local-ssh-opts='-o ConnectTimeout=2'"
+        base = "virtctl ssh --local-ssh-opts='-o BatchMode=yes' --local-ssh-opts='-o PasswordAuthentication=no' --local-ssh-opts='-o ConnectTimeout=2' --local-ssh-opts='-o StrictHostKeyChecking=no' --local-ssh-opts='-o UserKnownHostsFile=/dev/null'"
 
         if self.is_virtctl_ge(min_version="1.6.0"):
             virtctl_cmd = f"{base} root@vm/{vm_name}/{namespace}"
-            check_cmd = f"{virtctl_cmd} 2>&1 | egrep 'denied|verification failed' && echo True || echo False"
+            check_cmd = f"{virtctl_cmd} 2>&1 | egrep -qi 'permission denied|denied|verification failed' && echo True || echo False"
         else:
             virtctl_cmd = f"{base} root@{vm_name} -n {namespace}"
             check_cmd = f"{virtctl_cmd} 2>&1 | egrep 'denied|verification failed' && echo True || echo False"

@@ -4845,7 +4845,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
         + g.panel.row.withId(176)
 
           + g.panel.row.withPanels([
-            g.panel.stateTimeline.new('240 Fedora37 VMs(Sec)')
+            g.panel.stateTimeline.new('240 Fedora43 VMs(Sec)')
             + stateTimeline.queryOptions.withDatasource('Elasticsearch-bootstorm-results')
             + g.panel.stateTimeline.withDescription('Time till VM Login - Lower is better')
 
@@ -5124,7 +5124,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
             ////////////////////////
 
-            g.panel.stateTimeline.new('240 Fedora37 VM Memory')
+            g.panel.stateTimeline.new('240 Fedora43 VM Memory')
             + stateTimeline.queryOptions.withDatasource('Elasticsearch-bootstorm-results')
             + g.panel.stateTimeline.withDescription('Time till VM Login - Lower is better')
 

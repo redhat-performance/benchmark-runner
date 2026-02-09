@@ -84,8 +84,8 @@ class EnvironmentVariables:
         # prometheus snap interval
         self._environment_variables_dict['prometheus_snap_interval'] = EnvironmentVariables.get_env('PROMETHEUS_SNAP_INTERVAL', '30')
 
-        # based on: quay.io/openshift-cnv/qe-cnv-tests-fedora:39
-        self._environment_variables_dict['fedora_container_disk'] = EnvironmentVariables.get_env('FEDORA_CONTAINER_DISK','quay.io/benchmark-runner/fedora39-container-disk:latest')
+        self._environment_variables_dict['fedora_container_disk'] = EnvironmentVariables.get_env(
+            'FEDORA_CONTAINER_DISK', 'quay.io/benchmark-runner/fedora-containerdisk:43')
         # windows url
         self._environment_variables_dict['windows_url'] = EnvironmentVariables.get_env('WINDOWS_URL', '')
         # Delete all resources before and after the run, default True
@@ -132,11 +132,11 @@ class EnvironmentVariables:
             'postgres': 13,
             'mariadb': 10.5,
             'db_vm_os_version': 'centos-stream9',
-            'vm_os_version': 'fedora39',
+            'vm_os_version': 'fedora43',
             'hammerdb': 4.0
         }
 
-        # Update namespace
+        # Set namespace based on workload
         base_workload = self._environment_variables_dict['workload'].split('_')[0]
         if EnvironmentVariables.get_env('NAMESPACE'):
             self._environment_variables_dict['namespace'] = EnvironmentVariables.get_env('NAMESPACE')
