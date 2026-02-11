@@ -46,7 +46,7 @@ jobs:
     - uses: actions/checkout@v6
       with:
         ref: ${{ github.event.pull_request.head.sha }}
-        persist_credentials: false
+        persist-credentials: false
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v6
       with:
@@ -94,7 +94,8 @@ jobs:
         GRAFANA_API_KEY: ${{ secrets.PERF_GRAFANA_API_KEY }}
         GRAFANA_JSON_PATH: ${{ secrets.PERF_GRAFANA_JSON_PATH }}
         OCP_CLIENT_VERSION: ${{ secrets.PERF_OCP_CLIENT_VERSION }}
-        VIRTCTL_VERSION: 1.7.0
+        VIRTCTL_VERSION: ${{ secrets.PERF_VIRTCTL_VERSION }}
+        BENCHMARK_OPERATOR_VERSION: ${{ secrets.PERF_BENCHMARK_OPERATOR_VERSION }}
       run: |
         # Install Dockerfile content for pytest
         # install oc/kubectl
@@ -110,8 +111,8 @@ jobs:
         cp $RUNNER_PATH/virtctl /usr/local/bin/virtctl
         rm -rf $RUNNER_PATH/virtctl
 
-        # clone benchmark-operator v1.0.4
-        git clone -b v1.0.4 https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
+        # clone benchmark-operator
+        git clone -b v${BENCHMARK_OPERATOR_VERSION} https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
 
         # run pytest
         pytest
@@ -127,7 +128,7 @@ jobs:
    - uses: actions/checkout@v6
      with:
        ref: ${{ github.event.pull_request.head.sha }}
-       persist_credentials: false
+       persist-credentials: false
    - name: Set up Python ${{ matrix.python-version }}
      uses: actions/setup-python@v6
      with:
@@ -161,6 +162,7 @@ jobs:
        ELASTICSEARCH_USER: ${{ secrets.PERF_ELASTICSEARCH_USER }}
        ELASTICSEARCH_PASSWORD: ${{ secrets.PERF_ELASTICSEARCH_PASSWORD }}
        OCP_CLIENT_VERSION: ${{ secrets.PERF_OCP_CLIENT_VERSION }}
+       BENCHMARK_OPERATOR_VERSION: ${{ secrets.PERF_BENCHMARK_OPERATOR_VERSION }}
      run: |
        # Install Dockerfile content for pytest
        # install oc/kubectl
@@ -170,8 +172,8 @@ jobs:
        cp $RUNNER_PATH/kubectl /usr/local/bin/kubectl
        cp $RUNNER_PATH/oc /usr/local/bin/oc
 
-       # clone benchmark-operator v1.0.4
-       git clone -b v1.0.4 https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
+       # clone benchmark-operator
+       git clone -b v${BENCHMARK_OPERATOR_VERSION} https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
 
        # run main
        PYTHONPATH=. python benchmark_runner/main/main.py
