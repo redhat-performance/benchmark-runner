@@ -68,6 +68,7 @@ jobs:
           IBM_KEY: ${{ secrets.IBM_KEY }}
           RUN_ARTIFACTS_URL: ${{ secrets.PERF_RUN_ARTIFACTS_URL }}
           OCP_CLIENT_VERSION: ${{ secrets.PERF_OCP_CLIENT_VERSION }}
+          BENCHMARK_OPERATOR_VERSION: ${{ secrets.PERF_BENCHMARK_OPERATOR_VERSION }}
         run: |
           # Install Dockerfile content for pytest
           # install oc/kubectl
@@ -77,8 +78,8 @@ jobs:
           cp $RUNNER_PATH/kubectl /usr/local/bin/kubectl
           cp $RUNNER_PATH/oc /usr/local/bin/oc
 
-          # clone benchmark-operator v1.0.3
-          git clone -b v1.0.3 https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
+          # clone benchmark-operator
+          git clone -b v${BENCHMARK_OPERATOR_VERSION} https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
 
           # run pytest - only unittest
           pytest -v tests/unittest/
@@ -139,6 +140,8 @@ jobs:
         GRAFANA_API_KEY: ${{ secrets.PERF_GRAFANA_API_KEY }}
         GRAFANA_JSON: ${{ secrets.PERF_GRAFANA_JSON }}
         OCP_CLIENT_VERSION: ${{ secrets.PERF_OCP_CLIENT_VERSION }}
+        VIRTCTL_VERSION: ${{ secrets.PERF_VIRTCTL_VERSION }}
+        BENCHMARK_OPERATOR_VERSION: ${{ secrets.PERF_BENCHMARK_OPERATOR_VERSION }}
       run: |
         # Install Dockerfile content for pytest
         # install oc/kubectl
@@ -151,14 +154,13 @@ jobs:
         rm -rf $RUNNER_PATH/oc
 
          # install virtctl for VNC
-        virtctl_version="1.0.0"
-        curl -L "https://github.com/kubevirt/kubevirt/releases/download/v${virtctl_version}/virtctl-v${virtctl_version}-linux-amd64" -o  "$RUNNER_PATH/virtctl"
+        curl -L "https://github.com/kubevirt/kubevirt/releases/download/v${VIRTCTL_VERSION}/virtctl-v${VIRTCTL_VERSION}-linux-amd64" -o  "$RUNNER_PATH/virtctl"
         chmod +x $RUNNER_PATH/virtctl
         cp $RUNNER_PATH/virtctl /usr/local/bin/virtctl
         rm -rf $RUNNER_PATH/virtctl
 
         # clone benchmark-operator
-        git clone -b v1.0.3 https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
+        git clone -b v${BENCHMARK_OPERATOR_VERSION} https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
         # run pytest
         pytest -v tests --cov=benchmark_runner --cov-report=term-missing
         coverage run -m pytest -v tests

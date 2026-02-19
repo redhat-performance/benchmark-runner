@@ -33,6 +33,7 @@ jobs:
       - name: 📃 Unittest with pytest
         env:
           OCP_CLIENT_VERSION: "4.20.9"
+          BENCHMARK_OPERATOR_VERSION: "1.0.4"
         run: |
           curl -L "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${OCP_CLIENT_VERSION}/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz" -o "/home/runner/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz"
           tar -xzvf /home/runner/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz -C /home/runner/
@@ -40,6 +41,6 @@ jobs:
           cp /home/runner/kubectl /usr/local/bin/kubectl
           cp /home/runner/oc /usr/local/bin/oc
 
-          git clone -b v1.0.3 https://github.com/cloud-bulldozer/benchmark-operator /home/runner/benchmark-operator
+          git clone -b v${BENCHMARK_OPERATOR_VERSION} https://github.com/cloud-bulldozer/benchmark-operator /home/runner/benchmark-operator
 
           pytest -v tests/unittest/
