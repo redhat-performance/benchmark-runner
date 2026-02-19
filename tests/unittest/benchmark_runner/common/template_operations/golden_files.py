@@ -31,7 +31,6 @@ class GoldenFiles:
                                                          'hammerdb_pod_postgres', 'hammerdb_vm_postgres', 'hammerdb_kata_postgres',
                                                          'hammerdb_pod_mssql', 'hammerdb_vm_mssql', 'hammerdb_kata_mssql',
                                                          'vdbench_pod', 'vdbench_kata', 'vdbench_vm', 'bootstorm_vm', 'windows_vm', 'winmssql_vm']
-
     def __clear_directory_yaml(self, dir):
         if os.path.isdir(dir):
             for file in os.listdir(dir):
@@ -65,6 +64,7 @@ class GoldenFiles:
             for run_type in environment_variables.run_types_list:
                 environment_variables.environment_variables_dict['run_type'] = run_type
                 for workload in environment_variables.workloads_list:
+                    environment_variables.environment_variables_dict['fedora_container_disk'] = 'quay.io/benchmark-runner/fedora-container-disk:43'
                     environment_variables.environment_variables_dict['namespace'] = environment_variables.get_workload_namespace(workload)
                     template = TemplateOperations(workload)
                     srcdir = template.get_current_run_path()
