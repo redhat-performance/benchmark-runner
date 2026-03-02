@@ -136,9 +136,13 @@ class EnvironmentVariables:
             'hammerdb': 4.0
         }
 
-        # Set namespace based on workload
+        # Set namespace based on workload.
+        # BENCHMARK_OPERATOR_NAMESPACE is used when set (e.g. OpenShift CI) so the app targets that
+        # namespace for workload/operator while NAMESPACE can remain the job namespace for the framework.
         base_workload = self._environment_variables_dict['workload'].split('_')[0]
-        if EnvironmentVariables.get_env('NAMESPACE'):
+        if EnvironmentVariables.get_env('BENCHMARK_OPERATOR_NAMESPACE'):
+            self._environment_variables_dict['namespace'] = EnvironmentVariables.get_env('BENCHMARK_OPERATOR_NAMESPACE')
+        elif EnvironmentVariables.get_env('NAMESPACE'):
             self._environment_variables_dict['namespace'] = EnvironmentVariables.get_env('NAMESPACE')
         elif base_workload in self._environment_variables_dict['workload_namespaces']:
             default_namespace = self._environment_variables_dict['workload_namespaces'][base_workload]
