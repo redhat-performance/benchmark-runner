@@ -86,9 +86,17 @@ class ElasticSearchUploader(object):
             for row in data:
                 # Update row with uuid
                 uuid = str(uuid4())
-                data.update({'uuid': uuid, 'status': 'Succeeded'})
-                response = self._elasticsearch.upload_to_elasticsearch(index=index, data=data, timestamp=datetime.now(timezone.utc)-timedelta(hours=8))
+                row.update({'uuid': uuid, 'status': 'Succeeded'})
+                response = self._elasticsearch.upload_to_elasticsearch(index=index, data=row, timestamp=datetime.now(timezone.utc)-timedelta(hours=8))
                 uuids.append(uuid)
+                # Log success
+                logger.info(f"Uploaded to Elasticsearch index '{index}', response: {response}")
+            # Update that vm data succeeded uploaded to Elasticsearch
+            uuid = str(uuid4())
+            response = self._elasticsearch.upload_to_elasticsearch(index=index, data={'uuid': uuid, 'vm': 'Succeeded', 'vm_os_version': 'winmssql2022'},
+                                                                   timestamp=datetime.now(timezone.utc) - timedelta(
+                                                                       hours=8))
+            uuids.append(uuid)
             # Log success
             logger.info(f"Uploaded to Elasticsearch index '{index}', response: {response}")
             return uuids
