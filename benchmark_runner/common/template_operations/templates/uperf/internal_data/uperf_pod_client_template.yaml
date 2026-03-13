@@ -1,0 +1,123 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: uperf-client-{{ trunc_uuid }}
+  namespace: {{ namespace }}
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        benchmark-uuid: {{ uuid }}
+        workload: uperf
+        role: client
+        app: uperf-bench-client
+        type: uperf-bench-client-{{ trunc_uuid }}
+    spec:
+      {%- if kind == 'kata' %}
+      runtimeClassName: kata
+      {%- endif %}
+      {%- if hostnetwork == 'true' or hostnetwork == true %}
+      hostNetwork: true
+      {%- endif %}
+      containers:
+      - name: benchmark
+        image: {{ image | default('quay.io/benchmark-runner/uperf:latest') }}
+        env:
+          - name: uuid
+            value: "{{ uuid }}"
+          - name: test_user
+            value: "{{ test_user | default('ripsaw') }}"
+          - name: clustername
+            value: "{{ clustername | default('') }}"
+          {%- if es_url %}
+          - name: es
+            value: "{{ es_url }}"
+          - name: es_index
+            value: "{{ es_index_name }}"
+          {%- endif %}
+          - name: client_node
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
+          - name: server_node
+            value: "{{ pin_server | default('unknown') }}"
+        {%- if client_resources is defined and client_resources %}
+        resources:
+          requests:
+            cpu: {{ requests_cpu }}
+            memory: {{ requests_memory }}
+          limits:
+            cpu: {{ limits_cpu }}
+            memory: {{ limits_memory }}
+        {%- endif %}
+        imagePullPolicy: Always
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            # Server IP passed from Python code
+            export h="{{ server_ip }}"
+            export port=30000
+            export hostnet={{ hostnetwork | default('false') }}
+            export num_pairs={{ pair | default('1') }}
+            export ips=$(hostname -I)
+            exit_status=0
+
+            # Create workdir and process each test file, replacing placeholder with actual server IP
+            mkdir -p /tmp/uperf-workdir
+            SERVER_IP="{{ server_ip }}"
+
+            # Run each test combination and upload metrics to ES
+            {%- for test_type in test_types %}
+            {%- for proto in protos %}
+            {%- for size in sizes %}
+            {%- for nthr in nthrs %}
+            # Replace placeholder and save to workdir
+            sed "s/SERVER_IP_PLACEHOLDER/$SERVER_IP/g" /tmp/uperf-test/uperf-{{ test_type }}-{{ proto }}-{{ size }}-{{ size }}-{{ nthr }} > /tmp/uperf-workdir/uperf-{{ test_type }}-{{ proto }}-{{ size }}-{{ size }}-{{ nthr }}
+            cat /tmp/uperf-workdir/uperf-{{ test_type }}-{{ proto }}-{{ size }}-{{ size }}-{{ nthr }}
+            OUTFILE="/tmp/uperf-out-{{ test_type }}-{{ proto }}-{{ size }}-{{ size }}-{{ nthr }}.out"
+            uperf -v -a -R -i 1 -m /tmp/uperf-workdir/uperf-{{ test_type }}-{{ proto }}-{{ size }}-{{ size }}-{{ nthr }} -P 30000 2>&1 | tee "$OUTFILE" || exit_status=1
+            if [ -n "${es:-}" ] && [ -n "${es_index:-}" ] && [ -f "$OUTFILE" ]; then
+              PROFILE=$(grep "running profile:" "$OUTFILE" | head -1 | sed 's/.*running profile: *\([^ .]*\).*/\1/')
+              pt=$(echo "$PROFILE" | cut -d- -f1); pproto=$(echo "$PROFILE" | cut -d- -f2); pmsg=$(echo "$PROFILE" | cut -d- -f3); prmsg=$(echo "$PROFILE" | cut -d- -f4); pnthr=$(echo "$PROFILE" | cut -d- -f5)
+              pt=${pt:-"{{ test_type }}"}; pproto=${pproto:-"{{ proto }}"}; pmsg=${pmsg:-"{{ size }}"}; prmsg=${prmsg:-"{{ size }}"}; pnthr=${pnthr:-"{{ nthr }}"}
+              TXN="Txn2"; [ "$pt" = "connect" ] && TXN="Txn1"
+              RESULT_LINES=$(grep "timestamp_ms:.*name:${TXN}.*nr_bytes:.*nr_ops:" "$OUTFILE" 2>/dev/null || true)
+              last_line=$(echo "$RESULT_LINES" | tail -1)
+              ts=$(echo "$last_line" | sed -n 's/.*timestamp_ms: *\([0-9.]*\).*/\1/p'); bytes=$(echo "$last_line" | sed -n 's/.*nr_bytes: *\([0-9]*\).*/\1/p'); ops=$(echo "$last_line" | sed -n 's/.*nr_ops: *\([0-9]*\).*/\1/p')
+              bytes=${bytes:-0}; ops=${ops:-0}
+              prev_line=$(echo "$RESULT_LINES" | tail -2 | head -1)
+              if [ -n "$prev_line" ]; then
+                prev_ts=$(echo "$prev_line" | sed -n 's/.*timestamp_ms: *\([0-9.]*\).*/\1/p'); prev_bytes=$(echo "$prev_line" | sed -n 's/.*nr_bytes: *\([0-9]*\).*/\1/p'); prev_ops=$(echo "$prev_line" | sed -n 's/.*nr_ops: *\([0-9]*\).*/\1/p')
+                norm_byte=$((bytes - ${prev_bytes:-0})); norm_ops=$((ops - ${prev_ops:-0}))
+                norm_ltcy=$(awk -v ts="$ts" -v prev_ts="$prev_ts" -v norm_ops="$norm_ops" 'BEGIN {printf "%.4f", (norm_ops != 0 && prev_ts != "") ? (ts - prev_ts) / norm_ops * 1000 : 0}' 2>/dev/null || echo 0)
+              else
+                norm_byte=$bytes; norm_ops=$ops; norm_ltcy=0
+              fi
+              norm_byte=${norm_byte:-0}; norm_ops=${norm_ops:-0}; norm_ltcy=${norm_ltcy:-0}
+              duration=$(echo "$RESULT_LINES" | wc -l); duration=${duration:-1}
+              first_ts=$(echo "$RESULT_LINES" | head -1 | sed -n 's/.*timestamp_ms: *\([0-9.]*\).*/\1/p')
+              duration_sec=$(awk -v ts="$ts" -v first_ts="$first_ts" 'BEGIN {printf "%.4f", (ts != "" && first_ts != "" && ts > first_ts) ? (ts - first_ts) / 1000 : 1}' 2>/dev/null || echo 1)
+              throughput_mbps=$(awk -v duration_sec="$duration_sec" -v bytes="$bytes" 'BEGIN {printf "%.4f", (duration_sec > 0 && bytes > 0) ? bytes * 8 / duration_sec / 1000000 : 0}' 2>/dev/null || echo 0)
+              timestamp_iso=$(date -u +%Y-%m-%dT%H:%M:%S.%3NZ)
+              json=$(printf '{"uuid":"%s","timestamp":"%s","test_type":"%s","protocol":"%s","message_size":%s,"read_message_size":%s,"num_threads":%s,"bytes":%s,"ops":%s,"norm_byte":%s,"norm_ops":%s,"norm_ltcy":%s,"duration":%s,"throughput_mbps":%s,"user":"%s","kind":"pod"}' "$uuid" "$timestamp_iso" "$pt" "$pproto" "${pmsg:-0}" "${prmsg:-0}" "${pnthr:-1}" "$bytes" "$ops" "$norm_byte" "$norm_ops" "$norm_ltcy" "$duration" "$throughput_mbps" "${test_user:-ripsaw}")
+              echo "$json" | curl -sS -X POST "$es/$es_index/_doc" -H 'Content-Type: application/json' -d @-
+            fi
+            {%- endfor %}
+            {%- endfor %}
+            {%- endfor %}
+            {%- endfor %}
+
+            exit $exit_status
+        volumeMounts:
+          - name: config-volume
+            mountPath: "/tmp/uperf-test"
+      volumes:
+        - name: config-volume
+          configMap:
+            name: uperf-test-{{ trunc_uuid }}
+      restartPolicy: Never
+      {%- if pin == 'true' or pin == true %}
+      nodeSelector:
+        kubernetes.io/hostname: '{{ pin_client }}'
+      {%- endif %}

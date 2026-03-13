@@ -316,6 +316,22 @@ class WorkloadsOperations:
             result_list.append(dict(line_dict))
         return result_list
 
+    def _create_run_artifacts(self, workload: str = '', labels: list = None):
+        """
+        This method creates pod logs for direct pod workloads (no operator)
+        :param workload: workload name
+        :param labels: list of pod labels - use when pod labels differ from workload name
+        :return: run artifacts url
+        """
+        # Create pod logs for workload pods
+        if labels:
+            for pod_label in labels:
+                self._create_pod_log(pod=pod_label)
+        elif workload:
+            self._create_pod_log(pod=workload)
+        workload_name = self._workload.replace('_', '-')
+        return os.path.join(self._environment_variables_dict.get('run_artifacts_url', ''), f'{self._get_run_artifacts_hierarchy(workload_name=workload_name, is_file=True)}-{self._time_stamp_format}.tar.gz')
+
     def __make_run_artifacts_tarfile(self, workload: str):
         """
         This method compresses the run artifacts directory and returns the compressed file path.
@@ -485,7 +501,7 @@ class WorkloadsOperations:
         self._es_operations.upload_to_elasticsearch(index=index, data=self.__get_metadata(kind=kind, status=status, result=result))
 
     @logger_time_stamp
-    def _update_elasticsearch_index(self, index: str, id: str, kind: str, status: str, run_artifacts_url: str, database: str = '', vm_name: str = '', data_updated: bool = False):
+    def _update_elasticsearch_index(self, index: str, id: str, kind: str, status: str, run_artifacts_url: str, database: str = '', vm_name: str = '', data_updated: bool = False, prometheus_result: dict = None):
         """
         This method updates elasticsearch id
         :param index:
@@ -495,22 +511,24 @@ class WorkloadsOperations:
         :param status:
         :param run_artifacts_url:
         :param data_updated: check if data was updated
+        :param prometheus_result:
         :return:
         """
-        metadata = self.__get_metadata(kind=kind, database=database, status=status, run_artifacts_url=run_artifacts_url)
+        metadata = self.__get_metadata(kind=kind, database=database, status=status, run_artifacts_url=run_artifacts_url, prometheus_result=prometheus_result)
         if vm_name:
             metadata.update({'vm_name': vm_name})
             metadata.update({'data_updated': data_updated})
         self._es_operations.update_elasticsearch_index(index=index, id=id, metadata=metadata)
 
-    def _verify_elasticsearch_data_uploaded(self, index: str, uuid: str):
+    def _verify_elasticsearch_data_uploaded(self, index: str, uuid: str, timeout: int = None):
         """
         This method verifies that elasticsearch data was uploaded
         :param index:
         :param uuid:
+        :param timeout:
         :return:
         """
-        self._es_operations.verify_elasticsearch_data_uploaded(index=index, uuid=uuid)
+        return self._es_operations.verify_elasticsearch_data_uploaded(index=index, uuid=uuid, timeout=timeout)
 
     def __parse_duration(self, value):
         try:
@@ -519,14 +537,12 @@ class WorkloadsOperations:
             return None
 
     @logger_time_stamp
-    def update_ci_status(self, status: str, ci_minutes_time: int, benchmark_runner_id: str, benchmark_operator_id: str, benchmark_wrapper_id: str, ocp_install_minutes_time: int = 0, ocp_resource_install_minutes_time: int = 0):
+    def update_ci_status(self, status: str, ci_minutes_time: int, benchmark_runner_id: str, ocp_install_minutes_time: int = 0, ocp_resource_install_minutes_time: int = 0):
         """
         This method updates ci status Pass/Failed
         :param status: Pass/Failed
         :param ci_minutes_time: ci time in minutes
         :param benchmark_runner_id: benchmark_runner last repository commit id
-        :param benchmark_operator_id: benchmark_operator last repository commit id
-        :param benchmark_wrapper_id: benchmark_wrapper last repository commit id
         :param ocp_install_minutes_time: ocp install minutes time, default 0 because ocp install run once a week
         :param ocp_resource_install_minutes_time: ocp install minutes time, default 0 because ocp install run once a week
         :return:
@@ -542,7 +558,7 @@ class WorkloadsOperations:
         if ocp_resource_install_minutes_time != 0:
             bm_operations = BareMetalOperations(user=self._environment_variables_dict.get('provision_user', ''))
             ocp_install_minutes_time = bm_operations.get_ocp_install_time()
-        metadata.update({'status': status, 'status#': status_dict[status], 'ci_minutes_time': ci_minutes_time, 'benchmark_runner_id': benchmark_runner_id, 'benchmark_operator_id': benchmark_operator_id, 'benchmark_wrapper_id': benchmark_wrapper_id, 'ocp_install_minutes_time': ocp_install_minutes_time, 'ocp_resource_install_minutes_time': ocp_resource_install_minutes_time, 'upgrade_masters_duration_seconds': self.__parse_duration(self._upgrade_masters_duration_seconds), 'upgrade_workers_duration_seconds': self.__parse_duration(self._upgrade_workers_duration_seconds)})
+        metadata.update({'status': status, 'status#': status_dict[status], 'ci_minutes_time': ci_minutes_time, 'benchmark_runner_id': benchmark_runner_id, 'ocp_install_minutes_time': ocp_install_minutes_time, 'ocp_resource_install_minutes_time': ocp_resource_install_minutes_time, 'upgrade_masters_duration_seconds': self.__parse_duration(self._upgrade_masters_duration_seconds), 'upgrade_workers_duration_seconds': self.__parse_duration(self._upgrade_workers_duration_seconds)})
         self._es_operations.upload_to_elasticsearch(index=es_index, data=metadata)
 
     @logger_time_stamp
