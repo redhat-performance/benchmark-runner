@@ -51,6 +51,7 @@ class WorkloadsOperations:
         self._run_artifacts_url = self._environment_variables_dict.get('run_artifacts_url', '')
         self._pin_node1 = self._environment_variables_dict.get('pin_node1', '')
         self._pin_node2 = self._environment_variables_dict.get('pin_node2', '')
+        self._pin_node_benchmark_operator = self._environment_variables_dict.get('pin_node_benchmark_operator', '')
         self._es_host = self._environment_variables_dict.get('elasticsearch', '')
         self._es_port = self._environment_variables_dict.get('elasticsearch_port', '')
         self._es_user = self._environment_variables_dict.get('elasticsearch_user', '')
@@ -441,8 +442,11 @@ class WorkloadsOperations:
                     'vm_os_version':  self._product_versions.get('db_vm_os_version', 'centos-stream9'),
                     'ci_date': datetime.now().strftime(date_format),
                     'uuid': self._uuid,
+                    'run_id': 'NA',
                     'pin_node1': self._pin_node1,
                     'pin_node2': self._pin_node2,
+                    'pin_node_benchmark_operator': self._pin_node_benchmark_operator,
+                    'storage_type': self._storage_type,
                     # display -1 when 0,1 for avoiding conflict with 0/1 status code
                     'odf_disk_count': -1 if self._oc.get_odf_disk_count() in {0, 1} else self._oc.get_odf_disk_count()
 }
@@ -461,8 +465,10 @@ class WorkloadsOperations:
         if 'win' in self._workload:
             metadata.update({'vm_os_version': self._windows_os})
         # for hammerdb
+        if database:
+            metadata.update({'hammerdb_version': self._product_versions.get('hammerdb', 4.0)})
         if database == 'mssql':
-            metadata.update({'db_type': 'mssql', 'db_version': self._product_versions.get('mssql', 2022), 'storage_type':self._storage_type})
+            metadata.update({'db_type': 'mssql', 'db_version': self._product_versions.get('mssql', 2022)})
         if self._test_name:
             metadata.update({'test_name': self._test_name})
         if result:

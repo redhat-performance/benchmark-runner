@@ -42,6 +42,42 @@ spec:
                 fieldPath: spec.nodeName
           - name: server_node
             value: "{{ pin_server | default('unknown') }}"
+          - name: server_ip
+            value: "{{ server_ip | default('') }}"
+          - name: run_id
+            value: "{{ run_id | default('NA') }}"
+          - name: client_ips
+            value: "{{ client_ips | default('') }}"
+          - name: service_ip
+            value: "{{ service_ip | default('False') }}"
+          - name: service_type
+            value: "{{ service_type | default('') }}"
+          - name: port
+            value: "{{ port | default('30000') }}"
+          - name: num_pairs
+            value: "{{ num_pairs | default('') }}"
+          - name: multus_client
+            value: "{{ multus_client | default('') }}"
+          - name: networkpolicy
+            value: "{{ networkpolicy | default('') }}"
+          - name: density
+            value: "{{ density | default('') }}"
+          - name: nodes_in_iter
+            value: "{{ nodes_in_iter | default('') }}"
+          - name: step_size
+            value: "{{ step_size | default('') }}"
+          - name: colocate
+            value: "{{ colocate | default('') }}"
+          - name: density_range
+            value: "{{ density_range | default('') }}"
+          - name: node_range
+            value: "{{ node_range | default('') }}"
+          - name: hostnetwork
+            value: "{{ hostnetwork | default('False') }}"
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
         {%- if client_resources is defined and client_resources %}
         resources:
           requests:
@@ -77,32 +113,6 @@ spec:
             cat /tmp/uperf-workdir/uperf-{{ test_type }}-{{ proto }}-{{ size }}-{{ size }}-{{ nthr }}
             OUTFILE="/tmp/uperf-out-{{ test_type }}-{{ proto }}-{{ size }}-{{ size }}-{{ nthr }}.out"
             uperf -v -a -R -i 1 -m /tmp/uperf-workdir/uperf-{{ test_type }}-{{ proto }}-{{ size }}-{{ size }}-{{ nthr }} -P 30000 2>&1 | tee "$OUTFILE" || exit_status=1
-            if [ -n "${es:-}" ] && [ -n "${es_index:-}" ] && [ -f "$OUTFILE" ]; then
-              PROFILE=$(grep "running profile:" "$OUTFILE" | head -1 | sed 's/.*running profile: *\([^ .]*\).*/\1/')
-              pt=$(echo "$PROFILE" | cut -d- -f1); pproto=$(echo "$PROFILE" | cut -d- -f2); pmsg=$(echo "$PROFILE" | cut -d- -f3); prmsg=$(echo "$PROFILE" | cut -d- -f4); pnthr=$(echo "$PROFILE" | cut -d- -f5)
-              pt=${pt:-"{{ test_type }}"}; pproto=${pproto:-"{{ proto }}"}; pmsg=${pmsg:-"{{ size }}"}; prmsg=${prmsg:-"{{ size }}"}; pnthr=${pnthr:-"{{ nthr }}"}
-              TXN="Txn2"; [ "$pt" = "connect" ] && TXN="Txn1"
-              RESULT_LINES=$(grep "timestamp_ms:.*name:${TXN}.*nr_bytes:.*nr_ops:" "$OUTFILE" 2>/dev/null || true)
-              last_line=$(echo "$RESULT_LINES" | tail -1)
-              ts=$(echo "$last_line" | sed -n 's/.*timestamp_ms: *\([0-9.]*\).*/\1/p'); bytes=$(echo "$last_line" | sed -n 's/.*nr_bytes: *\([0-9]*\).*/\1/p'); ops=$(echo "$last_line" | sed -n 's/.*nr_ops: *\([0-9]*\).*/\1/p')
-              bytes=${bytes:-0}; ops=${ops:-0}
-              prev_line=$(echo "$RESULT_LINES" | tail -2 | head -1)
-              if [ -n "$prev_line" ]; then
-                prev_ts=$(echo "$prev_line" | sed -n 's/.*timestamp_ms: *\([0-9.]*\).*/\1/p'); prev_bytes=$(echo "$prev_line" | sed -n 's/.*nr_bytes: *\([0-9]*\).*/\1/p'); prev_ops=$(echo "$prev_line" | sed -n 's/.*nr_ops: *\([0-9]*\).*/\1/p')
-                norm_byte=$((bytes - ${prev_bytes:-0})); norm_ops=$((ops - ${prev_ops:-0}))
-                norm_ltcy=$(awk -v ts="$ts" -v prev_ts="$prev_ts" -v norm_ops="$norm_ops" 'BEGIN {printf "%.4f", (norm_ops != 0 && prev_ts != "") ? (ts - prev_ts) / norm_ops * 1000 : 0}' 2>/dev/null || echo 0)
-              else
-                norm_byte=$bytes; norm_ops=$ops; norm_ltcy=0
-              fi
-              norm_byte=${norm_byte:-0}; norm_ops=${norm_ops:-0}; norm_ltcy=${norm_ltcy:-0}
-              duration=$(echo "$RESULT_LINES" | wc -l); duration=${duration:-1}
-              first_ts=$(echo "$RESULT_LINES" | head -1 | sed -n 's/.*timestamp_ms: *\([0-9.]*\).*/\1/p')
-              duration_sec=$(awk -v ts="$ts" -v first_ts="$first_ts" 'BEGIN {printf "%.4f", (ts != "" && first_ts != "" && ts > first_ts) ? (ts - first_ts) / 1000 : 1}' 2>/dev/null || echo 1)
-              throughput_mbps=$(awk -v duration_sec="$duration_sec" -v bytes="$bytes" 'BEGIN {printf "%.4f", (duration_sec > 0 && bytes > 0) ? bytes * 8 / duration_sec / 1000000 : 0}' 2>/dev/null || echo 0)
-              timestamp_iso=$(date -u +%Y-%m-%dT%H:%M:%S.%3NZ)
-              json=$(printf '{"uuid":"%s","timestamp":"%s","test_type":"%s","protocol":"%s","message_size":%s,"read_message_size":%s,"num_threads":%s,"bytes":%s,"ops":%s,"norm_byte":%s,"norm_ops":%s,"norm_ltcy":%s,"duration":%s,"throughput_mbps":%s,"user":"%s","kind":"pod"}' "$uuid" "$timestamp_iso" "$pt" "$pproto" "${pmsg:-0}" "${prmsg:-0}" "${pnthr:-1}" "$bytes" "$ops" "$norm_byte" "$norm_ops" "$norm_ltcy" "$duration" "$throughput_mbps" "${test_user:-ripsaw}")
-              echo "$json" | curl -sS -X POST "$es/$es_index/_doc" -H 'Content-Type: application/json' -d @-
-            fi
             {%- endfor %}
             {%- endfor %}
             {%- endfor %}

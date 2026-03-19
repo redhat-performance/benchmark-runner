@@ -152,20 +152,4 @@ spec:
               runcmd:
                 - sleep 30
                 - uperf -m /tmp/test.xml -a -e -i 1 -P 30000 > /tmp/uperf.out 2>&1
-                - |
-                  cat > /tmp/uperf_result.json << EOF
-                  {
-                    "uuid": "{{ uuid }}",
-                    "kind": "vm",
-                    "test_type": "stream",
-                    "protocol": "tcp",
-                    "message_size": 64,
-                    "num_threads": 1,
-                    "duration": 2,
-                    "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-                  }
-                  EOF
-                  curl -X POST "{{ es_url }}/{{ es_index_name }}/_doc" \
-                    -H 'Content-Type: application/json' \
-                    -d @/tmp/uperf_result.json
-                - poweroff
+                - touch /tmp/workload_complete.signal
