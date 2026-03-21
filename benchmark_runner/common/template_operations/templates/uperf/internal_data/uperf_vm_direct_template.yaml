@@ -37,6 +37,9 @@ spec:
           interfaces:
             - name: default
               masquerade: {}
+              ports:
+                - port: 30000
+                - port: 30001
         machine:
           type: ""
         resources:
@@ -63,8 +66,11 @@ spec:
               chpasswd: { expire: False }
               packages:
                 - uperf
+                - qemu-guest-agent
               runcmd:
-                - uperf -s -v -P 30000 > /tmp/uperf_server.log 2>&1 &
+                - mkdir -p /opt/uperf && chmod 777 /opt/uperf
+                - systemctl enable --now qemu-guest-agent
+                - uperf -s -v -P 30000 > /opt/uperf/server.log 2>&1 &
                 - sleep infinity
 ---
 apiVersion: kubevirt.io/v1
@@ -132,40 +138,57 @@ spec:
               chpasswd: { expire: False }
               packages:
                 - uperf
-              write_files:
-                - path: /tmp/test.xml
-                  content: |
-                    <?xml version="1.0"?>
-                    <profile name="test">
-                      <group nthreads="1">
-                        <transaction iterations="1">
-                          <flowop type="connect" options="remotehost={{ server_ip }} protocol=tcp tcp_nodelay"/>
-                        </transaction>
-                        <transaction duration="2">
-                          <flowop type="write" options="size=64"/>
-                        </transaction>
-                        <transaction iterations="1">
-                          <flowop type="disconnect"/>
-                        </transaction>
-                      </group>
-                    </profile>
+                - qemu-guest-agent
               runcmd:
+                - mkdir -p /opt/uperf && chmod 777 /opt/uperf
+                - systemctl enable --now qemu-guest-agent
                 - sleep 30
-                - uperf -m /tmp/test.xml -a -e -i 1 -P 30000 > /tmp/uperf.out 2>&1
                 - |
-                  cat > /tmp/uperf_result.json << EOF
-                  {
-                    "uuid": "{{ uuid }}",
-                    "kind": "vm",
-                    "test_type": "stream",
-                    "protocol": "tcp",
-                    "message_size": 64,
-                    "num_threads": 1,
-                    "duration": 2,
-                    "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-                  }
-                  EOF
-                  curl -X POST "{{ es_url }}/{{ es_index_name }}/_doc" \
-                    -H 'Content-Type: application/json' \
-                    -d @/tmp/uperf_result.json
-                - poweroff
+                  SERVER="{{ server_ip }}"
+                  RT="{{ runtime }}"
+                  for tt in {{ test_types | join(' ') }}; do
+                    for sz in {{ sizes | join(' ') }}; do
+                      for nt in {{ nthrs | join(' ') }}; do
+                        XML=/opt/uperf/test.xml
+                        if [ "$tt" = "rr" ]; then
+                          cat > $XML << XMLEOF
+                  <?xml version="1.0"?>
+                  <profile name="$tt-tcp-$sz-$sz-$nt">
+                    <group nthreads="$nt">
+                      <transaction iterations="1">
+                        <flowop type="connect" options="remotehost=$SERVER protocol=tcp port=30001"/>
+                      </transaction>
+                      <transaction duration="$RT">
+                        <flowop type="write" options="size=$sz"/>
+                        <flowop type="read" options="size=$sz"/>
+                      </transaction>
+                      <transaction iterations="1">
+                        <flowop type="disconnect"/>
+                      </transaction>
+                    </group>
+                  </profile>
+                  XMLEOF
+                        else
+                          cat > $XML << XMLEOF
+                  <?xml version="1.0"?>
+                  <profile name="$tt-tcp-$sz-$sz-$nt">
+                    <group nthreads="$nt">
+                      <transaction iterations="1">
+                        <flowop type="connect" options="remotehost=$SERVER protocol=tcp port=30001"/>
+                      </transaction>
+                      <transaction duration="$RT">
+                        <flowop type="write" options="count=16 size=$sz"/>
+                      </transaction>
+                      <transaction iterations="1">
+                        <flowop type="disconnect"/>
+                      </transaction>
+                    </group>
+                  </profile>
+                  XMLEOF
+                        fi
+                        echo "=== TEST $tt-tcp-$sz-$sz-$nt ===" >> /opt/uperf/output.txt
+                        uperf -v -a -R -i 1 -m $XML -P 30000 >> /opt/uperf/output.txt 2>&1
+                      done
+                    done
+                  done
+                - touch /opt/uperf/workload_complete.signal
