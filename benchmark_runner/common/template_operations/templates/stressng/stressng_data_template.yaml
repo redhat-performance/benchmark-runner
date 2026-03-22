@@ -1,10 +1,18 @@
 metadata:
   name: stressng
+files:
+  - name: stressng_pod_configmap.yaml
+    template: stressng_pod_configmap_template.yaml
+  - name: stressng_pod.yaml
+    template: stressng_pod_job_template.yaml
+  - name: stressng_vm.yaml
+    template: stressng_vm_direct_template.yaml
 template_data:
   shared:
     pin_node: {{ pin_node1 }}
     runtype: sequential
     instances: 1
+    image: quay.io/benchmark-runner/stressng:latest
     # cpu stressor options
     cpu_percentage: 100
     cpu_method: all
@@ -16,6 +24,7 @@ template_data:
   run_type:
     perf_ci:
       timeout: 120
+      stressng_timeout: 120
       cpu_stressors: 60
       vm_bytes: 60G
       limits_cpu: 60
@@ -24,6 +33,7 @@ template_data:
       requests_memory: 75Gi
     default:
       timeout: 30
+      stressng_timeout: 30
       cpu_stressors: 1
       vm_bytes: 128M
       limits_cpu: 2

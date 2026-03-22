@@ -1,0 +1,190 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: uperf-server-deadbeef
+  namespace: benchmark-runner
+  labels:
+    app: uperf-server-deadbeef
+    type: uperf-server-deadbeef
+    benchmark-uuid: deadbeef-0123-3210-cdef-01234567890abcdef
+    benchmark-runner-workload: uperf
+    role: server
+spec:
+  running: true
+  template:
+    metadata:
+      labels:
+        kubevirt-vm: uperf-server
+        app: uperf-server-deadbeef
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: 'pin-node-1'
+      domain:
+        cpu:
+          sockets: 
+          cores: 
+          threads: 1
+        devices:
+          disks:
+            - disk:
+                bus: virtio
+              name: containerdisk
+            - disk:
+                bus: virtio
+              name: cloudinitdisk
+          interfaces:
+            - name: default
+              masquerade: {}
+              ports:
+                - port: 30000
+                - port: 30001
+        machine:
+          type: ""
+        resources:
+          requests:
+            cpu: 8
+            memory: 8Gi
+          limits:
+            cpu: 8
+            memory: 8Gi
+      terminationGracePeriodSeconds: 180
+      networks:
+        - name: default
+          pod: {}
+      volumes:
+        - name: containerdisk
+          containerDisk:
+            image: quay.io/benchmark-runner/fedora-container-disk:43
+        - name: cloudinitdisk
+          cloudInitNoCloud:
+            userData: |
+              #cloud-config
+              user: fedora
+              password: fedora
+              chpasswd: { expire: False }
+              packages:
+                - uperf
+                - qemu-guest-agent
+              runcmd:
+                - mkdir -p /opt/uperf && chmod 777 /opt/uperf
+                - systemctl enable --now qemu-guest-agent
+                - uperf -s -v -P 30000 > /opt/uperf/server.log 2>&1 &
+                - sleep infinity
+---
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: uperf-client-deadbeef
+  namespace: benchmark-runner
+  labels:
+    app: uperf-client-deadbeef
+    type: uperf-client-deadbeef
+    benchmark-uuid: deadbeef-0123-3210-cdef-01234567890abcdef
+    benchmark-runner-workload: uperf
+    role: client
+spec:
+  runStrategy: Once
+  template:
+    metadata:
+      labels:
+        kubevirt-vm: uperf-client
+        app: uperf-client-deadbeef
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: 'pin-node-2'
+      domain:
+        cpu:
+          sockets: 
+          cores: 
+          threads: 1
+        devices:
+          disks:
+            - disk:
+                bus: virtio
+              name: containerdisk
+            - disk:
+                bus: virtio
+              name: cloudinitdisk
+          interfaces:
+            - name: default
+              masquerade: {}
+        machine:
+          type: ""
+        resources:
+          requests:
+            cpu: 8
+            memory: 8Gi
+          limits:
+            cpu: 8
+            memory: 8Gi
+      terminationGracePeriodSeconds: 180
+      networks:
+        - name: default
+          pod: {}
+      volumes:
+        - name: containerdisk
+          containerDisk:
+            image: quay.io/benchmark-runner/fedora-container-disk:43
+        - name: cloudinitdisk
+          cloudInitNoCloud:
+            userData: |
+              #cloud-config
+              user: fedora
+              password: fedora
+              chpasswd: { expire: False }
+              packages:
+                - uperf
+                - qemu-guest-agent
+              runcmd:
+                - mkdir -p /opt/uperf && chmod 777 /opt/uperf
+                - systemctl enable --now qemu-guest-agent
+                - sleep 30
+                - |
+                  SERVER=""
+                  RT="60"
+                  for tt in stream rr; do
+                    for sz in 64 1024 8192; do
+                      for nt in 1 8; do
+                        XML=/opt/uperf/test.xml
+                        if [ "$tt" = "rr" ]; then
+                          cat > $XML << XMLEOF
+                  <?xml version="1.0"?>
+                  <profile name="$tt-tcp-$sz-$sz-$nt">
+                    <group nthreads="$nt">
+                      <transaction iterations="1">
+                        <flowop type="connect" options="remotehost=$SERVER protocol=tcp port=30001"/>
+                      </transaction>
+                      <transaction duration="$RT">
+                        <flowop type="write" options="size=$sz"/>
+                        <flowop type="read" options="size=$sz"/>
+                      </transaction>
+                      <transaction iterations="1">
+                        <flowop type="disconnect"/>
+                      </transaction>
+                    </group>
+                  </profile>
+                  XMLEOF
+                        else
+                          cat > $XML << XMLEOF
+                  <?xml version="1.0"?>
+                  <profile name="$tt-tcp-$sz-$sz-$nt">
+                    <group nthreads="$nt">
+                      <transaction iterations="1">
+                        <flowop type="connect" options="remotehost=$SERVER protocol=tcp port=30001"/>
+                      </transaction>
+                      <transaction duration="$RT">
+                        <flowop type="write" options="count=16 size=$sz"/>
+                      </transaction>
+                      <transaction iterations="1">
+                        <flowop type="disconnect"/>
+                      </transaction>
+                    </group>
+                  </profile>
+                  XMLEOF
+                        fi
+                        echo "=== TEST $tt-tcp-$sz-$sz-$nt ===" >> /opt/uperf/output.txt
+                        uperf -v -a -R -i 1 -m $XML -P 30000 >> /opt/uperf/output.txt 2>&1
+                      done
+                    done
+                  done
+                - touch /opt/uperf/workload_complete.signal

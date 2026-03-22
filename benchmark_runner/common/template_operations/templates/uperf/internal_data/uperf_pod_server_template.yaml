@@ -1,0 +1,44 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: uperf-server-{{ trunc_uuid }}
+  namespace: {{ namespace }}
+spec:
+  ttlSecondsAfterFinished: 600
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        benchmark-uuid: {{ uuid }}
+        workload: uperf
+        role: server
+        app: uperf-bench-server-0-{{ trunc_uuid }}
+        index: "0"
+        type: uperf-bench-server-{{ trunc_uuid }}
+    spec:
+      {%- if kind == 'kata' %}
+      runtimeClassName: kata
+      {%- endif %}
+      {%- if hostnetwork == 'true' or hostnetwork == true %}
+      hostNetwork: true
+      {%- endif %}
+      containers:
+      - name: benchmark
+        image: {{ image | default('quay.io/benchmark-runner/uperf:latest') }}
+        {%- if server_resources is defined and server_resources %}
+        resources:
+          requests:
+            cpu: {{ requests_cpu }}
+            memory: {{ requests_memory }}
+          limits:
+            cpu: {{ limits_cpu }}
+            memory: {{ limits_memory }}
+        {%- endif %}
+        imagePullPolicy: Always
+        command: ["/bin/sh", "-c"]
+        args: ["uperf -s -v -P 30000"]
+      restartPolicy: Never
+      {%- if pin == 'true' or pin == true %}
+      nodeSelector:
+        kubernetes.io/hostname: '{{ pin_server }}'
+      {%- endif %}

@@ -1,0 +1,106 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: uperf-client-deadbeef
+  namespace: benchmark-runner
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        benchmark-uuid: deadbeef-0123-3210-cdef-01234567890abcdef
+        workload: uperf
+        role: client
+        app: uperf-bench-client
+        type: uperf-bench-client-deadbeef
+    spec:
+      containers:
+      - name: benchmark
+        image: quay.io/benchmark-runner/uperf:latest
+        env:
+          - name: uuid
+            value: "deadbeef-0123-3210-cdef-01234567890abcdef"
+          - name: test_user
+            value: "ripsaw"
+          - name: clustername
+            value: ""
+          - name: es
+            value: "http://elasticsearch.example.com:gol9999"
+          - name: es_index
+            value: "uperf-test-ci-results"
+          - name: client_node
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
+          - name: server_node
+            value: "pin-node-1"
+          - name: server_ip
+            value: ""
+          - name: run_id
+            value: "NA"
+          - name: client_ips
+            value: ""
+          - name: service_ip
+            value: "False"
+          - name: service_type
+            value: ""
+          - name: port
+            value: "30000"
+          - name: num_pairs
+            value: ""
+          - name: multus_client
+            value: ""
+          - name: networkpolicy
+            value: "False"
+          - name: density
+            value: ""
+          - name: nodes_in_iter
+            value: ""
+          - name: step_size
+            value: ""
+          - name: colocate
+            value: ""
+          - name: density_range
+            value: ""
+          - name: node_range
+            value: ""
+          - name: hostnetwork
+            value: "False"
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+        imagePullPolicy: Always
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            # Server IP passed from Python code
+            export h=""
+            export port=30000
+            export hostnet=False
+            export num_pairs=1
+            export ips=$(hostname -I)
+            exit_status=0
+
+            # Create workdir and process each test file, replacing placeholder with actual server IP
+            mkdir -p /tmp/uperf-workdir
+            SERVER_IP=""
+
+            # Run each test combination and upload metrics to ES
+            # Replace placeholder and save to workdir
+            sed "s/SERVER_IP_PLACEHOLDER/$SERVER_IP/g" /tmp/uperf-test/uperf-stream-tcp-64-64-1 > /tmp/uperf-workdir/uperf-stream-tcp-64-64-1
+            cat /tmp/uperf-workdir/uperf-stream-tcp-64-64-1
+            OUTFILE="/tmp/uperf-out-stream-tcp-64-64-1.out"
+            uperf -v -a -R -i 1 -m /tmp/uperf-workdir/uperf-stream-tcp-64-64-1 -P 30000 2>&1 | tee "$OUTFILE" || exit_status=1
+
+            exit $exit_status
+        volumeMounts:
+          - name: config-volume
+            mountPath: "/tmp/uperf-test"
+      volumes:
+        - name: config-volume
+          configMap:
+            name: uperf-test-deadbeef
+      restartPolicy: Never
+      nodeSelector:
+        kubernetes.io/hostname: 'pin-node-2'

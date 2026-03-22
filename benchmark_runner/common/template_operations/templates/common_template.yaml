@@ -1,7 +1,7 @@
 common_data:
   namespace: {{ namespace }}
   es_url: {{ elasticsearch_url }}
-  es_index_name: {{ workload_name }}{{ es_suffix }}
+  es_index_name: {{ workload_name }}{{ es_index_results_suffix }}
   # enable/disable system metrics
   system_metrics: {{ system_metrics }}
   prom_url: https://prometheus-k8s.openshift-monitoring.svc.cluster.local:9091

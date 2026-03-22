@@ -28,8 +28,10 @@ class TemplateOperations:
         self.__dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'templates'))
         if self.__run_type == 'test_ci':
             self.__environment_variables_dict['es_suffix'] = '-test-ci'
+            self.__environment_variables_dict['es_index_results_suffix'] = '-test-ci-results'
         else:
             self.__environment_variables_dict['es_suffix'] = ''
+            self.__environment_variables_dict['es_index_results_suffix'] = '-results'
 
     @logger_time_stamp
     def __split_run_bulks(self, iterable: range, limit: int = 1):

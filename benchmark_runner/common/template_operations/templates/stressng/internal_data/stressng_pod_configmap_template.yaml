@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: stressng-workload-{{ trunc_uuid }}
+  namespace: {{ namespace }}
+data:
+  jobfile: |
+    run {{ runtype }}
+    verbose
+    metrics-brief
+    timeout {{ timeout }}
+
+    # cpu stressor
+    {%- if cpu_stressors is defined %}
+    cpu {{ cpu_stressors }}
+    cpu-load {{ cpu_percentage }}
+    cpu-method {{ cpu_method }}
+    {%- endif %}
+
+    # vm stressor
+    {%- if vm_stressors is defined %}
+    vm {{ vm_stressors }}
+    vm-bytes {{ vm_bytes }}
+    vm-keep
+    vm-populate
+    {%- endif %}
+
+    # memcpy stressor
+    {%- if mem_stressors is defined %}
+    memcpy {{ mem_stressors }}
+    {%- endif %}
