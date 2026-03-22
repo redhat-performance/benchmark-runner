@@ -1,43 +1,113 @@
-apiVersion: ripsaw.cloudbulldozer.io/v1alpha1
-kind: Benchmark
+apiVersion: batch/v1
+kind: Job
 metadata:
-  name: stressng-kata
-  namespace: benchmark-operator
+  name: stressng-kata-deadbeef
+  namespace: benchmark-runner
 spec:
-  system_metrics:
-    collection: True
-    prom_url: "https://prometheus-k8s.openshift-monitoring.svc.cluster.local:9091"
-    es_url: "http://elasticsearch.example.com:gol9999"
-    prom_token: "fake_prom_token"
-    metrics_profile: "node-metrics.yml"
-    index_name: system-metrics
-  elasticsearch:
-    url: "http://elasticsearch.example.com:gol9999"
-    index_name: stressng
-  metadata:
-    collection: false
-  workload:
-    name: stressng
-    args:
-      runtime_class: kata
-      pin: True # enable for nodeSelector
-      pin_node: "pin-node-1"
-      image: "quay.io/benchmark-runner/stressng:latest"
-      resources: True # enable for resources requests/limits
-      requests_cpu: 60
-      requests_memory: 75Gi
-      limits_cpu: 60
-      limits_memory: 75Gi
-      # general options
-      runtype: "sequential"
-      timeout: "120"
-      instances: 1
-      # cpu stressor options
-      cpu_stressors: "60"
-      cpu_percentage: "100"
-      cpu_method: "all"
-      # vm stressor option
-      vm_stressors: "1"
-      vm_bytes: "60G"
-      # mem stressor options
-      mem_stressors: "1"
+  parallelism: 1
+  backoffLimit: 0
+  activeDeadlineSeconds: 3600
+  template:
+    metadata:
+      labels:
+        app: stressng_workload-deadbeef
+        type: stressng-bench-workload-deadbeef
+        benchmark-uuid: deadbeef-0123-3210-cdef-01234567890abcdef
+        benchmark-runner-workload: stressng
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: 'pin-node-1'
+      runtimeClassName: kata
+      containers:
+      - name: stressng
+        resources:
+          requests:
+            cpu: 60
+            memory: 75Gi
+          limits:
+            cpu: 60
+            memory: 75Gi
+        image: quay.io/benchmark-runner/stressng:latest
+        imagePullPolicy: Always
+        env:
+          - name: uuid
+            value: "deadbeef-0123-3210-cdef-01234567890abcdef"
+          - name: test_user
+            value: "ripsaw"
+          - name: clustername
+            value: ""
+          - name: runtype
+            value: "sequential"
+          - name: timeout
+            value: "120"
+          - name: cpu_stressors
+            value: "60"
+          - name: cpu_percentage
+            value: "100"
+          - name: cpu_method
+            value: "all"
+          - name: vm_stressors
+            value: "1"
+          - name: vm_bytes
+            value: "60G"
+          - name: mem_stressors
+            value: "1"
+          - name: es
+            value: "http://elasticsearch.example.com:gol9999"
+          - name: es_index
+            value: "stressng-results"
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            cd /tmp
+            stress-ng --job /workload/jobfile --log-file /tmp/stressng.log -Y /tmp/stressng.yml || exit 1
+            if [ -n "${es:-}" ] && [ -n "${es_index:-}" ]; then
+              if [ -f /tmp/stressng.yml ] && python3 -c 'import yaml' 2>/dev/null; then
+                json=$(python3 << 'PYEOF'
+            import yaml, json, os
+            from datetime import datetime, timezone
+            try:
+                with open("/tmp/stressng.yml") as f:
+                    d = yaml.safe_load(f)
+            except Exception:
+                d = {}
+            metrics = d.get("metrics", [])
+            doc = {
+                "uuid": os.environ.get("uuid", ""),
+                "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z",
+                "workload": "stressng",
+                "kind": "pod",
+                "runtype": os.environ.get("runtype", ""),
+                "timeout": int(os.environ.get("timeout", 0) or 0),
+                "vm_stressors": os.environ.get("vm_stressors", ""),
+                "vm_bytes": os.environ.get("vm_bytes", ""),
+                "mem_stressors": os.environ.get("mem_stressors", ""),
+                "cpu_method": os.environ.get("cpu_method", ""),
+            }
+            for m in metrics:
+                s = m.get("stressor", "")
+                b = m.get("bogo-ops", 0)
+                doc[s] = b
+                if s == "cpu": doc["cpu_bogomips"] = b
+                elif s == "vm": doc["vm_bogomips"] = b
+            bogo_total = sum(doc.get(s, 0) for s in ["cpu", "vm", "mem", "memcpy"])
+            doc["bogo_ops"] = bogo_total
+            print(json.dumps(doc))
+            PYEOF
+                )
+                echo "$json" | curl -sS -X POST "$es/$es_index/_doc" -H 'Content-Type: application/json' -d @- || true
+              else
+                timestamp=$(date -u +%Y-%m-%dT%H:%M:%S.%3NZ)
+                printf '{"uuid":"%s","timestamp":"%s","workload":"stressng","kind":"pod"}\n' "$uuid" "$timestamp" | curl -sS -X POST "$es/$es_index/_doc" -H 'Content-Type: application/json' -d @- || true
+              fi
+            fi
+        volumeMounts:
+        - name: stressng-workload-volume
+          mountPath: "/workload"
+          readOnly: false
+      volumes:
+      - name: stressng-workload-volume
+        configMap:
+          name: stressng-workload-deadbeef
+          defaultMode: 0660
+      restartPolicy: Never

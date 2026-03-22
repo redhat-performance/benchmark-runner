@@ -1,0 +1,192 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: uperf-test-deadbeef
+  namespace: benchmark-runner
+data:
+  uperf-stream-tcp-64-64-1: |
+    <?xml version=1.0?>
+    <profile name="stream-tcp-64-64-1">
+      <group nthreads="1">
+          <transaction iterations="1">
+            <flowop type="connect" options="remotehost=SERVER_IP_PLACEHOLDER protocol=tcp port=30001"/>
+          </transaction>
+          <transaction duration="60">
+            <flowop type=write options="count=16 size=64"/>
+          </transaction>
+          <transaction iterations="1">
+            <flowop type=disconnect />
+          </transaction>
+      </group>
+    </profile>
+  uperf-stream-tcp-64-64-8: |
+    <?xml version=1.0?>
+    <profile name="stream-tcp-64-64-8">
+      <group nthreads="8">
+          <transaction iterations="1">
+            <flowop type="connect" options="remotehost=SERVER_IP_PLACEHOLDER protocol=tcp port=30001"/>
+          </transaction>
+          <transaction duration="60">
+            <flowop type=write options="count=16 size=64"/>
+          </transaction>
+          <transaction iterations="1">
+            <flowop type=disconnect />
+          </transaction>
+      </group>
+    </profile>
+  uperf-stream-tcp-1024-1024-1: |
+    <?xml version=1.0?>
+    <profile name="stream-tcp-1024-1024-1">
+      <group nthreads="1">
+          <transaction iterations="1">
+            <flowop type="connect" options="remotehost=SERVER_IP_PLACEHOLDER protocol=tcp port=30001"/>
+          </transaction>
+          <transaction duration="60">
+            <flowop type=write options="count=16 size=1024"/>
+          </transaction>
+          <transaction iterations="1">
+            <flowop type=disconnect />
+          </transaction>
+      </group>
+    </profile>
+  uperf-stream-tcp-1024-1024-8: |
+    <?xml version=1.0?>
+    <profile name="stream-tcp-1024-1024-8">
+      <group nthreads="8">
+          <transaction iterations="1">
+            <flowop type="connect" options="remotehost=SERVER_IP_PLACEHOLDER protocol=tcp port=30001"/>
+          </transaction>
+          <transaction duration="60">
+            <flowop type=write options="count=16 size=1024"/>
+          </transaction>
+          <transaction iterations="1">
+            <flowop type=disconnect />
+          </transaction>
+      </group>
+    </profile>
+  uperf-stream-tcp-8192-8192-1: |
+    <?xml version=1.0?>
+    <profile name="stream-tcp-8192-8192-1">
+      <group nthreads="1">
+          <transaction iterations="1">
+            <flowop type="connect" options="remotehost=SERVER_IP_PLACEHOLDER protocol=tcp port=30001"/>
+          </transaction>
+          <transaction duration="60">
+            <flowop type=write options="count=16 size=8192"/>
+          </transaction>
+          <transaction iterations="1">
+            <flowop type=disconnect />
+          </transaction>
+      </group>
+    </profile>
+  uperf-stream-tcp-8192-8192-8: |
+    <?xml version=1.0?>
+    <profile name="stream-tcp-8192-8192-8">
+      <group nthreads="8">
+          <transaction iterations="1">
+            <flowop type="connect" options="remotehost=SERVER_IP_PLACEHOLDER protocol=tcp port=30001"/>
+          </transaction>
+          <transaction duration="60">
+            <flowop type=write options="count=16 size=8192"/>
+          </transaction>
+          <transaction iterations="1">
+            <flowop type=disconnect />
+          </transaction>
+      </group>
+    </profile>
+  uperf-rr-tcp-64-64-1: |
+    <?xml version=1.0?>
+    <profile name="rr-tcp-64-64-1">
+      <group nthreads="1">
+          <transaction iterations="1">
+            <flowop type="connect" options="remotehost=SERVER_IP_PLACEHOLDER protocol=tcp port=30001"/>
+          </transaction>
+          <transaction duration="60">
+            <flowop type=write options="size=64"/>
+            <flowop type=read  options="size=64"/>
+          </transaction>
+          <transaction iterations="1">
+            <flowop type=disconnect />
+          </transaction>
+      </group>
+    </profile>
+  uperf-rr-tcp-64-64-8: |
+    <?xml version=1.0?>
+    <profile name="rr-tcp-64-64-8">
+      <group nthreads="8">
+          <transaction iterations="1">
+            <flowop type="connect" options="remotehost=SERVER_IP_PLACEHOLDER protocol=tcp port=30001"/>
+          </transaction>
+          <transaction duration="60">
+            <flowop type=write options="size=64"/>
+            <flowop type=read  options="size=64"/>
+          </transaction>
+          <transaction iterations="1">
+            <flowop type=disconnect />
+          </transaction>
+      </group>
+    </profile>
+  uperf-rr-tcp-1024-1024-1: |
+    <?xml version=1.0?>
+    <profile name="rr-tcp-1024-1024-1">
+      <group nthreads="1">
+          <transaction iterations="1">
+            <flowop type="connect" options="remotehost=SERVER_IP_PLACEHOLDER protocol=tcp port=30001"/>
+          </transaction>
+          <transaction duration="60">
+            <flowop type=write options="size=1024"/>
+            <flowop type=read  options="size=1024"/>
+          </transaction>
+          <transaction iterations="1">
+            <flowop type=disconnect />
+          </transaction>
+      </group>
+    </profile>
+  uperf-rr-tcp-1024-1024-8: |
+    <?xml version=1.0?>
+    <profile name="rr-tcp-1024-1024-8">
+      <group nthreads="8">
+          <transaction iterations="1">
+            <flowop type="connect" options="remotehost=SERVER_IP_PLACEHOLDER protocol=tcp port=30001"/>
+          </transaction>
+          <transaction duration="60">
+            <flowop type=write options="size=1024"/>
+            <flowop type=read  options="size=1024"/>
+          </transaction>
+          <transaction iterations="1">
+            <flowop type=disconnect />
+          </transaction>
+      </group>
+    </profile>
+  uperf-rr-tcp-8192-8192-1: |
+    <?xml version=1.0?>
+    <profile name="rr-tcp-8192-8192-1">
+      <group nthreads="1">
+          <transaction iterations="1">
+            <flowop type="connect" options="remotehost=SERVER_IP_PLACEHOLDER protocol=tcp port=30001"/>
+          </transaction>
+          <transaction duration="60">
+            <flowop type=write options="size=8192"/>
+            <flowop type=read  options="size=8192"/>
+          </transaction>
+          <transaction iterations="1">
+            <flowop type=disconnect />
+          </transaction>
+      </group>
+    </profile>
+  uperf-rr-tcp-8192-8192-8: |
+    <?xml version=1.0?>
+    <profile name="rr-tcp-8192-8192-8">
+      <group nthreads="8">
+          <transaction iterations="1">
+            <flowop type="connect" options="remotehost=SERVER_IP_PLACEHOLDER protocol=tcp port=30001"/>
+          </transaction>
+          <transaction duration="60">
+            <flowop type=write options="size=8192"/>
+            <flowop type=read  options="size=8192"/>
+          </transaction>
+          <transaction iterations="1">
+            <flowop type=disconnect />
+          </transaction>
+      </group>
+    </profile>

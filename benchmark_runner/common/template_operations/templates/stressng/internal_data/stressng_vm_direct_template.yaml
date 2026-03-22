@@ -1,0 +1,66 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: stressng-vm-{{ trunc_uuid }}
+  namespace: {{ namespace }}
+  labels:
+    app: stressng-vm-{{ trunc_uuid }}
+    type: stressng-vm-{{ trunc_uuid }}
+    benchmark-uuid: {{ uuid }}
+    benchmark-runner-workload: stressng
+spec:
+  runStrategy: Once
+  template:
+    metadata:
+      labels:
+        kubevirt-vm: stressng-vm
+        app: stressng-vm-{{ trunc_uuid }}
+    spec:
+      {%- if pin == 'true' or pin == true %}
+      nodeSelector:
+        kubernetes.io/hostname: '{{ pin_node }}'
+      {%- endif %}
+      domain:
+        cpu:
+          sockets: {{ sockets }}
+          cores: 1
+          threads: 1
+        devices:
+          disks:
+            - disk:
+                bus: virtio
+              name: containerdisk
+            - disk:
+                bus: virtio
+              name: cloudinitdisk
+        machine:
+          type: ""
+        resources:
+          requests:
+            cpu: {{ requests_cpu }}
+            memory: {{ requests_memory }}
+          limits:
+            cpu: {{ limits_cpu }}
+            memory: {{ limits_memory }}
+      terminationGracePeriodSeconds: 180
+      volumes:
+        - name: containerdisk
+          containerDisk:
+            image: {{ fedora_container_disk }}
+        - name: cloudinitdisk
+          cloudInitNoCloud:
+            userData: |
+              #cloud-config
+              user: fedora
+              password: fedora
+              chpasswd: { expire: False }
+              packages:
+                - stress-ng
+                - qemu-guest-agent
+              runcmd:
+                - mkdir -p /opt/stressng && chmod 777 /opt/stressng
+                - systemctl enable --now qemu-guest-agent
+                - |
+                  stress-ng --cpu {{ cpu_stressors }} --cpu-load {{ cpu_percentage }} --vm {{ vm_stressors }} --vm-bytes {{ vm_bytes }} --memcpy {{ mem_stressors }} --verbose --metrics-brief --timeout {{ stressng_timeout }} 2>&1 | tee /opt/stressng/output.txt /dev/ttyS0
+                - echo "STRESSNG_COMPLETE" > /dev/ttyS0
+                - touch /opt/stressng/workload_complete.signal
