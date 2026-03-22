@@ -13,7 +13,7 @@ spec:
     index_name: system-metrics
   elasticsearch:
     url: "http://elasticsearch.example.com:gol9999"
-    index_name: hammerdb
+    index_name: hammerdb-results
   metadata:
     collection: false
   workload:

@@ -14,7 +14,7 @@ spec:
     index_name: system-metrics-test-ci
   elasticsearch:
     url: "http://elasticsearch.example.com:gol9999"
-    index_name: hammerdb-test-ci
+    index_name: hammerdb-test-ci-results
   metadata:
     collection: false
   workload:

@@ -1,0 +1,147 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: uperf-test-deadbeef
+  namespace: benchmark-runner
+data:
+  uperf-stream-tcp-64-64-1: |
+    <?xml version=1.0?>
+    <profile name="stream-tcp-64-64-1">
+      <group nthreads="1">
+          <transaction iterations="1">
+            <flowop type="connect" options="remotehost=SERVER_IP_PLACEHOLDER protocol=tcp port=30001"/>
+          </transaction>
+          <transaction duration="2">
+            <flowop type=write options="count=16 size=64"/>
+          </transaction>
+          <transaction iterations="1">
+            <flowop type=disconnect />
+          </transaction>
+      </group>
+    </profile>
+  uperf_parser.py: |
+    #!/usr/bin/env python3
+    import re, json, sys, glob
+
+    def parse_single_test(output_section, test_type='stream', protocol='tcp', message_size=64, num_threads=1):
+        result = {
+            'test_type': test_type, 'protocol': protocol,
+            'message_size': message_size, 'num_threads': num_threads,
+            'bytes': 0, 'ops': 0, 'norm_byte': 0, 'norm_ops': 0,
+            'norm_ltcy': 0.0, 'duration': 0
+        }
+        ts_results = re.findall(r'timestamp_ms:([\d.]+)\s+name:Txn2\s+nr_bytes:(\d+)\s+nr_ops:(\d+)', output_section)
+        if len(ts_results) > 1:
+            first_ts = float(ts_results[0][0])
+            last_ts = float(ts_results[-1][0])
+            total_bytes = int(ts_results[-1][1])
+            total_ops = int(ts_results[-1][2])
+            duration_sec = (last_ts - first_ts) / 1000.0
+            if duration_sec > 0:
+                result['bytes'] = total_bytes
+                result['norm_byte'] = total_bytes / duration_sec
+                result['ops'] = total_ops
+                result['norm_ops'] = total_ops / duration_sec
+                result['duration'] = int(duration_sec)
+                lat_samples = []
+                prev_ts, prev_ops = float(ts_results[0][0]), int(ts_results[0][2])
+                for ts_str, _, ops_str in ts_results[1:]:
+                    ts, ops = float(ts_str), int(ops_str)
+                    norm_ops = ops - prev_ops
+                    if norm_ops > 0 and prev_ts > 0:
+                        lat_samples.append(((ts - prev_ts) / norm_ops) * 1000)
+                    prev_ts, prev_ops = ts, ops
+                if lat_samples:
+                    lat_samples.sort()
+                    rank = 0.95 * (len(lat_samples) - 1)
+                    lower = int(rank)
+                    frac = rank - lower
+                    result['norm_ltcy'] = round(lat_samples[lower] + frac * (lat_samples[min(lower + 1, len(lat_samples) - 1)] - lat_samples[lower]), 4)
+        return result
+
+    import os
+    from datetime import datetime, timezone
+
+    results = []
+    for f in sorted(glob.glob('/tmp/uperf-out-*.out')):
+        name = f.replace('/tmp/uperf-out-', '').replace('.out', '')
+        parts = name.split('-')
+        if len(parts) >= 5:
+            tt, proto, sz, nt = parts[0], parts[1], int(parts[2]), int(parts[4])
+        else:
+            tt, proto, sz, nt = 'stream', 'tcp', 64, 1
+        output = open(f).read()
+        parsed = parse_single_test(output, tt, proto, sz, nt)
+        doc = {
+            'uuid': os.environ.get('uuid', ''),
+            'workload': 'uperf',
+            'kind': 'pod',
+            'test_type': parsed['test_type'],
+            'protocol': parsed['protocol'],
+            'message_size': parsed['message_size'],
+            'read_message_size': parsed['message_size'],
+            'num_threads': parsed['num_threads'],
+            'bytes': parsed['bytes'],
+            'ops': parsed['ops'],
+            'norm_byte': parsed['norm_byte'],
+            'norm_ops': parsed['norm_ops'],
+            'norm_ltcy': parsed['norm_ltcy'],
+            'duration': parsed['duration'],
+            'timestamp': datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z',
+            'uperf_ts': datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%S'),
+            'user': os.environ.get('test_user', 'user'),
+            'run_id': os.environ.get('run_id', 'NA'),
+            'cluster_name': os.environ.get('clustername', ''),
+            'iteration': 0,
+            'client_ips': os.environ.get('ips', ''),
+            'remote_ip': os.environ.get('server_ip', ''),
+            'service_ip': os.environ.get('service_ip', 'False'),
+            'service_type': os.environ.get('service_type', ''),
+            'port': os.environ.get('port', '30000'),
+            'client_node': os.environ.get('client_node', ''),
+            'server_node': os.environ.get('server_node', ''),
+            'pod_id': os.environ.get('POD_NAME', ''),
+            'num_pairs': os.environ.get('num_pairs', ''),
+            'multus_client': os.environ.get('multus_client', ''),
+            'networkpolicy': os.environ.get('networkpolicy', ''),
+            'density': os.environ.get('density', ''),
+            'nodes_in_iter': os.environ.get('nodes_in_iter', ''),
+            'step_size': os.environ.get('step_size', ''),
+            'colocate': os.environ.get('colocate', ''),
+            'density_range': os.environ.get('density_range', ''),
+            'node_range': os.environ.get('node_range', ''),
+            'hostnetwork': os.environ.get('hostnetwork', 'False'),
+        }
+        results.append(doc)
+    # Print one JSON per line for bash to loop and curl
+    for doc in results:
+        print(json.dumps(doc))
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: uperf-server-deadbeef
+  namespace: benchmark-runner
+spec:
+  ttlSecondsAfterFinished: 600
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        benchmark-uuid: deadbeef-0123-3210-cdef-01234567890abcdef
+        workload: uperf
+        role: server
+        app: uperf-bench-server-0-deadbeef
+        index: "0"
+        type: uperf-bench-server-deadbeef
+    spec:
+      runtimeClassName: kata
+      containers:
+      - name: benchmark
+        image: quay.io/benchmark-runner/uperf:latest
+        imagePullPolicy: Always
+        command: ["/bin/sh", "-c"]
+        args: ["uperf -s -v -P 30000"]
+      restartPolicy: Never
+      nodeSelector:
+        kubernetes.io/hostname: 'pin-node-1'

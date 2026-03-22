@@ -744,6 +744,25 @@ class OC(SSH):
         else:
             return False
 
+    def get_first_pod_name_by_label(self, label: str,
+                                    namespace: str = environment_variables.environment_variables_dict['namespace']):
+        """
+        Return the name of the first pod matching the label, or empty string if none.
+        Useful for Job-created pods whose name has a random suffix.
+        """
+        namespace_opt = f'-n {namespace}' if namespace else ''
+        try:
+            name = self.run(
+                f"{self._cli} get pods {namespace_opt} -l '{label}' -o jsonpath='{{.items[0].metadata.name}}'",
+                is_check=True)
+            if isinstance(name, bytes):
+                name = name.decode('utf-8').strip()
+            else:
+                name = name.strip() if name else ''
+            return name or ''
+        except Exception:
+            return ''
+
     @typechecked()
     def get_long_uuid(self, workload: str):
         """
@@ -882,6 +901,37 @@ class OC(SSH):
             current_wait_time += OC.SLEEP_TIME
         self.describe_pod(pod_name=pod_name, namespace=namespace)
         raise PodNotCreateTimeout(pod_name)
+
+    @typechecked
+    @logger_time_stamp
+    def wait_for_pod_create_by_label(self, label: str,
+                                     namespace: str = environment_variables.environment_variables_dict['namespace'],
+                                     timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
+        """
+        Wait until a pod matching the given label exists (e.g. for Job-created pods whose name has a random suffix).
+        :param label: Label selector, e.g. 'app=stressng_workload-<uuid>'
+        :param namespace: Namespace to look in
+        :param timeout: Max seconds to wait
+        :return: True when a matching pod exists
+        """
+        current_wait_time = 0
+        namespace_opt = f'-n {namespace}' if namespace else ''
+        while timeout <= 0 or current_wait_time <= timeout:
+            if self.pod_label_exists(label_name=label, namespace=namespace):
+                # Get one pod name for describe
+                pod_name = self.run(
+                    f"{self._cli} get pods {namespace_opt} -l '{label}' -o jsonpath='{{.items[0].metadata.name}}'",
+                    is_check=True)
+                if isinstance(pod_name, bytes):
+                    pod_name = pod_name.decode('utf-8').strip()
+                else:
+                    pod_name = pod_name.strip() if pod_name else ''
+                if pod_name:
+                    self.describe_pod(pod_name=pod_name, namespace=namespace)
+                return True
+            time.sleep(OC.SLEEP_TIME)
+            current_wait_time += OC.SLEEP_TIME
+        raise PodNotCreateTimeout(f'label {label}')
 
     @typechecked
     @logger_time_stamp
@@ -1163,13 +1213,23 @@ class OC(SSH):
                         f"{self._cli} {namespace} wait --for=condition=failed -l {label}-{self.__get_short_uuid(workload=workload)} jobs --timeout={OC.SLEEP_TIME}s")
                     if 'met' in result:
                         return False
-                if not job:
+                elif job:
+                    # Handle job=True with label_uuid=False (direct pod workloads)
+                    result = self.run(
+                        f"{self._cli} {namespace} wait --for=condition=complete -l {label} jobs --timeout={OC.SHORT_TIMEOUT}s")
+                    if 'met' in result:
+                        return True
+                    result = self.run(
+                        f"{self._cli} {namespace} wait --for=condition=failed -l {label} jobs --timeout={OC.SLEEP_TIME}s")
+                    if 'met' in result:
+                        return False
+                elif not job:
                     result = self.run(f"{self._cli} get pod -l {label}" + " -n benchmark-runner --no-headers | awk '{ print $3; }'")
                     if 'Completed' in result:
                         return True
-            # sleep for x seconds
-            time.sleep(OC.SLEEP_TIME)
-            current_wait_time += OC.SLEEP_TIME
+                # sleep for x seconds
+                time.sleep(OC.SLEEP_TIME)
+                current_wait_time += OC.SLEEP_TIME
         except Exception as err:
             raise PodNotCompletedTimeout(workload=workload)
 
@@ -1244,6 +1304,96 @@ class OC(SSH):
                 cmd=f"{self._cli} get vmi {namespace} --no-headers | awk '{{ print $1; }}' | grep -w '{label}'", is_check=True).rstrip().decode('ascii')
         else:
             return self.run(f'{self._cli} get vmi', is_check=True)
+
+    def get_pod_ip(self, label: str = '', pod_name: str = '', namespace: str = '') -> str:
+        """
+        Get pod IP by label or pod name
+        """
+        namespace = namespace or environment_variables.environment_variables_dict.get('namespace', '')
+        try:
+            if label:
+                result = self.run(
+                    cmd=f"{self._cli} get pods -n {namespace} -l {label} -o jsonpath='{{.items[0].status.podIP}}'")
+            else:
+                result = self.run(
+                    cmd=f"{self._cli} get pod -n {namespace} {pod_name} -o jsonpath='{{.status.podIP}}'")
+            return result.strip().strip(b"'").decode('ascii') if isinstance(result, bytes) else str(result).strip().strip("'")
+        except Exception:
+            return ''
+
+    def get_pod_node(self, label: str = '', pod_name: str = '', namespace: str = '') -> str:
+        """
+        Get pod node name by label or pod name
+        """
+        namespace = namespace or environment_variables.environment_variables_dict.get('namespace', '')
+        try:
+            if label:
+                result = self.run(
+                    cmd=f"{self._cli} get pods -n {namespace} -l {label} -o jsonpath='{{.items[0].spec.nodeName}}'")
+            else:
+                result = self.run(
+                    cmd=f"{self._cli} get pod -n {namespace} {pod_name} -o jsonpath='{{.spec.nodeName}}'")
+            return result.strip().strip(b"'").decode('ascii') if isinstance(result, bytes) else str(result).strip().strip("'")
+        except Exception:
+            return ''
+
+    def get_pod_logs(self, pod_name: str, namespace: str = '') -> str:
+        """
+        Get pod logs
+        """
+        namespace = namespace or environment_variables.environment_variables_dict.get('namespace', '')
+        try:
+            result = self.run(cmd=f"{self._cli} logs -n {namespace} {pod_name}")
+            return result.decode('utf-8') if isinstance(result, bytes) else str(result)
+        except Exception:
+            return ''
+
+    def get_vmi_ip(self, namespace: str, vm_name: str, retries: int = 30) -> str:
+        """
+        Get the IP address of a VirtualMachineInstance, retrying until available
+        """
+        for attempt in range(retries):
+            try:
+                result = self.run(
+                    cmd=f"{self._cli} get vmi -n {namespace} {vm_name} -o jsonpath='{{.status.interfaces[0].ipAddress}}'")
+                ip = result.strip().strip(b"'").decode('ascii') if isinstance(result, bytes) else str(result).strip().strip("'")
+                if ip and ip != '<none>':
+                    return ip
+            except Exception:
+                pass
+            time.sleep(2)
+        return ''
+
+    def get_vmi_node(self, namespace: str, vm_name: str) -> str:
+        """
+        Get the node name where a VirtualMachineInstance is running
+        """
+        try:
+            result = self.run(
+                cmd=f"{self._cli} get vmi -n {namespace} {vm_name} -o jsonpath='{{.status.nodeName}}'")
+            return result.strip().strip(b"'").decode('ascii') if isinstance(result, bytes) else str(result).strip().strip("'")
+        except Exception:
+            return ''
+
+    def get_cluster_name(self) -> str:
+        """
+        Get the cluster name/ID
+        """
+        try:
+            result = self.run(cmd=f"{self._cli} get infrastructure cluster -o jsonpath='{{.status.infrastructureName}}'")
+            return result.strip().strip(b"'").decode('ascii') if isinstance(result, bytes) else str(result).strip().strip("'")
+        except Exception:
+            return ''
+
+    def delete_vm_by_name(self, vm_name: str, namespace: str = ''):
+        """
+        Delete a VM by name (without requiring full YAML)
+        """
+        namespace = namespace or environment_variables.environment_variables_dict.get('namespace', '')
+        try:
+            self.run(f"{self._cli} delete vm {vm_name} -n {namespace} --ignore-not-found")
+        except Exception:
+            pass
 
     @logger_time_stamp
     def __verify_vm_log_complete(self, vm_name: str, timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
@@ -1492,9 +1642,19 @@ class OC(SSH):
         current_wait_time = 0
         namespace = f'-n {namespace}' if namespace else ''
         while timeout <= 0 or current_wait_time <= timeout:
-            if self.run(
-                    f"{self._cli} {namespace} get benchmark {workload} -o jsonpath={{.status.complete}}") == 'true':
-                return True
+            # Check VMI phase for direct VM workloads
+            if vm_name:
+                vmi_phase = self.run(
+                    f"{self._cli} {namespace} get vmi {vm_name} -o jsonpath={{.status.phase}}")
+                if vmi_phase == 'Succeeded':
+                    return True
+                elif vmi_phase == 'Failed':
+                    return False
+            else:
+                # Fallback to benchmark CR for operator-based workloads
+                if self.run(
+                        f"{self._cli} {namespace} get benchmark {workload} -o jsonpath={{.status.complete}}") == 'true':
+                    return True
             # sleep for x seconds
             time.sleep(OC.SLEEP_TIME)
             current_wait_time += OC.SLEEP_TIME

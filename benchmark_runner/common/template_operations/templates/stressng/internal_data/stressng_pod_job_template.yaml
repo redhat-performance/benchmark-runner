@@ -1,0 +1,158 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: stressng-workload-{{ trunc_uuid }}
+  namespace: {{ namespace }}
+data:
+  jobfile: |
+    run {{ runtype }}
+    verbose
+    metrics-brief
+    timeout {{ stressng_timeout }}
+
+    # cpu stressor
+    {%- if cpu_stressors is defined %}
+    cpu {{ cpu_stressors }}
+    cpu-load {{ cpu_percentage }}
+    cpu-method {{ cpu_method }}
+    {%- endif %}
+
+    # vm stressor
+    {%- if vm_stressors is defined %}
+    vm {{ vm_stressors }}
+    vm-bytes {{ vm_bytes }}
+    vm-keep
+    vm-populate
+    {%- endif %}
+
+    # memcpy stressor
+    {%- if mem_stressors is defined %}
+    memcpy {{ mem_stressors }}
+    {%- endif %}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: stressng-{{ kind }}-{{ trunc_uuid }}
+  namespace: {{ namespace }}
+spec:
+  parallelism: {{ instances }}
+  backoffLimit: 0
+  activeDeadlineSeconds: {{ job_timeout|default(3600) }}
+  template:
+    metadata:
+      labels:
+        app: stressng_workload-{{ trunc_uuid }}
+        type: stressng-bench-workload-{{ trunc_uuid }}
+        benchmark-uuid: {{ uuid }}
+        benchmark-runner-workload: stressng
+    spec:
+      {%- if pin == 'true' or pin == true %}
+      nodeSelector:
+        kubernetes.io/hostname: '{{ pin_node }}'
+      {%- endif %}
+      {%- if kind == 'kata' %}
+      runtimeClassName: kata
+      {%- endif %}
+      containers:
+      - name: stressng
+        {%- if resources == 'true' or resources == true %}
+        resources:
+          requests:
+            cpu: {{ requests_cpu }}
+            memory: {{ requests_memory }}
+          limits:
+            cpu: {{ limits_cpu }}
+            memory: {{ limits_memory }}
+        {%- endif %}
+        image: {{ image | default('quay.io/benchmark-runner/stressng:latest') }}
+        imagePullPolicy: Always
+        env:
+          - name: uuid
+            value: "{{ uuid }}"
+          - name: test_user
+            value: "{{ test_user | default('user') }}"
+          - name: clustername
+            value: "{{ clustername | default('') }}"
+          - name: runtype
+            value: "{{ runtype }}"
+          - name: timeout
+            value: "{{ stressng_timeout }}"
+          {%- if cpu_stressors is defined %}
+          - name: cpu_stressors
+            value: "{{ cpu_stressors }}"
+          {%- endif %}
+          {%- if cpu_percentage is defined %}
+          - name: cpu_percentage
+            value: "{{ cpu_percentage }}"
+          {%- endif %}
+          {%- if cpu_method is defined %}
+          - name: cpu_method
+            value: "{{ cpu_method }}"
+          {%- endif %}
+          {%- if vm_stressors is defined %}
+          - name: vm_stressors
+            value: "{{ vm_stressors }}"
+          {%- endif %}
+          {%- if vm_bytes is defined %}
+          - name: vm_bytes
+            value: "{{ vm_bytes }}"
+          {%- endif %}
+          {%- if mem_stressors is defined %}
+          - name: mem_stressors
+            value: "{{ mem_stressors }}"
+          {%- endif %}
+          {%- if es_url %}
+          - name: es
+            value: "{{ es_url }}"
+          - name: es_index
+            value: "{{ es_index_name }}"
+          {%- endif %}
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            set -e
+            cd /tmp
+            stress-ng --job /workload/jobfile --log-file /tmp/stressng.log -Y /tmp/stressng.yml || exit 1
+            # Parse results into JSON (visible in pod logs, uploaded by benchmark-runner)
+            if [ -f /tmp/stressng.yml ] && python3 -c 'import yaml' 2>/dev/null; then
+              python3 << 'PYEOF' | python3 -m json.tool 2>/dev/null
+            import yaml, json, os
+            from datetime import datetime, timezone
+            try:
+                with open("/tmp/stressng.yml") as f:
+                    d = yaml.safe_load(f)
+            except Exception:
+                d = {}
+            metrics = d.get("metrics", [])
+            doc = {
+                "workload": "stressng",
+                "kind": "pod",
+                "runtype": os.environ.get("runtype", ""),
+                "timeout": int(os.environ.get("timeout", 0) or 0),
+                "vm_stressors": os.environ.get("vm_stressors", ""),
+                "vm_bytes": os.environ.get("vm_bytes", ""),
+                "mem_stressors": os.environ.get("mem_stressors", ""),
+                "cpu_method": os.environ.get("cpu_method", ""),
+            }
+            for m in metrics:
+                s = m.get("stressor", "")
+                b = m.get("bogo-ops", 0)
+                doc[s] = b
+                if s == "cpu": doc["cpu_bogomips"] = b
+                elif s == "vm": doc["vm_bogomips"] = b
+            bogo_total = sum(doc.get(s, 0) for s in ["cpu", "vm", "mem", "memcpy"])
+            doc["bogo_ops"] = bogo_total
+            print(json.dumps(doc))
+            PYEOF
+            fi
+        volumeMounts:
+        - name: stressng-workload-volume
+          mountPath: "/workload"
+          readOnly: false
+      volumes:
+      - name: stressng-workload-volume
+        configMap:
+          name: stressng-workload-{{ trunc_uuid }}
+          defaultMode: 0660
+      restartPolicy: Never
