@@ -2,7 +2,7 @@ apiVersion: ripsaw.cloudbulldozer.io/v1alpha1
 kind: Benchmark
 metadata:
   name: uperf-pod
-  namespace: benchmark-operator
+  namespace: benchmark-runner
 spec:
   system_metrics:
     collection: True

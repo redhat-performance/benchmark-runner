@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: benchmark-runner
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: uperf-server-test123
+  namespace: benchmark-runner
+spec:
+  ttlSecondsAfterFinished: 600
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        benchmark-uuid: test-uuid-123
+        workload: uperf
+        role: server
+        app: uperf-bench-server-0-test123
+        type: uperf-bench-server-test123
+    spec:
+      containers:
+      - name: benchmark
+        image: quay.io/benchmark-runner/uperf:latest
+        imagePullPolicy: Always
+        command: ["/bin/sh", "-c"]
+        args: ["uperf -s -v -P 30000"]
+      restartPolicy: Never
