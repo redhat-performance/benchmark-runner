@@ -1,0 +1,196 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: uperf-server-{{ trunc_uuid }}
+  namespace: {{ namespace }}
+  labels:
+    app: uperf-server-{{ trunc_uuid }}
+    type: uperf-server-{{ trunc_uuid }}
+    benchmark-uuid: {{ uuid }}
+    benchmark-runner-workload: uperf
+    role: server
+spec:
+  running: true
+  template:
+    metadata:
+      labels:
+        kubevirt-vm: uperf-server
+        app: uperf-server-{{ trunc_uuid }}
+    spec:
+      {%- if pin == 'true' or pin == true %}
+      nodeSelector:
+        kubernetes.io/hostname: '{{ pin_server }}'
+      {%- endif %}
+      domain:
+        cpu:
+          sockets: {{ sockets }}
+          cores: {{ cores }}
+          threads: 1
+        devices:
+          disks:
+            - disk:
+                bus: virtio
+              name: containerdisk
+            - disk:
+                bus: virtio
+              name: cloudinitdisk
+          interfaces:
+            - name: default
+              masquerade: {}
+              ports:
+                - port: 30000
+                - port: 30001
+          networkInterfaceMultiqueue: true
+        machine:
+          type: ""
+        resources:
+          requests:
+            cpu: {{ requests_cpu }}
+            memory: {{ requests_memory }}
+          limits:
+            cpu: {{ limits_cpu }}
+            memory: {{ limits_memory }}
+      terminationGracePeriodSeconds: 180
+      networks:
+        - name: default
+          pod: {}
+      volumes:
+        - name: containerdisk
+          containerDisk:
+            image: {{ fedora_container_disk }}
+        - name: cloudinitdisk
+          cloudInitNoCloud:
+            userData: |
+              #cloud-config
+              user: fedora
+              password: fedora
+              chpasswd: { expire: False }
+              packages:
+                - uperf
+                - qemu-guest-agent
+              runcmd:
+                - mkdir -p /opt/uperf && chmod 777 /opt/uperf
+                - systemctl enable --now qemu-guest-agent
+                - uperf -s -v -P 30000 > /opt/uperf/server.log 2>&1 &
+                - sleep infinity
+---
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: uperf-client-{{ trunc_uuid }}
+  namespace: {{ namespace }}
+  labels:
+    app: uperf-client-{{ trunc_uuid }}
+    type: uperf-client-{{ trunc_uuid }}
+    benchmark-uuid: {{ uuid }}
+    benchmark-runner-workload: uperf
+    role: client
+spec:
+  runStrategy: Once
+  template:
+    metadata:
+      labels:
+        kubevirt-vm: uperf-client
+        app: uperf-client-{{ trunc_uuid }}
+    spec:
+      {%- if pin == 'true' or pin == true %}
+      nodeSelector:
+        kubernetes.io/hostname: '{{ pin_client }}'
+      {%- endif %}
+      domain:
+        cpu:
+          sockets: {{ sockets }}
+          cores: {{ cores }}
+          threads: 1
+        devices:
+          disks:
+            - disk:
+                bus: virtio
+              name: containerdisk
+            - disk:
+                bus: virtio
+              name: cloudinitdisk
+          interfaces:
+            - name: default
+              masquerade: {}
+          networkInterfaceMultiqueue: true
+        machine:
+          type: ""
+        resources:
+          requests:
+            cpu: {{ requests_cpu }}
+            memory: {{ requests_memory }}
+          limits:
+            cpu: {{ limits_cpu }}
+            memory: {{ limits_memory }}
+      terminationGracePeriodSeconds: 180
+      networks:
+        - name: default
+          pod: {}
+      volumes:
+        - name: containerdisk
+          containerDisk:
+            image: {{ fedora_container_disk }}
+        - name: cloudinitdisk
+          cloudInitNoCloud:
+            userData: |
+              #cloud-config
+              user: fedora
+              password: fedora
+              chpasswd: { expire: False }
+              packages:
+                - uperf
+                - qemu-guest-agent
+              runcmd:
+                - mkdir -p /opt/uperf && chmod 777 /opt/uperf
+                - systemctl enable --now qemu-guest-agent
+                - sleep 30
+                - |
+                  SERVER="{{ server_ip }}"
+                  RT="{{ runtime }}"
+                  for tt in {{ test_types | join(' ') }}; do
+                    for sz in {{ sizes | join(' ') }}; do
+                      for nt in {{ nthrs | join(' ') }}; do
+                        XML=/opt/uperf/test.xml
+                        if [ "$tt" = "rr" ]; then
+                          cat > $XML << XMLEOF
+                  <?xml version="1.0"?>
+                  <profile name="$tt-tcp-$sz-$sz-$nt">
+                    <group nthreads="$nt">
+                      <transaction iterations="1">
+                        <flowop type="connect" options="remotehost=$SERVER protocol=tcp port=30001"/>
+                      </transaction>
+                      <transaction duration="$RT">
+                        <flowop type="write" options="size=$sz"/>
+                        <flowop type="read" options="size=$sz"/>
+                      </transaction>
+                      <transaction iterations="1">
+                        <flowop type="disconnect"/>
+                      </transaction>
+                    </group>
+                  </profile>
+                  XMLEOF
+                        else
+                          cat > $XML << XMLEOF
+                  <?xml version="1.0"?>
+                  <profile name="$tt-tcp-$sz-$sz-$nt">
+                    <group nthreads="$nt">
+                      <transaction iterations="1">
+                        <flowop type="connect" options="remotehost=$SERVER protocol=tcp port=30001"/>
+                      </transaction>
+                      <transaction duration="$RT">
+                        <flowop type="write" options="count=16 size=$sz"/>
+                      </transaction>
+                      <transaction iterations="1">
+                        <flowop type="disconnect"/>
+                      </transaction>
+                    </group>
+                  </profile>
+                  XMLEOF
+                        fi
+                        echo "=== TEST $tt-tcp-$sz-$sz-$nt ===" >> /opt/uperf/output.txt
+                        uperf -v -a -R -i 1 -m $XML -P 30000 >> /opt/uperf/output.txt 2>&1
+                      done
+                    done
+                  done
+                - touch /opt/uperf/workload_complete.signal

@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: stressng-workload-deadbeef
+  namespace: benchmark-runner
+data:
+  jobfile: |
+    run sequential
+    verbose
+    metrics-brief
+    timeout 120
+
+    # cpu stressor
+    cpu 60
+    cpu-load 100
+    cpu-method all
+
+    # vm stressor
+    vm 1
+    vm-bytes 60G
+    vm-keep
+    vm-populate
+
+    # memcpy stressor
+    memcpy 1
