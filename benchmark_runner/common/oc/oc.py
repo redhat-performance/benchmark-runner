@@ -1,4 +1,6 @@
 
+import base64
+import json
 import os
 import ast
 import shutil
@@ -744,6 +746,25 @@ class OC(SSH):
         else:
             return False
 
+    def get_first_pod_name_by_label(self, label: str,
+                                    namespace: str = environment_variables.environment_variables_dict['namespace']):
+        """
+        Return the name of the first pod matching the label, or empty string if none.
+        Useful for Job-created pods whose name has a random suffix.
+        """
+        namespace_opt = f'-n {namespace}' if namespace else ''
+        try:
+            name = self.run(
+                f"{self._cli} get pods {namespace_opt} -l '{label}' -o jsonpath='{{.items[0].metadata.name}}'",
+                is_check=True)
+            if isinstance(name, bytes):
+                name = name.decode('utf-8').strip()
+            else:
+                name = name.strip() if name else ''
+            return name or ''
+        except Exception:
+            return ''
+
     @typechecked()
     def get_long_uuid(self, workload: str):
         """
@@ -882,6 +903,37 @@ class OC(SSH):
             current_wait_time += OC.SLEEP_TIME
         self.describe_pod(pod_name=pod_name, namespace=namespace)
         raise PodNotCreateTimeout(pod_name)
+
+    @typechecked
+    @logger_time_stamp
+    def wait_for_pod_create_by_label(self, label: str,
+                                     namespace: str = environment_variables.environment_variables_dict['namespace'],
+                                     timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
+        """
+        Wait until a pod matching the given label exists (e.g. for Job-created pods whose name has a random suffix).
+        :param label: Label selector, e.g. 'app=stressng_workload-<uuid>'
+        :param namespace: Namespace to look in
+        :param timeout: Max seconds to wait
+        :return: True when a matching pod exists
+        """
+        current_wait_time = 0
+        namespace_opt = f'-n {namespace}' if namespace else ''
+        while timeout <= 0 or current_wait_time <= timeout:
+            if self.pod_label_exists(label_name=label, namespace=namespace):
+                # Get one pod name for describe
+                pod_name = self.run(
+                    f"{self._cli} get pods {namespace_opt} -l '{label}' -o jsonpath='{{.items[0].metadata.name}}'",
+                    is_check=True)
+                if isinstance(pod_name, bytes):
+                    pod_name = pod_name.decode('utf-8').strip()
+                else:
+                    pod_name = pod_name.strip() if pod_name else ''
+                if pod_name:
+                    self.describe_pod(pod_name=pod_name, namespace=namespace)
+                return True
+            time.sleep(OC.SLEEP_TIME)
+            current_wait_time += OC.SLEEP_TIME
+        raise PodNotCreateTimeout(f'label {label}')
 
     @typechecked
     @logger_time_stamp
@@ -1163,13 +1215,23 @@ class OC(SSH):
                         f"{self._cli} {namespace} wait --for=condition=failed -l {label}-{self.__get_short_uuid(workload=workload)} jobs --timeout={OC.SLEEP_TIME}s")
                     if 'met' in result:
                         return False
-                if not job:
+                elif job:
+                    # Handle job=True with label_uuid=False (direct pod workloads)
+                    result = self.run(
+                        f"{self._cli} {namespace} wait --for=condition=complete -l {label} jobs --timeout={OC.SHORT_TIMEOUT}s")
+                    if 'met' in result:
+                        return True
+                    result = self.run(
+                        f"{self._cli} {namespace} wait --for=condition=failed -l {label} jobs --timeout={OC.SLEEP_TIME}s")
+                    if 'met' in result:
+                        return False
+                elif not job:
                     result = self.run(f"{self._cli} get pod -l {label}" + " -n benchmark-runner --no-headers | awk '{ print $3; }'")
                     if 'Completed' in result:
                         return True
-            # sleep for x seconds
-            time.sleep(OC.SLEEP_TIME)
-            current_wait_time += OC.SLEEP_TIME
+                # sleep for x seconds
+                time.sleep(OC.SLEEP_TIME)
+                current_wait_time += OC.SLEEP_TIME
         except Exception as err:
             raise PodNotCompletedTimeout(workload=workload)
 
@@ -1244,6 +1306,288 @@ class OC(SSH):
                 cmd=f"{self._cli} get vmi {namespace} --no-headers | awk '{{ print $1; }}' | grep -w '{label}'", is_check=True).rstrip().decode('ascii')
         else:
             return self.run(f'{self._cli} get vmi', is_check=True)
+
+    def get_pod_ip(self, label: str = '', pod_name: str = '', namespace: str = '') -> str:
+        """
+        Get pod IP by label or pod name
+        """
+        namespace = namespace or environment_variables.environment_variables_dict.get('namespace', '')
+        try:
+            if label:
+                result = self.run(
+                    cmd=f"{self._cli} get pods -n {namespace} -l {label} -o jsonpath='{{.items[0].status.podIP}}'")
+            else:
+                result = self.run(
+                    cmd=f"{self._cli} get pod -n {namespace} {pod_name} -o jsonpath='{{.status.podIP}}'")
+            return result.strip().strip(b"'").decode('ascii') if isinstance(result, bytes) else str(result).strip().strip("'")
+        except Exception:
+            return ''
+
+    def get_pod_node(self, label: str = '', pod_name: str = '', namespace: str = '') -> str:
+        """
+        Get pod node name by label or pod name
+        """
+        namespace = namespace or environment_variables.environment_variables_dict.get('namespace', '')
+        try:
+            if label:
+                result = self.run(
+                    cmd=f"{self._cli} get pods -n {namespace} -l {label} -o jsonpath='{{.items[0].spec.nodeName}}'")
+            else:
+                result = self.run(
+                    cmd=f"{self._cli} get pod -n {namespace} {pod_name} -o jsonpath='{{.spec.nodeName}}'")
+            return result.strip().strip(b"'").decode('ascii') if isinstance(result, bytes) else str(result).strip().strip("'")
+        except Exception:
+            return ''
+
+    def get_pod_logs(self, pod_name: str, namespace: str = '') -> str:
+        """
+        Get pod logs
+        """
+        namespace = namespace or environment_variables.environment_variables_dict.get('namespace', '')
+        try:
+            result = self.run(cmd=f"{self._cli} logs -n {namespace} {pod_name}")
+            return result.decode('utf-8') if isinstance(result, bytes) else str(result)
+        except Exception:
+            return ''
+
+    def get_vmi_ip(self, namespace: str, vm_name: str, retries: int = 30) -> str:
+        """
+        Get the IP address of a VirtualMachineInstance, retrying until available
+        """
+        for attempt in range(retries):
+            try:
+                result = self.run(
+                    cmd=f"{self._cli} get vmi -n {namespace} {vm_name} -o jsonpath='{{.status.interfaces[0].ipAddress}}'")
+                ip = result.strip().strip(b"'").decode('ascii') if isinstance(result, bytes) else str(result).strip().strip("'")
+                if ip and ip != '<none>':
+                    return ip
+            except Exception:
+                pass
+            time.sleep(2)
+        return ''
+
+    def get_vmi_node(self, namespace: str, vm_name: str) -> str:
+        """
+        Get the node name where a VirtualMachineInstance is running
+        """
+        try:
+            result = self.run(
+                cmd=f"{self._cli} get vmi -n {namespace} {vm_name} -o jsonpath='{{.status.nodeName}}'")
+            return result.strip().strip(b"'").decode('ascii') if isinstance(result, bytes) else str(result).strip().strip("'")
+        except Exception:
+            return ''
+
+    def get_cluster_name(self) -> str:
+        """
+        Get the cluster name/ID
+        """
+        try:
+            result = self.run(cmd=f"{self._cli} get infrastructure cluster -o jsonpath='{{.status.infrastructureName}}'")
+            return result.strip().strip(b"'").decode('ascii') if isinstance(result, bytes) else str(result).strip().strip("'")
+        except Exception:
+            return ''
+
+    def get_virt_launcher_pod(self, vm_name: str, namespace: str = '') -> str:
+        """
+        Get the virt-launcher pod name for a VM
+        """
+        namespace = namespace or environment_variables.environment_variables_dict.get('namespace', '')
+        try:
+            result = self.run(
+                cmd=f"{self._cli} get pods -n {namespace} -l kubevirt.io=virt-launcher -o name | grep {vm_name}")
+            if isinstance(result, bytes):
+                result = result.decode('utf-8')
+            pod_name = result.strip().replace('pod/', '')
+            return pod_name if pod_name else ''
+        except Exception:
+            logger.warning(f"Could not find virt-launcher pod for VM {vm_name}")
+            return ''
+
+    def get_vm_domain(self, pod_name: str, namespace: str = '') -> str:
+        """
+        Get the libvirt domain name from the virt-launcher pod
+        """
+        namespace = namespace or environment_variables.environment_variables_dict.get('namespace', '')
+        try:
+            result = self.run(
+                cmd=f"{self._cli} exec -n {namespace} {pod_name} -c compute -- virsh -c qemu+unix:///session list --name")
+            if isinstance(result, bytes):
+                result = result.decode('utf-8')
+            return result.strip()
+        except Exception:
+            logger.warning(f"Could not get libvirt domain name from pod {pod_name}")
+            return ''
+
+    def wait_for_guest_agent(self, vm_name: str, namespace: str = '', timeout: int = 180) -> bool:
+        """
+        Wait for qemu-guest-agent to connect inside the VM
+        """
+        namespace = namespace or environment_variables.environment_variables_dict.get('namespace', '')
+        for i in range(timeout):
+            try:
+                result = self.run(
+                    cmd=f"{self._cli} get vmi -n {namespace} {vm_name} -o jsonpath='{{.status.conditions[?(@.type==\"AgentConnected\")].status}}'")
+                if isinstance(result, bytes):
+                    result = result.decode('utf-8')
+                status = result.strip().strip("'")
+                if status == 'True':
+                    logger.info(f"Guest agent connected on {vm_name} after {i}s")
+                    return True
+            except Exception:
+                pass
+            if i > 0 and i % 30 == 0:
+                logger.info(f"Waiting for guest agent on {vm_name}... ({i}s)")
+            time.sleep(1)
+        logger.warning(f"Guest agent on {vm_name} did not connect within {timeout}s")
+        return False
+
+    def guest_exec(self, pod_name: str, domain: str, command: str, args: list = None, namespace: str = ''):
+        """
+        Execute a command inside the VM via qemu-guest-agent and return stdout.
+        Returns decoded stdout string, empty string on success with no output, or None on failure.
+        """
+        namespace = namespace or environment_variables.environment_variables_dict.get('namespace', '')
+
+        exec_args = {"path": command, "capture-output": True}
+        if args:
+            exec_args["arg"] = args
+
+        ga_cmd = json.dumps({"execute": "guest-exec", "arguments": exec_args})
+        cmd = f"{self._cli} exec -n {namespace} {pod_name} -c compute -- virsh -c qemu+unix:///session qemu-agent-command {domain} '{ga_cmd}'"
+        logger.debug(f"guest-exec: {command} {args or ''}")
+
+        try:
+            result = self.run(cmd)
+        except Exception as e:
+            logger.warning(f"guest-exec failed: {e}")
+            return None
+
+        if isinstance(result, bytes):
+            result = result.decode('utf-8')
+
+        try:
+            resp = json.loads(result)
+        except json.JSONDecodeError:
+            logger.warning(f"Failed to parse guest-exec response: {result[:500]}")
+            return None
+
+        pid = resp.get('return', {}).get('pid')
+        if pid is None:
+            logger.warning(f"No PID in guest-exec response: {resp}")
+            return None
+
+        logger.debug(f"guest-exec started with PID {pid}, waiting for completion...")
+        time.sleep(2)
+
+        status_cmd_json = json.dumps({"execute": "guest-exec-status", "arguments": {"pid": pid}})
+        status_cmd = f"{self._cli} exec -n {namespace} {pod_name} -c compute -- virsh -c qemu+unix:///session qemu-agent-command {domain} '{status_cmd_json}'"
+
+        for attempt in range(10):
+            try:
+                result = self.run(status_cmd)
+            except Exception as e:
+                logger.warning(f"guest-exec-status failed: {e}")
+                return None
+
+            if isinstance(result, bytes):
+                result = result.decode('utf-8')
+
+            try:
+                status_resp = json.loads(result)
+                ret = status_resp.get('return', {})
+                if ret.get('exited', False):
+                    exitcode = ret.get('exitcode', -1)
+                    out_data = ret.get('out-data', '')
+                    err_data = ret.get('err-data', '')
+                    logger.debug(f"guest-exec completed: exitcode={exitcode}, out-data-len={len(out_data)}, err-data-len={len(err_data)}")
+                    if err_data:
+                        logger.info(f"guest-exec stderr: {base64.b64decode(err_data).decode('utf-8', errors='ignore')[:200]}")
+                    if out_data:
+                        return base64.b64decode(out_data).decode('utf-8', errors='ignore')
+                    return '' if exitcode == 0 else None
+                else:
+                    logger.info(f"guest-exec PID {pid} still running (attempt {attempt + 1}/10)...")
+            except json.JSONDecodeError as e:
+                logger.warning(f"Failed to parse guest-exec-status response: {e}")
+                return None
+            time.sleep(2)
+
+        logger.warning(f"guest-exec PID {pid} did not complete after 10 retries")
+        return None
+
+    def guest_file_read(self, pod_name: str, domain: str, file_path: str, namespace: str = ''):
+        """
+        Read a file from inside the VM via guest-file-open/guest-file-read/guest-file-close.
+        Returns file content string, or None on failure.
+        """
+        namespace = namespace or environment_variables.environment_variables_dict.get('namespace', '')
+        base_cmd = f"{self._cli} exec -n {namespace} {pod_name} -c compute -- virsh -c qemu+unix:///session qemu-agent-command {domain}"
+
+        # Open the file
+        open_cmd = json.dumps({"execute": "guest-file-open", "arguments": {"path": file_path, "mode": "r"}})
+        try:
+            result = self.run(f"{base_cmd} '{open_cmd}'")
+        except Exception as e:
+            logger.warning(f"guest-file-open failed: {e}")
+            return None
+
+        if isinstance(result, bytes):
+            result = result.decode('utf-8')
+
+        try:
+            resp = json.loads(result)
+        except json.JSONDecodeError:
+            logger.warning(f"Failed to parse guest-file-open response: {result[:200]}")
+            return None
+
+        handle = resp.get('return')
+        if handle is None:
+            logger.warning(f"No file handle in guest-file-open response: {resp}")
+            return None
+
+        # Read the file contents in chunks
+        content = ''
+        for _ in range(100):
+            read_cmd = json.dumps({"execute": "guest-file-read", "arguments": {"handle": handle, "count": 49152}})
+            try:
+                result = self.run(f"{base_cmd} '{read_cmd}'")
+            except Exception:
+                break
+
+            if isinstance(result, bytes):
+                result = result.decode('utf-8')
+
+            try:
+                resp = json.loads(result)
+                ret = resp.get('return', {})
+                buf_b64 = ret.get('buf-b64', '')
+                if buf_b64:
+                    content += base64.b64decode(buf_b64).decode('utf-8', errors='ignore')
+                if ret.get('eof', False):
+                    break
+            except Exception as e:
+                logger.warning(f"Failed to parse guest-file-read response: {e}")
+                break
+
+        # Close the file
+        close_cmd = json.dumps({"execute": "guest-file-close", "arguments": {"handle": handle}})
+        try:
+            self.run(f"{base_cmd} '{close_cmd}'")
+        except Exception:
+            pass
+
+        logger.info(f"Read {len(content)} bytes from {file_path}")
+        return content if content else None
+
+    def delete_vm_by_name(self, vm_name: str, namespace: str = ''):
+        """
+        Delete a VM by name (without requiring full YAML)
+        """
+        namespace = namespace or environment_variables.environment_variables_dict.get('namespace', '')
+        try:
+            self.run(f"{self._cli} delete vm {vm_name} -n {namespace} --ignore-not-found")
+        except Exception:
+            pass
 
     @logger_time_stamp
     def __verify_vm_log_complete(self, vm_name: str, timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
@@ -1492,9 +1836,19 @@ class OC(SSH):
         current_wait_time = 0
         namespace = f'-n {namespace}' if namespace else ''
         while timeout <= 0 or current_wait_time <= timeout:
-            if self.run(
-                    f"{self._cli} {namespace} get benchmark {workload} -o jsonpath={{.status.complete}}") == 'true':
-                return True
+            # Check VMI phase for direct VM workloads
+            if vm_name:
+                vmi_phase = self.run(
+                    f"{self._cli} {namespace} get vmi {vm_name} -o jsonpath={{.status.phase}}")
+                if vmi_phase == 'Succeeded':
+                    return True
+                elif vmi_phase == 'Failed':
+                    return False
+            else:
+                # Fallback to benchmark CR for operator-based workloads
+                if self.run(
+                        f"{self._cli} {namespace} get benchmark {workload} -o jsonpath={{.status.complete}}") == 'true':
+                    return True
             # sleep for x seconds
             time.sleep(OC.SLEEP_TIME)
             current_wait_time += OC.SLEEP_TIME

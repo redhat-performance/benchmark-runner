@@ -2,7 +2,7 @@ apiVersion: ripsaw.cloudbulldozer.io/v1alpha1
 kind: Benchmark
 metadata:
   name: uperf-pod
-  namespace: benchmark-operator
+  namespace: benchmark-runner
 spec:
   system_metrics:
     collection: True
@@ -13,7 +13,7 @@ spec:
     index_name: system-metrics-test-ci
   elasticsearch:
     url: "http://elasticsearch.example.com:gol9999"
-    index_name: uperf-test-ci
+    index_name: uperf-test-ci-results
   metadata:
     collection: true
   cleanup: false

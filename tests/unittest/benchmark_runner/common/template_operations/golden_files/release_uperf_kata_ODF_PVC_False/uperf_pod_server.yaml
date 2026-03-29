@@ -1,0 +1,28 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: uperf-server-deadbeef
+  namespace: benchmark-runner
+spec:
+  ttlSecondsAfterFinished: 600
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        benchmark-uuid: deadbeef-0123-3210-cdef-01234567890abcdef
+        workload: uperf
+        role: server
+        app: uperf-bench-server-0-deadbeef
+        index: "0"
+        type: uperf-bench-server-deadbeef
+    spec:
+      runtimeClassName: kata
+      containers:
+      - name: benchmark
+        image: quay.io/benchmark-runner/uperf:latest
+        imagePullPolicy: Always
+        command: ["/bin/sh", "-c"]
+        args: ["uperf -s -v -P 30000"]
+      restartPolicy: Never
+      nodeSelector:
+        kubernetes.io/hostname: 'pin-node-1'
