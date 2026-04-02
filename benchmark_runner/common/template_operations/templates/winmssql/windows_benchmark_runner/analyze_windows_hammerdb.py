@@ -23,17 +23,15 @@ class AnalyzeWindowsHammerDB():
         path = Path(hammerdb_results_path)
         return [str(file) for file in path.iterdir() if file.is_file() and file.suffix == '.json']
 
-    import re
-
     def get_tpm_per_worker(self, json_files):
         """
-        Extract the maximum TPM per worker from a list of JSON files.
+        Extract the average TPM per worker from a list of JSON files.
         Args:
             json_files (list[str]): List of JSON file paths containing HammerDB results.
         Returns:
-            dict[int, int]: Dictionary mapping worker ID to its maximum TPM.
+            dict[int, int]: Dictionary mapping worker ID to its average TPM (rounded to int).
         """
-        results = {}
+        results = {}  # worker_id -> list of TPM values
         for json_file in json_files:
             logger.info(f"Analyzing: {json_file}")
             try:
@@ -43,27 +41,29 @@ class AnalyzeWindowsHammerDB():
                     raise ValueError(f"Cannot extract worker ID from filename: {json_file}")
                 current_worker = int(match.group(1))
 
-                current_max_tpm = self.extract_max_tpm(json_file)
+                current_avg_tpm = self.extract_avg_tpm(json_file)
 
-                if results.get(current_worker):
-                    if current_max_tpm > results.get(current_worker):
-                        results[current_worker] = current_max_tpm
-                else:
-                    results[current_worker] = current_max_tpm
+                if current_worker not in results:
+                    results[current_worker] = []
+                results[current_worker].append(current_avg_tpm)
 
             except Exception as e:
                 logger.error(f"Skipping file due to error: {json_file} -> {e}")
 
-        return results
+        # Convert lists to average TPM per worker (same format as before: int values)
+        return {
+            worker: int(round(sum(tpms) / len(tpms))) if tpms else 0
+            for worker, tpms in results.items()
+        }
 
-    def extract_max_tpm(self, json_file):
+    def extract_avg_tpm(self, json_file):
         """
-        Extract the maximum TPM value from a single JSON file.
+        Extract the average TPM value from a single JSON file.
         Handles Windows and Linux line endings and different encodings.
         Args:
             json_file (str): Path to the JSON file containing HammerDB results.
         Returns:
-            int: Maximum TPM value found in the file.
+            float: Average TPM value found in the file.
         """
         # Detect possible encoding
         try:
@@ -93,8 +93,10 @@ class AnalyzeWindowsHammerDB():
         tpm_dict = data["MSSQLServer tpm"]
 
         # Convert values to integers
-        tpm_values = [int(v) for v in tpm_dict.values()]
-        return max(tpm_values)
+        tpm_values = [int(v) for v in tpm_dict.values() if int(v) > 0]
+        if not tpm_values:
+            return 0
+        return sum(tpm_values) / len(tpm_values)
 
     def hammerdb_results_for_elasticsearch(self, hammerdb_results: dict, output_file: str) -> list[dict]:
         """
@@ -102,7 +104,7 @@ class AnalyzeWindowsHammerDB():
         and write them to a JSON file.
 
         Args:
-            hammerdb_results (dict): Dictionary of worker_id -> max TPM
+            hammerdb_results (dict): Dictionary of worker_id -> average TPM
             output_file (str): Path to output JSON file (default: hammerdb_result.json)
 
         Returns:
