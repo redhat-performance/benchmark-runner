@@ -1,0 +1,71 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: stressng-vm-{{ trunc_uuid }}
+  namespace: {{ namespace }}
+  labels:
+    app: stressng-vm-{{ trunc_uuid }}
+    type: stressng-vm-{{ trunc_uuid }}
+    benchmark-uuid: {{ uuid }}
+    benchmark-runner-workload: stressng
+spec:
+  runStrategy: Once
+  template:
+    metadata:
+      labels:
+        kubevirt-vm: stressng-vm
+        app: stressng-vm-{{ trunc_uuid }}
+    spec:
+      {%- if pin == 'true' or pin == true %}
+      nodeSelector:
+        kubernetes.io/hostname: '{{ pin_node }}'
+      {%- endif %}
+      domain:
+        cpu:
+          sockets: {{ sockets }}
+          cores: 1
+          threads: 1
+        devices:
+          disks:
+            - disk:
+                bus: virtio
+              name: containerdisk
+            - disk:
+                bus: virtio
+              name: cloudinitdisk
+        machine:
+          type: ""
+        resources:
+          requests:
+            cpu: {{ requests_cpu }}
+            memory: {{ requests_memory }}
+          limits:
+            cpu: {{ limits_cpu }}
+            memory: {{ limits_memory }}
+      terminationGracePeriodSeconds: 180
+      volumes:
+        - name: containerdisk
+          containerDisk:
+            image: {{ fedora_container_disk }}
+        - name: cloudinitdisk
+          cloudInitNoCloud:
+            userData: |
+              #cloud-config
+              user: fedora
+              password: fedora
+              chpasswd: { expire: False }
+              ssh_pwauth: true
+              {%- if ssh_public_key is defined and ssh_public_key %}
+              ssh_authorized_keys:
+                - {{ ssh_public_key }}
+              {%- endif %}
+              packages:
+                - stress-ng
+              runcmd:
+                - export HOME=/root
+                - export TMP=/tmp
+                - export TEMP=/tmp
+                - |
+                  stress-ng --cpu {{ cpu_stressors }} --cpu-load {{ cpu_percentage }} --vm {{ vm_stressors }} --vm-bytes {{ vm_bytes }} --memcpy {{ mem_stressors }} --verbose --metrics-brief --timeout {{ stressng_timeout }} 2>&1 | tee /tmp/stressng_output.txt /dev/ttyS0
+                - python3 -c "import re,json;t=open('/tmp/stressng_output.txt').read();c=re.search(r'\scpu\s+([\d.]+)',t);v=re.search(r'\svm\s+([\d.]+)',t);m=re.search(r'\smemcpy\s+([\d.]+)',t);cb=float(c.group(1)) if c else 0.0;vb=float(v.group(1)) if v else 0.0;mb=float(m.group(1)) if m else 0.0;json.dump({'cpu':cb,'cpu_bogomips':cb,'vm':vb,'vm_bogomips':vb,'memcpy':mb,'bogo_ops':cb+vb+mb},open('/tmp/stressng.json','w'))"
+                - echo "STRESSNG_COMPLETE" > /dev/ttyS0
