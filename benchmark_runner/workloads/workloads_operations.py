@@ -516,7 +516,7 @@ class WorkloadsOperations:
         self._es_operations.upload_to_elasticsearch(index=index, data=self.__get_metadata(kind=kind, status=status, result=result))
 
     @logger_time_stamp
-    def _update_elasticsearch_index(self, index: str, id: str, kind: str, status: str, run_artifacts_url: str, database: str = '', vm_name: str = '', data_updated: bool = False, , scale: int = None, prometheus_result: dict = None):
+    def _update_elasticsearch_index(self, index: str, id: str, kind: str, status: str, run_artifacts_url: str, database: str = '', vm_name: str = '', data_updated: bool = False, scale: int = None, prometheus_result: dict = None):
         """
         This method updates elasticsearch id
         :param index:
