@@ -113,6 +113,7 @@ class WorkloadsOperations:
         self._windows_url = self._environment_variables_dict.get('windows_url', '')
         self._create_vms_only = self._environment_variables_dict.get('create_vms_only', '')
         self._delete_all = self._environment_variables_dict.get('delete_all', '')
+        self._only_delete_all = False
         self._verification_only = self._environment_variables_dict.get('verification_only', '')
         self._must_gather_log = self._environment_variables_dict.get('must_gather_log', '')
         self._test_name = self._environment_variables_dict.get('test_name', '')
@@ -515,7 +516,7 @@ class WorkloadsOperations:
         self._es_operations.upload_to_elasticsearch(index=index, data=self.__get_metadata(kind=kind, status=status, result=result))
 
     @logger_time_stamp
-    def _update_elasticsearch_index(self, index: str, id: str, kind: str, status: str, run_artifacts_url: str, database: str = '', vm_name: str = '', data_updated: bool = False, prometheus_result: dict = None):
+    def _update_elasticsearch_index(self, index: str, id: str, kind: str, status: str, run_artifacts_url: str, database: str = '', vm_name: str = '', data_updated: bool = False, scale: int = None, prometheus_result: dict = None):
         """
         This method updates elasticsearch id
         :param index:
@@ -525,6 +526,7 @@ class WorkloadsOperations:
         :param status:
         :param run_artifacts_url:
         :param data_updated: check if data was updated
+        :param scale: scale number
         :param prometheus_result:
         :return:
         """
@@ -532,6 +534,8 @@ class WorkloadsOperations:
         if vm_name:
             metadata.update({'vm_name': vm_name})
             metadata.update({'data_updated': data_updated})
+        if scale is not None:
+            metadata.update({'scale': scale})
         self._es_operations.update_elasticsearch_index(index=index, id=id, metadata=metadata)
 
     def _verify_elasticsearch_data_uploaded(self, index: str, uuid: str, timeout: int = None):
