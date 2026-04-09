@@ -1,79 +1,168 @@
-apiVersion: ripsaw.cloudbulldozer.io/v1alpha1
-kind: Benchmark
+
+kind: PersistentVolumeClaim
+apiVersion: v1
 metadata:
-  name: hammerdb-kata
-  namespace: benchmark-operator
+    name: postgres-persistent-storage
+    namespace: benchmark-runner
 spec:
-  system_metrics:
-    collection: True
-    prom_url: "https://prometheus-k8s.openshift-monitoring.svc.cluster.local:9091"
-    es_url: "http://elasticsearch.example.com:gol9999"
-    prom_token: "fake_prom_token"
-    metrics_profile: "node-metrics.yml"
-    index_name: system-metrics-test-ci
-  elasticsearch:
-    url: "http://elasticsearch.example.com:gol9999"
-    index_name: hammerdb-test-ci
-  metadata:
-    collection: false
-  workload:
-    name: hammerdb
-    args:
-      runtime_class: kata
-      job_timeout: 3600
-      pin: True # enable for nodeSelector
-      pin_node: "pin-node-1"
-      resources: True # enable for resources requests/limits
-      requests_cpu: 10m
-      requests_memory: 16Gi
-      limits_cpu: 4
-      limits_memory: 16Gi
-      db_type: "pg"
-      timed_test: true
-      test_type: "tpc-c"
-      db_init: true
-      db_benchmark: true
-      db_server: postgres-deployment.postgres-db
-      db_port: "5432"
-      db_warehouses: 2
-      db_num_workers: 2
-      db_user: "postgres"
-      db_pass: "postgres"
-      db_name: "tpcc"
-      transactions: 200000
-      raiseerror: "false"
-      keyandthink: "false"
-      driver: "timed"
-      rampup: 1
-      runtime: 1
-      allwarehouse: false
-      timeprofile: false
-      async_scale: false
-      async_client: 10
-      async_verbose: false
-      async_delay: 1000
-      samples: 1
-      # database specific variables
-      # mssql:
-      db_mssql_tcp: "true"
-      db_mssql_azure: "false"
-      db_mssql_authentication: "windows"
-      db_mssql_linux_authent: "sql"
-      db_mssql_odbc_driver: "ODBC Driver 13 for SQL Server"
-      db_mssql_linux_odbc: "ODBC Driver 17 for SQL Server"
-      db_mssql_imdb: "false"
-      db_mssql_bucket: 1
-      db_mssql_durability: "SCHEMA_AND_DATA"
-      db_mssql_checkpoint: "false"
-      # mysql:
-      db_mysql_storage_engine: "innodb"
-      db_mysql_partition: "false"
-      db_mysql_socket: "/var/lib/mysql/mysql.sock"
-      # postgresql
-      db_postgresql_superuser: "postgres"
-      db_postgresql_superuser_pass: "postgres"
-      db_postgresql_defaultdbase: "tpcc"
-      db_postgresql_vacuum: "false"
-      db_postgresql_dritasnap: "false"
-      db_postgresql_oracompat: "false"
-      db_postgresql_storedprocs: "false"
+    storageClassName: ocs-storagecluster-ceph-rbd
+    accessModes: [ "ReadWriteOnce" ]
+    volumeMode: Filesystem
+    resources:
+      requests:
+        storage: 10Gi
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-custom-config
+  namespace: benchmark-runner
+data:
+  custom.pg_hba.conf: |
+    # TYPE  DATABASE        USER            ADDRESS                 METHOD
+    # "local" is for Unix domain socket connections only
+    local   all             all                                     trust
+    # IPv4 local connections:
+    host    all             all             all            trust
+  custom.perf.conf: |
+    autovacuum = 'off'
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+  namespace: benchmark-runner
+spec:
+  selector:
+    matchLabels:
+      app: postgres
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: postgres
+        type: postgres-database-server
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: "pin-node-2"
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: postgres
+          image: quay.io/benchmark-runner/postgresql:13-c9s
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 5432
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Gi
+            limits:
+              cpu: 4
+              memory: 16Gi
+          env:
+            - name: POSTGRESQL_USER
+              value: "test"
+            - name: POSTGRESQL_PASSWORD
+              value: "test"
+            - name: POSTGRESQL_DATABASE
+              value: "test"
+            - name: POSTGRESQL_ADMIN_PASSWORD
+              value: "postgres"
+          volumeMounts:
+            - name: postgres-custom-config
+              mountPath: /var/lib/pgsql/data/pg_hba.conf
+              subPath: custom.pg_hba.conf
+            - name: postgres-custom-config
+              mountPath: /opt/app-root/src/postgresql-cfg/perf.conf
+              subPath: custom.perf.conf
+            - name: postgres-persistent-storage
+              mountPath: /var/lib/pgsql/data
+              readOnly: false
+      volumes:
+        - name: postgres-custom-config
+          configMap:
+            name: postgres-custom-config
+        - name: postgres-persistent-storage
+          persistentVolumeClaim:
+            claimName: postgres-persistent-storage
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-deployment
+  namespace: benchmark-runner
+spec:
+  selector:
+    app: postgres
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: hammerdb-postgres-pod-deadbeef
+  namespace: benchmark-runner
+  labels:
+    app: hammerdb-postgres-pod-deadbeef
+    benchmark-uuid: deadbeef-0123-3210-cdef-01234567890abcdef
+spec:
+  restartPolicy: Never
+  nodeSelector:
+    kubernetes.io/hostname: "pin-node-1"
+  volumes:
+    - name: hammerdb-creator
+      configMap:
+        name: hammerdb-postgres-creator
+        defaultMode: 0640
+    - name: hammerdb-workload
+      configMap:
+        name: hammerdb-postgres-workload
+        defaultMode: 0640
+    - name: hammerdb-postgres-results-parser
+      configMap:
+        name: hammerdb-postgres-results-parser
+        defaultMode: 0640
+  initContainers:
+    - name: wait-for-postgres
+      image: quay.io/benchmark-runner/hammerdb-pod:centos9
+      command: ["/bin/sh", "-c"]
+      args:
+        - until python3 -c "import socket; s=socket.socket(); s.settimeout(2); s.connect(('$POSTGRES_HOST', 5432)); s.close()" 2>/dev/null; do echo "Waiting for PostgreSQL..."; sleep 3; done
+      env:
+        - name: POSTGRES_HOST
+          value: "postgres-deployment"
+  containers:
+    - name: hammerdb
+      image: quay.io/benchmark-runner/hammerdb-pod:centos10
+      imagePullPolicy: Always
+      env:
+        - name: POSTGRES_HOST
+          value: "postgres-deployment"
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          cd /hammer
+          echo "=== STEP 1: CREATE DB ==="
+          ./hammerdbcli auto /creator/createdb_postgres.tcl 2>&1 | tee /tmp/hammerdb-createdb.log
+          echo "=== STEP 2: RUN WORKLOAD ==="
+          ./hammerdbcli auto /workload/workload_postgres.tcl 2>&1 | tee /tmp/hammerdb-workload.log
+          python3 /parse-results/parse_results.py
+      volumeMounts:
+        - name: hammerdb-creator
+          mountPath: /creator
+          readOnly: false
+        - name: hammerdb-workload
+          mountPath: /workload
+          readOnly: false
+        - name: hammerdb-postgres-results-parser
+          mountPath: /parse-results
+          readOnly: false
+      resources:
+        requests:
+          cpu: "10m"
+          memory: "16Gi"
+        limits:
+          cpu: "4"
+          memory: "16Gi"

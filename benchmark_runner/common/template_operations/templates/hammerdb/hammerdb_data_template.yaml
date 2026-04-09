@@ -1,15 +1,13 @@
 metadata:
   name: hammerdb
-{%- if kind != 'vm' %}
 files:
-  - name: "{{ workload_extra_name }}.yaml"
-{%- endif %}
+  - name: "hammerdb_{{ kind }}_{{ workload_extra_name }}_configmap.yaml"
+    template: "hammerdb_{{ workload_extra_name }}_configmap.yaml"
 template_data:
   shared:
-    pin_node1: {{ pin_node1 }}
-    pin_node2: {{ pin_node2 }}
+    pin_node1: "{{ pin_node1 }}"
+    pin_node2: "{{ pin_node2 }}"
     odf_pvc: {{ odf_pvc }}
-    resources: true
     transactions: 100000
     rampup: 1
     runtime: 1

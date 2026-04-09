@@ -40,7 +40,7 @@ class Virtctl(OC):
     def virtctl_ssh(self, vm_name: str, command: str, namespace: str = '', key_path: str = '', username: str = '') -> Optional[str]:
         """Execute a command inside a VM via virtctl ssh. Returns stdout string, or None on failure."""
         namespace = namespace or environment_variables.environment_variables_dict.get('namespace', '')
-        username = username or environment_variables.environment_variables_dict.get('vm_user', 'fedora')
+        username = username or environment_variables.environment_variables_dict.get('vm_user', '')
         try:
             if self.is_virtctl_ge(min_version='1.6.0'):
                 target = f'vmi/{vm_name}'
@@ -107,7 +107,7 @@ class Virtctl(OC):
     def _scp_file(self, vm_name: str, remote_path: str, local_path: str, namespace: str = '', key_path: str = '', username: str = '') -> bool:
         """Copy a file from VM to local using virtctl scp."""
         namespace = namespace or environment_variables.environment_variables_dict.get('namespace', '')
-        username = username or environment_variables.environment_variables_dict.get('vm_user', 'fedora')
+        username = username or environment_variables.environment_variables_dict.get('vm_user', '')
         try:
             if self.is_virtctl_ge(min_version='1.6.0'):
                 source = f'{username}@vmi/{vm_name}:{remote_path}'

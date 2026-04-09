@@ -1,79 +1,125 @@
-apiVersion: ripsaw.cloudbulldozer.io/v1alpha1
-kind: Benchmark
+
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: hammerdb-kata
-  namespace: benchmark-operator
+  name: mssql-deployment
+  namespace: benchmark-runner
 spec:
-  system_metrics:
-    collection: True
-    prom_url: "https://prometheus-k8s.openshift-monitoring.svc.cluster.local:9091"
-    es_url: "http://elasticsearch.example.com:gol9999"
-    prom_token: "fake_prom_token"
-    metrics_profile: "node-metrics.yml"
-    index_name: system-metrics
-  elasticsearch:
-    url: "http://elasticsearch.example.com:gol9999"
-    index_name: hammerdb
-  metadata:
-    collection: false
-  workload:
-    name: hammerdb
-    args:
-      runtime_class: kata
-      job_timeout: 3600
-      pin: True # enable for nodeSelector
-      pin_node: "pin-node-1"
-      resources: True # enable for resources requests/limits
-      requests_cpu: 10m
-      requests_memory: 16Gi
-      limits_cpu: 16
-      limits_memory: 16Gi
-      db_type: "mssql"
-      timed_test: true
-      test_type: "tpc-c"
-      db_init: true
-      db_benchmark: true
-      db_server: mssql-deployment.mssql-db
-      db_port: "1433"
-      db_warehouses: 96
-      db_num_workers: 32
-      db_user: "SA"
-      db_pass: "s3curePasswordString"
-      db_name: "tpcc"
-      transactions: 100000
-      raiseerror: "false"
-      keyandthink: "false"
-      driver: "timed"
-      rampup: 1
-      runtime: 1
-      allwarehouse: false
-      timeprofile: false
-      async_scale: false
-      async_client: 10
-      async_verbose: false
-      async_delay: 1000
-      samples: 1
-      # database specific variables
-      # mssql:
-      db_mssql_tcp: "true"
-      db_mssql_azure: "false"
-      db_mssql_authentication: "windows"
-      db_mssql_linux_authent: "sql"
-      db_mssql_odbc_driver: "ODBC Driver 13 for SQL Server"
-      db_mssql_linux_odbc: "ODBC Driver 17 for SQL Server"
-      db_mssql_imdb: "false"
-      db_mssql_bucket: 1
-      db_mssql_durability: "SCHEMA_AND_DATA"
-      db_mssql_checkpoint: "false"
-      # mysql:
-      db_mysql_storage_engine: "innodb"
-      db_mysql_partition: "false"
-      db_mysql_socket: "/var/lib/mysql/mysql.sock"
-      # postgresql
-      db_postgresql_superuser: "postgres"
-      db_postgresql_superuser_pass: "postgres"
-      db_postgresql_defaultdbase: "tpcc"
-      db_postgresql_vacuum: "false"
-      db_postgresql_dritasnap: "false"
-      db_postgresql_oracompat: "false"
-      db_postgresql_storedprocs: "false"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mssql
+  template:
+    metadata:
+      labels:
+        app: mssql
+        type: mssql-database-server
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: "pin-node-2"
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: mssql
+        image: quay.io/benchmark-runner/mssql:2022-rhel9
+        imagePullPolicy: "IfNotPresent"
+        ports:
+        - containerPort: 1433
+        resources:
+          requests:
+            cpu: 32
+            memory: 32Gi
+          limits:
+            cpu: 32
+            memory: 32Gi
+        env:
+          - name: MSSQL_PID
+            value: "Enterprise"
+          - name: ACCEPT_EULA
+            value: "Y"
+          - name: MSSQL_SA_PASSWORD
+            value: "s3curePasswordString"
+        securityContext:
+          allowPrivilegeEscalation: true
+        volumeMounts:
+      volumes:
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mssql-deployment
+  namespace: benchmark-runner
+spec:
+  selector:
+    app: mssql
+  ports:
+    - protocol: TCP
+      port: 1433
+      targetPort: 1433
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: hammerdb-mssql-pod-deadbeef
+  namespace: benchmark-runner
+  labels:
+    app: hammerdb-mssql-pod-deadbeef
+    benchmark-uuid: deadbeef-0123-3210-cdef-01234567890abcdef
+spec:
+  restartPolicy: Never
+  nodeSelector:
+    kubernetes.io/hostname: "pin-node-1"
+  volumes:
+    - name: hammerdb-creator
+      configMap:
+        name: hammerdb-mssql-creator
+        defaultMode: 0640
+    - name: hammerdb-workload
+      configMap:
+        name: hammerdb-mssql-workload
+        defaultMode: 0640
+    - name: hammerdb-mssql-results-parser
+      configMap:
+        name: hammerdb-mssql-results-parser
+        defaultMode: 0640
+  initContainers:
+    - name: wait-for-mssql
+      image: quay.io/benchmark-runner/hammerdb-pod:centos10
+      command: ["/bin/sh", "-c"]
+      args:
+        - until /opt/mssql-tools18/bin/sqlcmd -S $MSSQL_HOST -U SA -P 's3curePasswordString' -C -No -Q 'SELECT 1' 2>/dev/null; do echo "Waiting for MSSQL..."; sleep 3; done
+      env:
+        - name: MSSQL_HOST
+          value: "mssql-deployment"
+  containers:
+    - name: hammerdb
+      image: quay.io/benchmark-runner/hammerdb-pod:centos10
+      imagePullPolicy: Always
+      env:
+        - name: MSSQL_HOST
+          value: "mssql-deployment"
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          cd /hammer
+          echo "=== STEP 1: CREATE DB ==="
+          ./hammerdbcli auto /creator/createdb_mssql.tcl 2>&1 | tee /tmp/hammerdb-createdb.log
+          echo "=== STEP 2: RUN WORKLOAD ==="
+          ./hammerdbcli auto /workload/workload_mssql.tcl 2>&1 | tee /tmp/hammerdb-workload.log
+          python3 /parse-results/parse_results.py
+      volumeMounts:
+        - name: hammerdb-creator
+          mountPath: /creator
+          readOnly: false
+        - name: hammerdb-workload
+          mountPath: /workload
+          readOnly: false
+        - name: hammerdb-mssql-results-parser
+          mountPath: /parse-results
+          readOnly: false
+      resources:
+        requests:
+          cpu: "10m"
+          memory: "16Gi"
+        limits:
+          cpu: "16"
+          memory: "16Gi"
