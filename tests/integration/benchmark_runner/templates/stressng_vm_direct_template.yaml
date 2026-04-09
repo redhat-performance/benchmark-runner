@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: benchmark-runner
+---
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: stressng-vm-test123
+  namespace: benchmark-runner
+  labels:
+    app: stressng-vm-test123
+    type: stressng-vm-test123
+    benchmark-uuid: test-uuid-123
+    benchmark-runner-workload: stressng
+spec:
+  runStrategy: Once
+  template:
+    metadata:
+      labels:
+        kubevirt-vm: stressng-vm
+        app: stressng-vm-test123
+    spec:
+      domain:
+        cpu:
+          sockets: 1
+          cores: 1
+          threads: 1
+        devices:
+          disks:
+            - disk:
+                bus: virtio
+              name: containerdisk
+            - disk:
+                bus: virtio
+              name: cloudinitdisk
+        machine:
+          type: ""
+        resources:
+          requests:
+            cpu: 10m
+            memory: 1Gi
+          limits:
+            cpu: 2
+            memory: 1Gi
+      terminationGracePeriodSeconds: 180
+      volumes:
+        - name: containerdisk
+          containerDisk:
+            image: quay.io/benchmark-runner/fedora-container-disk:43
+        - name: cloudinitdisk
+          cloudInitNoCloud:
+            userData: |
+              #cloud-config
+              user: fedora
+              password: fedora
+              chpasswd: { expire: False }
+              ssh_pwauth: true
+              packages:
+                - stress-ng
+              runcmd:
+                - export HOME=/root
+                - export TMP=/tmp
+                - export TEMP=/tmp
+                - stress-ng --cpu 1 --cpu-load 100 --vm 1 --vm-bytes 128M --memcpy 1 --verbose --metrics-brief --timeout 10 2>&1 | tee /tmp/stressng_output.txt /dev/ttyS0
+                - python3 -c "import re,json;t=open('/tmp/stressng_output.txt').read();c=re.search(r'\scpu\s+([\d.]+)',t);v=re.search(r'\svm\s+([\d.]+)',t);m=re.search(r'\smemcpy\s+([\d.]+)',t);cb=float(c.group(1)) if c else 0.0;vb=float(v.group(1)) if v else 0.0;mb=float(m.group(1)) if m else 0.0;json.dump({'cpu':cb,'cpu_bogomips':cb,'vm':vb,'vm_bogomips':vb,'memcpy':mb,'bogo_ops':cb+vb+mb},open('/tmp/stressng.json','w'))"
+                - sleep infinity

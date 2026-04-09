@@ -74,7 +74,7 @@ Choose one from the following list:
 
 Not mandatory:
 
-**auto:** NAMESPACE=benchmark-operator [ The default namespace is benchmark-operator ]
+**auto:** NAMESPACE=benchmark-runner [ The default namespace is benchmark-runner ]
 
 **auto:** ODF_PVC=True [ True=ODF PVC storage, False=Ephemeral storage, default True ]
 
@@ -83,8 +83,6 @@ Not mandatory:
 **auto:** SYSTEM_METRICS=False [ True=collect metric, False=not collect metrics, default False ]
 
 **auto:** RUNNER_PATH=/tmp [ The default work space is /tmp ]
-
-**optional:** PIN_NODE_BENCHMARK_OPERATOR=$PIN_NODE_BENCHMARK_OPERATOR [node selector for benchmark operator pod]
 
 **optional:** PIN_NODE1=$PIN_NODE1 [node1 selector for running the workload]
 
@@ -111,17 +109,16 @@ Not mandatory:
 For example:
 
 ```sh
-podman run --rm -e WORKLOAD="hammerdb_pod_mariadb" -e KUBEADMIN_PASSWORD="1234" -e PIN_NODE_BENCHMARK_OPERATOR="node_name-0" -e PIN_NODE1="node_name-1" -e PIN_NODE2="node_name-2" -e log_level=INFO -v /root/.kube/config:/root/.kube/config --privileged quay.io/benchmark-runner/benchmark-runner:latest
+podman run --rm -e WORKLOAD="hammerdb_pod_mariadb" -e KUBEADMIN_PASSWORD="1234" -e PIN_NODE1="node_name-1" -e PIN_NODE2="node_name-2" -e log_level=INFO -v /root/.kube/config:/root/.kube/config --privileged quay.io/benchmark-runner/benchmark-runner:latest
 ```
 or
 ```sh
-docker run --rm -e WORKLOAD="hammerdb_vm_mariadb" -e KUBEADMIN_PASSWORD="1234" -e PIN_NODE_BENCHMARK_OPERATOR="node_name-0" -e PIN_NODE1="node_name-1" -e PIN_NODE2="node_name-2" -e log_level=INFO -v /root/.kube/config:/root/.kube/config --privileged quay.io/benchmark-runner/benchmark-runner:latest
+docker run --rm -e WORKLOAD="hammerdb_vm_mariadb" -e KUBEADMIN_PASSWORD="1234" -e PIN_NODE1="node_name-1" -e PIN_NODE2="node_name-2" -e log_level=INFO -v /root/.kube/config:/root/.kube/config --privileged quay.io/benchmark-runner/benchmark-runner:latest
 ```
 
 SAVE RUN ARTIFACTS LOCAL:
 1. add `-e SAVE_ARTIFACTS_LOCAL='True'` or `--save-artifacts-local=true`
 2. add `-v /tmp/benchmark-runner-run-artifacts:/tmp/benchmark-runner-run-artifacts`
-3. git clone -b v1.0.3 https://github.com/cloud-bulldozer/benchmark-operator /tmp/benchmark-operator
 
 ### Run vdbench workload in Pod using OpenShift
 ![](media/benchmark-runner-demo.gif)

@@ -58,6 +58,9 @@ class EnvironmentVariables:
         self._environment_variables_dict['pin_node1'] = EnvironmentVariables.get_env('PIN_NODE1', '')
         self._environment_variables_dict['pin_node2'] = EnvironmentVariables.get_env('PIN_NODE2', '')
 
+        # VM SSH user (default: fedora, configurable for different VM images)
+        self._environment_variables_dict['vm_user'] = EnvironmentVariables.get_env('VM_USER', 'fedora')
+
         # ElasticSearch
         self._environment_variables_dict['elasticsearch'] = EnvironmentVariables.get_env('ELASTICSEARCH', '')
         self._environment_variables_dict['elasticsearch_port'] = EnvironmentVariables.get_env('ELASTICSEARCH_PORT', '')
@@ -115,9 +118,9 @@ class EnvironmentVariables:
                                                          'clusterbuster', 'bootstorm_vm', 'windows_vm', 'winmssql_vm', 'krknhub']
         # Workloads namespaces
         self._environment_variables_dict['workload_namespaces'] = {
-            'stressng': 'benchmark-operator',
+            'stressng': 'benchmark-runner',
             'hammerdb': 'benchmark-operator',
-            'uperf': 'benchmark-operator',
+            'uperf': 'benchmark-runner',
             'vdbench': 'benchmark-runner',
             'clusterbuster': 'clusterbuster',
             'bootstorm': 'benchmark-runner',
@@ -136,9 +139,13 @@ class EnvironmentVariables:
             'hammerdb': 4.0
         }
 
-        # Set namespace based on workload
+        # Set namespace based on workload.
+        # BENCHMARK_OPERATOR_NAMESPACE is used when set (e.g. OpenShift CI) so the app targets that
+        # namespace for workload/operator while NAMESPACE can remain the job namespace for the framework.
         base_workload = self._environment_variables_dict['workload'].split('_')[0]
-        if EnvironmentVariables.get_env('NAMESPACE'):
+        if EnvironmentVariables.get_env('BENCHMARK_OPERATOR_NAMESPACE'):
+            self._environment_variables_dict['namespace'] = EnvironmentVariables.get_env('BENCHMARK_OPERATOR_NAMESPACE')
+        elif EnvironmentVariables.get_env('NAMESPACE'):
             self._environment_variables_dict['namespace'] = EnvironmentVariables.get_env('NAMESPACE')
         elif base_workload in self._environment_variables_dict['workload_namespaces']:
             default_namespace = self._environment_variables_dict['workload_namespaces'][base_workload]
@@ -339,10 +346,6 @@ class EnvironmentVariables:
         self._environment_variables_dict['ocp_resource_install_minutes_time'] = EnvironmentVariables.get_env('OCP_RESOURCE_INSTALL_MINUTES_TIME', 0)
         # benchmark-runner last commit id
         self._environment_variables_dict['benchmark_runner_id'] = EnvironmentVariables.get_env('BENCHMARK_RUNNER_ID', '')
-        # benchmark-operator last commit id
-        self._environment_variables_dict['benchmark_operator_id'] = EnvironmentVariables.get_env('BENCHMARK_OPERATOR_ID', '')
-        # benchmark-wrapper last commit id
-        self._environment_variables_dict['benchmark_wrapper_id'] = EnvironmentVariables.get_env('BENCHMARK_WRAPPER_ID', '')
 
         # Node Selector functionality
         self._environment_variables_dict['pin'] = bool(self._environment_variables_dict['pin_node1'])

@@ -1,0 +1,75 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: benchmark-runner
+---
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: uperf-server-test123
+  namespace: benchmark-runner
+  labels:
+    app: uperf-server-test123
+    type: uperf-server-test123
+    benchmark-uuid: test-uuid-123
+    benchmark-runner-workload: uperf
+    role: server
+spec:
+  running: true
+  template:
+    metadata:
+      labels:
+        kubevirt-vm: uperf-server
+        app: uperf-server-test123
+    spec:
+      domain:
+        cpu:
+          sockets: 1
+          cores: 1
+          threads: 1
+        devices:
+          disks:
+            - disk:
+                bus: virtio
+              name: containerdisk
+            - disk:
+                bus: virtio
+              name: cloudinitdisk
+          interfaces:
+            - name: default
+              masquerade: {}
+              ports:
+                - port: 30000
+                - port: 30001
+          networkInterfaceMultiqueue: true
+        machine:
+          type: ""
+        resources:
+          requests:
+            cpu: 10m
+            memory: 1Gi
+          limits:
+            cpu: 2
+            memory: 1Gi
+      terminationGracePeriodSeconds: 180
+      networks:
+        - name: default
+          pod: {}
+      volumes:
+        - name: containerdisk
+          containerDisk:
+            image: quay.io/benchmark-runner/fedora-container-disk:43
+        - name: cloudinitdisk
+          cloudInitNoCloud:
+            userData: |
+              #cloud-config
+              user: fedora
+              password: fedora
+              chpasswd: { expire: False }
+              ssh_pwauth: true
+              packages:
+                - uperf
+              runcmd:
+                - export HOME=/root
+                - uperf -s -P 30000 > /tmp/uperf_server.log 2>&1 &
+                - sleep infinity

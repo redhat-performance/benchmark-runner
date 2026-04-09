@@ -1,0 +1,130 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: uperf-client-{{ trunc_uuid }}
+  namespace: {{ namespace }}
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        benchmark-uuid: {{ uuid }}
+        workload: uperf
+        role: client
+        app: uperf-bench-client
+        type: uperf-bench-client-{{ trunc_uuid }}
+    spec:
+      {%- if kind == 'kata' %}
+      runtimeClassName: kata
+      {%- endif %}
+      {%- if hostnetwork == 'true' or hostnetwork == true %}
+      hostNetwork: true
+      {%- endif %}
+      containers:
+      - name: benchmark
+        image: {{ image | default('quay.io/benchmark-runner/uperf:latest') }}
+        env:
+          - name: uuid
+            value: "{{ uuid }}"
+          - name: test_user
+            value: "{{ test_user | default('user') }}"
+          - name: clustername
+            value: "{{ clustername | default('') }}"
+          - name: client_node
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
+          - name: server_node
+            value: "{{ pin_server | default('unknown') }}"
+          - name: server_ip
+            value: "{{ server_ip | default('') }}"
+          - name: run_id
+            value: "{{ run_id | default('NA') }}"
+          - name: client_ips
+            value: "{{ client_ips | default('') }}"
+          - name: service_ip
+            value: "{{ service_ip | default('False') }}"
+          - name: service_type
+            value: "{{ service_type | default('') }}"
+          - name: port
+            value: "{{ port | default('30000') }}"
+          - name: num_pairs
+            value: "{{ num_pairs | default('') }}"
+          - name: multus_client
+            value: "{{ multus_client | default('') }}"
+          - name: networkpolicy
+            value: "{{ networkpolicy | default('') }}"
+          - name: density
+            value: "{{ density | default('') }}"
+          - name: nodes_in_iter
+            value: "{{ nodes_in_iter | default('') }}"
+          - name: step_size
+            value: "{{ step_size | default('') }}"
+          - name: colocate
+            value: "{{ colocate | default('') }}"
+          - name: density_range
+            value: "{{ density_range | default('') }}"
+          - name: node_range
+            value: "{{ node_range | default('') }}"
+          - name: hostnetwork
+            value: "{{ hostnetwork | default('False') }}"
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+        {%- if client_resources is defined and client_resources %}
+        resources:
+          requests:
+            cpu: {{ requests_cpu }}
+            memory: {{ requests_memory }}
+          limits:
+            cpu: {{ limits_cpu }}
+            memory: {{ limits_memory }}
+        {%- endif %}
+        imagePullPolicy: Always
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            # Server IP passed from Python code
+            export h="{{ server_ip }}"
+            export port=30000
+            export hostnet={{ hostnetwork | default('false') }}
+            export num_pairs={{ pair | default('1') }}
+            export ips=$(hostname -I)
+            exit_status=0
+
+            # Create workdir and process each test file, replacing placeholder with actual server IP
+            mkdir -p /tmp/uperf-workdir
+            SERVER_IP="{{ server_ip }}"
+
+            # Run each test combination and upload metrics to ES
+            {%- for test_type in test_types %}
+            {%- for proto in protos %}
+            {%- for size in sizes %}
+            {%- for nthr in nthrs %}
+            # Replace placeholder and save to workdir
+            sed "s/SERVER_IP_PLACEHOLDER/$SERVER_IP/g" /tmp/uperf-test/uperf-{{ test_type }}-{{ proto }}-{{ size }}-{{ size }}-{{ nthr }} > /tmp/uperf-workdir/uperf-{{ test_type }}-{{ proto }}-{{ size }}-{{ size }}-{{ nthr }}
+            cat /tmp/uperf-workdir/uperf-{{ test_type }}-{{ proto }}-{{ size }}-{{ size }}-{{ nthr }}
+            OUTFILE="/tmp/uperf-out-{{ test_type }}-{{ proto }}-{{ size }}-{{ size }}-{{ nthr }}.out"
+            uperf -v -a -R -i 1 -m /tmp/uperf-workdir/uperf-{{ test_type }}-{{ proto }}-{{ size }}-{{ size }}-{{ nthr }} -P 30000 2>&1 | tee "$OUTFILE" || exit_status=1
+            {%- endfor %}
+            {%- endfor %}
+            {%- endfor %}
+            {%- endfor %}
+
+            # Parse all test results into JSON (visible in pod logs)
+            python3 /tmp/uperf-test/uperf_parser.py
+
+            exit $exit_status
+        volumeMounts:
+          - name: config-volume
+            mountPath: "/tmp/uperf-test"
+      volumes:
+        - name: config-volume
+          configMap:
+            name: uperf-test-{{ trunc_uuid }}
+      restartPolicy: Never
+      {%- if pin == 'true' or pin == true %}
+      nodeSelector:
+        kubernetes.io/hostname: '{{ pin_client }}'
+      {%- endif %}

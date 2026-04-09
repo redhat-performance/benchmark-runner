@@ -4,7 +4,7 @@ from os import path
 from setuptools import setup, find_packages
 
 
-__version__ = '1.0.955'  # update also .bumpversion.cfg
+__version__ = '1.0.964'  # update also .bumpversion.cfg
 
 
 here = path.abspath(path.dirname(__file__))
@@ -46,7 +46,7 @@ setup(
         'azure==4.0.0',
         'boto3==1.33.13',  # s3
         'botocore==1.33.13',  # s3
-        'cryptography==44.0.1',  # for paramiko
+        'cryptography==46.0.6',  # for paramiko
         'elasticsearch==7.16.1',
         'elasticsearch-dsl==7.4.0',  # for deep search
         'google-auth==2.30.0',  # for Google Drive
