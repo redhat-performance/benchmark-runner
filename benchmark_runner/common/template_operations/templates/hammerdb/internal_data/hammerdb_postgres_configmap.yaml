@@ -1,0 +1,137 @@
+# Tcl benchmark params map to hammerdb_data_template.yaml:
+#   db_warehouses, db_num_workers  -> perf_ci (e.g. 96, 32) or default run_type
+#   transactions, rampup, runtime  -> shared section
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hammerdb-postgres-creator
+  namespace: "{{ namespace }}"
+data:
+  createdb_postgres.tcl: |
+    puts "SETTING CONFIGURATION"
+    global complete
+    proc wait_to_complete {} {
+        global complete
+        set complete [vucomplete]
+        if {!$complete} { after 5000 wait_to_complete } else { exit }
+    }
+    puts "SETTING CONFIGURATION"
+    dbset db pg
+    dbset bm TPC-C
+    set pg_host [expr {[info exists env(POSTGRES_HOST)] ? $env(POSTGRES_HOST) : "127.0.0.1"}]
+    diset connection pg_host $pg_host
+    diset connection pg_port 5432
+    diset tpcc pg_superuser postgres
+    diset tpcc pg_superuserpass postgres
+    diset tpcc pg_defaultdbase postgres
+    diset tpcc pg_user postgres
+    diset tpcc pg_pass postgres
+    diset tpcc pg_dbase tpcc
+    diset tpcc pg_count_ware {{ db_warehouses }}
+    diset tpcc pg_num_vu {{ db_num_workers }}
+    puts "CREATING SCHEMA"
+    buildschema
+    wait_to_complete
+    vwait forever
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hammerdb-postgres-workload
+  namespace: "{{ namespace }}"
+data:
+  workload_postgres.tcl: |
+    proc runtimer { seconds } {
+    set x 0
+    set timerstop 0
+    while {!$timerstop} {
+    incr x
+    after 1000
+      if { ![ expr {$x % 60} ] } {
+              set y [ expr $x / 60 ]
+              puts "Timer: $y minutes elapsed"
+      }
+    update
+    if { [ vucomplete ] || $x eq $seconds } { set timerstop 1 }
+        }
+    return
+    }
+    puts "SETTING DB CONFIGURATION"
+    dbset db pg
+    dbset bm TPC-C
+    puts "SETTING CONNECTION OPTIONS"
+    set pg_host [expr {[info exists env(POSTGRES_HOST)] ? $env(POSTGRES_HOST) : "127.0.0.1"}]
+    diset connection pg_host $pg_host
+    diset connection pg_port 5432
+    puts "SETTING BENCHMARK OPTIONS"
+    diset tpcc pg_count_ware {{ db_warehouses }}
+    diset tpcc pg_num_vu {{ db_num_workers }}
+    diset tpcc pg_superuser postgres
+    diset tpcc pg_superuserpass postgres
+    diset tpcc pg_defaultdbase postgres
+    diset tpcc pg_user postgres
+    diset tpcc pg_pass postgres
+    diset tpcc pg_dbase tpcc
+    diset tpcc pg_vacuum false
+    diset tpcc pg_dritasnap false
+    diset tpcc pg_oracompat false
+    diset tpcc pg_storedprocs false
+    diset tpcc pg_total_iterations {{ transactions }}
+    diset tpcc pg_raiseerror false
+    diset tpcc pg_keyandthink false
+    diset tpcc pg_driver timed
+    diset tpcc pg_rampup {{ rampup }}
+    diset tpcc pg_duration {{ runtime }}
+    diset tpcc pg_allwarehouse false
+    diset tpcc pg_timeprofile false
+    diset tpcc pg_async_scale false
+    diset tpcc pg_async_client 10
+    diset tpcc pg_async_verbose false
+    diset tpcc pg_async_delay 1000
+    vuset logtotemp 1
+    loadscript
+    puts "SEQUENCE STARTED"
+    set workers {{ db_num_workers }}
+    set transactions {{ transactions }}
+    set samples 1
+    for {set w 1} { $w <= $workers } { set w [expr {$w*2}] } {
+    puts "$w VU TEST"
+    for {set i 1} {$i <= $samples} {incr i} {
+        puts "============ RUNNING SAMPLE $i: $w WORKERS ============"
+        vuset vu $w
+        vucreate
+        vurun
+        set calculation [expr { ( {{ rampup }} + {{ runtime }} ) * 60 * 1.4 }]
+        set runtimer_seconds [expr int($calculation)]
+        runtimer $runtimer_seconds
+        runtimer 350
+        vudestroy
+        after 5000
+        }
+    }
+    puts "SEQUENCE COMPLETE"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hammerdb-postgres-results-parser
+  namespace: "{{ namespace }}"
+data:
+  parse_results.py: |
+    import re, json
+    results = []
+    current_vu = 0
+    with open('/tmp/hammerdb-workload.log') as f:
+        for line in f:
+            m = re.match(r'^(\d+) VU TEST', line)
+            if m:
+                current_vu = int(m.group(1))
+            m = re.search(r'System achieved \d+ NOPM from (\d+) PostgreSQL TPM', line)
+            if m and current_vu:
+                tpm = int(m.group(1))
+                results.append({"current_worker": current_vu, "thread": current_vu, "tpm": tpm})
+    output = json.dumps(results, indent=2)
+    with open('/tmp/hammerdb-results.json', 'w') as f:
+        f.write(output)
+    print("=== JSON RESULTS ===")
+    print(output)

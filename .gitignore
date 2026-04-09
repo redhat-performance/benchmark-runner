@@ -228,3 +228,6 @@ terraform.tfstate
 # Emacs autosave and backup files
 *~
 **/#*#
+
+# MacOS files
+**/.DS_Store

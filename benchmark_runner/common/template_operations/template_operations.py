@@ -118,7 +118,10 @@ class TemplateOperations:
                 self.__standard_output_file = f"{'_'.join([self.__workload_name, self.__workload_template_kind, scale])}.yaml"
             else:
                 self.__standard_output_file = f"{'_'.join([self.__workload_name, self.__workload_template_kind])}.yaml"
-        self.__standard_template_file = f"{'_'.join([self.__workload_name, self.__workload_template_kind])}_template.yaml"
+        if self.__workload_extra_name:
+            self.__standard_template_file = f"{'_'.join([self.__workload_name, self.__workload_extra_name, self.__workload_template_kind])}_template.yaml"
+        else:
+            self.__standard_template_file = f"{'_'.join([self.__workload_name, self.__workload_template_kind])}_template.yaml"
         workload_dir_path = os.path.join((os.path.dirname(benchmark_runner.__file__)), "workloads", self.__workload, "template") \
             if self.__environment_variables_dict['template_in_workload_dir'] \
                else os.path.join(self.__dir_path, self.__workload_name)

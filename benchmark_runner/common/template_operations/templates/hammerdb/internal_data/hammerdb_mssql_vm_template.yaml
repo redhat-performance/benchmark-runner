@@ -1,0 +1,190 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: hammerdb-mssql-cloudinit
+  namespace: benchmark-runner
+stringData:
+  userdata: |-
+    #cloud-config
+    password: centos
+    chpasswd: { expire: False }
+    ssh_pwauth: true
+    {%- if vm_ssh_public_key %}
+    ssh_authorized_keys:
+      - {{ vm_ssh_public_key }}
+    {%- endif %}
+    write_files:
+      - path: /etc/systemd/system/mssql-server.service.d/env.conf
+        permissions: '0644'
+        content: |
+          [Service]
+          Environment="ACCEPT_EULA=Y"
+          Environment="MSSQL_SA_PASSWORD=s3curePasswordString"
+          Environment="MSSQL_PID=Enterprise"
+    bootcmd:
+      - "mkdir /creator"
+      - "mount /dev/$(lsblk --nodeps -no name,serial | grep CVLY623300HK240C | cut -f1 -d' ') /creator"
+      - "mkdir /workload"
+      - "mount /dev/$(lsblk --nodeps -no name,serial | grep CVLY623300HK240D | cut -f1 -d' ') /workload"
+      - "mkdir /parse-results"
+      - "mount /dev/$(lsblk --nodeps -no name,serial | grep CVLY623300HK240E | cut -f1 -d' ') /parse-results"
+    runcmd:
+      - sysctl -w vm.overcommit_memory=1
+      - setenforce 0 || true
+      # Unlock QEMU guest agent file/exec RPCs so benchmark-runner can retrieve results
+      - |
+        { grep -v 'FILTER_RPC_ARGS' /etc/sysconfig/qemu-ga 2>/dev/null || true
+          echo 'FILTER_RPC_ARGS=""'
+        } > /tmp/qemu-ga.new && mv /tmp/qemu-ga.new /etc/sysconfig/qemu-ga
+      - systemctl restart qemu-guest-agent || systemctl enable --now qemu-guest-agent || true
+      - mkfs.ext4 /dev/$(lsblk --nodeps -no name,serial | grep "^.*data$" | cut -f1 -d' ') 2>&1 | tee /tmp/mkfs.log
+      - mkdir -p /var/opt/mssql/data
+      - mount /dev/$(lsblk --nodeps -no name,serial | grep "^.*data$" | cut -f1 -d' ') /var/opt/mssql/data
+      - chown -R mssql:mssql /var/opt/mssql/data
+      - restorecon -Rv /var/opt/mssql/data || true
+      - mkdir -p /etc/systemd/system/mssql-server.service.d
+      - systemctl daemon-reload
+      - sudo systemctl stop mssql-server || true
+      - sudo ACCEPT_EULA='Y' MSSQL_PID='Enterprise' MSSQL_SA_PASSWORD='s3curePasswordString' /opt/mssql/bin/mssql-conf setup
+      - sudo firewall-offline-cmd --add-port=1433/tcp
+      - sudo systemctl enable firewalld
+      - sudo systemctl start firewalld
+      - sudo systemctl start mssql-server
+      - until /opt/mssql-tools18/bin/sqlcmd -S 127.0.0.1 -U SA -P 's3curePasswordString' -C -No -Q 'SELECT 1' 2>/dev/null; do sleep 3; done
+      - sudo systemctl status mssql-server
+      - /opt/mssql-tools18/bin/sqlcmd -S 127.0.0.1 -U SA -P 's3curePasswordString' -C -No -Q "IF NOT EXISTS (SELECT name FROM sys.databases WHERE name='tpcc') CREATE DATABASE tpcc"
+      - ln -sf /opt/mssql-tools18/bin/sqlcmd /usr/local/bin/sqlcmd || true
+      - ln -sf /opt/mssql-tools18/bin/bcp /usr/local/bin/bcp || true
+      - export HOME=/root
+      - export TMP=/tmp
+      - export TEMP=/tmp
+      - export PATH=$PATH:/opt/mssql-tools18/bin:/opt/mssql-tools/bin
+      - curl -LO https://github.com/TPC-Council/HammerDB/releases/download/v4.12/HammerDB-4.12-Linux.tar.gz
+      - tar -xf HammerDB-4.12-Linux.tar.gz -C /opt
+      - mv /opt/HammerDB-4.12 /hammer
+      - rm -f HammerDB-4.12-Linux.tar.gz
+      - echo @@~@@START-WORKLOAD@@~@@
+      - |
+        export MSSQL_HOST=127.0.0.1
+        cd /hammer && ./hammerdbcli auto /creator/createdb_mssql.tcl 2>&1 | tee /tmp/hammerdb-createdb.log
+        cd /hammer && ./hammerdbcli auto /workload/workload_mssql.tcl 2>&1 | tee /tmp/hammerdb-workload.log
+      - python3 /parse-results/parse_results.py
+      - echo @@~@@END-WORKLOAD@@~@@
+---
+{%- if storage_type == 'lso' %}
+apiVersion: local.storage.openshift.io/v1
+kind: LocalVolume
+metadata:
+  name: local-disks
+  namespace: openshift-local-storage
+spec:
+  nodeSelector:
+    nodeSelectorTerms:
+    - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - {{ lso_node }}
+  storageClassDevices:
+    - storageClassName: local-sc
+      volumeMode: Block
+      devicePaths:
+        - /dev/disk/by-id/{{ lso_disk_id }}
+---
+{%- endif %}
+{%- if storage_type == 'lso' or odf_pvc == True %}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: hammerdb-mssql-pvc-claim
+  namespace: benchmark-runner
+spec:
+  {%- if storage_type == 'lso' %}
+  storageClassName: local-sc
+  {%- else %}
+  storageClassName: ocs-storagecluster-ceph-rbd
+  {%- endif %}
+  accessModes: [ "ReadWriteOnce" ]
+  volumeMode: Block
+  resources:
+    requests:
+      storage: {{ storage }}
+---
+{%- endif %}
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: hammerdb-mssql-vm-{{ trunc_uuid }}
+  namespace: benchmark-runner
+  labels:
+    app: hammerdb-mssql-vm-{{ trunc_uuid }}
+    benchmark-uuid: {{ uuid }}
+    benchmark-runner-workload: hammerdb-mssql
+spec:
+  runStrategy: Always
+  template:
+    metadata:
+      labels:
+        kubevirt-vm: hammerdb-mssql
+    spec:
+      {%- if pin_node2 %}
+      nodeSelector:
+        kubernetes.io/hostname: "{{ pin_node2 }}"
+      {%- endif %}
+      domain:
+        cpu:
+          sockets: {{ sockets }}
+          cores: {{ cores }}
+        devices:
+          disks:
+            - disk:
+                bus: virtio
+              name: containerdisk
+            - disk:
+                bus: virtio
+              name: cloudinitdisk
+            {%- if storage_type == 'lso' or odf_pvc == True %}
+            - disk:
+                bus: virtio
+              name: data-volume
+              serial: data
+            {%- endif %}
+            - disk: {}
+              name: hammerdb-creator-volume
+              serial: CVLY623300HK240C
+            - disk: {}
+              name: hammerdb-workload-volume
+              serial: CVLY623300HK240D
+            - disk: {}
+              name: hammerdb-mssql-results-parser-volume
+              serial: CVLY623300HK240E
+        machine:
+          type: ""
+        resources:
+          requests:
+            memory: "{{ vm_requests_memory }}"
+          limits:
+            memory: "{{ vm_limits_memory }}"
+      terminationGracePeriodSeconds: 180
+      volumes:
+        - containerDisk:
+            image: quay.io/benchmark-runner/mssql-container-disk:2022-centos9
+          name: containerdisk
+        - cloudInitNoCloud:
+            secretRef:
+              name: hammerdb-mssql-cloudinit
+          name: cloudinitdisk
+        {%- if storage_type == 'lso' or odf_pvc == True %}
+        - persistentVolumeClaim:
+            claimName: hammerdb-mssql-pvc-claim
+          name: data-volume
+        {%- endif %}
+        - configMap:
+            name: hammerdb-mssql-creator
+          name: hammerdb-creator-volume
+        - configMap:
+            name: hammerdb-mssql-workload
+          name: hammerdb-workload-volume
+        - configMap:
+            name: hammerdb-mssql-results-parser
+          name: hammerdb-mssql-results-parser-volume

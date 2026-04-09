@@ -1,0 +1,203 @@
+{%- if storage_type == 'lso' %}
+apiVersion: local.storage.openshift.io/v1
+kind: LocalVolume
+metadata:
+  name: local-disks
+  namespace: openshift-local-storage
+spec:
+  nodeSelector:
+    nodeSelectorTerms:
+    - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - {{ lso_node }}
+  storageClassDevices:
+    - storageClassName: local-sc
+      volumeMode: Filesystem
+      fsType: ext4
+      devicePaths:
+        - /dev/disk/by-id/{{ lso_disk_id }}
+---
+{%- endif %}
+{%- if storage_type == 'lso' or odf_pvc == True %}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+    name: postgres-persistent-storage
+    namespace: benchmark-runner
+spec:
+    {%- if storage_type == 'lso' %}
+    storageClassName: local-sc
+    {%- else %}
+    storageClassName: ocs-storagecluster-ceph-rbd
+    {%- endif %}
+    accessModes: [ "ReadWriteOnce" ]
+    volumeMode: Filesystem
+    resources:
+      requests:
+        storage: {{ storage }}
+---
+{%- endif %}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-custom-config
+  namespace: benchmark-runner
+data:
+  custom.pg_hba.conf: |
+    # TYPE  DATABASE        USER            ADDRESS                 METHOD
+    # "local" is for Unix domain socket connections only
+    local   all             all                                     trust
+    # IPv4 local connections:
+    host    all             all             all            trust
+  custom.perf.conf: |
+    autovacuum = 'off'
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+  namespace: benchmark-runner
+spec:
+  selector:
+    matchLabels:
+      app: postgres
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: postgres
+        type: postgres-database-server
+    spec:
+      {%- if pin_node2 %}
+      nodeSelector:
+        kubernetes.io/hostname: "{{ pin_node2 }}"
+      {%- endif %}
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: postgres
+          image: quay.io/benchmark-runner/postgresql:13-c9s
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 5432
+          resources:
+            requests:
+              cpu: {{ database_requests_cpu }}
+              memory: {{ database_requests_memory }}
+            limits:
+              cpu: {{ database_limits_cpu }}
+              memory: {{ database_limits_memory }}
+          env:
+            - name: POSTGRESQL_USER
+              value: "test"
+            - name: POSTGRESQL_PASSWORD
+              value: "test"
+            - name: POSTGRESQL_DATABASE
+              value: "test"
+            - name: POSTGRESQL_ADMIN_PASSWORD
+              value: "postgres"
+          volumeMounts:
+            - name: postgres-custom-config
+              mountPath: /var/lib/pgsql/data/pg_hba.conf
+              subPath: custom.pg_hba.conf
+            - name: postgres-custom-config
+              mountPath: /opt/app-root/src/postgresql-cfg/perf.conf
+              subPath: custom.perf.conf
+            {%- if storage_type == 'lso' or odf_pvc == True %}
+            - name: postgres-persistent-storage
+              mountPath: /var/lib/pgsql/data
+              readOnly: false
+            {%- endif %}
+      volumes:
+        - name: postgres-custom-config
+          configMap:
+            name: postgres-custom-config
+        {%- if storage_type == 'lso' or odf_pvc == True %}
+        - name: postgres-persistent-storage
+          persistentVolumeClaim:
+            claimName: postgres-persistent-storage
+        {%- endif %}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-deployment
+  namespace: benchmark-runner
+spec:
+  selector:
+    app: postgres
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: hammerdb-postgres-pod-{{ trunc_uuid }}
+  namespace: benchmark-runner
+  labels:
+    app: hammerdb-postgres-pod-{{ trunc_uuid }}
+    benchmark-uuid: {{ uuid }}
+spec:
+  restartPolicy: Never
+  {%- if pin_node1 %}
+  nodeSelector:
+    kubernetes.io/hostname: "{{ pin_node1 }}"
+  {%- endif %}
+  volumes:
+    - name: hammerdb-creator
+      configMap:
+        name: hammerdb-postgres-creator
+        defaultMode: 0640
+    - name: hammerdb-workload
+      configMap:
+        name: hammerdb-postgres-workload
+        defaultMode: 0640
+    - name: hammerdb-postgres-results-parser
+      configMap:
+        name: hammerdb-postgres-results-parser
+        defaultMode: 0640
+  initContainers:
+    - name: wait-for-postgres
+      image: quay.io/benchmark-runner/hammerdb-pod:centos9
+      command: ["/bin/sh", "-c"]
+      args:
+        - until python3 -c "import socket; s=socket.socket(); s.settimeout(2); s.connect(('$POSTGRES_HOST', 5432)); s.close()" 2>/dev/null; do echo "Waiting for PostgreSQL..."; sleep 3; done
+      env:
+        - name: POSTGRES_HOST
+          value: "postgres-deployment"
+  containers:
+    - name: hammerdb
+      image: quay.io/benchmark-runner/hammerdb-pod:centos10
+      imagePullPolicy: Always
+      env:
+        - name: POSTGRES_HOST
+          value: "postgres-deployment"
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          cd /hammer
+          echo "=== STEP 1: CREATE DB ==="
+          ./hammerdbcli auto /creator/createdb_postgres.tcl 2>&1 | tee /tmp/hammerdb-createdb.log
+          echo "=== STEP 2: RUN WORKLOAD ==="
+          ./hammerdbcli auto /workload/workload_postgres.tcl 2>&1 | tee /tmp/hammerdb-workload.log
+          python3 /parse-results/parse_results.py
+      volumeMounts:
+        - name: hammerdb-creator
+          mountPath: /creator
+          readOnly: false
+        - name: hammerdb-workload
+          mountPath: /workload
+          readOnly: false
+        - name: hammerdb-postgres-results-parser
+          mountPath: /parse-results
+          readOnly: false
+      resources:
+        requests:
+          cpu: "{{ requests_cpu }}"
+          memory: "{{ requests_memory }}"
+        limits:
+          cpu: "{{ limits_cpu }}"
+          memory: "{{ limits_memory }}"

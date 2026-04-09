@@ -1,0 +1,149 @@
+# Tcl benchmark params map to hammerdb_data_template.yaml:
+#   db_warehouses, db_num_workers  -> perf_ci (e.g. 96, 32) or default run_type
+#   transactions, rampup, runtime  -> shared section
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hammerdb-mssql-creator
+  namespace: "{{ namespace }}"
+data:
+  createdb_mssql.tcl: |
+    puts "SETTING CONFIGURATION"
+    global complete
+    proc wait_to_complete {} {
+        global complete
+        set complete [vucomplete]
+        if {!$complete} { after 5000 wait_to_complete } else { exit }
+    }
+    puts "SETTING CONFIGURATION"
+    dbset db mssqls
+    dbset bm TPC-C
+    set mssql_host [expr {[info exists env(MSSQL_HOST)] ? $env(MSSQL_HOST) : "127.0.0.1"}]
+    diset connection mssqls_server $mssql_host
+    diset connection mssqls_linux_server $mssql_host
+    diset connection mssqls_tcp true
+    diset connection mssqls_port 1433
+    diset connection mssqls_azure false
+    diset connection mssqls_authentication windows
+    diset connection mssqls_linux_authent sql
+    diset connection mssqls_odbc_driver "ODBC Driver 18 for SQL Server"
+    diset connection mssqls_linux_odbc "ODBC Driver 18 for SQL Server"
+    diset connection mssqls_uid SA
+    diset connection mssqls_pass s3curePasswordString
+    diset tpcc mssqls_count_ware {{ db_warehouses }}
+    diset tpcc mssqls_num_vu {{ db_num_workers }}
+    diset tpcc mssqls_dbase tpcc
+    diset tpcc mssqls_imdb false
+    diset tpcc mssqls_bucket 1
+    diset tpcc mssqls_durability SCHEMA_AND_DATA
+    diset tpcc mssqls_checkpoint false
+    puts "CREATING SCHEMA"
+    buildschema
+    wait_to_complete
+    vwait forever
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hammerdb-mssql-workload
+  namespace: "{{ namespace }}"
+data:
+  workload_mssql.tcl: |
+    proc runtimer { seconds } {
+    set x 0
+    set timerstop 0
+    while {!$timerstop} {
+    incr x
+    after 1000
+      if { ![ expr {$x % 60} ] } {
+              set y [ expr $x / 60 ]
+              puts "Timer: $y minutes elapsed"
+      }
+    update
+    if { [ vucomplete ] || $x eq $seconds } { set timerstop 1 }
+        }
+    return
+    }
+    puts "SETTING DB CONFIGURATION"
+    dbset db mssqls
+    dbset bm TPC-C
+    puts "SETTING CONNECTION OPTIONS"
+    set mssql_host [expr {[info exists env(MSSQL_HOST)] ? $env(MSSQL_HOST) : "127.0.0.1"}]
+    diset connection mssqls_server $mssql_host
+    diset connection mssqls_linux_server $mssql_host
+    diset connection mssqls_tcp true
+    diset connection mssqls_port 1433
+    diset connection mssqls_azure false
+    diset connection mssqls_authentication windows
+    diset connection mssqls_linux_authent sql
+    diset connection mssqls_odbc_driver "ODBC Driver 18 for SQL Server"
+    diset connection mssqls_linux_odbc "ODBC Driver 18 for SQL Server"
+    diset connection mssqls_uid SA
+    diset connection mssqls_pass s3curePasswordString
+    puts "SETTING BENCHMARK OPTIONS"
+    diset tpcc mssqls_count_ware {{ db_warehouses }}
+    diset tpcc mssqls_num_vu {{ db_num_workers }}
+    diset tpcc mssqls_dbase tpcc
+    diset tpcc mssqls_imdb false
+    diset tpcc mssqls_bucket 1
+    diset tpcc mssqls_durability SCHEMA_AND_DATA
+    diset tpcc mssqls_total_iterations {{ transactions }}
+    diset tpcc mssqls_raiseerror false
+    diset tpcc mssqls_keyandthink false
+    diset tpcc mssqls_checkpoint false
+    diset tpcc mssqls_driver timed
+    diset tpcc mssqls_rampup {{ rampup }}
+    diset tpcc mssqls_duration {{ runtime }}
+    diset tpcc mssqls_allwarehouse false
+    diset tpcc mssqls_timeprofile false
+    diset tpcc mssqls_async_scale false
+    diset tpcc mssqls_async_client 10
+    diset tpcc mssqls_async_verbose false
+    diset tpcc mssqls_async_delay 1000
+    vuset logtotemp 1
+    loadscript
+    puts "SEQUENCE STARTED"
+    set workers {{ db_num_workers }}
+    set transactions {{ transactions }}
+    set samples 1
+    for {set w 1} { $w <= $workers } { set w [expr {$w*2}] } {
+    puts "$w VU TEST"
+    for {set i 1} {$i <= $samples} {incr i} {
+        puts "============ RUNNING SAMPLE $i: $w WORKERS ============"
+        vuset vu $w
+        vucreate
+        vurun
+        set calculation [expr { ( {{ rampup }} + {{ runtime }} ) * 60 * 1.4 }]
+        set runtimer_seconds [expr int($calculation)]
+        runtimer $runtimer_seconds
+        runtimer 350
+        vudestroy
+        after 5000
+        }
+    }
+    puts "SEQUENCE COMPLETE"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hammerdb-mssql-results-parser
+  namespace: "{{ namespace }}"
+data:
+  parse_results.py: |
+    import re, json
+    results = []
+    current_vu = 0
+    with open('/tmp/hammerdb-workload.log') as f:
+        for line in f:
+            m = re.match(r'^(\d+) VU TEST', line)
+            if m:
+                current_vu = int(m.group(1))
+            m = re.search(r'System achieved \d+ NOPM from (\d+) SQL Server TPM', line)
+            if m and current_vu:
+                tpm = int(m.group(1))
+                results.append({"current_worker": current_vu, "thread": current_vu, "tpm": tpm})
+    output = json.dumps(results, indent=2)
+    with open('/tmp/hammerdb-results.json', 'w') as f:
+        f.write(output)
+    print("=== JSON RESULTS ===")
+    print(output)
