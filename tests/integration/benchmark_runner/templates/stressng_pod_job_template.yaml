@@ -1,0 +1,110 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: benchmark-runner
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: stressng-workload-test123
+  namespace: benchmark-runner
+data:
+  jobfile: |
+    run sequential
+    verbose
+    metrics-brief
+    timeout 10
+    cpu 1
+    cpu-load 100
+    cpu-method all
+    vm 1
+    vm-bytes 128M
+    vm-keep
+    vm-populate
+    memcpy 1
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: stressng-pod-test123
+  namespace: benchmark-runner
+spec:
+  parallelism: 1
+  backoffLimit: 0
+  activeDeadlineSeconds: 300
+  template:
+    metadata:
+      labels:
+        app: stressng_workload-test123
+        type: stressng-bench-workload-test123
+        benchmark-uuid: test-uuid-123
+        benchmark-runner-workload: stressng
+    spec:
+      containers:
+      - name: stressng
+        image: quay.io/benchmark-runner/stressng:latest
+        imagePullPolicy: Always
+        env:
+          - name: uuid
+            value: "test-uuid-123"
+          - name: test_user
+            value: "user"
+          - name: runtype
+            value: "sequential"
+          - name: timeout
+            value: "10"
+          - name: cpu_stressors
+            value: "1"
+          - name: cpu_percentage
+            value: "100"
+          - name: cpu_method
+            value: "all"
+          - name: vm_stressors
+            value: "1"
+          - name: vm_bytes
+            value: "128M"
+          - name: mem_stressors
+            value: "1"
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            set -e
+            cd /tmp
+            stress-ng --job /workload/jobfile --log-file /tmp/stressng.log -Y /tmp/stressng.yml || exit 1
+            if [ -f /tmp/stressng.yml ] && python3 -c 'import yaml' 2>/dev/null; then
+              python3 << 'PYEOF'
+            import yaml, json, os
+            from datetime import datetime, timezone
+            try:
+                with open("/tmp/stressng.yml") as f:
+                    d = yaml.safe_load(f)
+            except Exception:
+                d = {}
+            metrics = d.get("metrics", [])
+            doc = {
+                "workload": "stressng",
+                "kind": "pod",
+                "runtype": os.environ.get("runtype", ""),
+                "timeout": int(os.environ.get("timeout", 0) or 0),
+            }
+            for m in metrics:
+                s = m.get("stressor", "")
+                b = m.get("bogo-ops", 0)
+                doc[s] = b
+                if s == "cpu": doc["cpu_bogomips"] = b
+                elif s == "vm": doc["vm_bogomips"] = b
+            bogo_total = sum(doc.get(s, 0) for s in ["cpu", "vm", "mem", "memcpy"])
+            doc["bogo_ops"] = bogo_total
+            print(json.dumps(doc))
+            PYEOF
+            fi
+        volumeMounts:
+        - name: stressng-workload-volume
+          mountPath: "/workload"
+          readOnly: false
+      volumes:
+      - name: stressng-workload-volume
+        configMap:
+          name: stressng-workload-test123
+          defaultMode: 0660
+      restartPolicy: Never

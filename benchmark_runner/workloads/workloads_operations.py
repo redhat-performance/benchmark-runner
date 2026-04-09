@@ -51,6 +51,7 @@ class WorkloadsOperations:
         self._run_artifacts_url = self._environment_variables_dict.get('run_artifacts_url', '')
         self._pin_node1 = self._environment_variables_dict.get('pin_node1', '')
         self._pin_node2 = self._environment_variables_dict.get('pin_node2', '')
+        self._pin_node_benchmark_operator = self._environment_variables_dict.get('pin_node_benchmark_operator', '')
         self._es_host = self._environment_variables_dict.get('elasticsearch', '')
         self._es_port = self._environment_variables_dict.get('elasticsearch_port', '')
         self._es_user = self._environment_variables_dict.get('elasticsearch_user', '')
@@ -87,13 +88,21 @@ class WorkloadsOperations:
                                                            es_password=self._es_password,
                                                            es_url_protocol=self._es_url_protocol,
                                                            timeout=self._timeout)
-        # Generate templates class
-        self._template = TemplateOperations(workload=self._workload)
-
+        # Generate templates class - need Virtctl first for SSH key generation
         # get oc instance
         if WorkloadsOperations.oc is None:
             self._oc = self.get_oc(kubeadmin_password=self._kubeadmin_password)
         self._virtctl = Virtctl()
+
+        # Generate SSH key for VM workloads (needed before template generation)
+        if '_vm' in self._workload:
+            ssh_key_dir = os.path.join(self._run_artifacts_path, 'ssh')
+            os.makedirs(ssh_key_dir, exist_ok=True)
+            self._ssh_key_path = self._virtctl.generate_ssh_key(key_path=os.path.join(ssh_key_dir, 'vm_key'))
+            self._environment_variables_dict['ssh_public_key'] = self._virtctl.get_ssh_public_key(self._ssh_key_path)
+            self._environment_variables_dict['ssh_key_path'] = self._ssh_key_path
+
+        self._template = TemplateOperations(workload=self._workload)
 
         # Prometheus Snapshot
         self._prometheus_result = {}
@@ -316,6 +325,22 @@ class WorkloadsOperations:
             result_list.append(dict(line_dict))
         return result_list
 
+    def _create_run_artifacts(self, workload: str = '', labels: list = None):
+        """
+        This method creates pod logs for direct pod workloads (no operator)
+        :param workload: workload name
+        :param labels: list of pod labels - use when pod labels differ from workload name
+        :return: run artifacts url
+        """
+        # Create pod logs for workload pods
+        if labels:
+            for pod_label in labels:
+                self._create_pod_log(pod=pod_label)
+        elif workload:
+            self._create_pod_log(pod=workload)
+        workload_name = self._workload.replace('_', '-')
+        return os.path.join(self._environment_variables_dict.get('run_artifacts_url', ''), f'{self._get_run_artifacts_hierarchy(workload_name=workload_name, is_file=True)}-{self._time_stamp_format}.tar.gz')
+
     def __make_run_artifacts_tarfile(self, workload: str):
         """
         This method compresses the run artifacts directory and returns the compressed file path.
@@ -425,8 +450,11 @@ class WorkloadsOperations:
                     'vm_os_version':  self._product_versions.get('db_vm_os_version', 'centos-stream9'),
                     'ci_date': datetime.now().strftime(date_format),
                     'uuid': self._uuid,
+                    'run_id': 'NA',
                     'pin_node1': self._pin_node1,
                     'pin_node2': self._pin_node2,
+                    'pin_node_benchmark_operator': self._pin_node_benchmark_operator,
+                    'storage_type': self._storage_type,
                     # display -1 when 0,1 for avoiding conflict with 0/1 status code
                     'odf_disk_count': -1 if self._oc.get_odf_disk_count() in {0, 1} else self._oc.get_odf_disk_count()
 }
@@ -445,8 +473,10 @@ class WorkloadsOperations:
         if 'win' in self._workload:
             metadata.update({'vm_os_version': self._windows_os})
         # for hammerdb
+        if database:
+            metadata.update({'hammerdb_version': self._product_versions.get('hammerdb', 4.0)})
         if database == 'mssql':
-            metadata.update({'db_type': 'mssql', 'db_version': self._product_versions.get('mssql', 2022), 'storage_type':self._storage_type})
+            metadata.update({'db_type': 'mssql', 'db_version': self._product_versions.get('mssql', 2022)})
         if self._test_name:
             metadata.update({'test_name': self._test_name})
         if result:
@@ -485,7 +515,7 @@ class WorkloadsOperations:
         self._es_operations.upload_to_elasticsearch(index=index, data=self.__get_metadata(kind=kind, status=status, result=result))
 
     @logger_time_stamp
-    def _update_elasticsearch_index(self, index: str, id: str, kind: str, status: str, run_artifacts_url: str, database: str = '', vm_name: str = '', data_updated: bool = False):
+    def _update_elasticsearch_index(self, index: str, id: str, kind: str, status: str, run_artifacts_url: str, database: str = '', vm_name: str = '', data_updated: bool = False, prometheus_result: dict = None):
         """
         This method updates elasticsearch id
         :param index:
@@ -495,22 +525,24 @@ class WorkloadsOperations:
         :param status:
         :param run_artifacts_url:
         :param data_updated: check if data was updated
+        :param prometheus_result:
         :return:
         """
-        metadata = self.__get_metadata(kind=kind, database=database, status=status, run_artifacts_url=run_artifacts_url)
+        metadata = self.__get_metadata(kind=kind, database=database, status=status, run_artifacts_url=run_artifacts_url, prometheus_result=prometheus_result)
         if vm_name:
             metadata.update({'vm_name': vm_name})
             metadata.update({'data_updated': data_updated})
         self._es_operations.update_elasticsearch_index(index=index, id=id, metadata=metadata)
 
-    def _verify_elasticsearch_data_uploaded(self, index: str, uuid: str):
+    def _verify_elasticsearch_data_uploaded(self, index: str, uuid: str, timeout: int = None):
         """
         This method verifies that elasticsearch data was uploaded
         :param index:
         :param uuid:
+        :param timeout:
         :return:
         """
-        self._es_operations.verify_elasticsearch_data_uploaded(index=index, uuid=uuid)
+        return self._es_operations.verify_elasticsearch_data_uploaded(index=index, uuid=uuid, timeout=timeout)
 
     def __parse_duration(self, value):
         try:
@@ -519,14 +551,12 @@ class WorkloadsOperations:
             return None
 
     @logger_time_stamp
-    def update_ci_status(self, status: str, ci_minutes_time: int, benchmark_runner_id: str, benchmark_operator_id: str, benchmark_wrapper_id: str, ocp_install_minutes_time: int = 0, ocp_resource_install_minutes_time: int = 0):
+    def update_ci_status(self, status: str, ci_minutes_time: int, benchmark_runner_id: str, ocp_install_minutes_time: int = 0, ocp_resource_install_minutes_time: int = 0):
         """
         This method updates ci status Pass/Failed
         :param status: Pass/Failed
         :param ci_minutes_time: ci time in minutes
         :param benchmark_runner_id: benchmark_runner last repository commit id
-        :param benchmark_operator_id: benchmark_operator last repository commit id
-        :param benchmark_wrapper_id: benchmark_wrapper last repository commit id
         :param ocp_install_minutes_time: ocp install minutes time, default 0 because ocp install run once a week
         :param ocp_resource_install_minutes_time: ocp install minutes time, default 0 because ocp install run once a week
         :return:
@@ -542,7 +572,7 @@ class WorkloadsOperations:
         if ocp_resource_install_minutes_time != 0:
             bm_operations = BareMetalOperations(user=self._environment_variables_dict.get('provision_user', ''))
             ocp_install_minutes_time = bm_operations.get_ocp_install_time()
-        metadata.update({'status': status, 'status#': status_dict[status], 'ci_minutes_time': ci_minutes_time, 'benchmark_runner_id': benchmark_runner_id, 'benchmark_operator_id': benchmark_operator_id, 'benchmark_wrapper_id': benchmark_wrapper_id, 'ocp_install_minutes_time': ocp_install_minutes_time, 'ocp_resource_install_minutes_time': ocp_resource_install_minutes_time, 'upgrade_masters_duration_seconds': self.__parse_duration(self._upgrade_masters_duration_seconds), 'upgrade_workers_duration_seconds': self.__parse_duration(self._upgrade_workers_duration_seconds)})
+        metadata.update({'status': status, 'status#': status_dict[status], 'ci_minutes_time': ci_minutes_time, 'benchmark_runner_id': benchmark_runner_id, 'ocp_install_minutes_time': ocp_install_minutes_time, 'ocp_resource_install_minutes_time': ocp_resource_install_minutes_time, 'upgrade_masters_duration_seconds': self.__parse_duration(self._upgrade_masters_duration_seconds), 'upgrade_workers_duration_seconds': self.__parse_duration(self._upgrade_workers_duration_seconds)})
         self._es_operations.upload_to_elasticsearch(index=es_index, data=metadata)
 
     @logger_time_stamp

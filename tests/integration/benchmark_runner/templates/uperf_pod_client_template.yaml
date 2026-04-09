@@ -1,0 +1,72 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: uperf-client-test123
+  namespace: benchmark-runner
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        benchmark-uuid: test-uuid-123
+        workload: uperf
+        role: client
+        app: uperf-bench-client
+        type: uperf-bench-client-test123
+    spec:
+      containers:
+      - name: benchmark
+        image: quay.io/benchmark-runner/uperf:latest
+        env:
+          - name: uuid
+            value: "test-uuid-123"
+          - name: test_user
+            value: "user"
+          - name: clustername
+            value: ""
+          - name: client_node
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
+          - name: server_node
+            value: "unknown"
+          - name: server_ip
+            value: "SERVER_IP_PLACEHOLDER"
+          - name: run_id
+            value: "NA"
+          - name: port
+            value: "30000"
+          - name: hostnetwork
+            value: "False"
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+        imagePullPolicy: Always
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            export h="SERVER_IP_PLACEHOLDER"
+            export port=30000
+            # Simple stream test
+            cat > /tmp/uperf-test.xml << 'XMLEOF'
+            <?xml version="1.0"?>
+            <profile name="stream-tcp-64-64-1">
+              <group nthreads="1">
+                <transaction iterations="1">
+                  <flowop type="connect" options="remotehost=SERVER_IP_PLACEHOLDER protocol=tcp port=30001"/>
+                </transaction>
+                <transaction duration="2">
+                  <flowop type="write" options="count=16 size=64"/>
+                </transaction>
+                <transaction iterations="1">
+                  <flowop type="disconnect"/>
+                </transaction>
+              </group>
+            </profile>
+            XMLEOF
+            sed -i "s/SERVER_IP_PLACEHOLDER/$h/g" /tmp/uperf-test.xml
+            uperf -v -a -R -i 1 -m /tmp/uperf-test.xml -P 30000 > /tmp/uperf-out.out 2>&1
+            echo '{"test_type":"stream","protocol":"tcp","message_size":64,"num_threads":1,"bytes":0,"ops":0,"norm_byte":0,"norm_ops":0,"norm_ltcy":0,"duration":2}'
+            exit 0
+      restartPolicy: Never

@@ -1,82 +1,235 @@
-apiVersion: ripsaw.cloudbulldozer.io/v1alpha1
-kind: Benchmark
+apiVersion: v1
+kind: Secret
 metadata:
- name: uperf-vm
- namespace: benchmark-operator
+  name: uperf-client-cloudinit-deadbeef
+  namespace: benchmark-runner
+stringData:
+  userdata: |
+    #cloud-config
+    user: fedora
+    password: fedora
+    chpasswd: { expire: False }
+    ssh_pwauth: true
+    packages:
+      - uperf
+    write_files:
+      - path: /tmp/uperf_parser.py
+        permissions: '0755'
+        content: |
+          #!/usr/bin/env python3
+          import re, json, sys
+
+          def parse_single_test(output_section, test_type='stream', protocol='tcp', message_size=64, num_threads=1):
+              result = {
+                  'test_type': test_type, 'protocol': protocol,
+                  'message_size': message_size, 'num_threads': num_threads,
+                  'bytes': 0, 'ops': 0, 'norm_byte': 0, 'norm_ops': 0,
+                  'norm_ltcy': 0.0, 'duration': 0
+              }
+              ts_results = re.findall(r'timestamp_ms:([\d.]+)\s+name:Txn2\s+nr_bytes:(\d+)\s+nr_ops:(\d+)', output_section)
+              if len(ts_results) > 1:
+                  first_ts = float(ts_results[0][0])
+                  last_ts = float(ts_results[-1][0])
+                  total_bytes = int(ts_results[-1][1])
+                  total_ops = int(ts_results[-1][2])
+                  duration_sec = (last_ts - first_ts) / 1000.0
+                  if duration_sec > 0:
+                      result['bytes'] = total_bytes
+                      result['norm_byte'] = total_bytes / duration_sec
+                      result['ops'] = total_ops
+                      result['norm_ops'] = total_ops / duration_sec
+                      result['duration'] = int(duration_sec)
+                      lat_samples = []
+                      prev_ts, prev_ops = float(ts_results[0][0]), int(ts_results[0][2])
+                      for ts_str, _, ops_str in ts_results[1:]:
+                          ts, ops = float(ts_str), int(ops_str)
+                          norm_ops = ops - prev_ops
+                          if norm_ops > 0 and prev_ts > 0:
+                              lat_samples.append(((ts - prev_ts) / norm_ops) * 1000)
+                          prev_ts, prev_ops = ts, ops
+                      if lat_samples:
+                          lat_samples.sort()
+                          rank = 0.95 * (len(lat_samples) - 1)
+                          lower = int(rank)
+                          frac = rank - lower
+                          result['norm_ltcy'] = round(lat_samples[lower] + frac * (lat_samples[min(lower + 1, len(lat_samples) - 1)] - lat_samples[lower]), 4)
+              return result
+
+          output = open(sys.argv[1]).read()
+          test_sections = re.split(r'=== TEST (\S+) ===', output)
+          results = []
+          i = 1
+          while i < len(test_sections) - 1:
+              test_name = test_sections[i]
+              test_output = test_sections[i + 1]
+              i += 2
+              parts = test_name.split('-')
+              if len(parts) >= 5:
+                  tt, proto, sz, nt = parts[0], parts[1], int(parts[2]), int(parts[4])
+              else:
+                  tt, proto, sz, nt = 'stream', 'tcp', 64, 1
+              results.append(parse_single_test(test_output, tt, proto, sz, nt))
+          if not results:
+              results.append(parse_single_test(output))
+          json.dump(results, open(sys.argv[2], 'w'))
+    runcmd:
+      - export HOME=/root
+      - export TMP=/tmp
+      - export TEMP=/tmp
+      - dnf install -y uperf || true
+      - for nic in $(ls /sys/class/net/ | grep -v lo); do ethtool -L $nic combined $(nproc) 2>/dev/null; done || true
+      - sleep 30
+      - |
+        SERVER=""
+        RT="60"
+        for tt in stream rr; do
+          for sz in 64 1024 8192; do
+            for nt in 1 8; do
+              XML=/tmp/uperf_test.xml
+              if [ "$tt" = "rr" ]; then
+                printf '<?xml version="1.0"?>\n<profile name="%s-tcp-%s-%s-%s">\n  <group nthreads="%s">\n    <transaction iterations="1">\n      <flowop type="connect" options="remotehost=%s protocol=tcp port=30001"/>\n    </transaction>\n    <transaction duration="%s">\n      <flowop type="write" options="size=%s"/>\n      <flowop type="read" options="size=%s"/>\n    </transaction>\n    <transaction iterations="1">\n      <flowop type="disconnect"/>\n    </transaction>\n  </group>\n</profile>\n' "$tt" "$sz" "$sz" "$nt" "$nt" "$SERVER" "$RT" "$sz" "$sz" > $XML
+              else
+                printf '<?xml version="1.0"?>\n<profile name="%s-tcp-%s-%s-%s">\n  <group nthreads="%s">\n    <transaction iterations="1">\n      <flowop type="connect" options="remotehost=%s protocol=tcp port=30001"/>\n    </transaction>\n    <transaction duration="%s">\n      <flowop type="write" options="count=16 size=%s"/>\n    </transaction>\n    <transaction iterations="1">\n      <flowop type="disconnect"/>\n    </transaction>\n  </group>\n</profile>\n' "$tt" "$sz" "$sz" "$nt" "$nt" "$SERVER" "$RT" "$sz" > $XML
+              fi
+              echo "=== TEST $tt-tcp-$sz-$sz-$nt ===" >> /tmp/uperf_output.txt
+              uperf -v -R -m $XML -P 30000 >> /tmp/uperf_output.txt 2>/dev/null
+            done
+          done
+        done
+      - python3 /tmp/uperf_parser.py /tmp/uperf_output.txt /tmp/uperf.json
+---
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: uperf-server-deadbeef
+  namespace: benchmark-runner
+  labels:
+    app: uperf-server-deadbeef
+    type: uperf-server-deadbeef
+    benchmark-uuid: deadbeef-0123-3210-cdef-01234567890abcdef
+    benchmark-runner-workload: uperf
+    role: server
 spec:
- clustername: test-cluster
- test_user: user # user is a key that points to user triggering benchmark-operator, useful to search results in ES
- system_metrics:
-    collection: True
-    prom_url: "https://prometheus-k8s.openshift-monitoring.svc.cluster.local:9091"
-    es_url: "http://elasticsearch.example.com:gol9999"
-    prom_token: "fake_prom_token"
-    metrics_profile: "node-metrics.yml"
-    index_name: system-metrics
- elasticsearch:
-    url: "http://elasticsearch.example.com:gol9999"
-    index_name: uperf
- metadata:
-   collection: false
- cleanup: false
- workload:
-   name: uperf
-   args:
-     hostnetwork: false # irrelevant for vms
-     serviceip: false # irrelevant for vms
-     networkpolicy: False
-     pin: True
-     pin_server: "pin-node-1"
-     pin_client: "pin-node-2"
-     samples: 1
-     pair: 1
-     test_types:
-       - stream
-       - rr
-     protos:
-       - tcp
-     sizes:
-       - 64
-       - 1024
-       - 8192
-     nthrs:
-       - 1
-       - 8
-     runtime: 60
-     kind: vm
-     server_vm:
-       dedicatedcpuplacement: false
-       sockets: 8
-       cores: 1
-       threads: 1
-       image: quay.io/benchmark-runner/fedora-container-disk:43
-       limits:
-         memory: 8Gi
-       requests:
-         memory: 8Gi
-       network:
-         front_end: masquerade
-         multiqueue:
-           enabled: true
-           queues: 8 # must be given if enabled is set to true and ideally should be set to vcpus ideally so sockets*threads*cores, your image must've ethtool installed
-       extra_options:
-         - none
-         #- hostpassthrough
-     client_vm:
-       dedicatedcpuplacement: false
-       sockets: 8
-       cores: 1
-       threads: 1
-       image: quay.io/benchmark-runner/fedora-container-disk:43
-       limits:
-         memory: 8Gi
-       requests:
-         memory: 8Gi
-       network:
-         front_end: masquerade
-         multiqueue:
-           enabled: true
-           queues: 8 # must be given if enabled is set to true and ideally should be set to vcpus ideally so sockets*threads*cores, your image must've ethtool installed
-       extra_options:
-         - none
-         #- hostpassthrough
+  running: true
+  template:
+    metadata:
+      labels:
+        kubevirt-vm: uperf-server
+        app: uperf-server-deadbeef
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: 'pin-node-1'
+      domain:
+        cpu:
+          sockets: 8
+          cores: 1
+          threads: 1
+        devices:
+          disks:
+            - disk:
+                bus: virtio
+              name: containerdisk
+            - disk:
+                bus: virtio
+              name: cloudinitdisk
+          interfaces:
+            - name: default
+              masquerade: {}
+              ports:
+                - port: 30000
+                - port: 30001
+          networkInterfaceMultiqueue: true
+        machine:
+          type: ""
+        resources:
+          requests:
+            cpu: 8
+            memory: 8Gi
+          limits:
+            cpu: 8
+            memory: 8Gi
+      terminationGracePeriodSeconds: 180
+      networks:
+        - name: default
+          pod: {}
+      volumes:
+        - name: containerdisk
+          containerDisk:
+            image: quay.io/benchmark-runner/fedora-container-disk:43
+        - name: cloudinitdisk
+          cloudInitNoCloud:
+            userData: |
+              #cloud-config
+              user: fedora
+              password: fedora
+              chpasswd: { expire: False }
+              ssh_pwauth: true
+              packages:
+                - uperf
+              runcmd:
+                - export HOME=/root
+                - export TMP=/tmp
+                - export TEMP=/tmp
+                - for nic in $(ls /sys/class/net/ | grep -v lo); do ethtool -L $nic combined $(nproc) 2>/dev/null; done || true
+                - uperf -s -P 30000 > /tmp/uperf_server.log 2>&1 &
+                - sleep infinity
+---
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: uperf-client-deadbeef
+  namespace: benchmark-runner
+  labels:
+    app: uperf-client-deadbeef
+    type: uperf-client-deadbeef
+    benchmark-uuid: deadbeef-0123-3210-cdef-01234567890abcdef
+    benchmark-runner-workload: uperf
+    role: client
+spec:
+  runStrategy: Once
+  template:
+    metadata:
+      labels:
+        kubevirt-vm: uperf-client
+        app: uperf-client-deadbeef
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: 'pin-node-2'
+      domain:
+        cpu:
+          sockets: 8
+          cores: 1
+          threads: 1
+        devices:
+          disks:
+            - disk:
+                bus: virtio
+              name: containerdisk
+            - disk:
+                bus: virtio
+              name: cloudinitdisk
+          interfaces:
+            - name: default
+              masquerade: {}
+          networkInterfaceMultiqueue: true
+        machine:
+          type: ""
+        resources:
+          requests:
+            cpu: 8
+            memory: 8Gi
+          limits:
+            cpu: 8
+            memory: 8Gi
+      terminationGracePeriodSeconds: 180
+      networks:
+        - name: default
+          pod: {}
+      volumes:
+        - name: containerdisk
+          containerDisk:
+            image: quay.io/benchmark-runner/fedora-container-disk:43
+        - name: cloudinitdisk
+          cloudInitNoCloud:
+            secretRef:
+              name: uperf-client-cloudinit-deadbeef
