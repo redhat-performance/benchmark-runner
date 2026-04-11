@@ -1,0 +1,180 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: hammerdb-postgres-cloudinit
+  namespace: benchmark-runner
+stringData:
+  userdata: |-
+    #cloud-config
+    password: centos
+    chpasswd: { expire: False }
+    ssh_pwauth: true
+    {%- if vm_ssh_public_key %}
+    ssh_authorized_keys:
+      - {{ vm_ssh_public_key }}
+    {%- endif %}
+    bootcmd:
+      - "mkdir /creator"
+      - "mount /dev/$(lsblk --nodeps -no name,serial | grep CVLY623300HK240C | cut -f1 -d' ') /creator"
+      - "mkdir /workload"
+      - "mount /dev/$(lsblk --nodeps -no name,serial | grep CVLY623300HK240D | cut -f1 -d' ') /workload"
+      - "mkdir /parse-results"
+      - "mount /dev/$(lsblk --nodeps -no name,serial | grep CVLY623300HK240E | cut -f1 -d' ') /parse-results"
+    runcmd:
+      - sysctl -w vm.overcommit_memory=1
+      - setenforce 0 || true
+      # Unlock QEMU guest agent file/exec RPCs so benchmark-runner can retrieve results
+      - |
+        { grep -v 'FILTER_RPC_ARGS' /etc/sysconfig/qemu-ga 2>/dev/null || true
+          echo 'FILTER_RPC_ARGS=""'
+        } > /tmp/qemu-ga.new && mv /tmp/qemu-ga.new /etc/sysconfig/qemu-ga
+      - systemctl restart qemu-guest-agent || systemctl enable --now qemu-guest-agent || true
+      - mkfs.ext4 /dev/$(lsblk --nodeps -no name,serial | grep "^.*data$" | cut -f1 -d' ') 2>&1 | tee /tmp/mkfs.log
+      - mkdir -p /var/lib/pgsql/data
+      - mount /dev/$(lsblk --nodeps -no name,serial | grep "^.*data$" | cut -f1 -d' ') /var/lib/pgsql/data
+      - chown -R postgres:postgres /var/lib/pgsql/data
+      - restorecon -Rv /var/lib/pgsql/data || true
+      - rm -rf /var/lib/pgsql/data/lost+found
+      - sudo systemctl stop postgresql || true
+      - sudo -u postgres postgresql-setup --initdb || sudo -u postgres initdb -D /var/lib/pgsql/data
+      - echo "local   all             all                                     trust" > /var/lib/pgsql/data/pg_hba.conf
+      - echo "host    all             all             all            trust" >> /var/lib/pgsql/data/pg_hba.conf
+      - echo "autovacuum = off" >> /var/lib/pgsql/data/postgresql.conf
+      - echo "listen_addresses = '*'" >> /var/lib/pgsql/data/postgresql.conf
+      - sudo systemctl start postgresql
+      - until psql -U postgres -c 'SELECT 1' 2>/dev/null; do sleep 2; done
+      - sudo systemctl status postgresql
+      - psql -U postgres -c "ALTER ROLE postgres PASSWORD 'postgres';"
+      - psql -U postgres -c "CREATE DATABASE tpcc;" || true
+      - export HOME=/root
+      - export TMP=/tmp
+      - export TEMP=/tmp
+      - curl -LO https://github.com/TPC-Council/HammerDB/releases/download/v4.12/HammerDB-4.12-Linux.tar.gz
+      - tar -xf HammerDB-4.12-Linux.tar.gz -C /opt
+      - mv /opt/HammerDB-4.12 /hammer
+      - rm -f HammerDB-4.12-Linux.tar.gz
+      - echo @@~@@START-WORKLOAD@@~@@
+      - |
+        export POSTGRES_HOST=127.0.0.1
+        cd /hammer && ./hammerdbcli auto /creator/createdb_postgres.tcl 2>&1 | tee /tmp/hammerdb-createdb.log
+        cd /hammer && ./hammerdbcli auto /workload/workload_postgres.tcl 2>&1 | tee /tmp/hammerdb-workload.log
+      - python3 /parse-results/parse_results.py
+      - echo @@~@@END-WORKLOAD@@~@@
+---
+{%- if storage_type == 'lso' %}
+apiVersion: local.storage.openshift.io/v1
+kind: LocalVolume
+metadata:
+  name: local-disks
+  namespace: openshift-local-storage
+spec:
+  nodeSelector:
+    nodeSelectorTerms:
+    - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - {{ lso_node }}
+  storageClassDevices:
+    - storageClassName: local-sc
+      volumeMode: Block
+      devicePaths:
+        - /dev/disk/by-id/{{ lso_disk_id }}
+---
+{%- endif %}
+{%- if storage_type == 'lso' or odf_pvc == True %}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: hammerdb-postgres-pvc-claim
+  namespace: benchmark-runner
+spec:
+  {%- if storage_type == 'lso' %}
+  storageClassName: local-sc
+  {%- else %}
+  storageClassName: ocs-storagecluster-ceph-rbd
+  {%- endif %}
+  accessModes: [ "ReadWriteOnce" ]
+  volumeMode: Block
+  resources:
+    requests:
+      storage: {{ storage }}
+---
+{%- endif %}
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: hammerdb-postgres-vm-{{ trunc_uuid }}
+  namespace: benchmark-runner
+  labels:
+    app: hammerdb-postgres-vm-{{ trunc_uuid }}
+    benchmark-uuid: {{ uuid }}
+    benchmark-runner-workload: hammerdb-postgres
+spec:
+  runStrategy: Always
+  template:
+    metadata:
+      labels:
+        kubevirt-vm: hammerdb-postgres
+    spec:
+      {%- if pin_node2 %}
+      nodeSelector:
+        kubernetes.io/hostname: "{{ pin_node2 }}"
+      {%- endif %}
+      domain:
+        cpu:
+          sockets: {{ sockets }}
+          cores: {{ cores }}
+        devices:
+          disks:
+            - disk:
+                bus: virtio
+              name: containerdisk
+            - disk:
+                bus: virtio
+              name: cloudinitdisk
+            {%- if storage_type == 'lso' or odf_pvc == True %}
+            - disk:
+                bus: virtio
+              name: data-volume
+              serial: data
+            {%- endif %}
+            - disk: {}
+              name: hammerdb-creator-volume
+              serial: CVLY623300HK240C
+            - disk: {}
+              name: hammerdb-workload-volume
+              serial: CVLY623300HK240D
+            - disk: {}
+              name: hammerdb-postgres-results-parser-volume
+              serial: CVLY623300HK240E
+        machine:
+          type: ""
+        resources:
+          requests:
+            memory: "{{ vm_requests_memory }}"
+          limits:
+            memory: "{{ vm_limits_memory }}"
+      terminationGracePeriodSeconds: 180
+      volumes:
+        - containerDisk:
+            image: quay.io/benchmark-runner/postgresql13-centos9-container-disk:latest
+          name: containerdisk
+        - cloudInitNoCloud:
+            secretRef:
+              name: hammerdb-postgres-cloudinit
+          name: cloudinitdisk
+        {%- if storage_type == 'lso' or odf_pvc == True %}
+        - persistentVolumeClaim:
+            claimName: hammerdb-postgres-pvc-claim
+          name: data-volume
+        {%- endif %}
+        - configMap:
+            name: hammerdb-postgres-creator
+          name: hammerdb-creator-volume
+        - configMap:
+            name: hammerdb-postgres-workload
+          name: hammerdb-workload-volume
+        - configMap:
+            name: hammerdb-postgres-results-parser
+          name: hammerdb-postgres-results-parser-volume

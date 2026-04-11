@@ -25,8 +25,14 @@ class Workloads(WorkloadsOperations):
 
         # kata use pod module - replace kata to pod
         workload = self._workload.replace('kata', 'pod')
+        # For hammerdb workloads the db type is a suffix: hammerdb_vm_mariadb -> hammerdb_vm
+        module_workload = workload
+        if workload.startswith('hammerdb_'):
+            parts = workload.split('_')
+            if len(parts) >= 3:
+                module_workload = '_'.join(parts[:2])
         # load the workload module before doing anything else (in case it fails)
-        workload_module = importlib.import_module(f'benchmark_runner.workloads.{workload}')
+        workload_module = importlib.import_module(f'benchmark_runner.workloads.{module_workload}')
 
         try:
             if not self._verification_only:
@@ -34,7 +40,7 @@ class Workloads(WorkloadsOperations):
             success = True
             # extract workload module and class
             for cls in inspect.getmembers(workload_module, inspect.isclass):
-                if workload.replace('_', '').lower() == cls[0].lower():
+                if module_workload.replace('_', '').lower() == cls[0].lower():
                     if cls[1]().run() == False:
                         success = False
             if not self._verification_only:

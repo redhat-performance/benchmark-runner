@@ -1,0 +1,60 @@
+FROM quay.io/centos/centos:stream10
+
+ARG HAMMERDB_VERSION=4.12
+ENV HAMMERDB_VERSION=${HAMMERDB_VERSION}
+
+RUN curl -sL https://packages.microsoft.com/config/rhel/10/prod.repo -o /etc/yum.repos.d/mssql-release.repo \
+    && ACCEPT_EULA=Y dnf install -y --allowerasing --nogpgcheck \
+        tcl tk unixODBC msodbcsql18 mssql-tools18 unzip which procps-ng curl \
+    && dnf clean all \
+    && ln -sf /usr/lib64/libodbc.so.2 /usr/lib64/libiodbc.so
+
+# Add sqlcmd and bcp to PATH
+ENV PATH="$PATH:/opt/mssql-tools18/bin"
+
+# Set TMP/TEMP for HammerDB Virtual Users
+ENV TMP=/tmp
+ENV TEMP=/tmp
+
+# Postgres
+RUN dnf install -y --allowerasing \
+    tcl \
+    tk \
+    postgresql \
+    postgresql-libs \
+    unzip \
+    which \
+    procps-ng \
+    curl \
+    && dnf clean all
+
+# mysql/mariadb libs for HammerDB mysqltcl on Stream 10
+RUN dnf install -y dnf5-plugins \
+    && dnf config-manager --set-enabled crb 2>/dev/null || true \
+    && dnf install -y --allowerasing \
+    tcl \
+    tk \
+    mariadb-connector-c \
+    mariadb \
+    unzip \
+    which \
+    procps-ng \
+    curl \
+    && ln -sf /usr/lib64/libmariadb.so.3 /usr/lib64/libmysqlclient.so.21 \
+    && dnf clean all
+
+RUN curl -LO https://github.com/TPC-Council/HammerDB/releases/download/v${HAMMERDB_VERSION}/HammerDB-${HAMMERDB_VERSION}-Linux.tar.gz \
+    && tar -xf HammerDB-${HAMMERDB_VERSION}-Linux.tar.gz \
+    && mkdir -p /hammer \
+    && mv HammerDB-${HAMMERDB_VERSION}/* /hammer \
+    && rm -rf HammerDB-${HAMMERDB_VERSION} HammerDB-${HAMMERDB_VERSION}-Linux.tar.gz
+
+ENV LD_LIBRARY_PATH=/usr/lib64:/hammer/lib:${LD_LIBRARY_PATH}
+ENV PATH=/hammer/bin:${PATH}
+
+RUN mkdir -p /opt/scripts
+COPY createdb_mariadb.tcl workload_mariadb.tcl /opt/scripts/
+
+WORKDIR /hammer
+
+CMD ["/bin/bash", "-c", "sleep infinity"]
