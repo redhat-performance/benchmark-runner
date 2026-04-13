@@ -133,7 +133,7 @@ def test_virtctl_ssh_ready_and_wait():
     # Wait for SSH to be ready (cloud-init needs time to install packages + setup SSH)
     import time
     for i in range(0, 180, 5):
-        result = virtctl.virtctl_ssh(vm_name=vm_name, command='echo hello', namespace=namespace, key_path=key_path)
+        result = virtctl.virtctl_ssh(vm_name=vm_name, command='echo hello', namespace=namespace, key_path=key_path, username='fedora')
         if result is not None and 'hello' in result:
             break
         time.sleep(5)
@@ -144,7 +144,7 @@ def test_virtctl_ssh_ready_and_wait():
     local_path = os.path.join(tempfile.mkdtemp(), 'stressng.json')
     assert virtctl.wait_for_vm_workload_completed(vm_name=vm_name, file_path='/tmp/stressng.json',
                                                    local_path=local_path, namespace=namespace,
-                                                   key_path=key_path, timeout=300)
+                                                   key_path=key_path, username='fedora', timeout=300)
     assert os.path.exists(local_path)
 
     # Cleanup

@@ -27,6 +27,7 @@ class UperfVM(WorkloadsOperations):
         self.__client_vm_name = f'uperf-client-{self._trunc_uuid}'
         self.__template_ops = TemplateOperations(workload=self._workload)
         self.__namespace = self._environment_variables_dict['namespace']
+        self.__username = self._environment_variables_dict.get('vm_user', '') or 'fedora'
 
     def save_error_logs(self):
         if self._es_host:
@@ -130,6 +131,7 @@ class UperfVM(WorkloadsOperations):
                 local_path=local_json_path,
                 namespace=self.__namespace,
                 key_path=self._ssh_key_path,
+                username=self.__username,
                 timeout=self._timeout
             )
 

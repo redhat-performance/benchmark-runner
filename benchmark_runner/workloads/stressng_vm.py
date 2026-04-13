@@ -23,6 +23,7 @@ class StressngVM(WorkloadsOperations):
         self.__status = ''
         self.__vm_name = f'{self.__workload_name}-{self._trunc_uuid}'
         self.__namespace = self._environment_variables_dict['namespace']
+        self.__username = self._environment_variables_dict.get('vm_user', '') or 'fedora'
 
     def save_error_logs(self):
         if self._es_host:
@@ -80,6 +81,7 @@ class StressngVM(WorkloadsOperations):
                 local_path=local_json_path,
                 namespace=self.__namespace,
                 key_path=self._ssh_key_path,
+                username=self.__username,
                 timeout=self._timeout
             )
 
