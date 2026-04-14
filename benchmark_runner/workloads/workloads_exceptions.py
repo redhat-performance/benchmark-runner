@@ -32,6 +32,15 @@ class ODFNotInstalled(BenchmarkRunnerError):
         super(ODFNotInstalled, self).__init__(self.message)
 
 
+class EmptyLSOPath(BenchmarkRunnerError):
+    """
+    This class raises an error that LSO disk id is empty
+    """
+    def __init__(self):
+        self.message = "LSO disk id is empty, set 'LSO_DISK_ID' or configure 'worker_disk_ids'"
+        super(EmptyLSOPath, self).__init__(self.message)
+
+
 class MissingScaleNodes(BenchmarkRunnerError):
     """
     This class raises an error for missing scale nodes

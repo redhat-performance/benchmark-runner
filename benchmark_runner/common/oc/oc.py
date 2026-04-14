@@ -29,7 +29,7 @@ class OC(SSH):
     """
 
     SHORT_TIMEOUT = 600
-    # sleep time between checks is 5 sec
+    # sleep time between checks is 3 sec
     SLEEP_TIME = 3
     RETRIES = 10
     DELAY = 30

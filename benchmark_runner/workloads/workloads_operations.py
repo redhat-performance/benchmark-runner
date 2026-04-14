@@ -8,7 +8,7 @@ from csv import DictReader
 from datetime import datetime, timezone, timedelta
 
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp
-from benchmark_runner.workloads.workloads_exceptions import ODFNotInstalled, CNVNotInstalled, KataNotInstalled, MissingScaleNodes, MissingRedis
+from benchmark_runner.workloads.workloads_exceptions import ODFNotInstalled, CNVNotInstalled, KataNotInstalled, EmptyLSOPath, MissingScaleNodes, MissingRedis
 from benchmark_runner.common.oc.oc import OC
 from benchmark_runner.common.virtctl.virtctl import Virtctl
 from benchmark_runner.common.elasticsearch.elasticsearch_operations import ElasticSearchOperations
@@ -110,6 +110,20 @@ class WorkloadsOperations:
             self._snapshot = PrometheusSnapshot(oc=self._oc, artifacts_path=self._run_artifacts_path, verbose=True)
             self._prometheus_snap_interval = self._environment_variables_dict.get('prometheus_snap_interval', '')
             self._prometheus_metrics_operation = PrometheusMetricsOperation()
+                # Extract lso id for LSO workload
+        # Extract lso id for LSO workload
+        if '_lso' in self._environment_variables_dict.get('workload'):
+            self._oc.delete_namespace()
+            self._oc.delete_available_released_pv()
+            # Update lso_disk_id only if both worker_disk_ids and a free disk exist
+            if self._environment_variables_dict.get('worker_disk_ids', '') and self._oc.get_free_disk_id(
+                    node=self._environment_variables_dict['lso_node']):
+                self._lso_disk_id = self._oc.get_free_disk_id(node=self._environment_variables_dict['lso_node'])
+                self._environment_variables_dict['lso_disk_id'] = self._lso_disk_id
+            else:
+                self._lso_disk_id = self._environment_variables_dict.get('lso_disk_id', '')
+        else:
+            self._lso_disk_id = None
         self._windows_url = self._environment_variables_dict.get('windows_url', '')
         self._create_vms_only = self._environment_variables_dict.get('create_vms_only', '')
         self._delete_all = self._environment_variables_dict.get('delete_all', '')
@@ -163,6 +177,9 @@ class WorkloadsOperations:
         :return:
         """
         self._oc.delete_namespace()
+        if self._storage_type == 'lso':
+            self._oc.delete_available_released_pv()
+            self._oc.remove_lso_path()
 
     @logger_time_stamp
     def start_prometheus(self):
@@ -202,6 +219,15 @@ class WorkloadsOperations:
         if workload_name[0] in self._workloads_odf_pvc and '_lso' not in self._workload:
             if not self._oc.is_odf_installed():
                 raise ODFNotInstalled(workload=self._workload)
+
+    @logger_time_stamp
+    def verify_lso(self):
+        """
+        This method verifies that lso disk id is set
+        :return:
+        """
+        if not self._lso_disk_id:
+            raise EmptyLSOPath()
 
     def _create_vm_log(self, labels: list) -> str:
         """
@@ -473,10 +499,15 @@ class WorkloadsOperations:
         if 'win' in self._workload:
             metadata.update({'vm_os_version': self._windows_os})
         # for hammerdb
-        if database:
-            metadata.update({'hammerdb_version': self._product_versions.get('hammerdb', 4.0)})
+        product_versions = self._product_versions if isinstance(self._product_versions, dict) else {}
         if database == 'mssql':
-            metadata.update({'db_type': 'mssql', 'db_version': self._product_versions.get('mssql', 2022)})
+            metadata.update({'db_type': 'mssql', 'db_version': product_versions.get('mssql', 2022), 'storage_type': self._storage_type})
+        elif database == 'postgres':
+            metadata.update({'db_type': 'pg', 'db_version': product_versions.get('postgres', 13), 'storage_type': self._storage_type})
+        elif database == 'mariadb':
+            metadata.update({'db_type': 'mariadb', 'db_version': product_versions.get('mariadb', 10.5), 'storage_type': self._storage_type})
+        if database:
+            metadata.update({'hammerdb_version': self._product_versions.get('hammerdb', 4.12)})
         if self._test_name:
             metadata.update({'test_name': self._test_name})
         if result:
@@ -503,16 +534,17 @@ class WorkloadsOperations:
         end_datetime = current_datetime + timedelta(hours=1)
         return self._es_operations.get_latest_resource_with_key(index=index, key=key, start_datetime=start_datetime, end_datetime=end_datetime)
 
-    def _upload_to_elasticsearch(self, index: str, kind: str, status: str, result: dict = None):
+    def _upload_to_elasticsearch(self, index: str, kind: str, status: str, result: dict = None, database: str = ''):
         """
         This method uploads results to elasticsearch
         :param index:
         :param kind:
         :param status:
         :param result:
+        :param database:
         :return:
         """
-        self._es_operations.upload_to_elasticsearch(index=index, data=self.__get_metadata(kind=kind, status=status, result=result))
+        self._es_operations.upload_to_elasticsearch(index=index, data=self.__get_metadata(kind=kind, status=status, database=database, result=result))
 
     @logger_time_stamp
     def _update_elasticsearch_index(self, index: str, id: str, kind: str, status: str, run_artifacts_url: str, database: str = '', vm_name: str = '', data_updated: bool = False, prometheus_result: dict = None):
@@ -611,6 +643,8 @@ class WorkloadsOperations:
             self.clear_nodes_cache()
         if self._odf_pvc:
             self.odf_workload_verification()
+        if 'lso' in self._workload:
+            self.verify_lso()
         self._template.generate_yamls(scale=str(self._scale), scale_nodes=self._scale_node_list, redis=self._redis, thread_limit=self._threads_limit)
         if self._enable_prometheus_snapshot:
             self.start_prometheus()
@@ -633,3 +667,68 @@ class WorkloadsOperations:
             self.delete_local_artifacts()
         if self._delete_all:
             self.delete_all()
+
+    # ── HammerDB helpers ──────────────────────────────────────────────────────
+
+    def _hammerdb_elasticsearch_template_fields(self) -> dict:
+        """Return common HammerDB Elasticsearch fields derived from the workload name."""
+        workload_parts = self._workload.split('_')
+        database = workload_parts[2] if len(workload_parts) >= 3 else ''
+        db_type_map = {'mariadb': 'mariadb', 'mssql': 'mssql', 'postgres': 'pg'}
+        product_versions = self._product_versions if isinstance(self._product_versions, dict) else {}
+        db_version_defaults = {'mariadb': 10.5, 'mssql': 2022, 'postgres': 13}
+        return {
+            'db_type': db_type_map.get(database, database),
+            'db_version': product_versions.get(database, db_version_defaults.get(database, '')),
+            'storage_type': self._storage_type,
+        }
+
+    def _hammerdb_thread_results(self, results_list: list) -> list:
+        """Return the per-thread result list (enriched with common template fields)."""
+        if not results_list:
+            return []
+        common_fields = self._hammerdb_elasticsearch_template_fields()
+        return [{**common_fields, **entry} for entry in results_list]
+
+    def _upload_hammerdb_thread_result(self, index: str, kind: str, status: str,
+                                       run_artifacts_url: str, database: str,
+                                       thread_result: dict):
+        """Upload a single per-thread HammerDB result to Elasticsearch."""
+        result = {'run_artifacts_url': run_artifacts_url, **thread_result}
+        self._upload_to_elasticsearch(index=index, kind=kind, status=status,
+                                      result=result, database=database)
+
+    def _parse_hammerdb_results_pod(self, log_output: str,
+                                               source_label: str = '') -> list:
+        """Parse HammerDB JSON results from pod log output.
+
+        The results section is expected to be a JSON array somewhere in the log.
+        """
+        import json as _json
+        from benchmark_runner.common.logger.logger_time_stamp import logger
+        start = log_output.find('[')
+        end = log_output.rfind(']')
+        if start == -1 or end == -1 or end <= start:
+            logger.warning('_parse_hammerdb_results_pod: no JSON array found in %s', source_label)
+            return []
+        try:
+            data = _json.loads(log_output[start:end + 1])
+            if isinstance(data, list):
+                return data
+        except ValueError as err:
+            logger.warning('_parse_hammerdb_results_pod: JSON parse error in %s: %s', source_label, err)
+        return []
+
+    def _parse_hammerdb_results_vm(self, json_path: str) -> list:
+        """Load and return the list of per-thread result dicts from a JSON file."""
+        import json as _json
+        try:
+            with open(json_path, encoding='utf-8') as f:
+                data = _json.load(f)
+            if isinstance(data, list):
+                return data
+            return []
+        except (OSError, ValueError) as err:
+            from benchmark_runner.common.logger.logger_time_stamp import logger
+            logger.warning('_parse_hammerdb_results_vm: could not read %s: %s', json_path, err)
+            return []
