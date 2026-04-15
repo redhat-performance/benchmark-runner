@@ -37,7 +37,7 @@ spec:
       kind: vm
       client_vm:
         dedicatedcpuplacement: false
-        sockets: {{ sockets }}
+        sockets:{% if sockets %} {{ sockets }}{% endif %}
         cores: 1
         threads: 1
         image: {{ fedora_container_disk }}

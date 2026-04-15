@@ -121,8 +121,8 @@ spec:
         kubernetes.io/hostname: 'pin-node-1'
       domain:
         cpu:
-          sockets: 
-          cores: 
+          sockets:
+          cores:
           threads: 1
         devices:
           disks:
@@ -197,8 +197,8 @@ spec:
         kubernetes.io/hostname: 'pin-node-2'
       domain:
         cpu:
-          sockets: 
-          cores: 
+          sockets:
+          cores:
           threads: 1
         devices:
           disks:

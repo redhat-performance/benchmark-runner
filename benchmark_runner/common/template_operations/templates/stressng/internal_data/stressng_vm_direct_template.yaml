@@ -22,7 +22,7 @@ spec:
       {%- endif %}
       domain:
         cpu:
-          sockets: {{ sockets }}
+          sockets:{% if sockets %} {{ sockets }}{% endif %}
           cores: 1
           threads: 1
         devices:
