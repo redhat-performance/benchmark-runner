@@ -710,7 +710,11 @@ class OC(SSH):
         """
         try:
             namespace = f'-n {namespace}' if namespace else ''
-            return self.run(f'{self._cli} get {namespace} pods -o name | grep {pod_name}')
+            result = self.run(f"{self._cli} get {namespace} pods -o jsonpath='{{.items[*].metadata.name}}'")
+            for name in result.split():
+                if pod_name in name:
+                    return name
+            raise PodNameNotExist(pod_name=pod_name)
         except Exception as err:
             raise PodNameNotExist(pod_name=pod_name)
 
@@ -723,7 +727,7 @@ class OC(SSH):
         :return:
         """
         namespace = f'-n {namespace}' if namespace else ''
-        result = self.run(f'{self._cli} get {namespace} pods -o name | grep {pod_name}')
+        result = self.run(f"{self._cli} get {namespace} pods -o jsonpath='{{.items[*].metadata.name}}'")
         if pod_name in result:
             return True
         else:
@@ -968,7 +972,7 @@ class OC(SSH):
         :param namespace:
         :param label:
         :param status:
-        :param label_uuid: need to get uuid from label (benchmark-operator)
+        :param label_uuid: need to get uuid from label
         :param timeout:
         :param workload:
         :return:
@@ -1063,7 +1067,7 @@ class OC(SSH):
         :param workload:
         :param namespace:
         :param status:
-        :param label_uuid: need to get uuid from label (benchmark-operator)
+        :param label_uuid: need to get uuid from label
         :param timeout:
         :return:
         """
@@ -1154,7 +1158,7 @@ class OC(SSH):
         This method waits for a pod to be completed
         :param workload:
         :param label:
-        :param label_uuid: need to get uuid from label (benchmark-operator)
+        :param label_uuid: need to get uuid from label
         :param job: kind is job instead of pod
         :param timeout:
         :param namespace:
@@ -1214,7 +1218,11 @@ class OC(SSH):
         """
         try:
             namespace = f'-n {namespace}' if namespace else ''
-            return self.run(f'{self._cli} get {namespace} vmi -o name | grep {vm_name}', is_check=True)
+            result = self.run(f"{self._cli} get {namespace} vmi -o jsonpath='{{.items[*].metadata.name}}'")
+            for name in result.split():
+                if vm_name in name:
+                    return name
+            raise VMNameNotExist(vm_name=vm_name)
         except Exception as err:
             raise VMNameNotExist(vm_name=vm_name)
 
@@ -1243,7 +1251,7 @@ class OC(SSH):
         :return: True or False
         """
         namespace = f'-n {namespace}' if namespace else ''
-        result = self.run(f'{self._cli} get {namespace} vmi -o name | grep {vm_name}')
+        result = self.run(f"{self._cli} get {namespace} vmi -o jsonpath='{{.items[*].metadata.name}}'")
         if vm_name in result:
             return True
         else:

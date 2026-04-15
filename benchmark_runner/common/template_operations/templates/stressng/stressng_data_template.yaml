@@ -2,9 +2,9 @@ metadata:
   name: stressng
 files:
   - name: stressng_pod.yaml
-    template: stressng_pod_job_template.yaml
+    template: stressng_pod_template.yaml
   - name: stressng_vm.yaml
-    template: stressng_vm_direct_template.yaml
+    template: stressng_vm_template.yaml
 template_data:
   shared:
     pin_node: {{ pin_node1 }}

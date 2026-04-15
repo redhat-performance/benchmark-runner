@@ -7,7 +7,7 @@ pipeline {
         PROVISION_USER = credentials('perfci_provision_user')
         PROVISION_IP = credentials('perfci_provision_ip')
         SCALE_NODES = credentials('perfci_scale_nodes')
-        PIN_NODE_BENCHMARK_OPERATOR = credentials('perfci_pin_node_benchmark_operator')
+        PIN_NODE0 = credentials('perfci_pin_node0')
         PIN_NODE1 = credentials('perfci_pin_node1')
         PIN_NODE2 = credentials('perfci_pin_node2')
         ELASTICSEARCH = credentials('perfci_elasticsearch')
@@ -167,7 +167,7 @@ END
                                         sudo podman run --rm -t \
                                         -e WORKLOAD='${workload}' \
                                         -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' \
-                                        -e PIN_NODE_BENCHMARK_OPERATOR='${PIN_NODE_BENCHMARK_OPERATOR}' \
+                                        -e PIN_NODE0='${PIN_NODE0}' \
                                         -e PIN_NODE1='${PIN_NODE1}' \
                                         -e PIN_NODE2='${PIN_NODE2}' \
                                         -e ELASTICSEARCH='${ELASTICSEARCH}' \

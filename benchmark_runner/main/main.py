@@ -11,7 +11,6 @@ warnings.filterwarnings("ignore", category=CryptographyDeprecationWarning)
 
 from benchmark_runner.main.environment_variables import *
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
-from benchmark_runner.benchmark_operator.benchmark_operator_workloads import BenchmarkOperatorWorkloads
 from benchmark_runner.workloads.workloads import Workloads
 from benchmark_runner.main.environment_variables import environment_variables
 from benchmark_runner.common.clouds.Azure.azure_operations import AzureOperations
@@ -28,7 +27,6 @@ logger.setLevel(level=log_level)
 SYSTEM_EXIT_BENCHMARK_FAILED = 1
 SYSTEM_EXIT_UNKNOWN_EXECUTION_TYPE = 2
 
-benchmark_operator_workload = None
 benchmark_runner_workload = None
 clusterbuster_workload = None
 krknhub_workload = None
@@ -48,8 +46,6 @@ cnv_version = environment_variables_dict.get('cnv_version', '')
 install_ocp_resources = environment_variables_dict.get('install_ocp_resources', False)
 run_type = environment_variables_dict.get('run_type', '')
 
-is_benchmark_operator_workload = 'benchmark-operator' in (
-    environment_variables.get_workload_namespace(workload), environment_variables_dict.get("runner_type"))
 is_benchmark_runner_workload = 'benchmark-runner' in (
     environment_variables.get_workload_namespace(workload), environment_variables_dict.get("runner_type"))
 is_clusterbuster_workload = 'clusterbuster' in (
@@ -72,8 +68,6 @@ if workload and not ci_status:
         clusterbuster_workload = ClusterBusterWorkloads()
     elif is_krknhub_workload:
         krknhub_workload = KrknHubWorkloads()
-    elif is_benchmark_operator_workload:
-        benchmark_operator_workload = BenchmarkOperatorWorkloads()
     elif is_benchmark_runner_workload:
         benchmark_runner_workload = Workloads()
 
@@ -219,20 +213,6 @@ def update_ci_status():
 
 
 @logger_time_stamp
-def run_benchmark_operator_workload():
-    """
-    This method runs benchmark-operator workload
-    :return:
-    """
-    # benchmark-operator node selector
-    if environment_variables_dict.get('pin_node_benchmark_operator'):
-        benchmark_operator_workload.update_node_selector(runner_path=environment_variables_dict.get('runner_path', ''),
-                                                         yaml_path='benchmark-operator/config/manager/manager.yaml',
-                                                         pin_node='pin_node_benchmark_operator')
-    return benchmark_operator_workload.run()
-
-
-@logger_time_stamp
 def run_benchmark_runner_workload():
     """
     This method runs benchmark-runner workload
@@ -301,8 +281,6 @@ def main():
         install_resources()
     elif ci_status == 'pass' or ci_status == 'failed':
         update_ci_status()
-    elif is_benchmark_operator_workload:
-        success = run_benchmark_operator_workload()
     elif is_benchmark_runner_workload:
         success = run_benchmark_runner_workload()
     elif is_clusterbuster_workload:

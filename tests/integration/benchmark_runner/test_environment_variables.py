@@ -36,7 +36,7 @@ def __get_test_environment_variable():
     # ** DO NOT CHANGE THE PARAMETERS BELOW **
     # Constant parameters
 
-    test_environment_variable['namespace'] = EnvironmentVariables.get_env('NAMESPACE', 'benchmark-operator')
+    test_environment_variable['namespace'] = EnvironmentVariables.get_env('NAMESPACE', 'benchmark-runner')
     # run Hammerdb workload with ocs pvc
     test_environment_variable['ocs_pvc'] = EnvironmentVariables.get_boolean_from_environment('OCS_PVC', True)
     test_environment_variable['system_metrics'] = EnvironmentVariables.get_boolean_from_environment('SYSTEM_METRICS', False)

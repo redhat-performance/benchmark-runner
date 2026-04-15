@@ -95,7 +95,6 @@ jobs:
         GRAFANA_JSON_PATH: ${{ secrets.PERF_GRAFANA_JSON_PATH }}
         OCP_CLIENT_VERSION: ${{ secrets.PERF_OCP_CLIENT_VERSION }}
         VIRTCTL_VERSION: ${{ secrets.PERF_VIRTCTL_VERSION }}
-        BENCHMARK_OPERATOR_VERSION: ${{ secrets.PERF_BENCHMARK_OPERATOR_VERSION }}
       run: |
         # Install Dockerfile content for pytest
         # install oc/kubectl
@@ -110,9 +109,6 @@ jobs:
         chmod +x $RUNNER_PATH/virtctl
         cp $RUNNER_PATH/virtctl /usr/local/bin/virtctl
         rm -rf $RUNNER_PATH/virtctl
-
-        # clone benchmark-operator
-        git clone -b v${BENCHMARK_OPERATOR_VERSION} https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
 
         # run pytest
         pytest
@@ -153,7 +149,7 @@ jobs:
      env:
        WORKLOAD: "stressng_pod"
        KUBEADMIN_PASSWORD: ${{ secrets.PERF_KUBEADMIN_PASSWORD }}
-       PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.PERF_PIN_NODE_BENCHMARK_OPERATOR }}
+       PIN_NODE0: ${{ secrets.PERF_PIN_NODE0 }}
        PIN_NODE1: ${{ secrets.PERF_PIN_NODE1 }}
        PIN_NODE2: ${{ secrets.PERF_PIN_NODE2 }}
        RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
@@ -162,7 +158,6 @@ jobs:
        ELASTICSEARCH_USER: ${{ secrets.PERF_ELASTICSEARCH_USER }}
        ELASTICSEARCH_PASSWORD: ${{ secrets.PERF_ELASTICSEARCH_PASSWORD }}
        OCP_CLIENT_VERSION: ${{ secrets.PERF_OCP_CLIENT_VERSION }}
-       BENCHMARK_OPERATOR_VERSION: ${{ secrets.PERF_BENCHMARK_OPERATOR_VERSION }}
      run: |
        # Install Dockerfile content for pytest
        # install oc/kubectl
@@ -171,9 +166,6 @@ jobs:
        rm $RUNNER_PATH/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz
        cp $RUNNER_PATH/kubectl /usr/local/bin/kubectl
        cp $RUNNER_PATH/oc /usr/local/bin/oc
-
-       # clone benchmark-operator
-       git clone -b v${BENCHMARK_OPERATOR_VERSION} https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
 
        # run main
        PYTHONPATH=. python benchmark_runner/main/main.py

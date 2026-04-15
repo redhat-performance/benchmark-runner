@@ -6,7 +6,7 @@ files:
   - name: uperf_pod_client.yaml
     template: uperf_pod_client_template.yaml
   - name: uperf_vm.yaml
-    template: uperf_vm_direct_template.yaml
+    template: uperf_vm_template.yaml
 template_data:
   shared:
     pin_server: {{ pin_node1 }}

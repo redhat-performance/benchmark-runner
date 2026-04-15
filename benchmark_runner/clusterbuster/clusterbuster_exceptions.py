@@ -1,7 +1,7 @@
 
 class ClusterBusterError(Exception):
-    """ Base class for all benchmark operator error classes.
-        All exceptions raised by the benchmark runner library should inherit from this class. """
+    """ Base class for all ClusterBuster error classes.
+        All exceptions raised by the ClusterBuster library should inherit from this class. """
     pass
 
 

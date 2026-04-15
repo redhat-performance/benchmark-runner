@@ -41,7 +41,7 @@ class EnvironmentVariables:
         # dynamic parameters - configure for local run
         # parameters for running workload
 
-        # This path is GitHub actions runner path (benchmark-operator should be cloned here)
+        # This path is GitHub actions runner path
         self._environment_variables_dict['runner_path'] = EnvironmentVariables.get_env('RUNNER_PATH', '/tmp')
         # This path is for vm/pod/prometheus run artifacts
         self._environment_variables_dict['run_artifacts'] = EnvironmentVariables.get_env('RUN_ARTIFACTS', os.path.join(self._environment_variables_dict['runner_path'], 'benchmark-runner-run-artifacts'))
@@ -53,7 +53,7 @@ class EnvironmentVariables:
         self._environment_variables_dict['kubeadmin_password'] = EnvironmentVariables.get_env('KUBEADMIN_PASSWORD', '')
 
         # PIN=node selector
-        self._environment_variables_dict['pin_node_benchmark_operator'] = EnvironmentVariables.get_env('PIN_NODE_BENCHMARK_OPERATOR', '')
+        self._environment_variables_dict['pin_node0'] = EnvironmentVariables.get_env('PIN_NODE0', '')
         self._environment_variables_dict['pin_node1'] = EnvironmentVariables.get_env('PIN_NODE1', '')
         self._environment_variables_dict['pin_node2'] = EnvironmentVariables.get_env('PIN_NODE2', '')
 
@@ -105,18 +105,18 @@ class EnvironmentVariables:
 
         # default parameter - change only if needed
         # Parameters below related to 'run_workload()'
-        self._environment_variables_dict['workloads'] = ['stressng_pod', 'stressng_vm', 'stressng_kata',
-                                                         'uperf_pod', 'uperf_vm', 'uperf_kata',
-                                                         'hammerdb_pod_mariadb', 'hammerdb_vm_mariadb', 'hammerdb_kata_mariadb',
-                                                         'hammerdb_pod_mariadb_lso', 'hammerdb_vm_mariadb_lso', 'hammerdb_kata_mariadb_lso',
+        self._environment_variables_dict['workloads'] = ['stressng_pod', 'stressng_vm',
+                                                         'uperf_pod', 'uperf_vm',
+                                                         'hammerdb_pod_mariadb', 'hammerdb_vm_mariadb',
+                                                         'hammerdb_pod_mariadb_lso', 'hammerdb_vm_mariadb_lso',
                                                          'hammerdb_pod_mariadb_ephemeral', 'hammerdb_vm_mariadb_ephemeral',
-                                                         'hammerdb_pod_postgres', 'hammerdb_vm_postgres', 'hammerdb_kata_postgres',
-                                                         'hammerdb_pod_postgres_lso', 'hammerdb_vm_postgres_lso', 'hammerdb_kata_postgres_lso',
+                                                         'hammerdb_pod_postgres', 'hammerdb_vm_postgres',
+                                                         'hammerdb_pod_postgres_lso', 'hammerdb_vm_postgres_lso',
                                                          'hammerdb_pod_postgres_ephemeral', 'hammerdb_vm_postgres_ephemeral',
-                                                         'hammerdb_pod_mssql', 'hammerdb_vm_mssql', 'hammerdb_kata_mssql',
-                                                         'hammerdb_pod_mssql_lso', 'hammerdb_vm_mssql_lso', 'hammerdb_kata_mssql_lso',
+                                                         'hammerdb_pod_mssql', 'hammerdb_vm_mssql',
+                                                         'hammerdb_pod_mssql_lso', 'hammerdb_vm_mssql_lso',
                                                          'hammerdb_pod_mssql_ephemeral', 'hammerdb_vm_mssql_ephemeral',
-                                                         'vdbench_pod', 'vdbench_kata', 'vdbench_vm',
+                                                         'vdbench_pod', 'vdbench_vm',
                                                          'clusterbuster', 'bootstorm_vm', 'windows_vm', 'winmssql_vm',
                                                          'krknhub']
         # Workloads namespaces
@@ -142,16 +142,16 @@ class EnvironmentVariables:
             'hammerdb': 4.12
         }
 
-        # Set namespace based on workload
+        # Set namespace based on workload.
+        # The workload_namespaces dict is the source of truth for where each workload runs.
+        # NAMESPACE env var is only used as a fallback for unknown workloads.
         base_workload = self._environment_variables_dict['workload'].split('_')[0]
-        if EnvironmentVariables.get_env('NAMESPACE'):
+        if base_workload in self._environment_variables_dict['workload_namespaces']:
+            self._environment_variables_dict['namespace'] = self._environment_variables_dict['workload_namespaces'][base_workload]
+        elif EnvironmentVariables.get_env('NAMESPACE'):
             self._environment_variables_dict['namespace'] = EnvironmentVariables.get_env('NAMESPACE')
-        elif base_workload in self._environment_variables_dict['workload_namespaces']:
-            default_namespace = self._environment_variables_dict['workload_namespaces'][base_workload]
-            self._environment_variables_dict['namespace'] = EnvironmentVariables.get_env('NAMESPACE', default_namespace)
         else:
-            # TBD if this is not set
-            self._environment_variables_dict['namespace'] = 'benchmark-operator'
+            self._environment_variables_dict['namespace'] = 'benchmark-runner'
 
         # run workload with odf pvc True/False. True=ODF, False=Ephemeral
         self._environment_variables_dict['odf_pvc'] = EnvironmentVariables.get_boolean_from_environment('ODF_PVC', True)
@@ -176,7 +176,7 @@ class EnvironmentVariables:
         self._environment_variables_dict['workloads_odf_pvc'] = ['vdbench', 'hammerdb']
         # This parameter get from Test_CI.yml file
         self._environment_variables_dict['build_version'] = EnvironmentVariables.get_env('BUILD_VERSION', '1.0.0')
-        # collect system metrics True/False - required by benchmark-operator: @todo disable in OCP4.12.0-rc.5 - pod not create
+        # collect system metrics True/False
         self._environment_variables_dict['system_metrics'] = EnvironmentVariables.get_boolean_from_environment('SYSTEM_METRICS', False)
         # CI status update once at the end of CI pass/failed
         self._environment_variables_dict['ci_status'] = EnvironmentVariables.get_env('CI_STATUS', '')
