@@ -127,8 +127,8 @@ spec:
       {%- endif %}
       domain:
         cpu:
-          sockets: {{ sockets }}
-          cores: {{ cores }}
+          sockets:{% if sockets %} {{ sockets }}{% endif %}
+          cores:{% if cores %} {{ cores }}{% endif %}
           threads: 1
         devices:
           disks:
@@ -209,8 +209,8 @@ spec:
       {%- endif %}
       domain:
         cpu:
-          sockets: {{ sockets }}
-          cores: {{ cores }}
+          sockets:{% if sockets %} {{ sockets }}{% endif %}
+          cores:{% if cores %} {{ cores }}{% endif %}
           threads: 1
         devices:
           disks:
