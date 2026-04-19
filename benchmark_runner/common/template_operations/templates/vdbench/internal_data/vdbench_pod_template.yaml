@@ -121,6 +121,10 @@ spec:
         - name: vdbench-pod-pvc-claim
         {%- endif %}
           mountPath: "/workload"
+      {%- else %}
+      volumeMounts:
+        - name: vdbench-ephemeral-vol
+          mountPath: "/workload"
       {%- endif %}
       env:
         - name: BLOCK_SIZES
@@ -197,4 +201,8 @@ spec:
       persistentVolumeClaim:
         claimName: vdbench-pod-pvc-claim
     {%- endif %}
+  {%- else %}
+  volumes:
+    - name: vdbench-ephemeral-vol
+      emptyDir: {}
   {%- endif %}

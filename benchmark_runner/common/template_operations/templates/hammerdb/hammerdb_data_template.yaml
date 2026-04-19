@@ -29,13 +29,13 @@ template_data:
       db_warehouses: 2
       storage: 10Gi
       database_limits_cpu: 4
-      database_limits_memory: 16Gi
+      database_limits_memory: 12Gi
       database_requests_cpu: 10m
-      database_requests_memory: 16Gi
+      database_requests_memory: 4Gi
       limits_cpu: 4
-      limits_memory: 16Gi
+      limits_memory: 12Gi
       requests_cpu: 10m
-      requests_memory: 16Gi
+      requests_memory: 4Gi
   extra:
     mariadb:
       db_image: mariadb10.5-centos9-container-disk:latest
@@ -69,6 +69,6 @@ template_data:
           vm_requests_memory: 32Gi
         default:
           sockets: 1
-          cores: 4
-          vm_limits_memory: 16Gi
-          vm_requests_memory: 16Gi
+          cores: 2
+          vm_limits_memory: 12Gi
+          vm_requests_memory: 4Gi

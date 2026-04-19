@@ -40,10 +40,10 @@ spec:
         resources:
           requests:
             cpu: 10m
-            memory: 16Gi
+            memory: 4Gi
           limits:
             cpu: 4
-            memory: 16Gi
+            memory: 12Gi
         env:
           - name: MSSQL_PID
             value: "Enterprise"
@@ -138,7 +138,7 @@ spec:
       resources:
         requests:
           cpu: "10m"
-          memory: "16Gi"
+          memory: "4Gi"
         limits:
           cpu: "4"
-          memory: "16Gi"
+          memory: "12Gi"

@@ -1,6 +1,10 @@
 
+import glob
+import math
 import os
+import re
 import time
+from csv import DictReader
 from multiprocessing import Process
 
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
@@ -26,6 +30,56 @@ class VdbenchVM(WorkloadsOperations):
         self.__vm_name = ''
         self.__scale = ''
         self.__data_dict = {}
+        self.__namespace = self._environment_variables_dict.get('namespace', 'benchmark-runner')
+        self.__username = self._environment_variables_dict.get('vm_user') or 'cloud-user'
+
+    def _get_expected_file_count(self) -> int:
+        """Parse IO_OPERATION from the rendered YAML and return the number of comma-separated items."""
+        yaml_path = os.path.join(self._run_artifacts_path, f'{self.__name}.yaml')
+        if not os.path.exists(yaml_path):
+            candidates = sorted(glob.glob(os.path.join(self._run_artifacts_path, f'{self.__name}_*.yaml')))
+            if candidates:
+                yaml_path = candidates[0]
+        with open(yaml_path, 'r') as f:
+            for line in f:
+                match = re.search(r'export IO_OPERATION=(.+)', line.strip())
+                if match:
+                    io_operation = match.group(1).strip()
+                    return len(io_operation.split(','))
+        return 0
+
+    def _upload_vdbench_result(self, result: dict):
+        """Upload a single vdbench CSV result to Elasticsearch."""
+        if self._enable_prometheus_snapshot:
+            result.update(self._prometheus_result)
+        self._upload_to_elasticsearch(index=self.__es_index, kind=self.__kind, status=self.__status, result=result)
+        self._verify_elasticsearch_data_uploaded(index=self.__es_index, uuid=self._uuid)
+
+    def _scp_and_parse_csv_results(self, vm_name: str = '') -> list:
+        """SCP CSV result files from the VM to local run artifacts path and parse them into dicts for ES upload."""
+        vm_name = vm_name or self.__vm_name
+        local_csv_files = self._virtctl.scp_vm_files(
+            vm_name=vm_name, remote_dir='/workload/', local_dir=self._run_artifacts_path,
+            namespace=self.__namespace, key_path=self._ssh_key_path, username=self.__username)
+        result_list = []
+        workload_name = self._environment_variables_dict.get('workload', '').replace('_', '-')
+        for csv_file in local_csv_files:
+            with open(csv_file, 'r') as f:
+                for line_dict in DictReader(f):
+                    for key, value in line_dict.items():
+                        try:
+                            num = float(value)
+                            line_dict[key] = 0.0 if math.isnan(num) or math.isinf(num) else round(num, 3)
+                        except (ValueError, TypeError):
+                            if value == 'n/a':
+                                line_dict[key] = 0.0
+                    if line_dict.get('Run', '').startswith('format_for_'):
+                        continue
+                    line_dict['vm_name'] = vm_name
+                    workload = self._get_workload_file_name(workload=self._get_run_artifacts_hierarchy(workload_name=workload_name, is_file=True))
+                    line_dict['run_artifacts_url'] = os.path.join(self._run_artifacts_url, f'{workload}.tar.gz')
+                    result_list.append(dict(line_dict))
+        return result_list
 
     def save_error_logs(self):
         """
@@ -58,28 +112,23 @@ class VdbenchVM(WorkloadsOperations):
         """
         try:
             self._oc.wait_for_ready(label=f'app=vdbench-{self._trunc_uuid}-{vm_num}', run_type='vm', label_uuid=False)
-            # Create vm log should be direct after vm is ready
-            self.__vm_name = self._create_vm_log(labels=[f'{self.__workload_name}-{self._trunc_uuid}-{vm_num}'])
-            self.__status = self._oc.wait_for_vm_log_completed(vm_name=self.__vm_name, end_stamp=self.END_STAMP)
+            scale_vm_name = f'{self.__vm_name}-{vm_num}'
+            expected_count = self._get_expected_file_count()
+            self.__status = self._virtctl.wait_for_vm_completed_by_file_count(
+                vm_name=scale_vm_name, remote_dir='/workload/',
+                expected_count=expected_count, namespace=self.__namespace, key_path=self._ssh_key_path, username=self.__username)
             self.__status = 'complete' if self.__status else 'failed'
             if self._enable_prometheus_snapshot:
-                # prometheus queries
                 self._prometheus_metrics_operation.finalize_prometheus()
                 metric_results = self._prometheus_metrics_operation.run_prometheus_queries()
                 self._prometheus_result = self._prometheus_metrics_operation.parse_prometheus_metrics(data=metric_results)
-            # save run artifacts logs
-            result_list = self._create_vm_run_artifacts(vm_name=f'{self.__workload_name}-{self._trunc_uuid}-{vm_num}', start_stamp=self.START_STAMP, end_stamp=self.END_STAMP, log_type='.csv')
+            result_list = self._scp_and_parse_csv_results(vm_name=scale_vm_name)
             if self._es_host:
-                # upload several run results
                 for result in result_list:
-                    if self._enable_prometheus_snapshot:
-                        result.update(self._prometheus_result)
-                    self._upload_to_elasticsearch(index=self.__es_index, kind=self.__kind, status=self.__status, result=result)
-                # verify that data upload to elastic search according to unique uuid
-                self._verify_elasticsearch_data_uploaded(index=self.__es_index, uuid=self._uuid)
+                    self._upload_vdbench_result(result)
             self._oc.delete_vm_sync(
                 yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}_{vm_num}.yaml'),
-                vm_name=f'{self.__vm_name}-{vm_num}')
+                vm_name=scale_vm_name)
         except Exception as err:
             # save run artifacts logs
             self.save_error_logs()
@@ -105,12 +154,13 @@ class VdbenchVM(WorkloadsOperations):
         try:
             if self._enable_prometheus_snapshot:
                 self._prometheus_metrics_operation.init_prometheus()
-            self.__name = self._workload
+            workload = self._workload.removesuffix('_ephemeral')
+            self.__name = workload
             if self._run_type == 'test_ci':
                 self.__es_index = 'vdbench-test-ci-results'
             else:
                 self.__es_index = 'vdbench-results'
-            self.__workload_name = self._workload.replace('_', '-')
+            self.__workload_name = workload.replace('_', '-')
             self.__vm_name = f'{self.__workload_name}-{self._trunc_uuid}'
             self.__kind = 'vm'
             self._environment_variables_dict['kind'] = 'vm'
@@ -119,25 +169,19 @@ class VdbenchVM(WorkloadsOperations):
             if not self._scale:
                 self._oc.create_vm_sync(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}.yaml'), vm_name=self.__vm_name)
                 self._oc.wait_for_ready(label=f'app=vdbench-{self._trunc_uuid}', run_type='vm', label_uuid=False)
-                # Create vm log should be direct after vm is ready
-                self.__vm_name = self._create_vm_log(labels=[self.__workload_name])
-                self.__status = self._oc.wait_for_vm_log_completed(vm_name=self.__vm_name, end_stamp=self.END_STAMP)
+                expected_count = self._get_expected_file_count()
+                self.__status = self._virtctl.wait_for_vm_completed_by_file_count(
+                vm_name=self.__vm_name, remote_dir='/workload/',
+                expected_count=expected_count, namespace=self.__namespace, key_path=self._ssh_key_path, username=self.__username)
                 self.__status = 'complete' if self.__status else 'failed'
-                # save run artifacts logs
-                result_list = self._create_vm_run_artifacts(vm_name=self.__vm_name, start_stamp=self.START_STAMP, end_stamp=self.END_STAMP, log_type='.csv')
+                result_list = self._scp_and_parse_csv_results()
                 if self._enable_prometheus_snapshot:
-                    # prometheus queries
                     self._prometheus_metrics_operation.finalize_prometheus()
                     metric_results = self._prometheus_metrics_operation.run_prometheus_queries()
                     self._prometheus_result = self._prometheus_metrics_operation.parse_prometheus_metrics(data=metric_results)
                 if self._es_host:
-                    # upload several run results
                     for result in result_list:
-                        if self._enable_prometheus_snapshot:
-                            result.update(self._prometheus_result)
-                        self._upload_to_elasticsearch(index=self.__es_index, kind=self.__kind, status=self.__status, result=result)
-                    # verify that data upload to elastic search according to unique uuid
-                    self._verify_elasticsearch_data_uploaded(index=self.__es_index, uuid=self._uuid)
+                        self._upload_vdbench_result(result)
                 self._oc.delete_vm_sync(
                     yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}.yaml'),
                     vm_name=self.__vm_name)

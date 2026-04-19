@@ -27,6 +27,9 @@ spec:
         limits:
           cpu: 2
           memory: 4Gi
+      volumeMounts:
+        - name: vdbench-ephemeral-vol
+          mountPath: "/workload"
       env:
         - name: BLOCK_SIZES
           value: "oltp1,oltp2,oltphw,odss2,odss128,4_cache,64_cache,4,64,4_cache,64_cache,4,64"
@@ -83,3 +86,6 @@ spec:
       storageClassName: ocs-storagecluster-ceph-rbd
     source:
       blank: {}
+  volumes:
+    - name: vdbench-ephemeral-vol
+      emptyDir: {}

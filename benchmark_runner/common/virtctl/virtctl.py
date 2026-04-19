@@ -104,6 +104,74 @@ class Virtctl(OC):
         return False
 
     @typechecked
+    def count_remote_vm_files(self, vm_name: str, remote_dir: str, file_type: str = '.csv',
+                              namespace: str = '', key_path: str = '', username: str = '') -> int:
+        """Count files of a given type in a directory on a remote VM. Returns -1 on failure."""
+        result = self.virtctl_ssh(
+            vm_name=vm_name,
+            command=f'find {remote_dir} -maxdepth 1 -type f -name "*{file_type}" | wc -l',
+            namespace=namespace,
+            key_path=key_path,
+            username=username
+        )
+        if result is not None:
+            try:
+                return int(result.strip())
+            except ValueError:
+                logger.warning(f'Unexpected output counting files on {vm_name}: {result.strip()[:200]}')
+        return -1
+
+    @typechecked
+    @logger_time_stamp
+    def wait_for_vm_completed_by_file_count(self, vm_name: str, remote_dir: str, expected_count: int,
+                                            file_type: str = '.csv',
+                                            namespace: str = '', key_path: str = '', username: str = '',
+                                            timeout: int = int(environment_variables.environment_variables_dict.get('timeout', 3600)),
+                                            sleep_time: int = 30) -> bool:
+        """Poll until the number of files (of given type) in remote_dir matches expected_count."""
+        if not self._wait_for_virtctl_ssh(vm_name=vm_name, namespace=namespace, key_path=key_path, username=username):
+            logger.warning(f'SSH never became ready on {vm_name}')
+            return False
+        for elapsed in range(0, timeout, sleep_time):
+            actual_count = self.count_remote_vm_files(
+                vm_name=vm_name, remote_dir=remote_dir, file_type=file_type,
+                namespace=namespace, key_path=key_path, username=username
+            )
+            logger.debug(f'{file_type} file count on {vm_name}:{remote_dir} = {actual_count}/{expected_count}')
+            if actual_count >= expected_count:
+                return True
+            time.sleep(sleep_time)
+        logger.warning(f'{file_type} file count on {vm_name}:{remote_dir} did not reach {expected_count} within {timeout}s')
+        return False
+
+    @typechecked
+    def scp_vm_files(self, vm_name: str, remote_dir: str, local_dir: str, file_type: str = '.csv',
+                     namespace: str = '', key_path: str = '', username: str = '') -> list:
+        """List files of given type on the VM via SSH, SCP each to local_dir, and return the list of local file paths."""
+        result = self.virtctl_ssh(
+            vm_name=vm_name,
+            command=f'find {remote_dir} -maxdepth 1 -type f -name "*{file_type}" -printf "%f\\n"',
+            namespace=namespace, key_path=key_path, username=username
+        )
+        if not result:
+            logger.warning(f'Failed to list {file_type} files on {vm_name}:{remote_dir}')
+            return []
+        local_files = []
+        for filename in result.strip().splitlines():
+            filename = filename.strip()
+            if not filename:
+                continue
+            remote_path = f'{remote_dir}{filename}'
+            local_filename = f'{vm_name}_{filename}' if vm_name else filename
+            local_path = os.path.join(local_dir, local_filename)
+            if self._scp_file(vm_name=vm_name, remote_path=remote_path, local_path=local_path,
+                              namespace=namespace, key_path=key_path, username=username):
+                local_files.append(local_path)
+            else:
+                logger.warning(f'Failed to SCP {remote_path} from {vm_name}')
+        return local_files
+
+    @typechecked
     def _scp_file(self, vm_name: str, remote_path: str, local_path: str, namespace: str = '', key_path: str = '', username: str = '') -> bool:
         """Copy a file from VM to local using virtctl scp."""
         namespace = namespace or environment_variables.environment_variables_dict.get('namespace', '')

@@ -109,7 +109,8 @@ class TemplateOperations:
         answer = {}
         self.__workload_name = self.__workload.split('_')[0]
         self.__workload_kind = self.__workload.split('_')[1]
-        self.__workload_extra_name = '_'.join(self.__workload.split('_')[2:3])
+        extra = '_'.join(self.__workload.split('_')[2:3])
+        self.__workload_extra_name = '' if extra in ('ephemeral', 'lso') else extra
         self.__workload_template_kind = self.__get_workload_template_kind()
         if self.__workload_extra_name:
             self.__standard_output_file = f"{'_'.join([self.__workload_name, self.__workload_template_kind, self.__workload_extra_name])}.yaml"
