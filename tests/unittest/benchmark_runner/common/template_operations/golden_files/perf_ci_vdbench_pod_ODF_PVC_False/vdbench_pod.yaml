@@ -75,17 +75,6 @@ spec:
       command: ["/bin/bash"]
       args: ["-c", "$WORKLOAD_METHOD"]
   restartPolicy: "Never"
-  spec:
-    pvc:
-      accessModes:
-        - ReadWriteOnce
-      resources:
-        requests:
-          storage: 64Gi
-          Reclaim Policy: Delete
-      storageClassName: ocs-storagecluster-ceph-rbd
-    source:
-      blank: {}
   volumes:
     - name: vdbench-ephemeral-vol
       emptyDir: {}

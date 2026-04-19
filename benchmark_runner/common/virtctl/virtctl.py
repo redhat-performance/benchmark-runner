@@ -161,7 +161,7 @@ class Virtctl(OC):
             filename = filename.strip()
             if not filename:
                 continue
-            remote_path = f'{remote_dir}{filename}'
+            remote_path = os.path.join(remote_dir, filename)
             local_filename = f'{vm_name}_{filename}' if vm_name else filename
             local_path = os.path.join(local_dir, local_filename)
             if self._scp_file(vm_name=vm_name, remote_path=remote_path, local_path=local_path,

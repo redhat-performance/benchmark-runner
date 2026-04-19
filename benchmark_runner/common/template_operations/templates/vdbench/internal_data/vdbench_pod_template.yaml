@@ -90,9 +90,6 @@ spec:
     kubernetes.io/hostname: {{ pin_node1 }}
     {%- endif %}
   {%- endif %}
-  {%- if kind == 'kata' %}
-  runtimeClassName: kata
-  {%- endif %}
   containers:
     - name: vdbench-pod
       image: {{ vdbench_image }}
@@ -175,7 +172,7 @@ spec:
       args: ["-c", "$WORKLOAD_METHOD"]
       {%- endif %}
   restartPolicy: "Never"
-  {%- if cluster != "kubernetes" %}
+  {%- if cluster != "kubernetes" and odf_pvc == True %}
   spec:
     pvc:
       accessModes:

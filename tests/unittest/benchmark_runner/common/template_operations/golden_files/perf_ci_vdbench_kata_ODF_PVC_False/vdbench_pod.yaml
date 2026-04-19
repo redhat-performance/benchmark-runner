@@ -18,7 +18,6 @@ spec:
       app: vdbench
   nodeSelector:
     kubernetes.io/hostname: pin-node-1
-  runtimeClassName: kata
   containers:
     - name: vdbench-pod
       image: quay.io/benchmark-runner/centos-stream9-vdbench5.04.07-pod:latest
@@ -78,17 +77,6 @@ spec:
       command: ["/bin/bash"]
       args: ["-c", "$WORKLOAD_METHOD"]
   restartPolicy: "Never"
-  spec:
-    pvc:
-      accessModes:
-        - ReadWriteOnce
-      resources:
-        requests:
-          storage: 64Gi
-          Reclaim Policy: Delete
-      storageClassName: ocs-storagecluster-ceph-rbd
-    source:
-      blank: {}
   volumes:
     - name: vdbench-ephemeral-vol
       emptyDir: {}

@@ -9,6 +9,7 @@ from multiprocessing import Process
 
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 from benchmark_runner.common.elasticsearch.elasticsearch_exceptions import ElasticSearchDataNotUploaded
+from benchmark_runner.workloads.workloads_exceptions import MissingIOOperation
 from benchmark_runner.workloads.workloads_operations import WorkloadsOperations
 
 
@@ -45,8 +46,8 @@ class VdbenchVM(WorkloadsOperations):
                 match = re.search(r'export IO_OPERATION=(.+)', line.strip())
                 if match:
                     io_operation = match.group(1).strip()
-                    return len(io_operation.split(','))
-        return 0
+                    return max(len(io_operation.split(',')), 1)
+        raise MissingIOOperation(yaml_path=yaml_path)
 
     def _upload_vdbench_result(self, result: dict):
         """Upload a single vdbench CSV result to Elasticsearch."""
