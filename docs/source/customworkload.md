@@ -69,10 +69,10 @@ any template .yaml files.
     2. Add custom workload class, [benchmark_runner/workloads/vdbench_pod.py](benchmark_runner/workloads/vdbench_pod.py):
        Please copy the whole class and functionality
 9. Add workload method name (workload_pod/workload_vm) to environment_variables_dict['workloads'] in [benchmark_runner/main/environment_variables.py](benchmark_runner/main/environment_variables.py)
-10. Add workload folder path in [MANIFEST.in](MANIFEST.in), add 2 paths: the workload path to 'workload_data_template.yaml' and path to 'internal_data' Pod and VM template yaml files
-   ```
-   include benchmark_runner/common/template_operations/templates/vdbench/*.yaml
-   include benchmark_runner/common/template_operations/templates/vdbench/internal_data/*.yaml
+10. Add workload package data paths in the `[tool.setuptools.package-data]` section of [pyproject.toml](pyproject.toml), e.g.
+   ```toml
+   "benchmark_runner.common.template_operations.templates.vdbench" = ["*.yaml"]
+   "benchmark_runner.common.template_operations.templates.vdbench.internal_data" = ["*.yaml"]
    ```
 11. Add tests for all new methods you write under `tests/integration`.
 12. Update the golden unit test files as described [above](#add-new-workload-modify-parameters-to-workload-or-change-parameters-for-any-ci-job)
