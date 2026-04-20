@@ -149,7 +149,10 @@ class TemplateOperations:
 
         render_data = self.__build_template_data(template_render_data, workload_data)
 
-        out_files = [{'name': self.__standard_output_file, 'template': self.__standard_template_file}]
+        out_files = []
+        standard_template_path = os.path.join(workload_dir_path, 'internal_data', self.__standard_template_file)
+        if os.path.isfile(standard_template_path):
+            out_files.append({'name': self.__standard_output_file, 'template': self.__standard_template_file})
         if 'files' in workload_data:
             out_files.extend(workload_data['files'])
         for out_file in out_files:

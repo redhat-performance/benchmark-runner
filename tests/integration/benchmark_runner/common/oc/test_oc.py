@@ -1,4 +1,4 @@
-# Tests that are not required benchmark-operator pod
+# Tests that do not require a running workload pod
 
 import time
 import tempfile
@@ -7,6 +7,7 @@ import mock
 import pytest
 
 from benchmark_runner.common.oc.oc import OC
+from benchmark_runner.common.oc.oc_exceptions import PodNameNotExist
 from tests.integration.benchmark_runner.test_environment_variables import *
 from benchmark_runner.common.prometheus.prometheus_snapshot import PrometheusSnapshot
 
@@ -151,7 +152,8 @@ def test_oc_get_pod_name():
     :return:
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
-    assert oc._get_pod_name(pod_name='erererer', namespace=test_environment_variable['namespace']) == ''
+    with pytest.raises(PodNameNotExist):
+        oc._get_pod_name(pod_name='erererer', namespace=test_environment_variable['namespace'])
 
 
 def test_oc_get_pods():

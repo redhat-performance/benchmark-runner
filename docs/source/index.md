@@ -37,5 +37,4 @@ prometheus
 customworkload
 develop
 scaleVM
-build_fedora_benchmark_operator
 ```

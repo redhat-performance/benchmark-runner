@@ -71,7 +71,7 @@ def before_after_each_test_fixture():
     __delete_test_objects(workloads=['uperf'], kind='vm_direct')
     oc.delete_namespace(namespace=test_environment_variable['namespace'])
     # revert to defaults namespace
-    test_environment_variable['namespace'] = 'benchmark-operator'
+    test_environment_variable['namespace'] = 'benchmark-runner'
     print('Test End')
 
 

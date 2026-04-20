@@ -68,7 +68,6 @@ jobs:
           IBM_KEY: ${{ secrets.IBM_KEY }}
           RUN_ARTIFACTS_URL: ${{ secrets.PERF_RUN_ARTIFACTS_URL }}
           OCP_CLIENT_VERSION: ${{ secrets.PERF_OCP_CLIENT_VERSION }}
-          BENCHMARK_OPERATOR_VERSION: ${{ secrets.PERF_BENCHMARK_OPERATOR_VERSION }}
         run: |
           # Install Dockerfile content for pytest
           # install oc/kubectl
@@ -77,9 +76,6 @@ jobs:
           rm $RUNNER_PATH/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz
           cp $RUNNER_PATH/kubectl /usr/local/bin/kubectl
           cp $RUNNER_PATH/oc /usr/local/bin/oc
-
-          # clone benchmark-operator
-          git clone -b v${BENCHMARK_OPERATOR_VERSION} https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
 
           # run pytest - only unittest
           pytest -v tests/unittest/
@@ -141,7 +137,6 @@ jobs:
         GRAFANA_JSON: ${{ secrets.PERF_GRAFANA_JSON }}
         OCP_CLIENT_VERSION: ${{ secrets.PERF_OCP_CLIENT_VERSION }}
         VIRTCTL_VERSION: ${{ secrets.PERF_VIRTCTL_VERSION }}
-        BENCHMARK_OPERATOR_VERSION: ${{ secrets.PERF_BENCHMARK_OPERATOR_VERSION }}
       run: |
         # Install Dockerfile content for pytest
         # install oc/kubectl
@@ -159,8 +154,6 @@ jobs:
         cp $RUNNER_PATH/virtctl /usr/local/bin/virtctl
         rm -rf $RUNNER_PATH/virtctl
 
-        # clone benchmark-operator
-        git clone -b v${BENCHMARK_OPERATOR_VERSION} https://github.com/cloud-bulldozer/benchmark-operator $RUNNER_PATH/benchmark-operator
         # run pytest
         pytest -v tests --cov=benchmark_runner --cov-report=term-missing
         coverage run -m pytest -v tests
@@ -379,7 +372,7 @@ jobs:
     - name: ✔️ E2E tests using latest quay.io
       env:
         KUBEADMIN_PASSWORD: ${{ secrets.PERF_KUBEADMIN_PASSWORD }}
-        PIN_NODE_BENCHMARK_OPERATOR: ${{ secrets.PERF_PIN_NODE_BENCHMARK_OPERATOR }}
+        PIN_NODE0: ${{ secrets.PERF_PIN_NODE0 }}
         PIN_NODE1: ${{ secrets.PERF_PIN_NODE1 }}
         PIN_NODE2: ${{ secrets.PERF_PIN_NODE2 }}
         ELASTICSEARCH: ${{ secrets.PERF_ELASTICSEARCH }}
@@ -400,7 +393,7 @@ jobs:
         build_version="$(cut -d'=' -f2 <<<"$build")"
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> Start E2E workload: ${{ matrix.workload }} >>>>>>>>>>>>>>>>>>>>>>>>>>'
         scp -r "$RUNNER_PATH/.kube/config" provision:"$CONTAINER_KUBECONFIG_PATH"
-        ssh -t provision "podman run --rm -t -e WORKLOAD='${{ matrix.workload }}' -e KUBEADMIN_PASSWORD='$KUBEADMIN_PASSWORD' -e PIN_NODE_BENCHMARK_OPERATOR='$PIN_NODE_BENCHMARK_OPERATOR' -e PIN_NODE1='$PIN_NODE1' -e PIN_NODE2='$PIN_NODE2' -e ELASTICSEARCH='$ELASTICSEARCH' -e ELASTICSEARCH_PORT='$ELASTICSEARCH_PORT' -e ELASTICSEARCH_USER='$ELASTICSEARCH_USER' -e ELASTICSEARCH_PASSWORD='$ELASTICSEARCH_PASSWORD' -e IBM_REGION_NAME='$IBM_REGION_NAME' -e IBM_ENDPOINT_URL='$IBM_ENDPOINT_URL' -e IBM_ACCESS_KEY_ID='$IBM_ACCESS_KEY_ID' -e IBM_SECRET_ACCESS_KEY='$IBM_SECRET_ACCESS_KEY' -e IBM_BUCKET='$IBM_BUCKET' -e IBM_KEY='$IBM_KEY' -e RUN_ARTIFACTS_URL='$RUN_ARTIFACTS_URL' -e BUILD_VERSION='$build_version' -e RUN_TYPE='test_ci' -e TIMEOUT='2000' -e log_level='INFO' -v '$CONTAINER_KUBECONFIG_PATH':'$CONTAINER_KUBECONFIG_PATH' --privileged '${{ secrets.QUAY_BENCHMARK_RUNNER_REPOSITORY }}'"
+        ssh -t provision "podman run --rm -t -e WORKLOAD='${{ matrix.workload }}' -e KUBEADMIN_PASSWORD='$KUBEADMIN_PASSWORD' -e PIN_NODE0='$PIN_NODE0' -e PIN_NODE1='$PIN_NODE1' -e PIN_NODE2='$PIN_NODE2' -e ELASTICSEARCH='$ELASTICSEARCH' -e ELASTICSEARCH_PORT='$ELASTICSEARCH_PORT' -e ELASTICSEARCH_USER='$ELASTICSEARCH_USER' -e ELASTICSEARCH_PASSWORD='$ELASTICSEARCH_PASSWORD' -e IBM_REGION_NAME='$IBM_REGION_NAME' -e IBM_ENDPOINT_URL='$IBM_ENDPOINT_URL' -e IBM_ACCESS_KEY_ID='$IBM_ACCESS_KEY_ID' -e IBM_SECRET_ACCESS_KEY='$IBM_SECRET_ACCESS_KEY' -e IBM_BUCKET='$IBM_BUCKET' -e IBM_KEY='$IBM_KEY' -e RUN_ARTIFACTS_URL='$RUN_ARTIFACTS_URL' -e BUILD_VERSION='$build_version' -e RUN_TYPE='test_ci' -e TIMEOUT='2000' -e log_level='INFO' -v '$CONTAINER_KUBECONFIG_PATH':'$CONTAINER_KUBECONFIG_PATH' --privileged '${{ secrets.QUAY_BENCHMARK_RUNNER_REPOSITORY }}'"
         ssh -t provision "podman rmi -f '${{ secrets.QUAY_BENCHMARK_RUNNER_REPOSITORY }}'"
         echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End E2E workload: ${{ matrix.workload }} >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
 
