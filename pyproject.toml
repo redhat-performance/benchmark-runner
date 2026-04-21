@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "benchmark-runner"
-version = "1.0.970"
+version = "1.0.972"
 description = "Benchmark Runner Tool"
 readme = "README.md"
 license = "Apache-2.0"
@@ -13,7 +13,6 @@ authors = [
     { name = "Red Hat", email = "ebattat@redhat.com" },
 ]
 classifiers = [
-    "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",

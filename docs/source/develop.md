@@ -115,7 +115,7 @@ any template .yaml files.
     1. Add workload_data_template for configuration parameters, e.g. [benchmark_runner/common/template_operations/templates/stressng/stressng_data_template.yaml](benchmark_runner/common/template_operations/templates/stressng/stressng_data_template.yaml).
     2. The data template is structured as discussed [below](#data-template).
     3. Add workload pod and VM custom resource template inside [benchmark_runner/common/template_operations/templates/stressng/internal_data](benchmark_runner/common/template_operations/templates/stressng/internal_data)
-9. Add workload package data paths in the `[tool.setuptools.package-data]` section of [pyproject.toml](pyproject.toml), e.g.
+7. Add workload package data paths in the `[tool.setuptools.package-data]` section of [pyproject.toml](pyproject.toml), e.g.
    ```toml
      "benchmark_runner.common.template_operations.templates.stressng" = ["*.yaml"]
      "benchmark_runner.common.template_operations.templates.stressng.internal_data" = ["*.yaml"]
