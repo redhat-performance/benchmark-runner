@@ -1,0 +1,91 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "benchmark-runner"
+version = "1.0.972"
+description = "Benchmark Runner Tool"
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.10"
+authors = [
+    { name = "Red Hat", email = "ebattat@redhat.com" },
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+    "attrs==21.4.0",
+    "azure==4.0.0",
+    "boto3==1.33.13",
+    "botocore==1.33.13",
+    "cryptography==46.0.7",
+    "elasticsearch==7.16.1",
+    "elasticsearch-dsl==7.4.0",
+    "google-auth==2.30.0",
+    "google-auth-httplib2==0.2.0",
+    "google-auth-oauthlib==1.2.0",
+    "google-api-python-client==2.135.0",
+    "ipywidgets==8.0.6",
+    "jinja2==3.1.6",
+    "myst-parser==1.0.0",
+    "openshift-client==1.0.17",
+    "prometheus-api-client==0.5.1",
+    "pandas",
+    "paramiko==3.4.0",
+    "PyGitHub==1.55",
+    "PyYAML==6.0.1",
+    "setuptools",
+    "sphinx==5.0.0",
+    "sphinx-rtd-theme==1.0.0",
+    "tenacity==8.0.1",
+    "tqdm==4.66.3",
+    "typeguard==2.12.1",
+    "typing==3.7.4.3",
+]
+
+[project.urls]
+Homepage = "https://github.com/redhat-performance/benchmark-runner"
+
+[tool.setuptools.packages.find]
+include = ["benchmark_runner", "benchmark_runner.*"]
+
+[tool.setuptools.package-data]
+"benchmark_runner.common.template_operations.templates" = ["*.yaml"]
+"benchmark_runner.common.template_operations.templates.hammerdb" = ["*.yaml"]
+"benchmark_runner.common.template_operations.templates.hammerdb.internal_data" = ["*.yaml"]
+"benchmark_runner.common.template_operations.templates.stressng" = ["*.yaml"]
+"benchmark_runner.common.template_operations.templates.stressng.internal_data" = ["*.yaml"]
+"benchmark_runner.common.template_operations.templates.uperf" = ["*.yaml"]
+"benchmark_runner.common.template_operations.templates.uperf.internal_data" = ["*.yaml"]
+"benchmark_runner.common.template_operations.templates.scale" = ["*.yaml"]
+"benchmark_runner.common.template_operations.templates.vdbench" = ["*.yaml"]
+"benchmark_runner.common.template_operations.templates.vdbench.internal_data" = ["*.yaml"]
+"benchmark_runner.common.template_operations.templates.bootstorm" = ["*.yaml"]
+"benchmark_runner.common.template_operations.templates.bootstorm.internal_data" = ["*.yaml"]
+"benchmark_runner.common.template_operations.templates.windows" = ["*.yaml"]
+"benchmark_runner.common.template_operations.templates.windows.internal_data" = ["*.yaml"]
+"benchmark_runner.common.template_operations.templates.winmssql" = ["*.yaml"]
+"benchmark_runner.common.template_operations.templates.winmssql.internal_data" = ["*.yaml"]
+"benchmark_runner.common.template_operations.templates.winmssql.windows_benchmark_runner" = ["*"]
+"benchmark_runner.common.ocp_resources.lso.template" = ["*.sh", "*.yaml"]
+"benchmark_runner.common.ocp_resources.odf.template" = ["*.sh", "*.yaml"]
+"benchmark_runner.common.ocp_resources.infra.template" = ["*.sh", "*.yaml"]
+"benchmark_runner.common.ocp_resources.kata.template" = ["*.sh", "*.yaml"]
+"benchmark_runner.common.ocp_resources.cnv.template" = ["*.sh", "*.yaml"]
+"benchmark_runner.common.ocp_resources.custom.template" = ["*.sh", "*.yaml"]
+"benchmark_runner.common.ocp_resources.nhc_far.template" = ["*.sh", "*.yaml"]
+"benchmark_runner.common.assisted_installer.jetlag" = ["run_jetlag.sh"]
+"benchmark_runner.common.prometheus" = ["*.yaml"]
+"benchmark_runner.jupyterlab.templates.analyze_perfci_cluster" = ["*.ipynb"]
+"benchmark_runner.jupyterlab.templates.analyze_prometheus_logs" = ["*.ipynb"]
+"benchmark_runner.jupyterlab.templates.analyze_workloads.analyze_hammerdb_logs" = ["*.ipynb"]
+"benchmark_runner.jupyterlab.templates.analyze_workloads.analyze_uperf_logs" = ["*.ipynb"]
+"benchmark_runner.jupyterlab.templates.analyze_workloads.analyze_vdbench_logs" = ["*.ipynb"]
+"benchmark_runner.jupyterlab.templates.elasticsearch_operations" = ["*.ipynb"]

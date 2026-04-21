@@ -114,11 +114,11 @@ any template .yaml files.
 6. Create workload folder in the [benchmark_runner/common/template_operations/templates](benchmark_runner/common/template_operations/templates) directory.  Create the following files in that directory:
     1. Add workload_data_template for configuration parameters, e.g. [benchmark_runner/common/template_operations/templates/stressng/stressng_data_template.yaml](benchmark_runner/common/template_operations/templates/stressng/stressng_data_template.yaml).
     2. The data template is structured as discussed [below](#data-template).
-    3. Add workload pod and VM template inside [benchmark_runner/common/template_operations/templates/stressng/internal_data](benchmark_runner/common/template_operations/templates/stressng/internal_data)
-7. Add workload folder path in [MANIFEST.in](MANIFEST.in), add 2 paths: the workload path to 'workload_data_template.yaml' and path to 'internal_data' Pod and VM template yaml files. e.g.
-   ```
-     include benchmark_runner/common/template_operations/templates/stressng/*.yaml
-     include benchmark_runner/common/template_operations/templates/stressng/internal_data/*.yaml
+    3. Add workload pod and VM custom resource template inside [benchmark_runner/common/template_operations/templates/stressng/internal_data](benchmark_runner/common/template_operations/templates/stressng/internal_data)
+7. Add workload package data paths in the `[tool.setuptools.package-data]` section of [pyproject.toml](pyproject.toml), e.g.
+   ```toml
+     "benchmark_runner.common.template_operations.templates.stressng" = ["*.yaml"]
+     "benchmark_runner.common.template_operations.templates.stressng.internal_data" = ["*.yaml"]
    ```
 8. Add tests for all new methods you write under `tests/integration`.
 9. Update the golden unit test files as described [above](#add-new-workload-modify-parameters-to-workload-or-change-parameters-for-any-ci-job)
@@ -248,7 +248,7 @@ virtual environment:
 ## Determine the version of benchmark-runner in the current container image
 
 The version of [https://pypi.org/project/benchmark-runner/](https://pypi.org/project/benchmark-runner/) should match the
-version in `setup.py`, and the [https://quay.io/repository/benchmark-runner/benchmark-runner?tab=tags](https://quay.io/repository/benchmark-runner/benchmark-runner?tab=tags)
+version in `pyproject.toml`, and the [https://quay.io/repository/benchmark-runner/benchmark-runner?tab=tags](https://quay.io/repository/benchmark-runner/benchmark-runner?tab=tags)
 should also match that version.  However, if the version on PyPi is
 not updated quickly enough, the container image may remain stale.
 This may result in unexpected errors.
