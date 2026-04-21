@@ -30,7 +30,6 @@ spec:
       app: vdbench
   nodeSelector:
     kubernetes.io/hostname: pin-node-1
-  runtimeClassName: kata
   containers:
     - name: vdbench-pod
       image: quay.io/benchmark-runner/centos-stream9-vdbench5.04.07-pod:latest
@@ -47,13 +46,13 @@ spec:
           mountPath: "/workload"
       env:
         - name: BLOCK_SIZES
-          value: "64,oltp1"
+          value: "oltp1,oltp2"
         - name: IO_OPERATION
-          value: "write,oltp1"
+          value: "oltp1,oltp2"
         - name: IO_THREADS
-          value: "16,3"
+          value: "8,8"
         - name: FILES_IO #How file IO will be done
-          value: "random,oltp1"
+          value: "oltp1,oltp2"
         - name: IO_RATE # an integer or "max"
           value: "max,max"
         - name: MIX_PRECENTAGE # used for mixed workload 0-100

@@ -55,10 +55,10 @@ spec:
           resources:
             requests:
               cpu: 10m
-              memory: 16Gi
+              memory: 4Gi
             limits:
               cpu: 4
-              memory: 16Gi
+              memory: 12Gi
           env:
             - name: POSTGRESQL_USER
               value: "test"
@@ -162,7 +162,7 @@ spec:
       resources:
         requests:
           cpu: "10m"
-          memory: "16Gi"
+          memory: "4Gi"
         limits:
           cpu: "4"
-          memory: "16Gi"
+          memory: "12Gi"

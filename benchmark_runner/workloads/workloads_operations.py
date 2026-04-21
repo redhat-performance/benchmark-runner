@@ -314,43 +314,6 @@ class WorkloadsOperations:
             result_list.append(dict(line_dict))
         return result_list
 
-    def _create_vm_run_artifacts(self, vm_name: str, start_stamp: str, end_stamp: str, log_type: str):
-        """
-        This method creates vm run artifacts
-        :param vm_name: vm name
-        :param start_stamp: start stamp
-        :param end_stamp: end stamp
-        :param log_type: log type extension
-        :return: run results dict
-        """
-        result_list = []
-        results_list = self._oc.extract_vm_results(vm_name=vm_name, start_stamp=start_stamp, end_stamp=end_stamp)
-        workload_name = self._environment_variables_dict.get('workload', '').replace('_', '-')
-        # save scale pod log
-        if self._scale:
-            self._create_pod_log(pod='state-signals-exporter', log_type='.log')
-            self._create_pod_log(pod='redis-master', log_type='.log')
-        # insert results to csv
-        csv_result_file = os.path.join(self._run_artifacts_path, f'{vm_name}{log_type}')
-        with open(csv_result_file, 'w') as out:
-            for row in results_list:
-                if row:
-                    out.write(f'{row[0].strip()}\n')
-        # csv to dictionary
-        the_reader = DictReader(open(csv_result_file, 'r'))
-        for line_dict in the_reader:
-            for key, value in line_dict.items():
-                if self.__is_float(value):
-                    num = float(value)
-                    line_dict[key] = round(num, 3)
-                elif value == 'n/a':
-                    line_dict[key] = 0.0
-            line_dict['vm_name'] = vm_name
-            workload = self._get_workload_file_name(workload=self._get_run_artifacts_hierarchy(workload_name=workload_name, is_file=True))
-            line_dict['run_artifacts_url'] = os.path.join(self._run_artifacts_url, f'{workload}.tar.gz')
-            result_list.append(dict(line_dict))
-        return result_list
-
     def _create_run_artifacts(self, workload: str = '', labels: list = None):
         """
         This method creates pod logs for direct pod workloads (no operator)
@@ -463,6 +426,11 @@ class WorkloadsOperations:
         :return:
         """
         date_format = '%Y_%m_%d'
+        if self._storage_type == 'ephemeral':
+            odf_disk_count = -1
+        else:
+            odf_disk_count = self._oc.get_odf_disk_count()
+            odf_disk_count = -1 if odf_disk_count in {0, 1} else odf_disk_count
         metadata = {'ocp_version': self._oc.get_ocp_server_version(),
                     'previous_ocp_version': '' if len(self._oc.get_previous_ocp_version()) > 10 else self._oc.get_previous_ocp_version(),
                     'cnv_version': self._oc.get_cnv_version(),
@@ -481,8 +449,7 @@ class WorkloadsOperations:
                     'pin_node2': self._pin_node2,
                     'pin_node0': self._pin_node0,
                     'storage_type': self._storage_type,
-                    # display -1 when 0,1 for avoiding conflict with 0/1 status code
-                    'odf_disk_count': -1 if self._oc.get_odf_disk_count() in {0, 1} else self._oc.get_odf_disk_count()
+                    'odf_disk_count': odf_disk_count
 }
         if kind:
             metadata.update({'kind': kind})
@@ -695,6 +662,8 @@ class WorkloadsOperations:
                                        thread_result: dict):
         """Upload a single per-thread HammerDB result to Elasticsearch."""
         result = {'run_artifacts_url': run_artifacts_url, **thread_result}
+        if self._enable_prometheus_snapshot:
+            result.update(self._prometheus_result)
         self._upload_to_elasticsearch(index=index, kind=kind, status=status,
                                       result=result, database=database)
 

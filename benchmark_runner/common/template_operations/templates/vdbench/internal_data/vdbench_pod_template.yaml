@@ -90,9 +90,6 @@ spec:
     kubernetes.io/hostname: {{ pin_node1 }}
     {%- endif %}
   {%- endif %}
-  {%- if kind == 'kata' %}
-  runtimeClassName: kata
-  {%- endif %}
   containers:
     - name: vdbench-pod
       image: {{ vdbench_image }}
@@ -120,6 +117,10 @@ spec:
         {%- else -%}
         - name: vdbench-pod-pvc-claim
         {%- endif %}
+          mountPath: "/workload"
+      {%- else %}
+      volumeMounts:
+        - name: vdbench-ephemeral-vol
           mountPath: "/workload"
       {%- endif %}
       env:
@@ -171,7 +172,7 @@ spec:
       args: ["-c", "$WORKLOAD_METHOD"]
       {%- endif %}
   restartPolicy: "Never"
-  {%- if cluster != "kubernetes" %}
+  {%- if cluster != "kubernetes" and odf_pvc == True %}
   spec:
     pvc:
       accessModes:
@@ -197,4 +198,8 @@ spec:
       persistentVolumeClaim:
         claimName: vdbench-pod-pvc-claim
     {%- endif %}
+  {%- else %}
+  volumes:
+    - name: vdbench-ephemeral-vol
+      emptyDir: {}
   {%- endif %}

@@ -117,6 +117,7 @@ class EnvironmentVariables:
                                                          'hammerdb_pod_mssql_lso', 'hammerdb_vm_mssql_lso',
                                                          'hammerdb_pod_mssql_ephemeral', 'hammerdb_vm_mssql_ephemeral',
                                                          'vdbench_pod', 'vdbench_vm',
+                                                         'vdbench_pod_ephemeral', 'vdbench_vm_ephemeral',
                                                          'clusterbuster', 'bootstorm_vm', 'windows_vm', 'winmssql_vm',
                                                          'krknhub']
         # Workloads namespaces
@@ -155,17 +156,21 @@ class EnvironmentVariables:
 
         # run workload with odf pvc True/False. True=ODF, False=Ephemeral
         self._environment_variables_dict['odf_pvc'] = EnvironmentVariables.get_boolean_from_environment('ODF_PVC', True)
-        if base_workload == 'hammerdb' or base_workload == 'winmssql':
-            if len(self._environment_variables_dict['workload'].split('_')) == self.HAMMERDB_LSO_LEN:
-                storage_type = self._environment_variables_dict['workload'].split('_')[self.HAMMERDB_LSO_LEN - 1]
+        workload_parts = self._environment_variables_dict['workload'].split('_')
+        if workload_parts[-1] == 'ephemeral':
+            self._environment_variables_dict['storage_type'] = 'ephemeral'
+            self._environment_variables_dict['odf_pvc'] = False
+        elif base_workload == 'hammerdb' or base_workload == 'winmssql':
+            if len(workload_parts) == self.HAMMERDB_LSO_LEN:
+                storage_type = workload_parts[self.HAMMERDB_LSO_LEN - 1]
                 self._environment_variables_dict['storage_type'] = storage_type
-                if storage_type == 'ephemeral':
-                    self._environment_variables_dict['odf_pvc'] = False
             elif self._environment_variables_dict['odf_pvc']:
                 self._environment_variables_dict['storage_type'] = 'odf'
             else:
                 self._environment_variables_dict['storage_type'] = 'ephemeral'
                 self._environment_variables_dict['odf_pvc'] = False
+        elif not self._environment_variables_dict['odf_pvc']:
+            self._environment_variables_dict['storage_type'] = 'ephemeral'
 
         # LSO Disk id - auto-detect when located on worker-2, put only the id not full ( i.e. /dev/disk/by-id/{{ lso_disk_id }} )
         self._environment_variables_dict['lso_disk_id'] = EnvironmentVariables.get_env('LSO_DISK_ID', '')

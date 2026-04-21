@@ -66,6 +66,11 @@ class HammerdbPod(WorkloadsOperations):
             # 1. Create namespace
             self._oc.create_async(yaml=os.path.join(self._run_artifacts_path, 'namespace.yaml'))
 
+            # MSSQL needs anyuid SCC to write to /.system at startup
+            if self.__database == 'mssql':
+                namespace = self._environment_variables_dict.get('namespace', 'benchmark-runner')
+                self._oc.run(f'oc adm policy add-scc-to-user anyuid -z default -n {namespace}')
+
             # 2. Create configmaps
             configmap_yaml = os.path.join(
                 self._run_artifacts_path,

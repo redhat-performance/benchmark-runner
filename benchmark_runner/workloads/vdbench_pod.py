@@ -97,13 +97,10 @@ class VdbenchPod(WorkloadsOperations):
         try:
             if self._enable_prometheus_snapshot:
                 self._prometheus_metrics_operation.init_prometheus()
-            if 'kata' in self._workload:
-                self.__kind = 'kata'
-                self.__name = self._workload.replace('kata', 'pod')
-            else:
-                self.__kind = 'pod'
-                self.__name = self._workload
-            self.__workload_name = self._workload.replace('_', '-')
+            workload = self._workload.removesuffix('_ephemeral')
+            self.__kind = 'pod'
+            self.__name = workload
+            self.__workload_name = workload.replace('_', '-')
             self.__pod_name = f'{self.__workload_name}-{self._trunc_uuid}'
             if self._run_type == 'test_ci':
                 self.__es_index = 'vdbench-test-ci-results'

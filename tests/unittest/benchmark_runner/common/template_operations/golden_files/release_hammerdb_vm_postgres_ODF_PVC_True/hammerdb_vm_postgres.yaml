@@ -91,7 +91,7 @@ spec:
       domain:
         cpu:
           sockets: 1
-          cores: 4
+          cores: 2
         devices:
           disks:
             - disk:
@@ -117,9 +117,9 @@ spec:
           type: ""
         resources:
           requests:
-            memory: "16Gi"
+            memory: "4Gi"
           limits:
-            memory: "16Gi"
+            memory: "12Gi"
       terminationGracePeriodSeconds: 180
       volumes:
         - containerDisk:

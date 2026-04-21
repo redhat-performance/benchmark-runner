@@ -78,3 +78,12 @@ class Windows_HammerDB_NOT_Succeeded(BenchmarkRunnerError):
         else:
             self.message = "Windows HammerDB workload did not succeed within the timeout"
         super(Windows_HammerDB_NOT_Succeeded, self).__init__(self.message)
+
+
+class MissingIOOperation(BenchmarkRunnerError):
+    """
+    This class raises an error when IO_OPERATION is not found in the rendered YAML
+    """
+    def __init__(self, yaml_path: str):
+        self.message = f"IO_OPERATION not found in {yaml_path}"
+        super(MissingIOOperation, self).__init__(self.message)

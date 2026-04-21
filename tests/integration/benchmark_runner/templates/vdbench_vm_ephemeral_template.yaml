@@ -1,14 +1,23 @@
 apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ namespace }}
+---
+apiVersion: v1
 kind: Secret
 metadata:
   name: vdbench-cloudinit
-  namespace: benchmark-runner
+  namespace: {{ namespace }}
 stringData:
   userdata: |-
     #cloud-config
     password: centos
     chpasswd: { expire: False }
     ssh_pwauth: true
+    {%- if ssh_public_key is defined and ssh_public_key %}
+    ssh_authorized_keys:
+      - {{ ssh_public_key }}
+    {%- endif %}
     bootcmd:
       - "mkdir -p /workload || true"
       - "[ -e /dev/disk/by-id/*vdbenchdata ] && disk=$(shopt -s nullglob; basename /dev/disk/by-id/*vdbenchdata) && mkfs.ext4 /dev/disk/by-id/$disk && mount /dev/disk/by-id/$disk /workload"
@@ -18,7 +27,7 @@ stringData:
       - export IO_THREADS=8,8
       - export FILES_IO=oltp1,oltp2
       - export IO_RATE=max,max
-      - export MIX_PRECENTAGE # used for mixed workload 0-100
+      - export MIX_PRECENTAGE
       - export DURATION=20
       - export PAUSE=0
       - export WARMUP=20
@@ -36,28 +45,14 @@ stringData:
       - podman run --rm -e BLOCK_SIZES="$BLOCK_SIZES" -e IO_OPERATION="$IO_OPERATION" -e IO_THREADS="$IO_THREADS" -e FILES_IO="$FILES_IO" -e IO_RATE="$IO_RATE" -e MIX_PRECENTAGE="$MIX_PRECENTAGE" -e DURATION="$DURATION" -e PAUSE="$PAUSE" -e WARMUP="$WARMUP" -e FILES_SELECTION="$FILES_SELECTION" -e COMPRESSION_RATIO="$COMPRESSION_RATIO" -e RUN_FILLUP="$RUN_FILLUP" -e DIRECTORIES="$DIRECTORIES" -e FILES_PER_DIRECTORY="$FILES_PER_DIRECTORY" -e SIZE_PER_FILE="$SIZE_PER_FILE" -e REDIS_HOST="$REDIS_HOST" -e LOGS_DIR="$LOGS_DIR" -e TIMEOUT="$TIMEOUT" -v "/workload":"/workload" --privileged quay.io/benchmark-runner/centos-stream9-vdbench5.04.07-pod:latest "$WORKLOAD_METHOD"
       - echo @@~@@END-WORKLOAD@@~@@
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: vdbench-pvc-claim
-  namespace: benchmark-runner
-spec:
-  storageClassName: ocs-storagecluster-ceph-rbd
-  accessModes: [ "ReadWriteOnce" ]
-  volumeMode: Block
-  resources:
-    requests:
-      storage: 10Gi
----
 apiVersion: kubevirt.io/v1
 kind: VirtualMachine
 metadata:
-  name: vdbench-vm-deadbeef
-  namespace: benchmark-runner
+  name: vdbench-vm-test
+  namespace: {{ namespace }}
   labels:
-    app: vdbench-deadbeef
-    type: vdbench-vm-deadbeef
-    benchmark-uuid: deadbeef-0123-3210-cdef-01234567890abcdef
+    app: vdbench-test
+    type: vdbench-vm-test
     benchmark-runner-workload: vdbench
 spec:
   running: true
@@ -66,8 +61,6 @@ spec:
       labels:
         kubevirt-vm: vdbench
     spec:
-      nodeSelector:
-        kubernetes.io/hostname: pin-node-1
       domain:
         cpu:
           sockets: 2
@@ -97,8 +90,8 @@ spec:
       terminationGracePeriodSeconds: 180
       volumes:
         - name: data-volume
-          persistentVolumeClaim:
-            claimName: vdbench-pvc-claim
+          emptyDisk:
+            capacity: 10Gi
         - containerDisk:
             image: quay.io/benchmark-runner/centos-stream9-container-disk:latest
           name: containerdisk

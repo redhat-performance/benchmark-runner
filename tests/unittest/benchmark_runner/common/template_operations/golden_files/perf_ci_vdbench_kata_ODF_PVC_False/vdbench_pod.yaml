@@ -18,7 +18,6 @@ spec:
       app: vdbench
   nodeSelector:
     kubernetes.io/hostname: pin-node-1
-  runtimeClassName: kata
   containers:
     - name: vdbench-pod
       image: quay.io/benchmark-runner/centos-stream9-vdbench5.04.07-pod:latest
@@ -30,6 +29,9 @@ spec:
           cpu: 2
           # Remove memory limit for Kata pods due to
           # https://github.com/kata-containers/kata-containers/issues/6129
+      volumeMounts:
+        - name: vdbench-ephemeral-vol
+          mountPath: "/workload"
       env:
         - name: BLOCK_SIZES
           value: "oltp1,oltp2,oltphw,odss2,odss128,4_cache,64_cache,4,64,4_cache,64_cache,4,64"
@@ -75,14 +77,6 @@ spec:
       command: ["/bin/bash"]
       args: ["-c", "$WORKLOAD_METHOD"]
   restartPolicy: "Never"
-  spec:
-    pvc:
-      accessModes:
-        - ReadWriteOnce
-      resources:
-        requests:
-          storage: 64Gi
-          Reclaim Policy: Delete
-      storageClassName: ocs-storagecluster-ceph-rbd
-    source:
-      blank: {}
+  volumes:
+    - name: vdbench-ephemeral-vol
+      emptyDir: {}

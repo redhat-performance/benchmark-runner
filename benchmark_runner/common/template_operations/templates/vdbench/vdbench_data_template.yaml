@@ -45,10 +45,10 @@ template_data:
       requests_memory: 4Gi
       storage: 64Gi
     default:
-      BLOCK_SIZES: 64,oltp1
-      IO_OPERATION: write,oltp1
-      IO_THREADS: 16,3
-      FILES_IO: random,oltp1
+      BLOCK_SIZES: oltp1,oltp2
+      IO_OPERATION: oltp1,oltp2
+      IO_THREADS: 8,8
+      FILES_IO: oltp1,oltp2
       IO_RATE: max,max
       # used for mixed workload 0-100
       MIX_PRECENTAGE:
