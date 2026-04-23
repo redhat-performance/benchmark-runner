@@ -236,7 +236,7 @@ def test_delete_sync_pod_timeout_error():
 def test_get_long_short_uuid():
     """
     This method tests UUID propagation in native workloads.
-    In benchmark-operator, UUID was stored in CRD status (get_long_uuid);
+    In benchmark-runner, UUID was stored in CRD status (get_long_uuid);
     in native workloads, UUID is a pod label (benchmark-uuid).
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
