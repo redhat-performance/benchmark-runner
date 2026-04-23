@@ -6,10 +6,14 @@ from os import listdir
 from os.path import isfile, join
 from benchmark_runner.common.clouds.shared.s3.s3_operations import S3Operations
 
-from moto import mock_aws
+# walk around for moto DeprecationWarning
+import warnings
+with warnings.catch_warnings():
+    warnings.filterwarnings("ignore", category=DeprecationWarning)
+    from moto import mock_s3
 
 
-@mock_aws
+@mock_s3
 def test_upload_file():
     """ This test for testing upload data into s3 bucket"""
     expected_file_name = 'file.txt'
@@ -26,7 +30,7 @@ def test_upload_file():
         assert s3operations.file_exist(bucket='benchmark', key='test-data', file_name=expected_file_name)
 
 
-@mock_aws
+@mock_s3
 def test_download_file():
     """ This test for testing upload data into s3 bucket"""
     expected_file_name = 'file.txt'
@@ -44,7 +48,7 @@ def test_download_file():
             assert os.path.exists(os.path.join(temp_local_directory2, expected_file_name))
 
 
-@mock_aws
+@mock_s3
 def test_upload_objects():
     """ This test for testing upload data into s3 bucket"""
     expected_files_list = ['file1.txt', 'file2.txt']
@@ -64,7 +68,7 @@ def test_upload_objects():
     assert sorted(actual_files_list) == sorted(expected_files_list)
 
 
-@mock_aws
+@mock_s3
 def test_upload_objects_no_key():
     """ This test for testing upload data into s3 bucket"""
     expected_files_list = ['file1.txt', 'file2.txt']
@@ -85,7 +89,7 @@ def test_upload_objects_no_key():
         assert sorted(actual_files_list) == sorted(expected_files_list)
 
 
-@mock_aws
+@mock_s3
 def test_download_objects():
     """ This test for testing upload data into s3 bucket"""
     expected_files_list = ['file1.txt', 'file2.txt']
@@ -104,7 +108,7 @@ def test_download_objects():
     assert sorted(actual_files_list) == sorted(expected_files_list)
 
 
-@mock_aws
+@mock_s3
 def test_download_objects_no_key():
     """ This test for testing upload data into s3 bucket"""
     expected_files_list = ['file1.txt', 'file2.txt']
@@ -124,7 +128,7 @@ def test_download_objects_no_key():
         assert sorted(actual_files_list) == sorted(expected_files_list)
 
 
-@mock_aws
+@mock_s3
 def test_file_exist():
     """ This test for testing upload data into s3 bucket"""
     expected_file_name = 'file.txt'
@@ -139,7 +143,7 @@ def test_file_exist():
         assert s3operations.file_exist(bucket='benchmark', key='test-data', file_name=expected_file_name)
 
 
-@mock_aws
+@mock_s3
 def test_file_delete():
     """ This test for testing upload data into s3 bucket"""
     expected_file_name = 'file.txt'
@@ -155,7 +159,7 @@ def test_file_delete():
         assert not s3operations.file_exist(bucket='benchmark', key='test-data', file_name=expected_file_name)
 
 
-@mock_aws
+@mock_s3
 def test_folder_delete():
     """ This test for testing upload data into s3 bucket"""
     expected_files_list = ['file1.txt', 'file2.txt']
