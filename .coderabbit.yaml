@@ -1,0 +1,58 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: "en-US"
+early_access: false
+
+reviews:
+  profile: "chill"
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: false
+  review_status: true
+  collapse_walkthrough: true
+  sequence_diagrams: false
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches:
+      - main
+    ignore_title_keywords:
+      - "WIP"
+      - "[WIP]"
+      - "do-not-merge"
+      - "work-in-progress"
+      - "[skip ci]"
+    path_filters:
+      - "!**/golden_files/**"
+  path_instructions:
+    - path: "benchmark_runner/**"
+      instructions: >
+        Focus on Python best practices, error handling, and resource cleanup.
+        Check for proper use of OpenShift/Kubernetes client patterns.
+        Flag any hardcoded credentials or secrets.
+    - path: "benchmark_runner/workloads/**"
+      instructions: >
+        Verify workload lifecycle: creation, monitoring, data collection, cleanup.
+        Check timeout handling and retry logic.
+    - path: "benchmark_runner/common/template_operations/**"
+      instructions: >
+        Verify Jinja2 template variable substitution is correct.
+        Check that YAML templates are well-formed.
+    - path: ".github/workflows/**"
+      instructions: >
+        Check for proper secret handling, job dependencies, and workflow triggers.
+        Verify CI steps are idempotent where possible.
+    - path: "tests/**"
+      instructions: >
+        Ensure test coverage for edge cases.
+        Verify mocks and fixtures are properly scoped.
+
+chat:
+  auto_reply: true
+
+knowledge_base:
+  code_guidelines:
+    enabled: true
+    filePatterns:
+      - "CONTRIBUTING.md"
+      - "HOW_TO.md"
+      - "README.md"
