@@ -61,8 +61,12 @@ class CreateOCPResource:
         :param resource:
         :return:
         """
-        for resource_file in os.listdir(os.path.join(self.__dir_path, resource, 'template')):
-            with open(os.path.join(self.__dir_path, resource, 'template', resource_file)) as f:
+        template_dir = os.path.join(self.__dir_path, resource, 'template')
+        for resource_file in os.listdir(template_dir):
+            resource_file_path = os.path.join(template_dir, resource_file)
+            if os.path.isdir(resource_file_path):
+                continue
+            with open(resource_file_path) as f:
                 template_str = f.read()
             tm = Template(template_str, keep_trailing_newline=True)
             data = tm.render(self.__environment_variables_dict)
