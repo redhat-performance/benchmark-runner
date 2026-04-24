@@ -33,8 +33,6 @@ jobs:
        fail-fast: false
        matrix:
           resource: [ 'cnv', 'lso', 'infra', 'custom']
-    outputs:
-      install_resource_time_output: ${{ steps.ocp_install_resource_step.outputs.install_resource_time }}
     steps:
       - uses: actions/checkout@v6
       - name: Set up Python 3.14
@@ -126,5 +124,3 @@ jobs:
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End  ${{ matrix.resource }} installation   >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
           end=$(printf '%(%s)T' -1)
           echo "INSTALL_OCP_RESOURCE_MINUTES_TIME=$(( (( end - start )) / 60))" >> "$GITHUB_ENV"
-      - id: ocp_install_resource_step
-        run: echo "install_resource_time=$INSTALL_OCP_RESOURCE_MINUTES_TIME" >> $GITHUB_OUTPUT
