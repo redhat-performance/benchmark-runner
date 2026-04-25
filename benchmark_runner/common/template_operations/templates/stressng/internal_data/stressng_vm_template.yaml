@@ -37,10 +37,8 @@ spec:
           type: ""
         resources:
           requests:
-            cpu: {{ requests_cpu }}
             memory: {{ requests_memory }}
           limits:
-            cpu: {{ limits_cpu }}
             memory: {{ limits_memory }}
       terminationGracePeriodSeconds: 180
       volumes:
