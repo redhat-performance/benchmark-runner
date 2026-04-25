@@ -44,6 +44,13 @@ template_data:
       db_type: mariadb
       db_user: root
       db_server_pod: mariadb-deployment.mariadb-db
+      run_type:
+        perf_ci:
+          innodb_buffer_pool_size: 8192M
+          innodb_log_buffer_size: 2048M
+        default:
+          innodb_buffer_pool_size: 4096M
+          innodb_log_buffer_size: 1024M
     mssql:
       db_image: mssql2022-centos9-container-disk:latest
       db_pass: s3curePasswordString
