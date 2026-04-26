@@ -38,7 +38,10 @@ spec:
             value: "Y"
           - name: MSSQL_SA_PASSWORD
             value: "s3curePasswordString"
+        # MSSQL 2022 defaults to non-root user 'mssql' which cannot create /.system;
+        # runAsUser: 0 + allowPrivilegeEscalation are both required for sqlservr to start.
         securityContext:
+          runAsUser: 0
           allowPrivilegeEscalation: true
         volumeMounts:
       volumes:
