@@ -14,6 +14,8 @@ class BootstormVM(WorkloadsOperations):
     This class runs bootstorm vm
     """
 
+    STOP_VM_TIMEOUT = 1800
+
     def __init__(self):
         super().__init__()
         self._name = ''
@@ -365,7 +367,8 @@ class BootstormVM(WorkloadsOperations):
         This method waits for VMs stop in parallel
         """
         try:
-            self._virtctl.wait_for_vm_status(vm_name=f'{self._workload_name}-{self._trunc_uuid}-{vm_num}')
+            self._virtctl.wait_for_vm_status(vm_name=f'{self._workload_name}-{self._trunc_uuid}-{vm_num}',
+                                             timeout=self.STOP_VM_TIMEOUT)
         except Exception as err:
             # save run artifacts logs
             self.save_error_logs()
@@ -436,37 +439,23 @@ class BootstormVM(WorkloadsOperations):
                 # create run bulks
                 bulks = tuple(self.split_run_bulks(iterable=range(self._scale * len(self._scale_node_list)),
                                                    limit=self._threads_limit))
-                # only propagate failures from action steps to their wait counterpart:
-                # create→run, stop→wait_for_stop, delete→wait_for_delete
-                propagate_failure_steps = {self._create_vm_scale, self._stop_vm_scale, self._delete_vm_scale}
-                failed_vms = set()
                 # create, run and delete vms
                 for target in steps:
-                    step_failed_vms = set()
                     proc = []
                     for bulk in bulks:
                         for vm_num in bulk:
-                            vm_num_str = str(vm_num)
-                            if vm_num_str in failed_vms:
-                                logger.warning(f'Skipping VM {vm_num_str} for {target.__name__} due to previous step failure')
-                                continue
                             # save the first run vm time
                             if self._run_vm_scale == target and not first_run_time_updated:
                                 self._set_bootstorm_vm_first_run_time()
                                 first_run_time_updated = True
-                            p = Process(target=target, args=(vm_num_str,))
+                            p = Process(target=target, args=(str(vm_num),))
                             p.start()
-                            proc.append((p, vm_num_str))
-                        for p, vm_num_str in proc:
+                            proc.append(p)
+                        for p in proc:
                             p.join()
-                            if p.exitcode != 0:
-                                step_failed_vms.add(vm_num_str)
-                                logger.error(f'VM {vm_num_str} failed in {target.__name__} (exit code {p.exitcode})')
                         # sleep between bulks
                         time.sleep(self._bulk_sleep_time)
                         proc = []
-                    # carry failures only from action→wait pairs, reset otherwise
-                    failed_vms = step_failed_vms if target in propagate_failure_steps else set()
 
     @logger_time_stamp
     def run(self):
