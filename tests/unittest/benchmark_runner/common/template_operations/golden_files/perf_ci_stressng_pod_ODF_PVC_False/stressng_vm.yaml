@@ -35,10 +35,8 @@ spec:
           type: ""
         resources:
           requests:
-            cpu: 60
             memory: 75Gi
           limits:
-            cpu: 60
             memory: 75Gi
       terminationGracePeriodSeconds: 180
       volumes:
