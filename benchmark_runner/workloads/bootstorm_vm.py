@@ -453,7 +453,12 @@ class BootstormVM(WorkloadsOperations):
                             if p.is_alive():
                                 p.terminate()
                                 p.join(timeout=OC.DELAY)
-                                logger.error(f'Process {p.name} timed out in {target.__name__}, terminated')
+                                if p.is_alive():
+                                    p.kill()
+                                    p.join(timeout=OC.DELAY)
+                                    logger.error(f'Process {p.name} killed in {target.__name__} after terminate failed')
+                                else:
+                                    logger.error(f'Process {p.name} timed out in {target.__name__}, terminated')
                         # sleep between bulks
                         time.sleep(self._bulk_sleep_time)
                         proc = []
