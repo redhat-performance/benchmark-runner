@@ -9,7 +9,7 @@ from urllib3 import disable_warnings
 disable_warnings(InsecureRequestWarning)
 
 from benchmark_runner.main.environment_variables import environment_variables
-from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
+from benchmark_runner.common.logger.logger_time_stamp import logger
 
 
 class PrometheusMetricsOperation:
@@ -166,7 +166,6 @@ class PrometheusMetricsOperation:
             raise Exception('Missing ElasticSearch data')
 
     @staticmethod
-    @logger_time_stamp
     def parse_prometheus_metrics(data: dict):
         """
         This method parses prometheus metrics and returns summary result
