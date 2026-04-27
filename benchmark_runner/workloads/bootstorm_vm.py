@@ -6,7 +6,7 @@ from multiprocessing import Process, Manager
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 from benchmark_runner.common.elasticsearch.elasticsearch_exceptions import ElasticSearchDataNotUploaded
 from benchmark_runner.workloads.workloads_operations import WorkloadsOperations
-from benchmark_runner.common.oc.oc import VMStatus
+from benchmark_runner.common.oc.oc import OC, VMStatus
 
 
 class BootstormVM(WorkloadsOperations):
@@ -449,7 +449,11 @@ class BootstormVM(WorkloadsOperations):
                             p.start()
                             proc.append(p)
                         for p in proc:
-                            p.join()
+                            p.join(timeout=OC.SHORT_TIMEOUT)
+                            if p.is_alive():
+                                p.terminate()
+                                p.join(timeout=30)
+                                logger.error(f'Process {p.name} timed out in {target.__name__}, terminated')
                         # sleep between bulks
                         time.sleep(self._bulk_sleep_time)
                         proc = []
