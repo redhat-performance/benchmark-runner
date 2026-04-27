@@ -23,7 +23,7 @@ data:
         myisam_sort_buffer_size = 2M
         max_connections = 151
 
-        innodb_buffer_pool_size = 8192M
+        innodb_buffer_pool_size = 16384M
         innodb_log_file_size = 2457M
         innodb_log_buffer_size = 2048M
         innodb_file_per_table = 1

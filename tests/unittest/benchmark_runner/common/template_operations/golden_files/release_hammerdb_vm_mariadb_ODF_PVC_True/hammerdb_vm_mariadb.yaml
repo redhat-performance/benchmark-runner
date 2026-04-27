@@ -149,9 +149,7 @@ spec:
           type: ""
         resources:
           requests:
-            memory: "4Gi"
-          limits:
-            memory: "12Gi"
+            memory: "8Gi"
       terminationGracePeriodSeconds: 180
       volumes:
         - containerDisk:

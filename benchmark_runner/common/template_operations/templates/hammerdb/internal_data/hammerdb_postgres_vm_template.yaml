@@ -153,8 +153,6 @@ spec:
         resources:
           requests:
             memory: "{{ vm_requests_memory }}"
-          limits:
-            memory: "{{ vm_limits_memory }}"
       terminationGracePeriodSeconds: 180
       volumes:
         - containerDisk:

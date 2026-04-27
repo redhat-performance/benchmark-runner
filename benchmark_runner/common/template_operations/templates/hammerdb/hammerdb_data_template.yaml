@@ -49,8 +49,8 @@ template_data:
           innodb_buffer_pool_size: 16384M
           innodb_log_buffer_size: 2048M
         default:
-          innodb_buffer_pool_size: 8192M
-          innodb_log_buffer_size: 2048M
+          innodb_buffer_pool_size: 4096M
+          innodb_log_buffer_size: 1024M
     mssql:
       db_image: mssql2022-centos9-container-disk:latest
       db_pass: s3curePasswordString
@@ -72,10 +72,8 @@ template_data:
         perf_ci:
           sockets: 32
           cores: 1
-          vm_limits_memory: 32Gi
           vm_requests_memory: 32Gi
         default:
           sockets: 1
           cores: 2
-          vm_limits_memory: 12Gi
-          vm_requests_memory: 12Gi
+          vm_requests_memory: 8Gi
