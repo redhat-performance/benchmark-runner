@@ -118,8 +118,6 @@ spec:
         resources:
           requests:
             memory: "32Gi"
-          limits:
-            memory: "32Gi"
       terminationGracePeriodSeconds: 180
       volumes:
         - containerDisk:
