@@ -140,7 +140,9 @@ class EnvironmentVariables:
             'mariadb': 10.5,
             'db_vm_os_version': 'centos-stream9',
             'vm_os_version': 'fedora43',
-            'hammerdb': 4.12
+            'hammerdb': 4.12,
+            'stressng': '0.20.01',
+            'uperf': '1.0.8'
         }
 
         # Set namespace based on workload.
