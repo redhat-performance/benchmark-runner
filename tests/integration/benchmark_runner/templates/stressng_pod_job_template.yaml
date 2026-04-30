@@ -40,12 +40,9 @@ spec:
         benchmark-uuid: test-uuid-123
         benchmark-runner-workload: stressng
     spec:
-      serviceAccountName: benchmark-runner
       containers:
       - name: stressng
-        image: quay.io/fedora/fedora:43
-        securityContext:
-          runAsUser: 0
+        image: quay.io/benchmark-runner/fedora:43
         imagePullPolicy: Always
         env:
           - name: uuid
@@ -72,7 +69,6 @@ spec:
         args:
           - |
             set -e
-            dnf install -y stress-ng python3-pyyaml > /dev/null || exit 1
             cd /tmp
             stress-ng --job /workload/jobfile --log-file /tmp/stressng.log -Y /tmp/stressng.yml || exit 1
             if [ -f /tmp/stressng.yml ] && python3 -c 'import yaml' 2>/dev/null; then

@@ -178,12 +178,9 @@ spec:
       {%- if hostnetwork == 'true' or hostnetwork == true %}
       hostNetwork: true
       {%- endif %}
-      serviceAccountName: {{ namespace }}
       containers:
       - name: benchmark
-        image: {{ image | default('quay.io/fedora/fedora:43') }}
-        securityContext:
-          runAsUser: 0
+        image: {{ image | default('quay.io/benchmark-runner/fedora:43') }}
         {%- if server_resources is defined and server_resources %}
         resources:
           requests:
@@ -195,7 +192,7 @@ spec:
         {%- endif %}
         imagePullPolicy: Always
         command: ["/bin/sh", "-c"]
-        args: ["(dnf install -y uperf > /dev/null || exit 1) && uperf -s -v -P 30000"]
+        args: ["uperf -s -v -P 30000"]
       restartPolicy: Never
       {%- if pin == 'true' or pin == true %}
       nodeSelector:

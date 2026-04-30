@@ -43,11 +43,8 @@ spec:
     spec:
       nodeSelector:
         kubernetes.io/hostname: 'pin-node-1'
-      serviceAccountName: benchmark-runner
       containers:
       - name: stressng
-        securityContext:
-          runAsUser: 0
         resources:
           requests:
             cpu: 10m
@@ -55,7 +52,7 @@ spec:
           limits:
             cpu: 2
             memory: 1Gi
-        image: quay.io/fedora/fedora:43
+        image: quay.io/benchmark-runner/fedora:43
         imagePullPolicy: Always
         env:
           - name: uuid
@@ -84,7 +81,6 @@ spec:
         args:
           - |
             set -e
-            dnf install -y stress-ng python3-pyyaml > /dev/null || exit 1
             cd /tmp
             stress-ng --job /workload/jobfile --log-file /tmp/stressng.log -Y /tmp/stressng.yml || exit 1
             # Parse results into JSON (visible in pod logs, uploaded by benchmark-runner)
