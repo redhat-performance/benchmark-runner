@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
       - name: benchmark
-        image: quay.io/benchmark-runner/uperf:latest
+        image: quay.io/fedora/fedora:43
         imagePullPolicy: Always
         command: ["/bin/sh", "-c"]
         args: ["uperf -s -v -P 30000"]

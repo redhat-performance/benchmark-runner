@@ -68,6 +68,7 @@ class StressngPod(WorkloadsOperations):
             self._environment_variables_dict['kind'] = self.__kind
 
             self._oc.apply_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'namespace.yaml'))
+            self._oc.apply_security_privileged()
 
             self._oc.create_async(
                 yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}.yaml'),

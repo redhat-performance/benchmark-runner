@@ -42,7 +42,7 @@ spec:
     spec:
       containers:
       - name: stressng
-        image: quay.io/benchmark-runner/stressng:latest
+        image: quay.io/fedora/fedora:43
         imagePullPolicy: Always
         env:
           - name: uuid

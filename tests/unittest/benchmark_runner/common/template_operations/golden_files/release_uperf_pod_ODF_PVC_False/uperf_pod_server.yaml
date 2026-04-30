@@ -135,12 +135,15 @@ spec:
         index: "0"
         type: uperf-bench-server-deadbeef
     spec:
+      serviceAccountName: benchmark-runner
       containers:
       - name: benchmark
-        image: quay.io/benchmark-runner/uperf:latest
+        image: quay.io/fedora/fedora:43
+        securityContext:
+          runAsUser: 0
         imagePullPolicy: Always
         command: ["/bin/sh", "-c"]
-        args: ["uperf -s -v -P 30000"]
+        args: ["dnf install -y uperf > /dev/null 2>&1 && uperf -s -v -P 30000"]
       restartPolicy: Never
       nodeSelector:
         kubernetes.io/hostname: 'pin-node-1'

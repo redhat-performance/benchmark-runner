@@ -54,8 +54,11 @@ spec:
       {%- if kind == 'kata' %}
       runtimeClassName: kata
       {%- endif %}
+      serviceAccountName: {{ namespace }}
       containers:
       - name: stressng
+        securityContext:
+          runAsUser: 0
         {%- if resources == 'true' or resources == true %}
         resources:
           requests:
@@ -65,7 +68,7 @@ spec:
             cpu: {{ limits_cpu }}
             memory: {{ limits_memory }}
         {%- endif %}
-        image: {{ image | default('quay.io/benchmark-runner/stressng:latest') }}
+        image: {{ image | default('quay.io/fedora/fedora:43') }}
         imagePullPolicy: Always
         env:
           - name: uuid
@@ -106,6 +109,7 @@ spec:
         args:
           - |
             set -e
+            dnf install -y stress-ng python3-pyyaml > /dev/null 2>&1
             cd /tmp
             stress-ng --job /workload/jobfile --log-file /tmp/stressng.log -Y /tmp/stressng.yml || exit 1
             # Parse results into JSON (visible in pod logs, uploaded by benchmark-runner)

@@ -21,7 +21,7 @@ template_data:
     multus: false
     samples: 1
     pair: 1
-    image: quay.io/benchmark-runner/uperf:latest
+    image: quay.io/fedora/fedora:43
     protos:
       - tcp
   run_type:

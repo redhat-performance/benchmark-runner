@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: benchmark
-        image: quay.io/benchmark-runner/uperf:latest
+        image: quay.io/fedora/fedora:43
         env:
           - name: uuid
             value: "test-uuid-123"
