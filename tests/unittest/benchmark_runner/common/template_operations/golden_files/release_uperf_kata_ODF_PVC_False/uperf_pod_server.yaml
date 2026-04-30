@@ -144,7 +144,7 @@ spec:
           runAsUser: 0
         imagePullPolicy: Always
         command: ["/bin/sh", "-c"]
-        args: ["dnf install -y uperf > /dev/null 2>&1 && uperf -s -v -P 30000"]
+        args: ["(dnf install -y uperf > /dev/null || exit 1) && uperf -s -v -P 30000"]
       restartPolicy: Never
       nodeSelector:
         kubernetes.io/hostname: 'pin-node-1'

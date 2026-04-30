@@ -73,7 +73,7 @@ spec:
         command: ["/bin/sh", "-c"]
         args:
           - |
-            dnf install -y uperf python3 > /dev/null 2>&1
+            dnf install -y uperf python3 > /dev/null || exit 1
             # Server IP passed from Python code
             export h=""
             export port=30000

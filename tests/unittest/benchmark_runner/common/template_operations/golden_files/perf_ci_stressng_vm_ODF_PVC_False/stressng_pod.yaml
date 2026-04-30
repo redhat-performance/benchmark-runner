@@ -84,7 +84,7 @@ spec:
         args:
           - |
             set -e
-            dnf install -y stress-ng python3-pyyaml > /dev/null 2>&1
+            dnf install -y stress-ng python3-pyyaml > /dev/null || exit 1
             cd /tmp
             stress-ng --job /workload/jobfile --log-file /tmp/stressng.log -Y /tmp/stressng.yml || exit 1
             # Parse results into JSON (visible in pod logs, uploaded by benchmark-runner)
