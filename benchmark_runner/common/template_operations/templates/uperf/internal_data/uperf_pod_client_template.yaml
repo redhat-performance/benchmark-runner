@@ -22,7 +22,7 @@ spec:
       {%- endif %}
       containers:
       - name: benchmark
-        image: {{ image | default('quay.io/benchmark-runner/fedora:43') }}
+        image: {{ image | default(fedora) }}
         env:
           - name: uuid
             value: "{{ uuid }}"
