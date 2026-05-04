@@ -1,13 +1,26 @@
 metadata:
   name: windows
+files:
+  - name: "run_main_hammerdb.ps1"
+  - name: "01_provision-data-disk.ps1"
+  - name: "02_create_db.sql"
+  - name: "03_buildschema_mssql.tcl"
+  - name: "04_traceflags.sql"
+  - name: "05_hammerdb-auto-runs.ps1"
+  - name: "06_parse_results.ps1"
 template_data:
   shared:
     pin_node: {{ pin_node1 }}
     odf_pvc: {{ odf_pvc }}
     uuid: {{ uuid }}
     url: {{ windows_url }}
+    transactions: 100000
+    rampup: 1
+    runtime: 1
   run_type:
     perf_ci:
+      db_num_workers: 32
+      db_warehouses: 96
       requests_memory: 32G
       requests_cpu: 32
       limit_memory: 32G
@@ -15,6 +28,8 @@ template_data:
       sockets: 32
       storage: 71Gi
     default:
+      db_num_workers: 2
+      db_warehouses: 2
       requests_memory: 32G
       requests_cpu: 32
       limit_memory: 32G

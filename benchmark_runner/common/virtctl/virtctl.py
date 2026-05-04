@@ -37,10 +37,11 @@ class Virtctl(OC):
             return f.read().strip()
 
     @typechecked
-    def virtctl_ssh(self, vm_name: str, command: str, namespace: str = '', key_path: str = '', username: str = '') -> Optional[str]:
+    def virtctl_ssh(self, vm_name: str, command: str, namespace: str = '', key_path: str = '', username: str = '', timeout: int = None) -> Optional[str]:
         """Execute a command inside a VM via virtctl ssh. Returns stdout string, or None on failure."""
         namespace = namespace or environment_variables.environment_variables_dict.get('namespace', '')
         username = username or environment_variables.environment_variables_dict.get('vm_user', '')
+        ssh_timeout = timeout or self.SHORT_TIMEOUT
         try:
             if self.is_virtctl_ge(min_version='1.6.0'):
                 target = f'vmi/{vm_name}'
@@ -49,13 +50,15 @@ class Virtctl(OC):
             result = subprocess.run(
                 ['virtctl', '-n', namespace, 'ssh', f'--username={username}', f'--identity-file={key_path}',
                  '--known-hosts=',
-                 '-t', '-o StrictHostKeyChecking=no', '-t', '-o UserKnownHostsFile=/dev/null',
+                 '-t', '-oStrictHostKeyChecking=no',
+                 '-t', '-oUserKnownHostsFile=/dev/null',
+                 '-t', '-oBatchMode=yes',
                  f'--command={command}', target],
-                capture_output=True, text=True, timeout=self.SHORT_TIMEOUT)
+                capture_output=True, text=True, timeout=ssh_timeout)
             if result.returncode == 0:
                 return result.stdout
             stderr = result.stderr.strip()
-            if 'connection refused' in stderr or 'no route to host' in stderr:
+            if any(msg in stderr.lower() for msg in ('connection refused', 'no route to host', 'websocket', 'unexpected eof')):
                 pass
             elif 'Permanently added' in stderr and not result.stdout.strip():
                 pass
@@ -67,6 +70,51 @@ class Virtctl(OC):
         except Exception as e:
             logger.warning(f'virtctl ssh error: {e}')
             return None
+
+    @typechecked
+    def virtctl_ssh_password(self, vm_name: str, command: str, password: str, namespace: str = '', username: str = '') -> Optional[str]:
+        """Execute a command inside a VM via virtctl ssh using password auth (sshpass)."""
+        namespace = namespace or environment_variables.environment_variables_dict.get('namespace', '')
+        username = username or environment_variables.environment_variables_dict.get('vm_user', '')
+        try:
+            if self.is_virtctl_ge(min_version='1.6.0'):
+                target = f'vmi/{vm_name}'
+            else:
+                target = vm_name
+            result = subprocess.run(
+                ['sshpass', '-p', password,
+                 'virtctl', '-n', namespace, 'ssh', f'--username={username}',
+                 '--known-hosts=',
+                 '-t', '-o StrictHostKeyChecking=no', '-t', '-o UserKnownHostsFile=/dev/null',
+                 f'--command={command}', target],
+                capture_output=True, text=True, timeout=self.SHORT_TIMEOUT)
+            if result.returncode == 0:
+                return result.stdout
+            stderr = result.stderr.strip()
+            if 'connection refused' in stderr or 'no route to host' in stderr:
+                pass
+            else:
+                if result.stdout.strip():
+                    return result.stdout
+                logger.warning(f'virtctl ssh (password) failed: {stderr[:200]}')
+            return None
+        except Exception as e:
+            logger.warning(f'virtctl ssh (password) error: {e}')
+            return None
+
+    @typechecked
+    def _wait_for_virtctl_ssh_password(self, vm_name: str, password: str, namespace: str = '', username: str = '', timeout: int = OC.SHORT_TIMEOUT) -> bool:
+        """Wait for SSH to be accessible on a VM via password auth."""
+        for i in range(0, timeout, self.SLEEP_TIME):
+            result = self.virtctl_ssh_password(vm_name=vm_name, command='echo ready', password=password, namespace=namespace, username=username)
+            if result is not None and 'ready' in result:
+                logger.debug(f'SSH (password) ready on {vm_name} after {i}s')
+                return True
+            if i > 0 and i % OC.DELAY == 0:
+                logger.debug(f'Waiting for SSH (password) on {vm_name}... ({i}s)')
+            time.sleep(self.SLEEP_TIME)
+        logger.warning(f'SSH (password) on {vm_name} not ready within {timeout}s')
+        return False
 
     @typechecked
     def _ssh_ready(self, vm_name: str, namespace: str = '', key_path: str = '', username: str = '') -> bool:
@@ -184,7 +232,8 @@ class Virtctl(OC):
             result = subprocess.run(
                 ['virtctl', '-n', namespace, 'scp', f'--identity-file={key_path}',
                  '--known-hosts=',
-                 '-t', '-o StrictHostKeyChecking=no', '-t', '-o UserKnownHostsFile=/dev/null',
+                 '-t', '-oStrictHostKeyChecking=no',
+                 '-t', '-oUserKnownHostsFile=/dev/null',
                  source, local_path],
                 capture_output=True, text=True, timeout=self.SHORT_TIMEOUT)
             if result.returncode == 0:
@@ -194,6 +243,32 @@ class Virtctl(OC):
             return False
         except Exception as e:
             logger.warning(f'virtctl scp error: {e}')
+            return False
+
+    @typechecked
+    def _scp_to_vm(self, vm_name: str, local_path: str, remote_path: str, namespace: str = '', key_path: str = '', username: str = '') -> bool:
+        """Copy a file from local to VM using virtctl scp."""
+        namespace = namespace or environment_variables.environment_variables_dict.get('namespace', '')
+        username = username or environment_variables.environment_variables_dict.get('vm_user', '')
+        try:
+            if self.is_virtctl_ge(min_version='1.6.0'):
+                destination = f'{username}@vmi/{vm_name}:{remote_path}'
+            else:
+                destination = f'{username}@{vm_name}:{remote_path}'
+            result = subprocess.run(
+                ['virtctl', '-n', namespace, 'scp', f'--identity-file={key_path}',
+                 '--known-hosts=',
+                 '-t', '-oStrictHostKeyChecking=no',
+                 '-t', '-oUserKnownHostsFile=/dev/null',
+                 local_path, destination],
+                capture_output=True, text=True, timeout=self.SHORT_TIMEOUT)
+            if result.returncode == 0:
+                logger.debug(f'SCP {local_path} to {vm_name}:{remote_path}')
+                return True
+            logger.warning(f'virtctl scp to VM failed: {result.stderr.strip()[:200]}')
+            return False
+        except Exception as e:
+            logger.warning(f'virtctl scp to VM error: {e}')
             return False
 
     @typechecked

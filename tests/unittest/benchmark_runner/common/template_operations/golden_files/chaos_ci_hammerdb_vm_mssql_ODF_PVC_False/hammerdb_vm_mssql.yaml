@@ -114,7 +114,7 @@ spec:
       terminationGracePeriodSeconds: 180
       volumes:
         - containerDisk:
-            image: quay.io/benchmark-runner/mssql-container-disk:2022-centos9
+            image: quay.io/benchmark-runner/mssql-container-disk:2025-centos9
           name: containerdisk
         - cloudInitNoCloud:
             secretRef:
