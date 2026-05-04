@@ -12,7 +12,7 @@ template_data:
     run_id: NA
     runtype: sequential
     instances: 1
-    image: quay.io/benchmark-runner/stressng:latest
+    image: "{{ fedora }}"
     # cpu stressor options
     cpu_percentage: 100
     cpu_method: all

@@ -17,7 +17,7 @@ spec:
       runtimeClassName: kata
       containers:
       - name: benchmark
-        image: quay.io/benchmark-runner/uperf:latest
+        image: quay.io/benchmark-runner/fedora:43
         env:
           - name: uuid
             value: "deadbeef-0123-3210-cdef-01234567890abcdef"

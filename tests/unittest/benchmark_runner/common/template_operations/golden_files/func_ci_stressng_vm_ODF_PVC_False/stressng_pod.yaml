@@ -52,7 +52,7 @@ spec:
           limits:
             cpu: 2
             memory: 1Gi
-        image: quay.io/benchmark-runner/stressng:latest
+        image: quay.io/benchmark-runner/fedora:43
         imagePullPolicy: Always
         env:
           - name: uuid

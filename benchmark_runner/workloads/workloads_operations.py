@@ -475,6 +475,10 @@ class WorkloadsOperations:
             metadata.update({'db_type': 'mariadb', 'db_version': product_versions.get('mariadb', 10.5), 'storage_type': self._storage_type})
         if database:
             metadata.update({'hammerdb_version': self._product_versions.get('hammerdb', 4.12)})
+        if 'stressng' in self._workload:
+            metadata.update({'stressng_version': self._product_versions.get('stressng', '0.20.01')})
+        if 'uperf' in self._workload:
+            metadata.update({'uperf_version': self._product_versions.get('uperf', '1.0.8')})
         if self._test_name:
             metadata.update({'test_name': self._test_name})
         if result:

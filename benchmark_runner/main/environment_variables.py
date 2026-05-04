@@ -88,6 +88,8 @@ class EnvironmentVariables:
         self._environment_variables_dict['vm_password'] = EnvironmentVariables.get_env('VM_PASSWORD', '')
         self._environment_variables_dict['fedora_container_disk'] = EnvironmentVariables.get_env(
             'FEDORA_CONTAINER_DISK', 'quay.io/benchmark-runner/fedora-container-disk:43')
+        self._environment_variables_dict['fedora'] = EnvironmentVariables.get_env(
+            'FEDORA', 'quay.io/benchmark-runner/fedora:43')
         # windows url
         self._environment_variables_dict['windows_url'] = EnvironmentVariables.get_env('WINDOWS_URL', '')
         # Delete all resources before and after the run, default True
@@ -140,7 +142,9 @@ class EnvironmentVariables:
             'mariadb': 10.5,
             'db_vm_os_version': 'centos-stream9',
             'vm_os_version': 'fedora43',
-            'hammerdb': 4.12
+            'hammerdb': 4.12,
+            'stressng': '0.20.01',
+            'uperf': '1.0.8'
         }
 
         # Set namespace based on workload.

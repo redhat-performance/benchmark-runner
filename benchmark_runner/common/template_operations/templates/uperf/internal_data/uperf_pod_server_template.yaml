@@ -180,7 +180,7 @@ spec:
       {%- endif %}
       containers:
       - name: benchmark
-        image: {{ image | default('quay.io/benchmark-runner/uperf:latest') }}
+        image: {{ image | default(fedora) }}
         {%- if server_resources is defined and server_resources %}
         resources:
           requests:

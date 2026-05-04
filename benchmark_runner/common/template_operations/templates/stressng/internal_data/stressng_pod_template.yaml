@@ -65,7 +65,7 @@ spec:
             cpu: {{ limits_cpu }}
             memory: {{ limits_memory }}
         {%- endif %}
-        image: {{ image | default('quay.io/benchmark-runner/stressng:latest') }}
+        image: {{ image | default(fedora) }}
         imagePullPolicy: Always
         env:
           - name: uuid
