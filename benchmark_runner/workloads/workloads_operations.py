@@ -468,7 +468,7 @@ class WorkloadsOperations:
         # for hammerdb
         product_versions = self._product_versions if isinstance(self._product_versions, dict) else {}
         if database == 'mssql':
-            metadata.update({'db_type': 'mssql', 'db_version': product_versions.get('mssql', 2022), 'storage_type': self._storage_type})
+            metadata.update({'db_type': 'mssql', 'db_version': product_versions.get('mssql', 2025), 'storage_type': self._storage_type})
         elif database == 'postgres':
             metadata.update({'db_type': 'pg', 'db_version': product_versions.get('postgres', 13), 'storage_type': self._storage_type})
         elif database == 'mariadb':
@@ -647,7 +647,7 @@ class WorkloadsOperations:
         database = workload_parts[2] if len(workload_parts) >= 3 else ''
         db_type_map = {'mariadb': 'mariadb', 'mssql': 'mssql', 'postgres': 'pg'}
         product_versions = self._product_versions if isinstance(self._product_versions, dict) else {}
-        db_version_defaults = {'mariadb': 10.5, 'mssql': 2022, 'postgres': 13}
+        db_version_defaults = {'mariadb': 10.5, 'mssql': 2025, 'postgres': 13}
         return {
             'db_type': db_type_map.get(database, database),
             'db_version': product_versions.get(database, db_version_defaults.get(database, '')),
@@ -696,7 +696,7 @@ class WorkloadsOperations:
         """Load and return the list of per-thread result dicts from a JSON file."""
         import json as _json
         try:
-            with open(json_path, encoding='utf-8') as f:
+            with open(json_path, encoding='utf-8-sig') as f:
                 data = _json.load(f)
             if isinstance(data, list):
                 return data

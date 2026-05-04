@@ -137,7 +137,7 @@ class EnvironmentVariables:
 
         # Versions
         self._environment_variables_dict['product_versions'] = {
-            'mssql': 2022,
+            'mssql': 2025,
             'postgres': 13,
             'mariadb': 10.5,
             'db_vm_os_version': 'centos-stream9',

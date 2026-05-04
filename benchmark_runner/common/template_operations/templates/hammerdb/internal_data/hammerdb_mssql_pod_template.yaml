@@ -62,7 +62,7 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
       - name: mssql
-        image: quay.io/benchmark-runner/mssql:2022-rhel9
+        image: quay.io/benchmark-runner/mssql:{{ db_version }}-rhel9
         imagePullPolicy: "IfNotPresent"
         ports:
         - containerPort: 1433
@@ -80,7 +80,7 @@ spec:
             value: "Y"
           - name: MSSQL_SA_PASSWORD
             value: "s3curePasswordString"
-        # MSSQL 2022 defaults to non-root user 'mssql' which cannot create /.system;
+        # MSSQL 2025 defaults to non-root user 'mssql' which cannot create /.system;
         # runAsUser: 0 + allowPrivilegeEscalation are both required for sqlservr to start.
         securityContext:
           runAsUser: 0

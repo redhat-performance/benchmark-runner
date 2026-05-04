@@ -17,38 +17,11 @@ class WinMSSQLVM(BootstormVM):
         super().__init__()
         if not self._windows_url:
             raise ValueError('Missing Windows DV URL')
+        self.__namespace = self._environment_variables_dict.get('namespace', 'benchmark-runner')
+        self.__username = self._environment_variables_dict.get('vm_user') or 'Administrator'
+        self.__ssh_key_path = self._ssh_key_path
+        self.__remote_dir = 'C:/tools/hammerdb-4.12'
 
-    def wait_for_windows_hammerdb_finished(self):
-        """
-        Wait until the Windows HammerDB workload finishes by checking the 'status' key in Elasticsearch
-        and verifying that data is not already updated by checking key data_updated.
-        Returns:
-            True if the workload succeeded.
-        Raises:
-            Windows_HammerDB_NOT_Succeeded: If the workload did not succeed within the timeout.
-        """
-        current_wait_time = 0
-
-        while True:
-            response = self._get_latest_resource_with_key(index=self._es_index, key='status')
-            # Verify that winmssl elasticsearch data is uploaded by checking 'status', 'vm_os_version'
-            # Checking that this is the latest data by verify that 'data_updated' is not True
-            if response.get('status') == 'Succeeded' and response.get('vm_os_version') == 'winmssql2022' and str(response.get('data_updated', '')).lower() != 'true':
-                return True
-            else:
-                logger.info('Waiting for the Windows HammerDB run to finish successfully...')
-
-            # check timeout
-            if self._timeout > 0 and current_wait_time >= self._timeout:
-                break
-
-            # sleep before next check
-            time.sleep(OC.DELAY)
-            current_wait_time += OC.DELAY
-
-        raise Windows_HammerDB_NOT_Succeeded(
-            f"HammerDB did not succeed within {self._timeout} seconds"
-        )
 
     @logger_time_stamp
     def run(self):
@@ -62,22 +35,106 @@ class WinMSSQLVM(BootstormVM):
             else:
                 self._es_index = 'hammerdb-results'
             self._initialize_run()
+            self._set_bootstorm_vm_first_run_time()
             # create windows dv
             self._oc.create_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'windows_dv.yaml'))
             self._oc.wait_for_dv_status(status='Succeeded')
             self._oc.create_async(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self._name}.yaml'))
             self._oc.wait_for_vm_status(vm_name=f'{self._workload_name}-{self._trunc_uuid}', status=VMStatus.Stopped)
-            self._set_bootstorm_vm_first_run_time()
-            self._set_bootstorm_vm_start_time(vm_name=self._vm_name)
             self._virtctl.start_vm_sync(vm_name=self._vm_name)
-            self._data_dict = self._get_bootstorm_vm_elapsed_time(vm_name=self._vm_name, vm_node='')
+            self._data_dict = {}
             self._data_dict['run_artifacts_url'] = os.path.join(self._run_artifacts_url,
                                                                 f'{self._get_run_artifacts_hierarchy(workload_name=self._workload_name, is_file=True)}-{self._time_stamp_format}.tar.gz')
-            self.wait_for_windows_hammerdb_finished()
-            ids = self._get_index_ids_between_dates(index=self._es_index, key='status')
-            # Adding data_updated=True to stamp that this data is already updated and enrich with new product versions fields
-            for id in ids:
-                self._update_elasticsearch_index(index=self._es_index, id=id, kind='vm', status='Succeeded', run_artifacts_url=self._data_dict['run_artifacts_url'], database='mssql', vm_name=f'{self._workload_name}-{self._trunc_uuid}', data_updated=True)
+
+            # SSH key is injected via cloudInitNoCloud at boot
+            if not self._virtctl._wait_for_virtctl_ssh(vm_name=self._vm_name, namespace=self.__namespace,
+                                                       key_path=self.__ssh_key_path, username=self.__username,
+                                                       timeout=self._timeout):
+                raise Windows_HammerDB_NOT_Succeeded('SSH never became ready on VM')
+
+            # SCP all scripts to the VM
+            scripts = ['run_main_hammerdb.ps1', '01_provision-data-disk.ps1',
+                       '02_create_db.sql', '04_traceflags.sql',
+                       '05_hammerdb-auto-runs.ps1', '06_parse_results.ps1']
+            for script in scripts:
+                script_path = os.path.join(self._run_artifacts_path, script)
+                if not self._virtctl._scp_to_vm(vm_name=self._vm_name, local_path=script_path,
+                                                remote_path=f'{self.__remote_dir}/{script}',
+                                                namespace=self.__namespace, key_path=self.__ssh_key_path,
+                                                username=self.__username):
+                    raise Windows_HammerDB_NOT_Succeeded(f'Failed to SCP required script {script} to VM')
+                logger.info(f'Copied {script} to VM')
+
+            # SCP buildschema tcl to HammerDB scripts path
+            buildschema_script = '03_buildschema_mssql.tcl'
+            script_path = os.path.join(self._run_artifacts_path, buildschema_script)
+            if not self._virtctl._scp_to_vm(vm_name=self._vm_name, local_path=script_path,
+                                            remote_path=f'{self.__remote_dir}/scripts/tcl/mssqls/tprocc/{buildschema_script}',
+                                            namespace=self.__namespace, key_path=self.__ssh_key_path,
+                                            username=self.__username):
+                logger.warning(f'Failed to SCP {buildschema_script} to VM')
+            else:
+                logger.info(f'Copied {buildschema_script} to VM at scripts/tcl/mssqls/tprocc/')
+
+            # Run main script (rebuild DB + run HammerDB workload)
+            logger.info('Running run_main_hammerdb.ps1 inside Windows VM ...')
+            self._virtctl.virtctl_ssh(vm_name=self._vm_name,
+                                     command=f'powershell -NoProfile -ExecutionPolicy Bypass -File {self.__remote_dir}/run_main_hammerdb.ps1',
+                                     namespace=self.__namespace, key_path=self.__ssh_key_path, username=self.__username,
+                                     timeout=self._timeout)
+
+            # SCP results back
+            local_result_json = os.path.join(self._run_artifacts_path, 'hammerdb_result.json')
+            check_cmd = f'powershell -Command "if (Test-Path \'{self.__remote_dir}/results/hammerdb_result.json\') {{ echo found }}"'
+            for elapsed in range(0, self._timeout, OC.DELAY):
+                check = self._virtctl.virtctl_ssh(vm_name=self._vm_name, command=check_cmd,
+                                                  namespace=self.__namespace, key_path=self.__ssh_key_path, username=self.__username)
+                if check and 'found' in check:
+                    break
+                logger.info(f'Waiting for hammerdb_result.json on VM... ({elapsed}s)')
+                time.sleep(OC.DELAY)
+            if self._virtctl._scp_file(vm_name=self._vm_name, remote_path=f'{self.__remote_dir}/results/hammerdb_result.json',
+                                       local_path=local_result_json,
+                                       namespace=self.__namespace, key_path=self.__ssh_key_path, username=self.__username):
+                logger.info(f'hammerdb_result.json copied to {local_result_json}')
+            else:
+                logger.warning(f'Failed to SCP hammerdb_result.json from VM')
+
+            # Upload per-thread results to Elasticsearch
+            hammerdb_results_dict = self._parse_hammerdb_results_vm(local_result_json)
+            if hammerdb_results_dict and self._es_host:
+                for entry in hammerdb_results_dict:
+                    thread_result = {
+                        'vm_name': f'{self._workload_name}-{self._trunc_uuid}',
+                        'db_type': 'mssql',
+                        'db_version': self._product_versions.get('mssql', 2025) if isinstance(self._product_versions, dict) else 2025,
+                        'storage_type': self._storage_type,
+                        **entry,
+                    }
+                    self._upload_hammerdb_thread_result(
+                        index=self._es_index,
+                        kind=self._kind,
+                        status='complete',
+                        run_artifacts_url=self._data_dict['run_artifacts_url'],
+                        database='mssql',
+                        thread_result=thread_result,
+                    )
+                    self._verify_elasticsearch_data_uploaded(
+                        index=self._es_index,
+                        uuid=self._uuid,
+                    )
+            else:
+                logger.warning('HammerDB results could not be parsed from %s', local_result_json)
+
+            # SCP run log back
+            local_log_file = os.path.join(self._run_artifacts_path, 'run_main_hammerdb.log')
+            if self._virtctl._scp_file(vm_name=self._vm_name, remote_path=f'{self.__remote_dir}/run_main_hammerdb.log',
+                                       local_path=local_log_file,
+                                       namespace=self.__namespace, key_path=self.__ssh_key_path, username=self.__username):
+                logger.info(f'run_main_hammerdb.log copied to {local_log_file}')
+            else:
+                logger.warning(f'Failed to SCP run_main_hammerdb.log from VM')
+
             self._finalize_vm()
             if self._delete_all:
                 self._oc.delete_vm_sync(
