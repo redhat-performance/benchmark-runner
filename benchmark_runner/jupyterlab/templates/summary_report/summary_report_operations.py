@@ -22,7 +22,7 @@ class SummaryReportOperations:
     VDBENCH_LATENCY_METRIC = 'Latency'
     VDBENCH_IOPS_METRIC = 'Iops'
     BOOTSTORM_FEDORA = 'fedora37'
-    BOOTSTORM_WINDOWS = ['windows10', 'windows11', 'windows_server_2019', 'windows_server_2022']
+    BOOTSTORM_WINDOWS = [ 'windows11', 'windows_server_2022', 'windows_server_2025']
     BOOTSTORM_FEDORA_METRIC = '240 VMs run time'
     BOOTSTORM_WINDOWS_METRIC = '111 VMs run time'
 

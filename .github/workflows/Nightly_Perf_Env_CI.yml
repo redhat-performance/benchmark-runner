@@ -108,10 +108,9 @@ jobs:
 #              - 'vdbench_vm_scale'
 #              - 'clusterbuster'
 #              - 'bootstorm_vm_scale'
-#              - 'windows_vm_scale_windows10'
 #              - 'windows_vm_scale_windows11'
-#              - 'windows_vm_scale_windows_server_2019'
 #              - 'windows_vm_scale_windows_server_2022'
+#              - 'windows_vm_scale_windows_server_2025'
 
     steps:
     - uses: actions/checkout@v6
@@ -183,10 +182,9 @@ jobs:
         THREADS_LIMIT: 20
         RUN_TYPE: 'test_ci'
         ENABLE_PROMETHEUS_SNAPSHOT: 'True'
-        WINDOWS10_URL: ${{ secrets.PERF_WINDOWS10_URL }}
         WINDOWS11_URL: ${{ secrets.PERF_WINDOWS11_URL }}
-        WINDOWS_SERVER_2019_URL: ${{ secrets.PERF_WINDOWS_SERVER_2019_URL }}
         WINDOWS_SERVER_2022_URL: ${{ secrets.PERF_WINDOWS_SERVER_2022_URL }}
+        WINDOWS_SERVER_2025_URL: ${{ secrets.PERF_WINDOWS_SERVER_2025_URL }}
       run: |
         build=$(pip freeze | grep benchmark-runner | sed 's/==/=/g')
         build_version="$(cut -d'=' -f2 <<<"$build")"
@@ -206,10 +204,9 @@ jobs:
             elif [[ "$WORKLOAD" == "windows_vm" ]]
             then
               case "${{ matrix.workload }}" in
-                   "windows_vm_scale_windows10") WINDOWS_URL=$WINDOWS10_URL ;;
                    "windows_vm_scale_windows11") WINDOWS_URL=$WINDOWS11_URL ;;
-                   "windows_vm_scale_windows_server_2019") WINDOWS_URL=$WINDOWS_SERVER_2019_URL ;;
                    "windows_vm_scale_windows_server_2022") WINDOWS_URL=$WINDOWS_SERVER_2022_URL ;;
+                   "windows_vm_scale_windows_server_2025") WINDOWS_URL=$WINDOWS_SERVER_2025_URL ;;
                     *) echo "Unknown Windows scale workload ${{ matrix.workload }}"; exit 1 ;;
               esac
               # Warm-up: Load DV for Windows
