@@ -58,7 +58,7 @@ spec:
                 - {{ ssh_public_key }}
               {%- endif %}
               packages:
-                - stress-ng
+                - stress-ng-0.20.01
               runcmd:
                 - export HOME=/root
                 - export TMP=/tmp

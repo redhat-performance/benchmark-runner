@@ -52,7 +52,7 @@ spec:
               chpasswd: { expire: False }
               ssh_pwauth: true
               packages:
-                - stress-ng
+                - stress-ng-0.20.01
               runcmd:
                 - export HOME=/root
                 - export TMP=/tmp

@@ -11,7 +11,7 @@ stringData:
     chpasswd: { expire: False }
     ssh_pwauth: true
     packages:
-      - uperf
+      - uperf-1.0.8
     write_files:
       - path: /tmp/uperf_parser.py
         permissions: '0755'
@@ -76,7 +76,7 @@ stringData:
       - export HOME=/root
       - export TMP=/tmp
       - export TEMP=/tmp
-      - dnf install -y uperf || true
+      - dnf install -y uperf-1.0.8 || true
       - for nic in $(ls /sys/class/net/ | grep -v lo); do ethtool -L $nic combined $(nproc) 2>/dev/null; done || true
       - sleep 30
       - |
@@ -163,7 +163,7 @@ spec:
               chpasswd: { expire: False }
               ssh_pwauth: true
               packages:
-                - uperf
+                - uperf-1.0.8
               runcmd:
                 - export HOME=/root
                 - export TMP=/tmp
