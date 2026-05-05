@@ -32,7 +32,7 @@ spec:
         cpu:
           cores: 1
           model: host-passthrough
-          sockets: 32
+          sockets: 16
           threads: 1
         devices:
           blockMultiQueue: false
@@ -76,11 +76,8 @@ spec:
           type: q35
         resources:
           requests:
-            cpu: 32
-            memory: 32G
-          limits:
-            cpu: 32
-            memory: 32G
+            cpu: 16
+            memory: 16G
       networks:
       - name: nic-0
         pod: {}

@@ -78,9 +78,6 @@ spec:
           requests:
             cpu: 32
             memory: 32G
-          limits:
-            cpu: 32
-            memory: 32G
       networks:
       - name: nic-0
         pod: {}
