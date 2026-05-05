@@ -1,7 +1,8 @@
 metadata:
   name: windows
 files:
-  - name: "run_main_hammerdb.ps1"
+  - name: "run_prepare_hammerdb.ps1"
+  - name: "run_hammerdb_benchmark.ps1"
   - name: "01_provision-data-disk.ps1"
   - name: "02_create_db.sql"
   - name: "03_buildschema_mssql.tcl"
@@ -23,16 +24,12 @@ template_data:
       db_warehouses: 96
       requests_memory: 32G
       requests_cpu: 32
-      limit_memory: 32G
-      limit_cpu: 32
       sockets: 32
       storage: 71Gi
     default:
       db_num_workers: 2
       db_warehouses: 2
-      requests_memory: 32G
-      requests_cpu: 32
-      limit_memory: 32G
-      limit_cpu: 32
-      sockets: 32
+      requests_memory: 16G
+      requests_cpu: 16
+      sockets: 16
       storage: 71Gi

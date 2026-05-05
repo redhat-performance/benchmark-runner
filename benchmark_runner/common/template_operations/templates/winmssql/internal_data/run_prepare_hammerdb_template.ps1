@@ -1,26 +1,21 @@
 # --- Setup ---
 $hammerdb = "C:\tools\hammerdb-4.12"
 $mssql = "D:\mssql"
-$logFile = "$hammerdb\run_main_hammerdb.log"
-$resultsFolder = "$hammerdb\results"
+$logFile = "$hammerdb\run_prepare_hammerdb.log"
 
 # Clear the log file at the beginning of each run
 Clear-Content -Path $logFile -ErrorAction SilentlyContinue
 
-# Remove old results
-if (Test-Path $resultsFolder) {
-    Remove-Item -Path "$resultsFolder\*" -Recurse -Force -ErrorAction SilentlyContinue
-}
 function Log {
     param([string]$message)
     $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
     $logMessage = "$timestamp - $message"
-    Write-Host $logMessage                  # Console output
-    $logMessage | Add-Content $logFile      # Append to log file
+    Write-Host $logMessage
+    $logMessage | Add-Content $logFile
 }
 
 # --- Start Script ---
-Log "Script started"
+Log "Prepare script started"
 
 Log "Changed directory to $hammerdb"
 cd $hammerdb
@@ -63,10 +58,4 @@ sqlcmd -E -i 04_traceflags.sql
 Log "Sleeping for 60 seconds to let services stabilize"
 Start-Sleep 60
 
-Log "05 Running HammerDB automation script - 05_hammerdb-auto-runs.ps1"
-.\05_hammerdb-auto-runs.ps1 2>&1 | ForEach-Object { Log $_ }
-
-Log "06 Parsing HammerDB results - 06_parse_results.ps1"
-.\06_parse_results.ps1 2>&1 | ForEach-Object { Log $_ }
-
-Log "Script finished"
+Log "Prepare script finished"

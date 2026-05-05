@@ -100,9 +100,6 @@ spec:
           requests:
             cpu: {{ requests_cpu }}
             memory: {{ requests_memory }}
-          limits:
-            cpu: {{ limit_cpu }}
-            memory: {{ limit_memory }}
       networks:
       - name: nic-0
         pod: {}
