@@ -188,6 +188,24 @@ class WinMSSQLVM(BootstormVM):
             self.save_error_logs()
             raise err
 
+    def _run_parallel_phases(self, steps, bulks, bulk_sleep):
+        """Run each phase sequentially; within each phase run all VMs in parallel."""
+        for target in steps:
+            proc = []
+            for bulk in bulks:
+                for vm_num in bulk:
+                    p = Process(target=target, args=(str(vm_num),))
+                    p.start()
+                    proc.append(p)
+                for p in proc:
+                    p.join()
+                failed = [p for p in proc if p.exitcode != 0]
+                if failed:
+                    raise Windows_HammerDB_NOT_Succeeded(
+                        f'Phase {target.__name__} failed for {len(failed)} VM(s)')
+                time.sleep(bulk_sleep)
+                proc = []
+
     def save_error_logs(self):
         """Upload error logs to Elasticsearch."""
         if self._es_host:
@@ -229,24 +247,23 @@ class WinMSSQLVM(BootstormVM):
 
             bulks = tuple(self.split_run_bulks(iterable=range(vm_count), limit=threads_limit))
 
-            # Run all phases sequentially; each phase runs across all VMs in parallel
-            steps = (self._create_vm, self._prepare_vm, self._run_hammerdb,
-                     self._collect_results, self._delete_vm)
-            for target in steps:
-                proc = []
-                for bulk in bulks:
-                    for vm_num in bulk:
-                        p = Process(target=target, args=(str(vm_num),))
-                        p.start()
-                        proc.append(p)
-                    for p in proc:
-                        p.join()
-                    failed = [p for p in proc if p.exitcode != 0]
-                    if failed:
-                        raise Windows_HammerDB_NOT_Succeeded(
-                            f'Phase {target.__name__} failed for {len(failed)} VM(s)')
-                    time.sleep(bulk_sleep)
-                    proc = []
+            # Run phases: create, prepare, run HammerDB
+            self._run_parallel_phases([self._create_vm, self._prepare_vm, self._run_hammerdb], bulks, bulk_sleep)
+
+            # Capture Prometheus metrics and Google Drive path before ES upload
+            if self._enable_prometheus_snapshot:
+                self._prometheus_metrics_operation.finalize_prometheus()
+                metric_results = self._prometheus_metrics_operation.run_prometheus_queries()
+                self._prometheus_result = self._prometheus_metrics_operation.parse_prometheus_metrics(data=metric_results)
+                self._data_dict.update(self._prometheus_result)
+            if self._google_drive_path:
+                self._data_dict.update({'run_artifacts_url': self.get_run_artifacts_google_drive()})
+
+            # Collect results (uploads to ES) and delete VMs
+            post_steps = [self._collect_results]
+            if self._delete_all:
+                post_steps.append(self._delete_vm)
+            self._run_parallel_phases(post_steps, bulks, bulk_sleep)
 
             if self._delete_all:
                 self._oc.delete_async(yaml=os.path.join(self._run_artifacts_path, 'windows_dv.yaml'))
