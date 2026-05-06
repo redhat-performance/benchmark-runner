@@ -241,6 +241,10 @@ class WinMSSQLVM(BootstormVM):
                         proc.append(p)
                     for p in proc:
                         p.join()
+                    failed = [p for p in proc if p.exitcode != 0]
+                    if failed:
+                        raise Windows_HammerDB_NOT_Succeeded(
+                            f'Phase {target.__name__} failed for {len(failed)} VM(s)')
                     time.sleep(bulk_sleep)
                     proc = []
 

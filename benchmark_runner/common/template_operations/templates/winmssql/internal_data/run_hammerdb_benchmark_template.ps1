@@ -27,8 +27,16 @@ cd $hammerdb
 
 Log "05 Running HammerDB automation script - 05_hammerdb-auto-runs.ps1"
 .\05_hammerdb-auto-runs.ps1 2>&1 | ForEach-Object { Log $_ }
+if ($LASTEXITCODE -ne 0) {
+    Log "ERROR: HammerDB automation script failed with exit code $LASTEXITCODE"
+    exit 1
+}
 
 Log "06 Parsing HammerDB results - 06_parse_results.ps1"
 .\06_parse_results.ps1 2>&1 | ForEach-Object { Log $_ }
+if ($LASTEXITCODE -ne 0) {
+    Log "ERROR: HammerDB results parsing failed with exit code $LASTEXITCODE"
+    exit 1
+}
 
 Log "Benchmark script finished"
