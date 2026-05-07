@@ -112,7 +112,9 @@ class WinMSSQLVM(BootstormVM):
             raise err
 
     def _collect_results(self, vm_num: str):
-        """Phase 4: SCP results back and upload to Elasticsearch."""
+        """Phase 4: SCP results and logs back from VM (no ES, no Prometheus).
+        Runs in a child process — only file operations, no SSL connections.
+        """
         try:
             vm_name = self._get_vm_name(vm_num)
 
@@ -134,32 +136,6 @@ class WinMSSQLVM(BootstormVM):
                 raise Windows_HammerDB_NOT_Succeeded(f'hammerdb_result.json not found locally at {local_result_json}')
             logger.info(f'hammerdb_result.json copied to {local_result_json}')
 
-            hammerdb_results_dict = self._parse_hammerdb_results_vm(local_result_json)
-            if hammerdb_results_dict and self._es_host:
-                for entry in hammerdb_results_dict:
-                    thread_result = {
-                        'vm_name': vm_name,
-                        'vm_name_num': f'winmssql-vm-{vm_num}',
-                        'db_type': 'mssql',
-                        'db_version': self._product_versions.get('mssql', 2025) if isinstance(self._product_versions, dict) else 2025,
-                        'storage_type': self._storage_type,
-                        **entry,
-                    }
-                    self._upload_hammerdb_thread_result(
-                        index=self._es_index,
-                        kind=self._kind,
-                        status='complete',
-                        run_artifacts_url=self._data_dict.get('run_artifacts_url', ''),
-                        database='mssql',
-                        thread_result=thread_result,
-                    )
-                    self._verify_elasticsearch_data_uploaded(
-                        index=self._es_index,
-                        uuid=self._uuid,
-                    )
-            else:
-                logger.warning(f'HammerDB results could not be parsed from {local_result_json}')
-
             local_log_file = os.path.join(self._run_artifacts_path, f'run_hammerdb_benchmark_{vm_num}.log')
             if self._virtctl._scp_file(vm_name=vm_name, remote_path=f'{self.__remote_dir}/run_hammerdb_benchmark.log',
                                        local_path=local_log_file,
@@ -178,6 +154,50 @@ class WinMSSQLVM(BootstormVM):
         except Exception as err:
             self.save_error_logs()
             raise err
+
+    def _upload_results(self, vm_count: int):
+        """Upload all VM results to ES from the main process (no SSL issues).
+        Called after all child processes complete.
+        """
+        if self._enable_prometheus_snapshot:
+            self._prometheus_metrics_operation.finalize_prometheus()
+            metric_results = self._prometheus_metrics_operation.run_prometheus_queries()
+            self._prometheus_result = self._prometheus_metrics_operation.parse_prometheus_metrics(data=metric_results)
+        if self._google_drive_path:
+            self._data_dict.update({'run_artifacts_url': self.get_run_artifacts_google_drive()})
+        run_artifacts_url = self._data_dict.get('run_artifacts_url', '')
+
+        for vm_num in range(vm_count):
+            vm_name = self._get_vm_name(str(vm_num))
+            vm_node = self._oc.get_vm_node(vm_name=vm_name)
+            local_result_json = os.path.join(self._run_artifacts_path, f'hammerdb_result_{vm_num}.json')
+
+            hammerdb_results_dict = self._parse_hammerdb_results_vm(local_result_json)
+            if hammerdb_results_dict and self._es_host:
+                for entry in hammerdb_results_dict:
+                    thread_result = {
+                        'vm_name': vm_name,
+                        'vm_name_num': f'winmssql-vm-{vm_num}',
+                        'node': vm_node,
+                        'db_type': 'mssql',
+                        'db_version': self._product_versions.get('mssql', 2025) if isinstance(self._product_versions, dict) else 2025,
+                        'storage_type': self._storage_type,
+                        **entry,
+                    }
+                    self._upload_hammerdb_thread_result(
+                        index=self._es_index,
+                        kind=self._kind,
+                        status='complete',
+                        run_artifacts_url=run_artifacts_url,
+                        database='mssql',
+                        thread_result=thread_result,
+                    )
+                    self._verify_elasticsearch_data_uploaded(
+                        index=self._es_index,
+                        uuid=self._uuid,
+                    )
+            else:
+                logger.warning(f'HammerDB results could not be parsed from {local_result_json}')
 
     def _delete_vm(self, vm_num: str):
         """Phase 5: Delete VM."""
@@ -225,7 +245,6 @@ class WinMSSQLVM(BootstormVM):
             else:
                 self._es_index = 'hammerdb-results'
             self._initialize_run()
-            self._set_bootstorm_vm_first_run_time()
 
             # create windows dv
             self._oc.create_async(yaml=os.path.join(self._run_artifacts_path, 'windows_dv.yaml'))
@@ -247,23 +266,14 @@ class WinMSSQLVM(BootstormVM):
 
             bulks = tuple(self.split_run_bulks(iterable=range(vm_count), limit=threads_limit))
 
-            # Run phases: create, prepare, run HammerDB
-            self._run_parallel_phases([self._create_vm, self._prepare_vm, self._run_hammerdb], bulks, bulk_sleep)
-
-            # Capture Prometheus metrics and Google Drive path before ES upload
-            if self._enable_prometheus_snapshot:
-                self._prometheus_metrics_operation.finalize_prometheus()
-                metric_results = self._prometheus_metrics_operation.run_prometheus_queries()
-                self._prometheus_result = self._prometheus_metrics_operation.parse_prometheus_metrics(data=metric_results)
-                self._data_dict.update(self._prometheus_result)
-            if self._google_drive_path:
-                self._data_dict.update({'run_artifacts_url': self.get_run_artifacts_google_drive()})
-
-            # Collect results (uploads to ES) and delete VMs
-            post_steps = [self._collect_results]
+            # Run all phases in child processes (no ES/Prometheus — avoids SSL issues)
+            steps = [self._create_vm, self._prepare_vm, self._run_hammerdb, self._collect_results]
             if self._delete_all:
-                post_steps.append(self._delete_vm)
-            self._run_parallel_phases(post_steps, bulks, bulk_sleep)
+                steps.append(self._delete_vm)
+            self._run_parallel_phases(steps, bulks, bulk_sleep)
+
+            # Prometheus + ES upload from main process (same as _finalize_vm pattern)
+            self._upload_results(vm_count)
 
             if self._delete_all:
                 self._oc.delete_async(yaml=os.path.join(self._run_artifacts_path, 'windows_dv.yaml'))

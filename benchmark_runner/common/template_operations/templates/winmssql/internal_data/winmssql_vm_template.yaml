@@ -130,9 +130,9 @@ spec:
           userData: |
             #cloud-config
             runcmd:
-              - powershell -Command "New-Item -ItemType Directory -Force -Path 'C:\ProgramData\ssh\' | Out-Null"
-              - powershell -Command "Set-Content -Path 'C:\ProgramData\ssh\administrators_authorized_keys' -Value '{{ ssh_public_key }}' -Encoding ascii"
-              - powershell -Command "icacls 'C:\ProgramData\ssh\administrators_authorized_keys' /inheritance:r /grant 'Administrators:F' /grant 'SYSTEM:F'"
+              - powershell -Command "New-Item -ItemType Directory -Force -Path 'C:\ProgramData\ssh' | Out-Null; Set-Content -Path 'C:\ProgramData\ssh\administrators_authorized_keys' -Value '{{ ssh_public_key }}' -Encoding ascii -Force; icacls 'C:\ProgramData\ssh\administrators_authorized_keys' /inheritance:r /grant 'Administrators:F' /grant 'SYSTEM:F'"
+              - cmd /c "mkdir C:\Users\Administrator\.ssh >nul 2>&1 & icacls C:\Users\Administrator\.ssh /grant Everyone:F >nul 2>&1 & takeown /f C:\Users\Administrator\.ssh\authorized_keys >nul 2>&1 & icacls C:\Users\Administrator\.ssh\authorized_keys /grant Everyone:F >nul 2>&1 & del /f C:\Users\Administrator\.ssh\authorized_keys >nul 2>&1"
+              - powershell -Command "Copy-Item 'C:\ProgramData\ssh\administrators_authorized_keys' 'C:\Users\Administrator\.ssh\authorized_keys' -Force; icacls 'C:\Users\Administrator\.ssh\authorized_keys' /inheritance:r /grant 'Administrators:F' /grant 'SYSTEM:F'; icacls 'C:\Users\Administrator\.ssh' /inheritance:r /grant 'Administrators:F' /grant 'SYSTEM:F'"
         name: cloudinitdisk
   dataVolumeTemplates:
   - metadata:
