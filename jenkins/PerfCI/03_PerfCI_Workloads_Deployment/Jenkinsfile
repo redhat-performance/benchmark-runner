@@ -25,6 +25,7 @@ pipeline {
         WINDOWS_SERVER_2025_URL = credentials('perfci_windows_server_2025_url')
         WINDOWS_SERVER_2022_URL = credentials('perfci_windows_server_2022_url')
         WINDOWS_SERVER_MSSQL_2022_URL = credentials('perfci_windows_server_mssql_2022_url')
+        WINDOWS_SERVER_MSSQL_2025_URL = credentials('perfci_windows_server_2025_url')
         LSO_NODE = credentials('perfci_lso_node')
         QUAY_BENCHMARK_RUNNER_REPOSITORY = credentials('perfci_quay_repository')
         KUBEADMIN_PASSWORD = readFile('/home/jenkins/.kube/kubeadmin-password').trim()
@@ -153,7 +154,7 @@ END
                                 } else {
                                     SCALE = ""
                                     if (workload == "winmssql_vm") {
-                                        WINDOWS_URL = WINDOWS_SERVER_MSSQL_2022_URL
+                                        WINDOWS_URL = WINDOWS_SERVER_MSSQL_2025_URL
                                     }
                                 }
 
