@@ -1,7 +1,6 @@
 
 import os
 import time
-from multiprocessing import Process
 
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 from benchmark_runner.common.elasticsearch.elasticsearch_exceptions import ElasticSearchDataNotUploaded
@@ -207,24 +206,6 @@ class WinMSSQLVM(BootstormVM):
         except Exception as err:
             self.save_error_logs()
             raise err
-
-    def _run_parallel_phases(self, steps, bulks, bulk_sleep):
-        """Run each phase sequentially; within each phase run all VMs in parallel."""
-        for target in steps:
-            proc = []
-            for bulk in bulks:
-                for vm_num in bulk:
-                    p = Process(target=target, args=(str(vm_num),))
-                    p.start()
-                    proc.append(p)
-                for p in proc:
-                    p.join()
-                failed = [p for p in proc if p.exitcode != 0]
-                if failed:
-                    raise Windows_HammerDB_NOT_Succeeded(
-                        f'Phase {target.__name__} failed for {len(failed)} VM(s)')
-                time.sleep(bulk_sleep)
-                proc = []
 
     def save_error_logs(self):
         """Upload error logs to Elasticsearch."""

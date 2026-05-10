@@ -24,7 +24,11 @@ spec:
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
+    {% if scale -%}
+    name: postgres-persistent-storage-{{ scale }}
+    {%- else -%}
     name: postgres-persistent-storage
+    {%- endif %}
     namespace: benchmark-runner
 spec:
     {%- if storage_type == 'lso' %}
@@ -42,7 +46,11 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
+  {% if scale -%}
+  name: postgres-custom-config-{{ scale }}
+  {%- else -%}
   name: postgres-custom-config
+  {%- endif %}
   namespace: benchmark-runner
 data:
   custom.pg_hba.conf: |
@@ -57,17 +65,29 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  {% if scale -%}
+  name: postgres-deployment-{{ scale }}
+  {%- else -%}
   name: postgres-deployment
+  {%- endif %}
   namespace: benchmark-runner
 spec:
   selector:
     matchLabels:
+      {% if scale -%}
+      app: postgres-{{ scale }}
+      {%- else -%}
       app: postgres
+      {%- endif %}
   replicas: 1
   template:
     metadata:
       labels:
+        {% if scale -%}
+        app: postgres-{{ scale }}
+        {%- else -%}
         app: postgres
+        {%- endif %}
         type: postgres-database-server
     spec:
       {%- if pin_node2 %}
@@ -112,21 +132,37 @@ spec:
       volumes:
         - name: postgres-custom-config
           configMap:
+            {% if scale -%}
+            name: postgres-custom-config-{{ scale }}
+            {%- else -%}
             name: postgres-custom-config
+            {%- endif %}
         {%- if storage_type == 'lso' or odf_pvc == True %}
         - name: postgres-persistent-storage
           persistentVolumeClaim:
+            {% if scale -%}
+            claimName: postgres-persistent-storage-{{ scale }}
+            {%- else -%}
             claimName: postgres-persistent-storage
+            {%- endif %}
         {%- endif %}
 ---
 apiVersion: v1
 kind: Service
 metadata:
+  {% if scale -%}
+  name: postgres-deployment-{{ scale }}
+  {%- else -%}
   name: postgres-deployment
+  {%- endif %}
   namespace: benchmark-runner
 spec:
   selector:
+    {% if scale -%}
+    app: postgres-{{ scale }}
+    {%- else -%}
     app: postgres
+    {%- endif %}
   ports:
     - protocol: TCP
       port: 5432
@@ -135,10 +171,18 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
+  {% if scale -%}
+  name: hammerdb-postgres-pod-{{ trunc_uuid }}-{{ scale }}
+  {%- else -%}
   name: hammerdb-postgres-pod-{{ trunc_uuid }}
+  {%- endif %}
   namespace: benchmark-runner
   labels:
+    {% if scale -%}
+    app: hammerdb-postgres-pod-{{ trunc_uuid }}-{{ scale }}
+    {%- else -%}
     app: hammerdb-postgres-pod-{{ trunc_uuid }}
+    {%- endif %}
     benchmark-uuid: {{ uuid }}
 spec:
   restartPolicy: Never
@@ -167,14 +211,22 @@ spec:
         - until python3 -c "import socket; s=socket.socket(); s.settimeout(2); s.connect(('$POSTGRES_HOST', 5432)); s.close()" 2>/dev/null; do echo "Waiting for PostgreSQL..."; sleep 3; done
       env:
         - name: POSTGRES_HOST
+          {% if scale -%}
+          value: "postgres-deployment-{{ scale }}"
+          {%- else -%}
           value: "postgres-deployment"
+          {%- endif %}
   containers:
     - name: hammerdb
       image: quay.io/benchmark-runner/hammerdb-pod:centos10
       imagePullPolicy: Always
       env:
         - name: POSTGRES_HOST
+          {% if scale -%}
+          value: "postgres-deployment-{{ scale }}"
+          {%- else -%}
           value: "postgres-deployment"
+          {%- endif %}
       command: ["/bin/sh", "-c"]
       args:
         - |
