@@ -48,11 +48,17 @@ close $of
 '@
 
 $maxVU = {{ db_num_workers }}
+if ({{ db_min_workers }} -gt $maxVU) {
+    throw "db_min_workers ({{ db_min_workers }}) must be <= db_num_workers ({{ db_num_workers }})"
+}
 $vuCounts = @()
 $vu = {{ db_min_workers }}
 while ($vu -le $maxVU) {
     $vuCounts += $vu
     $vu *= 2
+}
+if ($vuCounts -notcontains $maxVU) {
+    $vuCounts += $maxVU
 }
 
 for ($i=1; $i -le {{ iterations }}; $i++) {
