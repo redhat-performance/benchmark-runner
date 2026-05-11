@@ -1,9 +1,14 @@
 metadata:
   name: sysbench
+files:
+  - name: sysbench_pod.yaml
+    template: sysbench_pod_template.yaml
+  - name: sysbench_vm.yaml
+    template: sysbench_vm_template.yaml
 template_data:
   shared:
     pin_node: {{ pin_node1 }}
-    image: quay.io/fedora/fedora:43
+    image: {{ image | default(fedora) }}
     resources: true
   run_type:
     perf_ci:

@@ -724,3 +724,46 @@ class WorkloadsOperations:
             from benchmark_runner.common.logger.logger_time_stamp import logger
             logger.warning('_parse_hammerdb_results_vm: could not read %s: %s', json_path, err)
             return []
+
+    def _extract_json_from_pod_logs(self, pod_logs: str) -> dict:
+        """Extract last JSON object from pod logs."""
+        import json as _json
+        from benchmark_runner.common.logger.logger_time_stamp import logger
+        for line in reversed(pod_logs.strip().splitlines()):
+            line = line.strip()
+            if line.startswith('{') and line.endswith('}'):
+                try:
+                    return _json.loads(line)
+                except _json.JSONDecodeError:
+                    pass
+        logger.warning("No JSON result found in pod logs")
+        return {}
+
+    def _extract_all_json_from_pod_logs(self, pod_logs: str) -> list:
+        """Extract all JSON objects from pod logs."""
+        import json as _json
+        from benchmark_runner.common.logger.logger_time_stamp import logger
+        results = []
+        for line in pod_logs.strip().splitlines():
+            line = line.strip()
+            if line.startswith('{') and line.endswith('}'):
+                try:
+                    results.append(_json.loads(line))
+                except _json.JSONDecodeError:
+                    pass
+        if not results:
+            logger.warning("No JSON results found in pod logs")
+        return results
+
+    @staticmethod
+    def _load_vm_json_results(json_path: str, workload: str = ''):
+        """Load JSON results from a VM-extracted file. Returns parsed data or None."""
+        import json as _json
+        from benchmark_runner.common.logger.logger_time_stamp import logger
+        if os.path.exists(json_path):
+            with open(json_path, 'r') as f:
+                data = _json.load(f)
+            logger.info(f"Parsed {workload} metrics from VM: {data}" if not isinstance(data, list) else f"Parsed {len(data)} {workload} results from VM")
+            return data
+        logger.warning(f"Failed to extract {workload} JSON from VM")
+        return None

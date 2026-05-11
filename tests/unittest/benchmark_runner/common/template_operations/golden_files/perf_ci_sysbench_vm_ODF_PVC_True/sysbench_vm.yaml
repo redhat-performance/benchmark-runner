@@ -9,7 +9,7 @@ metadata:
     benchmark-uuid: deadbeef-0123-3210-cdef-01234567890abcdef
     benchmark-runner-workload: sysbench
 spec:
-  runStrategy: Always
+  runStrategy: Once
   template:
     metadata:
       labels:
@@ -32,11 +32,16 @@ spec:
             - name: cloudinitdisk
               disk:
                 bus: virtio
-          networkInterfaceMultiqueue: true
+          interfaces:
+            - masquerade: {}
+              name: default
+      networks:
+        - name: default
+          pod: {}
       volumes:
         - name: containerdisk
           containerDisk:
-            image: quay.io/containerdisks/fedora:43
+            image: quay.io/benchmark-runner/fedora-container-disk:43
         - name: cloudinitdisk
           cloudInitNoCloud:
             userData: |
@@ -46,8 +51,8 @@ spec:
               ssh_pwauth: true
               packages:
                 - sysbench
-                - qemu-guest-agent
               runcmd:
-                - systemctl enable --now qemu-guest-agent
                 - mkdir -p /opt/sysbench && chmod 777 /opt/sysbench
-                - bash -c 'set -e && echo "=== SYSBENCH CPU TEST ===" > /opt/sysbench/output.tmp && sysbench cpu run --threads=80 --time=300 >> /opt/sysbench/output.tmp 2>&1 && echo "=== SYSBENCH CPU TEST DONE ===" >> /opt/sysbench/output.tmp && echo "=== SYSBENCH MEMORY TEST ===" >> /opt/sysbench/output.tmp && sysbench memory --memory-block-size=1M --memory-total-size=100G --threads=80 --max-time=300 --memory-oper=write run >> /opt/sysbench/output.tmp 2>&1 && echo "=== SYSBENCH MEMORY TEST DONE ===" >> /opt/sysbench/output.tmp && mv /opt/sysbench/output.tmp /opt/sysbench/output.txt'
+                - bash -c 'sysbench cpu run --threads=80 --time=300 > /opt/sysbench/cpu.txt 2>&1'
+                - bash -c 'sysbench memory --memory-block-size=1M --memory-total-size=100G --threads=80 --max-time=300 --memory-oper=write run > /opt/sysbench/mem.txt 2>&1'
+                - touch /opt/sysbench/done

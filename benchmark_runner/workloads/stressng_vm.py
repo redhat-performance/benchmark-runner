@@ -1,5 +1,4 @@
 
-import json
 import os
 from datetime import datetime, timezone
 
@@ -88,13 +87,7 @@ class StressngVM(WorkloadsOperations):
             self.__status = 'complete' if workload_complete else 'failed'
 
             # Read parsed JSON
-            parsed_metrics = None
-            if workload_complete and os.path.exists(local_json_path):
-                with open(local_json_path, 'r') as f:
-                    parsed_metrics = json.load(f)
-                logger.info(f"Parsed metrics from VM: {parsed_metrics}")
-            else:
-                logger.warning("Failed to extract stress-ng JSON from VM")
+            parsed_metrics = self._load_vm_json_results(local_json_path, 'stressng') if workload_complete else None
 
             # Create vm logs
             logger.info("Creating VM logs")

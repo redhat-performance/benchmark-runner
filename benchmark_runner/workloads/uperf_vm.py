@@ -1,5 +1,4 @@
 
-import json
 import os
 import time
 from datetime import datetime, timezone
@@ -138,13 +137,7 @@ class UperfVM(WorkloadsOperations):
             self.__status = 'complete' if workload_complete else 'failed'
 
             # Read parsed JSON (array of test results)
-            parsed_results = None
-            if workload_complete and os.path.exists(local_json_path):
-                with open(local_json_path, 'r') as f:
-                    parsed_results = json.load(f)
-                logger.info(f"Parsed {len(parsed_results)} uperf test results from VM")
-            else:
-                logger.warning("Failed to extract uperf JSON from VM")
+            parsed_results = self._load_vm_json_results(local_json_path, 'uperf') if workload_complete else None
 
             # Create vm logs
             logger.info("Creating VM logs")
