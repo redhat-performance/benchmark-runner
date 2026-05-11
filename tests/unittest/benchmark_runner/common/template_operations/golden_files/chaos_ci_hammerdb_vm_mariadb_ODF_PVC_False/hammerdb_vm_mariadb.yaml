@@ -109,8 +109,8 @@ spec:
         kubernetes.io/hostname: "pin-node-2"
       domain:
         cpu:
-          sockets: 4
-          cores: 1
+          sockets: 1
+          cores: 2
         devices:
           disks:
             - disk:
@@ -132,7 +132,7 @@ spec:
           type: ""
         resources:
           requests:
-            memory: "12Gi"
+            memory: "8Gi"
       terminationGracePeriodSeconds: 180
       volumes:
         - containerDisk:
