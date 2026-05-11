@@ -86,7 +86,11 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  {% if scale -%}
+  name: hammerdb-postgres-pvc-claim-{{ scale }}
+  {%- else -%}
   name: hammerdb-postgres-pvc-claim
+  {%- endif %}
   namespace: benchmark-runner
 spec:
   {%- if storage_type == 'lso' %}
@@ -104,10 +108,18 @@ spec:
 apiVersion: kubevirt.io/v1
 kind: VirtualMachine
 metadata:
+  {% if scale -%}
+  name: hammerdb-postgres-vm-{{ trunc_uuid }}-{{ scale }}
+  {%- else -%}
   name: hammerdb-postgres-vm-{{ trunc_uuid }}
+  {%- endif %}
   namespace: benchmark-runner
   labels:
+    {% if scale -%}
+    app: hammerdb-postgres-vm-{{ trunc_uuid }}-{{ scale }}
+    {%- else -%}
     app: hammerdb-postgres-vm-{{ trunc_uuid }}
+    {%- endif %}
     benchmark-uuid: {{ uuid }}
     benchmark-runner-workload: hammerdb-postgres
 spec:
@@ -164,7 +176,11 @@ spec:
           name: cloudinitdisk
         {%- if storage_type == 'lso' or odf_pvc == True %}
         - persistentVolumeClaim:
+            {% if scale -%}
+            claimName: hammerdb-postgres-pvc-claim-{{ scale }}
+            {%- else -%}
             claimName: hammerdb-postgres-pvc-claim
+            {%- endif %}
           name: data-volume
         {%- endif %}
         - configMap:
