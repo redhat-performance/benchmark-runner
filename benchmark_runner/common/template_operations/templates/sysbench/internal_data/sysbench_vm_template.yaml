@@ -1,0 +1,59 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: sysbench-vm-{{ trunc_uuid }}
+  namespace: {{ namespace }}
+  labels:
+    app: sysbench-vm-{{ trunc_uuid }}
+    type: sysbench-vm-{{ trunc_uuid }}
+    benchmark-uuid: {{ uuid }}
+    benchmark-runner-workload: sysbench
+spec:
+  runStrategy: Always
+  template:
+    metadata:
+      labels:
+        app: sysbench-vm-{{ trunc_uuid }}
+        kubevirt.io/domain: sysbench-vm-{{ trunc_uuid }}
+    spec:
+      {%- if pin == 'true' or pin == true %}
+      nodeSelector:
+        kubernetes.io/hostname: '{{ pin_node }}'
+      {%- endif %}
+      domain:
+        cpu:
+          cores: {{ cores | default(2) }}
+        resources:
+          requests:
+            memory: {{ memory | default('4Gi') }}
+        devices:
+          disks:
+            - name: containerdisk
+              disk:
+                bus: virtio
+            - name: cloudinitdisk
+              disk:
+                bus: virtio
+          networkInterfaceMultiqueue: true
+      volumes:
+        - name: containerdisk
+          containerDisk:
+            image: quay.io/containerdisks/fedora:43
+        - name: cloudinitdisk
+          cloudInitNoCloud:
+            userData: |
+              #cloud-config
+              password: fedora
+              chpasswd: { expire: False }
+              ssh_pwauth: true
+              {%- if ssh_public_key is defined and ssh_public_key %}
+              ssh_authorized_keys:
+                - {{ ssh_public_key }}
+              {%- endif %}
+              packages:
+                - sysbench
+                - qemu-guest-agent
+              runcmd:
+                - systemctl enable --now qemu-guest-agent
+                - mkdir -p /opt/sysbench && chmod 777 /opt/sysbench
+                - bash -c 'set -e && echo "=== SYSBENCH CPU TEST ===" > /opt/sysbench/output.tmp && sysbench cpu run --threads={{ sysbench_threads }} --time={{ sysbench_time }} >> /opt/sysbench/output.tmp 2>&1 && echo "=== SYSBENCH CPU TEST DONE ===" >> /opt/sysbench/output.tmp && echo "=== SYSBENCH MEMORY TEST ===" >> /opt/sysbench/output.tmp && sysbench memory --memory-block-size=1M --memory-total-size=100G --threads={{ sysbench_threads }} --max-time={{ sysbench_time }} --memory-oper=write run >> /opt/sysbench/output.tmp 2>&1 && echo "=== SYSBENCH MEMORY TEST DONE ===" >> /opt/sysbench/output.tmp && mv /opt/sysbench/output.tmp /opt/sysbench/output.txt'

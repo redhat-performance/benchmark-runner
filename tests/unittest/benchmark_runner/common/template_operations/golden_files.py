@@ -27,6 +27,7 @@ class GoldenFiles:
         environment_variables.environment_variables_dict['trunc_uuid'] = environment_variables.environment_variables_dict['uuid'].split('-')[0]
         environment_variables.environment_variables_dict['workloads'] = ['stressng_pod', 'stressng_vm', 'stressng_kata',
                                                          'uperf_pod', 'uperf_vm', 'uperf_kata',
+                                                         'sysbench_pod', 'sysbench_vm',
                                                          'hammerdb_pod_mariadb', 'hammerdb_vm_mariadb', 'hammerdb_kata_mariadb',
                                                          'hammerdb_pod_postgres', 'hammerdb_vm_postgres', 'hammerdb_kata_postgres',
                                                          'hammerdb_pod_mssql', 'hammerdb_vm_mssql', 'hammerdb_kata_mssql',

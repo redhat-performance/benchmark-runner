@@ -1,0 +1,44 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: sysbench-pod-deadbeef
+  namespace: benchmark-runner
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 3600
+  template:
+    metadata:
+      labels:
+        app: sysbench-workload-deadbeef
+        type: sysbench-bench-workload-deadbeef
+        benchmark-uuid: deadbeef-0123-3210-cdef-01234567890abcdef
+        benchmark-runner-workload: sysbench
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: 'pin-node-1'
+      serviceAccountName: benchmark-runner
+      containers:
+      - name: sysbench
+        securityContext:
+          runAsUser: 0
+        resources:
+          requests:
+            cpu: 70
+            memory: 75Gi
+          limits:
+            cpu: 80
+            memory: 350Gi
+        image: quay.io/fedora/fedora:43
+        imagePullPolicy: Always
+        command: ["/bin/bash", "-c"]
+        args:
+          - |
+            set -euo pipefail
+            dnf install -y sysbench
+            echo "=== SYSBENCH CPU TEST ==="
+            sysbench cpu run --threads=80 --time=300
+            echo "=== SYSBENCH CPU TEST DONE ==="
+            echo "=== SYSBENCH MEMORY TEST ==="
+            sysbench memory --memory-block-size=1M --memory-total-size=100G --threads=80 --max-time=300 --memory-oper=write run
+            echo "=== SYSBENCH MEMORY TEST DONE ==="
+      restartPolicy: Never

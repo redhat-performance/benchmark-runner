@@ -109,6 +109,7 @@ class EnvironmentVariables:
         # Parameters below related to 'run_workload()'
         self._environment_variables_dict['workloads'] = ['stressng_pod', 'stressng_vm',
                                                          'uperf_pod', 'uperf_vm',
+                                                         'sysbench_pod', 'sysbench_vm',
                                                          'hammerdb_pod_mariadb', 'hammerdb_vm_mariadb',
                                                          'hammerdb_pod_mariadb_lso', 'hammerdb_vm_mariadb_lso',
                                                          'hammerdb_pod_mariadb_ephemeral', 'hammerdb_vm_mariadb_ephemeral',
@@ -125,6 +126,7 @@ class EnvironmentVariables:
         # Workloads namespaces
         self._environment_variables_dict['workload_namespaces'] = {
             'stressng': 'benchmark-runner',
+            'sysbench': 'benchmark-runner',
             'hammerdb': 'benchmark-runner',
             'uperf': 'benchmark-runner',
             'vdbench': 'benchmark-runner',

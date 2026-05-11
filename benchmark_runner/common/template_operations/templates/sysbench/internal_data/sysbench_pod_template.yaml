@@ -1,0 +1,48 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: sysbench-pod-{{ trunc_uuid }}
+  namespace: {{ namespace }}
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: {{ timeout|default(3600) }}
+  template:
+    metadata:
+      labels:
+        app: sysbench-workload-{{ trunc_uuid }}
+        type: sysbench-bench-workload-{{ trunc_uuid }}
+        benchmark-uuid: {{ uuid }}
+        benchmark-runner-workload: sysbench
+    spec:
+      {%- if pin == 'true' or pin == true %}
+      nodeSelector:
+        kubernetes.io/hostname: '{{ pin_node }}'
+      {%- endif %}
+      serviceAccountName: {{ namespace }}
+      containers:
+      - name: sysbench
+        securityContext:
+          runAsUser: 0
+        {%- if resources == 'true' or resources == true %}
+        resources:
+          requests:
+            cpu: {{ requests_cpu }}
+            memory: {{ requests_memory }}
+          limits:
+            cpu: {{ limits_cpu }}
+            memory: {{ limits_memory }}
+        {%- endif %}
+        image: {{ image | default('quay.io/fedora/fedora:43') }}
+        imagePullPolicy: Always
+        command: ["/bin/bash", "-c"]
+        args:
+          - |
+            set -euo pipefail
+            dnf install -y sysbench
+            echo "=== SYSBENCH CPU TEST ==="
+            sysbench cpu run --threads={{ sysbench_threads }} --time={{ sysbench_time }}
+            echo "=== SYSBENCH CPU TEST DONE ==="
+            echo "=== SYSBENCH MEMORY TEST ==="
+            sysbench memory --memory-block-size=1M --memory-total-size=100G --threads={{ sysbench_threads }} --max-time={{ sysbench_time }} --memory-oper=write run
+            echo "=== SYSBENCH MEMORY TEST DONE ==="
+      restartPolicy: Never
