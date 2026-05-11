@@ -150,6 +150,11 @@ class TemplateOperations:
 
         render_data = self.__build_template_data(template_render_data, workload_data)
 
+        hammerdb_config = self.__environment_variables_dict.get('hammerdb_config', {})
+        if hammerdb_config:
+            logger.info(f'HAMMERDB_CONFIG override: {hammerdb_config}')
+            render_data.update(hammerdb_config)
+
         out_files = []
         standard_template_path = os.path.join(workload_dir_path, 'internal_data', self.__standard_template_file)
         if os.path.isfile(standard_template_path):

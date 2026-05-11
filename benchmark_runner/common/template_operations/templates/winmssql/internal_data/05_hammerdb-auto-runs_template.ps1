@@ -26,8 +26,8 @@ diset connection mssqls_linux_odbc {ODBC Driver 18 for SQL Server}
 diset tpcc mssqls_dbase tpcc
 diset tpcc mssqls_driver timed
 diset tpcc mssqls_total_iterations 10000000
-diset tpcc mssqls_rampup 1
-diset tpcc mssqls_duration 1
+diset tpcc mssqls_rampup {{ rampup }}
+diset tpcc mssqls_duration {{ runtime }}
 diset tpcc mssqls_checkpoint false
 diset tpcc mssqls_timeprofile true
 diset tpcc mssqls_allwarehouse true
@@ -49,13 +49,13 @@ close $of
 
 $maxVU = {{ db_num_workers }}
 $vuCounts = @()
-$vu = 1
+$vu = {{ db_min_workers }}
 while ($vu -le $maxVU) {
     $vuCounts += $vu
     $vu *= 2
 }
 
-for ($i=1; $i -le 2; $i++) {
+for ($i=1; $i -le {{ iterations }}; $i++) {
     Write-Output "Iteration $i started"
 
     foreach ($vu in $vuCounts) {

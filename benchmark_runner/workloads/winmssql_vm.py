@@ -1,6 +1,7 @@
 
 import os
 import time
+import urllib.request
 from multiprocessing import Process
 
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
@@ -19,6 +20,10 @@ class WinMSSQLVM(BootstormVM):
         super().__init__()
         if not self._windows_url:
             raise ValueError('Missing Windows DV URL')
+        try:
+            urllib.request.urlopen(urllib.request.Request(self._windows_url, method='HEAD'), timeout=10)
+        except Exception as err:
+            raise ValueError(f'Windows DV URL not accessible: {self._windows_url} ({err})')
         self.__namespace = self._environment_variables_dict.get('namespace', 'benchmark-runner')
         self.__username = self._environment_variables_dict.get('vm_user') or 'Administrator'
         self.__ssh_key_path = self._ssh_key_path
@@ -75,7 +80,17 @@ class WinMSSQLVM(BootstormVM):
             if not self._virtctl._wait_for_virtctl_ssh(vm_name=vm_name, namespace=self.__namespace,
                                                        key_path=self.__ssh_key_path, username=self.__username,
                                                        timeout=self._timeout):
-                raise Windows_HammerDB_NOT_Succeeded(f'SSH never became ready on VM {vm_name}')
+                raise Windows_HammerDB_NOT_Succeeded(
+                    f'SSH key auth never became ready on VM {vm_name}. '
+                    f'Cloudbase-init may not have executed runcmd (image needs sysprep). '
+                    f'Verify: virtctl ssh --username=Administrator vmi/{vm_name} -n {self.__namespace}')
+
+            verify = self._virtctl.virtctl_ssh(vm_name=vm_name,
+                                               command='powershell -Command "if (Test-Path C:\\ProgramData\\ssh\\administrators_authorized_keys) { echo key_ok }"',
+                                               namespace=self.__namespace, key_path=self.__ssh_key_path,
+                                               username=self.__username, timeout=60)
+            if not verify or 'key_ok' not in verify:
+                logger.warning(f'SSH key file not found on VM {vm_name} — cloudbase-init runcmd may not have executed (image needs sysprep)')
 
             scripts = ['run_prepare_hammerdb.ps1', 'run_hammerdb_benchmark.ps1',
                        '01_provision-data-disk.ps1', '02_create_db.sql',
