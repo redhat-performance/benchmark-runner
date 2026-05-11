@@ -59,6 +59,4 @@ spec:
                 - sysbench
               runcmd:
                 - mkdir -p /opt/sysbench && chmod 777 /opt/sysbench
-                - bash -c 'sysbench cpu run --threads={{ sysbench_threads }} --time={{ sysbench_time }} > /opt/sysbench/cpu.txt 2>&1'
-                - bash -c 'sysbench memory --memory-block-size=1M --memory-total-size=100G --threads={{ sysbench_threads }} --max-time={{ sysbench_time }} --memory-oper=write run > /opt/sysbench/mem.txt 2>&1'
-                - touch /opt/sysbench/done
+                - bash -c 'sysbench cpu run --threads={{ sysbench_threads }} --time={{ sysbench_time }} > /opt/sysbench/cpu.txt 2>&1 && sysbench memory --memory-block-size=1M --memory-total-size=100G --threads={{ sysbench_threads }} --max-time={{ sysbench_time }} --memory-oper=write run > /opt/sysbench/mem.txt 2>&1 && touch /opt/sysbench/done'

@@ -81,7 +81,7 @@ stringData:
       - sleep 30
       - |
         SERVER=""
-        RT="2"
+        RT="10"
         for tt in stream; do
           for sz in 64; do
             for nt in 1; do

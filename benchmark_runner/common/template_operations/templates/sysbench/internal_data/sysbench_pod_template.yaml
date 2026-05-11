@@ -28,9 +28,11 @@ spec:
           requests:
             cpu: {{ requests_cpu }}
             memory: {{ requests_memory }}
+          {%- if limits_cpu is defined and limits_memory is defined %}
           limits:
             cpu: {{ limits_cpu }}
             memory: {{ limits_memory }}
+          {%- endif %}
         {%- endif %}
         image: {{ image | default(fedora) }}
         imagePullPolicy: Always
@@ -38,7 +40,7 @@ spec:
         args:
           - |
             set -euo pipefail
-            dnf install -y sysbench
+            dnf install -y sysbench python3 > /dev/null
             echo "=== SYSBENCH CPU TEST ==="
             sysbench cpu run --threads={{ sysbench_threads }} --time={{ sysbench_time }} 2>&1 | tee /tmp/cpu.txt
             echo "=== SYSBENCH CPU TEST DONE ==="

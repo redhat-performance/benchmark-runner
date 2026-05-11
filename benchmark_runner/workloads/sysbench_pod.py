@@ -51,7 +51,6 @@ class SysbenchPod(WorkloadsOperations):
 
             self._environment_variables_dict['kind'] = self.__kind
 
-            # Create namespace and apply security privileged SCC
             self._oc.apply_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'namespace.yaml'))
             self._oc.apply_security_privileged()
 

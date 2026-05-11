@@ -20,8 +20,11 @@ spec:
       {%- if hostnetwork == 'true' or hostnetwork == true %}
       hostNetwork: true
       {%- endif %}
+      serviceAccountName: {{ namespace }}
       containers:
       - name: benchmark
+        securityContext:
+          runAsUser: 0
         image: {{ image | default(fedora) }}
         env:
           - name: uuid
@@ -85,6 +88,7 @@ spec:
         command: ["/bin/sh", "-c"]
         args:
           - |
+            dnf install -y uperf python3 > /dev/null
             # Server IP passed from Python code
             export h="{{ server_ip }}"
             export port=30000

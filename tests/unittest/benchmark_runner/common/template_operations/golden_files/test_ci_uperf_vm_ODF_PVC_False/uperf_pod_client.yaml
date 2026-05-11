@@ -14,8 +14,11 @@ spec:
         app: uperf-bench-client
         type: uperf-bench-client-deadbeef
     spec:
+      serviceAccountName: benchmark-runner
       containers:
       - name: benchmark
+        securityContext:
+          runAsUser: 0
         image: quay.io/benchmark-runner/fedora:43
         env:
           - name: uuid
@@ -70,6 +73,7 @@ spec:
         command: ["/bin/sh", "-c"]
         args:
           - |
+            dnf install -y uperf python3 > /dev/null
             # Server IP passed from Python code
             export h=""
             export port=30000

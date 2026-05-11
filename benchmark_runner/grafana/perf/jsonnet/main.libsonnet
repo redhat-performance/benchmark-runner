@@ -1003,6 +1003,204 @@ g.dashboard.new('PerfCI-Regression-Summary')
         ]),
 
 
+        //////////////////////////////////////////
+        // Sysbench Row
+        //////////////////////////////////////////
+
+      g.panel.row.new("Sysbench")
+        + g.panel.row.withCollapsed(value=true)
+        + g.panel.row.gridPos.withH(1)
+        + g.panel.row.gridPos.withW(24)
+        + g.panel.row.gridPos.withX(0)
+        + g.panel.row.gridPos.withY(14)
+        + g.panel.row.withId(180)
+        + g.panel.row.withPanels([
+
+          g.panel.stateTimeline.new('Sysbench CPU Events (avg)')
+            + stateTimeline.queryOptions.withDatasource('Elasticsearch-sysbench-results')
+            + g.panel.stateTimeline.withDescription('Higher is better')
+            + stateTimeline.standardOptions.color.withMode('thresholds')
+            + stateTimeline.fieldConfig.defaults.custom.withFillOpacity(70)
+            + stateTimeline.fieldConfig.defaults.custom.withLineWidth(0)
+            + stateTimeline.fieldConfig.defaults.withDecimals(0)
+            + stateTimeline.fieldConfig.defaults.withMappings([])
+            + stateTimeline.standardOptions.withMin(0)
+            + stateTimeline.fieldConfig.defaults.thresholds.withMode('percentage')
+            + stateTimeline.fieldConfig.defaults.thresholds.withSteps([
+              stateTimeline.thresholdStep.withColor('semi-dark-red'),
+              stateTimeline.thresholdStep.withColor('semi-dark-orange') + stateTimeline.thresholdStep.withValue(50),
+              stateTimeline.thresholdStep.withColor('super-light-green') + stateTimeline.thresholdStep.withValue(80),
+              stateTimeline.thresholdStep.withColor('dark-green') + stateTimeline.thresholdStep.withValue(90),
+              stateTimeline.thresholdStep.withColor('dark-blue') + stateTimeline.thresholdStep.withValue(100)
+            ])
+            + stateTimeline.fieldConfig.withOverrides([])
+            + stateTimeline.gridPos.withH(10) + stateTimeline.gridPos.withW(24) + stateTimeline.gridPos.withX(0) + stateTimeline.gridPos.withY(15)
+            + stateTimeline.withId(181) + stateTimeline.withInterval('1d')
+            + stateTimeline.options.withAlignValue('center')
+            + stateTimeline.options.legend.withDisplayMode('list') + stateTimeline.options.legend.withPlacement('bottom')
+            + stateTimeline.options.withMergeValues(value = false) + stateTimeline.options.withRowHeight(value = 0.9)
+            + stateTimeline.options.withShowValue('always') + stateTimeline.options.tooltip.withMode('single')
+            + g.panel.stateTimeline.withTargets([
+              elasticsearch.withAlias('{{term kind.keyword}}')
+              + elasticsearch.withBucketAggs([
+                elasticsearch.bucketAggs.Terms.withField('kind.keyword') + elasticsearch.bucketAggs.Terms.withId('3')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1') + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term') + elasticsearch.bucketAggs.Terms.settings.withSize('10')
+                + elasticsearch.bucketAggs.Terms.withType('terms'),
+                elasticsearch.bucketAggs.DateHistogram.withField('timestamp') + elasticsearch.bucketAggs.DateHistogram.withId('2')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto') + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('0')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone('utc') + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges('0')
+                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+              ])
+              + elasticsearch.withMetrics([
+                elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('cpu_events_avg')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Average.withSettings({})
+                + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg')
+              ])
+              +elasticsearch.withQuery('_exists_:cpu_events_avg AND kind:$kind AND ocp_version:$ocp_version')
+              +elasticsearch.withRefId('A') +elasticsearch.withTimeField('timestamp')
+            ]),
+
+          g.panel.stateTimeline.new('Sysbench CPU Latency P95 (ms)')
+            + stateTimeline.queryOptions.withDatasource('Elasticsearch-sysbench-results')
+            + g.panel.stateTimeline.withDescription('Lower is better')
+            + stateTimeline.standardOptions.color.withMode('thresholds')
+            + stateTimeline.fieldConfig.defaults.custom.withFillOpacity(70)
+            + stateTimeline.fieldConfig.defaults.custom.withLineWidth(0)
+            + stateTimeline.fieldConfig.defaults.withDecimals(2)
+            + stateTimeline.fieldConfig.defaults.withMappings([])
+            + stateTimeline.standardOptions.withMax(-1)
+            + stateTimeline.fieldConfig.defaults.thresholds.withMode('percentage')
+            + stateTimeline.fieldConfig.defaults.thresholds.withSteps([
+              stateTimeline.thresholdStep.withColor('dark-blue'),
+              stateTimeline.thresholdStep.withColor('dark-green') + stateTimeline.thresholdStep.withValue(1),
+              stateTimeline.thresholdStep.withColor('super-light-green') + stateTimeline.thresholdStep.withValue(10),
+              stateTimeline.thresholdStep.withColor('semi-dark-orange') + stateTimeline.thresholdStep.withValue(20),
+              stateTimeline.thresholdStep.withColor('dark-red') + stateTimeline.thresholdStep.withValue(50)
+            ])
+            + stateTimeline.fieldConfig.withOverrides([])
+            + stateTimeline.gridPos.withH(10) + stateTimeline.gridPos.withW(24) + stateTimeline.gridPos.withX(0) + stateTimeline.gridPos.withY(25)
+            + stateTimeline.withId(182) + stateTimeline.withInterval('1d')
+            + stateTimeline.options.withAlignValue('center')
+            + stateTimeline.options.legend.withDisplayMode('list') + stateTimeline.options.legend.withPlacement('bottom')
+            + stateTimeline.options.withMergeValues(value = false) + stateTimeline.options.withRowHeight(value = 0.9)
+            + stateTimeline.options.withShowValue('always') + stateTimeline.options.tooltip.withMode('single')
+            + g.panel.stateTimeline.withTargets([
+              elasticsearch.withAlias('{{term kind.keyword}}')
+              + elasticsearch.withBucketAggs([
+                elasticsearch.bucketAggs.Terms.withField('kind.keyword') + elasticsearch.bucketAggs.Terms.withId('3')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1') + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term') + elasticsearch.bucketAggs.Terms.settings.withSize('10')
+                + elasticsearch.bucketAggs.Terms.withType('terms'),
+                elasticsearch.bucketAggs.DateHistogram.withField('timestamp') + elasticsearch.bucketAggs.DateHistogram.withId('2')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto') + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('0')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone('utc') + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges('0')
+                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+              ])
+              + elasticsearch.withMetrics([
+                elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('cpu_latency_95th')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Average.withSettings({})
+                + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg')
+              ])
+              +elasticsearch.withQuery('_exists_:cpu_latency_95th AND kind:$kind AND ocp_version:$ocp_version')
+              +elasticsearch.withRefId('A') +elasticsearch.withTimeField('timestamp')
+            ]),
+
+          g.panel.stateTimeline.new('Sysbench Memory Throughput (MiB/s)')
+            + stateTimeline.queryOptions.withDatasource('Elasticsearch-sysbench-results')
+            + g.panel.stateTimeline.withDescription('Higher is better')
+            + stateTimeline.standardOptions.color.withMode('thresholds')
+            + stateTimeline.fieldConfig.defaults.custom.withFillOpacity(70)
+            + stateTimeline.fieldConfig.defaults.custom.withLineWidth(0)
+            + stateTimeline.fieldConfig.defaults.withDecimals(0)
+            + stateTimeline.fieldConfig.defaults.withMappings([])
+            + stateTimeline.standardOptions.withMin(0)
+            + stateTimeline.fieldConfig.defaults.thresholds.withMode('percentage')
+            + stateTimeline.fieldConfig.defaults.thresholds.withSteps([
+              stateTimeline.thresholdStep.withColor('semi-dark-red'),
+              stateTimeline.thresholdStep.withColor('semi-dark-orange') + stateTimeline.thresholdStep.withValue(50),
+              stateTimeline.thresholdStep.withColor('super-light-green') + stateTimeline.thresholdStep.withValue(80),
+              stateTimeline.thresholdStep.withColor('dark-green') + stateTimeline.thresholdStep.withValue(90),
+              stateTimeline.thresholdStep.withColor('dark-blue') + stateTimeline.thresholdStep.withValue(100)
+            ])
+            + stateTimeline.fieldConfig.withOverrides([])
+            + stateTimeline.gridPos.withH(10) + stateTimeline.gridPos.withW(24) + stateTimeline.gridPos.withX(0) + stateTimeline.gridPos.withY(35)
+            + stateTimeline.withId(183) + stateTimeline.withInterval('1d')
+            + stateTimeline.options.withAlignValue('center')
+            + stateTimeline.options.legend.withDisplayMode('list') + stateTimeline.options.legend.withPlacement('bottom')
+            + stateTimeline.options.withMergeValues(value = false) + stateTimeline.options.withRowHeight(value = 0.9)
+            + stateTimeline.options.withShowValue('always') + stateTimeline.options.tooltip.withMode('single')
+            + g.panel.stateTimeline.withTargets([
+              elasticsearch.withAlias('{{term kind.keyword}}')
+              + elasticsearch.withBucketAggs([
+                elasticsearch.bucketAggs.Terms.withField('kind.keyword') + elasticsearch.bucketAggs.Terms.withId('3')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1') + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term') + elasticsearch.bucketAggs.Terms.settings.withSize('10')
+                + elasticsearch.bucketAggs.Terms.withType('terms'),
+                elasticsearch.bucketAggs.DateHistogram.withField('timestamp') + elasticsearch.bucketAggs.DateHistogram.withId('2')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto') + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('0')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone('utc') + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges('0')
+                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+              ])
+              + elasticsearch.withMetrics([
+                elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('memory_throughput_mib')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Average.withSettings({})
+                + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg')
+              ])
+              +elasticsearch.withQuery('_exists_:memory_throughput_mib AND kind:$kind AND ocp_version:$ocp_version')
+              +elasticsearch.withRefId('A') +elasticsearch.withTimeField('timestamp')
+            ]),
+
+          g.panel.stateTimeline.new('Sysbench Memory Latency P95 (ms)')
+            + stateTimeline.queryOptions.withDatasource('Elasticsearch-sysbench-results')
+            + g.panel.stateTimeline.withDescription('Lower is better')
+            + stateTimeline.standardOptions.color.withMode('thresholds')
+            + stateTimeline.fieldConfig.defaults.custom.withFillOpacity(70)
+            + stateTimeline.fieldConfig.defaults.custom.withLineWidth(0)
+            + stateTimeline.fieldConfig.defaults.withDecimals(2)
+            + stateTimeline.fieldConfig.defaults.withMappings([])
+            + stateTimeline.standardOptions.withMax(-1)
+            + stateTimeline.fieldConfig.defaults.thresholds.withMode('percentage')
+            + stateTimeline.fieldConfig.defaults.thresholds.withSteps([
+              stateTimeline.thresholdStep.withColor('dark-blue'),
+              stateTimeline.thresholdStep.withColor('dark-green') + stateTimeline.thresholdStep.withValue(1),
+              stateTimeline.thresholdStep.withColor('super-light-green') + stateTimeline.thresholdStep.withValue(10),
+              stateTimeline.thresholdStep.withColor('semi-dark-orange') + stateTimeline.thresholdStep.withValue(20),
+              stateTimeline.thresholdStep.withColor('dark-red') + stateTimeline.thresholdStep.withValue(50)
+            ])
+            + stateTimeline.fieldConfig.withOverrides([])
+            + stateTimeline.gridPos.withH(10) + stateTimeline.gridPos.withW(24) + stateTimeline.gridPos.withX(0) + stateTimeline.gridPos.withY(45)
+            + stateTimeline.withId(184) + stateTimeline.withInterval('1d')
+            + stateTimeline.options.withAlignValue('center')
+            + stateTimeline.options.legend.withDisplayMode('list') + stateTimeline.options.legend.withPlacement('bottom')
+            + stateTimeline.options.withMergeValues(value = false) + stateTimeline.options.withRowHeight(value = 0.9)
+            + stateTimeline.options.withShowValue('always') + stateTimeline.options.tooltip.withMode('single')
+            + g.panel.stateTimeline.withTargets([
+              elasticsearch.withAlias('{{term kind.keyword}}')
+              + elasticsearch.withBucketAggs([
+                elasticsearch.bucketAggs.Terms.withField('kind.keyword') + elasticsearch.bucketAggs.Terms.withId('3')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1') + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term') + elasticsearch.bucketAggs.Terms.settings.withSize('10')
+                + elasticsearch.bucketAggs.Terms.withType('terms'),
+                elasticsearch.bucketAggs.DateHistogram.withField('timestamp') + elasticsearch.bucketAggs.DateHistogram.withId('2')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto') + elasticsearch.bucketAggs.DateHistogram.settings.withMinDocCount('0')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withTimeZone('utc') + elasticsearch.bucketAggs.DateHistogram.settings.withTrimEdges('0')
+                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+              ])
+              + elasticsearch.withMetrics([
+                elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('memory_latency_95th')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Average.withSettings({})
+                + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg')
+              ])
+              +elasticsearch.withQuery('_exists_:memory_latency_95th AND kind:$kind AND ocp_version:$ocp_version')
+              +elasticsearch.withRefId('A') +elasticsearch.withTimeField('timestamp')
+            ]),
+
+        ]),
 
 
 

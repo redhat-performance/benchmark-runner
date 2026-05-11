@@ -44,7 +44,7 @@ template_data:
         - 64
       nthrs:
         - 1
-      runtime: 2
+      runtime: 10
   kind:
     vm:
       run_type:

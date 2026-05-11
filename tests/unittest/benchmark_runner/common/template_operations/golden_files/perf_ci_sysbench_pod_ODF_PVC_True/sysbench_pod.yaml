@@ -34,7 +34,7 @@ spec:
         args:
           - |
             set -euo pipefail
-            dnf install -y sysbench
+            dnf install -y sysbench python3 > /dev/null
             echo "=== SYSBENCH CPU TEST ==="
             sysbench cpu run --threads=80 --time=300 2>&1 | tee /tmp/cpu.txt
             echo "=== SYSBENCH CPU TEST DONE ==="
