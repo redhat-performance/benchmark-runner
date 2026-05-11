@@ -1,5 +1,6 @@
 
 import os
+import time
 
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 from benchmark_runner.common.elasticsearch.elasticsearch_exceptions import ElasticSearchDataNotUploaded
@@ -8,141 +9,187 @@ from benchmark_runner.workloads.workloads_operations import WorkloadsOperations
 
 class HammerdbVm(WorkloadsOperations):
     """
-    This class runs HammerDB VM workload.
+    This class runs HammerDB VM workload with scale support.
+    Same code path for 1 VM and N VMs.
     The VM cloud-init runs the full benchmark (DB setup + HammerDB + parse_results.py).
-    Results are retrieved by copying /tmp/hammerdb-results.json from the running VM
-    via the QEMU guest agent (no virtctl console streaming required).
+    Results are retrieved by copying /tmp/hammerdb-results.json from the running VM.
     """
     HAMMERDB_RESULTS_FILE = '/tmp/hammerdb-results.json'
 
     def __init__(self):
         super().__init__()
-        self.__name = ''
-        self.__workload_name = ''
-        self.__database = ''
-        self.__es_index = ''
-        self.__kind = ''
-        self.__status = ''
-        self.__vm_name = ''
-        self.__namespace = self._environment_variables_dict.get('namespace', 'benchmark-runner')
-        self.__username = self._environment_variables_dict.get('vm_user') or 'cloud-user'
+        self._name = ''
+        self._workload_name = ''
+        self._database = ''
+        self._es_index = ''
+        self._kind = ''
+        self._namespace = self._environment_variables_dict.get('namespace', 'benchmark-runner')
+        self._username = self._environment_variables_dict.get('vm_user') or 'cloud-user'
+        self._ssh_key_path = ''
 
-    def __save_error_logs(self):
-        """Save logs and upload failure status to Elasticsearch on error"""
+    def _get_vm_name(self, vm_num: str) -> str:
+        if self._scale:
+            return f'{self._workload_name}-{self._trunc_uuid}-{vm_num}'
+        return f'{self._workload_name}-{self._trunc_uuid}'
+
+    def _get_vm_yaml(self, vm_num: str) -> str:
+        if self._scale:
+            return os.path.join(self._run_artifacts_path, f'{self._name}_{vm_num}.yaml')
+        return os.path.join(self._run_artifacts_path, f'{self._name}.yaml')
+
+    def _create_vm(self, vm_num: str):
+        """Phase 1: Create VM and wait for ready."""
+        try:
+            vm_name = self._get_vm_name(vm_num)
+            self._oc.create_async(yaml=self._get_vm_yaml(vm_num))
+            self._oc.wait_for_ready(label=f'app={vm_name}', run_type='vm', label_uuid=False)
+        except Exception as err:
+            self._save_error_logs()
+            raise err
+
+    def _wait_and_collect(self, vm_num: str):
+        """Phase 2: Wait for workload completion and SCP results."""
+        try:
+            vm_name = self._get_vm_name(vm_num)
+            local_json_path = os.path.join(self._run_artifacts_path, f'hammerdb-results_{vm_num}.json')
+            workload_complete = self._virtctl.wait_for_vm_workload_completed(
+                vm_name=vm_name,
+                file_path=self.HAMMERDB_RESULTS_FILE,
+                local_path=local_json_path,
+                namespace=self._namespace,
+                key_path=self._ssh_key_path,
+                username=self._username,
+                timeout=self._timeout
+            )
+            if not workload_complete:
+                logger.warning(f'Timed out waiting for results in VM {vm_name}')
+        except Exception as err:
+            self._save_error_logs()
+            raise err
+
+    def _delete_vm(self, vm_num: str):
+        """Phase 3: Delete VM."""
+        try:
+            vm_name = self._get_vm_name(vm_num)
+            self._oc.delete_vm_sync(yaml=self._get_vm_yaml(vm_num), vm_name=vm_name)
+        except Exception as err:
+            self._save_error_logs()
+            raise err
+
+    def _upload_results(self, vm_count: int):
+        """Upload all VM results to ES from the main process (no SSL issues)."""
+        if self._enable_prometheus_snapshot:
+            self._prometheus_metrics_operation.finalize_prometheus()
+            metric_results = self._prometheus_metrics_operation.run_prometheus_queries()
+            self._prometheus_result = self._prometheus_metrics_operation.parse_prometheus_metrics(data=metric_results)
+
+        run_artifacts_url = os.path.join(
+            self._run_artifacts_url,
+            f'{self._get_run_artifacts_hierarchy(workload_name=self._workload_name, is_file=True)}-{self._time_stamp_format}.tar.gz'
+        )
+
+        for vm_num in range(vm_count):
+            local_json_path = os.path.join(self._run_artifacts_path, f'hammerdb-results_{vm_num}.json')
+            hammerdb_results_dict = self._parse_hammerdb_results_vm(local_json_path)
+            if hammerdb_results_dict and self._es_host:
+                vm_name = self._get_vm_name(str(vm_num))
+                vm_node = self._oc.get_vm_node(vm_name=vm_name)
+                thread_results = self._hammerdb_thread_results(hammerdb_results_dict)
+                for thread_result in thread_results:
+                    thread_result.update({
+                        'vm_name': vm_name,
+                        'vm_name_num': f'hammerdb-vm-{vm_num}',
+                        'node': vm_node,
+                    })
+                    self._upload_hammerdb_thread_result(
+                        index=self._es_index,
+                        kind=self._kind,
+                        status='complete',
+                        run_artifacts_url=run_artifacts_url,
+                        database=self._database,
+                        thread_result=thread_result,
+                    )
+                    self._verify_elasticsearch_data_uploaded(
+                        index=self._es_index,
+                        uuid=self._uuid,
+                    )
+            else:
+                logger.warning(f'HammerDB results could not be parsed from {local_json_path}')
+
+    def _save_error_logs(self):
+        """Save logs and upload failure status to Elasticsearch on error."""
         if self._es_host:
             run_artifacts_url = os.path.join(
                 self._run_artifacts_url,
-                f'{self._get_run_artifacts_hierarchy(workload_name=self.__workload_name, is_file=True)}-{self._time_stamp_format}.tar.gz'
+                f'{self._get_run_artifacts_hierarchy(workload_name=self._workload_name, is_file=True)}-{self._time_stamp_format}.tar.gz'
             )
             tmpl = self._hammerdb_elasticsearch_template_fields()
             self._upload_to_elasticsearch(
-                index=self.__es_index,
-                kind=self.__kind,
+                index=self._es_index,
+                kind=self._kind,
                 status='failed',
                 result={**{'run_artifacts_url': run_artifacts_url}, **tmpl},
-                database=self.__database,
+                database=self._database,
             )
-            self._verify_elasticsearch_data_uploaded(index=self.__es_index, uuid=self._uuid)
+            self._verify_elasticsearch_data_uploaded(index=self._es_index, uuid=self._uuid)
 
     @logger_time_stamp
     def run(self):
         """
-        Run HammerDB VM workload: create VM, wait for ready, copy /tmp/hammerdb-results.json
-        from the VM via QEMU guest agent, upload per-thread results to Elasticsearch.
+        Run HammerDB VM workload. Same flow for 1 VM and N VMs.
         """
         try:
             if self._enable_prometheus_snapshot:
                 self._prometheus_metrics_operation.init_prometheus()
 
-            # e.g. workload = 'hammerdb_vm_mariadb' -> database = 'mariadb', kind = 'vm'
             parts = self._workload.split('_')
-            self.__database = parts[2]
-            self.__kind = 'vm'
-            self.__name = f'hammerdb_{self.__kind}_{self.__database}'
-            self.__workload_name = f'hammerdb-{self.__database}-vm'
-            self.__vm_name = f'{self.__workload_name}-{self._trunc_uuid}'
+            self._database = parts[2]
+            self._kind = 'vm'
+            self._name = f'hammerdb_{self._kind}_{self._database}'
+            self._workload_name = f'hammerdb-{self._database}-vm'
 
             if self._run_type == 'test_ci':
-                self.__es_index = 'hammerdb-test-ci-results'
+                self._es_index = 'hammerdb-test-ci-results'
             else:
-                self.__es_index = 'hammerdb-results'
+                self._es_index = 'hammerdb-results'
 
-            vm_yaml = os.path.join(self._run_artifacts_path, f'{self.__name}.yaml')
-            configmap_yaml = os.path.join(
-                self._run_artifacts_path,
-                f'hammerdb_{self.__kind}_{self.__database}_configmap.yaml'
-            )
-
-            # 1. Generate SSH key and inject public key into VM cloud-init via template regeneration
-            ssh_key_path = self._virtctl.generate_ssh_key()
-            self._environment_variables_dict['vm_ssh_public_key'] = self._virtctl.get_ssh_public_key(ssh_key_path)
+            self._ssh_key_path = self._virtctl.generate_ssh_key()
+            self._environment_variables_dict['vm_ssh_public_key'] = self._virtctl.get_ssh_public_key(self._ssh_key_path)
             self._template.generate_yamls(scale=str(self._scale), scale_nodes=self._scale_node_list,
                                           redis=self._redis, thread_limit=self._threads_limit)
 
-            # 2. Create namespace and ConfigMaps (creator, workload, results-parser)
             self._oc.create_async(yaml=os.path.join(self._run_artifacts_path, 'namespace.yaml'))
+            configmap_yaml = os.path.join(
+                self._run_artifacts_path,
+                f'hammerdb_{self._kind}_{self._database}_configmap.yaml'
+            )
             self._oc.create_async(yaml=configmap_yaml)
 
-            # 3. Create VM (Secret + optional PVC + VirtualMachine)
-            self._oc.create_vm_sync(yaml=vm_yaml, vm_name=self.__vm_name)
+            if self._scale:
+                vm_count = self._scale * len(self._scale_node_list)
+                threads_limit = self._threads_limit
+                bulk_sleep = self._bulk_sleep_time
+            else:
+                vm_count = 1
+                threads_limit = 1
+                bulk_sleep = 0
 
-            # 4. Wait for VM guest to be ready (VMI running)
-            self._oc.wait_for_ready(label=f'app={self.__vm_name}', run_type='vm', label_uuid=False)
+            bulks = tuple(self.split_run_bulks(iterable=range(vm_count), limit=threads_limit))
 
-            # 5. Wait for workload completion and SCP /tmp/hammerdb-results.json via virtctl
-            local_json_path = os.path.join(self._run_artifacts_path, os.path.basename(self.HAMMERDB_RESULTS_FILE))
-            workload_complete = self._virtctl.wait_for_vm_workload_completed(
-                vm_name=self.__vm_name,
-                file_path=self.HAMMERDB_RESULTS_FILE,
-                local_path=local_json_path,
-                namespace=self.__namespace,
-                key_path=ssh_key_path,
-                username=self.__username,
-                timeout=self._timeout
-            )
-            self.__status = 'complete' if workload_complete else 'failed'
-            if not workload_complete:
-                logger.warning('Timed out waiting for results in VM %s', self.__vm_name)
+            steps = [self._create_vm, self._wait_and_collect]
+            if self._delete_all:
+                steps.append(self._delete_vm)
+            self._run_parallel_phases(steps, bulks, bulk_sleep)
 
-            if self._enable_prometheus_snapshot:
-                self._prometheus_metrics_operation.finalize_prometheus()
-                metric_results = self._prometheus_metrics_operation.run_prometheus_queries()
-                self._prometheus_result = self._prometheus_metrics_operation.parse_prometheus_metrics(data=metric_results)
+            self._upload_results(vm_count)
 
-            # 7. Parse results from the retrieved JSON
-            hammerdb_results_dict = self._parse_hammerdb_results_vm(local_json_path)
-            if not hammerdb_results_dict:
-                logger.warning('HammerDB results could not be parsed from copied JSON (path=%s)', local_json_path)
-
-            # 8. Upload per-thread results to Elasticsearch
-            if self._es_host:
-                run_artifacts_url = os.path.join(
-                    self._run_artifacts_url,
-                    f'{self._get_run_artifacts_hierarchy(workload_name=self.__workload_name, is_file=True)}-{self._time_stamp_format}.tar.gz'
-                )
-                thread_results = self._hammerdb_thread_results(hammerdb_results_dict)
-                if thread_results:
-                    for thread_result in thread_results:
-                        self._upload_hammerdb_thread_result(
-                            index=self.__es_index,
-                            kind=self.__kind,
-                            status=self.__status,
-                            run_artifacts_url=run_artifacts_url,
-                            database=self.__database,
-                            thread_result=thread_result,
-                        )
-                        self._verify_elasticsearch_data_uploaded(
-                            index=self.__es_index,
-                            uuid=self._uuid,
-                        )
-
-            # 9. Cleanup
-            self._oc.delete_vm_sync(yaml=vm_yaml, vm_name=self.__vm_name)
-            self._oc.delete_async(yaml=configmap_yaml)
+            if self._delete_all:
+                self._oc.delete_async(yaml=configmap_yaml)
+                self._oc.delete_async(yaml=os.path.join(self._run_artifacts_path, 'namespace.yaml'))
 
         except ElasticSearchDataNotUploaded as err:
-            self.__save_error_logs()
+            self._save_error_logs()
             raise err
         except Exception as err:
-            self.__save_error_logs()
+            self._save_error_logs()
             raise err

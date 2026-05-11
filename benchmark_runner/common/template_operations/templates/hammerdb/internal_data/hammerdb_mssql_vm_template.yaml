@@ -46,9 +46,9 @@ stringData:
       - systemctl daemon-reload
       - sudo systemctl stop mssql-server || true
       - sudo ACCEPT_EULA='Y' MSSQL_PID='Enterprise' MSSQL_SA_PASSWORD='s3curePasswordString' /opt/mssql/bin/mssql-conf setup
-      - sudo firewall-offline-cmd --add-port=1433/tcp
-      - sudo systemctl enable firewalld
-      - sudo systemctl start firewalld
+      - sudo firewall-offline-cmd --add-port=1433/tcp || true
+      - sudo systemctl enable firewalld || true
+      - sudo systemctl start firewalld || true
       - sudo systemctl start mssql-server
       - until /opt/mssql-tools18/bin/sqlcmd -S 127.0.0.1 -U SA -P 's3curePasswordString' -C -No -Q 'SELECT 1' 2>/dev/null; do sleep 3; done
       - sudo systemctl status mssql-server
@@ -59,10 +59,6 @@ stringData:
       - export TMP=/tmp
       - export TEMP=/tmp
       - export PATH=$PATH:/opt/mssql-tools18/bin:/opt/mssql-tools/bin
-      - curl -LO https://github.com/TPC-Council/HammerDB/releases/download/v4.12/HammerDB-4.12-Linux.tar.gz
-      - tar -xf HammerDB-4.12-Linux.tar.gz -C /opt
-      - mv /opt/HammerDB-4.12 /hammer
-      - rm -f HammerDB-4.12-Linux.tar.gz
       - echo @@~@@START-WORKLOAD@@~@@
       - |
         export MSSQL_HOST=127.0.0.1
@@ -96,7 +92,11 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  {% if scale -%}
+  name: hammerdb-mssql-pvc-claim-{{ scale }}
+  {%- else -%}
   name: hammerdb-mssql-pvc-claim
+  {%- endif %}
   namespace: benchmark-runner
 spec:
   {%- if storage_type == 'lso' %}
@@ -114,10 +114,18 @@ spec:
 apiVersion: kubevirt.io/v1
 kind: VirtualMachine
 metadata:
+  {% if scale -%}
+  name: hammerdb-mssql-vm-{{ trunc_uuid }}-{{ scale }}
+  {%- else -%}
   name: hammerdb-mssql-vm-{{ trunc_uuid }}
+  {%- endif %}
   namespace: benchmark-runner
   labels:
+    {% if scale -%}
+    app: hammerdb-mssql-vm-{{ trunc_uuid }}-{{ scale }}
+    {%- else -%}
     app: hammerdb-mssql-vm-{{ trunc_uuid }}
+    {%- endif %}
     benchmark-uuid: {{ uuid }}
     benchmark-runner-workload: hammerdb-mssql
 spec:
@@ -174,7 +182,11 @@ spec:
           name: cloudinitdisk
         {%- if storage_type == 'lso' or odf_pvc == True %}
         - persistentVolumeClaim:
+            {% if scale -%}
+            claimName: hammerdb-mssql-pvc-claim-{{ scale }}
+            {%- else -%}
             claimName: hammerdb-mssql-pvc-claim
+            {%- endif %}
           name: data-volume
         {%- endif %}
         - configMap:

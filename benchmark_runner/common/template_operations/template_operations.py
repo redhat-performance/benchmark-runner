@@ -113,7 +113,10 @@ class TemplateOperations:
         self.__workload_extra_name = '' if extra in ('ephemeral', 'lso') else extra
         self.__workload_template_kind = self.__get_workload_template_kind()
         if self.__workload_extra_name:
-            self.__standard_output_file = f"{'_'.join([self.__workload_name, self.__workload_template_kind, self.__workload_extra_name])}.yaml"
+            if scale:
+                self.__standard_output_file = f"{'_'.join([self.__workload_name, self.__workload_template_kind, self.__workload_extra_name, scale])}.yaml"
+            else:
+                self.__standard_output_file = f"{'_'.join([self.__workload_name, self.__workload_template_kind, self.__workload_extra_name])}.yaml"
         else:
             if scale:
                 self.__standard_output_file = f"{'_'.join([self.__workload_name, self.__workload_template_kind, scale])}.yaml"

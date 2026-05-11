@@ -6,9 +6,10 @@ import tarfile
 import shutil
 from csv import DictReader
 from datetime import datetime, timezone, timedelta
+from multiprocessing import Process
 
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp
-from benchmark_runner.workloads.workloads_exceptions import ODFNotInstalled, CNVNotInstalled, KataNotInstalled, EmptyLSOPath, MissingScaleNodes, MissingRedis
+from benchmark_runner.workloads.workloads_exceptions import ODFNotInstalled, CNVNotInstalled, KataNotInstalled, EmptyLSOPath, MissingScaleNodes, MissingRedis, BenchmarkRunnerError
 from benchmark_runner.common.oc.oc import OC
 from benchmark_runner.common.virtctl.virtctl import Virtctl
 from benchmark_runner.common.elasticsearch.elasticsearch_operations import ElasticSearchOperations
@@ -436,8 +437,8 @@ class WorkloadsOperations:
                     'cnv_version': self._oc.get_cnv_version(),
                     'nhc_version': self._oc.get_nhc_version(),
                     'far_version': self._oc.get_far_version(),
-                    'kata_version': self._oc.get_kata_operator_version(),
-                    'kata_rpm_version': self._oc.get_kata_rpm_version(node=self._pin_node1),
+                    'kata_version': self._oc.get_kata_operator_version() if self._oc.is_kata_installed() else '',
+                    'kata_rpm_version': self._oc.get_kata_rpm_version(node=self._pin_node1) if self._oc.is_kata_installed() and self._pin_node1 else '',
                     'odf_version': self._oc.get_odf_version(),
                     'runner_version': self._build_version,
                     'version': int(self._build_version.split('.')[-1]),
@@ -587,6 +588,24 @@ class WorkloadsOperations:
         length = len(iterable)
         for ndx in range(0, length, limit):
             yield iterable[ndx:min(ndx + limit, length)]
+
+    def _run_parallel_phases(self, steps, bulks, bulk_sleep):
+        """Run each phase sequentially; within each phase run all pods/VMs in parallel."""
+        for target in steps:
+            proc = []
+            for bulk in bulks:
+                for vm_num in bulk:
+                    p = Process(target=target, args=(str(vm_num),))
+                    p.start()
+                    proc.append(p)
+                for p in proc:
+                    p.join()
+                failed = [p for p in proc if p.exitcode != 0]
+                if failed:
+                    raise BenchmarkRunnerError(
+                        f'Phase {target.__name__} failed for {len(failed)} instance(s)')
+                time.sleep(bulk_sleep)
+                proc = []
 
     @logger_time_stamp
     def clear_nodes_cache(self):

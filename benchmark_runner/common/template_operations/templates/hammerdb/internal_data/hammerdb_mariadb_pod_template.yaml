@@ -24,7 +24,11 @@ spec:
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
+    {% if scale -%}
+    name: mariadb-persistent-storage-{{ scale }}
+    {%- else -%}
     name: mariadb-persistent-storage
+    {%- endif %}
     namespace: benchmark-runner
 spec:
     {%- if storage_type == 'lso' %}
@@ -42,7 +46,11 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
+  {% if scale -%}
+  name: mariadb-custom-config-{{ scale }}
+  {%- else -%}
   name: mariadb-custom-config
+  {%- endif %}
   namespace: benchmark-runner
 data:
   custom.conf: |
@@ -84,16 +92,28 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  {% if scale -%}
+  name: mariadb-deployment-{{ scale }}
+  {%- else -%}
   name: mariadb-deployment
+  {%- endif %}
   namespace: benchmark-runner
 spec:
   selector:
     matchLabels:
+      {% if scale -%}
+      app: mariadb-{{ scale }}
+      {%- else -%}
       app: mariadb
+      {%- endif %}
   template:
     metadata:
       labels:
+        {% if scale -%}
+        app: mariadb-{{ scale }}
+        {%- else -%}
         app: mariadb
+        {%- endif %}
         type: mariadb-database-server
     spec:
       {%- if pin_node2 %}
@@ -133,21 +153,37 @@ spec:
       volumes:
         - name: mariadb-custom-config
           configMap:
+            {% if scale -%}
+            name: mariadb-custom-config-{{ scale }}
+            {%- else -%}
             name: mariadb-custom-config
+            {%- endif %}
         {%- if storage_type == 'lso' or odf_pvc == True %}
         - name: mariadb-persistent-storage
           persistentVolumeClaim:
+            {% if scale -%}
+            claimName: mariadb-persistent-storage-{{ scale }}
+            {%- else -%}
             claimName: mariadb-persistent-storage
+            {%- endif %}
         {%- endif %}
 ---
 apiVersion: v1
 kind: Service
 metadata:
+  {% if scale -%}
+  name: mariadb-deployment-{{ scale }}
+  {%- else -%}
   name: mariadb-deployment
+  {%- endif %}
   namespace: benchmark-runner
 spec:
   selector:
+    {% if scale -%}
+    app: mariadb-{{ scale }}
+    {%- else -%}
     app: mariadb
+    {%- endif %}
   ports:
     - protocol: TCP
       port: 3306
@@ -156,10 +192,18 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
+  {% if scale -%}
+  name: hammerdb-mariadb-pod-{{ trunc_uuid }}-{{ scale }}
+  {%- else -%}
   name: hammerdb-mariadb-pod-{{ trunc_uuid }}
+  {%- endif %}
   namespace: benchmark-runner
   labels:
+    {% if scale -%}
+    app: hammerdb-mariadb-pod-{{ trunc_uuid }}-{{ scale }}
+    {%- else -%}
     app: hammerdb-mariadb-pod-{{ trunc_uuid }}
+    {%- endif %}
     benchmark-uuid: {{ uuid }}
 spec:
   restartPolicy: Never
@@ -172,7 +216,11 @@ spec:
       image: quay.io/benchmark-runner/hammerdb-pod:centos10
       command: ["/bin/sh", "-c"]
       args:
+        {% if scale -%}
+        - until mysqladmin ping -h mariadb-deployment-{{ scale }} -P 3306 --silent 2>/dev/null; do echo "Waiting for MariaDB..."; sleep 3; done
+        {%- else -%}
         - until mysqladmin ping -h mariadb-deployment -P 3306 --silent 2>/dev/null; do echo "Waiting for MariaDB..."; sleep 3; done
+        {%- endif %}
   volumes:
     - name: hammerdb-creator
       configMap:
@@ -192,7 +240,11 @@ spec:
       imagePullPolicy: Always
       env:
         - name: MYSQL_HOST
+          {% if scale -%}
+          value: "mariadb-deployment-{{ scale }}"
+          {%- else -%}
           value: "mariadb-deployment"
+          {%- endif %}
       command: ["/bin/sh", "-c"]
       args:
         - |
