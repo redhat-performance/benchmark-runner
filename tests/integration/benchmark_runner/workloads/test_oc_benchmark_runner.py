@@ -53,7 +53,7 @@ def before_after_each_test_fixture():
     oc.delete_namespace(namespace=test_environment_variable['namespace'])
     kinds = ('pod', 'vm')
     for kind in kinds:
-        __generate_yamls(workloads=['vdbench', 'bootstorm'], kind=kind)
+        __generate_yamls(workloads=['vdbench', 'bootstorm', 'fio'], kind=kind)
     # Generate stressng and uperf native templates
     for kind in ('pod', 'vm'):
         __generate_yamls(workloads=['stressng'], kind=kind)
@@ -63,7 +63,7 @@ def before_after_each_test_fixture():
     yield
     # After all tests
     for kind in kinds:
-        __delete_test_objects(workloads=['vdbench', 'bootstorm'], kind=kind)
+        __delete_test_objects(workloads=['vdbench', 'bootstorm', 'fio'], kind=kind)
     __delete_test_objects(workloads=['stressng'], kind='pod')
     __delete_test_objects(workloads=['stressng'], kind='vm')
     __delete_test_objects(workloads=['uperf'], kind='pod_server')
@@ -117,6 +117,47 @@ def test_benchmark_runner_vdbench_vm_create_ready_complete_delete():
     virtctl = Virtctl()
     virtctl.save_vm_log(vm_name=vm_name, output_filename=os.path.join(f'{templates_path}', 'vdbench_vm.log'), namespace=test_environment_variable['namespace'])
     assert oc.wait_for_vm_log_completed(vm_name=vm_name, end_stamp='@@~@@END-WORKLOAD@@~@@', output_filename=os.path.join(f'{templates_path}', 'vdbench_vm.log'))
+
+
+def test_benchmark_runner_fio_pod_ephemeral_create_initialized_ready_complete_delete():
+    """
+    This method tests fio pod with ephemeral storage create, initialized, ready, complete, delete
+    """
+    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
+    namespace = test_environment_variable['namespace']
+    assert oc.create_async(yaml=os.path.join(f'{templates_path}', 'fio_pod.yaml'))
+    assert oc.wait_for_pod_create(pod_name='fio-pod', namespace=namespace)
+    assert oc.wait_for_initialized(label='app=fio', label_uuid=False, namespace=namespace)
+    assert oc.wait_for_ready(label='app=fio', label_uuid=False, namespace=namespace)
+    assert oc.wait_for_pod_completed(label='app=fio', label_uuid=False, job=False, namespace=namespace)
+
+
+def test_benchmark_runner_fio_vm_ephemeral_create_ready_complete_delete():
+    """
+    This method tests fio vm with ephemeral storage create, ready, complete, delete.
+    Generates SSH key, injects into VM template, waits for fio_summary.json via SSH.
+    """
+    import tempfile
+    oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
+    namespace = test_environment_variable['namespace']
+    vm_name = 'fio-vm-test'
+    virtctl = Virtctl()
+    key_dir = tempfile.mkdtemp()
+    key_path = os.path.join(key_dir, 'vm_key')
+    virtctl.generate_ssh_key(key_path=key_path)
+    pub_key = virtctl.get_ssh_public_key(key_path=key_path)
+    test_environment_variable['ssh_public_key'] = pub_key
+    data = render_yaml_file(dir_path=templates_path, yaml_file='fio_vm_template.yaml', environment_variable_dict=test_environment_variable)
+    with open(os.path.join(templates_path, 'fio_vm.yaml'), 'w') as f:
+        f.write(data)
+    assert oc.create_async(yaml=os.path.join(f'{templates_path}', 'fio_vm.yaml'))
+    assert oc.wait_for_vm_create(vm_name=vm_name, namespace=namespace)
+    assert oc.wait_for_ready(label='app=fio-test', run_type='vm', label_uuid=False, namespace=namespace)
+    assert virtctl.wait_for_vm_completed_by_file_count(
+        vm_name=vm_name, remote_dir='/workload/',
+        expected_count=1, file_type='fio_summary.json',
+        namespace=namespace, key_path=key_path,
+        username='cloud-user')
 
 
 def test_benchmark_runner_stressng_pod_create_complete_get_pod_info():

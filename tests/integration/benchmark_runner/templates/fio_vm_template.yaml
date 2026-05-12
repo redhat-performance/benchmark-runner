@@ -1,0 +1,162 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ namespace }}
+  labels:
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/warn: privileged
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fio-runner-script
+  namespace: {{ namespace }}
+data:
+  fio_runner.sh: |
+    #!/bin/bash
+    IFS=',' read -ra BS_ARRAY <<< "$BLOCK_SIZES"
+    IFS=',' read -ra OP_ARRAY <<< "$IO_OPERATION"
+    IFS=',' read -ra THREADS_ARRAY <<< "$IO_THREADS"
+    IFS=',' read -ra DEPTH_ARRAY <<< "$IO_DEPTH"
+    for i in "${!BS_ARRAY[@]}"; do
+      for j in "${!OP_ARRAY[@]}"; do
+        bs="${BS_ARRAY[$i]}"
+        op="${OP_ARRAY[$j]}"
+        threads="${THREADS_ARRAY[$j]:-${THREADS_ARRAY[0]}}"
+        depth="${DEPTH_ARRAY[$j]:-${DEPTH_ARRAY[0]}}"
+        output_file="${LOGS_DIR}/${bs}_${op}.json"
+        fio --name="${bs}_${op}" --ioengine="${IOENGINE}" --bs="${bs}" --rw="${op}" --numjobs="${threads}" --iodepth="${depth}" --size="${SIZE}" --runtime="${DURATION}" --time_based --direct="${DIRECT}" --filename=/workload/fio_testfile --group_reporting --output-format=json --output="${output_file}"
+        sleep "${PAUSE:-0}"
+      done
+    done
+    python3 -c "
+    import json, glob, os
+    summary = {}
+    for f in sorted(glob.glob(os.path.join('${LOGS_DIR}', '*.json'))):
+        if os.path.basename(f) == 'fio_summary.json':
+            continue
+        with open(f) as fh:
+            data = json.load(fh)
+        for job in data.get('jobs', []):
+            opts = job.get('job options', {})
+            bs = opts.get('bs', '')
+            rw = opts.get('rw', '')
+            if rw in ('read', 'randread'):
+                iops = job.get('read', {}).get('iops', 0)
+                bw = job.get('read', {}).get('bw', 0)
+                lat = job.get('read', {}).get('lat_ns', {})
+            else:
+                iops = job.get('write', {}).get('iops', 0)
+                bw = job.get('write', {}).get('bw', 0)
+                lat = job.get('write', {}).get('lat_ns', {})
+            if bs not in summary:
+                summary[bs] = {}
+            summary[bs][rw] = {
+                'TotalIOPS': round(iops, 2),
+                'TotalBW_KBs': round(bw, 2),
+                'LatAvg_usec': round(lat.get('mean', 0) / 1000, 2),
+                'LatP99_usec': round(lat.get('percentile', {}).get('99.000000', 0) / 1000, 2)
+            }
+    with open('${LOGS_DIR}/fio_summary.json', 'w') as out:
+        json.dump(summary, out, indent=2)
+    "
+    echo '@@~@@FIO-RESULTS-START@@~@@'
+    cat "${LOGS_DIR}/fio_summary.json"
+    echo '@@~@@FIO-RESULTS-END@@~@@'
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: fio-cloudinit
+  namespace: {{ namespace }}
+stringData:
+  userdata: |-
+    #cloud-config
+    password: centos
+    chpasswd: { expire: False }
+    ssh_pwauth: true
+    {%- if ssh_public_key is defined and ssh_public_key %}
+    ssh_authorized_keys:
+      - {{ ssh_public_key }}
+    {%- endif %}
+    bootcmd:
+      - "mkdir -p /workload || true"
+      - "mkdir -p /fio || true"
+      - "mount /dev/$(lsblk --nodeps -no name,serial | grep fiorunner | cut -f1 -d' ') /mnt && cp /mnt/fio_runner.sh /fio/fio_runner.sh && chmod +x /fio/fio_runner.sh && umount /mnt"
+    runcmd:
+      - export BLOCK_SIZES=4k,8k
+      - export IO_OPERATION=read,write
+      - export IO_THREADS=8,8
+      - export IO_DEPTH=4,4
+      - export DURATION=20
+      - export PAUSE=0
+      - export DIRECT=1
+      - export IOENGINE=libaio
+      - export SIZE=1G
+      - export LOGS_DIR=/workload/
+      - export WORKLOAD_METHOD=/fio/fio_runner.sh
+      - echo @@~@@START-WORKLOAD@@~@@
+      - podman run --rm -e BLOCK_SIZES="$BLOCK_SIZES" -e IO_OPERATION="$IO_OPERATION" -e IO_THREADS="$IO_THREADS" -e IO_DEPTH="$IO_DEPTH" -e DURATION="$DURATION" -e PAUSE="$PAUSE" -e DIRECT="$DIRECT" -e IOENGINE="$IOENGINE" -e SIZE="$SIZE" -e LOGS_DIR="$LOGS_DIR" -v "/workload":"/workload" -v "/fio":"/fio" --privileged quay.io/benchmark-runner/fedora:43 bash -c "dnf install -y fio >/dev/null 2>&1 && $WORKLOAD_METHOD"
+      - echo @@~@@END-WORKLOAD@@~@@
+---
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: fio-vm-test
+  namespace: {{ namespace }}
+  labels:
+    app: fio-test
+    type: fio-vm-test
+    benchmark-runner-workload: fio
+spec:
+  running: true
+  template:
+    metadata:
+      labels:
+        kubevirt-vm: fio
+    spec:
+      domain:
+        cpu:
+          sockets: 2
+          cores: 1
+          threads: 1
+        devices:
+          disks:
+            - disk:
+                bus: virtio
+              name: containerdisk
+            - disk:
+                bus: virtio
+              name: cloudinitdisk
+            - disk:
+                bus: virtio
+              name: data-volume
+              serial: fiodata
+            - disk: {}
+              name: fio-runner-volume
+              serial: fiorunner
+        machine:
+          type: ""
+        resources:
+          requests:
+            cpu: 10m
+            memory: 4Gi
+          limits:
+            cpu: 2
+            memory: 4Gi
+      terminationGracePeriodSeconds: 180
+      volumes:
+        - name: data-volume
+          emptyDisk:
+            capacity: 10Gi
+        - containerDisk:
+            image: quay.io/benchmark-runner/centos-stream9-container-disk:latest
+          name: containerdisk
+        - cloudInitNoCloud:
+            secretRef:
+              name: fio-cloudinit
+          name: cloudinitdisk
+        - configMap:
+            name: fio-runner-script
+          name: fio-runner-volume

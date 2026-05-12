@@ -1,0 +1,58 @@
+metadata:
+  name: fio
+files:
+  - name: fio_configmap.yaml
+    template: fio_configmap_template.yaml
+template_data:
+  shared:
+    pin_node: {{ pin_node1 }}
+    odf_pvc: {{ odf_pvc }}
+    uuid: {{ uuid }}
+    fedora: {{ fedora }}
+    centos_stream_container_disk: quay.io/benchmark-runner/centos-stream9-container-disk:latest
+  run_type:
+    perf_ci:
+      BLOCK_SIZES: 4k,8k,32k,1M
+      IO_OPERATION: read,write,randread,randwrite
+      IO_THREADS: 8,8,8,8
+      IO_DEPTH: 4,4,4,4
+      DURATION: 180
+      WARMUP: 20
+      PAUSE: 20
+      DIRECT: 1
+      IOENGINE: libaio
+      SIZE: 4G
+      RUN_FILLUP: "yes"
+      LOGS_DIR: "/workload/"
+      WORKLOAD_METHOD: "/fio/fio_runner.sh"
+      limits_cpu: 2
+      limits_memory: 4Gi
+      requests_cpu: 2
+      requests_memory: 4Gi
+      storage: 64Gi
+    default:
+      BLOCK_SIZES: 4k,8k
+      IO_OPERATION: read,write
+      IO_THREADS: 8,8
+      IO_DEPTH: 4,4
+      DURATION: 20
+      WARMUP: 20
+      PAUSE: 0
+      DIRECT: 1
+      IOENGINE: libaio
+      SIZE: 1G
+      RUN_FILLUP: "yes"
+      LOGS_DIR: "/workload/"
+      WORKLOAD_METHOD: "/fio/fio_runner.sh"
+      limits_cpu: 2
+      limits_memory: 4Gi
+      requests_cpu: 10m
+      requests_memory: 4Gi
+      storage: 10Gi
+  kind:
+    vm:
+      run_type:
+        perf_ci:
+          sockets: 2
+        default:
+          sockets: 2
