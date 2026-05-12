@@ -121,6 +121,8 @@ class EnvironmentVariables:
                                                          'hammerdb_pod_mssql_ephemeral', 'hammerdb_vm_mssql_ephemeral',
                                                          'vdbench_pod', 'vdbench_vm',
                                                          'vdbench_pod_ephemeral', 'vdbench_vm_ephemeral',
+                                                         'fio_pod', 'fio_vm',
+                                                         'fio_pod_ephemeral', 'fio_vm_ephemeral',
                                                          'clusterbuster', 'bootstorm_vm', 'windows_vm', 'winmssql_vm',
                                                          'krknhub']
         # Workloads namespaces
@@ -130,6 +132,7 @@ class EnvironmentVariables:
             'hammerdb': 'benchmark-runner',
             'uperf': 'benchmark-runner',
             'vdbench': 'benchmark-runner',
+            'fio': 'benchmark-runner',
             'clusterbuster': 'clusterbuster',
             'bootstorm': 'benchmark-runner',
             'windows': 'benchmark-runner',
@@ -184,7 +187,7 @@ class EnvironmentVariables:
         # Ceph version required for disk cleanup, using default 19
         self._environment_variables_dict['ceph_version'] = EnvironmentVariables.get_env('CEPH_VERSION', '19')
         # Workloads that required ODF
-        self._environment_variables_dict['workloads_odf_pvc'] = ['vdbench', 'hammerdb']
+        self._environment_variables_dict['workloads_odf_pvc'] = ['vdbench', 'hammerdb', 'fio']
         # This parameter get from Test_CI.yml file
         self._environment_variables_dict['build_version'] = EnvironmentVariables.get_env('BUILD_VERSION', '1.0.0')
         # collect system metrics True/False

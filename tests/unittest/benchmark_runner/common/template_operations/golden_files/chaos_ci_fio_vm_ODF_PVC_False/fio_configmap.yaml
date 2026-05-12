@@ -1,0 +1,79 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fio-runner-script
+  namespace: benchmark-runner
+data:
+  fio_runner.sh: |
+    #!/bin/bash
+    IFS=',' read -ra BS_ARRAY <<< "$BLOCK_SIZES"
+    IFS=',' read -ra OP_ARRAY <<< "$IO_OPERATION"
+    IFS=',' read -ra THREADS_ARRAY <<< "$IO_THREADS"
+    IFS=',' read -ra DEPTH_ARRAY <<< "$IO_DEPTH"
+
+    for i in "${!BS_ARRAY[@]}"; do
+      for j in "${!OP_ARRAY[@]}"; do
+        bs="${BS_ARRAY[$i]}"
+        op="${OP_ARRAY[$j]}"
+        threads="${THREADS_ARRAY[$j]:-${THREADS_ARRAY[0]}}"
+        depth="${DEPTH_ARRAY[$j]:-${DEPTH_ARRAY[0]}}"
+        output_file="${LOGS_DIR}/${bs}_${op}.json"
+
+        echo "Running FIO: bs=${bs} rw=${op} numjobs=${threads} iodepth=${depth} duration=${DURATION}s"
+        fio --name="${bs}_${op}" \
+            --ioengine="${IOENGINE}" \
+            --bs="${bs}" \
+            --rw="${op}" \
+            --numjobs="${threads}" \
+            --iodepth="${depth}" \
+            --size="${SIZE}" \
+            --runtime="${DURATION}" \
+            --time_based \
+            --direct="${DIRECT}" \
+            --filename=/workload/fio_testfile \
+            --group_reporting \
+            --output-format=json \
+            --output="${output_file}"
+
+        echo "Completed: bs=${bs} rw=${op}"
+        sleep "${PAUSE:-0}"
+      done
+    done
+
+    # Build summary JSON with results pivoted by block_size x io_operation
+    python3 -c "
+    import json, glob, os
+    summary = {}
+    for f in sorted(glob.glob(os.path.join('${LOGS_DIR}', '*.json'))):
+        if os.path.basename(f) == 'fio_summary.json':
+            continue
+        with open(f) as fh:
+            data = json.load(fh)
+        for job in data.get('jobs', []):
+            opts = job.get('job options', {})
+            bs = opts.get('bs', '')
+            rw = opts.get('rw', '')
+            if rw in ('read', 'randread'):
+                iops = job.get('read', {}).get('iops', 0)
+                bw = job.get('read', {}).get('bw', 0)
+                lat = job.get('read', {}).get('lat_ns', {})
+            else:
+                iops = job.get('write', {}).get('iops', 0)
+                bw = job.get('write', {}).get('bw', 0)
+                lat = job.get('write', {}).get('lat_ns', {})
+            if bs not in summary:
+                summary[bs] = {}
+            summary[bs][rw] = {
+                'TotalIOPS': round(iops, 2),
+                'TotalBW_KBs': round(bw, 2),
+                'LatAvg_usec': round(lat.get('mean', 0) / 1000, 2),
+                'LatP99_usec': round(lat.get('percentile', {}).get('99.000000', 0) / 1000, 2)
+            }
+    with open('${LOGS_DIR}/fio_summary.json', 'w') as out:
+        json.dump(summary, out, indent=2)
+    "
+
+    # Output summary to stdout for pod log collection
+    echo "@@~@@FIO-RESULTS-START@@~@@"
+    cat "${LOGS_DIR}/fio_summary.json"
+    echo "@@~@@FIO-RESULTS-END@@~@@"
