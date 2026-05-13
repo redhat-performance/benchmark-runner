@@ -117,33 +117,27 @@ data:
     for doc in results:
         print(json.dumps(doc))
 ---
-apiVersion: batch/v1
-kind: Job
+apiVersion: v1
+kind: Pod
 metadata:
   name: uperf-server-deadbeef
   namespace: benchmark-runner
+  labels:
+    benchmark-uuid: deadbeef-0123-3210-cdef-01234567890abcdef
+    workload: uperf
+    role: server
+    app: uperf-bench-server-0-deadbeef
+    index: "0"
+    type: uperf-bench-server-deadbeef
 spec:
-  ttlSecondsAfterFinished: 600
-  backoffLimit: 0
-  template:
-    metadata:
-      labels:
-        benchmark-uuid: deadbeef-0123-3210-cdef-01234567890abcdef
-        workload: uperf
-        role: server
-        app: uperf-bench-server-0-deadbeef
-        index: "0"
-        type: uperf-bench-server-deadbeef
-    spec:
-      serviceAccountName: benchmark-runner
-      containers:
-      - name: benchmark
-        securityContext:
-          runAsUser: 0
-        image: quay.io/benchmark-runner/fedora:43
-        imagePullPolicy: Always
-        command: ["/bin/sh", "-c"]
-        args: ["dnf install -y uperf > /dev/null && uperf -s -v -P 30000"]
-      restartPolicy: Never
-      nodeSelector:
-        kubernetes.io/hostname: 'pin-node-1'
+  containers:
+  - name: benchmark
+    securityContext:
+      runAsUser: 0
+    image: quay.io/benchmark-runner/fedora:43
+    imagePullPolicy: Always
+    command: ["/bin/sh", "-c"]
+    args: ["dnf install -y uperf > /dev/null && uperf -s -v -P 30000"]
+  restartPolicy: Never
+  nodeSelector:
+    kubernetes.io/hostname: 'pin-node-1'

@@ -56,7 +56,6 @@ class UperfPod(WorkloadsOperations):
             self._environment_variables_dict['kind'] = self.__kind
 
             self._oc.create_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'namespace.yaml'))
-            self._oc.apply_security_privileged()
 
             logger.info("Creating uperf server job")
             self._oc.create_async(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}_server.yaml'))
@@ -100,7 +99,7 @@ class UperfPod(WorkloadsOperations):
             self._oc.wait_for_initialized(label='app=uperf-bench-client', workload=self.__workload_name, label_uuid=False)
             self._oc.wait_for_ready(label='app=uperf-bench-client', workload=self.__workload_name, label_uuid=False)
 
-            self.__status = self._oc.wait_for_pod_completed(label='app=uperf-bench-client', workload=self.__workload_name, label_uuid=False, job=True)
+            self.__status = self._oc.wait_for_pod_completed(label='app=uperf-bench-client', workload=self.__workload_name, label_uuid=False, job=False)
             self.__status = 'complete' if self.__status else 'failed'
 
             # Get client pod info

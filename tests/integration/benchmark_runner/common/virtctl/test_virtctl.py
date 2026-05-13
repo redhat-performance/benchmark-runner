@@ -51,11 +51,11 @@ def before_after_each_test_fixture():
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     oc.delete_namespace(namespace=test_environment_variable['namespace'])
     __generate_yamls(workload='vdbench')
-    __generate_yamls(workload='stressng', kind='vm_direct')
+    __generate_yamls(workload='stressng', kind='vm')
     yield
     # After all tests
     __delete_test_objects(workload='vdbench')
-    __delete_test_objects(workload='stressng', kind='vm_direct')
+    __delete_test_objects(workload='stressng', kind='vm')
     oc.delete_namespace(namespace=test_environment_variable['namespace'])
     # revert to defaults namespace
     test_environment_variable['namespace'] = 'benchmark-runner'
@@ -92,8 +92,8 @@ def test_virtctl_ssh_ready_and_wait():
     pub_key = virtctl.get_ssh_public_key(key_path=key_path)
 
     # Read template source and inject SSH key, write as rendered YAML
-    template_file = os.path.join(f'{templates_path}', 'stressng_vm_direct_template.yaml')
-    vm_yaml = os.path.join(f'{templates_path}', 'stressng_vm_direct_ssh.yaml')
+    template_file = os.path.join(f'{templates_path}', 'stressng_vm_template.yaml')
+    vm_yaml = os.path.join(f'{templates_path}', 'stressng_vm_ssh.yaml')
     with open(template_file, 'r') as f:
         content = f.read()
     content = content.replace('ssh_pwauth: true', f'ssh_pwauth: true\n              ssh_authorized_keys:\n                - {pub_key}')

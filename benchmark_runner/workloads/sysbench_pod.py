@@ -52,7 +52,6 @@ class SysbenchPod(WorkloadsOperations):
             self._environment_variables_dict['kind'] = self.__kind
 
             self._oc.apply_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'namespace.yaml'))
-            self._oc.apply_security_privileged()
 
             # Create Job
             self._oc.create_async(
@@ -66,7 +65,7 @@ class SysbenchPod(WorkloadsOperations):
             self._oc.wait_for_initialized(label=sysbench_label, label_uuid=False)
             self._oc.wait_for_ready(label=sysbench_label, label_uuid=False)
 
-            self.__status = self._oc.wait_for_pod_completed(label=sysbench_label, label_uuid=False, job=True)
+            self.__status = self._oc.wait_for_pod_completed(label=sysbench_label, label_uuid=False, job=False)
             self.__status = 'complete' if self.__status else 'failed'
 
             if self._enable_prometheus_snapshot:

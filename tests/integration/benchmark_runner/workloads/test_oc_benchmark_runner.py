@@ -55,20 +55,20 @@ def before_after_each_test_fixture():
     for kind in kinds:
         __generate_yamls(workloads=['vdbench', 'bootstorm'], kind=kind)
     # Generate stressng and uperf native templates
-    for kind in ('pod_job', 'vm_direct'):
+    for kind in ('pod', 'vm'):
         __generate_yamls(workloads=['stressng'], kind=kind)
     __generate_yamls(workloads=['uperf'], kind='pod_server')
     __generate_yamls(workloads=['uperf'], kind='pod_client')
-    __generate_yamls(workloads=['uperf'], kind='vm_direct')
+    __generate_yamls(workloads=['uperf'], kind='vm')
     yield
     # After all tests
     for kind in kinds:
         __delete_test_objects(workloads=['vdbench', 'bootstorm'], kind=kind)
-    __delete_test_objects(workloads=['stressng'], kind='pod_job')
-    __delete_test_objects(workloads=['stressng'], kind='vm_direct')
+    __delete_test_objects(workloads=['stressng'], kind='pod')
+    __delete_test_objects(workloads=['stressng'], kind='vm')
     __delete_test_objects(workloads=['uperf'], kind='pod_server')
     __delete_test_objects(workloads=['uperf'], kind='pod_client')
-    __delete_test_objects(workloads=['uperf'], kind='vm_direct')
+    __delete_test_objects(workloads=['uperf'], kind='vm')
     oc.delete_namespace(namespace=test_environment_variable['namespace'])
     # revert to defaults namespace
     test_environment_variable['namespace'] = 'benchmark-runner'
@@ -126,9 +126,9 @@ def test_benchmark_runner_stressng_pod_create_complete_get_pod_info():
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     namespace = test_environment_variable['namespace']
-    assert oc.create_async(yaml=os.path.join(f'{templates_path}', 'stressng_pod_job.yaml'))
+    assert oc.create_async(yaml=os.path.join(f'{templates_path}', 'stressng_pod.yaml'))
     assert oc.wait_for_pod_create(label='app=stressng_workload-test123', namespace=namespace)
-    assert oc.wait_for_pod_completed(label='app=stressng_workload-test123', label_uuid=False, job=True, namespace=namespace)
+    assert oc.wait_for_pod_completed(label='app=stressng_workload-test123', label_uuid=False, job=False, namespace=namespace)
     # Test get_pod, get_pod_ip, get_pod_node on completed pod
     pod_name = oc.get_pod(label='stressng-pod', namespace=namespace)
     assert pod_name
@@ -190,7 +190,7 @@ def test_benchmark_runner_uperf_vm_create_ready_get_vmi_ip_delete():
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     namespace = test_environment_variable['namespace']
     vm_name = 'uperf-server-test123'
-    assert oc.create_vm_sync(yaml=os.path.join(f'{templates_path}', 'uperf_vm_direct.yaml'),
+    assert oc.create_vm_sync(yaml=os.path.join(f'{templates_path}', 'uperf_vm.yaml'),
                              vm_name=vm_name, namespace=namespace)
     assert oc.wait_for_initialized(label='app=uperf-server-test123', label_uuid=False, namespace=namespace)
     assert oc.wait_for_ready(label='app=uperf-server-test123', label_uuid=False, namespace=namespace)
@@ -200,7 +200,7 @@ def test_benchmark_runner_uperf_vm_create_ready_get_vmi_ip_delete():
     vm_node = oc.get_vm_node(vm_name=vm_name, namespace=namespace)
     assert vm_node
     # Cleanup
-    assert oc.delete_vm_sync(yaml=os.path.join(f'{templates_path}', 'uperf_vm_direct.yaml'),
+    assert oc.delete_vm_sync(yaml=os.path.join(f'{templates_path}', 'uperf_vm.yaml'),
                              vm_name=vm_name, namespace=namespace)
 
 
@@ -218,8 +218,9 @@ def test_create_sync_pod_timeout_error():
     This method creates pod with timeout error
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
+    namespace = test_environment_variable['namespace']
     with pytest.raises(PodNotCreateTimeout) as err:
-        oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_pod_job.yaml'), pod_name='stressng-pod-nonexistent', namespace=test_environment_variable['namespace'], timeout=1)
+        oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_pod.yaml'), pod_name='stressng-pod-nonexistent', namespace=namespace, timeout=1)
 
 
 def test_delete_sync_pod_timeout_error():
@@ -228,9 +229,9 @@ def test_delete_sync_pod_timeout_error():
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     namespace = test_environment_variable['namespace']
-    oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_pod_job.yaml'), pod_name='stressng-pod-test123', namespace=namespace)
+    oc.create_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_pod.yaml'), pod_name='stressng-pod-test123', namespace=namespace)
     with pytest.raises(PodTerminateTimeout) as err:
-        oc.delete_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_pod_job.yaml'), pod_name='stressng-pod-test123', namespace=namespace, timeout=1)
+        oc.delete_pod_sync(yaml=os.path.join(f'{templates_path}', 'stressng_pod.yaml'), pod_name='stressng-pod-test123', namespace=namespace, timeout=1)
 
 
 def test_get_long_short_uuid():
@@ -241,7 +242,7 @@ def test_get_long_short_uuid():
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     namespace = test_environment_variable['namespace']
-    assert oc.create_async(yaml=os.path.join(f'{templates_path}', 'stressng_pod_job.yaml'))
+    assert oc.create_async(yaml=os.path.join(f'{templates_path}', 'stressng_pod.yaml'))
     assert oc.wait_for_pod_create(label='app=stressng_workload-test123', namespace=namespace)
     # Verify benchmark-uuid label is propagated from template
     assert oc.pod_label_exists(label_name='benchmark-uuid=test-uuid-123', namespace=namespace)
@@ -253,7 +254,7 @@ def test_create_sync_vm_timeout_error():
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
     with pytest.raises(VMNotCreateTimeout) as err:
-        oc.create_vm_sync(yaml=os.path.join(f'{templates_path}', 'stressng_vm_direct.yaml'), vm_name='stressng-vm-nonexistent', namespace=test_environment_variable['namespace'], timeout=1)
+        oc.create_vm_sync(yaml=os.path.join(f'{templates_path}', 'stressng_vm.yaml'), vm_name='stressng-vm-nonexistent', namespace=test_environment_variable['namespace'], timeout=1)
 
 
 @pytest.mark.skip(reason="Disable kata")

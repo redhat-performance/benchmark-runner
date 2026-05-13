@@ -1,73 +1,67 @@
-apiVersion: batch/v1
-kind: Job
+apiVersion: v1
+kind: Pod
 metadata:
   name: sysbench-pod-{{ trunc_uuid }}
   namespace: {{ namespace }}
+  labels:
+    app: sysbench-workload-{{ trunc_uuid }}
+    type: sysbench-bench-workload-{{ trunc_uuid }}
+    benchmark-uuid: {{ uuid }}
+    benchmark-runner-workload: sysbench
 spec:
-  backoffLimit: 0
-  activeDeadlineSeconds: {{ timeout|default(3600) }}
-  template:
-    metadata:
-      labels:
-        app: sysbench-workload-{{ trunc_uuid }}
-        type: sysbench-bench-workload-{{ trunc_uuid }}
-        benchmark-uuid: {{ uuid }}
-        benchmark-runner-workload: sysbench
-    spec:
-      {%- if pin == 'true' or pin == true %}
-      nodeSelector:
-        kubernetes.io/hostname: '{{ pin_node }}'
+  {%- if pin == 'true' or pin == true %}
+  nodeSelector:
+    kubernetes.io/hostname: '{{ pin_node }}'
+  {%- endif %}
+  containers:
+  - name: sysbench
+    securityContext:
+      runAsUser: 0
+    {%- if resources == 'true' or resources == true %}
+    resources:
+      requests:
+        cpu: {{ requests_cpu }}
+        memory: {{ requests_memory }}
+      {%- if limits_cpu is defined and limits_memory is defined %}
+      limits:
+        cpu: {{ limits_cpu }}
+        memory: {{ limits_memory }}
       {%- endif %}
-      serviceAccountName: {{ namespace }}
-      containers:
-      - name: sysbench
-        securityContext:
-          runAsUser: 0
-        {%- if resources == 'true' or resources == true %}
-        resources:
-          requests:
-            cpu: {{ requests_cpu }}
-            memory: {{ requests_memory }}
-          {%- if limits_cpu is defined and limits_memory is defined %}
-          limits:
-            cpu: {{ limits_cpu }}
-            memory: {{ limits_memory }}
-          {%- endif %}
-        {%- endif %}
-        image: {{ image | default(fedora) }}
-        imagePullPolicy: Always
-        command: ["/bin/bash", "-c"]
-        args:
-          - |
-            set -euo pipefail
-            dnf install -y sysbench python3 > /dev/null
-            echo "=== SYSBENCH CPU TEST ==="
-            sysbench cpu run --threads={{ sysbench_threads }} --time={{ sysbench_time }} 2>&1 | tee /tmp/cpu.txt
-            echo "=== SYSBENCH CPU TEST DONE ==="
-            echo "=== SYSBENCH MEMORY TEST ==="
-            sysbench memory --memory-block-size=1M --memory-total-size=100G --threads={{ sysbench_threads }} --max-time={{ sysbench_time }} --memory-oper=write run 2>&1 | tee /tmp/mem.txt
-            echo "=== SYSBENCH MEMORY TEST DONE ==="
-            python3 << 'PYEOF'
-            import re, json
-            result = {'workload': 'sysbench'}
-            for fname, prefix in [('/tmp/cpu.txt', 'cpu'), ('/tmp/mem.txt', 'memory')]:
-                try:
-                    s = open(fname).read()
-                except FileNotFoundError:
-                    continue
-                for pat, key, fn in [
-                    (r'events\s+\(avg/stddev\):\s+([\d.]+)', 'events_avg', float),
-                    (r'95th percentile:\s+([\d.]+)', 'latency_95th', float),
-                    (r'events per second:\s+([\d.]+)', 'events_per_second', float),
-                    (r'total number of events:\s+(\d+)', 'total_events', int),
-                    (r'total time:\s+([\d.]+)s', 'total_time', float),
-                    (r'Latency.*?avg:\s+([\d.]+)', 'latency_avg', float),
-                    (r'Number of threads:\s+(\d+)', 'threads', int),
-                    (r'MiB transferred \(([\d.]+) MiB/sec\)', 'throughput_mib', float),
-                ]:
-                    m = re.search(pat, s, re.DOTALL)
-                    if m:
-                        result[f'{prefix}_{key}'] = fn(m.group(1))
-            print(json.dumps(result))
-            PYEOF
-      restartPolicy: Never
+    {%- endif %}
+    image: {{ image | default(fedora) }}
+    imagePullPolicy: Always
+    command: ["/bin/bash", "-c"]
+    args:
+      - |
+        set -euo pipefail
+        dnf install -y sysbench python3 > /dev/null
+        echo "=== SYSBENCH CPU TEST ==="
+        sysbench cpu run --threads={{ sysbench_threads }} --time={{ sysbench_time }} 2>&1 | tee /tmp/cpu.txt
+        echo "=== SYSBENCH CPU TEST DONE ==="
+        echo "=== SYSBENCH MEMORY TEST ==="
+        sysbench memory --memory-block-size=1M --memory-total-size=100G --threads={{ sysbench_threads }} --max-time={{ sysbench_time }} --memory-oper=write run 2>&1 | tee /tmp/mem.txt
+        echo "=== SYSBENCH MEMORY TEST DONE ==="
+        python3 << 'PYEOF'
+        import re, json
+        result = {'workload': 'sysbench'}
+        for fname, prefix in [('/tmp/cpu.txt', 'cpu'), ('/tmp/mem.txt', 'memory')]:
+            try:
+                s = open(fname).read()
+            except FileNotFoundError:
+                continue
+            for pat, key, fn in [
+                (r'events\s+\(avg/stddev\):\s+([\d.]+)', 'events_avg', float),
+                (r'95th percentile:\s+([\d.]+)', 'latency_95th', float),
+                (r'events per second:\s+([\d.]+)', 'events_per_second', float),
+                (r'total number of events:\s+(\d+)', 'total_events', int),
+                (r'total time:\s+([\d.]+)s', 'total_time', float),
+                (r'Latency.*?avg:\s+([\d.]+)', 'latency_avg', float),
+                (r'Number of threads:\s+(\d+)', 'threads', int),
+                (r'MiB transferred \(([\d.]+) MiB/sec\)', 'throughput_mib', float),
+            ]:
+                m = re.search(pat, s, re.DOTALL)
+                if m:
+                    result[f'{prefix}_{key}'] = fn(m.group(1))
+        print(json.dumps(result))
+        PYEOF
+  restartPolicy: Never
