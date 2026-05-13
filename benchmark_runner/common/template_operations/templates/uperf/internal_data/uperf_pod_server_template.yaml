@@ -178,8 +178,11 @@ spec:
       {%- if hostnetwork == 'true' or hostnetwork == true %}
       hostNetwork: true
       {%- endif %}
+      serviceAccountName: {{ namespace }}
       containers:
       - name: benchmark
+        securityContext:
+          runAsUser: 0
         image: {{ image | default(fedora) }}
         {%- if server_resources is defined and server_resources %}
         resources:
@@ -192,7 +195,7 @@ spec:
         {%- endif %}
         imagePullPolicy: Always
         command: ["/bin/sh", "-c"]
-        args: ["uperf -s -v -P 30000"]
+        args: ["dnf install -y uperf > /dev/null && uperf -s -v -P 30000"]
       restartPolicy: Never
       {%- if pin == 'true' or pin == true %}
       nodeSelector:

@@ -1,0 +1,62 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: sysbench-vm-{{ trunc_uuid }}
+  namespace: {{ namespace }}
+  labels:
+    app: sysbench-vm-{{ trunc_uuid }}
+    type: sysbench-vm-{{ trunc_uuid }}
+    benchmark-uuid: {{ uuid }}
+    benchmark-runner-workload: sysbench
+spec:
+  runStrategy: Once
+  template:
+    metadata:
+      labels:
+        app: sysbench-vm-{{ trunc_uuid }}
+        kubevirt.io/domain: sysbench-vm-{{ trunc_uuid }}
+    spec:
+      {%- if pin == 'true' or pin == true %}
+      nodeSelector:
+        kubernetes.io/hostname: '{{ pin_node }}'
+      {%- endif %}
+      domain:
+        cpu:
+          cores: {{ cores | default(2) }}
+        resources:
+          requests:
+            memory: {{ memory | default('4Gi') }}
+        devices:
+          disks:
+            - name: containerdisk
+              disk:
+                bus: virtio
+            - name: cloudinitdisk
+              disk:
+                bus: virtio
+          interfaces:
+            - masquerade: {}
+              name: default
+      networks:
+        - name: default
+          pod: {}
+      volumes:
+        - name: containerdisk
+          containerDisk:
+            image: {{ fedora_container_disk }}
+        - name: cloudinitdisk
+          cloudInitNoCloud:
+            userData: |
+              #cloud-config
+              password: fedora
+              chpasswd: { expire: False }
+              ssh_pwauth: true
+              {%- if ssh_public_key is defined and ssh_public_key %}
+              ssh_authorized_keys:
+                - {{ ssh_public_key }}
+              {%- endif %}
+              packages:
+                - sysbench
+              runcmd:
+                - mkdir -p /opt/sysbench && chmod 777 /opt/sysbench
+                - bash -c 'sysbench cpu run --threads={{ sysbench_threads }} --time={{ sysbench_time }} > /opt/sysbench/cpu.txt 2>&1 && sysbench memory --memory-block-size=1M --memory-total-size=100G --threads={{ sysbench_threads }} --max-time={{ sysbench_time }} --memory-oper=write run > /opt/sysbench/mem.txt 2>&1 && touch /opt/sysbench/done'

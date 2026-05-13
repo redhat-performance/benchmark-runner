@@ -1,0 +1,36 @@
+metadata:
+  name: sysbench
+files:
+  - name: sysbench_pod.yaml
+    template: sysbench_pod_template.yaml
+  - name: sysbench_vm.yaml
+    template: sysbench_vm_template.yaml
+template_data:
+  shared:
+    pin_node: {{ pin_node1 }}
+    image: {{ image | default(fedora) }}
+    resources: true
+  run_type:
+    perf_ci:
+      sysbench_threads: 80
+      sysbench_time: 300
+      limits_cpu: 80
+      limits_memory: 350Gi
+      requests_cpu: 70
+      requests_memory: 75Gi
+    default:
+      sysbench_threads: 2
+      sysbench_time: 10
+      limits_cpu: 4
+      limits_memory: 4Gi
+      requests_cpu: 2
+      requests_memory: 2Gi
+  kind:
+    vm:
+      run_type:
+        perf_ci:
+          cores: 80
+          memory: 75Gi
+        default:
+          cores: 2
+          memory: 4Gi

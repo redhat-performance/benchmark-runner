@@ -1,5 +1,5 @@
 
-import json
+
 import os
 from datetime import datetime, timezone
 
@@ -19,20 +19,6 @@ class StressngPod(WorkloadsOperations):
         self.__es_index = ''
         self.__kind = ''
         self.__status = ''
-
-    def _extract_json_from_pod_logs(self, pod_logs: str) -> dict:
-        """
-        Extract parsed JSON result from pod logs.
-        """
-        for line in reversed(pod_logs.strip().splitlines()):
-            line = line.strip()
-            if line.startswith('{') and line.endswith('}'):
-                try:
-                    return json.loads(line)
-                except json.JSONDecodeError:
-                    pass
-        logger.warning("No JSON result found in pod logs")
-        return {}
 
     def save_error_logs(self):
         if self._es_host:
@@ -68,6 +54,7 @@ class StressngPod(WorkloadsOperations):
             self._environment_variables_dict['kind'] = self.__kind
 
             self._oc.apply_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'namespace.yaml'))
+            self._oc.apply_security_privileged()
 
             self._oc.create_async(
                 yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}.yaml'),

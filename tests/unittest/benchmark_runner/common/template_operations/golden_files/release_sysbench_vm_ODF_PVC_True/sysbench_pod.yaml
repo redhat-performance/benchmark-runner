@@ -1,0 +1,67 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: sysbench-pod-deadbeef
+  namespace: benchmark-runner
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 3600
+  template:
+    metadata:
+      labels:
+        app: sysbench-workload-deadbeef
+        type: sysbench-bench-workload-deadbeef
+        benchmark-uuid: deadbeef-0123-3210-cdef-01234567890abcdef
+        benchmark-runner-workload: sysbench
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: 'pin-node-1'
+      serviceAccountName: benchmark-runner
+      containers:
+      - name: sysbench
+        securityContext:
+          runAsUser: 0
+        resources:
+          requests:
+            cpu: 2
+            memory: 2Gi
+          limits:
+            cpu: 4
+            memory: 4Gi
+        image: quay.io/benchmark-runner/fedora:43
+        imagePullPolicy: Always
+        command: ["/bin/bash", "-c"]
+        args:
+          - |
+            set -euo pipefail
+            dnf install -y sysbench python3 > /dev/null
+            echo "=== SYSBENCH CPU TEST ==="
+            sysbench cpu run --threads=2 --time=10 2>&1 | tee /tmp/cpu.txt
+            echo "=== SYSBENCH CPU TEST DONE ==="
+            echo "=== SYSBENCH MEMORY TEST ==="
+            sysbench memory --memory-block-size=1M --memory-total-size=100G --threads=2 --max-time=10 --memory-oper=write run 2>&1 | tee /tmp/mem.txt
+            echo "=== SYSBENCH MEMORY TEST DONE ==="
+            python3 << 'PYEOF'
+            import re, json
+            result = {'workload': 'sysbench'}
+            for fname, prefix in [('/tmp/cpu.txt', 'cpu'), ('/tmp/mem.txt', 'memory')]:
+                try:
+                    s = open(fname).read()
+                except FileNotFoundError:
+                    continue
+                for pat, key, fn in [
+                    (r'events\s+\(avg/stddev\):\s+([\d.]+)', 'events_avg', float),
+                    (r'95th percentile:\s+([\d.]+)', 'latency_95th', float),
+                    (r'events per second:\s+([\d.]+)', 'events_per_second', float),
+                    (r'total number of events:\s+(\d+)', 'total_events', int),
+                    (r'total time:\s+([\d.]+)s', 'total_time', float),
+                    (r'Latency.*?avg:\s+([\d.]+)', 'latency_avg', float),
+                    (r'Number of threads:\s+(\d+)', 'threads', int),
+                    (r'MiB transferred \(([\d.]+) MiB/sec\)', 'throughput_mib', float),
+                ]:
+                    m = re.search(pat, s, re.DOTALL)
+                    if m:
+                        result[f'{prefix}_{key}'] = fn(m.group(1))
+            print(json.dumps(result))
+            PYEOF
+      restartPolicy: Never

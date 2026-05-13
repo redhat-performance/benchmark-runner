@@ -3315,6 +3315,448 @@
          "id": 11,
          "panels": [
             {
+               "datasource": "Elasticsearch-sysbench-results",
+               "description": "Higher is better",
+               "fieldConfig": {
+                  "defaults": {
+                     "color": {
+                        "mode": "thresholds"
+                     },
+                     "custom": {
+                        "fillOpacity": 70,
+                        "lineWidth": 0
+                     },
+                     "decimals": 0,
+                     "mappings": [ ],
+                     "min": 0,
+                     "thresholds": {
+                        "mode": "percentage",
+                        "steps": [
+                           {
+                              "color": "semi-dark-red"
+                           },
+                           {
+                              "color": "semi-dark-orange",
+                              "value": 50
+                           },
+                           {
+                              "color": "super-light-green",
+                              "value": 80
+                           },
+                           {
+                              "color": "dark-green",
+                              "value": 90
+                           },
+                           {
+                              "color": "dark-blue",
+                              "value": 100
+                           }
+                        ]
+                     }
+                  },
+                  "overrides": [ ]
+               },
+               "gridPos": {
+                  "h": 10,
+                  "w": 24,
+                  "x": 0,
+                  "y": 15
+               },
+               "id": 12,
+               "interval": "1d",
+               "options": {
+                  "alignValue": "center",
+                  "legend": {
+                     "displayMode": "list",
+                     "placement": "bottom"
+                  },
+                  "mergeValues": false,
+                  "rowHeight": 0.90000000000000002,
+                  "showValue": "always",
+                  "tooltip": {
+                     "mode": "single"
+                  }
+               },
+               "pluginVersion": "v10.0.0",
+               "targets": [
+                  {
+                     "alias": "{{term kind.keyword}}",
+                     "bucketAggs": [
+                        {
+                           "field": "kind.keyword",
+                           "id": "3",
+                           "settings": {
+                              "min_doc_count": "1",
+                              "order": "desc",
+                              "orderBy": "_term",
+                              "size": "10"
+                           },
+                           "type": "terms"
+                        },
+                        {
+                           "field": "timestamp",
+                           "id": "2",
+                           "settings": {
+                              "interval": "auto",
+                              "min_doc_count": "0",
+                              "timeZone": "utc",
+                              "trimEdges": "0"
+                           },
+                           "type": "date_histogram"
+                        }
+                     ],
+                     "metrics": [
+                        {
+                           "field": "cpu_events_avg",
+                           "id": "1",
+                           "settings": { },
+                           "type": "avg"
+                        }
+                     ],
+                     "query": "_exists_:cpu_events_avg AND kind:$kind AND ocp_version:$ocp_version",
+                     "refId": "A",
+                     "timeField": "timestamp"
+                  }
+               ],
+               "title": "Sysbench CPU Events (avg)",
+               "type": "state-timeline"
+            },
+            {
+               "datasource": "Elasticsearch-sysbench-results",
+               "description": "Lower is better",
+               "fieldConfig": {
+                  "defaults": {
+                     "color": {
+                        "mode": "thresholds"
+                     },
+                     "custom": {
+                        "fillOpacity": 70,
+                        "lineWidth": 0
+                     },
+                     "decimals": 2,
+                     "mappings": [ ],
+                     "max": -1,
+                     "thresholds": {
+                        "mode": "percentage",
+                        "steps": [
+                           {
+                              "color": "dark-blue"
+                           },
+                           {
+                              "color": "dark-green",
+                              "value": 1
+                           },
+                           {
+                              "color": "super-light-green",
+                              "value": 10
+                           },
+                           {
+                              "color": "semi-dark-orange",
+                              "value": 20
+                           },
+                           {
+                              "color": "dark-red",
+                              "value": 50
+                           }
+                        ]
+                     }
+                  },
+                  "overrides": [ ]
+               },
+               "gridPos": {
+                  "h": 10,
+                  "w": 24,
+                  "x": 0,
+                  "y": 25
+               },
+               "id": 13,
+               "interval": "1d",
+               "options": {
+                  "alignValue": "center",
+                  "legend": {
+                     "displayMode": "list",
+                     "placement": "bottom"
+                  },
+                  "mergeValues": false,
+                  "rowHeight": 0.90000000000000002,
+                  "showValue": "always",
+                  "tooltip": {
+                     "mode": "single"
+                  }
+               },
+               "pluginVersion": "v10.0.0",
+               "targets": [
+                  {
+                     "alias": "{{term kind.keyword}}",
+                     "bucketAggs": [
+                        {
+                           "field": "kind.keyword",
+                           "id": "3",
+                           "settings": {
+                              "min_doc_count": "1",
+                              "order": "desc",
+                              "orderBy": "_term",
+                              "size": "10"
+                           },
+                           "type": "terms"
+                        },
+                        {
+                           "field": "timestamp",
+                           "id": "2",
+                           "settings": {
+                              "interval": "auto",
+                              "min_doc_count": "0",
+                              "timeZone": "utc",
+                              "trimEdges": "0"
+                           },
+                           "type": "date_histogram"
+                        }
+                     ],
+                     "metrics": [
+                        {
+                           "field": "cpu_latency_95th",
+                           "id": "1",
+                           "settings": { },
+                           "type": "avg"
+                        }
+                     ],
+                     "query": "_exists_:cpu_latency_95th AND kind:$kind AND ocp_version:$ocp_version",
+                     "refId": "A",
+                     "timeField": "timestamp"
+                  }
+               ],
+               "title": "Sysbench CPU Latency P95 (ms)",
+               "type": "state-timeline"
+            },
+            {
+               "datasource": "Elasticsearch-sysbench-results",
+               "description": "Higher is better",
+               "fieldConfig": {
+                  "defaults": {
+                     "color": {
+                        "mode": "thresholds"
+                     },
+                     "custom": {
+                        "fillOpacity": 70,
+                        "lineWidth": 0
+                     },
+                     "decimals": 0,
+                     "mappings": [ ],
+                     "min": 0,
+                     "thresholds": {
+                        "mode": "percentage",
+                        "steps": [
+                           {
+                              "color": "semi-dark-red"
+                           },
+                           {
+                              "color": "semi-dark-orange",
+                              "value": 50
+                           },
+                           {
+                              "color": "super-light-green",
+                              "value": 80
+                           },
+                           {
+                              "color": "dark-green",
+                              "value": 90
+                           },
+                           {
+                              "color": "dark-blue",
+                              "value": 100
+                           }
+                        ]
+                     }
+                  },
+                  "overrides": [ ]
+               },
+               "gridPos": {
+                  "h": 10,
+                  "w": 24,
+                  "x": 0,
+                  "y": 35
+               },
+               "id": 14,
+               "interval": "1d",
+               "options": {
+                  "alignValue": "center",
+                  "legend": {
+                     "displayMode": "list",
+                     "placement": "bottom"
+                  },
+                  "mergeValues": false,
+                  "rowHeight": 0.90000000000000002,
+                  "showValue": "always",
+                  "tooltip": {
+                     "mode": "single"
+                  }
+               },
+               "pluginVersion": "v10.0.0",
+               "targets": [
+                  {
+                     "alias": "{{term kind.keyword}}",
+                     "bucketAggs": [
+                        {
+                           "field": "kind.keyword",
+                           "id": "3",
+                           "settings": {
+                              "min_doc_count": "1",
+                              "order": "desc",
+                              "orderBy": "_term",
+                              "size": "10"
+                           },
+                           "type": "terms"
+                        },
+                        {
+                           "field": "timestamp",
+                           "id": "2",
+                           "settings": {
+                              "interval": "auto",
+                              "min_doc_count": "0",
+                              "timeZone": "utc",
+                              "trimEdges": "0"
+                           },
+                           "type": "date_histogram"
+                        }
+                     ],
+                     "metrics": [
+                        {
+                           "field": "memory_throughput_mib",
+                           "id": "1",
+                           "settings": { },
+                           "type": "avg"
+                        }
+                     ],
+                     "query": "_exists_:memory_throughput_mib AND kind:$kind AND ocp_version:$ocp_version",
+                     "refId": "A",
+                     "timeField": "timestamp"
+                  }
+               ],
+               "title": "Sysbench Memory Throughput (MiB/s)",
+               "type": "state-timeline"
+            },
+            {
+               "datasource": "Elasticsearch-sysbench-results",
+               "description": "Lower is better",
+               "fieldConfig": {
+                  "defaults": {
+                     "color": {
+                        "mode": "thresholds"
+                     },
+                     "custom": {
+                        "fillOpacity": 70,
+                        "lineWidth": 0
+                     },
+                     "decimals": 2,
+                     "mappings": [ ],
+                     "max": -1,
+                     "thresholds": {
+                        "mode": "percentage",
+                        "steps": [
+                           {
+                              "color": "dark-blue"
+                           },
+                           {
+                              "color": "dark-green",
+                              "value": 1
+                           },
+                           {
+                              "color": "super-light-green",
+                              "value": 10
+                           },
+                           {
+                              "color": "semi-dark-orange",
+                              "value": 20
+                           },
+                           {
+                              "color": "dark-red",
+                              "value": 50
+                           }
+                        ]
+                     }
+                  },
+                  "overrides": [ ]
+               },
+               "gridPos": {
+                  "h": 10,
+                  "w": 24,
+                  "x": 0,
+                  "y": 45
+               },
+               "id": 15,
+               "interval": "1d",
+               "options": {
+                  "alignValue": "center",
+                  "legend": {
+                     "displayMode": "list",
+                     "placement": "bottom"
+                  },
+                  "mergeValues": false,
+                  "rowHeight": 0.90000000000000002,
+                  "showValue": "always",
+                  "tooltip": {
+                     "mode": "single"
+                  }
+               },
+               "pluginVersion": "v10.0.0",
+               "targets": [
+                  {
+                     "alias": "{{term kind.keyword}}",
+                     "bucketAggs": [
+                        {
+                           "field": "kind.keyword",
+                           "id": "3",
+                           "settings": {
+                              "min_doc_count": "1",
+                              "order": "desc",
+                              "orderBy": "_term",
+                              "size": "10"
+                           },
+                           "type": "terms"
+                        },
+                        {
+                           "field": "timestamp",
+                           "id": "2",
+                           "settings": {
+                              "interval": "auto",
+                              "min_doc_count": "0",
+                              "timeZone": "utc",
+                              "trimEdges": "0"
+                           },
+                           "type": "date_histogram"
+                        }
+                     ],
+                     "metrics": [
+                        {
+                           "field": "memory_latency_95th",
+                           "id": "1",
+                           "settings": { },
+                           "type": "avg"
+                        }
+                     ],
+                     "query": "_exists_:memory_latency_95th AND kind:$kind AND ocp_version:$ocp_version",
+                     "refId": "A",
+                     "timeField": "timestamp"
+                  }
+               ],
+               "title": "Sysbench Memory Latency P95 (ms)",
+               "type": "state-timeline"
+            }
+         ],
+         "title": "Sysbench",
+         "type": "row"
+      },
+      {
+         "collapsed": true,
+         "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 14
+         },
+         "id": 16,
+         "panels": [
+            {
                "datasource": "Elasticsearch-vdbench-results",
                "fieldConfig": {
                   "defaults": {
@@ -3360,7 +3802,7 @@
                   "x": 0,
                   "y": 83
                },
-               "id": 12,
+               "id": 17,
                "interval": "1d",
                "links": [
                   {
@@ -3658,7 +4100,7 @@
                   "x": 0,
                   "y": 131
                },
-               "id": 13,
+               "id": 18,
                "interval": "1d",
                "links": [
                   {
@@ -3956,7 +4398,7 @@
                   "x": 0,
                   "y": 131
                },
-               "id": 14,
+               "id": 19,
                "interval": "1d",
                "links": [
                   {
@@ -4109,7 +4551,7 @@
             "x": 0,
             "y": 20
          },
-         "id": 15,
+         "id": 20,
          "panels": [
             {
                "datasource": "Elasticsearch-bootstorm-results",
@@ -4171,7 +4613,7 @@
                   "x": 0,
                   "y": 187
                },
-               "id": 16,
+               "id": 21,
                "interval": "1d",
                "links": [
                   {
@@ -4371,7 +4813,7 @@
                   "x": 0,
                   "y": 187
                },
-               "id": 17,
+               "id": 22,
                "interval": "1d",
                "links": [
                   {
@@ -4482,7 +4924,7 @@
                   "x": 0,
                   "y": 187
                },
-               "id": 18,
+               "id": 23,
                "interval": "1d",
                "links": [
                   {
@@ -4605,7 +5047,7 @@
                   "x": 0,
                   "y": 206
                },
-               "id": 19,
+               "id": 24,
                "interval": "1d",
                "links": [
                   {
@@ -4849,7 +5291,7 @@
                   "x": 0,
                   "y": 206
                },
-               "id": 20,
+               "id": 25,
                "interval": "1d",
                "links": [
                   {
@@ -4971,7 +5413,7 @@
                   "x": 0,
                   "y": 206
                },
-               "id": 21,
+               "id": 26,
                "interval": "1d",
                "links": [
                   {
@@ -5057,7 +5499,7 @@
             "x": 0,
             "y": 21
          },
-         "id": 22,
+         "id": 27,
          "panels": [
             {
                "datasource": "Elasticsearch-hammerdb-results",
@@ -5191,7 +5633,7 @@
                   "x": 0,
                   "y": 22
                },
-               "id": 23,
+               "id": 28,
                "interval": "1d",
                "links": [
                   {
@@ -5436,7 +5878,7 @@
                   "x": 0,
                   "y": 50
                },
-               "id": 24,
+               "id": 29,
                "interval": "1d",
                "links": [
                   {
@@ -5682,7 +6124,7 @@
                   "x": 0,
                   "y": 65
                },
-               "id": 25,
+               "id": 30,
                "interval": "1d",
                "links": [
                   {
@@ -5904,7 +6346,7 @@
                   "x": 0,
                   "y": 75
                },
-               "id": 26,
+               "id": 31,
                "interval": "1d",
                "links": [
                   {
@@ -6066,7 +6508,7 @@
                   "x": 0,
                   "y": 85
                },
-               "id": 27,
+               "id": 32,
                "interval": "1d",
                "links": [
                   {
@@ -6230,7 +6672,7 @@
                   "x": 0,
                   "y": 91
                },
-               "id": 28,
+               "id": 33,
                "links": [
                   {
                      "targetBlank": true,
@@ -6430,7 +6872,7 @@
                   "x": 0,
                   "y": 97
                },
-               "id": 29,
+               "id": 34,
                "links": [
                   {
                      "targetBlank": true,
@@ -6649,7 +7091,7 @@
                   "x": 0,
                   "y": 102
                },
-               "id": 30,
+               "id": 35,
                "interval": "1d",
                "links": [
                   {
@@ -6766,7 +7208,7 @@
                   "x": 19,
                   "y": 107
                },
-               "id": 31,
+               "id": 36,
                "links": [
                   {
                      "targetBlank": true,

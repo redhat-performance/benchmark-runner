@@ -11,7 +11,7 @@ data:
           <transaction iterations="1">
             <flowop type="connect" options="remotehost=SERVER_IP_PLACEHOLDER protocol=tcp port=30001"/>
           </transaction>
-          <transaction duration="2">
+          <transaction duration="10">
             <flowop type=write options="count=16 size=64"/>
           </transaction>
           <transaction iterations="1">
@@ -136,12 +136,15 @@ spec:
         type: uperf-bench-server-deadbeef
     spec:
       runtimeClassName: kata
+      serviceAccountName: benchmark-runner
       containers:
       - name: benchmark
+        securityContext:
+          runAsUser: 0
         image: quay.io/benchmark-runner/fedora:43
         imagePullPolicy: Always
         command: ["/bin/sh", "-c"]
-        args: ["uperf -s -v -P 30000"]
+        args: ["dnf install -y uperf > /dev/null && uperf -s -v -P 30000"]
       restartPolicy: Never
       nodeSelector:
         kubernetes.io/hostname: 'pin-node-1'
