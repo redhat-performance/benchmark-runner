@@ -84,7 +84,7 @@ class WinMSSQLVM(BootstormVM):
                 raise Windows_HammerDB_NOT_Succeeded(
                     f'SSH key auth never became ready on VM {vm_name}. '
                     f'Cloudbase-init may not have executed runcmd (image needs sysprep). '
-                    f'Verify: virtctl ssh --username=Administrator vmi/{vm_name} -n {self.__namespace}')
+                    f'Verify: virtctl ssh --username={self.__username} vmi/{vm_name} -n {self.__namespace}')
 
             verify = self._virtctl.virtctl_ssh(vm_name=vm_name,
                                                command='powershell -Command "if (Test-Path C:\\ProgramData\\ssh\\administrators_authorized_keys) { echo key_ok }"',
