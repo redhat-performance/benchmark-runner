@@ -7,6 +7,7 @@ from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, 
 from benchmark_runner.common.elasticsearch.elasticsearch_exceptions import ElasticSearchDataNotUploaded
 from benchmark_runner.workloads.workloads_operations import WorkloadsOperations
 from benchmark_runner.common.oc.oc import VMStatus
+from benchmark_runner.common.oc.oc_exceptions import VMStateTimeout
 
 
 class BootstormVM(WorkloadsOperations):
@@ -73,8 +74,11 @@ class BootstormVM(WorkloadsOperations):
         """
         if self._oc.get_vm_node(vm_name=vm_name):
             vm_node = self._oc.get_vm_node(vm_name=vm_name)
-            if self._oc.wait_for_vm_access(vm_name=vm_name):
-                logger.info(f"Successfully virtctl into VM: '{vm_name}' in node {vm_node} ")
+            try:
+                if self._oc.wait_for_vm_access(vm_name=vm_name, timeout=self._timeout):
+                    logger.info(f"Successfully virtctl into VM: '{vm_name}' in node {vm_node} ")
+            except VMStateTimeout:
+                logger.warning(f"VM '{vm_name}' on node {vm_node} not accessible within timeout, recording as failed")
             return vm_node
         return False
 
