@@ -82,35 +82,21 @@ class FioPod(WorkloadsOperations):
             self._oc.create_async(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}_{pod_num}.yaml'))
             self._oc.wait_for_pod_create(pod_name=f'{self.__pod_name}-{pod_num}')
         except Exception as err:
-            self.save_error_logs()
             raise err
 
     def __run_pod_scale(self, pod_num: str):
         try:
             self._oc.wait_for_initialized(label=f'app=fio-{self._trunc_uuid}-{pod_num}', label_uuid=False)
             self._oc.wait_for_ready(label=f'app=fio-{self._trunc_uuid}-{pod_num}', label_uuid=False)
-            self.__status = self._oc.wait_for_pod_completed(label=f'app=fio-{self._trunc_uuid}-{pod_num}', label_uuid=False, job=False)
-            self.__status = 'complete' if self.__status else 'failed'
-            if self._enable_prometheus_snapshot:
-                self._prometheus_metrics_operation.finalize_prometheus()
-                metric_results = self._prometheus_metrics_operation.run_prometheus_queries()
-                self._prometheus_result = self._prometheus_metrics_operation.parse_prometheus_metrics(data=metric_results)
-            result_list = self._create_pod_run_artifacts_json(pod_name=f'{self.__pod_name}-{pod_num}')
-            if self._es_host:
-                for result in result_list:
-                    if self._enable_prometheus_snapshot:
-                        result.update(self._prometheus_result)
-                    self._upload_to_elasticsearch(index=self.__es_index, kind=self.__kind, status=self.__status, result=result)
-                self._verify_elasticsearch_data_uploaded(index=self.__es_index, uuid=self._uuid)
+            self._oc.wait_for_pod_completed(label=f'app=fio-{self._trunc_uuid}-{pod_num}', label_uuid=False, job=False)
+            self._create_pod_run_artifacts_json(pod_name=f'{self.__pod_name}-{pod_num}')
         except Exception as err:
-            self.save_error_logs()
             raise err
 
     def __delete_pod_scale(self, pod_num: str):
         try:
             self._oc.delete_async(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}_{pod_num}.yaml'))
         except Exception as err:
-            self.save_error_logs()
             raise err
 
     @logger_time_stamp
@@ -152,7 +138,8 @@ class FioPod(WorkloadsOperations):
                     pod_name=self.__pod_name)
             else:
                 self.__scale = int(self._scale)
-                bulks = tuple(self.split_run_bulks(iterable=range(self._scale * len(self._scale_node_list)), limit=self._threads_limit))
+                pod_count = self._scale * len(self._scale_node_list)
+                bulks = tuple(self.split_run_bulks(iterable=range(pod_count), limit=self._threads_limit))
                 for target in (self.__create_pod_scale, self.__run_pod_scale, self.__delete_pod_scale):
                     proc = []
                     for bulk in bulks:
@@ -164,6 +151,22 @@ class FioPod(WorkloadsOperations):
                             p.join()
                         time.sleep(self._bulk_sleep_time)
                         proc = []
+                if self._enable_prometheus_snapshot:
+                    self._prometheus_metrics_operation.finalize_prometheus()
+                    metric_results = self._prometheus_metrics_operation.run_prometheus_queries()
+                    self._prometheus_result = self._prometheus_metrics_operation.parse_prometheus_metrics(data=metric_results)
+                if self._es_host:
+                    for pod_num in range(pod_count):
+                        result_json = os.path.join(self._run_artifacts_path, f'{self.__pod_name}-{pod_num}.json')
+                        if not os.path.exists(result_json):
+                            continue
+                        with open(result_json) as f:
+                            result_list = json.load(f)
+                        for result in result_list:
+                            if self._enable_prometheus_snapshot:
+                                result.update(self._prometheus_result)
+                            self._upload_to_elasticsearch(index=self.__es_index, kind=self.__kind, status='complete', result=result)
+                    self._verify_elasticsearch_data_uploaded(index=self.__es_index, uuid=self._uuid)
             self._oc.delete_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'namespace.yaml'))
         except ElasticSearchDataNotUploaded as err:
             self._oc.delete_pod_sync(

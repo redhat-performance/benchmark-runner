@@ -24,9 +24,6 @@ metadata:
     benchmark-uuid: deadbeef-0123-3210-cdef-01234567890abcdef
     benchmark-runner-workload: fio
 spec:
-  selector:
-    matchLabels:
-      app: fio
   nodeSelector:
     kubernetes.io/hostname: pin-node-1
   containers:
@@ -70,20 +67,8 @@ spec:
       command: ["/bin/bash"]
       args: ["-c", "dnf install -y fio >/dev/null 2>&1 && $WORKLOAD_METHOD"]
   restartPolicy: "Never"
-  spec:
-    pvc:
-      accessModes:
-        - ReadWriteOnce
-      resources:
-        requests:
-          storage: 10Gi
-          Reclaim Policy: Delete
-      storageClassName: ocs-storagecluster-ceph-rbd
-    source:
-      blank: {}
   volumes:
     - name: fio-pod-pvc-claim
-      namespace: benchmark-runner
       persistentVolumeClaim:
         claimName: fio-pod-pvc-claim
     - name: fio-runner-script

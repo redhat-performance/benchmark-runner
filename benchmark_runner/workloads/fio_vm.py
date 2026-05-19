@@ -96,7 +96,6 @@ class FioVM(WorkloadsOperations):
             self._oc.create_async(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}_{vm_num}.yaml'))
             self._oc.wait_for_vm_create(vm_name=f'{self.__vm_name}-{vm_num}')
         except Exception as err:
-            self.save_error_logs()
             raise err
 
     def __run_vm_scale(self, vm_num: str):
@@ -104,30 +103,20 @@ class FioVM(WorkloadsOperations):
             self._oc.wait_for_ready(label=f'app=fio-{self._trunc_uuid}-{vm_num}', run_type='vm', label_uuid=False)
             scale_vm_name = f'{self.__vm_name}-{vm_num}'
             expected_count = self._get_expected_file_count()
-            self.__status = self._virtctl.wait_for_vm_completed_by_file_count(
+            self._virtctl.wait_for_vm_completed_by_file_count(
                 vm_name=scale_vm_name, remote_dir='/workload/',
                 expected_count=expected_count, file_type='fio_summary.json', namespace=self.__namespace, key_path=self._ssh_key_path, username=self.__username)
-            self.__status = 'complete' if self.__status else 'failed'
-            if self._enable_prometheus_snapshot:
-                self._prometheus_metrics_operation.finalize_prometheus()
-                metric_results = self._prometheus_metrics_operation.run_prometheus_queries()
-                self._prometheus_result = self._prometheus_metrics_operation.parse_prometheus_metrics(data=metric_results)
-            result_list = self._scp_and_parse_json_results(vm_name=scale_vm_name)
-            if self._es_host:
-                for result in result_list:
-                    self._upload_fio_result(result)
+            self._scp_and_parse_json_results(vm_name=scale_vm_name)
             self._oc.delete_vm_sync(
                 yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}_{vm_num}.yaml'),
                 vm_name=scale_vm_name)
         except Exception as err:
-            self.save_error_logs()
             raise err
 
     def __delete_vm_scale(self, vm_num: str):
         try:
             self._oc.delete_async(yaml=os.path.join(f'{self._run_artifacts_path}', f'{self.__name}_{vm_num}.yaml'))
         except Exception as err:
-            self.save_error_logs()
             raise err
 
     @logger_time_stamp
@@ -168,7 +157,8 @@ class FioVM(WorkloadsOperations):
                     vm_name=self.__vm_name)
             else:
                 self.__scale = int(self._scale)
-                bulks = tuple(self.split_run_bulks(iterable=range(self._scale * len(self._scale_node_list)), limit=self._threads_limit))
+                vm_count = self._scale * len(self._scale_node_list)
+                bulks = tuple(self.split_run_bulks(iterable=range(vm_count), limit=self._threads_limit))
                 for target in (self.__create_vm_scale, self.__run_vm_scale, self.__delete_vm_scale):
                     proc = []
                     for bulk in bulks:
@@ -180,6 +170,20 @@ class FioVM(WorkloadsOperations):
                             p.join()
                         time.sleep(self._bulk_sleep_time)
                         proc = []
+                if self._enable_prometheus_snapshot:
+                    self._prometheus_metrics_operation.finalize_prometheus()
+                    metric_results = self._prometheus_metrics_operation.run_prometheus_queries()
+                    self._prometheus_result = self._prometheus_metrics_operation.parse_prometheus_metrics(data=metric_results)
+                if self._es_host:
+                    for vm_num in range(vm_count):
+                        result_json = os.path.join(self._run_artifacts_path, f'{self.__vm_name}-{vm_num}.json')
+                        if not os.path.exists(result_json):
+                            continue
+                        with open(result_json) as f:
+                            result_list = json.load(f)
+                        for result in result_list:
+                            self._upload_fio_result(result)
+                    self._verify_elasticsearch_data_uploaded(index=self.__es_index, uuid=self._uuid)
             self._oc.delete_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'namespace.yaml'))
         except ElasticSearchDataNotUploaded as err:
             self._oc.delete_vm_sync(

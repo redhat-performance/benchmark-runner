@@ -71,11 +71,6 @@ metadata:
     benchmark-uuid: {{ uuid }}
     benchmark-runner-workload: fio
 spec:
-  {%- if cluster != "kubernetes" %}
-  selector:
-    matchLabels:
-      app: fio
-  {%- endif %}
   {%- if cluster == "kubernetes" %}
   volumes:
     - name: fio-pod-vol
@@ -160,29 +155,14 @@ spec:
       command: ["/bin/bash"]
       args: ["-c", "dnf install -y fio >/dev/null 2>&1 && $WORKLOAD_METHOD"]
   restartPolicy: "Never"
-  {%- if cluster != "kubernetes" and odf_pvc == True %}
-  spec:
-    pvc:
-      accessModes:
-        - ReadWriteOnce
-      resources:
-        requests:
-          storage: {{ storage }}
-          Reclaim Policy: Delete
-      storageClassName: ocs-storagecluster-ceph-rbd
-    source:
-      blank: {}
-  {%- endif %}
   {%- if odf_pvc == True %}
   volumes:
     {% if scale -%}
     - name: fio-pod-pvc-claim-{{ scale }}
-      namespace: {{ namespace }}
       persistentVolumeClaim:
         claimName: fio-pod-pvc-claim-{{ scale }}
     {%- else -%}
     - name: fio-pod-pvc-claim
-      namespace: {{ namespace }}
       persistentVolumeClaim:
         claimName: fio-pod-pvc-claim
     {%- endif %}
