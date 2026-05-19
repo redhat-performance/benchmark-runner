@@ -609,15 +609,15 @@ class OC(SSH):
 
     def delete_available_released_pv(self):
         """
-        This method deletes available or released pv because that avoid launching new pv
+        This method deletes available or released local-sc PVs, removing finalizers first
         """
-        pv_status_list = self.run(fr"{self._cli} get pv -o jsonpath={{..status.phase}}").split()
-        for ind, pv_status in enumerate(pv_status_list):
-            if pv_status == 'Available' or pv_status == 'Released':
-                available_pv = self.run(fr"{self._cli} get pv -o jsonpath={{.items[{ind}].metadata.name}}")
-                logger.info(f'Delete {pv_status} pv {available_pv}')
-                self.run(fr"{self._cli} delete localvolume -n openshift-local-storage local-disks --wait=false")
-                self.run(fr"{self._cli} delete pv {available_pv} --wait=false")
+        pvs = self.run(f"{self._cli} get pv --no-headers -o custom-columns=NAME:.metadata.name,STATUS:.status.phase,SC:.spec.storageClassName")
+        for line in pvs.strip().splitlines():
+            parts = line.split()
+            if len(parts) >= 3 and parts[2] == 'local-sc' and parts[1] in ('Available', 'Released'):
+                logger.info(f'Delete {parts[1]} pv {parts[0]}')
+                self.run(f"{self._cli} patch pv {parts[0]} --type=json -p='[{{\"op\":\"remove\",\"path\":\"/metadata/finalizers\"}}]'")
+                self.run(f"{self._cli} delete pv {parts[0]} --wait=false")
 
     def clear_node_caches(self):
         """
