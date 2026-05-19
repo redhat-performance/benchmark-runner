@@ -111,13 +111,15 @@ class WorkloadsOperations:
             self._snapshot = PrometheusSnapshot(oc=self._oc, artifacts_path=self._run_artifacts_path, verbose=True)
             self._prometheus_snap_interval = self._environment_variables_dict.get('prometheus_snap_interval', '')
             self._prometheus_metrics_operation = PrometheusMetricsOperation()
-                # Extract lso id for LSO workload
         # Extract lso id for LSO workload
         if '_lso' in self._environment_variables_dict.get('workload'):
             self._oc.delete_namespace()
             self._oc.delete_available_released_pv()
-            # Update lso_disk_id only if both worker_disk_ids and a free disk exist
-            if self._environment_variables_dict.get('worker_disk_ids', '') and self._oc.get_free_disk_id(
+            if not self._environment_variables_dict.get('pin_node2', ''):
+                self._environment_variables_dict['pin_node2'] = self._environment_variables_dict.get('lso_node', '')
+            if self._environment_variables_dict.get('lso_disk_id', ''):
+                self._lso_disk_id = self._environment_variables_dict['lso_disk_id']
+            elif self._environment_variables_dict.get('worker_disk_ids', '') and self._oc.get_free_disk_id(
                     node=self._environment_variables_dict['lso_node']):
                 self._lso_disk_id = self._oc.get_free_disk_id(node=self._environment_variables_dict['lso_node'])
                 self._environment_variables_dict['lso_disk_id'] = self._lso_disk_id
