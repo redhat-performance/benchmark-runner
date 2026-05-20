@@ -24,6 +24,7 @@ This framework support the following embedded workloads:
 * [stressng](https://wiki.ubuntu.com/Kernel/Reference/stress-ng): running stressng workload in Pod, Kata or VM [Configuration](benchmark_runner/common/template_operations/templates/stressng)
 * [uperf](http://uperf.org/): running uperf workload in Pod, Kata or VM with [Configuration](benchmark_runner/common/template_operations/templates/uperf)
 * [vdbench](https://wiki.lustre.org/VDBench): running vdbench workload in Pod, Kata or VM with [Configuration](benchmark_runner/common/template_operations/templates/vdbench)
+* [fio](https://fio.readthedocs.io/en/latest/): running fio storage benchmark workload in Pod or VM with [Configuration](benchmark_runner/common/template_operations/templates/fio)
 * [bootstorm](https://en.wiktionary.org/wiki/boot_storm): calculate VMs boot load time [Configuration](benchmark_runner/common/template_operations/templates/bootstorm)
 
 ** For hammerdb mssql must run once [permission](https://github.com/redhat-performance/benchmark-runner/blob/main/benchmark_runner/common/ocp_resources/custom/template/02_mssql_patch_template.sh)
@@ -65,7 +66,7 @@ The following options may be passed via command line flags or set in the environ
 
 Choose one from the following list:
 
-`['stressng_pod', 'stressng_vm', 'stressng_kata', 'uperf_pod', 'uperf_vm', 'uperf_kata', 'hammerdb_pod_mariadb', 'hammerdb_vm_mariadb', 'hammerdb_kata_mariadb', 'hammerdb_pod_mariadb_lso', 'hammerdb_vm_mariadb_lso', 'hammerdb_kata_mariadb_lso', 'hammerdb_pod_postgres', 'hammerdb_vm_postgres', 'hammerdb_kata_postgres', 'hammerdb_pod_postgres_lso', 'hammerdb_vm_postgres_lso', 'hammerdb_kata_postgres_lso', 'hammerdb_pod_mssql', 'hammerdb_vm_mssql', 'hammerdb_kata_mssql', 'hammerdb_pod_mssql_lso', 'hammerdb_vm_mssql_lso', 'hammerdb_kata_mssql_lso', 'vdbench_pod', 'vdbench_kata', 'vdbench_vm', 'clusterbuster', 'bootstorm_vm', 'windows_vm', 'winmssql_vm' ]`
+`['stressng_pod', 'stressng_vm', 'stressng_kata', 'uperf_pod', 'uperf_vm', 'uperf_kata', 'hammerdb_pod_mariadb', 'hammerdb_vm_mariadb', 'hammerdb_kata_mariadb', 'hammerdb_pod_mariadb_lso', 'hammerdb_vm_mariadb_lso', 'hammerdb_kata_mariadb_lso', 'hammerdb_pod_postgres', 'hammerdb_vm_postgres', 'hammerdb_kata_postgres', 'hammerdb_pod_postgres_lso', 'hammerdb_vm_postgres_lso', 'hammerdb_kata_postgres_lso', 'hammerdb_pod_mssql', 'hammerdb_vm_mssql', 'hammerdb_kata_mssql', 'hammerdb_pod_mssql_lso', 'hammerdb_vm_mssql_lso', 'hammerdb_kata_mssql_lso', 'vdbench_pod', 'vdbench_kata', 'vdbench_vm', 'fio_pod', 'fio_vm', 'fio_pod_ephemeral', 'fio_vm_ephemeral', 'clusterbuster', 'bootstorm_vm', 'windows_vm', 'winmssql_vm' ]`
 
 ** clusterbuster workloads: cpusoaker, files, fio, uperf. for more details [see](https://github.com/RobertKrawitz/OpenShift4-tools)
 ** For windows workloads: need to share windows qcow2 image by nginx
