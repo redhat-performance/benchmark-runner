@@ -32,6 +32,10 @@ python -m benchmark_runner.main.main
 
 Pre-commit hooks run automatically on commit (rh-pre-commit, YAML/JSON validation, trailing whitespace, private key detection).
 
+**Important**: Any change to files under `benchmark_runner/common/template_operations/` (templates, data files, or the template engine itself) requires running `make golden_files` followed by `make test_golden_files` before committing.
+
+**Integration test environment**: The CI integration test cluster does not have ODF installed. Integration tests must use ephemeral storage (emptyDir/emptyDisk) only. ODF-dependent tests should be marked with `@pytest.mark.skip(reason="Disable ODF")`.
+
 ## Architecture
 
 ### Entry Point

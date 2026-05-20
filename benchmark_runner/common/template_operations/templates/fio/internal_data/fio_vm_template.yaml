@@ -1,0 +1,152 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  {% if scale -%}
+  name: fio-cloudinit-{{ scale }}
+  {%- else -%}
+  name: fio-cloudinit
+  {%- endif %}
+  namespace: {{ namespace }}
+stringData:
+  userdata: |-
+    #cloud-config
+    password: centos
+    chpasswd: { expire: False }
+    ssh_pwauth: true
+    {%- if ssh_public_key is defined and ssh_public_key %}
+    ssh_authorized_keys:
+      - {{ ssh_public_key }}
+    {%- endif %}
+    bootcmd:
+      - "mkdir -p /workload || true"
+      - "mkfs.ext4 /dev/$(lsblk --nodeps -no name,serial | grep fiodata | cut -f1 -d' ') 2>/dev/null && mount /dev/$(lsblk --nodeps -no name,serial | grep fiodata | cut -f1 -d' ') /workload || true"
+      - "mkdir -p /fio || true"
+      - "mount /dev/$(lsblk --nodeps -no name,serial | grep fiorunner | cut -f1 -d' ') /mnt && cp /mnt/fio_runner.sh /fio/fio_runner.sh && chmod +x /fio/fio_runner.sh && umount /mnt"
+    runcmd:
+      - export BLOCK_SIZES={{ BLOCK_SIZES }}
+      - export IO_OPERATION={{ IO_OPERATION }}
+      - export IO_THREADS={{ IO_THREADS }}
+      - export IO_DEPTH={{ IO_DEPTH }}
+      - export DURATION={{ DURATION }}
+      - export PAUSE={{ PAUSE }}
+      - export DIRECT={{ DIRECT }}
+      - export IOENGINE={{ IOENGINE }}
+      - export SIZE={{ SIZE }}
+      - export LOGS_DIR={{ LOGS_DIR }}
+      - export REDIS_HOST={{ redis }}
+      - export WORKLOAD_METHOD={{ WORKLOAD_METHOD }}
+      - echo @@~@@START-WORKLOAD@@~@@
+      - podman run --rm -e BLOCK_SIZES="$BLOCK_SIZES" -e IO_OPERATION="$IO_OPERATION" -e IO_THREADS="$IO_THREADS" -e IO_DEPTH="$IO_DEPTH" -e DURATION="$DURATION" -e PAUSE="$PAUSE" -e DIRECT="$DIRECT" -e IOENGINE="$IOENGINE" -e SIZE="$SIZE" -e LOGS_DIR="$LOGS_DIR" -v "/workload":"/workload" -v "/fio":"/fio" --privileged {{ fedora }} bash -c "dnf install -y fio >/dev/null 2>&1 && $WORKLOAD_METHOD"
+      - echo @@~@@END-WORKLOAD@@~@@
+---
+{%- if odf_pvc == True %}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  {% if scale -%}
+  name: fio-pvc-claim-{{ scale }}
+  {%- else -%}
+  name: fio-pvc-claim
+  {%- endif %}
+  namespace: {{ namespace }}
+spec:
+  storageClassName: ocs-storagecluster-ceph-rbd
+  accessModes: [ "ReadWriteOnce" ]
+  volumeMode: Block
+  resources:
+    requests:
+      storage: {{ storage }}
+---
+{%- endif %}
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  {% if scale -%}
+  name: fio-{{ kind }}-{{ trunc_uuid }}-{{ scale }}
+  {%- else -%}
+  name: fio-{{ kind }}-{{ trunc_uuid }}
+  {%- endif %}
+  namespace: {{ namespace }}
+  labels:
+    {% if scale -%}
+    app: fio-{{ trunc_uuid }}-{{ scale }}
+    type: fio-{{ kind }}-{{ trunc_uuid }}-{{ scale }}
+    {%- else -%}
+    app: fio-{{ trunc_uuid }}
+    type: fio-{{ kind }}-{{ trunc_uuid }}
+    {%- endif %}
+    benchmark-uuid: {{ uuid }}
+    benchmark-runner-workload: fio
+spec:
+  running: true
+  template:
+    metadata:
+      labels:
+        kubevirt-vm: fio
+    spec:
+      {%- if pin_node1 or scale_node %}
+      nodeSelector:
+        {% if scale -%}
+        kubernetes.io/hostname: {{ scale_node }}
+        {%- else -%}
+        kubernetes.io/hostname: {{ pin_node1 }}
+        {%- endif %}
+      {%- endif %}
+      domain:
+        cpu:
+          sockets: {{ sockets }}
+          cores: 1
+          threads: 1
+        devices:
+          disks:
+            - disk:
+                bus: virtio
+              name: containerdisk
+            - disk:
+                bus: virtio
+              name: cloudinitdisk
+            - disk:
+                bus: virtio
+              name: data-volume
+              serial: fiodata
+            - disk: {}
+              name: fio-runner-volume
+              serial: fiorunner
+        machine:
+          type: ""
+        resources:
+          requests:
+            cpu: {{ requests_cpu }}
+            memory: {{ requests_memory }}
+          limits:
+            cpu: {{ limits_cpu }}
+            memory: {{ limits_memory }}
+      terminationGracePeriodSeconds: 180
+      volumes:
+{%- if odf_pvc == True %}
+        - name: data-volume
+          persistentVolumeClaim:
+            {% if scale -%}
+            claimName: fio-pvc-claim-{{ scale }}
+            {%- else -%}
+            claimName: fio-pvc-claim
+            {%- endif %}
+{%- else %}
+        - name: data-volume
+          emptyDisk:
+            capacity: {{ storage }}
+{%- endif %}
+        - containerDisk:
+            image: {{ centos_stream_container_disk }}
+          name: containerdisk
+        - cloudInitNoCloud:
+            secretRef:
+              {% if scale -%}
+              name: fio-cloudinit-{{ scale }}
+              {%- else -%}
+              name: fio-cloudinit
+              {%- endif %}
+          name: cloudinitdisk
+        - configMap:
+            name: fio-runner-script
+          name: fio-runner-volume

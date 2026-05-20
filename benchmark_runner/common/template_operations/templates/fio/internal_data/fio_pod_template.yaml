@@ -1,0 +1,181 @@
+{%- if cluster == "kubernetes" %}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: fio-pv
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: {{ storage }}
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: fio-pod-pvc-claim
+  namespace: {{ namespace }}
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: {{ storage }}
+{%- endif %}
+{%- if odf_pvc == True %}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  {% if scale -%}
+  name: fio-pod-pvc-claim-{{ scale }}
+  {%- else -%}
+  name: fio-pod-pvc-claim
+  {%- endif %}
+  namespace: {{ namespace }}
+spec:
+  storageClassName: ocs-storagecluster-ceph-rbd
+  accessModes: [ "ReadWriteOnce" ]
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: {{ storage }}
+{%- endif %}
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  {% if scale -%}
+  name: fio-{{ kind }}-{{ trunc_uuid }}-{{ scale }}
+  {%- else -%}
+  name: fio-{{ kind }}-{{ trunc_uuid }}
+  {%- endif %}
+  namespace: {{ namespace }}
+  annotations:
+    {%- if kind == 'kata' %}
+    io.katacontainers.config.hypervisor.virtio_fs_extra_args: '["-o","allow_direct_io"]'
+    {%- endif %}
+  labels:
+    {% if scale -%}
+    app: fio-{{ trunc_uuid }}-{{ scale }}
+    type: fio-{{ kind }}-{{ trunc_uuid }}-{{ scale }}
+    {%- else -%}
+    app: fio-{{ trunc_uuid }}
+    type: fio-{{ kind }}-{{ trunc_uuid }}
+    {%- endif %}
+    benchmark-uuid: {{ uuid }}
+    benchmark-runner-workload: fio
+spec:
+  {%- if cluster == "kubernetes" %}
+  volumes:
+    - name: fio-pod-vol
+      persistentVolumeClaim:
+        claimName: fio-pod-pvc-claim
+    - name: fio-runner-script
+      configMap:
+        name: fio-runner-script
+        defaultMode: 0755
+  {%- endif %}
+  {%- if pin_node1 or scale_node %}
+  nodeSelector:
+    {% if scale -%}
+    kubernetes.io/hostname: {{ scale_node }}
+    {%- else -%}
+    kubernetes.io/hostname: {{ pin_node1 }}
+    {%- endif %}
+  {%- endif %}
+  containers:
+    - name: fio-pod
+      image: {{ fedora }}
+      {%- if odf_pvc != True %}
+      securityContext:
+        runAsUser: 0
+      {%- endif %}
+      resources:
+        requests:
+          cpu: {{ requests_cpu }}
+          memory: {{ requests_memory }}
+        limits:
+          cpu: {{ limits_cpu }}
+          {%- if kind != 'kata' %}
+          memory: {{ limits_memory }}
+          {%- endif %}
+      {%- if cluster == "kubernetes" %}
+      volumeMounts:
+        - name: fio-pod-vol
+          mountPath: "/workload"
+        - name: fio-runner-script
+          mountPath: /fio
+      {%- endif %}
+      {%- if odf_pvc == True %}
+      volumeMounts:
+        {% if scale -%}
+        - name: fio-pod-pvc-claim-{{ scale }}
+        {%- else -%}
+        - name: fio-pod-pvc-claim
+        {%- endif %}
+          mountPath: "/workload"
+        - name: fio-runner-script
+          mountPath: /fio
+      {%- else %}
+      volumeMounts:
+        - name: fio-ephemeral-vol
+          mountPath: "/workload"
+        - name: fio-runner-script
+          mountPath: /fio
+      {%- endif %}
+      env:
+        - name: BLOCK_SIZES
+          value: "{{ BLOCK_SIZES }}"
+        - name: IO_OPERATION
+          value: "{{ IO_OPERATION }}"
+        - name: IO_THREADS
+          value: "{{ IO_THREADS }}"
+        - name: IO_DEPTH
+          value: "{{ IO_DEPTH }}"
+        - name: DURATION
+          value: "{{ DURATION }}"
+        - name: PAUSE
+          value: "{{ PAUSE }}"
+        - name: DIRECT
+          value: "{{ DIRECT }}"
+        - name: IOENGINE
+          value: "{{ IOENGINE }}"
+        - name: SIZE
+          value: "{{ SIZE }}"
+        - name: LOGS_DIR
+          value: "{{ LOGS_DIR }}"
+        - name: WORKLOAD_METHOD
+          value: "{{ WORKLOAD_METHOD }}"
+      command: ["/bin/bash"]
+      args: ["-c", "dnf install -y fio >/dev/null 2>&1 && $WORKLOAD_METHOD"]
+  restartPolicy: "Never"
+  {%- if odf_pvc == True %}
+  volumes:
+    {% if scale -%}
+    - name: fio-pod-pvc-claim-{{ scale }}
+      persistentVolumeClaim:
+        claimName: fio-pod-pvc-claim-{{ scale }}
+    {%- else -%}
+    - name: fio-pod-pvc-claim
+      persistentVolumeClaim:
+        claimName: fio-pod-pvc-claim
+    {%- endif %}
+    - name: fio-runner-script
+      configMap:
+        name: fio-runner-script
+        defaultMode: 0755
+  {%- else %}
+  volumes:
+    - name: fio-ephemeral-vol
+      emptyDir: {}
+    - name: fio-runner-script
+      configMap:
+        name: fio-runner-script
+        defaultMode: 0755
+  {%- endif %}
