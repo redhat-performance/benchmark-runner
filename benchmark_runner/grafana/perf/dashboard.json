@@ -4561,9 +4561,419 @@
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 20
+            "y": 15
          },
          "id": 20,
+         "panels": [
+            {
+               "datasource": "Elasticsearch-fio-results",
+               "fieldConfig": {
+                  "defaults": {
+                     "color": {
+                        "mode": "thresholds"
+                     },
+                     "custom": {
+                        "fillOpacity": 70,
+                        "lineWidth": 0
+                     },
+                     "mappings": [ ],
+                     "min": 0,
+                     "thresholds": {
+                        "mode": "percentage",
+                        "steps": [
+                           {
+                              "color": "dark-red"
+                           },
+                           {
+                              "color": "semi-dark-orange",
+                              "value": 50
+                           },
+                           {
+                              "color": "light-green",
+                              "value": 80
+                           },
+                           {
+                              "color": "dark-green",
+                              "value": 90
+                           },
+                           {
+                              "color": "dark-blue",
+                              "value": 100
+                           }
+                        ]
+                     }
+                  },
+                  "overrides": [ ]
+               },
+               "gridPos": {
+                  "h": 36,
+                  "w": 24,
+                  "x": 0,
+                  "y": 16
+               },
+               "id": 21,
+               "interval": "1d",
+               "options": {
+                  "alignValue": "center",
+                  "legend": {
+                     "displayMode": "list",
+                     "placement": "bottom"
+                  },
+                  "mergeValues": false,
+                  "rowHeight": 0.90000000000000002,
+                  "showValue": "always",
+                  "tooltip": {
+                     "mode": "single"
+                  }
+               },
+               "pluginVersion": "v10.0.0",
+               "targets": [
+                  {
+                     "alias": "{{term block_size.keyword}} {{term io_operation.keyword}} : 1 {{term kind.keyword}}",
+                     "bucketAggs": [
+                        {
+                           "field": "block_size.keyword",
+                           "id": "2",
+                           "settings": {
+                              "min_doc_count": "1",
+                              "order": "asc",
+                              "orderBy": "_term",
+                              "size": "10"
+                           },
+                           "type": "terms"
+                        },
+                        {
+                           "field": "io_operation.keyword",
+                           "id": "3",
+                           "settings": {
+                              "min_doc_count": "1",
+                              "order": "asc",
+                              "orderBy": "_term",
+                              "size": "10"
+                           },
+                           "type": "terms"
+                        },
+                        {
+                           "field": "kind.keyword",
+                           "id": "4",
+                           "settings": {
+                              "min_doc_count": "1",
+                              "order": "desc",
+                              "orderBy": "_term",
+                              "size": "10"
+                           },
+                           "type": "terms"
+                        },
+                        {
+                           "field": "timestamp",
+                           "id": "5",
+                           "settings": {
+                              "interval": "auto",
+                              "min_doc_count": "0",
+                              "timeZone": "utc",
+                              "trimEdges": "0"
+                           },
+                           "type": "date_histogram"
+                        }
+                     ],
+                     "metrics": [
+                        {
+                           "field": "total_iops",
+                           "id": "1",
+                           "type": "avg"
+                        }
+                     ],
+                     "query": "!scale AND kind:$kind AND block_size:$fio_block_size AND io_operation:$fio_io_operation AND ocp_version:$ocp_version",
+                     "refId": "A",
+                     "timeField": "timestamp"
+                  },
+                  {
+                     "alias": "{{term block_size.keyword}} {{term io_operation.keyword}} : {{term scale}} {{term kind.keyword}}s",
+                     "bucketAggs": [
+                        {
+                           "field": "block_size.keyword",
+                           "id": "2",
+                           "settings": {
+                              "min_doc_count": "1",
+                              "order": "asc",
+                              "orderBy": "_term",
+                              "size": "10"
+                           },
+                           "type": "terms"
+                        },
+                        {
+                           "field": "io_operation.keyword",
+                           "id": "3",
+                           "settings": {
+                              "min_doc_count": "1",
+                              "order": "asc",
+                              "orderBy": "_term",
+                              "size": "10"
+                           },
+                           "type": "terms"
+                        },
+                        {
+                           "field": "kind.keyword",
+                           "id": "4",
+                           "settings": {
+                              "min_doc_count": "1",
+                              "order": "desc",
+                              "orderBy": "_term",
+                              "size": "10"
+                           },
+                           "type": "terms"
+                        },
+                        {
+                           "field": "scale",
+                           "id": "6",
+                           "settings": {
+                              "min_doc_count": "1",
+                              "order": "desc",
+                              "orderBy": "_term",
+                              "size": "10"
+                           },
+                           "type": "terms"
+                        },
+                        {
+                           "field": "timestamp",
+                           "id": "5",
+                           "settings": {
+                              "interval": "auto",
+                              "min_doc_count": "0",
+                              "timeZone": "utc",
+                              "trimEdges": "0"
+                           },
+                           "type": "date_histogram"
+                        }
+                     ],
+                     "hide": false,
+                     "metrics": [
+                        {
+                           "field": "total_iops",
+                           "id": "1",
+                           "type": "avg"
+                        }
+                     ],
+                     "query": "scale AND kind:$kind AND block_size:$fio_block_size AND io_operation:$fio_io_operation AND ocp_version:$ocp_version",
+                     "refId": "B",
+                     "timeField": "timestamp"
+                  }
+               ],
+               "title": "FIO (IOPS)",
+               "type": "state-timeline"
+            },
+            {
+               "datasource": "Elasticsearch-fio-results",
+               "description": "Lower is better",
+               "fieldConfig": {
+                  "defaults": {
+                     "color": {
+                        "mode": "thresholds"
+                     },
+                     "custom": {
+                        "fillOpacity": 70,
+                        "lineWidth": 0
+                     },
+                     "decimals": 1,
+                     "mappings": [ ],
+                     "max": -1,
+                     "thresholds": {
+                        "mode": "percentage",
+                        "steps": [
+                           {
+                              "color": "dark-blue"
+                           },
+                           {
+                              "color": "dark-green",
+                              "value": 1
+                           },
+                           {
+                              "color": "super-light-green",
+                              "value": 10
+                           },
+                           {
+                              "color": "semi-dark-orange",
+                              "value": 50
+                           },
+                           {
+                              "color": "dark-red",
+                              "value": 80
+                           }
+                        ]
+                     }
+                  },
+                  "overrides": [ ]
+               },
+               "gridPos": {
+                  "h": 36,
+                  "w": 24,
+                  "x": 0,
+                  "y": 52
+               },
+               "id": 22,
+               "interval": "1d",
+               "options": {
+                  "alignValue": "center",
+                  "legend": {
+                     "displayMode": "list",
+                     "placement": "bottom"
+                  },
+                  "mergeValues": false,
+                  "rowHeight": 0.90000000000000002,
+                  "showValue": "always",
+                  "tooltip": {
+                     "mode": "single"
+                  }
+               },
+               "pluginVersion": "v10.0.0",
+               "targets": [
+                  {
+                     "alias": "{{term block_size.keyword}} {{term io_operation.keyword}} : 1 {{term kind.keyword}}",
+                     "bucketAggs": [
+                        {
+                           "field": "block_size.keyword",
+                           "id": "2",
+                           "settings": {
+                              "min_doc_count": "1",
+                              "order": "asc",
+                              "orderBy": "_term",
+                              "size": "10"
+                           },
+                           "type": "terms"
+                        },
+                        {
+                           "field": "io_operation.keyword",
+                           "id": "3",
+                           "settings": {
+                              "min_doc_count": "1",
+                              "order": "asc",
+                              "orderBy": "_term",
+                              "size": "10"
+                           },
+                           "type": "terms"
+                        },
+                        {
+                           "field": "kind.keyword",
+                           "id": "4",
+                           "settings": {
+                              "min_doc_count": "1",
+                              "order": "desc",
+                              "orderBy": "_term",
+                              "size": "10"
+                           },
+                           "type": "terms"
+                        },
+                        {
+                           "field": "timestamp",
+                           "id": "5",
+                           "settings": {
+                              "interval": "auto",
+                              "min_doc_count": "0",
+                              "timeZone": "utc",
+                              "trimEdges": "0"
+                           },
+                           "type": "date_histogram"
+                        }
+                     ],
+                     "metrics": [
+                        {
+                           "field": "lat_avg_usec",
+                           "id": "1",
+                           "type": "avg"
+                        }
+                     ],
+                     "query": "!scale AND kind:$kind AND block_size:$fio_block_size AND io_operation:$fio_io_operation AND ocp_version:$ocp_version",
+                     "refId": "A",
+                     "timeField": "timestamp"
+                  },
+                  {
+                     "alias": "{{term block_size.keyword}} {{term io_operation.keyword}} : {{term scale}} {{term kind.keyword}}s",
+                     "bucketAggs": [
+                        {
+                           "field": "block_size.keyword",
+                           "id": "2",
+                           "settings": {
+                              "min_doc_count": "1",
+                              "order": "asc",
+                              "orderBy": "_term",
+                              "size": "10"
+                           },
+                           "type": "terms"
+                        },
+                        {
+                           "field": "io_operation.keyword",
+                           "id": "3",
+                           "settings": {
+                              "min_doc_count": "1",
+                              "order": "asc",
+                              "orderBy": "_term",
+                              "size": "10"
+                           },
+                           "type": "terms"
+                        },
+                        {
+                           "field": "kind.keyword",
+                           "id": "4",
+                           "settings": {
+                              "min_doc_count": "1",
+                              "order": "desc",
+                              "orderBy": "_term",
+                              "size": "10"
+                           },
+                           "type": "terms"
+                        },
+                        {
+                           "field": "scale",
+                           "id": "6",
+                           "settings": {
+                              "min_doc_count": "1",
+                              "order": "desc",
+                              "orderBy": "_term",
+                              "size": "10"
+                           },
+                           "type": "terms"
+                        },
+                        {
+                           "field": "timestamp",
+                           "id": "5",
+                           "settings": {
+                              "interval": "auto",
+                              "min_doc_count": "0",
+                              "timeZone": "utc",
+                              "trimEdges": "0"
+                           },
+                           "type": "date_histogram"
+                        }
+                     ],
+                     "hide": false,
+                     "metrics": [
+                        {
+                           "field": "lat_avg_usec",
+                           "id": "1",
+                           "type": "avg"
+                        }
+                     ],
+                     "query": "scale AND kind:$kind AND block_size:$fio_block_size AND io_operation:$fio_io_operation AND ocp_version:$ocp_version",
+                     "refId": "B",
+                     "timeField": "timestamp"
+                  }
+               ],
+               "title": "FIO Latency (usec)",
+               "type": "state-timeline"
+            }
+         ],
+         "title": "FIO",
+         "type": "row"
+      },
+      {
+         "collapsed": true,
+         "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 20
+         },
+         "id": 23,
          "panels": [
             {
                "datasource": "Elasticsearch-bootstorm-results",
@@ -4625,7 +5035,7 @@
                   "x": 0,
                   "y": 187
                },
-               "id": 21,
+               "id": 24,
                "interval": "1d",
                "links": [
                   {
@@ -4825,7 +5235,7 @@
                   "x": 0,
                   "y": 187
                },
-               "id": 22,
+               "id": 25,
                "interval": "1d",
                "links": [
                   {
@@ -4936,7 +5346,7 @@
                   "x": 0,
                   "y": 187
                },
-               "id": 23,
+               "id": 26,
                "interval": "1d",
                "links": [
                   {
@@ -5059,7 +5469,7 @@
                   "x": 0,
                   "y": 206
                },
-               "id": 24,
+               "id": 27,
                "interval": "1d",
                "links": [
                   {
@@ -5303,7 +5713,7 @@
                   "x": 0,
                   "y": 206
                },
-               "id": 25,
+               "id": 28,
                "interval": "1d",
                "links": [
                   {
@@ -5425,7 +5835,7 @@
                   "x": 0,
                   "y": 206
                },
-               "id": 26,
+               "id": 29,
                "interval": "1d",
                "links": [
                   {
@@ -5511,7 +5921,7 @@
             "x": 0,
             "y": 21
          },
-         "id": 27,
+         "id": 30,
          "panels": [
             {
                "datasource": "Elasticsearch-hammerdb-results",
@@ -5645,7 +6055,7 @@
                   "x": 0,
                   "y": 22
                },
-               "id": 28,
+               "id": 31,
                "interval": "1d",
                "links": [
                   {
@@ -5890,7 +6300,7 @@
                   "x": 0,
                   "y": 50
                },
-               "id": 29,
+               "id": 32,
                "interval": "1d",
                "links": [
                   {
@@ -6136,7 +6546,7 @@
                   "x": 0,
                   "y": 65
                },
-               "id": 30,
+               "id": 33,
                "interval": "1d",
                "links": [
                   {
@@ -6358,7 +6768,7 @@
                   "x": 0,
                   "y": 75
                },
-               "id": 31,
+               "id": 34,
                "interval": "1d",
                "links": [
                   {
@@ -6520,7 +6930,7 @@
                   "x": 0,
                   "y": 85
                },
-               "id": 32,
+               "id": 35,
                "interval": "1d",
                "links": [
                   {
@@ -6684,7 +7094,7 @@
                   "x": 0,
                   "y": 91
                },
-               "id": 33,
+               "id": 36,
                "links": [
                   {
                      "targetBlank": true,
@@ -6884,7 +7294,7 @@
                   "x": 0,
                   "y": 97
                },
-               "id": 34,
+               "id": 37,
                "links": [
                   {
                      "targetBlank": true,
@@ -7103,7 +7513,7 @@
                   "x": 0,
                   "y": 102
                },
-               "id": 35,
+               "id": 38,
                "interval": "1d",
                "links": [
                   {
@@ -7220,7 +7630,7 @@
                   "x": 19,
                   "y": 107
                },
-               "id": 36,
+               "id": 39,
                "links": [
                   {
                      "targetBlank": true,
@@ -7344,6 +7754,32 @@
             "multi": true,
             "name": "vdbench_type",
             "query": "{\"find\":\"terms\",\"field\":\"Run.keyword\"}",
+            "refresh": 2,
+            "regex": "",
+            "sort": 6,
+            "type": "query"
+         },
+         {
+            "allValue": "",
+            "datasource": "Elasticsearch-fio-results",
+            "hide": 0,
+            "includeAll": true,
+            "multi": true,
+            "name": "fio_block_size",
+            "query": "{\"find\":\"terms\",\"field\":\"block_size.keyword\"}",
+            "refresh": 2,
+            "regex": "",
+            "sort": 6,
+            "type": "query"
+         },
+         {
+            "allValue": "",
+            "datasource": "Elasticsearch-fio-results",
+            "hide": 0,
+            "includeAll": true,
+            "multi": true,
+            "name": "fio_io_operation",
+            "query": "{\"find\":\"terms\",\"field\":\"io_operation.keyword\"}",
             "refresh": 2,
             "regex": "",
             "sort": 6,
