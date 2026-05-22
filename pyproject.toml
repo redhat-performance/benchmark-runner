@@ -40,6 +40,7 @@ dependencies = [
     "pandas",
     "paramiko==3.4.0",
     "PyGitHub==1.55",
+    "PySocks>=1.7.1",
     "PyYAML==6.0.1",
     "setuptools",
     "sphinx==5.0.0",
