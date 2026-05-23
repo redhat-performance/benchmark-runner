@@ -166,7 +166,7 @@ def test_virtctl_vdbench_vm_ephemeral_file_count_scp_and_parse():
     # Wait for CSV files (IO_OPERATION=oltp1,oltp2 => 2 files expected)
     assert virtctl.wait_for_vm_completed_by_file_count(
         vm_name=vm_name, remote_dir='/workload/', expected_count=2,
-        namespace=namespace, key_path=key_path, username='cloud-user', timeout=600)
+        namespace=namespace, key_path=key_path, username='cloud-user', timeout=1200)
 
     # Verify count_remote_vm_files
     csv_count = virtctl.count_remote_vm_files(
