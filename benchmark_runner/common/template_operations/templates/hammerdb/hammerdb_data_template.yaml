@@ -9,6 +9,8 @@ template_data:
     pin_node2: "{{ pin_node2 }}"
     odf_pvc: {{ odf_pvc }}
     transactions: 100000
+    db_min_workers: 1
+    iterations: 2
     rampup: 1
     runtime: 1
   run_type:
