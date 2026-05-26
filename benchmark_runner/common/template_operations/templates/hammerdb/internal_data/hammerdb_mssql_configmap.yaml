@@ -106,7 +106,7 @@ data:
     set workers {{ db_num_workers }}
     set transactions {{ transactions }}
     set samples 1
-    for {set w 1} { $w <= $workers } { set w [expr {$w*2}] } {
+    for {set w {{ db_min_workers }}} { $w <= $workers } { set w [expr {$w*2}] } {
     puts "$w VU TEST"
     for {set i 1} {$i <= $samples} {incr i} {
         puts "============ RUNNING SAMPLE $i: $w WORKERS ============"
