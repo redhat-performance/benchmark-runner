@@ -131,6 +131,15 @@ g.dashboard.new('PerfCI-Regression-Summary')
   + g.dashboard.variable.query.withSort(6)
   + g.dashboard.variable.query.withRefresh(2),
 
+  g.dashboard.variable.query.new('fio_vm_os_version', '{\"find\":\"terms\",\"field\":\"vm_os_version.keyword\"}')
+  + elasticsearch.withDatasource('Elasticsearch-fio-results')
+  + g.query.azureMonitor.withHide(0)
+  + g.dashboard.variable.query.selectionOptions.withIncludeAll(true, '')
+  + g.dashboard.variable.query.selectionOptions.withMulti(true)
+  + g.dashboard.variable.query.withRegex('')
+  + g.dashboard.variable.query.withSort(1)
+  + g.dashboard.variable.query.withRefresh(2),
+
 
 
 
@@ -1994,7 +2003,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
             + stateTimeline.options.tooltip.withMode('single')
 
             + g.panel.stateTimeline.withTargets([
-              elasticsearch.withAlias('{{term block_size.keyword}} {{term io_operation.keyword}} : 1 {{term kind.keyword}}')
+              elasticsearch.withAlias('{{term vm_os_version.keyword}} : {{term block_size.keyword}} : {{term io_operation.keyword}} : 1 {{term kind.keyword}}')
 
               + elasticsearch.withBucketAggs([
                 elasticsearch.bucketAggs.Terms.withField('block_size.keyword')
@@ -2021,6 +2030,14 @@ g.dashboard.new('PerfCI-Regression-Summary')
                 + elasticsearch.bucketAggs.Terms.settings.withSize('10')
                 + elasticsearch.bucketAggs.Terms.withType('terms'),
 
+                elasticsearch.bucketAggs.Terms.withField('vm_os_version.keyword')
+                + elasticsearch.bucketAggs.Terms.withId('7')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
+                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
+                + elasticsearch.bucketAggs.Terms.withType('terms'),
+
                 elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
                 + elasticsearch.bucketAggs.DateHistogram.withId('5')
                 + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
@@ -2038,13 +2055,13 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
               ])
 
-              +elasticsearch.withQuery("!scale AND kind:$kind AND block_size:$fio_block_size AND io_operation:$fio_io_operation AND ocp_version:$ocp_version")
+              +elasticsearch.withQuery("!scale AND kind:$kind AND block_size:$fio_block_size AND io_operation:$fio_io_operation AND ocp_version:$ocp_version AND vm_os_version:$fio_vm_os_version")
               +elasticsearch.withRefId('A')
               +elasticsearch.withTimeField('timestamp'),
 
               ////
 
-              elasticsearch.withAlias('{{term block_size.keyword}} {{term io_operation.keyword}} : {{term scale}} {{term kind.keyword}}s')
+              elasticsearch.withAlias('{{term vm_os_version.keyword}} : {{term block_size.keyword}} : {{term io_operation.keyword}} : {{term scale}} {{term kind.keyword}}s')
 
               + elasticsearch.withBucketAggs([
                 elasticsearch.bucketAggs.Terms.withField('block_size.keyword')
@@ -2079,6 +2096,14 @@ g.dashboard.new('PerfCI-Regression-Summary')
                 + elasticsearch.bucketAggs.Terms.settings.withSize('10')
                 + elasticsearch.bucketAggs.Terms.withType('terms'),
 
+                elasticsearch.bucketAggs.Terms.withField('vm_os_version.keyword')
+                + elasticsearch.bucketAggs.Terms.withId('7')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
+                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
+                + elasticsearch.bucketAggs.Terms.withType('terms'),
+
                 elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
                 + elasticsearch.bucketAggs.DateHistogram.withId('5')
                 + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
@@ -2097,7 +2122,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
               ])
 
-              +elasticsearch.withQuery("scale AND kind:$kind AND block_size:$fio_block_size AND io_operation:$fio_io_operation AND ocp_version:$ocp_version")
+              +elasticsearch.withQuery("scale AND kind:$kind AND block_size:$fio_block_size AND io_operation:$fio_io_operation AND ocp_version:$ocp_version AND vm_os_version:$fio_vm_os_version")
               +elasticsearch.withRefId('B')
               +elasticsearch.withTimeField('timestamp'),
 
@@ -2153,7 +2178,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
             + stateTimeline.options.tooltip.withMode('single')
 
             + g.panel.stateTimeline.withTargets([
-              elasticsearch.withAlias('{{term block_size.keyword}} {{term io_operation.keyword}} : 1 {{term kind.keyword}}')
+              elasticsearch.withAlias('{{term vm_os_version.keyword}} : {{term block_size.keyword}} : {{term io_operation.keyword}} : 1 {{term kind.keyword}}')
 
               + elasticsearch.withBucketAggs([
                 elasticsearch.bucketAggs.Terms.withField('block_size.keyword')
@@ -2180,6 +2205,14 @@ g.dashboard.new('PerfCI-Regression-Summary')
                 + elasticsearch.bucketAggs.Terms.settings.withSize('10')
                 + elasticsearch.bucketAggs.Terms.withType('terms'),
 
+                elasticsearch.bucketAggs.Terms.withField('vm_os_version.keyword')
+                + elasticsearch.bucketAggs.Terms.withId('7')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
+                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
+                + elasticsearch.bucketAggs.Terms.withType('terms'),
+
                 elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
                 + elasticsearch.bucketAggs.DateHistogram.withId('5')
                 + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
@@ -2197,13 +2230,13 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
               ])
 
-              +elasticsearch.withQuery("!scale AND kind:$kind AND block_size:$fio_block_size AND io_operation:$fio_io_operation AND ocp_version:$ocp_version")
+              +elasticsearch.withQuery("!scale AND kind:$kind AND block_size:$fio_block_size AND io_operation:$fio_io_operation AND ocp_version:$ocp_version AND vm_os_version:$fio_vm_os_version")
               +elasticsearch.withRefId('A')
               +elasticsearch.withTimeField('timestamp'),
 
               ////
 
-              elasticsearch.withAlias('{{term block_size.keyword}} {{term io_operation.keyword}} : {{term scale}} {{term kind.keyword}}s')
+              elasticsearch.withAlias('{{term vm_os_version.keyword}} : {{term block_size.keyword}} : {{term io_operation.keyword}} : {{term scale}} {{term kind.keyword}}s')
 
               + elasticsearch.withBucketAggs([
                 elasticsearch.bucketAggs.Terms.withField('block_size.keyword')
@@ -2238,6 +2271,14 @@ g.dashboard.new('PerfCI-Regression-Summary')
                 + elasticsearch.bucketAggs.Terms.settings.withSize('10')
                 + elasticsearch.bucketAggs.Terms.withType('terms'),
 
+                elasticsearch.bucketAggs.Terms.withField('vm_os_version.keyword')
+                + elasticsearch.bucketAggs.Terms.withId('7')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
+                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
+                + elasticsearch.bucketAggs.Terms.withType('terms'),
+
                 elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
                 + elasticsearch.bucketAggs.DateHistogram.withId('5')
                 + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
@@ -2256,7 +2297,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
               ])
 
-              +elasticsearch.withQuery("scale AND kind:$kind AND block_size:$fio_block_size AND io_operation:$fio_io_operation AND ocp_version:$ocp_version")
+              +elasticsearch.withQuery("scale AND kind:$kind AND block_size:$fio_block_size AND io_operation:$fio_io_operation AND ocp_version:$ocp_version AND vm_os_version:$fio_vm_os_version")
               +elasticsearch.withRefId('B')
               +elasticsearch.withTimeField('timestamp'),
 

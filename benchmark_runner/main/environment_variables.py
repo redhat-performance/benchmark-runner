@@ -123,7 +123,7 @@ class EnvironmentVariables:
                                                          'vdbench_pod_ephemeral', 'vdbench_vm_ephemeral',
                                                          'fio_pod', 'fio_vm',
                                                          'fio_pod_ephemeral', 'fio_vm_ephemeral',
-                                                         'clusterbuster', 'bootstorm_vm', 'windows_vm', 'winmssql_vm',
+                                                         'clusterbuster', 'bootstorm_vm', 'windows_vm', 'winmssql_vm', 'winfio_vm',
                                                          'krknhub']
         # Workloads namespaces
         self._environment_variables_dict['workload_namespaces'] = {
@@ -137,6 +137,7 @@ class EnvironmentVariables:
             'bootstorm': 'benchmark-runner',
             'windows': 'benchmark-runner',
             'winmssql': 'benchmark-runner',
+            'winfio': 'benchmark-runner',
             'krknhub': 'krknhub',
         }
 
