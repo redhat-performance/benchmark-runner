@@ -125,13 +125,15 @@ class Virtctl(OC):
     @typechecked
     def _wait_for_virtctl_ssh(self, vm_name: str, namespace: str = '', key_path: str = '', username: str = '', timeout: int = OC.SHORT_TIMEOUT) -> bool:
         """Wait for SSH to be accessible on a VM via virtctl."""
-        for i in range(0, timeout, self.SLEEP_TIME):
+        # wait before checking for SSH to avoid boot issues
+        time.sleep(OC.DELAY)
+        for i in range(0, timeout, OC.DELAY):
             if self._ssh_ready(vm_name=vm_name, namespace=namespace, key_path=key_path, username=username):
                 logger.debug(f'SSH ready on {vm_name} after {i}s')
                 return True
             if i > 0 and i % OC.DELAY == 0:
                 logger.debug(f'Waiting for SSH on {vm_name}... ({i}s)')
-            time.sleep(self.SLEEP_TIME)
+            time.sleep(OC.DELAY)
         logger.warning(f'SSH on {vm_name} not ready within {timeout}s')
         return False
 

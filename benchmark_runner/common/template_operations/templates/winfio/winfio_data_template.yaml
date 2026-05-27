@@ -1,0 +1,38 @@
+metadata:
+  name: windows
+files:
+  - name: run_fio_benchmark.ps1
+    template: run_fio_benchmark_template.ps1
+  - name: parse_fio_results.ps1
+    template: parse_fio_results_template.ps1
+template_data:
+  shared:
+    pin_node: {{ pin_node1 }}
+    odf_pvc: {{ odf_pvc }}
+    uuid: {{ uuid }}
+    url: {{ windows_url }}
+    BLOCK_SIZES: 4k,8k
+    IO_OPERATION: read,write
+    IO_THREADS: 8,8
+    IO_DEPTH: 4,4
+    DURATION: 20
+    PAUSE: 15
+    SIZE: 1G
+  run_type:
+    perf_ci:
+      BLOCK_SIZES: 4k,8k,32k,1M
+      IO_OPERATION: read,write,randread,randwrite
+      IO_THREADS: 8,8,8,8
+      IO_DEPTH: 4,4,4,4
+      DURATION: 180
+      PAUSE: 15
+      SIZE: 4G
+      requests_memory: 4G
+      requests_cpu: 1
+      sockets: 2
+      storage: 76Gi
+    default:
+      requests_memory: 4G
+      requests_cpu: 1
+      sockets: 2
+      storage: 76Gi
