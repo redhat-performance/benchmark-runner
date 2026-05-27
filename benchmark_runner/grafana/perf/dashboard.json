@@ -4645,7 +4645,7 @@
                "pluginVersion": "v10.0.0",
                "targets": [
                   {
-                     "alias": "{{term block_size.keyword}} {{term io_operation.keyword}} : 1 {{term kind.keyword}}",
+                     "alias": "{{term vm_os_version.keyword}} : {{term block_size.keyword}} : {{term io_operation.keyword}} : 1 {{term kind.keyword}}",
                      "bucketAggs": [
                         {
                            "field": "block_size.keyword",
@@ -4681,6 +4681,17 @@
                            "type": "terms"
                         },
                         {
+                           "field": "vm_os_version.keyword",
+                           "id": "7",
+                           "settings": {
+                              "min_doc_count": "1",
+                              "order": "desc",
+                              "orderBy": "_term",
+                              "size": "10"
+                           },
+                           "type": "terms"
+                        },
+                        {
                            "field": "timestamp",
                            "id": "5",
                            "settings": {
@@ -4699,12 +4710,12 @@
                            "type": "avg"
                         }
                      ],
-                     "query": "!scale AND kind:$kind AND block_size:$fio_block_size AND io_operation:$fio_io_operation AND ocp_version:$ocp_version",
+                     "query": "!scale AND kind:$kind AND block_size:$fio_block_size AND io_operation:$fio_io_operation AND ocp_version:$ocp_version AND vm_os_version:$fio_vm_os_version",
                      "refId": "A",
                      "timeField": "timestamp"
                   },
                   {
-                     "alias": "{{term block_size.keyword}} {{term io_operation.keyword}} : {{term scale}} {{term kind.keyword}}s",
+                     "alias": "{{term vm_os_version.keyword}} : {{term block_size.keyword}} : {{term io_operation.keyword}} : {{term scale}} {{term kind.keyword}}s",
                      "bucketAggs": [
                         {
                            "field": "block_size.keyword",
@@ -4751,6 +4762,17 @@
                            "type": "terms"
                         },
                         {
+                           "field": "vm_os_version.keyword",
+                           "id": "7",
+                           "settings": {
+                              "min_doc_count": "1",
+                              "order": "desc",
+                              "orderBy": "_term",
+                              "size": "10"
+                           },
+                           "type": "terms"
+                        },
+                        {
                            "field": "timestamp",
                            "id": "5",
                            "settings": {
@@ -4770,7 +4792,7 @@
                            "type": "avg"
                         }
                      ],
-                     "query": "scale AND kind:$kind AND block_size:$fio_block_size AND io_operation:$fio_io_operation AND ocp_version:$ocp_version",
+                     "query": "scale AND kind:$kind AND block_size:$fio_block_size AND io_operation:$fio_io_operation AND ocp_version:$ocp_version AND vm_os_version:$fio_vm_os_version",
                      "refId": "B",
                      "timeField": "timestamp"
                   }
@@ -4844,7 +4866,7 @@
                "pluginVersion": "v10.0.0",
                "targets": [
                   {
-                     "alias": "{{term block_size.keyword}} {{term io_operation.keyword}} : 1 {{term kind.keyword}}",
+                     "alias": "{{term vm_os_version.keyword}} : {{term block_size.keyword}} : {{term io_operation.keyword}} : 1 {{term kind.keyword}}",
                      "bucketAggs": [
                         {
                            "field": "block_size.keyword",
@@ -4880,6 +4902,17 @@
                            "type": "terms"
                         },
                         {
+                           "field": "vm_os_version.keyword",
+                           "id": "7",
+                           "settings": {
+                              "min_doc_count": "1",
+                              "order": "desc",
+                              "orderBy": "_term",
+                              "size": "10"
+                           },
+                           "type": "terms"
+                        },
+                        {
                            "field": "timestamp",
                            "id": "5",
                            "settings": {
@@ -4898,12 +4931,12 @@
                            "type": "avg"
                         }
                      ],
-                     "query": "!scale AND kind:$kind AND block_size:$fio_block_size AND io_operation:$fio_io_operation AND ocp_version:$ocp_version",
+                     "query": "!scale AND kind:$kind AND block_size:$fio_block_size AND io_operation:$fio_io_operation AND ocp_version:$ocp_version AND vm_os_version:$fio_vm_os_version",
                      "refId": "A",
                      "timeField": "timestamp"
                   },
                   {
-                     "alias": "{{term block_size.keyword}} {{term io_operation.keyword}} : {{term scale}} {{term kind.keyword}}s",
+                     "alias": "{{term vm_os_version.keyword}} : {{term block_size.keyword}} : {{term io_operation.keyword}} : {{term scale}} {{term kind.keyword}}s",
                      "bucketAggs": [
                         {
                            "field": "block_size.keyword",
@@ -4950,6 +4983,17 @@
                            "type": "terms"
                         },
                         {
+                           "field": "vm_os_version.keyword",
+                           "id": "7",
+                           "settings": {
+                              "min_doc_count": "1",
+                              "order": "desc",
+                              "orderBy": "_term",
+                              "size": "10"
+                           },
+                           "type": "terms"
+                        },
+                        {
                            "field": "timestamp",
                            "id": "5",
                            "settings": {
@@ -4969,7 +5013,7 @@
                            "type": "avg"
                         }
                      ],
-                     "query": "scale AND kind:$kind AND block_size:$fio_block_size AND io_operation:$fio_io_operation AND ocp_version:$ocp_version",
+                     "query": "scale AND kind:$kind AND block_size:$fio_block_size AND io_operation:$fio_io_operation AND ocp_version:$ocp_version AND vm_os_version:$fio_vm_os_version",
                      "refId": "B",
                      "timeField": "timestamp"
                   }
@@ -7799,6 +7843,19 @@
             "refresh": 2,
             "regex": "",
             "sort": 6,
+            "type": "query"
+         },
+         {
+            "allValue": "",
+            "datasource": "Elasticsearch-fio-results",
+            "hide": 0,
+            "includeAll": true,
+            "multi": true,
+            "name": "fio_vm_os_version",
+            "query": "{\"find\":\"terms\",\"field\":\"vm_os_version.keyword\"}",
+            "refresh": 2,
+            "regex": "",
+            "sort": 1,
             "type": "query"
          }
       ]
