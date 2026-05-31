@@ -116,10 +116,11 @@ END
 
                     for (workload in workloads) {
                         boolean success = false
+                        def originalWorkload = workload
                         for (int i = 0; i < retryCount && !success; i++) {
                             try {
                                 // workload full name
-                                workload_name = workload
+                                workload_name = originalWorkload
                                 // Parse the workload name
                                 def parts = "${workload}".split("_")
                                 def WORKLOAD = parts[0] + "_" + parts[1]
