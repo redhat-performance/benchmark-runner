@@ -2836,7 +2836,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
               ])
 
-              + elasticsearch.withQuery('scale:(111 OR 120) AND ocp_version:$ocp_version')
+              + elasticsearch.withQuery('scale:111 AND ocp_version:$ocp_version')
               + elasticsearch.withRefId('B')
               + elasticsearch.withTimeField('timestamp'),
 
@@ -2871,7 +2871,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
               ])
 
-              + elasticsearch.withQuery('scale:(111 OR 120) AND ocp_version:$ocp_version')
+              + elasticsearch.withQuery('scale:111 AND ocp_version:$ocp_version')
               + elasticsearch.withRefId('C')
               + elasticsearch.withTimeField('timestamp'),
 
@@ -2907,7 +2907,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
               ])
 
-              + elasticsearch.withQuery('scale:(111 OR 120) AND ocp_version:$ocp_version')
+              + elasticsearch.withQuery('scale:111 AND ocp_version:$ocp_version')
               + elasticsearch.withRefId('C')
               + elasticsearch.withTimeField('timestamp'),
 
@@ -3013,7 +3013,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
               ])
 
-              + elasticsearch.withQuery('scale:(111 OR 120) AND ocp_version:$ocp_version')
+              + elasticsearch.withQuery('scale:111 AND ocp_version:$ocp_version')
               + elasticsearch.withRefId('A')
               + elasticsearch.withTimeField('timestamp')
 
@@ -3128,7 +3128,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
               ])
 
-              + elasticsearch.withQuery('scale:(111 OR 120) AND ocp_version:$ocp_version')
+              + elasticsearch.withQuery('scale:111 AND ocp_version:$ocp_version')
               + elasticsearch.withRefId('A')
               + elasticsearch.withTimeField('timestamp'),
 

@@ -147,9 +147,6 @@ END
                                             case "windows_vm_scale_windows11":
                                                 WINDOWS_URL = WINDOWS11_URL
                                                 break
-                                            case "windows_vm_scale_windows_server_2025":
-                                                WINDOWS_URL = WINDOWS_SERVER_2025_URL
-                                                break
                                             case "windows_vm_scale_windows_server_2022":
                                                 WINDOWS_URL = WINDOWS_SERVER_2022_URL
                                                 break
