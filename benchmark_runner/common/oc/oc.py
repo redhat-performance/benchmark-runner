@@ -91,7 +91,7 @@ class OC(SSH):
         """
         Returns the virtctl client version as a string.
         """
-        return self.run('virtctl version --client | grep "Client Version" | sed -E \'s/.*GitVersion:"([^"]+)".*/\\1/\'').strip()
+        return self.run('virtctl version 2>/dev/null | grep "Client Version" | sed -E \'s/.*GitVersion:"([^"]+)".*/\\1/\'').strip()
 
     def is_virtctl_ge(self, min_version="1.6.0"):
         """
