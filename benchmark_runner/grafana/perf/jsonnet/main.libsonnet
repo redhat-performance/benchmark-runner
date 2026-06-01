@@ -131,7 +131,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
   + g.dashboard.variable.query.withSort(6)
   + g.dashboard.variable.query.withRefresh(2),
 
-  g.dashboard.variable.query.new('fio_vm_os_version', '{\"find\":\"terms\",\"field\":\"vm_os_version.keyword\"}')
+  g.dashboard.variable.query.new('vm_os_version', '{\"find\":\"terms\",\"field\":\"vm_os_version.keyword\"}')
   + elasticsearch.withDatasource('Elasticsearch-fio-results')
   + g.query.azureMonitor.withHide(0)
   + g.dashboard.variable.query.selectionOptions.withIncludeAll(true, '')
@@ -2055,7 +2055,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
               ])
 
-              +elasticsearch.withQuery("!scale AND kind:$kind AND block_size:$fio_block_size AND io_operation:$fio_io_operation AND ocp_version:$ocp_version AND vm_os_version:$fio_vm_os_version")
+              +elasticsearch.withQuery("!scale AND kind:$kind AND block_size:$fio_block_size AND io_operation:$fio_io_operation AND ocp_version:$ocp_version AND vm_os_version:$vm_os_version")
               +elasticsearch.withRefId('A')
               +elasticsearch.withTimeField('timestamp'),
 
@@ -2122,7 +2122,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
               ])
 
-              +elasticsearch.withQuery("scale AND kind:$kind AND block_size:$fio_block_size AND io_operation:$fio_io_operation AND ocp_version:$ocp_version AND vm_os_version:$fio_vm_os_version")
+              +elasticsearch.withQuery("scale AND kind:$kind AND block_size:$fio_block_size AND io_operation:$fio_io_operation AND ocp_version:$ocp_version AND vm_os_version:$vm_os_version")
               +elasticsearch.withRefId('B')
               +elasticsearch.withTimeField('timestamp'),
 
@@ -2230,7 +2230,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
               ])
 
-              +elasticsearch.withQuery("!scale AND kind:$kind AND block_size:$fio_block_size AND io_operation:$fio_io_operation AND ocp_version:$ocp_version AND vm_os_version:$fio_vm_os_version")
+              +elasticsearch.withQuery("!scale AND kind:$kind AND block_size:$fio_block_size AND io_operation:$fio_io_operation AND ocp_version:$ocp_version AND vm_os_version:$vm_os_version")
               +elasticsearch.withRefId('A')
               +elasticsearch.withTimeField('timestamp'),
 
@@ -2297,7 +2297,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
               ])
 
-              +elasticsearch.withQuery("scale AND kind:$kind AND block_size:$fio_block_size AND io_operation:$fio_io_operation AND ocp_version:$ocp_version AND vm_os_version:$fio_vm_os_version")
+              +elasticsearch.withQuery("scale AND kind:$kind AND block_size:$fio_block_size AND io_operation:$fio_io_operation AND ocp_version:$ocp_version AND vm_os_version:$vm_os_version")
               +elasticsearch.withRefId('B')
               +elasticsearch.withTimeField('timestamp'),
 
@@ -2800,7 +2800,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
               ])
 
-              + elasticsearch.withQuery('scale:(111 OR 120) AND ocp_version:$ocp_version')
+              + elasticsearch.withQuery('scale:111 AND ocp_version:$ocp_version')
               + elasticsearch.withRefId('A')
               + elasticsearch.withTimeField('timestamp'),
 
