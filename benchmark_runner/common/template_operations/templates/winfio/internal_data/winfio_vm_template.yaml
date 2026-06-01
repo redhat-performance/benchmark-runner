@@ -61,6 +61,13 @@ spec:
             dedicatedIOThread: false
           - disk:
               bus: virtio
+            {% if scale -%}
+            name: winfio-{{ kind }}-data-disk-{{ trunc_uuid }}-{{ scale }}
+            {%- else -%}
+            name: winfio-{{ kind }}-data-disk-{{ trunc_uuid }}
+            {%- endif %}
+          - disk:
+              bus: virtio
             name: cloudinitdisk
           interfaces:
           - masquerade: {}
@@ -108,6 +115,17 @@ spec:
         {%- else -%}
         name: winfio-{{ kind }}-root-disk-{{ trunc_uuid }}
         {%- endif %}
+      - dataVolume:
+          {% if scale -%}
+          name: winfio-{{ kind }}-data-disk-{{ trunc_uuid }}-{{ scale }}
+          {%- else -%}
+          name: winfio-{{ kind }}-data-disk-{{ trunc_uuid }}
+          {%- endif %}
+        {% if scale -%}
+        name: winfio-{{ kind }}-data-disk-{{ trunc_uuid }}-{{ scale }}
+        {%- else -%}
+        name: winfio-{{ kind }}-data-disk-{{ trunc_uuid }}
+        {%- endif %}
       - cloudInitNoCloud:
           userData: |
             #cloud-config
@@ -138,3 +156,22 @@ spec:
         pvc:
           namespace: {{ namespace }}
           name: windows-clone-dv
+  - metadata:
+      annotations:
+        descheduler.alpha.kubernetes.io/evict: "true"
+      {% if scale -%}
+      name: winfio-{{ kind }}-data-disk-{{ trunc_uuid }}-{{ scale }}
+      {%- else -%}
+      name: winfio-{{ kind }}-data-disk-{{ trunc_uuid }}
+      {%- endif %}
+    spec:
+      pvc:
+        accessModes:
+        - ReadWriteMany
+        resources:
+          requests:
+            storage: {{ data_disk_storage }}
+        volumeMode: Block
+        storageClassName: ocs-storagecluster-ceph-rbd-virtualization
+      source:
+        blank: {}

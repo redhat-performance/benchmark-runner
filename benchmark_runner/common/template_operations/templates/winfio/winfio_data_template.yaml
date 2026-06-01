@@ -1,10 +1,12 @@
 metadata:
   name: windows
 files:
-  - name: run_fio_benchmark.ps1
-    template: run_fio_benchmark_template.ps1
-  - name: parse_fio_results.ps1
-    template: parse_fio_results_template.ps1
+  - name: 01_provision-data-disk.ps1
+    template: 01_provision-data-disk_template.ps1
+  - name: 02_run_fio_benchmark.ps1
+    template: 02_run_fio_benchmark_template.ps1
+  - name: 03_parse_fio_results.ps1
+    template: 03_parse_fio_results_template.ps1
 template_data:
   shared:
     pin_node: {{ pin_node1 }}
@@ -31,8 +33,10 @@ template_data:
       requests_cpu: 1
       sockets: 2
       storage: 76Gi
+      data_disk_storage: 64Gi
     default:
       requests_memory: 4G
       requests_cpu: 1
       sockets: 2
       storage: 76Gi
+      data_disk_storage: 64Gi

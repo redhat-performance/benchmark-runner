@@ -43,6 +43,9 @@ spec:
             dedicatedIOThread: false
           - disk:
               bus: virtio
+            name: winfio-vm-data-disk-deadbeef
+          - disk:
+              bus: virtio
             name: cloudinitdisk
           interfaces:
           - masquerade: {}
@@ -82,6 +85,9 @@ spec:
       - dataVolume:
           name: winfio-vm-root-disk-deadbeef
         name: winfio-vm-root-disk-deadbeef
+      - dataVolume:
+          name: winfio-vm-data-disk-deadbeef
+        name: winfio-vm-data-disk-deadbeef
       - cloudInitNoCloud:
           userData: |
             #cloud-config
@@ -108,3 +114,18 @@ spec:
         pvc:
           namespace: benchmark-runner
           name: windows-clone-dv
+  - metadata:
+      annotations:
+        descheduler.alpha.kubernetes.io/evict: "true"
+      name: winfio-vm-data-disk-deadbeef
+    spec:
+      pvc:
+        accessModes:
+        - ReadWriteMany
+        resources:
+          requests:
+            storage: 64Gi
+        volumeMode: Block
+        storageClassName: ocs-storagecluster-ceph-rbd-virtualization
+      source:
+        blank: {}
