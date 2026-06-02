@@ -90,17 +90,29 @@ class OC(SSH):
     def get_virtctl_version(self):
         """
         Returns the virtctl client version as a string.
+        Uses 2>/dev/null to suppress server-unreachable errors from leaking into the output.
         """
-        return self.run('virtctl version | grep "Client Version" | sed -E \'s/.*GitVersion:"([^"]+)".*/\\1/\'').strip()
+        return self.run('virtctl version 2>/dev/null | grep "Client Version" | sed -E \'s/.*GitVersion:"([^"]+)".*/\\1/\'').strip()
 
     def is_virtctl_ge(self, min_version="1.6.0"):
         """
         Returns True if virtctl client version >= min_version.
         Handles pre-release tags like v1.0.0-rc.0.
         [In virtctl v1.6.0, the SSH command syntax changed from `virtctl ssh user@vmname -n namespace` to `virtctl ssh user@vm/vmname/namespace`]
+        Cached after first successful parse to avoid repeated virtctl version calls.
         """
-        version = self.get_virtctl_version().lstrip("v").split("-")[0]
-        version_tuple = tuple(map(int, version.split(".")))
+        cache_attr = '_virtctl_ge_cache'
+        if hasattr(self, cache_attr):
+            cached = getattr(self, cache_attr)
+            min_version_tuple = tuple(map(int, min_version.split(".")))
+            return cached >= min_version_tuple
+        try:
+            version = self.get_virtctl_version().lstrip("v").split("-")[0]
+            version_tuple = tuple(map(int, version.split(".")))
+            setattr(self, cache_attr, version_tuple)
+        except (ValueError, AttributeError):
+            logger.warning(f'Could not parse virtctl version, defaulting to pre-1.6.0 syntax')
+            version_tuple = (0, 0, 0)
         min_version_tuple = tuple(map(int, min_version.split(".")))
         return version_tuple >= min_version_tuple
 
