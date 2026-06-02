@@ -4,7 +4,7 @@ param(
     [string]$DiskID
 )
 
-$setup = "c:\tools\setup"
+$setup = "c:\tools\fio"
 $diskExists = Get-Disk -Number $DiskID -ErrorAction SilentlyContinue
 $diskExists = ($null -ne $diskExists)
 

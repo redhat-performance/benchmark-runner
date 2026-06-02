@@ -18,16 +18,9 @@ $duration = "{{ DURATION }}"
 $size = "{{ SIZE }}"
 $pause = {{ PAUSE }}
 
-# Verify D: is writable before running FIO
-"test" | Set-Content -Path "D:\fio\write_test.txt" -ErrorAction SilentlyContinue
-if (Test-Path "D:\fio\write_test.txt") {
-    "D: write test PASSED" | Tee-Object -FilePath $logFile -Append
-} else {
-    "ERROR: D: write test FAILED - cannot write to D:\fio" | Tee-Object -FilePath $logFile -Append
-    exit 1
-}
-
-"FIO target: D:\fio\fio_testfile" | Tee-Object -FilePath $logFile -Append
+# Change working directory to D:\fio so FIO creates test files there
+Set-Location D:\fio
+"FIO working directory: $(Get-Location)" | Tee-Object -FilePath $logFile -Append
 "FIO benchmark started at $(Get-Date)" | Tee-Object -FilePath $logFile -Append
 
 foreach ($bs in $blockSizes) {
@@ -39,9 +32,9 @@ foreach ($bs in $blockSizes) {
 
         "Running FIO: bs=$bs rw=$op numjobs=$threads iodepth=$depth duration=${duration}s" | Tee-Object -FilePath $logFile -Append
 
-        & ".\fio.exe" `
+        & "C:\tools\fio\fio.exe" `
             "--name=${bs}_${op}" `
-            "--ioengine=sync" `
+            "--ioengine=windowsaio" `
             "--bs=$bs" `
             "--rw=$op" `
             "--numjobs=$threads" `
@@ -49,8 +42,9 @@ foreach ($bs in $blockSizes) {
             "--size=$size" `
             "--runtime=$duration" `
             "--time_based" `
+            "--direct=1" `
             "--thread" `
-            "--filename=D:\fio\fio_testfile" `
+            "--filename=fio_testfile" `
             "--group_reporting" `
             "--output-format=json" `
             "--output=$outputFile" 2>"C:\tools\fio\results\${bs}_${op}_error.log"
