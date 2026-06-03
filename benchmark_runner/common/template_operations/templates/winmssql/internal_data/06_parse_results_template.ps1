@@ -6,40 +6,39 @@ Write-Output "Parsing HammerDB results from $resultsPath"
 
 $results = @{}
 
-foreach ($jsonFile in (Get-ChildItem -Path $resultsPath -Filter "*.json" | Where-Object { $_.Name -match '_\d+vu_run\d+\.json$' })) {
-    Write-Output "Analyzing: $($jsonFile.FullName)"
+foreach ($outFile in (Get-ChildItem -Path $resultsPath -Filter "*.out" | Where-Object { $_.Name -match '_\d+vu_run\d+\.out$' })) {
+    Write-Output "Analyzing: $($outFile.FullName)"
 
-    if ($jsonFile.Name -match '_(\d+)vu_') {
+    if ($outFile.Name -match '_(\d+)vu_') {
         $workerCount = [int]$Matches[1]
     } else {
-        Write-Output "WARNING: Cannot extract worker ID from filename: $($jsonFile.Name)"
+        Write-Output "WARNING: Cannot extract worker count from filename: $($outFile.Name)"
         continue
     }
 
     try {
-        $text = [System.IO.File]::ReadAllText($jsonFile.FullName, [System.Text.Encoding]::Unicode)
-        $text = $text -replace "`r`n", "`n" -replace "`r", "`n"
+        $text = [System.IO.File]::ReadAllText($outFile.FullName, [System.Text.Encoding]::Unicode)
+        $tpmValues = [System.Collections.Generic.List[int]]::new()
+        foreach ($line in ($text -split "`r?`n")) {
+            if ($line -match '^(\d+)\s+MSSQLServer\s+tpm') {
+                $val = [int]$Matches[1]
+                if ($val -gt 0) { $tpmValues.Add($val) }
+            }
+        }
 
-        if ($text -match '(?s)\{"MSSQLServer tpm":\s*\{.*?\}\s*\}') {
-            $jsonBlock = $Matches[0]
-            $tpmData = $jsonBlock | ConvertFrom-Json
-            # Filter out 0 values (ramp-up period) before averaging
-            $tpmValues = $tpmData.'MSSQLServer tpm'.PSObject.Properties | ForEach-Object { [int]$_.Value } | Where-Object { $_ -gt 0 }
+        if ($tpmValues.Count -gt 0) {
             $avgTpm = [int](($tpmValues | Measure-Object -Average).Average)
-
             if ($results.ContainsKey($workerCount)) {
-                if ($avgTpm -gt $results[$workerCount]) {
-                    $results[$workerCount] = $avgTpm
-                }
+                if ($avgTpm -gt $results[$workerCount]) { $results[$workerCount] = $avgTpm }
             } else {
                 $results[$workerCount] = $avgTpm
             }
-            Write-Output "  Worker $workerCount : avg TPM = $avgTpm"
+            Write-Output "  Worker $workerCount : avg TPM = $avgTpm (from $($tpmValues.Count) samples)"
         } else {
-            Write-Output "WARNING: Could not find MSSQLServer tpm block in $($jsonFile.Name)"
+            Write-Output "WARNING: No TPM values found in $($outFile.Name)"
         }
     } catch {
-        Write-Output "ERROR: Skipping file $($jsonFile.Name) -> $_"
+        Write-Output "ERROR: Skipping file $($outFile.Name) -> $_"
     }
 }
 
