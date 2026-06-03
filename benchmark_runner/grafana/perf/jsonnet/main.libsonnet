@@ -2118,6 +2118,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
               + elasticsearch.withMetrics([
                 elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('total_iops')
                 + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Average.settings.withScript('_value*6')
                 + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg')
 
               ])
