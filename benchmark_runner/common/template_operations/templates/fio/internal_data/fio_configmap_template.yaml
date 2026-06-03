@@ -30,7 +30,7 @@ data:
             --runtime="${DURATION}" \
             --time_based \
             --direct="${DIRECT}" \
-            --directory=/workload \
+            --filename=/workload/fio_testfile \
             --group_reporting \
             --output-format=json \
             --output="${output_file}"

@@ -83,7 +83,7 @@ spec:
         - name: WORKLOAD_METHOD
           value: "/vdbench/vdbench_runner.sh"
         - name: TIMEOUT
-          value: "360090"
+          value: "3600"
       command: ["/bin/bash"]
       args: ["-c", "$WORKLOAD_METHOD"]
   restartPolicy: "Never"
