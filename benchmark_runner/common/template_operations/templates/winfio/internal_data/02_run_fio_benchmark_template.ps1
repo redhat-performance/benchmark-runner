@@ -44,7 +44,7 @@ foreach ($bs in $blockSizes) {
             "--time_based" `
             "--direct=1" `
             "--thread" `
-            "--filename=fio_testfile" `
+            "--directory=D:\fio" `
             "--group_reporting" `
             "--output-format=json" `
             "--output=$outputFile" 2>"C:\tools\fio\results\${bs}_${op}_error.log"
