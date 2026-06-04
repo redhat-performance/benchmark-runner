@@ -2366,6 +2366,10 @@
                            "index": 580,
                            "text": "4.22.0-190"
                         },
+                        "4220193": {
+                           "index": 581,
+                           "text": "4.22.0-193"
+                        },
                         "422021": {
                            "index": 545,
                            "text": "4.22.0-21"
@@ -4730,7 +4734,7 @@
                            "type": "avg"
                         }
                      ],
-                     "query": "!scale AND kind:$kind AND block_size:$fio_block_size AND io_operation:$fio_io_operation AND ocp_version:$ocp_version AND vm_os_version:$fio_vm_os_version",
+                     "query": "!scale AND kind:$kind AND block_size:$fio_block_size AND io_operation:$fio_io_operation AND ocp_version:$ocp_version AND vm_os_version:$vm_os_version",
                      "refId": "A",
                      "timeField": "timestamp"
                   },
@@ -4812,7 +4816,7 @@
                            "type": "avg"
                         }
                      ],
-                     "query": "scale AND kind:$kind AND block_size:$fio_block_size AND io_operation:$fio_io_operation AND ocp_version:$ocp_version AND vm_os_version:$fio_vm_os_version",
+                     "query": "scale AND kind:$kind AND block_size:$fio_block_size AND io_operation:$fio_io_operation AND ocp_version:$ocp_version AND vm_os_version:$vm_os_version",
                      "refId": "B",
                      "timeField": "timestamp"
                   }
@@ -4951,7 +4955,7 @@
                            "type": "avg"
                         }
                      ],
-                     "query": "!scale AND kind:$kind AND block_size:$fio_block_size AND io_operation:$fio_io_operation AND ocp_version:$ocp_version AND vm_os_version:$fio_vm_os_version",
+                     "query": "!scale AND kind:$kind AND block_size:$fio_block_size AND io_operation:$fio_io_operation AND ocp_version:$ocp_version AND vm_os_version:$vm_os_version",
                      "refId": "A",
                      "timeField": "timestamp"
                   },
@@ -5033,7 +5037,7 @@
                            "type": "avg"
                         }
                      ],
-                     "query": "scale AND kind:$kind AND block_size:$fio_block_size AND io_operation:$fio_io_operation AND ocp_version:$ocp_version AND vm_os_version:$fio_vm_os_version",
+                     "query": "scale AND kind:$kind AND block_size:$fio_block_size AND io_operation:$fio_io_operation AND ocp_version:$ocp_version AND vm_os_version:$vm_os_version",
                      "refId": "B",
                      "timeField": "timestamp"
                   }
@@ -5607,7 +5611,7 @@
                            "type": "min"
                         }
                      ],
-                     "query": "scale:(111 OR 120) AND ocp_version:$ocp_version",
+                     "query": "scale:111 AND ocp_version:$ocp_version",
                      "refId": "A",
                      "timeField": "timestamp"
                   },
@@ -5649,7 +5653,7 @@
                            "type": "percentiles"
                         }
                      ],
-                     "query": "scale:(111 OR 120) AND ocp_version:$ocp_version",
+                     "query": "scale:111 AND ocp_version:$ocp_version",
                      "refId": "B",
                      "timeField": "timestamp"
                   },
@@ -5687,7 +5691,7 @@
                            "type": "max"
                         }
                      ],
-                     "query": "scale:(111 OR 120) AND ocp_version:$ocp_version",
+                     "query": "scale:111 AND ocp_version:$ocp_version",
                      "refId": "C",
                      "timeField": "timestamp"
                   },
@@ -5725,7 +5729,7 @@
                            "type": "max"
                         }
                      ],
-                     "query": "scale:(111 OR 120) AND ocp_version:$ocp_version",
+                     "query": "scale:111 AND ocp_version:$ocp_version",
                      "refId": "C",
                      "timeField": "timestamp"
                   }
@@ -5847,7 +5851,7 @@
                            "type": "count"
                         }
                      ],
-                     "query": "scale:(111 OR 120) AND ocp_version:$ocp_version",
+                     "query": "scale:111 AND ocp_version:$ocp_version",
                      "refId": "A",
                      "timeField": "timestamp"
                   }
@@ -5981,7 +5985,7 @@
                            "type": "max"
                         }
                      ],
-                     "query": "scale:(111 OR 120) AND ocp_version:$ocp_version",
+                     "query": "scale:111 AND ocp_version:$ocp_version",
                      "refId": "A",
                      "timeField": "timestamp"
                   }
@@ -7871,7 +7875,7 @@
             "hide": 0,
             "includeAll": true,
             "multi": true,
-            "name": "fio_vm_os_version",
+            "name": "vm_os_version",
             "query": "{\"find\":\"terms\",\"field\":\"vm_os_version.keyword\"}",
             "refresh": 2,
             "regex": "",
