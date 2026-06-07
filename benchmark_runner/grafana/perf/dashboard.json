@@ -4825,6 +4825,9 @@
                         {
                            "field": "total_iops",
                            "id": "1",
+                           "settings": {
+                              "script": "_value*6"
+                           },
                            "type": "avg"
                         }
                      ],
