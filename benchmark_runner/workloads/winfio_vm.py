@@ -72,11 +72,15 @@ class WinfioVM(BootstormVM):
                 logger.warning(f'SSH never became ready on VM {vm_name}, skipping')
                 return
 
-            scripts = ['run_fio_benchmark.ps1', 'parse_fio_results.ps1']
+            scripts = ['01_provision-data-disk.ps1', '02_run_fio_benchmark.ps1', '03_parse_fio_results.ps1']
             for script in scripts:
                 self._scp_to_vm_with_verify(vm_name=vm_name,
                                             local_path=os.path.join(self._run_artifacts_path, script),
                                             remote_path=f'{self.__remote_dir}/{script}')
+            logger.info(f'Running 01_provision-data-disk.ps1 on VM {vm_name} ...')
+            self._virtctl.virtctl_ssh(vm_name=vm_name,
+                                     command=f'powershell -NoProfile -ExecutionPolicy Bypass -File {self.__remote_dir}/01_provision-data-disk.ps1 -DiskID 1',
+                                     namespace=self.__namespace, key_path=self.__ssh_key_path, username=self.__username)
         except Exception as err:
             logger.warning(f'Failed to prepare VM {self._get_vm_name(vm_num)}: {err}')
 
@@ -84,9 +88,9 @@ class WinfioVM(BootstormVM):
     def _run_fio(self, vm_num: str):
         try:
             vm_name = self._get_vm_name(vm_num)
-            logger.info(f'Running run_fio_benchmark.ps1 on VM {vm_name} ...')
+            logger.info(f'Running 02_run_fio_benchmark.ps1 on VM {vm_name} ...')
             self._virtctl.virtctl_ssh(vm_name=vm_name,
-                                     command=f'powershell -NoProfile -ExecutionPolicy Bypass -File {self.__remote_dir}/run_fio_benchmark.ps1',
+                                     command=f'powershell -NoProfile -ExecutionPolicy Bypass -File {self.__remote_dir}/02_run_fio_benchmark.ps1',
                                      namespace=self.__namespace, key_path=self.__ssh_key_path, username=self.__username,
                                      timeout=self._timeout)
         except Exception as err:
