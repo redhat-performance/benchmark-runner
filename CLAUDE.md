@@ -23,12 +23,31 @@ make golden_files
 # Run both
 make all
 
+# Run all unit tests (required before pushing any commit)
+PYTHONPATH=. python3 -m pytest -v tests/unittest/
+
 # Run specific test
 PYTHONPATH=. python3 -m pytest -v tests/unittest/benchmark_runner/common/template_operations/test_golden_files.py
 
 # Run the benchmark workload
 python -m benchmark_runner.main.main
 ```
+
+## Before Every Push
+
+Always run these two steps before pushing any commit:
+
+1. **Rebase onto main** to stay up to date and avoid conflicts:
+   ```bash
+   git fetch origin main && git rebase origin/main
+   ```
+
+2. **Run all unit tests** to ensure nothing is broken:
+   ```bash
+   PYTHONPATH=. python3 -m pytest -v tests/unittest/
+   ```
+
+All unit tests must pass before pushing.
 
 Pre-commit hooks run automatically on commit (rh-pre-commit, YAML/JSON validation, trailing whitespace, private key detection).
 
