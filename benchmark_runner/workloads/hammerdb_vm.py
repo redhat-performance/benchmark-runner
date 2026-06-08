@@ -91,7 +91,9 @@ class HammerdbVm(WorkloadsOperations):
         for vm_num in range(vm_count):
             local_json_path = os.path.join(self._run_artifacts_path, f'hammerdb-results_{vm_num}.json')
             hammerdb_results_dict = self._parse_hammerdb_results_vm(local_json_path)
-            if hammerdb_results_dict and self._es_host:
+            if not hammerdb_results_dict:
+                logger.warning(f'HammerDB results could not be parsed from {local_json_path}')
+            elif self._es_host:
                 vm_name = self._get_vm_name(str(vm_num))
                 vm_node = self._oc.get_vm_node(vm_name=vm_name)
                 thread_results = self._hammerdb_thread_results(hammerdb_results_dict)
@@ -114,7 +116,7 @@ class HammerdbVm(WorkloadsOperations):
                         uuid=self._uuid,
                     )
             else:
-                logger.warning(f'HammerDB results could not be parsed from {local_json_path}')
+                logger.info(f'HammerDB results parsed from {local_json_path} (ES upload skipped: no host configured)')
 
     def _save_error_logs(self):
         """Save logs and upload failure status to Elasticsearch on error."""

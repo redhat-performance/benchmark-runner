@@ -37,9 +37,10 @@ class WinMSSQLVM(BootstormVM):
 
     def _get_vm_yaml(self, vm_num: str) -> str:
         """Return the yaml file path for the given vm_num."""
+        base_name = self._name.removesuffix('_scale')
         if self._scale:
-            return os.path.join(self._run_artifacts_path, f'{self._name}_{vm_num}.yaml')
-        return os.path.join(self._run_artifacts_path, f'{self._name}.yaml')
+            return os.path.join(self._run_artifacts_path, f'{base_name}_{vm_num}.yaml')
+        return os.path.join(self._run_artifacts_path, f'{base_name}.yaml')
 
     SCP_RETRIES = 3
 
@@ -188,7 +189,9 @@ class WinMSSQLVM(BootstormVM):
             local_result_json = os.path.join(self._run_artifacts_path, f'hammerdb_result_{vm_num}.json')
 
             hammerdb_results_dict = self._parse_hammerdb_results_vm(local_result_json)
-            if hammerdb_results_dict and self._es_host:
+            if not hammerdb_results_dict:
+                logger.warning(f'HammerDB results could not be parsed from {local_result_json}')
+            elif self._es_host:
                 for entry in hammerdb_results_dict:
                     thread_result = {
                         'vm_name': vm_name,
@@ -212,7 +215,7 @@ class WinMSSQLVM(BootstormVM):
                         uuid=self._uuid,
                     )
             else:
-                logger.warning(f'HammerDB results could not be parsed from {local_result_json}')
+                logger.info(f'HammerDB results parsed from {local_result_json} (ES upload skipped: no host configured)')
 
     def _delete_vm(self, vm_num: str):
         """Phase 5: Delete VM."""
