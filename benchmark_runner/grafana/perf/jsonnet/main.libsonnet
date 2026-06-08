@@ -745,11 +745,19 @@ g.dashboard.new('PerfCI-Regression-Summary')
             + stateTimeline.withPluginVersion()
 
             + g.panel.stateTimeline.withTargets([
-              elasticsearch.withAlias('{{term vm_os_version.keyword}} : {{term vm_name_num.keyword}} : {{term db_type.keyword}}')
+              elasticsearch.withAlias('{{term vm_os_version.keyword}} : {{term vm_name_num.keyword}} : {{term node.keyword}} : {{term db_type.keyword}}')
 
               + elasticsearch.withBucketAggs([
                 elasticsearch.bucketAggs.Terms.withField('vm_name_num.keyword')
                 + elasticsearch.bucketAggs.Terms.withId('3')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+                + elasticsearch.bucketAggs.Terms.settings.withOrder('asc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
+                + elasticsearch.bucketAggs.Terms.settings.withSize('50')
+                + elasticsearch.bucketAggs.Terms.withType('terms'),
+
+                elasticsearch.bucketAggs.Terms.withField('node.keyword')
+                + elasticsearch.bucketAggs.Terms.withId('6')
                 + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
                 + elasticsearch.bucketAggs.Terms.settings.withOrder('asc')
                 + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')

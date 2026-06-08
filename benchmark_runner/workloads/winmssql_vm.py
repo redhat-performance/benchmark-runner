@@ -28,6 +28,7 @@ class WinMSSQLVM(BootstormVM):
         self.__username = self._environment_variables_dict.get('vm_user') or 'Administrator'
         self.__ssh_key_path = self._ssh_key_path
         self.__remote_dir = 'C:/tools/hammerdb-4.12'
+        self._vm_nodes = {}
 
     def _get_vm_name(self, vm_num: str) -> str:
         """Return the VM name for the given vm_num, handling both scale and non-scale."""
@@ -185,7 +186,7 @@ class WinMSSQLVM(BootstormVM):
 
         for vm_num in range(vm_count):
             vm_name = self._get_vm_name(str(vm_num))
-            vm_node = self._oc.get_vm_node(vm_name=vm_name)
+            vm_node = self._vm_nodes.get(vm_num)
             local_result_json = os.path.join(self._run_artifacts_path, f'hammerdb_result_{vm_num}.json')
 
             hammerdb_results_dict = self._parse_hammerdb_results_vm(local_result_json)
@@ -267,10 +268,13 @@ class WinMSSQLVM(BootstormVM):
             bulks = tuple(self.split_run_bulks(iterable=range(vm_count), limit=threads_limit))
 
             # Run all phases in child processes (no ES/Prometheus — avoids SSL issues)
-            steps = [self._create_vm, self._prepare_vm, self._run_hammerdb, self._collect_results]
+            self._run_parallel_phases([self._create_vm, self._prepare_vm, self._run_hammerdb, self._collect_results], bulks, bulk_sleep)
+
+            for vm_num in range(vm_count):
+                self._vm_nodes[vm_num] = self._oc.get_vm_node(vm_name=self._get_vm_name(str(vm_num)))
+
             if self._delete_all:
-                steps.append(self._delete_vm)
-            self._run_parallel_phases(steps, bulks, bulk_sleep)
+                self._run_parallel_phases([self._delete_vm], bulks, bulk_sleep)
 
             # Prometheus + ES upload from main process (same as _finalize_vm pattern)
             self._upload_results(vm_count)

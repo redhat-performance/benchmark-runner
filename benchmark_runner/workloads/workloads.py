@@ -31,7 +31,7 @@ class Workloads(WorkloadsOperations):
             parts = workload.split('_')
             if len(parts) >= 3:
                 module_workload = '_'.join(parts[:2])
-        elif workload.endswith('_ephemeral') or workload.endswith('_lso'):
+        elif workload.endswith('_ephemeral') or workload.endswith('_lso') or workload.endswith('_scale'):
             module_workload = '_'.join(workload.split('_')[:-1])
         # load the workload module before doing anything else (in case it fails)
         workload_module = importlib.import_module(f'benchmark_runner.workloads.{module_workload}')

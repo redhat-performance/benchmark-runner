@@ -405,7 +405,7 @@ class BootstormVM(WorkloadsOperations):
         if self._enable_prometheus_snapshot:
             self._prometheus_metrics_operation.init_prometheus()
         self._name = self._workload
-        self._workload_name = self._workload.replace('_', '-')
+        self._workload_name = self._workload.removesuffix('_scale').replace('_', '-')
         self._vm_name = f'{self._workload_name}-{self._trunc_uuid}'
         self._kind = 'vm'
         self._environment_variables_dict['kind'] = 'vm'
