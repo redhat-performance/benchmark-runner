@@ -688,12 +688,116 @@ g.dashboard.new('PerfCI-Regression-Summary')
 
 
 
-        //////////////////////////////////////////
+      g.panel.row.new("Hammerdb Scale")
+        + g.panel.row.withCollapsed(value=true)
 
+        + g.panel.row.gridPos.withH(1)
+        + g.panel.row.gridPos.withW(24)
+        + g.panel.row.gridPos.withX(0)
+        + g.panel.row.gridPos.withY(12)
 
+        + g.panel.row.withId(300)
+        + g.panel.row.withPanels([
 
+          g.panel.stateTimeline.new('HammerDB KTPM (Scale)')
+            + stateTimeline.queryOptions.withDatasource('Elasticsearch-hammerdb-results')
+            + stateTimeline.withDescription("HammerDB Scale: KTPM per VM\nLinux: hammerdb_vm_mssql_scale\nWindows: winmssql_vm_scale")
+            + stateTimeline.standardOptions.color.withMode('thresholds')
+            + stateTimeline.fieldConfig.defaults.custom.withFillOpacity(70)
+            + stateTimeline.fieldConfig.defaults.custom.withLineWidth(0)
 
+            + stateTimeline.fieldConfig.defaults.withMappings([])
+            + stateTimeline.standardOptions.withMin(0)
+            + stateTimeline.fieldConfig.defaults.thresholds.withMode('percentage')
+            + stateTimeline.fieldConfig.defaults.thresholds.withSteps([
+              stateTimeline.thresholdStep.withColor('dark-red'),
 
+              stateTimeline.thresholdStep.withColor('semi-dark-orange')
+              + stateTimeline.thresholdStep.withValue(50),
+
+              stateTimeline.thresholdStep.withColor('super-light-green')
+              + stateTimeline.thresholdStep.withValue(80),
+
+              stateTimeline.thresholdStep.withColor('dark-green')
+              + stateTimeline.thresholdStep.withValue(90),
+
+              stateTimeline.thresholdStep.withColor('dark-blue')
+              + stateTimeline.thresholdStep.withValue(100)
+            ])
+            + stateTimeline.fieldConfig.withOverrides([])
+
+            + stateTimeline.gridPos.withH(38)
+            + stateTimeline.gridPos.withW(24)
+            + stateTimeline.gridPos.withX(0)
+            + stateTimeline.gridPos.withY(13)
+
+            + stateTimeline.withId(301)
+            + stateTimeline.withInterval('1d')
+
+            + stateTimeline.options.withAlignValue('center')
+            + stateTimeline.options.legend.withDisplayMode('list')
+            + stateTimeline.options.legend.withPlacement('bottom')
+            + stateTimeline.options.withMergeValues(value = false)
+            + stateTimeline.options.withRowHeight(value = 0.9)
+            + stateTimeline.options.withShowValue('always')
+            + stateTimeline.options.tooltip.withMode('single')
+
+            + stateTimeline.withPluginVersion()
+
+            + g.panel.stateTimeline.withTargets([
+              elasticsearch.withAlias('{{term vm_os_version.keyword}} : {{term vm_name_num.keyword}} : {{term node.keyword}} : {{term db_type.keyword}}')
+
+              + elasticsearch.withBucketAggs([
+                elasticsearch.bucketAggs.Terms.withField('vm_name_num.keyword')
+                + elasticsearch.bucketAggs.Terms.withId('3')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+                + elasticsearch.bucketAggs.Terms.settings.withOrder('asc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
+                + elasticsearch.bucketAggs.Terms.settings.withSize('50')
+                + elasticsearch.bucketAggs.Terms.withType('terms'),
+
+                elasticsearch.bucketAggs.Terms.withField('node.keyword')
+                + elasticsearch.bucketAggs.Terms.withId('6')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+                + elasticsearch.bucketAggs.Terms.settings.withOrder('asc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
+                + elasticsearch.bucketAggs.Terms.settings.withSize('50')
+                + elasticsearch.bucketAggs.Terms.withType('terms'),
+
+                elasticsearch.bucketAggs.Terms.withField('db_type.keyword')
+                + elasticsearch.bucketAggs.Terms.withId('4')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+                + elasticsearch.bucketAggs.Terms.settings.withOrder('asc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
+                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
+                + elasticsearch.bucketAggs.Terms.withType('terms'),
+
+                elasticsearch.bucketAggs.Terms.withField('vm_os_version.keyword')
+                + elasticsearch.bucketAggs.Terms.withId('5')
+                + elasticsearch.bucketAggs.Terms.settings.withMinDocCount('1')
+                + elasticsearch.bucketAggs.Terms.settings.withOrder('desc')
+                + elasticsearch.bucketAggs.Terms.settings.withOrderBy('_term')
+                + elasticsearch.bucketAggs.Terms.settings.withSize('10')
+                + elasticsearch.bucketAggs.Terms.withType('terms'),
+
+                elasticsearch.bucketAggs.DateHistogram.withField('timestamp')
+                + elasticsearch.bucketAggs.DateHistogram.withId('2')
+                + elasticsearch.bucketAggs.DateHistogram.settings.withInterval('auto')
+                + elasticsearch.bucketAggs.DateHistogram.withType('date_histogram')
+              ])
+
+              + elasticsearch.withMetrics([
+                elasticsearch.metrics.MetricAggregationWithSettings.Average.withField('tpm')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Average.withId('1')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Average.settings.withScript('_value/1000')
+                + elasticsearch.metrics.MetricAggregationWithSettings.Average.withType('avg')
+              ])
+              + elasticsearch.withQuery('_exists_:scale AND _exists_:vm_name_num AND _exists_:tpm AND ocp_version:$ocp_version AND vm_os_version:$vm_os_version')
+              + elasticsearch.withRefId('A')
+              + elasticsearch.withTimeField('timestamp')
+            ])
+
+        ]),
 
 
       g.panel.row.new("Uperf")

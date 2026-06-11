@@ -44,6 +44,7 @@ pipeline {
         VDBENCH_SCALE = 2
         FIO_SCALE = 2
         WINFIO_SCALE = 2
+        HAMMERDB_SCALE = 2
         BOOTSTORM_SCALE = 80
         WINDOWS_SCALE = 37
         THREADS_LIMIT= 20
@@ -107,7 +108,7 @@ END
         stage('WORKLOADS Deployment') {
             steps {
                 script {
-                    def workloads =  ['sysbench_pod', 'sysbench_vm', 'uperf_pod', 'uperf_vm', 'hammerdb_pod_mariadb', 'hammerdb_vm_mariadb','hammerdb_pod_mariadb_lso', 'hammerdb_vm_mariadb_lso', 'hammerdb_pod_postgres', 'hammerdb_vm_postgres', 'hammerdb_pod_postgres_lso', 'hammerdb_vm_postgres_lso', 'hammerdb_pod_mssql', 'hammerdb_vm_mssql', 'hammerdb_pod_mssql_lso', 'hammerdb_vm_mssql_lso', 'winmssql_vm', 'winfio_vm', 'winfio_vm_scale', 'vdbench_pod', 'vdbench_vm', 'vdbench_pod_scale', 'vdbench_vm_scale', 'fio_pod', 'fio_vm', 'fio_pod_scale', 'fio_vm_scale', 'bootstorm_vm_scale', 'windows_vm_scale_windows11', 'windows_vm_scale_windows_server_2022' ]
+                    def workloads =  ['sysbench_pod', 'sysbench_vm', 'uperf_pod', 'uperf_vm', 'hammerdb_pod_mariadb', 'hammerdb_vm_mariadb','hammerdb_pod_mariadb_lso', 'hammerdb_vm_mariadb_lso', 'hammerdb_pod_postgres', 'hammerdb_vm_postgres', 'hammerdb_pod_postgres_lso', 'hammerdb_vm_postgres_lso', 'hammerdb_pod_mssql', 'hammerdb_vm_mssql', 'hammerdb_pod_mssql_lso', 'hammerdb_vm_mssql_lso', 'hammerdb_vm_mssql_scale', 'winmssql_vm', 'winmssql_vm_scale', 'winfio_vm', 'winfio_vm_scale', 'vdbench_pod', 'vdbench_vm', 'vdbench_pod_scale', 'vdbench_vm_scale', 'fio_pod', 'fio_vm', 'fio_pod_scale', 'fio_vm_scale', 'bootstorm_vm_scale', 'windows_vm_scale_windows11', 'windows_vm_scale_windows_server_2022' ]
                     def build_version = sh(script: 'curl -s "https://pypi.org/pypi/benchmark-runner/json" | jq -r .info.version', returnStdout: true).trim()
                     def WINDOWS_URL = ''
                     def SCALE = ''
@@ -134,6 +135,10 @@ END
                                     }
                                     if (workload == "winfio_vm_scale") {
                                         SCALE = WINFIO_SCALE
+                                        WINDOWS_URL = WINDOWS_SERVER_MSSQL_2025_URL
+                                    }
+                                    if (workload == "winmssql_vm_scale") {
+                                        SCALE = HAMMERDB_SCALE
                                         WINDOWS_URL = WINDOWS_SERVER_MSSQL_2025_URL
                                     }
                                     // bootstorm_vm_scale: no need redis for synchronization but need SCALE and THREADS_LIMIT
@@ -163,6 +168,11 @@ END
                                   workload = WORKLOAD
                                 } else {
                                     SCALE = ""
+                                    // HammerDB VM scale: _scale is at parts[3] (parts[2] is the db type)
+                                    if (workload.startsWith("hammerdb_vm_") && workload.endsWith("_scale")) {
+                                        SCALE = HAMMERDB_SCALE
+                                        workload = workload.replace("_scale", "")
+                                    }
                                     if (workload == "winmssql_vm") {
                                         WINDOWS_URL = WINDOWS_SERVER_MSSQL_2025_URL
                                     }

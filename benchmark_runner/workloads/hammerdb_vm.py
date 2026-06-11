@@ -26,6 +26,7 @@ class HammerdbVm(WorkloadsOperations):
         self._namespace = self._environment_variables_dict.get('namespace', 'benchmark-runner')
         self._username = self._environment_variables_dict.get('vm_user') or 'cloud-user'
         self._ssh_key_path = ''
+        self._vm_nodes = {}
 
     def _get_vm_name(self, vm_num: str) -> str:
         if self._scale:
@@ -91,9 +92,11 @@ class HammerdbVm(WorkloadsOperations):
         for vm_num in range(vm_count):
             local_json_path = os.path.join(self._run_artifacts_path, f'hammerdb-results_{vm_num}.json')
             hammerdb_results_dict = self._parse_hammerdb_results_vm(local_json_path)
-            if hammerdb_results_dict and self._es_host:
+            if not hammerdb_results_dict:
+                logger.warning(f'HammerDB results could not be parsed from {local_json_path}')
+            elif self._es_host:
                 vm_name = self._get_vm_name(str(vm_num))
-                vm_node = self._oc.get_vm_node(vm_name=vm_name)
+                vm_node = self._vm_nodes.get(vm_num)
                 thread_results = self._hammerdb_thread_results(hammerdb_results_dict)
                 for thread_result in thread_results:
                     thread_result.update({
@@ -114,7 +117,7 @@ class HammerdbVm(WorkloadsOperations):
                         uuid=self._uuid,
                     )
             else:
-                logger.warning(f'HammerDB results could not be parsed from {local_json_path}')
+                logger.info(f'HammerDB results parsed from {local_json_path} (ES upload skipped: no host configured)')
 
     def _save_error_logs(self):
         """Save logs and upload failure status to Elasticsearch on error."""
@@ -176,10 +179,13 @@ class HammerdbVm(WorkloadsOperations):
 
             bulks = tuple(self.split_run_bulks(iterable=range(vm_count), limit=threads_limit))
 
-            steps = [self._create_vm, self._wait_and_collect]
+            self._run_parallel_phases([self._create_vm, self._wait_and_collect], bulks, bulk_sleep)
+
+            for vm_num in range(vm_count):
+                self._vm_nodes[vm_num] = self._oc.get_vm_node(vm_name=self._get_vm_name(str(vm_num)))
+
             if self._delete_all:
-                steps.append(self._delete_vm)
-            self._run_parallel_phases(steps, bulks, bulk_sleep)
+                self._run_parallel_phases([self._delete_vm], bulks, bulk_sleep)
 
             self._upload_results(vm_count)
 
