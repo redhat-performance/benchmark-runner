@@ -2282,6 +2282,10 @@
                            "index": 560,
                            "text": "4.21.6-3"
                         },
+                        "4220": {
+                           "index": 585,
+                           "text": "4.22.0"
+                        },
                         "422002": {
                            "index": 541,
                            "text": "4.22.0-ec.2"
@@ -2381,6 +2385,10 @@
                         "4220196": {
                            "index": 582,
                            "text": "4.22.0-196"
+                        },
+                        "4220209": {
+                           "index": 586,
+                           "text": "4.22.0-209"
                         },
                         "422021": {
                            "index": 545,
@@ -2973,9 +2981,161 @@
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 13
+            "y": 12
          },
          "id": 7,
+         "panels": [
+            {
+               "datasource": "Elasticsearch-hammerdb-results",
+               "description": "HammerDB Scale: KTPM per VM\nLinux: hammerdb_vm_mssql_scale\nWindows: winmssql_vm_scale",
+               "fieldConfig": {
+                  "defaults": {
+                     "color": {
+                        "mode": "thresholds"
+                     },
+                     "custom": {
+                        "fillOpacity": 70,
+                        "lineWidth": 0
+                     },
+                     "mappings": [ ],
+                     "min": 0,
+                     "thresholds": {
+                        "mode": "percentage",
+                        "steps": [
+                           {
+                              "color": "dark-red"
+                           },
+                           {
+                              "color": "semi-dark-orange",
+                              "value": 50
+                           },
+                           {
+                              "color": "super-light-green",
+                              "value": 80
+                           },
+                           {
+                              "color": "dark-green",
+                              "value": 90
+                           },
+                           {
+                              "color": "dark-blue",
+                              "value": 100
+                           }
+                        ]
+                     }
+                  },
+                  "overrides": [ ]
+               },
+               "gridPos": {
+                  "h": 38,
+                  "w": 24,
+                  "x": 0,
+                  "y": 13
+               },
+               "id": 8,
+               "interval": "1d",
+               "options": {
+                  "alignValue": "center",
+                  "legend": {
+                     "displayMode": "list",
+                     "placement": "bottom"
+                  },
+                  "mergeValues": false,
+                  "rowHeight": 0.90000000000000002,
+                  "showValue": "always",
+                  "tooltip": {
+                     "mode": "single"
+                  }
+               },
+               "pluginVersion": "v10.0.0",
+               "targets": [
+                  {
+                     "alias": "{{term vm_os_version.keyword}} : {{term vm_name_num.keyword}} : {{term node.keyword}} : {{term db_type.keyword}}",
+                     "bucketAggs": [
+                        {
+                           "field": "vm_name_num.keyword",
+                           "id": "3",
+                           "settings": {
+                              "min_doc_count": "1",
+                              "order": "asc",
+                              "orderBy": "_term",
+                              "size": "50"
+                           },
+                           "type": "terms"
+                        },
+                        {
+                           "field": "node.keyword",
+                           "id": "6",
+                           "settings": {
+                              "min_doc_count": "1",
+                              "order": "asc",
+                              "orderBy": "_term",
+                              "size": "50"
+                           },
+                           "type": "terms"
+                        },
+                        {
+                           "field": "db_type.keyword",
+                           "id": "4",
+                           "settings": {
+                              "min_doc_count": "1",
+                              "order": "asc",
+                              "orderBy": "_term",
+                              "size": "10"
+                           },
+                           "type": "terms"
+                        },
+                        {
+                           "field": "vm_os_version.keyword",
+                           "id": "5",
+                           "settings": {
+                              "min_doc_count": "1",
+                              "order": "desc",
+                              "orderBy": "_term",
+                              "size": "10"
+                           },
+                           "type": "terms"
+                        },
+                        {
+                           "field": "timestamp",
+                           "id": "2",
+                           "settings": {
+                              "interval": "auto"
+                           },
+                           "type": "date_histogram"
+                        }
+                     ],
+                     "metrics": [
+                        {
+                           "field": "tpm",
+                           "id": "1",
+                           "settings": {
+                              "script": "_value/1000"
+                           },
+                           "type": "avg"
+                        }
+                     ],
+                     "query": "_exists_:scale AND _exists_:vm_name_num AND _exists_:tpm AND ocp_version:$ocp_version AND vm_os_version:$vm_os_version",
+                     "refId": "A",
+                     "timeField": "timestamp"
+                  }
+               ],
+               "title": "HammerDB KTPM (Scale)",
+               "type": "state-timeline"
+            }
+         ],
+         "title": "Hammerdb Scale",
+         "type": "row"
+      },
+      {
+         "collapsed": true,
+         "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 13
+         },
+         "id": 9,
          "panels": [
             {
                "datasource": "Elasticsearch-uperf-results",
@@ -3025,7 +3185,7 @@
                   "x": 0,
                   "y": 52
                },
-               "id": 8,
+               "id": 10,
                "interval": "1d",
                "links": [
                   {
@@ -3164,7 +3324,7 @@
                   "x": 0,
                   "y": 67
                },
-               "id": 9,
+               "id": 11,
                "interval": "1d",
                "links": [
                   {
@@ -3300,7 +3460,7 @@
                   "x": 0,
                   "y": 67
                },
-               "id": 10,
+               "id": 12,
                "interval": "1d",
                "links": [
                   {
@@ -3376,7 +3536,7 @@
             "x": 0,
             "y": 14
          },
-         "id": 11,
+         "id": 13,
          "panels": [
             {
                "datasource": "Elasticsearch-sysbench-results",
@@ -3426,7 +3586,7 @@
                   "x": 0,
                   "y": 15
                },
-               "id": 12,
+               "id": 14,
                "interval": "1d",
                "options": {
                   "alignValue": "center",
@@ -3533,7 +3693,7 @@
                   "x": 0,
                   "y": 25
                },
-               "id": 13,
+               "id": 15,
                "interval": "1d",
                "options": {
                   "alignValue": "center",
@@ -3640,7 +3800,7 @@
                   "x": 0,
                   "y": 35
                },
-               "id": 14,
+               "id": 16,
                "interval": "1d",
                "options": {
                   "alignValue": "center",
@@ -3747,7 +3907,7 @@
                   "x": 0,
                   "y": 45
                },
-               "id": 15,
+               "id": 17,
                "interval": "1d",
                "options": {
                   "alignValue": "center",
@@ -3818,7 +3978,7 @@
             "x": 0,
             "y": 14
          },
-         "id": 16,
+         "id": 18,
          "panels": [
             {
                "datasource": "Elasticsearch-vdbench-results",
@@ -3866,7 +4026,7 @@
                   "x": 0,
                   "y": 83
                },
-               "id": 17,
+               "id": 19,
                "interval": "1d",
                "links": [
                   {
@@ -4164,7 +4324,7 @@
                   "x": 0,
                   "y": 131
                },
-               "id": 18,
+               "id": 20,
                "interval": "1d",
                "links": [
                   {
@@ -4462,7 +4622,7 @@
                   "x": 0,
                   "y": 131
                },
-               "id": 19,
+               "id": 21,
                "interval": "1d",
                "links": [
                   {
@@ -4615,7 +4775,7 @@
             "x": 0,
             "y": 15
          },
-         "id": 20,
+         "id": 22,
          "panels": [
             {
                "datasource": "Elasticsearch-fio-results",
@@ -4663,7 +4823,7 @@
                   "x": 0,
                   "y": 16
                },
-               "id": 21,
+               "id": 23,
                "interval": "1d",
                "options": {
                   "alignValue": "center",
@@ -4887,7 +5047,7 @@
                   "x": 0,
                   "y": 52
                },
-               "id": 22,
+               "id": 24,
                "interval": "1d",
                "options": {
                   "alignValue": "center",
@@ -5072,7 +5232,7 @@
             "x": 0,
             "y": 20
          },
-         "id": 23,
+         "id": 25,
          "panels": [
             {
                "datasource": "Elasticsearch-bootstorm-results",
@@ -5134,7 +5294,7 @@
                   "x": 0,
                   "y": 187
                },
-               "id": 24,
+               "id": 26,
                "interval": "1d",
                "links": [
                   {
@@ -5334,7 +5494,7 @@
                   "x": 0,
                   "y": 187
                },
-               "id": 25,
+               "id": 27,
                "interval": "1d",
                "links": [
                   {
@@ -5445,7 +5605,7 @@
                   "x": 0,
                   "y": 187
                },
-               "id": 26,
+               "id": 28,
                "interval": "1d",
                "links": [
                   {
@@ -5568,7 +5728,7 @@
                   "x": 0,
                   "y": 206
                },
-               "id": 27,
+               "id": 29,
                "interval": "1d",
                "links": [
                   {
@@ -5812,7 +5972,7 @@
                   "x": 0,
                   "y": 206
                },
-               "id": 28,
+               "id": 30,
                "interval": "1d",
                "links": [
                   {
@@ -5934,7 +6094,7 @@
                   "x": 0,
                   "y": 206
                },
-               "id": 29,
+               "id": 31,
                "interval": "1d",
                "links": [
                   {
@@ -6020,7 +6180,7 @@
             "x": 0,
             "y": 21
          },
-         "id": 30,
+         "id": 32,
          "panels": [
             {
                "datasource": "Elasticsearch-hammerdb-results",
@@ -6154,7 +6314,7 @@
                   "x": 0,
                   "y": 22
                },
-               "id": 31,
+               "id": 33,
                "interval": "1d",
                "links": [
                   {
@@ -6399,7 +6559,7 @@
                   "x": 0,
                   "y": 50
                },
-               "id": 32,
+               "id": 34,
                "interval": "1d",
                "links": [
                   {
@@ -6645,7 +6805,7 @@
                   "x": 0,
                   "y": 65
                },
-               "id": 33,
+               "id": 35,
                "interval": "1d",
                "links": [
                   {
@@ -6867,7 +7027,7 @@
                   "x": 0,
                   "y": 75
                },
-               "id": 34,
+               "id": 36,
                "interval": "1d",
                "links": [
                   {
@@ -7029,7 +7189,7 @@
                   "x": 0,
                   "y": 85
                },
-               "id": 35,
+               "id": 37,
                "interval": "1d",
                "links": [
                   {
@@ -7193,7 +7353,7 @@
                   "x": 0,
                   "y": 91
                },
-               "id": 36,
+               "id": 38,
                "links": [
                   {
                      "targetBlank": true,
@@ -7393,7 +7553,7 @@
                   "x": 0,
                   "y": 97
                },
-               "id": 37,
+               "id": 39,
                "links": [
                   {
                      "targetBlank": true,
@@ -7612,7 +7772,7 @@
                   "x": 0,
                   "y": 102
                },
-               "id": 38,
+               "id": 40,
                "interval": "1d",
                "links": [
                   {
@@ -7729,7 +7889,7 @@
                   "x": 19,
                   "y": 107
                },
-               "id": 39,
+               "id": 41,
                "links": [
                   {
                      "targetBlank": true,
