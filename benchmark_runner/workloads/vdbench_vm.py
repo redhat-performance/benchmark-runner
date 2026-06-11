@@ -32,7 +32,7 @@ class VdbenchVM(WorkloadsOperations):
         self.__scale = ''
         self.__data_dict = {}
         self.__namespace = self._environment_variables_dict.get('namespace', 'benchmark-runner')
-        self.__username = self._environment_variables_dict.get('vm_user') or 'cloud-user'
+        self.__username = self._environment_variables_dict.get('vm_user') or 'fedora'
 
     def _get_expected_file_count(self) -> int:
         """Parse IO_OPERATION from the rendered YAML and return the number of comma-separated items."""
@@ -189,19 +189,8 @@ class VdbenchVM(WorkloadsOperations):
             # scale
             else:
                 self.__scale = int(self._scale)
-                # create redis and state signals
-                sync_pods = {'redis': 'redis', 'state_signals_exporter_pod': 'state-signals-exporter'}
-                for pod, name in sync_pods.items():
-                    if pod == 'redis':
-                        pod_name = f'redis-master'
-                    else:
-                        pod_name = name
-                    self._oc.create_pod_sync(yaml=os.path.join(f'{self._run_artifacts_path}', f'{pod}.yaml'), pod_name=pod_name)
-                    self._oc.wait_for_initialized(label=f'app={name}', label_uuid=False)
-                    self._oc.wait_for_ready(label=f'app={name}', label_uuid=False)
                 # prepare scale run
                 bulks = tuple(self.split_run_bulks(iterable=range(self._scale * len(self._scale_node_list)), limit=self._threads_limit))
-                # create, run and delete vms
                 for target in (self.__create_vm_scale, self.__run_vm_scale, self.__delete_vm_scale):
                     proc = []
                     for bulk in bulks:
@@ -211,17 +200,8 @@ class VdbenchVM(WorkloadsOperations):
                             proc.append(p)
                         for p in proc:
                             p.join()
-                        # sleep between bulks
                         time.sleep(self._bulk_sleep_time)
                         proc = []
-                self._create_scale_logs()
-                # delete redis and state signals
-                for pod, name in sync_pods.items():
-                    if pod == 'redis':
-                        pod_name = f'redis-master'
-                    else:
-                        pod_name = name
-                    self._oc.delete_pod_sync(yaml=os.path.join(f'{self._run_artifacts_path}', f'{pod}.yaml'), pod_name=pod_name)
             # delete namespace
             self._oc.delete_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'namespace.yaml'))
         except ElasticSearchDataNotUploaded as err:

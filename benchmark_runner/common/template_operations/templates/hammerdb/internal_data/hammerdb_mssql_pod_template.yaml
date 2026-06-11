@@ -78,7 +78,7 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
       - name: mssql
-        image: quay.io/benchmark-runner/mssql:{{ db_version }}-rhel9
+        image: {{ db_image_pod }}
         imagePullPolicy: "IfNotPresent"
         ports:
         - containerPort: 1433

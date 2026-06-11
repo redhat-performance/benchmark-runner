@@ -85,7 +85,7 @@ spec:
           emptyDisk:
             capacity: 64Gi
         - containerDisk:
-            image: quay.io/benchmark-runner/centos-stream9-container-disk:latest
+            image: quay.io/benchmark-runner/fedora-container-disk:43
           name: containerdisk
         - cloudInitNoCloud:
             secretRef:

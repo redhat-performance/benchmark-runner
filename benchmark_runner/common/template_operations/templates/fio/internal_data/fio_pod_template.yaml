@@ -56,10 +56,6 @@ metadata:
   name: fio-{{ kind }}-{{ trunc_uuid }}
   {%- endif %}
   namespace: {{ namespace }}
-  annotations:
-    {%- if kind == 'kata' %}
-    io.katacontainers.config.hypervisor.virtio_fs_extra_args: '["-o","allow_direct_io"]'
-    {%- endif %}
   labels:
     {% if scale -%}
     app: fio-{{ trunc_uuid }}-{{ scale }}
@@ -102,9 +98,7 @@ spec:
           memory: {{ requests_memory }}
         limits:
           cpu: {{ limits_cpu }}
-          {%- if kind != 'kata' %}
           memory: {{ limits_memory }}
-          {%- endif %}
       {%- if cluster == "kubernetes" %}
       volumeMounts:
         - name: fio-pod-vol

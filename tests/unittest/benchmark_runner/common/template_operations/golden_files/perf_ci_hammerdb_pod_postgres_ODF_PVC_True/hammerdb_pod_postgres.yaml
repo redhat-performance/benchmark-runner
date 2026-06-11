@@ -48,7 +48,7 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
         - name: postgres
-          image: quay.io/benchmark-runner/postgresql:13-c9s
+          image: quay.io/benchmark-runner/postgresql:16-c10s
           imagePullPolicy: "IfNotPresent"
           ports:
             - containerPort: 5432
@@ -126,7 +126,7 @@ spec:
         defaultMode: 0640
   initContainers:
     - name: wait-for-postgres
-      image: quay.io/benchmark-runner/hammerdb-pod:centos9
+      image: quay.io/benchmark-runner/hammerdb-pod:centos10
       command: ["/bin/sh", "-c"]
       args:
         - until python3 -c "import socket; s=socket.socket(); s.settimeout(2); s.connect(('$POSTGRES_HOST', 5432)); s.close()" 2>/dev/null; do echo "Waiting for PostgreSQL..."; sleep 3; done

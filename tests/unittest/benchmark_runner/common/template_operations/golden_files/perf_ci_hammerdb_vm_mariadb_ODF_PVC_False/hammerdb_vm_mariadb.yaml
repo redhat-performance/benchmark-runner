@@ -76,7 +76,9 @@ stringData:
       - sudo systemctl start mariadb
       - until mysqladmin ping --socket=/var/lib/mysql/mysql.sock --silent 2>/dev/null; do sleep 2; done
       - sudo systemctl status mariadb
-      # Install HammerDB
+      - dnf install -y https://dev.mysql.com/get/mysql80-community-release-el9-5.noarch.rpm
+      - dnf install -y mysql-community-libs --nogpgcheck
+      - ln -sf /usr/lib64/mysql/libmysqlclient.so.21 /usr/lib64/libmysqlclient.so.21
       - export HOME=/root
       - export TMP=/tmp
       - export TEMP=/tmp
@@ -136,7 +138,7 @@ spec:
       terminationGracePeriodSeconds: 180
       volumes:
         - containerDisk:
-            image: quay.io/benchmark-runner/mariadb-container-disk:105-c9s
+            image: quay.io/benchmark-runner/mariadb-container-disk:1011-c10s
           name: containerdisk
         - cloudInitNoCloud:
             secretRef:

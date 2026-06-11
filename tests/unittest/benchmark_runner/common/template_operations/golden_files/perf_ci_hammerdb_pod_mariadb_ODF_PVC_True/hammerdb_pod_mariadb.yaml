@@ -74,7 +74,7 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
       - name: mariadb
-        image: quay.io/benchmark-runner/mariadb:105-c9s
+        image: quay.io/benchmark-runner/mariadb:1011-c10s
         imagePullPolicy: "IfNotPresent"
         ports:
         - containerPort: 3306

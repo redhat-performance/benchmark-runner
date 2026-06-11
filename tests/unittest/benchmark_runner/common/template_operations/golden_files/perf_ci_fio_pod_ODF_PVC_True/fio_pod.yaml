@@ -17,7 +17,6 @@ kind: Pod
 metadata:
   name: fio-pod-deadbeef
   namespace: benchmark-runner
-  annotations:
   labels:
     app: fio-deadbeef
     type: fio-pod-deadbeef

@@ -70,8 +70,6 @@ class WorkloadsOperations:
             self._redis = self._environment_variables_dict.get('redis', '')
             if not self._scale_nodes:
                 raise MissingScaleNodes()
-            if not self._redis and 'vdbench' in self._workload:
-                raise MissingRedis()
             self._scale_node_list = ast.literal_eval(self._scale_nodes)
             if self._threads_limit:
                 self._threads_limit = int(self._threads_limit)
@@ -482,6 +480,10 @@ class WorkloadsOperations:
             metadata.update({'stressng_version': self._product_versions.get('stressng', '0.20.01')})
         if 'uperf' in self._workload:
             metadata.update({'uperf_version': self._product_versions.get('uperf', '1.0.8')})
+        if 'fio' in self._workload:
+            metadata.update({'fio_version': self._product_versions.get('fio', '3.40')})
+        if 'vdbench' in self._workload:
+            metadata.update({'vdbench_version': self._product_versions.get('vdbench', '5.04.07')})
         if self._test_name:
             metadata.update({'test_name': self._test_name})
         if result:

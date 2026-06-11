@@ -137,7 +137,7 @@ spec:
             capacity: {{ storage }}
 {%- endif %}
         - containerDisk:
-            image: {{ centos_stream_container_disk }}
+            image: {{ fedora_container_disk }}
           name: containerdisk
         - cloudInitNoCloud:
             secretRef:

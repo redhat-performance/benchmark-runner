@@ -17,6 +17,7 @@ stringData:
           Environment="ACCEPT_EULA=Y"
           Environment="MSSQL_SA_PASSWORD=s3curePasswordString"
           Environment="MSSQL_PID=Enterprise"
+          TimeoutStopSec=30
     bootcmd:
       - "mkdir /creator"
       - "mount /dev/$(lsblk --nodeps -no name,serial | grep CVLY623300HK240C | cut -f1 -d' ') /creator"
@@ -40,7 +41,7 @@ stringData:
       - restorecon -Rv /var/opt/mssql/data || true
       - mkdir -p /etc/systemd/system/mssql-server.service.d
       - systemctl daemon-reload
-      - sudo systemctl stop mssql-server || true
+      - systemctl kill -s SIGKILL mssql-server || true
       - sudo ACCEPT_EULA='Y' MSSQL_PID='Enterprise' MSSQL_SA_PASSWORD='s3curePasswordString' /opt/mssql/bin/mssql-conf setup
       - sudo firewall-offline-cmd --add-port=1433/tcp || true
       - sudo systemctl enable firewalld || true
@@ -110,7 +111,7 @@ spec:
       terminationGracePeriodSeconds: 180
       volumes:
         - containerDisk:
-            image: quay.io/benchmark-runner/mssql-container-disk:2025-centos9
+            image: quay.io/benchmark-runner/mssql-container-disk:2025-centos10
           name: containerdisk
         - cloudInitNoCloud:
             secretRef:

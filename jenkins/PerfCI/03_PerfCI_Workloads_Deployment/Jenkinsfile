@@ -19,7 +19,6 @@ pipeline {
         IBM_BUCKET = credentials('perfci_ibm_bucket')
         IBM_KEY = credentials('perfci_ibm_key')
         RUN_ARTIFACTS_URL = credentials('perfci_run_artifacts_url')
-        REDIS = credentials('perfci_redis')
         WORKER_DISK_IDS = credentials('perfci_worker_disk_ids')
         WINDOWS11_URL = credentials('perfci_windows11_url')
         WINDOWS_SERVER_2022_URL = credentials('perfci_windows_server_2022_url')
@@ -207,7 +206,6 @@ END
                                         -e WORKER_DISK_PREFIX='${WORKER_DISK_PREFIX}' \
                                         -e SCALE='${SCALE}' \
                                         -e SCALE_NODES='${SCALE_NODES}' \
-                                        -e REDIS='${REDIS}' \
                                         -e THREADS_LIMIT='${THREADS_LIMIT}' \
                                         -e WINDOWS_URL='${WINDOWS_URL}'  \
                                         -e LSO_NODE='${LSO_NODE}'  \

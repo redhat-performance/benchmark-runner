@@ -51,7 +51,6 @@ class EnvironmentVariables:
         # dynamic parameters - configure for local run
         self._environment_variables_dict['workload'] = EnvironmentVariables.get_env('WORKLOAD', '')
         self._environment_variables_dict['kubeadmin_password'] = EnvironmentVariables.get_env('KUBEADMIN_PASSWORD', '')
-
         # PIN=node selector
         self._environment_variables_dict['pin_node0'] = EnvironmentVariables.get_env('PIN_NODE0', '')
         self._environment_variables_dict['pin_node1'] = EnvironmentVariables.get_env('PIN_NODE1', '')
@@ -73,11 +72,10 @@ class EnvironmentVariables:
         # Scale Per Node
         self._environment_variables_dict['scale'] = EnvironmentVariables.get_env('SCALE', '')
         # list of nodes per pod/vm, scale number per node, e.g: [ 'master-1', 'master-2' ] - run 1 pod/vm in each node
-        self._environment_variables_dict['scale_nodes'] = EnvironmentVariables.get_env('SCALE_NODES', "")
+        self._environment_variables_dict['scale_nodes'] = EnvironmentVariables.get_env('SCALE_NODES', '')
         self._environment_variables_dict['bulk_sleep_time'] = EnvironmentVariables.get_env('BULK_SLEEP_TIME', '30')
         # CPU processors = threads limit
-        self._environment_variables_dict['threads_limit'] = EnvironmentVariables.get_env('THREADS_LIMIT', '')
-        # redis for synchronization
+        self._environment_variables_dict['threads_limit'] = EnvironmentVariables.get_env('THREADS_LIMIT', '20')
         self._environment_variables_dict['redis'] = EnvironmentVariables.get_env('REDIS', '')
 
         # prometheus snap interval
@@ -148,13 +146,15 @@ class EnvironmentVariables:
         # Versions
         self._environment_variables_dict['product_versions'] = {
             'mssql': 2025,
-            'postgres': 13,
-            'mariadb': 10.5,
-            'db_vm_os_version': 'centos-stream9',
+            'postgres': 16,
+            'mariadb': 10.11,
+            'db_vm_os_version': 'centos-stream10',
             'vm_os_version': 'fedora43',
             'hammerdb': 4.12,
             'stressng': '0.20.01',
-            'uperf': '1.0.8'
+            'uperf': '1.0.8',
+            'fio': '3.40',
+            'vdbench': '5.04.07'
         }
 
         # HammerDB config override (optional), overrides template defaults.
