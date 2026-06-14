@@ -32,6 +32,7 @@ class WorkloadsOperations:
     This class contains workloads operations
     """
     def __init__(self):
+        self._start_date = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
         # environment variables
         self._environment_variables_dict = environment_variables.environment_variables_dict
         self._workload = self._environment_variables_dict.get('workload', '')
@@ -434,7 +435,10 @@ class WorkloadsOperations:
         else:
             odf_disk_count = self._oc.get_odf_disk_count()
             odf_disk_count = -1 if odf_disk_count in {0, 1} else odf_disk_count
-        metadata = {'ocp_version': self._oc.get_ocp_server_version(),
+        ocp_version = self._oc.get_ocp_server_version()
+        worker_nodes = self._oc.get_worker_nodes().strip()
+        master_nodes = self._oc.get_master_nodes().strip()
+        metadata = {'ocp_version': ocp_version,
                     'previous_ocp_version': '' if len(self._oc.get_previous_ocp_version()) > 10 else self._oc.get_previous_ocp_version(),
                     'cnv_version': self._oc.get_cnv_version(),
                     'nhc_version': self._oc.get_nhc_version(),
@@ -452,7 +456,19 @@ class WorkloadsOperations:
                     'pin_node2': self._pin_node2,
                     'pin_node0': self._pin_node0,
                     'storage_type': self._storage_type,
-                    'odf_disk_count': odf_disk_count
+                    'odf_disk_count': odf_disk_count,
+                    'ocpVersion': ocp_version,
+                    'releaseStream': next((k for k in ('nightly', 'rc', 'ec', 'candidate', 'ci') if k in ocp_version), 'stable'),
+                    'ciSystem': 'prow' if os.getenv('PROW_JOB_ID') else ('jenkins' if os.getenv('BUILD_URL') else 'manual'),
+                    'upstreamJob': os.getenv('JOB_NAME', ''),
+                    'jobType': os.getenv('JOB_TYPE', ''),
+                    'buildId': os.getenv('BUILD_ID', ''),
+                    'platform': self._oc.run("oc get infrastructure cluster -o jsonpath='{.status.platform}'").strip().strip("'"),
+                    'benchmark': self._workload,
+                    'workerNodesCount': len(worker_nodes.split('\n')) if worker_nodes else 0,
+                    'masterNodesCount': len(master_nodes.split('\n')) if master_nodes else 0,
+                    'startDate': self._start_date,
+                    'endDate': datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
 }
         if kind:
             metadata.update({'kind': kind})
@@ -578,7 +594,7 @@ class WorkloadsOperations:
         if ocp_resource_install_minutes_time != 0:
             bm_operations = BareMetalOperations(user=self._environment_variables_dict.get('provision_user', ''))
             ocp_install_minutes_time = bm_operations.get_ocp_install_time()
-        metadata.update({'status': status, 'status#': status_dict[status], 'ci_minutes_time': ci_minutes_time, 'benchmark_runner_id': benchmark_runner_id, 'ocp_install_minutes_time': ocp_install_minutes_time, 'ocp_resource_install_minutes_time': ocp_resource_install_minutes_time, 'upgrade_masters_duration_seconds': self.__parse_duration(self._upgrade_masters_duration_seconds), 'upgrade_workers_duration_seconds': self.__parse_duration(self._upgrade_workers_duration_seconds)})
+        metadata.update({'status': status, 'status#': status_dict[status], 'jobStatus': 'success' if status == 'pass' else 'failure', 'ci_minutes_time': ci_minutes_time, 'benchmark_runner_id': benchmark_runner_id, 'ocp_install_minutes_time': ocp_install_minutes_time, 'ocp_resource_install_minutes_time': ocp_resource_install_minutes_time, 'upgrade_masters_duration_seconds': self.__parse_duration(self._upgrade_masters_duration_seconds), 'upgrade_workers_duration_seconds': self.__parse_duration(self._upgrade_workers_duration_seconds)})
         self._es_operations.upload_to_elasticsearch(index=es_index, data=metadata)
 
     @logger_time_stamp
