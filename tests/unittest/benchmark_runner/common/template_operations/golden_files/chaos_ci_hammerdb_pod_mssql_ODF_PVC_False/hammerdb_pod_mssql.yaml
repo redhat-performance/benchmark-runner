@@ -20,7 +20,7 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
       - name: mssql
-        image: quay.io/benchmark-runner/mssql:2025-rhel9
+        image: quay.io/benchmark-runner/mssql:2025-rhel10
         imagePullPolicy: "IfNotPresent"
         ports:
         - containerPort: 1433

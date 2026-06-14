@@ -42,6 +42,7 @@ stringData:
       - mkdir -p /etc/systemd/system/mssql-server.service.d
       - systemctl daemon-reload
       - systemctl kill -s SIGKILL mssql-server || true
+      - sleep 3
       - sudo ACCEPT_EULA='Y' MSSQL_PID='Enterprise' MSSQL_SA_PASSWORD='s3curePasswordString' /opt/mssql/bin/mssql-conf setup
       - sudo firewall-offline-cmd --add-port=1433/tcp || true
       - sudo systemctl enable firewalld || true
@@ -128,7 +129,7 @@ spec:
       terminationGracePeriodSeconds: 180
       volumes:
         - containerDisk:
-            image: quay.io/benchmark-runner/mssql-container-disk:2025-centos10
+            image: quay.io/benchmark-runner/mssql-container-disk:2025-c10s
           name: containerdisk
         - cloudInitNoCloud:
             secretRef:
