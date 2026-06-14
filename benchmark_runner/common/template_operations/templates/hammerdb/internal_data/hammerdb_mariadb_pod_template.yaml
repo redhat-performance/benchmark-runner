@@ -213,7 +213,7 @@ spec:
   {%- endif %}
   initContainers:
     - name: wait-for-mariadb
-      image: quay.io/benchmark-runner/hammerdb-pod:centos10
+      image: {{ hammerdb_image }}
       command: ["/bin/sh", "-c"]
       args:
         {% if scale -%}
@@ -236,7 +236,7 @@ spec:
         defaultMode: 0640
   containers:
     - name: hammerdb
-      image: quay.io/benchmark-runner/hammerdb-pod:centos10
+      image: {{ hammerdb_image }}
       imagePullPolicy: Always
       env:
         - name: MYSQL_HOST

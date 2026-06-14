@@ -115,7 +115,7 @@ spec:
     kubernetes.io/hostname: "pin-node-1"
   initContainers:
     - name: wait-for-mariadb
-      image: quay.io/benchmark-runner/hammerdb-pod:centos10
+      image: quay.io/benchmark-runner/hammerdb:c10s
       command: ["/bin/sh", "-c"]
       args:
         - until mysqladmin ping -h mariadb-deployment -P 3306 --silent 2>/dev/null; do echo "Waiting for MariaDB..."; sleep 3; done
@@ -134,7 +134,7 @@ spec:
         defaultMode: 0640
   containers:
     - name: hammerdb
-      image: quay.io/benchmark-runner/hammerdb-pod:centos10
+      image: quay.io/benchmark-runner/hammerdb:c10s
       imagePullPolicy: Always
       env:
         - name: MYSQL_HOST

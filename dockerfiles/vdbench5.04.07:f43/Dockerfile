@@ -46,4 +46,4 @@ RUN python3 -m pip --no-cache-dir install --upgrade pip && pip3 --no-cache-dir i
 
 COPY state_signals_responder.py /state_signals_responder.py
 
-#podman build -t quay.io/ebattat/centos-stream10-vdbench5.04.07-pod:latest . --no-cache
+#podman build -t quay.io/benchmark-runner/vdbench5.04.07:f43 . --no-cache

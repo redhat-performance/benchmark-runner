@@ -8,6 +8,7 @@ template_data:
     pin_node1: "{{ pin_node1 }}"
     pin_node2: "{{ pin_node2 }}"
     odf_pvc: {{ odf_pvc }}
+    hammerdb_image: quay.io/benchmark-runner/hammerdb:c10s
     transactions: 100000
     db_min_workers: 1
     iterations: 2
@@ -55,8 +56,8 @@ template_data:
           innodb_buffer_pool_size: 4096M
           innodb_log_buffer_size: 1024M
     mssql:
-      db_image_container_disk: quay.io/benchmark-runner/mssql-container-disk:2025-centos10
-      db_image_pod: quay.io/benchmark-runner/mssql:2025-rhel9
+      db_image_container_disk: quay.io/benchmark-runner/mssql-container-disk:2025-c10s
+      db_image_pod: quay.io/benchmark-runner/mssql:2025-rhel10
       db_pass: s3curePasswordString
       db_port: 1433
       db_type: mssql
