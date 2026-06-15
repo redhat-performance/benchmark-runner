@@ -1,22 +1,27 @@
 # /pr-push
 
-Prepare and push the current branch: rebase onto main, run all unit tests, and push.
+Commit all changes, rebase onto main, run all unit tests, and push.
 
 ## Steps
 
-1. **Rebase onto main**
+1. **Commit all uncommitted changes**
+   - Stage all modified, deleted, and untracked files
+   - Create a commit with a descriptive message summarizing the changes
+   - If there are no uncommitted changes, skip this step
+
+2. **Rebase onto main**
    ```bash
    git fetch origin main && git rebase origin/main
    ```
    If there are conflicts, resolve them and continue the rebase before proceeding.
 
-2. **Run all unit tests**
+3. **Run all unit tests**
    ```bash
    PYTHONPATH=. python3 -m pytest -v tests/unittest/
    ```
    All 26 tests must pass. If any fail, fix them before pushing.
 
-3. **Push**
+4. **Push**
    ```bash
    git push
    ```

@@ -1,15 +1,15 @@
-# /integration-test
+# /integration
 
 Run integration tests against a live OCP cluster.
 
 ## Steps
 
-1. **Run all integration tests**:
+1. **Run all integration tests**
    ```bash
    PYTHONPATH=. python3 -m pytest -v tests/integration/
    ```
 
-2. **Run a specific workload test**:
+2. **Run a specific workload test** (if args provided)
    ```bash
    PYTHONPATH=. python3 -m pytest -v tests/integration/benchmark_runner/workloads/test_oc_benchmark_runner.py -k "<workload_name>"
    ```
