@@ -1,4 +1,4 @@
-# /pr-push
+# /push
 
 Commit all changes, rebase onto main, run all unit tests, and push.
 

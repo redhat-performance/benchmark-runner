@@ -4,7 +4,12 @@ Run all unit tests.
 
 ## Steps
 
-1. **Run all unit tests**
+1. **Regenerate golden files**
+   ```bash
+   make golden_files
+   ```
+
+2. **Run all unit tests**
    ```bash
    PYTHONPATH=. python3 -m pytest -v tests/unittest/
    ```
