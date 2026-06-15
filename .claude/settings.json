@@ -8,6 +8,7 @@
       "Bash(git rebase*)",
       "Bash(git stash*)",
       "Bash(git add*)",
+      "Bash(git rm*)",
       "Bash(git commit*)",
       "Bash(git push*)",
       "Bash(PYTHONPATH=. python3 -m pytest*)",
