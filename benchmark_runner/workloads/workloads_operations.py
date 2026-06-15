@@ -432,7 +432,7 @@ class WorkloadsOperations:
                     'odf_version': self._oc.get_odf_version(),
                     'runner_version': self._build_version,
                     'version': int(self._build_version.split('.')[-1]),
-                    'vm_os_version':  self._product_versions.get('db_vm_os_version', 'centos-stream9'),
+                    'vm_os_version':  self._product_versions.get('db_vm_os_version', 'centos-stream10') if isinstance(self._product_versions, dict) else 'centos-stream10',
                     'ci_date': datetime.now().strftime(date_format),
                     'uuid': self._uuid,
                     'run_id': 'NA',
@@ -453,7 +453,8 @@ class WorkloadsOperations:
         if self._scale:
             metadata.update({'scale': int(self._scale)*len(self._scale_node_list)})
         if 'bootstorm' in self._workload:
-            metadata.update({'vm_os_version': 'fedora37'})
+            product_versions = self._product_versions if isinstance(self._product_versions, dict) else {}
+            metadata.update({'vm_os_version': product_versions.get('vm_os_version', 'fedora43')})
         if 'win' in self._workload:
             metadata.update({'vm_os_version': self._windows_os})
         # for hammerdb
@@ -465,15 +466,15 @@ class WorkloadsOperations:
         elif database == 'mariadb':
             metadata.update({'db_type': 'mariadb', 'db_version': product_versions.get('mariadb', 10.5), 'storage_type': self._storage_type})
         if database:
-            metadata.update({'hammerdb_version': self._product_versions.get('hammerdb', 4.12)})
+            metadata.update({'hammerdb_version': product_versions.get('hammerdb', 4.12)})
         if 'stressng' in self._workload:
-            metadata.update({'stressng_version': self._product_versions.get('stressng', '0.20.01')})
+            metadata.update({'stressng_version': product_versions.get('stressng', '0.20.01')})
         if 'uperf' in self._workload:
-            metadata.update({'uperf_version': self._product_versions.get('uperf', '1.0.8')})
+            metadata.update({'uperf_version': product_versions.get('uperf', '1.0.8')})
         if 'fio' in self._workload:
-            metadata.update({'fio_version': self._product_versions.get('fio', '3.40')})
+            metadata.update({'fio_version': product_versions.get('fio', '3.40')})
         if 'vdbench' in self._workload:
-            metadata.update({'vdbench_version': self._product_versions.get('vdbench', '5.04.07')})
+            metadata.update({'vdbench_version': product_versions.get('vdbench', '5.04.07')})
         if self._test_name:
             metadata.update({'test_name': self._test_name})
         if result:
