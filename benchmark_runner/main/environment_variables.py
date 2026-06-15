@@ -75,8 +75,7 @@ class EnvironmentVariables:
         self._environment_variables_dict['scale_nodes'] = EnvironmentVariables.get_env('SCALE_NODES', '')
         self._environment_variables_dict['bulk_sleep_time'] = EnvironmentVariables.get_env('BULK_SLEEP_TIME', '30')
         # CPU processors = threads limit
-        self._environment_variables_dict['threads_limit'] = EnvironmentVariables.get_env('THREADS_LIMIT', '20')
-        self._environment_variables_dict['redis'] = EnvironmentVariables.get_env('REDIS', '')
+        self._environment_variables_dict['threads_limit'] = EnvironmentVariables.get_env('THREADS_LIMIT', '')
 
         # prometheus snap interval
         self._environment_variables_dict['prometheus_snap_interval'] = EnvironmentVariables.get_env('PROMETHEUS_SNAP_INTERVAL', '30')
