@@ -15,11 +15,7 @@ Commit all changes, rebase onto main, run all unit tests, and push.
    ```
    If there are conflicts, resolve them and continue the rebase before proceeding.
 
-3. **Run all unit tests**
-   ```bash
-   PYTHONPATH=. python3 -m pytest -v tests/unittest/
-   ```
-   All 26 tests must pass. If any fail, fix them before pushing.
+3. **Run /unittest**
 
 4. **Push**
    ```bash
@@ -29,6 +25,6 @@ Commit all changes, rebase onto main, run all unit tests, and push.
 
 ## Notes
 
+- If there are no uncommitted changes and nothing new to push, stop early
 - Never push if any unit test fails
-- Never skip the rebase step — always stay up to date with main before pushing
 - If `git push` is rejected after rebase, use `git push --force-with-lease`
