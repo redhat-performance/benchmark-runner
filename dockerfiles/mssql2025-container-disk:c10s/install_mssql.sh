@@ -1,7 +1,7 @@
 
 #Install Mssql 2025  https://learn.microsoft.com/en-us/sql/linux/quickstart-install-connect-red-hat?view=sql-server-ver17&tabs=rhel8%2C2025rhel10
 #Skip install ‘sudo yum install -y mssql-server-selinux’
-#(choose: 7- Enterprise Core (PAID) - CPU Core utilization up to Operating System Maximum) - Yes/Yes/s3curePasswordString
+# choose: 7- Enterprise Core (PAID) - CPU Core utilization up to Operating System Maximum - Yes/Yes/s3curePasswordString
 sqlcmd -S 127.0.0.1 -U SA -P 's3curePasswordString' -C
 USE master ;
 GO
