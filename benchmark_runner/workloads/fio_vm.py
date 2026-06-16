@@ -32,7 +32,7 @@ class FioVM(WorkloadsOperations):
         self.__scale = ''
         self.__data_dict = {}
         self.__namespace = self._environment_variables_dict.get('namespace', 'benchmark-runner')
-        self.__username = self._environment_variables_dict.get('vm_user') or 'cloud-user'
+        self.__username = self._environment_variables_dict.get('vm_user', '') or 'fedora'
 
     def _get_expected_file_count(self) -> int:
         """Wait for fio_summary.json — the last file created by the runner script"""

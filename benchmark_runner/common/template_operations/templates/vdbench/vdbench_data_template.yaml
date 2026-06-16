@@ -5,39 +5,26 @@ template_data:
     pin_node: {{ pin_node1 }}
     odf_pvc: {{ odf_pvc }}
     uuid: {{ uuid }}
-    vdbench_image: quay.io/benchmark-runner/centos-stream9-vdbench5.04.07-pod:latest
-    centos_stream_container_disk: quay.io/benchmark-runner/centos-stream9-container-disk:latest
+    vdbench_image: quay.io/benchmark-runner/vdbench5.04.07:f43
+    fedora_container_disk: {{ fedora_container_disk }}
   run_type:
     perf_ci:
       BLOCK_SIZES: oltp1,oltp2,oltphw,odss2,odss128,4_cache,64_cache,4,64,4_cache,64_cache,4,64
       IO_OPERATION: oltp1,oltp2,oltphw,odss2,odss128,read,read,read,read,write,write,write,write
       IO_THREADS: 8,8,8,8,16,32,4,16,4,32,4,16,4
-      # How file IO will be done
       FILES_IO: oltp1,oltp2,oltphw,odss2,odss128,random,random,random,random,random,random,random,random
-      # an integer or "max"
       IO_RATE: max,max,max,max,max,max,max,max,max,max,max,max,max
-      # used for mixed workload 0-100
       MIX_PRECENTAGE:
-      # duration time in sec
       DURATION: 360
-      # pause after every test in sec
       PAUSE: 20
-      # warmup before any test in sec
       WARMUP: 20
-      # This parameter allows you to select directories and files for processing either sequential/random
       FILES_SELECTION: random
-      # ratio is 1:X e.g 2 = 50% compressible
       COMPRESSION_RATIO: 2
-      # will it run a fillup before testing starts yes/no
       RUN_FILLUP: "yes"
-      # Logs directory
       LOGS_DIR: "/workload/"
-      # vdbench workload main script
       WORKLOAD_METHOD: "/vdbench/vdbench_runner.sh"
-      # how many directories to create
       DIRECTORIES: 600
       FILES_PER_DIRECTORY: 10
-      # size in MB
       SIZE_PER_FILE: 10
       limits_cpu: 2
       limits_memory: 4Gi
@@ -50,28 +37,17 @@ template_data:
       IO_THREADS: 8,8
       FILES_IO: oltp1,oltp2
       IO_RATE: max,max
-      # used for mixed workload 0-100
       MIX_PRECENTAGE:
-      # duration time in sec
       DURATION: 20
-      # pause after every test in sec
       PAUSE: 0
-      # warmup before any test in sec
       WARMUP: 20
-      # This parameter allows you to select directories and files for processing either sequential/random
       FILES_SELECTION: random
-      # ratio is 1:X e.g 2 = 50% compressible
       COMPRESSION_RATIO: 2
-      # will it run a fillup before testing starts yes/no
       RUN_FILLUP: "yes"
-      # Logs directory
       LOGS_DIR: "/workload/"
-      # vdbench workload main script
       WORKLOAD_METHOD: "/vdbench/vdbench_runner.sh"
-      # how many directories to create
       DIRECTORIES: 100
       FILES_PER_DIRECTORY: 10
-      # size in MB
       SIZE_PER_FILE: 5
       limits_cpu: 2
       limits_memory: 4Gi

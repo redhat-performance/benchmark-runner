@@ -93,18 +93,14 @@ spec:
   containers:
     - name: vdbench-pod
       image: {{ vdbench_image }}
+      imagePullPolicy: Always
       resources:
         requests:
           cpu: {{ requests_cpu }}
           memory: {{ requests_memory }}
         limits:
           cpu: {{ limits_cpu }}
-          {%- if kind != 'kata' %}
           memory: {{ limits_memory }}
-          {%- else %}
-          # Remove memory limit for Kata pods due to
-          # https://github.com/kata-containers/kata-containers/issues/6129
-          {%- endif %}
       {%- if cluster == "kubernetes" %}
       volumeMounts:
         - name: vdbench-pod-vol
@@ -158,19 +154,10 @@ spec:
           value: "{{ FILES_PER_DIRECTORY }}"
         - name: SIZE_PER_FILE # size in MB
           value: "{{ SIZE_PER_FILE }}"
-        #state-signals
-        - name: REDIS_HOST
-          value: "{{ redis }}"
         - name: WORKLOAD_METHOD
-          value: "/vdbench/vdbench_runner.sh"
-        - name: TIMEOUT
-          value: "{{ timeout }}"
+          value: "{{ WORKLOAD_METHOD }}"
       command: ["/bin/bash"]
-      {% if scale -%}
-      args: ["-c", "python3.12 /state_signals_responder.py $REDIS_HOST $WORKLOAD_METHOD $TIMEOUT"]
-      {%- else -%}
       args: ["-c", "$WORKLOAD_METHOD"]
-      {%- endif %}
   restartPolicy: "Never"
   {%- if cluster != "kubernetes" and odf_pvc == True %}
   spec:

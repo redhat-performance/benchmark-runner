@@ -28,12 +28,11 @@ stringData:
       - export DIRECTORIES=100
       - export FILES_PER_DIRECTORY=10
       - export SIZE_PER_FILE=5
-      - export REDIS_HOST=
-      - export WORKLOAD_METHOD=/vdbench/vdbench_runner.sh
-      - export TIMEOUT=3600
       - export LOGS_DIR=/workload/
+      - mkdir -p /workload/results
       - echo @@~@@START-WORKLOAD@@~@@
-      - podman run --rm -e BLOCK_SIZES="$BLOCK_SIZES" -e IO_OPERATION="$IO_OPERATION" -e IO_THREADS="$IO_THREADS" -e FILES_IO="$FILES_IO" -e IO_RATE="$IO_RATE" -e MIX_PRECENTAGE="$MIX_PRECENTAGE" -e DURATION="$DURATION" -e PAUSE="$PAUSE" -e WARMUP="$WARMUP" -e FILES_SELECTION="$FILES_SELECTION" -e COMPRESSION_RATIO="$COMPRESSION_RATIO" -e RUN_FILLUP="$RUN_FILLUP" -e DIRECTORIES="$DIRECTORIES" -e FILES_PER_DIRECTORY="$FILES_PER_DIRECTORY" -e SIZE_PER_FILE="$SIZE_PER_FILE" -e REDIS_HOST="$REDIS_HOST" -e LOGS_DIR="$LOGS_DIR" -e TIMEOUT="$TIMEOUT" -v "/workload":"/workload" --privileged quay.io/benchmark-runner/centos-stream9-vdbench5.04.07-pod:latest "$WORKLOAD_METHOD"
+      - podman --root /workload/podman run --rm -e BLOCK_SIZES="$BLOCK_SIZES" -e IO_OPERATION="$IO_OPERATION" -e IO_THREADS="$IO_THREADS" -e FILES_IO="$FILES_IO" -e IO_RATE="$IO_RATE" -e MIX_PRECENTAGE="$MIX_PRECENTAGE" -e DURATION="$DURATION" -e PAUSE="$PAUSE" -e WARMUP="$WARMUP" -e FILES_SELECTION="$FILES_SELECTION" -e COMPRESSION_RATIO="$COMPRESSION_RATIO" -e RUN_FILLUP="$RUN_FILLUP" -e DIRECTORIES="$DIRECTORIES" -e FILES_PER_DIRECTORY="$FILES_PER_DIRECTORY" -e SIZE_PER_FILE="$SIZE_PER_FILE" -e LOGS_DIR="/workload/" -v "/workload/results":"/workload" --privileged quay.io/benchmark-runner/vdbench5.04.07:f43 /vdbench/vdbench_runner.sh
+      - cp /workload/results/*.csv /workload/ 2>/dev/null || true
       - echo @@~@@END-WORKLOAD@@~@@
 ---
 apiVersion: kubevirt.io/v1
@@ -87,7 +86,8 @@ spec:
           emptyDisk:
             capacity: 10Gi
         - containerDisk:
-            image: quay.io/benchmark-runner/centos-stream9-container-disk:latest
+            image: quay.io/benchmark-runner/fedora-container-disk:43
+            imagePullPolicy: Always
           name: containerdisk
         - cloudInitNoCloud:
             secretRef:

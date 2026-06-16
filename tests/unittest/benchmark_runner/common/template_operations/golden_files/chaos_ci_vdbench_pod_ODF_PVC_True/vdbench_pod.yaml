@@ -31,7 +31,8 @@ spec:
     kubernetes.io/hostname: pin-node-1
   containers:
     - name: vdbench-pod
-      image: quay.io/benchmark-runner/centos-stream9-vdbench5.04.07-pod:latest
+      image: quay.io/benchmark-runner/vdbench5.04.07:f43
+      imagePullPolicy: Always
       resources:
         requests:
           cpu: 10m
@@ -77,13 +78,8 @@ spec:
           value: "10"
         - name: SIZE_PER_FILE # size in MB
           value: "5"
-        #state-signals
-        - name: REDIS_HOST
-          value: ""
         - name: WORKLOAD_METHOD
           value: "/vdbench/vdbench_runner.sh"
-        - name: TIMEOUT
-          value: "3600"
       command: ["/bin/bash"]
       args: ["-c", "$WORKLOAD_METHOD"]
   restartPolicy: "Never"

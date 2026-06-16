@@ -121,7 +121,7 @@ spec:
       terminationGracePeriodSeconds: 180
       volumes:
         - containerDisk:
-            image: quay.io/benchmark-runner/postgresql13-centos9-container-disk:latest
+            image: quay.io/benchmark-runner/postgresql-container-disk:16-c10s
           name: containerdisk
         - cloudInitNoCloud:
             secretRef:

@@ -9,7 +9,7 @@ from datetime import datetime, timezone, timedelta
 from multiprocessing import Process
 
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp
-from benchmark_runner.workloads.workloads_exceptions import ODFNotInstalled, CNVNotInstalled, KataNotInstalled, EmptyLSOPath, MissingScaleNodes, MissingRedis, BenchmarkRunnerError
+from benchmark_runner.workloads.workloads_exceptions import ODFNotInstalled, CNVNotInstalled, KataNotInstalled, EmptyLSOPath, MissingScaleNodes, BenchmarkRunnerError
 from benchmark_runner.common.oc.oc import OC
 from benchmark_runner.common.virtctl.virtctl import Virtctl
 from benchmark_runner.common.elasticsearch.elasticsearch_operations import ElasticSearchOperations
@@ -59,7 +59,6 @@ class WorkloadsOperations:
         self._es_password = self._environment_variables_dict.get('elasticsearch_password', '')
         self._es_url_protocol = self._environment_variables_dict['elasticsearch_url_protocol']
         self._scale = self._environment_variables_dict.get('scale', '')
-        self._redis = self._environment_variables_dict.get('redis', '')
         self._threads_limit = self._environment_variables_dict.get('threads_limit', '')
         self._kata_thread_pool_size = self._environment_variables_dict.get('kata_thread_pool_size', '')
         self._cnv_version = self._environment_variables_dict.get('cnv_version', '')
@@ -67,11 +66,8 @@ class WorkloadsOperations:
         if self._scale:
             self._scale = int(self._scale)
             self._scale_nodes = self._environment_variables_dict.get('scale_nodes', '')
-            self._redis = self._environment_variables_dict.get('redis', '')
             if not self._scale_nodes:
                 raise MissingScaleNodes()
-            if not self._redis and 'vdbench' in self._workload:
-                raise MissingRedis()
             self._scale_node_list = ast.literal_eval(self._scale_nodes)
             if self._threads_limit:
                 self._threads_limit = int(self._threads_limit)
@@ -284,14 +280,6 @@ class WorkloadsOperations:
         except (ValueError, TypeError):
             return False
 
-    def _create_scale_logs(self):
-        """
-        The method creates scale logs
-        :return:
-        """
-        self._create_pod_log(pod='state-signals-exporter', log_type='.log')
-        self._create_pod_log(pod='redis-master', log_type='.log')
-
     def _create_pod_run_artifacts(self, pod_name: str, log_type: str):
         """
         This method creates pod run artifacts
@@ -482,6 +470,10 @@ class WorkloadsOperations:
             metadata.update({'stressng_version': self._product_versions.get('stressng', '0.20.01')})
         if 'uperf' in self._workload:
             metadata.update({'uperf_version': self._product_versions.get('uperf', '1.0.8')})
+        if 'fio' in self._workload:
+            metadata.update({'fio_version': self._product_versions.get('fio', '3.40')})
+        if 'vdbench' in self._workload:
+            metadata.update({'vdbench_version': self._product_versions.get('vdbench', '5.04.07')})
         if self._test_name:
             metadata.update({'test_name': self._test_name})
         if result:
@@ -637,7 +629,7 @@ class WorkloadsOperations:
             self.odf_workload_verification()
         if 'lso' in self._workload:
             self.verify_lso()
-        self._template.generate_yamls(scale=str(self._scale), scale_nodes=self._scale_node_list, redis=self._redis, thread_limit=self._threads_limit)
+        self._template.generate_yamls(scale=str(self._scale), scale_nodes=self._scale_node_list, redis=None, thread_limit=self._threads_limit)
         if self._enable_prometheus_snapshot:
             self.start_prometheus()
         if self._google_drive_path:
