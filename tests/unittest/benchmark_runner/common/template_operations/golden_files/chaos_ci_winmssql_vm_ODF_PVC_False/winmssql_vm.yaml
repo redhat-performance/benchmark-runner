@@ -32,7 +32,7 @@ spec:
         cpu:
           cores: 1
           model: host-passthrough
-          sockets: 16
+          sockets: 32
           threads: 1
         devices:
           blockMultiQueue: false
@@ -76,8 +76,8 @@ spec:
           type: q35
         resources:
           requests:
-            cpu: 16
-            memory: 16G
+            cpu: 32
+            memory: 256G
       networks:
       - name: nic-0
         pod: {}
@@ -124,7 +124,7 @@ spec:
         - ReadWriteMany
         resources:
           requests:
-            storage: 100Gi
+            storage: 256Gi
         volumeMode: Block
         storageClassName: ocs-storagecluster-ceph-rbd-virtualization
       source:

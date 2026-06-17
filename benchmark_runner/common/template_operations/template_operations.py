@@ -155,6 +155,7 @@ class TemplateOperations:
 
         hammerdb_config = self.__environment_variables_dict.get('hammerdb_config', {})
         if hammerdb_config and ('hammerdb' in self.__workload_name or 'winmssql' in self.__workload_name):
+            hammerdb_config = {k: v for k, v in hammerdb_config.items() if v != ''}
             unknown_keys = set(hammerdb_config.keys()) - set(render_data.keys())
             if unknown_keys:
                 logger.warning(f'HAMMERDB_CONFIG unknown keys (will be ignored): {unknown_keys}')

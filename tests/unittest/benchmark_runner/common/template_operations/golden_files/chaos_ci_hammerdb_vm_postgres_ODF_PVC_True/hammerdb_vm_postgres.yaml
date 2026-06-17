@@ -68,7 +68,7 @@ spec:
   volumeMode: Block
   resources:
     requests:
-      storage: 10Gi
+      storage: 256Gi
 ---
 apiVersion: kubevirt.io/v1
 kind: VirtualMachine
@@ -90,7 +90,7 @@ spec:
         kubernetes.io/hostname: "pin-node-2"
       domain:
         cpu:
-          sockets: 1
+          sockets: 32
           cores: 2
         devices:
           disks:

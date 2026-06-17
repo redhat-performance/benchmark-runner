@@ -25,7 +25,7 @@ diset connection mssqls_linux_odbc {ODBC Driver 18 for SQL Server}
 
 diset tpcc mssqls_dbase tpcc
 diset tpcc mssqls_driver timed
-diset tpcc mssqls_total_iterations 10000000
+diset tpcc mssqls_total_iterations {{ transactions }}
 diset tpcc mssqls_rampup {{ rampup }}
 diset tpcc mssqls_duration {{ runtime }}
 diset tpcc mssqls_checkpoint false

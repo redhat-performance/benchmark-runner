@@ -10,7 +10,7 @@ spec:
     volumeMode: Filesystem
     resources:
       requests:
-        storage: 100Gi
+        storage: 256Gi
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -40,7 +40,7 @@ spec:
         resources:
           requests:
             cpu: 32
-            memory: 32Gi
+            memory: 256G
           limits:
             cpu: 32
             memory: 32Gi

@@ -10,7 +10,7 @@ spec:
     volumeMode: Filesystem
     resources:
       requests:
-        storage: 10Gi
+        storage: 256Gi
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -39,8 +39,8 @@ spec:
         - containerPort: 1433
         resources:
           requests:
-            cpu: 10m
-            memory: 4Gi
+            cpu: 32
+            memory: 256G
           limits:
             cpu: 4
             memory: 12Gi

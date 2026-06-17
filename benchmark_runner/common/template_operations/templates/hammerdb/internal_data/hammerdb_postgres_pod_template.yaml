@@ -40,7 +40,7 @@ spec:
     volumeMode: Filesystem
     resources:
       requests:
-        storage: {{ storage }}
+        storage: {{ data_storage }}
 ---
 {%- endif %}
 apiVersion: v1

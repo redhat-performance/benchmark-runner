@@ -77,7 +77,7 @@ spec:
         resources:
           requests:
             cpu: 32
-            memory: 32G
+            memory: 256G
       networks:
       - name: nic-0
         pod: {}
@@ -124,7 +124,7 @@ spec:
         - ReadWriteMany
         resources:
           requests:
-            storage: 100Gi
+            storage: 256Gi
         volumeMode: Block
         storageClassName: ocs-storagecluster-ceph-rbd-virtualization
       source:

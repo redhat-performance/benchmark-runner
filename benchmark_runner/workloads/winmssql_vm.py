@@ -1,6 +1,7 @@
 
 import os
 import time
+import datetime
 import urllib.request
 from multiprocessing import Process
 
@@ -106,11 +107,13 @@ class WinMSSQLVM(BootstormVM):
                                         local_path=os.path.join(self._run_artifacts_path, '03_buildschema_mssql.tcl'),
                                         remote_path=f'{self.__remote_dir}/scripts/tcl/mssqls/tprocc/03_buildschema_mssql.tcl')
 
-            logger.info(f'Running run_prepare_hammerdb.ps1 on VM {vm_name} ...')
+            start = time.time()
+            logger.info(f'Running run_prepare_hammerdb.ps1 on VM {vm_name} ... Start time: {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}')
             self._virtctl.virtctl_ssh(vm_name=vm_name,
                                      command=f'powershell -NoProfile -ExecutionPolicy Bypass -File {self.__remote_dir}/run_prepare_hammerdb.ps1',
                                      namespace=self.__namespace, key_path=self.__ssh_key_path, username=self.__username,
                                      timeout=self._timeout)
+            logger.info(f'Finished run_prepare_hammerdb.ps1 on VM {vm_name} ... End time: {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")} , Total time: {round(time.time() - start, 2)} sec')
         except Exception as err:
             self.save_error_logs()
             raise err
@@ -119,11 +122,13 @@ class WinMSSQLVM(BootstormVM):
         """Phase 3: Run HammerDB benchmark (synchronized across all VMs)."""
         try:
             vm_name = self._get_vm_name(vm_num)
-            logger.info(f'Running run_hammerdb_benchmark.ps1 on VM {vm_name} ...')
+            start = time.time()
+            logger.info(f'Running run_hammerdb_benchmark.ps1 on VM {vm_name} ... Start time: {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}')
             self._virtctl.virtctl_ssh(vm_name=vm_name,
                                      command=f'powershell -NoProfile -ExecutionPolicy Bypass -File {self.__remote_dir}/run_hammerdb_benchmark.ps1',
                                      namespace=self.__namespace, key_path=self.__ssh_key_path, username=self.__username,
                                      timeout=self._timeout)
+            logger.info(f'Finished run_hammerdb_benchmark.ps1 on VM {vm_name} ... End time: {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")} , Total time: {round(time.time() - start, 2)} sec')
         except Exception as err:
             self.save_error_logs()
             raise err

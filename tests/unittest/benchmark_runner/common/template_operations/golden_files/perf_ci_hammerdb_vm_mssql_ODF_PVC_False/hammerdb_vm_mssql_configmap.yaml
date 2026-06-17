@@ -30,8 +30,8 @@ data:
     diset connection mssqls_linux_odbc "ODBC Driver 18 for SQL Server"
     diset connection mssqls_uid SA
     diset connection mssqls_pass s3curePasswordString
-    diset tpcc mssqls_count_ware 96
-    diset tpcc mssqls_num_vu 32
+    diset tpcc mssqls_count_ware 500
+    diset tpcc mssqls_num_vu 100
     diset tpcc mssqls_dbase tpcc
     diset tpcc mssqls_imdb false
     diset tpcc mssqls_bucket 1
@@ -81,19 +81,19 @@ data:
     diset connection mssqls_uid SA
     diset connection mssqls_pass s3curePasswordString
     puts "SETTING BENCHMARK OPTIONS"
-    diset tpcc mssqls_count_ware 96
-    diset tpcc mssqls_num_vu 32
+    diset tpcc mssqls_count_ware 500
+    diset tpcc mssqls_num_vu 100
     diset tpcc mssqls_dbase tpcc
     diset tpcc mssqls_imdb false
     diset tpcc mssqls_bucket 1
     diset tpcc mssqls_durability SCHEMA_AND_DATA
-    diset tpcc mssqls_total_iterations 100000
+    diset tpcc mssqls_total_iterations 10000000
     diset tpcc mssqls_raiseerror false
     diset tpcc mssqls_keyandthink false
     diset tpcc mssqls_checkpoint false
     diset tpcc mssqls_driver timed
-    diset tpcc mssqls_rampup 1
-    diset tpcc mssqls_duration 1
+    diset tpcc mssqls_rampup 10
+    diset tpcc mssqls_duration 120
     diset tpcc mssqls_allwarehouse false
     diset tpcc mssqls_timeprofile false
     diset tpcc mssqls_async_scale false
@@ -103,17 +103,17 @@ data:
     vuset logtotemp 1
     loadscript
     puts "SEQUENCE STARTED"
-    set workers 32
-    set transactions 100000
+    set workers 100
+    set transactions 10000000
     set samples 1
-    for {set w 1} { $w <= $workers } { set w [expr {$w*2}] } {
+    for {set w 100} { $w <= $workers } { set w [expr {$w*2}] } {
     puts "$w VU TEST"
     for {set i 1} {$i <= $samples} {incr i} {
         puts "============ RUNNING SAMPLE $i: $w WORKERS ============"
         vuset vu $w
         vucreate
         vurun
-        set calculation [expr { ( 1 + 1 ) * 60 * 1.4 }]
+        set calculation [expr { ( 10 + 120 ) * 60 * 1.4 }]
         set runtimer_seconds [expr int($calculation)]
         runtimer $runtimer_seconds
         runtimer 350
