@@ -158,7 +158,7 @@ class EnvironmentVariables:
 
         # HammerDB config override (optional), overrides template defaults.
         # test_ci defaults: HAMMERDB_CONFIG="{'db_min_workers': 1, 'db_num_workers': 2, 'db_warehouses': 2, 'runtime': 1, 'rampup': 1, 'iterations': 2, 'transactions': 100000, 'database_requests_cpu': '', 'sockets': '', 'database_requests_memory': '', 'data_storage': ''}"
-        self._environment_variables_dict['hammerdb_config'] = literal_eval(EnvironmentVariables.get_env('HAMMERDB_CONFIG', ""))
+        self._environment_variables_dict['hammerdb_config'] = literal_eval(EnvironmentVariables.get_env('HAMMERDB_CONFIG', '{}'))
 
         # Set namespace based on workload.
         # The workload_namespaces dict is the source of truth for where each workload runs.

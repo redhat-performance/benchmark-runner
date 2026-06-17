@@ -42,7 +42,7 @@ stringData:
       - mkdir -p /etc/systemd/system/mssql-server.service.d
       - systemctl daemon-reload
       - systemctl kill -s SIGKILL mssql-server || true
-      - sleep 3
+      - while systemctl is-active mssql-server >/dev/null 2>&1; do sleep 1; done
       - sudo ACCEPT_EULA='Y' MSSQL_PID='Enterprise' MSSQL_SA_PASSWORD='s3curePasswordString' /opt/mssql/bin/mssql-conf setup
       - sudo firewall-offline-cmd --add-port=1433/tcp || true
       - sudo systemctl enable firewalld || true
@@ -76,7 +76,7 @@ spec:
   volumeMode: Block
   resources:
     requests:
-      storage: 256Gi
+      storage: 100Gi
 ---
 apiVersion: kubevirt.io/v1
 kind: VirtualMachine

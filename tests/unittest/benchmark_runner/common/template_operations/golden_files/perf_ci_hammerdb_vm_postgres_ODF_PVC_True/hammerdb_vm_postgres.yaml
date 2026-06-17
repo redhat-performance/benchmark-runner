@@ -68,7 +68,7 @@ spec:
   volumeMode: Block
   resources:
     requests:
-      storage: 256Gi
+      storage: 100Gi
 ---
 apiVersion: kubevirt.io/v1
 kind: VirtualMachine

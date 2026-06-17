@@ -159,7 +159,7 @@ class HammerdbVm(WorkloadsOperations):
             self._ssh_key_path = self._virtctl.generate_ssh_key()
             self._environment_variables_dict['vm_ssh_public_key'] = self._virtctl.get_ssh_public_key(self._ssh_key_path)
             self._template.generate_yamls(scale=str(self._scale), scale_nodes=self._scale_node_list,
-                                          redis=self._redis, thread_limit=self._threads_limit)
+                                          thread_limit=self._threads_limit)
 
             self._oc.create_async(yaml=os.path.join(self._run_artifacts_path, 'namespace.yaml'))
             configmap_yaml = os.path.join(

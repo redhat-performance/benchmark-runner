@@ -27,8 +27,8 @@ data:
     diset tpcc pg_user postgres
     diset tpcc pg_pass postgres
     diset tpcc pg_dbase tpcc
-    diset tpcc pg_count_ware 500
-    diset tpcc pg_num_vu 100
+    diset tpcc pg_count_ware 96
+    diset tpcc pg_num_vu 32
     puts "CREATING SCHEMA"
     buildschema
     wait_to_complete
@@ -64,8 +64,8 @@ data:
     diset connection pg_host $pg_host
     diset connection pg_port 5432
     puts "SETTING BENCHMARK OPTIONS"
-    diset tpcc pg_count_ware 500
-    diset tpcc pg_num_vu 100
+    diset tpcc pg_count_ware 96
+    diset tpcc pg_num_vu 32
     diset tpcc pg_superuser postgres
     diset tpcc pg_superuserpass postgres
     diset tpcc pg_defaultdbase postgres
@@ -76,12 +76,12 @@ data:
     diset tpcc pg_dritasnap false
     diset tpcc pg_oracompat false
     diset tpcc pg_storedprocs false
-    diset tpcc pg_total_iterations 10000000
+    diset tpcc pg_total_iterations 200000
     diset tpcc pg_raiseerror false
     diset tpcc pg_keyandthink false
     diset tpcc pg_driver timed
-    diset tpcc pg_rampup 10
-    diset tpcc pg_duration 120
+    diset tpcc pg_rampup 1
+    diset tpcc pg_duration 1
     diset tpcc pg_allwarehouse false
     diset tpcc pg_timeprofile false
     diset tpcc pg_async_scale false
@@ -91,17 +91,17 @@ data:
     vuset logtotemp 1
     loadscript
     puts "SEQUENCE STARTED"
-    set workers 100
-    set transactions 10000000
+    set workers 32
+    set transactions 200000
     set samples 1
-    for {set w 100} { $w <= $workers } { set w [expr {$w*2}] } {
+    for {set w 1} { $w <= $workers } { set w [expr {$w*2}] } {
     puts "$w VU TEST"
     for {set i 1} {$i <= $samples} {incr i} {
         puts "============ RUNNING SAMPLE $i: $w WORKERS ============"
         vuset vu $w
         vucreate
         vurun
-        set calculation [expr { ( 10 + 120 ) * 60 * 1.4 }]
+        set calculation [expr { ( 1 + 1 ) * 60 * 1.4 }]
         set runtimer_seconds [expr int($calculation)]
         runtimer $runtimer_seconds
         runtimer 350
