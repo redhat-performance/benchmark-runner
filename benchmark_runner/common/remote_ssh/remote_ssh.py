@@ -42,6 +42,8 @@ class RemoteSsh:
             else:
                 raise SshConnectionError
 
+            # Send keepalive every 60 seconds to prevent firewalls from dropping idle connections
+            self.__p_client.get_transport().set_keepalive(60)
             self.__p_sftp = self.__p_client.open_sftp()
 
         except socket.timeout as err:
