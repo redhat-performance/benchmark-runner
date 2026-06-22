@@ -10,6 +10,7 @@ from typeguard import typechecked
 
 from benchmark_runner.common.elasticsearch.elasticsearch_operations import ElasticSearchOperations
 from benchmark_runner.jupyterlab.templates.summary_report.summary_report_operations import SummaryReportOperations
+from benchmark_runner.main.environment_variables import environment_variables
 
 # Configure the logger
 logging.basicConfig(level=logging.INFO)
@@ -27,7 +28,7 @@ class SummaryReportWidgets:
     DEFAULT_END_DATE = datetime.combine(datetime.now().date(), datetime.max.time())
     DEFAULT_START_DATE = datetime.combine(DEFAULT_END_DATE - timedelta(days=FETCH_OCP_VERSIONS_DAYS),
                                           datetime.min.time())
-    STORAGE_TYPES = {'hammerdb': 'ODF', 'hammerdb_lso': 'LSO', 'uperf': 'Ephemeral', 'vdbench': 'ODF', 'vdbench_scale': 'ODF', 'bootstorm': 'Ephemeral', 'windows': 'ODF (virtio)'}
+    STORAGE_TYPES = {'hammerdb': 'ODF', 'hammerdb_lso': 'LSO', 'hammerdb_scale': 'ODF', 'uperf': 'Ephemeral', 'fio': 'ODF', 'fio_scale': 'ODF', 'vdbench': 'ODF', 'vdbench_scale': 'ODF', 'bootstorm': 'Ephemeral', 'windows': 'ODF (virtio)', 'sysbench': 'ODF'}
     compared_ocp_versions = None
 
     def __init__(self, elasticsearch: ElasticSearchOperations):
@@ -165,8 +166,12 @@ class SummaryReportWidgets:
         Located in this class for get_compared_ocp_versions
         @return:
         """
-        entries = self.summary_report.get_workload_data(index=f'{workload}-results', start_datetime=self.DEFAULT_START_DATE,
-                                                             end_datetime=self.DEFAULT_END_DATE)
+        try:
+            entries = self.summary_report.get_workload_data(index=f'{workload}-results', start_datetime=self.DEFAULT_START_DATE,
+                                                                 end_datetime=self.DEFAULT_END_DATE)
+        except Exception as e:
+            logger.warning(f'No index found for workload: {workload} - {e}')
+            return pd.DataFrame()
         filter_df = self.summary_report.filter_data(entries=entries,
                                                     compared_ocp_versions=self.get_two_last_major_versions(),
                                                     kind=self.FILTER_KIND,
@@ -193,12 +198,16 @@ class SummaryReportWidgets:
             filtered_df = self.get_workload_filtered_data(workload=workload, filter_field={'storage_type': 'odf'})
         elif workload == 'hammerdb_lso':
             filtered_df = self.get_workload_filtered_data(workload='hammerdb', filter_field={'storage_type': 'lso'})
+        elif workload == 'hammerdb_scale':
+            filtered_df = self.get_workload_filtered_data(workload='hammerdb', filter_field={'scale': 6})
         elif workload == 'vdbench':
             filtered_df = self.get_workload_filtered_data(workload=workload, filter_field={'scale': None})
         elif workload == 'vdbench_scale':
-            # 'vdbench' index
             filtered_df = self.get_workload_filtered_data(workload='vdbench', filter_field={'scale': 6})
-        # uperf, bootstorm
+        elif workload == 'fio':
+            filtered_df = self.get_workload_filtered_data(workload=workload, filter_field={'scale': None})
+        elif workload == 'fio_scale':
+            filtered_df = self.get_workload_filtered_data(workload='fio', filter_field={'scale': 6})
         else:
             filtered_df = self.get_workload_filtered_data(workload=workload)
         return filtered_df
@@ -209,12 +218,19 @@ class SummaryReportWidgets:
         This method analyzes workload metrics between different OpenShift versions
         @return:
         """
-        median_geometric_mean_df = self.calc_median_geometric_mean_df(workload, self.get_filtered_df(workload))
+        filtered_df = self.get_filtered_df(workload)
+        if filtered_df.empty:
+            logger.warning(f'No data found for workload: {workload}')
+            return pd.DataFrame()
+        median_geometric_mean_df = self.calc_median_geometric_mean_df(workload, filtered_df)
+        if median_geometric_mean_df.empty:
+            logger.warning(f'No median geometric mean data for workload: {workload}')
+            return pd.DataFrame()
         v1, v2 = self.get_two_last_major_versions()
         median_geometric_mean_df.rename(columns={'previous_val': v1, 'geometric_mean': v2, 'result': self.get_two_last_major_versions()}, inplace=True)
         return median_geometric_mean_df
 
-    def analyze_all_workload(self, workloads: list = ['hammerdb', 'hammerdb_lso', 'uperf', 'vdbench', 'vdbench_scale', 'bootstorm', 'windows']):
+    def analyze_all_workload(self, workloads: list = ['hammerdb', 'hammerdb_lso', 'hammerdb_scale', 'uperf', 'fio', 'fio_scale', 'vdbench', 'vdbench_scale', 'bootstorm', 'windows', 'sysbench']):
         """
         This method analyzes all the workloads
         @param workloads:
@@ -223,14 +239,21 @@ class SummaryReportWidgets:
         result_df = None
         for workload in workloads:
             median_geometric_mean_df = self.analyze_workload(workload=workload)
+            if median_geometric_mean_df.empty:
+                continue
 
             # Add column types before comparison result
             median_geometric_mean_df.insert(len(median_geometric_mean_df.columns) - 1, 'storage type',
                                             median_geometric_mean_df['workload'].map(self.STORAGE_TYPES))
 
             result_df = pd.concat([result_df, median_geometric_mean_df], ignore_index=True)
+        if result_df is None:
+            return pd.DataFrame()
         # change workloads names
         result_df.loc[result_df['workload'] == 'hammerdb_lso', 'workload'] = 'hammerdb'
+        result_df.loc[result_df['workload'] == 'hammerdb_scale', 'workload'] = 'hammerdb_scale(6 vms)'
+        result_df.loc[result_df['workload'] == 'fio_scale', 'workload'] = 'fio_scale(6 vms)'
+        result_df.loc[result_df['workload'] == 'vdbench_scale', 'workload'] = 'vdbench_scale(6 vms)'
         result_df.loc[result_df['workload'] == 'windows', 'workload'] = 'bootstorm'
 
         # Reorder columns to put vm_os_version after metric
@@ -312,6 +335,26 @@ class SummaryReportWidgets:
 
         # Display the HTML-styled DataFrame
         display(HTML(style_html + details_df.to_html(index=False)))
+
+    def get_product_versions(self):
+        """
+        This method displays configured product versions
+        @return:
+        """
+        product_versions = environment_variables.environment_variables_dict.get('product_versions', {})
+        versions_df = pd.DataFrame(
+            list(product_versions.items()),
+            columns=['Product', 'Version']
+        )
+
+        style_html = """
+        <style>
+        th, td {
+            text-align: left !important;
+        }
+        </style>
+        """
+        display(HTML(style_html + versions_df.to_html(index=False)))
 
     def upload_report_to_elasticsearch(self, df: pd.DataFrame, index_name: str = "summary-report"):
         """

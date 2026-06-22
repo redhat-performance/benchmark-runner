@@ -21,8 +21,10 @@ class SummaryReportOperations:
     UPERF_LATENCY_METRIC = 'Latency'
     VDBENCH_LATENCY_METRIC = 'Latency'
     VDBENCH_IOPS_METRIC = 'Iops'
-    BOOTSTORM_FEDORA = 'fedora37'
-    BOOTSTORM_WINDOWS = [ 'windows11', 'windows_server_2022', 'windows_server_2025']
+    FIO_IOPS_METRIC = 'Iops'
+    FIO_LATENCY_METRIC = 'Latency'
+    SYSBENCH_CPU_METRIC = 'cpu'
+    SYSBENCH_MEMORY_METRIC = 'memory'
     BOOTSTORM_FEDORA_METRIC = '240 VMs run time'
     BOOTSTORM_WINDOWS_METRIC = '111 VMs run time'
 
@@ -32,6 +34,8 @@ class SummaryReportOperations:
         self.geometric_mean_data_throughput = None
         self.geometric_mean_data_iops = None
         self.geometric_mean_data_latency = None
+        self.geometric_mean_data_cpu = None
+        self.geometric_mean_data_memory = None
         self.bootstorm_df = None
         self.median_indices = None
         self.geometric_mean_df = None
@@ -107,7 +111,8 @@ class SummaryReportOperations:
         @param unique_uuid:
         @return:
         """
-        logger.info(subset[['workload', 'db_type', 'vm_os_version', 'ocp_version', 'current_worker', 'tpm']])
+        log_cols = [c for c in ['workload', 'db_type', 'vm_os_version', 'ocp_version', 'current_worker', 'tpm'] if c in subset.columns]
+        logger.info(subset[log_cols])
         geometric_mean_result = self.__geometric_mean(subset['tpm'].tolist())
         # Get uuid, ocp_version, cnv_version, odf_version, geometric_mean and append data to result DataFrame
         self.__update_geometric_mean_data(subset, unique_uuid)
@@ -165,8 +170,8 @@ class SummaryReportOperations:
         geo_mean_latency = self.__geometric_mean(average_latency_df['Resp'])
         geo_mean_iops = self.__geometric_mean(average_iops_df['Rate'])
 
-        logger.info('geo_mean_latency', geo_mean_latency)
-        logger.info('geo_mean_iops', geo_mean_iops)
+        logger.info('geo_mean_latency=%s', geo_mean_latency)
+        logger.info('geo_mean_iops=%s', geo_mean_iops)
         self.__update_geometric_mean_data(subset, unique_uuid)
         self.geometric_mean_data_iops.update(self.geometric_mean_data)
         self.geometric_mean_data_iops['geometric_mean'].append(geo_mean_iops)
@@ -183,10 +188,46 @@ class SummaryReportOperations:
         """
         # Calculate bootstorm total run time
         self.bootstorm_df = subset.groupby(['vm_os_version', 'uuid', 'ocp_version', 'cnv_version', 'odf_version'])['total_run_time'].mean().reset_index()
-        logger.info('geometric_mean_df', self.geometric_mean_df)
+        logger.info('geometric_mean_df=%s', self.geometric_mean_df)
         self.__update_geometric_mean_data(subset, unique_uuid)
         self.geometric_mean_data['geometric_mean'].append(self.bootstorm_df['total_run_time'].iloc[0])
         self.geometric_mean_data['metric'].append(self.bootstorm_df['vm_os_version'].iloc[0])
+
+    @typechecked()
+    def update_fio_data(self, subset: pd.DataFrame, unique_uuid: str):
+        average_latency_df = \
+            subset.groupby(['uuid', 'ocp_version', 'cnv_version', 'odf_version', 'block_size', 'io_operation'])[
+                'lat_avg_usec'].mean().reset_index()
+        average_iops_df = \
+            subset.groupby(['uuid', 'ocp_version', 'cnv_version', 'odf_version', 'block_size', 'io_operation'])[
+                'total_iops'].mean().reset_index()
+
+        geo_mean_latency = self.__geometric_mean(average_latency_df['lat_avg_usec'])
+        geo_mean_iops = self.__geometric_mean(average_iops_df['total_iops'])
+
+        logger.info('geo_mean_latency=%s', geo_mean_latency)
+        logger.info('geo_mean_iops=%s', geo_mean_iops)
+        self.__update_geometric_mean_data(subset, unique_uuid)
+        self.geometric_mean_data_iops.update(self.geometric_mean_data)
+        self.geometric_mean_data_iops['geometric_mean'].append(geo_mean_iops)
+        self.geometric_mean_data_latency.update(self.geometric_mean_data)
+        self.geometric_mean_data_latency['geometric_mean'].append(geo_mean_latency)
+
+    @typechecked()
+    def update_sysbench_data(self, subset: pd.DataFrame, unique_uuid: str):
+        has_cpu = 'cpu_events_avg' in subset.columns and subset['cpu_events_avg'].notna().all()
+        has_memory = 'memory_throughput_mib' in subset.columns and subset['memory_throughput_mib'].notna().all()
+        if not has_cpu and not has_memory:
+            return
+        self.__update_geometric_mean_data(subset, unique_uuid)
+        if has_cpu:
+            geo_mean_cpu = self.__geometric_mean(subset['cpu_events_avg'].tolist())
+            self.geometric_mean_data_cpu.update(self.geometric_mean_data)
+            self.geometric_mean_data_cpu['geometric_mean'].append(geo_mean_cpu)
+        if has_memory:
+            geo_mean_memory = self.__geometric_mean(subset['memory_throughput_mib'].tolist())
+            self.geometric_mean_data_memory.update(self.geometric_mean_data)
+            self.geometric_mean_data_memory['geometric_mean'].append(geo_mean_memory)
 
     @typechecked()
     def prepare_workload_dataframe(self, workload: str, df: pd.DataFrame):
@@ -200,7 +241,7 @@ class SummaryReportOperations:
         # Initialize common structure
         common_structure = {'uuid': [], 'ocp_version': [], 'cnv_version': [], 'odf_version': [], 'vm_os_version': []}
 
-        if workload in ['hammerdb', 'hammerdb_lso']:
+        if workload in ['hammerdb', 'hammerdb_lso', 'hammerdb_scale']:
             self.geometric_mean_data = {'workload': workload, **common_structure, 'db_type': [], 'geometric_mean': []}
         elif workload == 'uperf':
             # Filter out values greater than 1000
@@ -217,8 +258,20 @@ class SummaryReportOperations:
                                              'geometric_mean': []}
             self.geometric_mean_data_latency = {'workload': workload, **common_structure, 'metric': self.VDBENCH_LATENCY_METRIC,
                                                 'geometric_mean': []}
+        elif workload in ['fio', 'fio_scale']:
+            self.geometric_mean_data = {**common_structure}
+            self.geometric_mean_data_iops = {'workload': workload, **common_structure, 'metric': self.FIO_IOPS_METRIC,
+                                             'geometric_mean': []}
+            self.geometric_mean_data_latency = {'workload': workload, **common_structure, 'metric': self.FIO_LATENCY_METRIC,
+                                                'geometric_mean': []}
         elif workload in ['bootstorm', 'windows']:
             self.geometric_mean_data = {'workload': workload, **common_structure, 'metric': [], 'geometric_mean': []}
+        elif workload == 'sysbench':
+            self.geometric_mean_data = {**common_structure}
+            self.geometric_mean_data_cpu = {'workload': workload, **common_structure, 'metric': self.SYSBENCH_CPU_METRIC,
+                                            'geometric_mean': []}
+            self.geometric_mean_data_memory = {'workload': workload, **common_structure, 'metric': self.SYSBENCH_MEMORY_METRIC,
+                                               'geometric_mean': []}
 
         return df
 
@@ -303,10 +356,19 @@ class SummaryReportOperations:
         self.geometric_mean_df = self.__calc_workload_precentage_diff(workload, self.geometric_mean_data, complementary=True, metric='windows_server_2019')
         # Set metric to the display name only (OS is in vm_os_version column)
         if workload == 'windows':
-            for os in self.BOOTSTORM_WINDOWS:
-                self.geometric_mean_df['metric'] = self.geometric_mean_df['metric'].replace({os: self.BOOTSTORM_WINDOWS_METRIC})
+            self.geometric_mean_df['metric'] = self.BOOTSTORM_WINDOWS_METRIC
         else:
-            self.geometric_mean_df['metric'] = self.geometric_mean_df['metric'].replace({self.BOOTSTORM_FEDORA: self.BOOTSTORM_FEDORA_METRIC})
+            self.geometric_mean_df['metric'] = self.BOOTSTORM_FEDORA_METRIC
+
+    def aggregate_fio_dataframe(self, workload):
+        geometric_mean_df_iops = self.__calc_workload_precentage_diff(workload, self.geometric_mean_data_iops)
+        geometric_mean_df_latency = self.__calc_workload_precentage_diff(workload, self.geometric_mean_data_latency, complementary=True)
+        self.geometric_mean_df = pd.concat([geometric_mean_df_iops, geometric_mean_df_latency], ignore_index=True)
+
+    def aggregate_sysbench_dataframe(self, workload):
+        geometric_mean_df_cpu = self.__calc_workload_precentage_diff(workload, self.geometric_mean_data_cpu)
+        geometric_mean_df_memory = self.__calc_workload_precentage_diff(workload, self.geometric_mean_data_memory)
+        self.geometric_mean_df = pd.concat([geometric_mean_df_cpu, geometric_mean_df_memory], ignore_index=True)
 
     @typechecked()
     def aggregate_workload_dataframe(self, workload: str):
@@ -315,14 +377,18 @@ class SummaryReportOperations:
         @param workload:
         @return:
         """
-        if workload in ['hammerdb', 'hammerdb_lso']:
+        if workload in ['hammerdb', 'hammerdb_lso', 'hammerdb_scale']:
             self.aggregate_hammerdb_dataframe(workload)
         elif workload == 'uperf':
             self.aggregate_uperf_dataframe(workload)
         elif workload in ['vdbench', 'vdbench_scale']:
             self.aggregate_vdbench_dataframe(workload)
+        elif workload in ['fio', 'fio_scale']:
+            self.aggregate_fio_dataframe(workload)
         elif workload in ['bootstorm', 'windows']:
             self.aggregate_bootstorm_dataframe(workload)
+        elif workload == 'sysbench':
+            self.aggregate_sysbench_dataframe(workload)
 
     @typechecked()
     def calc_median_geometric_mean_df(self, workload: str, df: pd.DataFrame):
@@ -334,6 +400,8 @@ class SummaryReportOperations:
         """
 
         logger.info('Wait till fetch and analyzing data ...')
+        if df.empty:
+            return pd.DataFrame()
         # Convert lists to strings in the 'uuid' column
         df['uuid'] = df['uuid'].apply(
             lambda x: x[0] if isinstance(x, list) and x else x)
@@ -351,8 +419,7 @@ class SummaryReportOperations:
         for label, unique_uuid in enumerate(uniques):
             # logger.info(f"For each UUID {unique_uuid}:")
             subset = df[labels == label]
-            if workload in ['hammerdb', 'hammerdb_lso']:
-                # Skip empty columns and skip NaN tpm values
+            if workload in ['hammerdb', 'hammerdb_lso', 'hammerdb_scale']:
                 if not subset.empty and subset['tpm'].notna().all():
                     self.update_hammerdb_data(subset, unique_uuid)
             elif workload == 'uperf':
@@ -361,9 +428,15 @@ class SummaryReportOperations:
             elif workload in ['vdbench', 'vdbench_scale']:
                 if not subset.empty and subset['Rate'].notna().all() and subset['Resp'].notna().all():
                     self.update_vdbench_data(subset, unique_uuid)
+            elif workload in ['fio', 'fio_scale']:
+                if not subset.empty and 'total_iops' in subset.columns and 'lat_avg_usec' in subset.columns and subset['total_iops'].notna().all() and subset['lat_avg_usec'].notna().all():
+                    self.update_fio_data(subset, unique_uuid)
             elif workload in ['bootstorm', 'windows']:
                 if not subset.empty and subset['total_run_time'].notna().all():
                     self.update_bootstorm_data(subset, unique_uuid)
+            elif workload == 'sysbench':
+                if not subset.empty:
+                    self.update_sysbench_data(subset, unique_uuid)
 
         self.aggregate_workload_dataframe(workload)
         return self.geometric_mean_df
