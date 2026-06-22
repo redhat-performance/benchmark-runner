@@ -20,18 +20,19 @@ template_data:
     iterations: 2
     rampup: 1
     runtime: 1
+    data_storage: 76Gi
   run_type:
     perf_ci:
       db_num_workers: 32
       db_warehouses: 96
-      requests_memory: 32G
-      requests_cpu: 32
+      database_requests_memory: 32G
+      database_requests_cpu: 32
       sockets: 32
       storage: 76Gi
     default:
       db_num_workers: 2
       db_warehouses: 2
-      requests_memory: 16G
-      requests_cpu: 16
+      database_requests_memory: 16G
+      database_requests_cpu: 16
       sockets: 16
       storage: 76Gi

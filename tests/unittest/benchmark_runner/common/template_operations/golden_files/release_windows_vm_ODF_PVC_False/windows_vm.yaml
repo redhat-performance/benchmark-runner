@@ -6,7 +6,7 @@ metadata:
     kubevirt.io/vm: windows-vm-deadbeef
   namespace: benchmark-runner
 spec:
-  running: false
+  runStrategy: Halted
   template:
     metadata:
       labels:

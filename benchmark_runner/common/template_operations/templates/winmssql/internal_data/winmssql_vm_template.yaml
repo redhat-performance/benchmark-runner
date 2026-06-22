@@ -15,7 +15,7 @@ spec:
   {% if run_strategy -%}
   runStrategy: Always
   {%- else -%}
-  running: false
+  runStrategy: Halted
   {%- endif %}
   template:
     metadata:
@@ -98,8 +98,8 @@ spec:
           type: q35
         resources:
           requests:
-            cpu: {{ requests_cpu }}
-            memory: {{ requests_memory }}
+            cpu: {{ database_requests_cpu }}
+            memory: {{ database_requests_memory }}
       networks:
       - name: nic-0
         pod: {}
@@ -170,7 +170,7 @@ spec:
         - ReadWriteMany
         resources:
           requests:
-            storage: 100Gi
+            storage: {{ data_storage }}
         volumeMode: Block
         storageClassName: ocs-storagecluster-ceph-rbd-virtualization
       source:

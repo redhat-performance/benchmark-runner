@@ -6,7 +6,7 @@ metadata:
     kubevirt.io/vm: winmssql-vm-deadbeef
   namespace: benchmark-runner
 spec:
-  running: false
+  runStrategy: Halted
   template:
     metadata:
       labels:
@@ -124,7 +124,7 @@ spec:
         - ReadWriteMany
         resources:
           requests:
-            storage: 100Gi
+            storage: 76Gi
         volumeMode: Block
         storageClassName: ocs-storagecluster-ceph-rbd-virtualization
       source:
