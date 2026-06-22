@@ -15,7 +15,7 @@ spec:
   {% if run_strategy -%}
   runStrategy: Always
   {%- else -%}
-  running: false
+  runStrategy: Halted
   {%- endif %}
   template:
     metadata:

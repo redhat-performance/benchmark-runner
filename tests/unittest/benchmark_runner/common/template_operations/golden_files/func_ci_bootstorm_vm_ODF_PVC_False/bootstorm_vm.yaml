@@ -9,7 +9,7 @@ metadata:
     benchmark-uuid: deadbeef-0123-3210-cdef-01234567890abcdef
     benchmark-runner-workload: bootstorm
 spec:
-  running: false
+  runStrategy: Halted
   template:
     metadata:
      labels:
