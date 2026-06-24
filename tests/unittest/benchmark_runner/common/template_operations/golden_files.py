@@ -9,6 +9,13 @@ from benchmark_runner.common.template_operations.template_operations import Temp
 from tests.unittest.benchmark_runner.common.template_operations.golden_files_exceptions import GoldenFileCheckFailed
 
 
+# Workloads excluded from golden-file regression tests.
+# Add entries here (with a comment explaining why) only if a workload
+# cannot reasonably produce golden files; do NOT maintain a separate allowlist.
+# clusterbuster and krknhub do not use YAML files
+_EXCLUDED_WORKLOADS: set = {'clusterbuster', 'krknhub'}
+
+
 class GoldenFiles:
     """Generate golden files for regression testing"""
 
@@ -25,15 +32,11 @@ class GoldenFiles:
         environment_variables.environment_variables_dict['prom_token_override'] = 'fake_prom_token'
         environment_variables.environment_variables_dict['uuid'] = 'deadbeef-0123-3210-cdef-01234567890abcdef'
         environment_variables.environment_variables_dict['trunc_uuid'] = environment_variables.environment_variables_dict['uuid'].split('-')[0]
-        environment_variables.environment_variables_dict['workloads'] = ['stressng_pod', 'stressng_vm', 'stressng_kata',
-                                                         'uperf_pod', 'uperf_vm', 'uperf_kata',
-                                                         'sysbench_pod', 'sysbench_vm',
-                                                         'hammerdb_pod_mariadb', 'hammerdb_vm_mariadb', 'hammerdb_kata_mariadb',
-                                                         'hammerdb_pod_postgres', 'hammerdb_vm_postgres', 'hammerdb_kata_postgres',
-                                                         'hammerdb_pod_mssql', 'hammerdb_vm_mssql', 'hammerdb_kata_mssql',
-                                                         'vdbench_pod', 'vdbench_kata', 'vdbench_vm',
-                                                         'fio_pod', 'fio_vm', 'winfio_vm',
-                                                         'bootstorm_vm', 'windows_vm', 'winmssql_vm']
+        environment_variables.environment_variables_dict['workloads'] = [
+            w for w in environment_variables.environment_variables_dict['workloads']
+            if w not in _EXCLUDED_WORKLOADS
+        ]
+
     def __clear_directory_yaml(self, dir):
         if os.path.isdir(dir):
             for file in os.listdir(dir):
