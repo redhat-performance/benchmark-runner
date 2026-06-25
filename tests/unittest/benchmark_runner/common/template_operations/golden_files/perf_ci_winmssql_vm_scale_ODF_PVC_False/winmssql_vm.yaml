@@ -1,0 +1,131 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name:  winmssql-vm-deadbeef
+  labels:
+    kubevirt.io/vm: winmssql-vm-deadbeef
+  namespace: benchmark-runner
+spec:
+  runStrategy: Halted
+  template:
+    metadata:
+      labels:
+        kubevirt.io/vm: windows-vm-deadbeef
+    spec:
+      terminationGracePeriodSeconds: 0
+      evictionStrategy: LiveMigrate
+      domain:
+        firmware:
+          bootloader:
+            efi:
+              secureBoot: false
+        clock:
+          timer:
+            hpet:
+              present: false
+            hyperv: {}
+            pit:
+              tickPolicy: delay
+            rtc:
+              tickPolicy: catchup
+          utc: {}
+        cpu:
+          cores: 1
+          model: host-passthrough
+          sockets: 32
+          threads: 1
+        devices:
+          blockMultiQueue: false
+          disks:
+          - disk:
+              bus: virtio
+            name: windows-vm-root-disk-deadbeef
+            dedicatedIOThread: false
+          - disk:
+              bus: virtio
+            name: windows-vm-data-disk-deadbeef
+          - disk:
+              bus: virtio
+            name: cloudinitdisk
+          interfaces:
+          - masquerade: {}
+            model: virtio
+            name: nic-0
+            networkInterfaceMultiqueue: true
+            tpm: { }
+        features:
+          acpi: {}
+          apic: {}
+          hyperv:
+            frequencies: {}
+            ipi: {}
+            reenlightenment: {}
+            tlbflush: {}
+            relaxed: {}
+            reset: {}
+            runtime: {}
+            spinlocks:
+              spinlocks: 8191
+            synic: {}
+            synictimer:
+                direct: {}
+            vapic: {}
+            vpindex: {}
+          smm: {}
+        machine:
+          type: q35
+        resources:
+          requests:
+            cpu: 32
+            memory: 32G
+      networks:
+      - name: nic-0
+        pod: {}
+      volumes:
+      - dataVolume:
+          name: windows-vm-root-disk-deadbeef
+        name: windows-vm-root-disk-deadbeef
+      - dataVolume:
+          name: windows-vm-data-disk-deadbeef
+        name: windows-vm-data-disk-deadbeef
+      - cloudInitNoCloud:
+          userData: |
+            #cloud-config
+            runcmd:
+              - powershell -Command "New-Item -ItemType Directory -Force -Path 'C:\ProgramData\ssh' | Out-Null; Set-Content -Path 'C:\ProgramData\ssh\administrators_authorized_keys' -Value '' -Encoding ascii -Force; icacls 'C:\ProgramData\ssh\administrators_authorized_keys' /inheritance:r /grant 'Administrators:F' /grant 'SYSTEM:F'"
+              - cmd /c "mkdir C:\Users\Administrator\.ssh >nul 2>&1 & icacls C:\Users\Administrator\.ssh /grant Everyone:F >nul 2>&1 & takeown /f C:\Users\Administrator\.ssh\authorized_keys >nul 2>&1 & icacls C:\Users\Administrator\.ssh\authorized_keys /grant Everyone:F >nul 2>&1 & del /f C:\Users\Administrator\.ssh\authorized_keys >nul 2>&1"
+              - powershell -Command "Copy-Item 'C:\ProgramData\ssh\administrators_authorized_keys' 'C:\Users\Administrator\.ssh\authorized_keys' -Force; icacls 'C:\Users\Administrator\.ssh\authorized_keys' /inheritance:r /grant 'Administrators:F' /grant 'SYSTEM:F'; icacls 'C:\Users\Administrator\.ssh' /inheritance:r /grant 'Administrators:F' /grant 'SYSTEM:F'"
+        name: cloudinitdisk
+  dataVolumeTemplates:
+  - metadata:
+      annotations:
+        descheduler.alpha.kubernetes.io/evict: "true"
+      name: windows-vm-root-disk-deadbeef
+    spec:
+      pvc:
+        accessModes:
+        - ReadWriteMany
+        resources:
+          requests:
+            storage: 76Gi
+        volumeMode: Block
+        storageClassName: ocs-storagecluster-ceph-rbd-virtualization
+      source:
+        pvc:
+          namespace: benchmark-runner
+          name: windows-clone-dv
+  - metadata:
+      annotations:
+        descheduler.alpha.kubernetes.io/evict: "true"
+      name: windows-vm-data-disk-deadbeef
+    spec:
+      pvc:
+        accessModes:
+        - ReadWriteMany
+        resources:
+          requests:
+            storage: 76Gi
+        volumeMode: Block
+        storageClassName: ocs-storagecluster-ceph-rbd-virtualization
+      source:
+        blank: {}
