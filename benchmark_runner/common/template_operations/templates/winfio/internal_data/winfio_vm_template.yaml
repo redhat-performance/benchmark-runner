@@ -26,13 +26,7 @@ spec:
         kubevirt.io/vm: winfio-{{ kind }}-{{ trunc_uuid }}
         {%- endif %}
     spec:
-      terminationGracePeriodSeconds: 0
-      evictionStrategy: LiveMigrate
       domain:
-        firmware:
-          bootloader:
-            efi:
-              secureBoot: false
         clock:
           timer:
             hpet:
@@ -49,16 +43,17 @@ spec:
           sockets: {{ sockets }}
           threads: 1
         devices:
+          autoattachMemBalloon: false
           blockMultiQueue: false
           disks:
-          - disk:
-              bus: virtio
-            {% if scale -%}
+          - {% if scale -%}
             name: winfio-{{ kind }}-root-disk-{{ trunc_uuid }}-{{ scale }}
             {%- else -%}
             name: winfio-{{ kind }}-root-disk-{{ trunc_uuid }}
             {%- endif %}
-            dedicatedIOThread: false
+            disk:
+              bus: virtio
+            bootOrder: 1
           - disk:
               bus: virtio
             {% if scale -%}
@@ -69,40 +64,53 @@ spec:
           - disk:
               bus: virtio
             name: cloudinitdisk
+          inputs:
+          - bus: virtio
+            name: tablet
+            type: tablet
+          tpm: {}
           interfaces:
-          - masquerade: {}
+          - name: nic-0
+            masquerade: {}
             model: virtio
-            name: nic-0
-            networkInterfaceMultiqueue: true
-            tpm: { }
+          networkInterfaceMultiqueue: true
         features:
           acpi: {}
           apic: {}
           hyperv:
-            frequencies: {}
             ipi: {}
-            reenlightenment: {}
-            tlbflush: {}
-            relaxed: {}
-            reset: {}
-            runtime: {}
-            spinlocks:
-              spinlocks: 8191
             synic: {}
             synictimer:
-                direct: {}
-            vapic: {}
+              direct: {}
+            spinlocks:
+              spinlocks: 8191
+            evmcs:
+              enabled: true
+            relaxed: {}
             vpindex: {}
+            runtime: {}
+            tlbflush: {}
+            frequencies: {}
+            vapic: {}
           smm: {}
+        firmware:
+          bootloader:
+            efi:
+              secureBoot: false
+        ioThreads:
+          supplementalPoolThreadCount: 8
+        ioThreadsPolicy: supplementalPool
         machine:
           type: q35
         resources:
           requests:
             cpu: {{ requests_cpu }}
             memory: {{ requests_memory }}
+      evictionStrategy: LiveMigrate
       networks:
       - name: nic-0
         pod: {}
+      terminationGracePeriodSeconds: 180
       volumes:
       - dataVolume:
           {% if scale -%}
