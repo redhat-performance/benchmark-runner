@@ -12,13 +12,7 @@ spec:
       labels:
         kubevirt.io/vm: winfio-vm-deadbeef
     spec:
-      terminationGracePeriodSeconds: 0
-      evictionStrategy: LiveMigrate
       domain:
-        firmware:
-          bootloader:
-            efi:
-              secureBoot: false
         clock:
           timer:
             hpet:
@@ -35,52 +29,66 @@ spec:
           sockets: 2
           threads: 1
         devices:
+          autoattachMemBalloon: false
           blockMultiQueue: false
           disks:
-          - disk:
+          - name: winfio-vm-root-disk-deadbeef
+            disk:
               bus: virtio
-            name: winfio-vm-root-disk-deadbeef
-            dedicatedIOThread: false
+            bootOrder: 1
           - disk:
               bus: virtio
             name: winfio-vm-data-disk-deadbeef
           - disk:
               bus: virtio
             name: cloudinitdisk
+          inputs:
+          - bus: virtio
+            name: tablet
+            type: tablet
+          tpm: {}
           interfaces:
-          - masquerade: {}
+          - name: nic-0
+            masquerade: {}
             model: virtio
-            name: nic-0
-            networkInterfaceMultiqueue: true
-            tpm: { }
+          networkInterfaceMultiqueue: true
         features:
           acpi: {}
           apic: {}
           hyperv:
-            frequencies: {}
             ipi: {}
-            reenlightenment: {}
-            tlbflush: {}
-            relaxed: {}
-            reset: {}
-            runtime: {}
-            spinlocks:
-              spinlocks: 8191
             synic: {}
             synictimer:
-                direct: {}
-            vapic: {}
+              direct: {}
+            spinlocks:
+              spinlocks: 8191
+            evmcs:
+              enabled: true
+            relaxed: {}
             vpindex: {}
+            runtime: {}
+            tlbflush: {}
+            frequencies: {}
+            vapic: {}
           smm: {}
+        firmware:
+          bootloader:
+            efi:
+              secureBoot: false
+        ioThreads:
+          supplementalPoolThreadCount: 8
+        ioThreadsPolicy: supplementalPool
         machine:
           type: q35
         resources:
           requests:
             cpu: 1
             memory: 4G
+      evictionStrategy: LiveMigrate
       networks:
       - name: nic-0
         pod: {}
+      terminationGracePeriodSeconds: 180
       volumes:
       - dataVolume:
           name: winfio-vm-root-disk-deadbeef
