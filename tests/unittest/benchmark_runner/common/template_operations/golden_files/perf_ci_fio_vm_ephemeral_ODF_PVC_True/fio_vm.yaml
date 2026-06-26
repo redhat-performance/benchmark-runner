@@ -1,0 +1,109 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: fio-cloudinit
+  namespace: benchmark-runner
+stringData:
+  userdata: |-
+    #cloud-config
+    password: centos
+    chpasswd: { expire: False }
+    ssh_pwauth: true
+    bootcmd:
+      - "mkdir -p /workload || true"
+      - "mkfs.ext4 /dev/$(lsblk --nodeps -no name,serial | grep fiodata | cut -f1 -d' ') 2>/dev/null && mount /dev/$(lsblk --nodeps -no name,serial | grep fiodata | cut -f1 -d' ') /workload || true"
+      - "mkdir -p /fio || true"
+      - "mount /dev/$(lsblk --nodeps -no name,serial | grep fiorunner | cut -f1 -d' ') /mnt && cp /mnt/fio_runner.sh /fio/fio_runner.sh && chmod +x /fio/fio_runner.sh && umount /mnt"
+    runcmd:
+      - export BLOCK_SIZES=4k,8k,32k,1M
+      - export IO_OPERATION=read,write,randread,randwrite
+      - export IO_THREADS=8,8,8,8
+      - export IO_DEPTH=4,4,4,4
+      - export DURATION=180
+      - export PAUSE=20
+      - export DIRECT=1
+      - export IOENGINE=libaio
+      - export SIZE=4G
+      - export LOGS_DIR=/workload/
+      - export REDIS_HOST=
+      - export WORKLOAD_METHOD=/fio/fio_runner.sh
+      - echo @@~@@START-WORKLOAD@@~@@
+      - podman run --rm -e BLOCK_SIZES="$BLOCK_SIZES" -e IO_OPERATION="$IO_OPERATION" -e IO_THREADS="$IO_THREADS" -e IO_DEPTH="$IO_DEPTH" -e DURATION="$DURATION" -e PAUSE="$PAUSE" -e DIRECT="$DIRECT" -e IOENGINE="$IOENGINE" -e SIZE="$SIZE" -e LOGS_DIR="$LOGS_DIR" -v "/workload":"/workload" -v "/fio":"/fio" --privileged quay.io/benchmark-runner/fedora:43 bash -c "dnf install -y fio >/dev/null 2>&1 && $WORKLOAD_METHOD"
+      - echo @@~@@END-WORKLOAD@@~@@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: fio-pvc-claim
+  namespace: benchmark-runner
+spec:
+  storageClassName: ocs-storagecluster-ceph-rbd
+  accessModes: [ "ReadWriteOnce" ]
+  volumeMode: Block
+  resources:
+    requests:
+      storage: 64Gi
+---
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: fio-vm-deadbeef
+  namespace: benchmark-runner
+  labels:
+    app: fio-deadbeef
+    type: fio-vm-deadbeef
+    benchmark-uuid: deadbeef-0123-3210-cdef-01234567890abcdef
+    benchmark-runner-workload: fio
+spec:
+  running: true
+  template:
+    metadata:
+      labels:
+        kubevirt-vm: fio
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: pin-node-1
+      domain:
+        cpu:
+          sockets: 2
+          cores: 1
+          threads: 1
+        devices:
+          disks:
+            - disk:
+                bus: virtio
+              name: containerdisk
+            - disk:
+                bus: virtio
+              name: cloudinitdisk
+            - disk:
+                bus: virtio
+              name: data-volume
+              serial: fiodata
+            - disk: {}
+              name: fio-runner-volume
+              serial: fiorunner
+        machine:
+          type: ""
+        resources:
+          requests:
+            cpu: 2
+            memory: 4Gi
+          limits:
+            cpu: 2
+            memory: 4Gi
+      terminationGracePeriodSeconds: 180
+      volumes:
+        - name: data-volume
+          persistentVolumeClaim:
+            claimName: fio-pvc-claim
+        - containerDisk:
+            image: quay.io/benchmark-runner/fedora-container-disk:43
+          name: containerdisk
+        - cloudInitNoCloud:
+            secretRef:
+              name: fio-cloudinit
+          name: cloudinitdisk
+        - configMap:
+            name: fio-runner-script
+          name: fio-runner-volume
