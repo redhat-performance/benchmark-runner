@@ -97,7 +97,8 @@ pipeline {
             }
         }
         success {
-            echo 'TBD'
+            echo 'Triggering 06-PerfCI-Orion-Deployment pipeline'
+            build job: '06-PerfCI-Orion-Deployment', wait: false
         }
     }
 }

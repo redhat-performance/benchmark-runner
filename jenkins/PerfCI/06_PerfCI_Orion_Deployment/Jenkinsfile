@@ -1,0 +1,85 @@
+pipeline {
+    agent {
+        label 'PerfCi'
+    }
+    environment {
+        CONTACT_EMAIL = credentials('perfci_contact_email')
+        ELASTICSEARCH = credentials('perfci_elasticsearch')
+        ELASTICSEARCH_PORT = credentials('perfci_elasticsearch_port')
+    }
+    stages {
+        stage('Cleanup') {
+            steps {
+                script {
+                    echo "Cleaning Jenkins workspace"
+                    deleteDir()
+                }
+            }
+        }
+
+        stage('Checkout') {
+            steps {
+                script {
+                    git branch: 'main', url: 'https://github.com/redhat-performance/benchmark-runner'
+                }
+            }
+        }
+
+        stage('Orion Regression Analysis') {
+            steps {
+                script {
+                    def indexMap = [
+                        'bootstorm': 'bootstorm-results',
+                        'windows-bootstorm': 'windows-results',
+                        'hammerdb': 'hammerdb-results',
+                        'uperf': 'uperf-results',
+                        'fio': 'fio-results',
+                        'vdbench': 'vdbench-results',
+                        'sysbench': 'sysbench-results'
+                    ]
+
+                    def esServer = "http://${ELASTICSEARCH}:${ELASTICSEARCH_PORT}"
+                    def configsDir = "${WORKSPACE}/orion-configs"
+                    def reportsDir = '/opt/orion-reports'
+                    def runDate = sh(script: 'date +%Y-%m-%d_%H-%M', returnStdout: true).trim()
+
+                    sh "find ${reportsDir} -mindepth 2 -maxdepth 2 -type d -mtime +90 -exec rm -rf {} + || true"
+
+                    indexMap.each { workload, idx ->
+                        def configPath = "${configsDir}/perfci-${workload}.yaml"
+                        def outDir = "${reportsDir}/${workload}/${runDate}"
+                        sh "mkdir -p ${outDir}"
+                        def rc = sh(returnStatus: true, script: """
+                            source /opt/orion-venv/bin/activate
+                            orion --es-server ${esServer} \
+                              --metadata-index ${idx} \
+                              --benchmark-index ${idx} \
+                              --lookback 15d \
+                              --hunter-analyze --viz \
+                              --save-output-path ${outDir}/results.txt \
+                              --config ${configPath}
+                        """)
+                        if (rc != 0) {
+                            echo "WARNING: Orion detected regression or error for ${workload} (exit ${rc})"
+                            currentBuild.result = 'UNSTABLE'
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        failure {
+            script {
+                msg = "Build error for ${env.JOB_NAME} ${env.BUILD_NUMBER} (${env.BUILD_URL})"
+                emailext body: """\
+                    Jenkins job: ${env.BUILD_URL}\nSee the console output for more details:  ${env.BUILD_URL}consoleFull\n\n
+                """, subject: msg, to: "${CONTACT_EMAIL}"
+            }
+        }
+        success {
+            echo "Orion reports available at http://${ELASTICSEARCH}:9091/"
+        }
+    }
+}

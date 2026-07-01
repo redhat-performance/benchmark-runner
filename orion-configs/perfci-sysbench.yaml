@@ -1,0 +1,59 @@
+tests:
+  - name: sysbench-vm
+    metadata:
+      kind: vm
+      run_status: complete
+    metrics:
+      - name: cpu-events-avg
+        metric_of_interest: cpu_events_avg
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+      - name: cpu-latency-p95
+        metric_of_interest: cpu_latency_95th
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: -1
+      - name: memory-throughput
+        metric_of_interest: memory_throughput_mib
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+      - name: memory-latency-p95
+        metric_of_interest: memory_latency_95th
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: -1
+  - name: sysbench-pod
+    metadata:
+      kind: pod
+      run_status: complete
+    metrics:
+      - name: cpu-events-avg
+        metric_of_interest: cpu_events_avg
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+      - name: cpu-latency-p95
+        metric_of_interest: cpu_latency_95th
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: -1
+      - name: memory-throughput
+        metric_of_interest: memory_throughput_mib
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+      - name: memory-latency-p95
+        metric_of_interest: memory_latency_95th
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: -1
