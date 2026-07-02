@@ -6,6 +6,8 @@ pipeline {
         CONTACT_EMAIL = credentials('perfci_contact_email')
         ELASTICSEARCH = credentials('perfci_elasticsearch')
         ELASTICSEARCH_PORT = credentials('perfci_elasticsearch_port')
+        SLACK_TOKEN = credentials('perfci_slack_token')
+        SLACK_CHANNEL = 'perfci-orion-results'
     }
     stages {
         stage('Cleanup') {
@@ -45,25 +47,53 @@ pipeline {
 
                     sh "find ${reportsDir} -mindepth 2 -maxdepth 2 -type d -mtime +90 -exec rm -rf {} + || true"
 
+                    def reportsUrl = "http://${ELASTICSEARCH}:9091"
+                    def results = []
+
                     indexMap.each { workload, idx ->
                         def configPath = "${configsDir}/perfci-${workload}.yaml"
                         def outDir = "${reportsDir}/${workload}/${runDate}"
                         sh "mkdir -p ${outDir}"
-                        def rc = sh(returnStatus: true, script: """
-                            source /opt/orion-venv/bin/activate
-                            orion --es-server ${esServer} \
-                              --metadata-index ${idx} \
-                              --benchmark-index ${idx} \
-                              --lookback 15d \
-                              --hunter-analyze --viz \
-                              --save-output-path ${outDir}/results.txt \
-                              --config ${configPath}
-                        """)
-                        if (rc != 0) {
-                            echo "WARNING: Orion detected regression or error for ${workload} (exit ${rc})"
-                            currentBuild.result = 'UNSTABLE'
+                        def rc = 1
+                        try {
+                            timeout(time: 10, unit: 'MINUTES') {
+                                rc = sh(returnStatus: true, script: """
+                                    source /opt/orion-venv/bin/activate
+                                    orion --es-server ${esServer} \
+                                      --metadata-index ${idx} \
+                                      --benchmark-index ${idx} \
+                                      --lookback 15d \
+                                      --hunter-analyze --viz \
+                                      --save-output-path ${outDir}/results.txt \
+                                      --config ${configPath}
+                                """)
+                            }
+                        } catch (err) {
+                            echo "WARNING: Orion timed out for ${workload}"
                         }
+                        def status = (rc == 0) ? 'pass' : 'regression'
+                        results.add([name: workload, status: status, link: "${reportsUrl}/${workload}/${runDate}/"])
                     }
+
+                    def regressionList = results.findAll { it.status == 'regression' }
+
+                    def slackMsg = "*PerfCI Orion Regression Report* (${runDate})\\n\\n"
+                    if (regressionList.size() > 0) {
+                        slackMsg += ":red_circle: *Regressions (${regressionList.size()}/${results.size()}):*\\n"
+                        regressionList.each { r ->
+                            slackMsg += "  • *${r.name}* (<${r.link}|view report>)\\n"
+                        }
+                        currentBuild.result = 'UNSTABLE'
+                    } else {
+                        slackMsg += ":large_green_circle: *All ${results.size()} workloads passed — no regressions*"
+                    }
+
+                    sh '''
+                        curl -s -X POST https://slack.com/api/chat.postMessage \
+                          -H "Authorization: Bearer $SLACK_TOKEN" \
+                          -H "Content-Type: application/json" \
+                          -d '{"channel":"''' + SLACK_CHANNEL + '''","text":"''' + slackMsg + '''"}' || true
+                    '''
                 }
             }
         }
