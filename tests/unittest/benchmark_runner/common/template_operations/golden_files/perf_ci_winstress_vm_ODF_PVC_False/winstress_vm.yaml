@@ -1,0 +1,120 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: winstress-vm-deadbeef
+  labels:
+    kubevirt.io/vm: winstress-vm-deadbeef
+  namespace: benchmark-runner
+spec:
+  runStrategy: Halted
+  template:
+    metadata:
+      labels:
+        kubevirt.io/vm: winstress-vm-deadbeef
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: 'None'
+      domain:
+        clock:
+          timer:
+            hpet:
+              present: false
+            hyperv: {}
+            pit:
+              tickPolicy: delay
+            rtc:
+              tickPolicy: catchup
+          utc: {}
+        cpu:
+          model: host-passthrough
+          cores: 1
+          sockets: 64
+          threads: 1
+        devices:
+          autoattachMemBalloon: false
+          blockMultiQueue: false
+          disks:
+          - name: winstress-vm-root-disk-deadbeef
+            disk:
+              bus: virtio
+            bootOrder: 1
+          - disk:
+              bus: virtio
+            name: cloudinitdisk
+          inputs:
+          - bus: virtio
+            name: tablet
+            type: tablet
+          tpm: {}
+          interfaces:
+          - name: nic-0
+            masquerade: {}
+            model: virtio
+          networkInterfaceMultiqueue: true
+        features:
+          acpi: {}
+          apic: {}
+          hyperv:
+            ipi: {}
+            synic: {}
+            synictimer:
+              direct: {}
+            spinlocks:
+              spinlocks: 8191
+            evmcs:
+              enabled: true
+            relaxed: {}
+            vpindex: {}
+            runtime: {}
+            tlbflush: {}
+            frequencies: {}
+            vapic: {}
+          smm: {}
+        firmware:
+          bootloader:
+            efi:
+              secureBoot: false
+        ioThreads:
+          supplementalPoolThreadCount: 8
+        ioThreadsPolicy: supplementalPool
+        machine:
+          type: q35
+        resources:
+          requests:
+            cpu: 8
+            memory: 32G
+      evictionStrategy: LiveMigrate
+      networks:
+      - name: nic-0
+        pod: {}
+      terminationGracePeriodSeconds: 180
+      volumes:
+      - dataVolume:
+          name: winstress-vm-root-disk-deadbeef
+        name: winstress-vm-root-disk-deadbeef
+      - cloudInitNoCloud:
+          userData: |
+            #cloud-config
+            runcmd:
+              - powershell -Command "New-Item -ItemType Directory -Force -Path 'C:\ProgramData\ssh' | Out-Null; Set-Content -Path 'C:\ProgramData\ssh\administrators_authorized_keys' -Value '' -Encoding ascii -Force; icacls 'C:\ProgramData\ssh\administrators_authorized_keys' /inheritance:r /grant 'Administrators:F' /grant 'SYSTEM:F'"
+              - cmd /c "mkdir C:\Users\Administrator\.ssh >nul 2>&1 & icacls C:\Users\Administrator\.ssh /grant Everyone:F >nul 2>&1 & takeown /f C:\Users\Administrator\.ssh\authorized_keys >nul 2>&1 & icacls C:\Users\Administrator\.ssh\authorized_keys /grant Everyone:F >nul 2>&1 & del /f C:\Users\Administrator\.ssh\authorized_keys >nul 2>&1"
+              - powershell -Command "Copy-Item 'C:\ProgramData\ssh\administrators_authorized_keys' 'C:\Users\Administrator\.ssh\authorized_keys' -Force; icacls 'C:\Users\Administrator\.ssh\authorized_keys' /inheritance:r /grant 'Administrators:F' /grant 'SYSTEM:F'; icacls 'C:\Users\Administrator\.ssh' /inheritance:r /grant 'Administrators:F' /grant 'SYSTEM:F'"
+        name: cloudinitdisk
+  dataVolumeTemplates:
+  - metadata:
+      annotations:
+        descheduler.alpha.kubernetes.io/evict: "true"
+      name: winstress-vm-root-disk-deadbeef
+    spec:
+      pvc:
+        accessModes:
+        - ReadWriteMany
+        resources:
+          requests:
+            storage: 76Gi
+        volumeMode: Block
+        storageClassName: ocs-storagecluster-ceph-rbd-virtualization
+      source:
+        pvc:
+          namespace: benchmark-runner
+          name: windows-clone-dv
