@@ -1,0 +1,47 @@
+tests:
+  - name: fio-vm
+    metadata:
+      kind: vm
+      run_status: complete
+    metrics:
+      - name: total-iops
+        metric_of_interest: total_iops
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+      - name: lat-avg
+        metric_of_interest: lat_avg_usec
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: -1
+      - name: bandwidth
+        metric_of_interest: total_bw_kbs
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: fio-pod
+    metadata:
+      kind: pod
+      run_status: complete
+    metrics:
+      - name: total-iops
+        metric_of_interest: total_iops
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+      - name: lat-avg
+        metric_of_interest: lat_avg_usec
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: -1
+      - name: bandwidth
+        metric_of_interest: total_bw_kbs
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1

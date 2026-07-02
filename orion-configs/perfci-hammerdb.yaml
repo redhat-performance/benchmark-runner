@@ -1,0 +1,73 @@
+tests:
+  - name: hammerdb-vm-mssql
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mssql
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-vm-mariadb
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mariadb
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-vm-pg
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: pg
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-pod-mssql
+    metadata:
+      kind: pod
+      run_status: complete
+      db_type: mssql
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-pod-mariadb
+    metadata:
+      kind: pod
+      run_status: complete
+      db_type: mariadb
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-pod-pg
+    metadata:
+      kind: pod
+      run_status: complete
+      db_type: pg
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1

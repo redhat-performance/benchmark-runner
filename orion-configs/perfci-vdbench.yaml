@@ -1,0 +1,35 @@
+tests:
+  - name: vdbench-vm
+    metadata:
+      kind: vm
+      run_status: complete
+    metrics:
+      - name: iops
+        metric_of_interest: Rate
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+      - name: latency
+        metric_of_interest: Resp
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: -1
+  - name: vdbench-pod
+    metadata:
+      kind: pod
+      run_status: complete
+    metrics:
+      - name: iops
+        metric_of_interest: Rate
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+      - name: latency
+        metric_of_interest: Resp
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: -1
