@@ -162,6 +162,15 @@ class TemplateOperations:
             logger.info(f'HAMMERDB_CONFIG override: {hammerdb_config}')
             render_data.update(hammerdb_config)
 
+        workload_config = self.__environment_variables_dict.get('workload_config', {})
+        if workload_config:
+            workload_config = {k: v for k, v in workload_config.items() if v != ''}
+            unknown_keys = set(workload_config.keys()) - set(render_data.keys())
+            if unknown_keys:
+                logger.warning(f'WORKLOAD_CONFIG unknown keys (will be ignored): {unknown_keys}')
+            logger.info(f'WORKLOAD_CONFIG override: {workload_config}')
+            render_data.update(workload_config)
+
         out_files = []
         standard_template_path = os.path.join(workload_dir_path, 'internal_data', self.__standard_template_file)
         if os.path.isfile(standard_template_path):

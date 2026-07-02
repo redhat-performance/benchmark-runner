@@ -1,0 +1,27 @@
+metadata:
+  name: linstress
+template_data:
+  shared:
+    pin_node: {{ pin_node0 }}
+    odf_pvc: {{ odf_pvc }}
+    uuid: {{ uuid }}
+    fedora_container_disk: {{ fedora_container_disk }}
+    stress_cpu: 100
+    stress_memory: 50
+    stress_duration: 600
+  run_type:
+    perf_ci:
+      stress_cpu: 100
+      stress_memory: 50
+      stress_duration: 1800
+      requests_memory: 8Gi
+      requests_cpu: 8
+      cores: 1
+      sockets: 8
+      threads: 1
+    default:
+      requests_memory: 1Gi
+      requests_cpu: 1
+      cores: 1
+      sockets: 2
+      threads: 1

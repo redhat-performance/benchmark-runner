@@ -124,7 +124,7 @@ class EnvironmentVariables:
                                                          'vdbench_pod_ephemeral', 'vdbench_vm_ephemeral',
                                                          'fio_pod', 'fio_vm',
                                                          'fio_pod_ephemeral', 'fio_vm_ephemeral',
-                                                         'clusterbuster', 'bootstorm_vm', 'windows_vm', 'winmssql_vm', 'winfio_vm',
+                                                         'clusterbuster', 'bootstorm_vm', 'windows_vm', 'winmssql_vm', 'winfio_vm', 'winstress_vm', 'linstress_vm',
                                                          'krknhub']
         # Workloads namespaces
         self._environment_variables_dict['workload_namespaces'] = {
@@ -139,6 +139,8 @@ class EnvironmentVariables:
             'windows': 'benchmark-runner',
             'winmssql': 'benchmark-runner',
             'winfio': 'benchmark-runner',
+            'winstress': 'benchmark-runner',
+            'linstress': 'benchmark-runner',
             'krknhub': 'krknhub',
         }
 
@@ -159,6 +161,12 @@ class EnvironmentVariables:
         # HammerDB config override (optional), overrides template defaults.
         # test_ci defaults: HAMMERDB_CONFIG="{'db_min_workers': 1, 'db_num_workers': 2, 'db_warehouses': 2, 'runtime': 1, 'rampup': 1, 'iterations': 2, 'transactions': 100000, 'database_requests_cpu': '', 'sockets': '', 'database_requests_memory': '', 'data_storage': ''}"
         self._environment_variables_dict['hammerdb_config'] = literal_eval(EnvironmentVariables.get_env('HAMMERDB_CONFIG', '{}'))
+
+        # Workload config override (optional), overrides template defaults for any workload.
+        # e.g. WORKLOAD_CONFIG="{'requests_cpu': 8, 'requests_memory': '32G', 'sockets': 64, 'cores': 1, 'threads': 1}"
+        # hammerdb: WORKLOAD_CONFIG="{'database_requests_cpu': 16, 'database_requests_memory': '16G', 'sockets': 16}"
+        # winstress: WORKLOAD_CONFIG="{'stress_cpu': 100, 'stress_memory': 50, 'sockets': 64}"
+        self._environment_variables_dict['workload_config'] = literal_eval(EnvironmentVariables.get_env('WORKLOAD_CONFIG', '{}'))
 
         # Set namespace based on workload.
         # The workload_namespaces dict is the source of truth for where each workload runs.
@@ -373,7 +381,7 @@ class EnvironmentVariables:
         self._environment_variables_dict['benchmark_runner_id'] = EnvironmentVariables.get_env('BENCHMARK_RUNNER_ID', '')
 
         # Node Selector functionality
-        self._environment_variables_dict['pin'] = bool(self._environment_variables_dict['pin_node1'])
+        self._environment_variables_dict['pin'] = bool(self._environment_variables_dict['pin_node0'] or self._environment_variables_dict['pin_node1'])
         # if pin_node2 not exist, get pin_node1 value
         if self._environment_variables_dict['pin_node1'] and not self._environment_variables_dict['pin_node2']:
             self._environment_variables_dict['pin_node2'] = self._environment_variables_dict['pin_node1']
