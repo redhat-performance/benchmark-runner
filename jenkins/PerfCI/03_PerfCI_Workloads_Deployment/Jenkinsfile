@@ -143,7 +143,7 @@ END
                                     // bootstorm_vm_scale: no need redis for synchronization but need SCALE and THREADS_LIMIT
                                     if (workload == "bootstorm_vm_scale") {
                                         // Warm-up: Pull the Fedora image from quay.io for each node
-                                        sh """ sudo podman run --rm -t -e WORKLOAD='${WORKLOAD}' -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' -e RUN_TYPE='${RUN_TYPE}' -e SCALE='1' -e SCALE_NODES='${SCALE_NODES}' -e TIMEOUT='${TIMEOUT}' -e log_level='INFO' -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}' """
+                                        sh """ sudo podman run --rm -t --pids-limit=-1 -e WORKLOAD='${WORKLOAD}' -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' -e RUN_TYPE='${RUN_TYPE}' -e SCALE='1' -e SCALE_NODES='${SCALE_NODES}' -e TIMEOUT='${TIMEOUT}' -e log_level='INFO' -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}' """
                                         SCALE = BOOTSTORM_SCALE
                                     }
                                     if (WORKLOAD == "windows_vm") {
@@ -161,7 +161,7 @@ END
                                                 error "Unknown Windows scale workload ${workload}"
                                         }
 
-                                        sh """ sudo podman run --rm -t -e WORKLOAD='${WORKLOAD}' -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' -e RUN_TYPE='${RUN_TYPE}' -e SCALE='1' -e SCALE_NODES='${SCALE_NODES}' -e WINDOWS_URL='${WINDOWS_URL}' -e TIMEOUT='${TIMEOUT}' -e log_level='INFO' -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}' """
+                                        sh """ sudo podman run --rm -t --pids-limit=-1 -e WORKLOAD='${WORKLOAD}' -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' -e RUN_TYPE='${RUN_TYPE}' -e SCALE='1' -e SCALE_NODES='${SCALE_NODES}' -e WINDOWS_URL='${WINDOWS_URL}' -e TIMEOUT='${TIMEOUT}' -e log_level='INFO' -v '${KUBECONFIG_PATH}:${KUBECONFIG_PATH}' --privileged '${QUAY_BENCHMARK_RUNNER_REPOSITORY}' """
                                         SCALE = WINDOWS_SCALE
                                     }
                                   workload = WORKLOAD
@@ -183,7 +183,7 @@ END
                                 // Create a stage for each workload
                                 stage(workload_name) {
                                     sh """
-                                        sudo podman run --rm -t \
+                                        sudo podman run --rm -t --pids-limit=-1 \
                                         -e WORKLOAD='${workload}' \
                                         -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' \
                                         -e PIN_NODE0='${PIN_NODE0}' \
