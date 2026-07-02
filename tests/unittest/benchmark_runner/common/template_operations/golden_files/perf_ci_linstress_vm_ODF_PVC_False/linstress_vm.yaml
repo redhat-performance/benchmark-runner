@@ -50,7 +50,7 @@ stringData:
           if __name__ == '__main__':
               cpu_total = multiprocessing.cpu_count()
               cpu_count = max(1, int(cpu_total * 100 / 100))
-              duration = 1800
+              duration = 600
               mem_target = 50
 
               print(f'CPU count: {cpu_total}')
