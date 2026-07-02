@@ -11,9 +11,6 @@ template_data:
     stress_duration: 600
   run_type:
     perf_ci:
-      stress_cpu: 100
-      stress_memory: 50
-      stress_duration: 1800
       requests_memory: 8Gi
       requests_cpu: 8
       cores: 1
