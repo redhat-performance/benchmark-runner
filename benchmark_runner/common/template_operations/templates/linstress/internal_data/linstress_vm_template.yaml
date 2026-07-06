@@ -161,6 +161,10 @@ spec:
         kubernetes.io/hostname: '{{ pin_node }}'
       {%- endif %}
       domain:
+        {%- if guest_memory is defined and guest_memory %}
+        memory: 
+          guest: {{ guest_memory }}
+        {%- endif %}
         cpu:
           sockets: {{ sockets }}
           cores: {{ cores }}

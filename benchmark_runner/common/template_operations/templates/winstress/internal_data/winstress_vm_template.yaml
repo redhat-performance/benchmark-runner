@@ -41,6 +41,10 @@ spec:
             rtc:
               tickPolicy: catchup
           utc: {}
+        {%- if guest_memory is defined and guest_memory %}
+        memory: 
+          guest: {{ guest_memory }}
+        {%- endif %}
         cpu:
           model: host-passthrough
           cores: {{ cores }}
