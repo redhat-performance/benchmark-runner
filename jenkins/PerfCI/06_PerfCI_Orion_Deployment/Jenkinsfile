@@ -7,7 +7,7 @@ pipeline {
         ELASTICSEARCH = credentials('perfci_elasticsearch')
         ELASTICSEARCH_PORT = credentials('perfci_elasticsearch_port')
         SLACK_TOKEN = credentials('perfci_slack_token')
-        SLACK_CHANNEL = 'perfci-orion-results'
+        SLACK_CHANNEL = credentials('perfci_orion_channel')
     }
     stages {
         stage('Cleanup') {
@@ -42,7 +42,7 @@ pipeline {
 
                     def esServer = "http://${ELASTICSEARCH}:${ELASTICSEARCH_PORT}"
                     def configsDir = "${WORKSPACE}/orion-configs"
-                    def reportsDir = '/opt/orion-reports'
+                    def reportsDir = '/home/jenkins/perfci/orion-reports'
                     def runDate = sh(script: 'date +%Y-%m-%d_%H-%M', returnStdout: true).trim()
 
                     sh "find ${reportsDir} -mindepth 2 -maxdepth 2 -type d -mtime +90 -exec rm -rf {} + || true"
@@ -58,8 +58,11 @@ pipeline {
                         try {
                             timeout(time: 10, unit: 'MINUTES') {
                                 rc = sh(returnStatus: true, script: """
-                                    source /opt/orion-venv/bin/activate
-                                    orion --es-server ${esServer} \
+                                    sudo podman run --rm --net=host -u \$(id -u) \
+                                      -v ${outDir}:${outDir}:Z \
+                                      -v ${configPath}:${configPath}:ro \
+                                      localhost/orion \
+                                      --es-server ${esServer} \
                                       --metadata-index ${idx} \
                                       --benchmark-index ${idx} \
                                       --lookback 15d \
@@ -76,24 +79,18 @@ pipeline {
                     }
 
                     def regressionList = results.findAll { it.status == 'regression' }
-
-                    def slackMsg = "*PerfCI Orion Regression Report* (${runDate})\\n\\n"
                     if (regressionList.size() > 0) {
-                        slackMsg += ":red_circle: *Regressions (${regressionList.size()}/${results.size()}):*\\n"
-                        regressionList.each { r ->
-                            slackMsg += "  • *${r.name}* (<${r.link}|view report>)\\n"
-                        }
                         currentBuild.result = 'UNSTABLE'
-                    } else {
-                        slackMsg += ":large_green_circle: *All ${results.size()} workloads passed — no regressions*"
                     }
 
-                    sh '''
-                        curl -s -X POST https://slack.com/api/chat.postMessage \
-                          -H "Authorization: Bearer $SLACK_TOKEN" \
-                          -H "Content-Type: application/json" \
-                          -d '{"channel":"''' + SLACK_CHANNEL + '''","text":"''' + slackMsg + '''"}' || true
-                    '''
+                    def resultsJson = groovy.json.JsonOutput.toJson(results)
+                    sh """
+                        PYTHONPATH="${WORKSPACE}" \
+                        SLACK_API_TOKEN="\${SLACK_TOKEN}" \
+                        SLACK_CHANNEL_NAME="${SLACK_CHANNEL}" \
+                        python3 ${WORKSPACE}/benchmark_runner/orion/orion_slack_notify.py \
+                          --results '${resultsJson}' --date '${runDate}' || true
+                    """
                 }
             }
         }
