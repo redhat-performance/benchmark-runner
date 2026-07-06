@@ -15,7 +15,8 @@ RUN dnf install -y \
 
 WORKDIR /build
 
-RUN git clone --depth 1 https://github.com/cloud-bulldozer/orion.git . && \
+RUN LATEST_TAG=$(git ls-remote --tags https://github.com/cloud-bulldozer/orion.git | awk -F'refs/tags/' '{print $2}' | grep -v '\^{}' | sort -V | tail -n1) && \
+    git clone --depth 1 --branch ${LATEST_TAG:-main} https://github.com/cloud-bulldozer/orion.git . && \
     pip install --upgrade pip && \
     pip install --no-cache-dir setuptools && \
     pip install --no-cache-dir --no-binary cryptography cryptography && \

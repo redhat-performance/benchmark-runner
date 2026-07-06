@@ -37,7 +37,9 @@ pipeline {
                         'uperf': 'uperf-results',
                         'fio': 'fio-results',
                         'vdbench': 'vdbench-results',
-                        'sysbench': 'sysbench-results'
+                        'sysbench': 'sysbench-results',
+                        'winmssql': 'windows-results',
+                        'winfio': 'fio-results'
                     ]
 
                     def esServer = "http://${ELASTICSEARCH}:${ELASTICSEARCH_PORT}"
@@ -55,27 +57,54 @@ pipeline {
                         def outDir = "${reportsDir}/${workload}/${runDate}"
                         sh "mkdir -p ${outDir}"
                         def rc = 1
+                        def timedOut = false
                         try {
                             timeout(time: 10, unit: 'MINUTES') {
                                 rc = sh(returnStatus: true, script: """
                                     sudo podman run --rm --net=host -u \$(id -u) \
-                                      -v ${outDir}:${outDir}:Z \
-                                      -v ${configPath}:${configPath}:ro \
+                                      -v ${outDir}:${outDir}:z \
+                                      -v ${configPath}:${configPath}:ro,z \
                                       localhost/orion \
                                       --es-server ${esServer} \
                                       --metadata-index ${idx} \
                                       --benchmark-index ${idx} \
-                                      --lookback 15d \
+                                      --lookback 60d \
                                       --hunter-analyze --viz \
-                                      --save-output-path ${outDir}/results.txt \
+                                      --output-format json \
+                                      --save-output-path ${outDir}/results.json \
                                       --config ${configPath}
                                 """)
                             }
                         } catch (err) {
                             echo "WARNING: Orion timed out for ${workload}"
+                            timedOut = true
                         }
-                        def status = (rc == 0) ? 'pass' : 'regression'
-                        results.add([name: workload, status: status, link: "${reportsUrl}/${workload}/${runDate}/"])
+                        if (timedOut) {
+                            results.add([name: workload, status: 'timeout', link: "${reportsUrl}/${workload}/${runDate}/"])
+                        } else {
+                            def variants = sh(returnStdout: true, script: """
+                                python3 -c "
+import json, glob
+for f in sorted(glob.glob('${outDir}/results_*.json')):
+    name = f.rsplit('results_',1)[1].replace('.json','')
+    try:
+        data = json.load(open(f))
+        reg = any(e.get('is_changepoint') for e in data)
+        print(name + ':' + ('regression' if reg else 'pass'))
+    except: pass
+" || true
+                            """).trim()
+                            if (variants) {
+                                variants.split('\n').each { line ->
+                                    def parts = line.split(':')
+                                    if (parts.length == 2) {
+                                        results.add([name: parts[0], status: parts[1], link: "${reportsUrl}/${workload}/${runDate}/"])
+                                    }
+                                }
+                            } else {
+                                results.add([name: workload, status: (rc == 0 || rc == 3 ? 'pass' : 'regression'), link: "${reportsUrl}/${workload}/${runDate}/"])
+                            }
+                        }
                     }
 
                     def regressionList = results.findAll { it.status == 'regression' }
@@ -83,13 +112,20 @@ pipeline {
                         currentBuild.result = 'UNSTABLE'
                     }
 
-                    def resultsJson = groovy.json.JsonOutput.toJson(results)
+                    def resultsJson = '['
+                    results.eachWithIndex { r, i ->
+                        if (i > 0) resultsJson += ','
+                        resultsJson += """{"name":"${r.name}","status":"${r.status}","link":"${r.link}"}"""
+                    }
+                    resultsJson += ']'
+
+                    writeFile file: "${WORKSPACE}/orion-results.json", text: resultsJson
                     sh """
                         PYTHONPATH="${WORKSPACE}" \
                         SLACK_API_TOKEN="\${SLACK_TOKEN}" \
-                        SLACK_CHANNEL_NAME="${SLACK_CHANNEL}" \
+                        SLACK_CHANNEL_NAME="\${SLACK_CHANNEL}" \
                         python3 ${WORKSPACE}/benchmark_runner/orion/orion_slack_notify.py \
-                          --results '${resultsJson}' --date '${runDate}' || true
+                          --results-file ${WORKSPACE}/orion-results.json --date '${runDate}' || true
                     """
                 }
             }

@@ -22,7 +22,7 @@ class SlackOperations:
             'channel': self.__channel_name,
             'text': text
         }
-        response = requests.post(url=self.SLACK_POST_API, headers=self.api_headers, json=json_data)
+        response = requests.post(url=self.SLACK_POST_API, headers=self.api_headers, json=json_data, timeout=30)
         response_data = response.json()
         if not response_data.get('ok'):
             logging.error("Slack post failed: %s", response_data.get('error'))
