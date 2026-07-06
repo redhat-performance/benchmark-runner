@@ -25,7 +25,7 @@ sudo chown jenkins:jenkins "$CI_PATH"/jupyterLab/templates/summary_report/*.html
 cd "$CI_POD_PATH"/orion
 sudo podman build -t orion .
 mkdir -p "$CI_PATH"/orion-reports
-sudo podman run --name orion-reports --pod ci_pod -d -v "$CI_PATH"/orion-reports:/reports:ro --privileged quay.io/fedora/python-314:latest python3 -m http.server 9091 --directory /reports
+sudo podman run --name orion-reports --pod ci_pod -d -v "$CI_PATH"/orion-reports:/reports:ro,z --privileged quay.io/fedora/python-314:latest python3 -m http.server 9091 --directory /reports
 # Elasticsearch MCP Server for AI Agent - port 8084
 sudo podman run --name elastic-mcp-server --rm -d -e ES_URL='http://localhost:9200' -e ES_DISABLE_AUTH='true' -e ES_ALLOW_INSECURE='true' --cpus=4 --memory=8g -p 127.0.0.1:8084:8080 docker.elastic.co/mcp/elasticsearch http
 echo "pod ci status"
