@@ -106,7 +106,9 @@ spec:
         resources:
           requests:
             cpu: {{ requests_cpu }}
+            {%- if requests_memory is defined and requests_memory %}
             memory: {{ requests_memory }}
+            {%- endif %}
       evictionStrategy: LiveMigrate
       networks:
       - name: nic-0

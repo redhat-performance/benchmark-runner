@@ -171,7 +171,8 @@ class EnvironmentVariables:
         # Workload config override (optional), overrides template defaults for any workload.
         # e.g. WORKLOAD_CONFIG="{'requests_cpu': 8, 'requests_memory': '32G', 'sockets': 64, 'cores': 1, 'threads': 1}"
         # hammerdb: WORKLOAD_CONFIG="{'database_requests_cpu': 16, 'database_requests_memory': '16G', 'sockets': 16}"
-        # winstress/linstress: WORKLOAD_CONFIG="{'stress_cpu': 100, 'stress_memory': 50, 'stress_duration': 800, 'requests_cpu': 8, 'requests_memory': '32G', 'sockets': 64, 'cores': 1, 'threads': 1}"
+        # winstress/linstress: WORKLOAD_CONFIG="{'stress_cpu': 100, 'stress_memory': 50, 'stress_duration': 800, 'requests_cpu': 8, 'requests_memory': '32G', 'guest_memory': '4Gi', 'sockets': 64, 'cores': 1, 'threads': 1}"
+        # winstress/linstress: 'requests_memory' and 'guest_memory' are optional - omit or set to '' to leave them out of the rendered VM resources/domain memory sections
         self._environment_variables_dict['workload_config'] = literal_eval(EnvironmentVariables.get_env('WORKLOAD_CONFIG', '{}'))
 
         # Set namespace based on workload.
