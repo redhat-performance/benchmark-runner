@@ -165,6 +165,7 @@ spec:
           type: ""
         resources:
           requests:
+            cpu: 8
             memory: 8Gi
       terminationGracePeriodSeconds: 180
       networks:

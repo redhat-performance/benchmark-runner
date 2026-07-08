@@ -183,11 +183,12 @@ spec:
           networkInterfaceMultiqueue: true
         machine:
           type: ""
-        {%- if requests_memory is defined and requests_memory %}
         resources:
           requests:
+            cpu: {{ requests_cpu }}
+            {%- if requests_memory is defined and requests_memory %}
             memory: {{ requests_memory }}
-        {%- endif %}
+            {%- endif %}
       terminationGracePeriodSeconds: 180
       networks:
         - name: default
