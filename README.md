@@ -107,7 +107,13 @@ Not mandatory:
 
 **optional:** WORKER_DISK_IDS=$WORKER_DISK_IDS [WORKER_DISK_IDS For ODF/LSO workloads hammerdb/vdbench]
 
-**optional:** WINDOWS_URL=$WINDOWS_URL [WINDOWS_URL for qcow2 image that can be shared by Nginx]
+**optional:** WINDOWS_URL=$WINDOWS_URL [WINDOWS_URL for qcow2 image — HTTP URL or S3 path-style HTTPS URL (`https://s3.{region}.amazonaws.com/{bucket}/{key}`)]
+
+**optional:** CDI_SOURCE_TYPE=$CDI_SOURCE_TYPE [CDI DataVolume source type: `http` (default) or `s3` for authenticated S3 access]
+
+**optional:** CDI_SOURCE_S3_CRED=$CDI_SOURCE_S3_CRED [K8s secret name containing `accessKeyId` and `secretKey` for S3 authentication. Secret must exist in benchmark-runner namespace before workload runs. Create with: `oc create secret generic <secret-name> --from-literal=accessKeyId=AKIA... --from-literal=secretKey=CLj4... -n benchmark-runner`]
+
+**optional:** WINDOWS_STORAGE_CLASS=$WINDOWS_STORAGE_CLASS [Storage class for Windows DataVolume PVCs. Default: `ocs-storagecluster-ceph-rbd-virtualization`]
 
 For example:
 

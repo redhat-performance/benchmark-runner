@@ -7,8 +7,16 @@ metadata:
   namespace: {{ namespace }}
 spec:
   source:
-      http:
-         url: {{ url }}
+    {%- if cdi_source_type == 's3' %}
+    s3:
+      url: {{ url }}
+      {%- if cdi_source_s3_cred %}
+      secretRef: {{ cdi_source_s3_cred }}
+      {%- endif %}
+    {%- else %}
+    http:
+      url: {{ url }}
+    {%- endif %}
   pvc:
     accessModes:
       - ReadWriteMany
@@ -16,4 +24,4 @@ spec:
       requests:
         storage: {{ storage }}
     volumeMode: Block
-    storageClassName: ocs-storagecluster-ceph-rbd-virtualization
+    storageClassName: {{ windows_storage_class }}

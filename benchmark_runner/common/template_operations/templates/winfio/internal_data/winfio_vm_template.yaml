@@ -6,7 +6,7 @@ metadata:
   labels:
     kubevirt.io/vm: winfio-{{ kind }}-{{ trunc_uuid }}-{{ scale }}
   {%- else -%}
-  name:  winfio-{{ kind }}-{{ trunc_uuid }}
+  name: winfio-{{ kind }}-{{ trunc_uuid }}
   labels:
     kubevirt.io/vm: winfio-{{ kind }}-{{ trunc_uuid }}
   {%- endif %}
@@ -159,7 +159,7 @@ spec:
           requests:
             storage: {{ storage }}
         volumeMode: Block
-        storageClassName: ocs-storagecluster-ceph-rbd-virtualization
+        storageClassName: {{ windows_storage_class }}
       source:
         pvc:
           namespace: {{ namespace }}
@@ -180,6 +180,6 @@ spec:
           requests:
             storage: {{ data_disk_storage }}
         volumeMode: Block
-        storageClassName: ocs-storagecluster-ceph-rbd-virtualization
+        storageClassName: {{ windows_storage_class }}
       source:
         blank: {}

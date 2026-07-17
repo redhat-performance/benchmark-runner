@@ -1,7 +1,7 @@
 apiVersion: kubevirt.io/v1
 kind: VirtualMachine
 metadata:
-  name:  winmssql-vm-deadbeef
+  name: winmssql-vm-deadbeef
   labels:
     kubevirt.io/vm: winmssql-vm-deadbeef
   namespace: benchmark-runner
