@@ -59,6 +59,7 @@ class WinstressVm(BootstormVM):
             self._oc.create_async(yaml=self._get_vm_yaml(vm_num))
             self._oc.wait_for_vm_status(vm_name=self._get_vm_name(vm_num), status=VMStatus.Stopped)
         except Exception as err:
+            self._save_vm_artifacts(vm_num)
             self.save_error_logs()
             raise err
 
@@ -70,9 +71,11 @@ class WinstressVm(BootstormVM):
                                                        key_path=self.__ssh_key_path, username=self.__username,
                                                        timeout=OC.SHORT_TIMEOUT):
                 logger.warning(f'SSH never became ready on VM {vm_name}, skipping')
+                self._save_vm_artifacts(vm_num)
                 return
 
         except Exception as err:
+            self._save_vm_artifacts(vm_num)
             logger.warning(f'Failed to prepare VM {self._get_vm_name(vm_num)}: {err}')
 
     def _run_stress(self, vm_num: str):
@@ -88,7 +91,17 @@ class WinstressVm(BootstormVM):
                                      namespace=self.__namespace, key_path=self.__ssh_key_path,
                                      username=self.__username, timeout=self._timeout)
         except Exception as err:
+            self._save_vm_artifacts(vm_num)
             logger.warning(f'Stress test failed on VM {self._get_vm_name(vm_num)}: {err}')
+
+    def _save_vm_artifacts(self, vm_num: str):
+        try:
+            vm_name = self._get_vm_name(vm_num)
+            self._oc.save_to_yaml(vm_name=vm_name, vm_access=True, output_dir=self._run_artifacts_path, namespace=self.__namespace)
+            self._oc.save_describe_yaml(vm_name=vm_name, vm_access=True, output_dir=self._run_artifacts_path, namespace=self.__namespace)
+            logger.info(f'Saved VM artifacts for {vm_name}')
+        except Exception as err:
+            logger.warning(f'Failed to save VM artifacts for {self._get_vm_name(vm_num)}: {err}')
 
     def _collect_results(self, vm_num: str):
         try:
@@ -203,7 +216,7 @@ class WinstressVm(BootstormVM):
 
             bulks = tuple(self.split_run_bulks(iterable=range(vm_count), limit=threads_limit))
 
-            steps = [self._create_vm, self._prepare_vm, self._run_stress, self._collect_results]
+            steps = [self._create_vm, self._prepare_vm, self._run_stress, self._save_vm_artifacts, self._collect_results]
             if self._delete_all:
                 steps.append(self._delete_vm)
             self._run_parallel_phases(steps, bulks, bulk_sleep)

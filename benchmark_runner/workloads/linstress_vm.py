@@ -39,15 +39,25 @@ class LinstressVm(BootstormVM):
             self._oc.wait_for_vm_create(vm_name=vm_name)
             logger.info(f'VM {vm_name} created, stress script running via cloud-init')
         except Exception as err:
+            self._save_vm_artifacts(vm_num)
             self.save_error_logs()
             raise err
+
+    def _save_vm_artifacts(self, vm_num: str):
+        try:
+            vm_name = self._get_vm_name(vm_num)
+            self._oc.save_to_yaml(vm_name=vm_name, vm_access=True, output_dir=self._run_artifacts_path, namespace=self.__namespace)
+            self._oc.save_describe_yaml(vm_name=vm_name, vm_access=True, output_dir=self._run_artifacts_path, namespace=self.__namespace)
+            logger.info(f'Saved VM artifacts for {vm_name}')
+        except Exception as err:
+            logger.warning(f'Failed to save VM artifacts for {self._get_vm_name(vm_num)}: {err}')
 
     def _collect_results(self, vm_num: str):
         try:
             vm_name = self._get_vm_name(vm_num)
             local_result_json = os.path.join(self._run_artifacts_path, f'{vm_name}.json')
 
-            stress_duration = self._environment_variables_dict.get('stress_duration', 600)
+            stress_duration = self._environment_variables_dict.get('workload_config', {}).get('stress_duration', self._environment_variables_dict.get('stress_duration', 600))
             logger.info(f'Waiting for stress test to complete on VM {vm_name} (stress_duration={stress_duration}s, timeout={self._timeout}s)')
 
             check_cmd = f'test -f /tmp/stress_report.json && echo found'
@@ -155,7 +165,7 @@ class LinstressVm(BootstormVM):
 
             bulks = tuple(self.split_run_bulks(iterable=range(vm_count), limit=threads_limit))
 
-            steps = [self._create_vm, self._collect_results]
+            steps = [self._create_vm, self._save_vm_artifacts, self._collect_results]
             if self._delete_all:
                 steps.append(self._delete_vm)
             self._run_parallel_phases(steps, bulks, bulk_sleep)
