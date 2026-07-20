@@ -43,6 +43,14 @@ class LinstressVm(BootstormVM):
             self.save_error_logs()
             raise err
 
+    def _save_vm_artifacts_by_name(self, vm_name: str):
+        try:
+            self._oc.save_to_yaml(vm_name=vm_name, vm_access=True, output_dir=self._run_artifacts_path, namespace=self.__namespace)
+            self._oc.save_describe_yaml(vm_name=vm_name, vm_access=True, output_dir=self._run_artifacts_path, namespace=self.__namespace)
+            logger.info(f'Saved VM artifacts for {vm_name}')
+        except Exception as err:
+            logger.warning(f'Failed to save VM artifacts for {vm_name}: {err}')
+
     def _save_vm_artifacts(self, vm_num: str):
         try:
             vm_name = self._get_vm_name(vm_num)
@@ -151,6 +159,14 @@ class LinstressVm(BootstormVM):
             self._vm_name = f'{self._workload_name}-{self._trunc_uuid}'
             self._kind = 'vm'
             self._environment_variables_dict['kind'] = 'vm'
+
+            if self._verification_only:
+                vm_names = self._oc._get_all_vm_names()
+                if vm_names:
+                    self._verify_vms_access(vm_names)
+                else:
+                    logger.info('Verification only: no VMs found')
+                return
 
             self._oc.create_async(yaml=os.path.join(self._run_artifacts_path, 'namespace.yaml'))
 

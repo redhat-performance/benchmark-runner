@@ -1818,3 +1818,16 @@ class OC(SSH):
                 f'oc get pod -n {namespace} -o jsonpath="{{.items[?(@.metadata.generateName==\'virt-launcher-{vm_name}-\')].metadata.name}}"'
             )
             self.run(f"oc describe pod '{pod_name}' -n '{namespace}' > '{output_dir}/describe-pod-{pod_name}.yaml'")
+
+    def save_pod_logs(self, vm_name, output_dir='/tmp', namespace: str = environment_variables.environment_variables_dict['namespace']):
+        """
+        This method saves virt-launcher pod logs for a given VM
+        """
+        try:
+            pod_name = self.run(
+                f"oc get pod -n '{namespace}' -o jsonpath=\"{{.items[?(@.metadata.generateName=='virt-launcher-{vm_name}-')].metadata.name}}\""
+            )
+            if pod_name:
+                self.run(f"oc logs '{pod_name}' -n '{namespace}' > '{output_dir}/{pod_name}.log'")
+        except Exception:
+            pass
