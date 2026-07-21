@@ -6,6 +6,9 @@ template_data:
     odf_pvc: {{ odf_pvc }}
     uuid: {{ uuid }}
     url: {{ windows_url }}
+    cdi_source_type: {{ cdi_source_type }}
+    cdi_source_s3_cred: {{ cdi_source_s3_cred }}
+    windows_storage_class: {{ windows_storage_class }}
   run_type:
     perf_ci:
       requests_memory: 2G

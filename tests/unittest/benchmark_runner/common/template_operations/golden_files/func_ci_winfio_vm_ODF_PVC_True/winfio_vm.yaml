@@ -1,7 +1,7 @@
 apiVersion: kubevirt.io/v1
 kind: VirtualMachine
 metadata:
-  name:  winfio-vm-deadbeef
+  name: winfio-vm-deadbeef
   labels:
     kubevirt.io/vm: winfio-vm-deadbeef
   namespace: benchmark-runner

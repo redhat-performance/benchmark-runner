@@ -14,6 +14,7 @@ from tests.unittest.benchmark_runner.common.template_operations.golden_files_exc
 # cannot reasonably produce golden files; do NOT maintain a separate allowlist.
 # clusterbuster and krknhub do not use YAML files
 _EXCLUDED_WORKLOADS: set = {'clusterbuster', 'krknhub'}
+_WINDOWS_WORKLOADS: set = {'windows_vm', 'winfio_vm', 'winmssql_vm', 'winmssql_vm_scale'}
 
 
 class GoldenFiles:
@@ -43,9 +44,11 @@ class GoldenFiles:
                 if file.endswith('.yaml'):
                     os.remove(os.path.join(dir, file))
 
-    def __generate_yaml_dir_name(self, run_type: str, workload: str, odf_pvc: str, dest: str=None):
+    def __generate_yaml_dir_name(self, run_type: str, workload: str, odf_pvc: str, cdi_source: str='http', dest: str=None):
         if dest is None:
             dest = self.__file_path
+        if cdi_source != 'http':
+            return os.path.join(dest, f'{run_type}_{workload}_ODF_PVC_{odf_pvc}_CDI_{cdi_source}')
         return os.path.join(dest, f'{run_type}_{workload}_ODF_PVC_{odf_pvc}')
 
     def __copy_yaml_files_to_dir(self, src: str, dest: str):
@@ -70,15 +73,19 @@ class GoldenFiles:
             for run_type in environment_variables.run_types_list:
                 environment_variables.environment_variables_dict['run_type'] = run_type
                 for workload in environment_variables.workloads_list:
-                    environment_variables.environment_variables_dict['fedora_container_disk'] = 'quay.io/benchmark-runner/fedora-container-disk:43'
-                    environment_variables.environment_variables_dict['namespace'] = environment_variables.get_workload_namespace(workload)
-                    template = TemplateOperations(workload)
-                    srcdir = template.get_current_run_path()
-                    self.__clear_directory_yaml(srcdir)
-                    destdir = self.__generate_yaml_dir_name(run_type=run_type, workload=workload, odf_pvc=odf_pvc, dest=dest)
-                    template.generate_yamls()
-                    self.__copy_yaml_files_to_dir(src=srcdir, dest=destdir)
-                    self.__clear_directory_yaml(srcdir)
+                    cdi_sources = ['http', 's3'] if workload in _WINDOWS_WORKLOADS else ['http']
+                    for cdi_source in cdi_sources:
+                        environment_variables.environment_variables_dict['fedora_container_disk'] = 'quay.io/benchmark-runner/fedora-container-disk:43'
+                        environment_variables.environment_variables_dict['namespace'] = environment_variables.get_workload_namespace(workload)
+                        environment_variables.environment_variables_dict['cdi_source_type'] = cdi_source
+                        environment_variables.environment_variables_dict['cdi_source_s3_cred'] = 's3-test-credentials' if cdi_source == 's3' else ''
+                        template = TemplateOperations(workload)
+                        srcdir = template.get_current_run_path()
+                        self.__clear_directory_yaml(srcdir)
+                        destdir = self.__generate_yaml_dir_name(run_type=run_type, workload=workload, odf_pvc=odf_pvc, cdi_source=cdi_source, dest=dest)
+                        template.generate_yamls()
+                        self.__copy_yaml_files_to_dir(src=srcdir, dest=destdir)
+                        self.__clear_directory_yaml(srcdir)
 
     # From https://stackoverflow.com/questions/4187564/recursively-compare-two-directories-to-ensure-they-have-the-same-files-and-subdi
     def __compare_tree__(self, root1, root2, subdir: str):

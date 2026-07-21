@@ -13,6 +13,9 @@ template_data:
     odf_pvc: {{ odf_pvc }}
     uuid: {{ uuid }}
     url: {{ windows_url }}
+    cdi_source_type: {{ cdi_source_type }}
+    cdi_source_s3_cred: {{ cdi_source_s3_cred }}
+    windows_storage_class: {{ windows_storage_class }}
     BLOCK_SIZES: 4k,8k
     IO_OPERATION: read,write
     IO_THREADS: 8,8

@@ -7,8 +7,8 @@ metadata:
   namespace: benchmark-runner
 spec:
   source:
-      http:
-         url: http://localhost:8083/winmssql2022.qcow2
+    http:
+      url: http://localhost:8083/winmssql2022.qcow2
   pvc:
     accessModes:
       - ReadWriteMany
