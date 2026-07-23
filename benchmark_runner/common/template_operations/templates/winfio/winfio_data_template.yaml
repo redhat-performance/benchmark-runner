@@ -34,12 +34,12 @@ template_data:
       SIZE: 4G
       requests_memory: 4G
       requests_cpu: 1
-      sockets: 2
+      cores: 2
       storage: 76Gi
       data_disk_storage: 64Gi
     default:
       requests_memory: 4G
       requests_cpu: 1
-      sockets: 2
+      cores: 2
       storage: 76Gi
       data_disk_storage: 64Gi

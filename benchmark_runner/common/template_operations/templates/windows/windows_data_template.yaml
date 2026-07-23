@@ -15,12 +15,12 @@ template_data:
       requests_cpu: 1
       limit_memory: 4G
       limit_cpu: 2
-      sockets: 1
+      cores: 1
       storage: 76Gi
     default:
       requests_memory: 2G
       requests_cpu: 1
       limit_memory: 4G
       limit_cpu: 2
-      sockets: 1
+      cores: 1
       storage: 76Gi
