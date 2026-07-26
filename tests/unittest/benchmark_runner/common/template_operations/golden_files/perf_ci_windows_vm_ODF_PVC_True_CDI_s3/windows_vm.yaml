@@ -24,13 +24,12 @@ spec:
               tickPolicy: catchup
           utc: {}
         cpu:
-          model: host-passthrough
           cores: 1
           sockets: 1
           threads: 1
         devices:
           autoattachMemBalloon: false
-          blockMultiQueue: false
+          blockMultiQueue: true
           disks:
           - name: windows-vm-root-disk-deadbeef
             disk:
@@ -56,8 +55,8 @@ spec:
               direct: {}
             spinlocks:
               spinlocks: 8191
-            evmcs:
-              enabled: true
+            reenlightenment: {}
+            reset: {}
             relaxed: {}
             vpindex: {}
             runtime: {}

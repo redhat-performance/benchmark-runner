@@ -24,13 +24,12 @@ spec:
               tickPolicy: catchup
           utc: {}
         cpu:
-          cores: 1
-          model: host-passthrough
-          sockets: 2
+          cores: 2
+          sockets: 1
           threads: 1
         devices:
           autoattachMemBalloon: false
-          blockMultiQueue: false
+          blockMultiQueue: true
           disks:
           - name: winfio-vm-root-disk-deadbeef
             disk:
@@ -62,8 +61,8 @@ spec:
               direct: {}
             spinlocks:
               spinlocks: 8191
-            evmcs:
-              enabled: true
+            reenlightenment: {}
+            reset: {}
             relaxed: {}
             vpindex: {}
             runtime: {}
