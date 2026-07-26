@@ -6,8 +6,8 @@ metadata:
 stringData:
   userdata: |
     #cloud-config
-    user: fedora
-    password: fedora
+    user: {{ vm_user }}
+    password: {{ vm_password }}
     chpasswd: { expire: False }
     ssh_pwauth: true
     {%- if ssh_public_key is defined and ssh_public_key %}
