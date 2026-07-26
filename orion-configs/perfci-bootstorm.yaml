@@ -1,0 +1,18 @@
+tests:
+  - name: bootstorm
+    metadata:
+      kind: vm
+      run_status: complete
+    metrics:
+      - name: bootstorm-time
+        metric_of_interest: bootstorm_time
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: -1
+      - name: total-run-time
+        metric_of_interest: total_run_time
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: -1

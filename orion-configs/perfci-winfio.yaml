@@ -1,0 +1,25 @@
+tests:
+  - name: winfio-vm
+    metadata:
+      kind: vm
+      run_status: complete
+      vm_os_version: windows_server_2k25
+    metrics:
+      - name: total-iops
+        metric_of_interest: total_iops
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+      - name: lat-avg
+        metric_of_interest: lat_avg_usec
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: -1
+      - name: bandwidth
+        metric_of_interest: bandwidth_MiBsec
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1

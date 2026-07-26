@@ -1,0 +1,49 @@
+tests:
+  - name: uperf-vm
+    metadata:
+      kind: vm
+      run_status: complete
+      test_type: stream
+    metrics:
+      - name: throughput
+        metric_of_interest: norm_byte
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+      - name: latency
+        metric_of_interest: norm_ltcy
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: -1
+      - name: operations
+        metric_of_interest: norm_ops
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: uperf-pod
+    metadata:
+      kind: pod
+      run_status: complete
+      test_type: stream
+    metrics:
+      - name: throughput
+        metric_of_interest: norm_byte
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+      - name: latency
+        metric_of_interest: norm_ltcy
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: -1
+      - name: operations
+        metric_of_interest: norm_ops
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1

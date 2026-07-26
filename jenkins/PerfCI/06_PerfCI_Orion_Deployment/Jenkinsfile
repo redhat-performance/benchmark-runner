@@ -1,0 +1,148 @@
+pipeline {
+    agent {
+        label 'PerfCi'
+    }
+    environment {
+        CONTACT_EMAIL = credentials('perfci_contact_email')
+        ELASTICSEARCH = credentials('perfci_elasticsearch')
+        ELASTICSEARCH_PORT = credentials('perfci_elasticsearch_port')
+        SLACK_TOKEN = credentials('perfci_slack_token')
+        SLACK_CHANNEL = credentials('perfci_orion_channel')
+    }
+    stages {
+        stage('Cleanup') {
+            steps {
+                script {
+                    echo "Cleaning Jenkins workspace"
+                    deleteDir()
+                }
+            }
+        }
+
+        stage('Checkout') {
+            steps {
+                script {
+                    git branch: 'main', url: 'https://github.com/redhat-performance/benchmark-runner'
+                }
+            }
+        }
+
+        stage('Orion Regression Analysis') {
+            steps {
+                script {
+                    def indexMap = [
+                        'bootstorm': 'bootstorm-results',
+                        'windows-bootstorm': 'windows-results',
+                        'hammerdb': 'hammerdb-results',
+                        'uperf': 'uperf-results',
+                        'fio': 'fio-results',
+                        'vdbench': 'vdbench-results',
+                        'sysbench': 'sysbench-results',
+                        'winmssql': 'windows-results',
+                        'winfio': 'fio-results'
+                    ]
+
+                    def esServer = "http://${ELASTICSEARCH}:${ELASTICSEARCH_PORT}"
+                    def configsDir = "${WORKSPACE}/orion-configs"
+                    def reportsDir = '/home/jenkins/perfci/orion-reports'
+                    def runDate = sh(script: 'date +%Y-%m-%d_%H-%M', returnStdout: true).trim()
+
+                    sh "find ${reportsDir} -mindepth 2 -maxdepth 2 -type d -mtime +90 -exec rm -rf {} + || true"
+
+                    def reportsUrl = "http://${ELASTICSEARCH}:9091"
+                    def results = []
+
+                    indexMap.each { workload, idx ->
+                        def configPath = "${configsDir}/perfci-${workload}.yaml"
+                        def outDir = "${reportsDir}/${workload}/${runDate}"
+                        sh "mkdir -p ${outDir}"
+                        def rc = 1
+                        def timedOut = false
+                        try {
+                            timeout(time: 10, unit: 'MINUTES') {
+                                rc = sh(returnStatus: true, script: """
+                                    sudo podman run --rm --net=host -u \$(id -u) \
+                                      -v ${outDir}:${outDir}:z \
+                                      -v ${configPath}:${configPath}:ro,z \
+                                      localhost/orion \
+                                      --es-server ${esServer} \
+                                      --metadata-index ${idx} \
+                                      --benchmark-index ${idx} \
+                                      --lookback 60d \
+                                      --hunter-analyze --viz \
+                                      --output-format json \
+                                      --save-output-path ${outDir}/results.json \
+                                      --config ${configPath}
+                                """)
+                            }
+                        } catch (err) {
+                            echo "WARNING: Orion timed out for ${workload}"
+                            timedOut = true
+                        }
+                        if (timedOut) {
+                            results.add([name: workload, status: 'timeout', link: "${reportsUrl}/${workload}/${runDate}/"])
+                        } else {
+                            def variants = sh(returnStdout: true, script: """
+                                python3 -c "
+import json, glob
+for f in sorted(glob.glob('${outDir}/results_*.json')):
+    name = f.rsplit('results_',1)[1].replace('.json','')
+    try:
+        data = json.load(open(f))
+        reg = any(e.get('is_changepoint') for e in data)
+        print(name + ':' + ('regression' if reg else 'pass'))
+    except: pass
+" || true
+                            """).trim()
+                            if (variants) {
+                                variants.split('\n').each { line ->
+                                    def parts = line.split(':')
+                                    if (parts.length == 2) {
+                                        results.add([name: parts[0], status: parts[1], link: "${reportsUrl}/${workload}/${runDate}/"])
+                                    }
+                                }
+                            } else {
+                                results.add([name: workload, status: (rc == 0 || rc == 3 ? 'pass' : 'regression'), link: "${reportsUrl}/${workload}/${runDate}/"])
+                            }
+                        }
+                    }
+
+                    def regressionList = results.findAll { it.status == 'regression' }
+                    if (regressionList.size() > 0) {
+                        currentBuild.result = 'UNSTABLE'
+                    }
+
+                    def resultsJson = '['
+                    results.eachWithIndex { r, i ->
+                        if (i > 0) resultsJson += ','
+                        resultsJson += """{"name":"${r.name}","status":"${r.status}","link":"${r.link}"}"""
+                    }
+                    resultsJson += ']'
+
+                    writeFile file: "${WORKSPACE}/orion-results.json", text: resultsJson
+                    sh """
+                        PYTHONPATH="${WORKSPACE}" \
+                        SLACK_API_TOKEN="\${SLACK_TOKEN}" \
+                        SLACK_CHANNEL_NAME="\${SLACK_CHANNEL}" \
+                        python3 ${WORKSPACE}/benchmark_runner/orion/orion_slack_notify.py \
+                          --results-file ${WORKSPACE}/orion-results.json --date '${runDate}' || true
+                    """
+                }
+            }
+        }
+    }
+
+    post {
+        failure {
+            script {
+                msg = "Build error for ${env.JOB_NAME} ${env.BUILD_NUMBER} (${env.BUILD_URL})"
+                emailext body: """\
+                    Jenkins job: ${env.BUILD_URL}\nSee the console output for more details:  ${env.BUILD_URL}consoleFull\n\n
+                """, subject: msg, to: "${CONTACT_EMAIL}"
+            }
+        }
+        success {
+            echo "Orion reports available at http://${ELASTICSEARCH}:9091/"
+        }
+    }
+}
