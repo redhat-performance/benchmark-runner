@@ -26,13 +26,12 @@ spec:
               tickPolicy: catchup
           utc: {}
         cpu:
-          model: host-passthrough
           cores: 1
           sockets: 64
           threads: 1
         devices:
           autoattachMemBalloon: false
-          blockMultiQueue: false
+          blockMultiQueue: true
           disks:
           - name: winstress-vm-root-disk-deadbeef
             disk:
@@ -61,8 +60,8 @@ spec:
               direct: {}
             spinlocks:
               spinlocks: 8191
-            evmcs:
-              enabled: true
+            reenlightenment: {}
+            reset: {}
             relaxed: {}
             vpindex: {}
             runtime: {}

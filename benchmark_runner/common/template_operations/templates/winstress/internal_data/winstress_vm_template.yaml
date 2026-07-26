@@ -42,17 +42,16 @@ spec:
               tickPolicy: catchup
           utc: {}
         {%- if guest_memory is defined and guest_memory %}
-        memory: 
+        memory:
           guest: {{ guest_memory }}
         {%- endif %}
         cpu:
-          model: host-passthrough
           cores: {{ cores }}
           sockets: {{ sockets }}
           threads: {{ threads }}
         devices:
           autoattachMemBalloon: false
-          blockMultiQueue: false
+          blockMultiQueue: true
           disks:
           - {% if scale -%}
             name: winstress-{{ kind }}-root-disk-{{ trunc_uuid }}-{{ scale }}
@@ -85,8 +84,8 @@ spec:
               direct: {}
             spinlocks:
               spinlocks: 8191
-            evmcs:
-              enabled: true
+            reenlightenment: {}
+            reset: {}
             relaxed: {}
             vpindex: {}
             runtime: {}
@@ -151,7 +150,7 @@ spec:
           requests:
             storage: {{ storage }}
         volumeMode: Block
-        storageClassName: ocs-storagecluster-ceph-rbd-virtualization
+        storageClassName: {{ windows_storage_class }}
       source:
         pvc:
           namespace: {{ namespace }}

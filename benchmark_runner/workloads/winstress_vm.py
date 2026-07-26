@@ -60,7 +60,6 @@ class WinstressVm(BootstormVM):
             self._oc.wait_for_vm_status(vm_name=self._get_vm_name(vm_num), status=VMStatus.Stopped)
         except Exception as err:
             self._save_vm_artifacts(vm_num)
-            self.save_error_logs()
             raise err
 
     def _prepare_vm(self, vm_num: str):
@@ -70,13 +69,12 @@ class WinstressVm(BootstormVM):
             if not self._virtctl._wait_for_virtctl_ssh(vm_name=vm_name, namespace=self.__namespace,
                                                        key_path=self.__ssh_key_path, username=self.__username,
                                                        timeout=OC.SHORT_TIMEOUT):
-                logger.warning(f'SSH never became ready on VM {vm_name}, skipping')
                 self._save_vm_artifacts(vm_num)
-                return
+                raise RuntimeError(f'SSH never became ready on VM {vm_name}')
 
         except Exception as err:
             self._save_vm_artifacts(vm_num)
-            logger.warning(f'Failed to prepare VM {self._get_vm_name(vm_num)}: {err}')
+            raise err
 
     def _run_stress(self, vm_num: str):
         try:
@@ -92,7 +90,7 @@ class WinstressVm(BootstormVM):
                                      username=self.__username, timeout=self._timeout)
         except Exception as err:
             self._save_vm_artifacts(vm_num)
-            logger.warning(f'Stress test failed on VM {self._get_vm_name(vm_num)}: {err}')
+            raise err
 
     def _save_vm_artifacts_by_name(self, vm_name: str):
         try:
@@ -117,12 +115,14 @@ class WinstressVm(BootstormVM):
             local_result_json = os.path.join(self._run_artifacts_path, f'{vm_name}.json')
 
             check_cmd = f'powershell -Command "if (Test-Path \'{self.__remote_dir}/stress_report.json\') {{ echo found }}"'
-            for elapsed in range(0, self._timeout, OC.DELAY):
+            deadline = time.time() + self._timeout
+            while time.time() < deadline:
                 check = self._virtctl.virtctl_ssh(vm_name=vm_name, command=check_cmd,
                                                   namespace=self.__namespace, key_path=self.__ssh_key_path,
                                                   username=self.__username, timeout=60)
                 if check and 'found' in check:
                     break
+                elapsed = int(self._timeout - (deadline - time.time()))
                 logger.info(f'Waiting for stress_report.json on VM {vm_name}... ({elapsed}s)')
                 time.sleep(OC.DELAY)
 
@@ -131,15 +131,13 @@ class WinstressVm(BootstormVM):
                                            local_path=local_result_json,
                                            namespace=self.__namespace, key_path=self.__ssh_key_path,
                                            username=self.__username):
-                logger.warning(f'Failed to SCP stress_report.json from VM {vm_name}')
-                return
+                raise RuntimeError(f'Failed to SCP stress_report.json from VM {vm_name}')
 
             try:
                 with open(local_result_json, 'r') as f:
                     report = json.load(f)
             except (json.JSONDecodeError, FileNotFoundError) as e:
-                logger.warning(f'Failed to parse stress report from {local_result_json}: {e}')
-                return
+                raise RuntimeError(f'Failed to parse stress report from {local_result_json}: {e}')
 
             vm_node = self._oc.get_vm_node(vm_name=vm_name) or ''
             workload_name = self._environment_variables_dict.get('workload', '').replace('_', '-')
@@ -167,7 +165,6 @@ class WinstressVm(BootstormVM):
             logger.info(f'  throughput: {result["total_ops_per_sec"]:.0f} ops/sec, avg_per_cpu: {result["avg_ops_per_cpu"]:.0f} ops/sec')
 
         except Exception as err:
-            self.save_error_logs()
             raise err
 
     def _delete_vm(self, vm_num: str):
@@ -175,7 +172,6 @@ class WinstressVm(BootstormVM):
             vm_name = self._get_vm_name(vm_num)
             self._oc.delete_vm_sync(yaml=self._get_vm_yaml(vm_num), vm_name=vm_name)
         except Exception as err:
-            self.save_error_logs()
             raise err
 
     def _upload_results(self, vm_count: int):

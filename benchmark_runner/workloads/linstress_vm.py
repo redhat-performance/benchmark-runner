@@ -40,7 +40,6 @@ class LinstressVm(BootstormVM):
             logger.info(f'VM {vm_name} created, stress script running via cloud-init')
         except Exception as err:
             self._save_vm_artifacts(vm_num)
-            self.save_error_logs()
             raise err
 
     def _save_vm_artifacts_by_name(self, vm_name: str):
@@ -69,12 +68,14 @@ class LinstressVm(BootstormVM):
             logger.info(f'Waiting for stress test to complete on VM {vm_name} (stress_duration={stress_duration}s, timeout={self._timeout}s)')
 
             check_cmd = f'test -f /tmp/stress_report.json && echo found'
-            for elapsed in range(0, self._timeout, OC.DELAY):
+            deadline = time.time() + self._timeout
+            while time.time() < deadline:
                 check = self._virtctl.virtctl_ssh(vm_name=vm_name, command=check_cmd,
                                                   namespace=self.__namespace, key_path=self.__ssh_key_path,
                                                   username=self.__username, timeout=60)
                 if check and 'found' in check:
                     break
+                elapsed = int(self._timeout - (deadline - time.time()))
                 if elapsed > 0 and elapsed % 300 == 0:
                     logger.info(f'Waiting for stress_report.json on VM {vm_name}... ({elapsed}s)')
                 time.sleep(OC.DELAY)
@@ -84,15 +85,13 @@ class LinstressVm(BootstormVM):
                                            local_path=local_result_json,
                                            namespace=self.__namespace, key_path=self.__ssh_key_path,
                                            username=self.__username):
-                logger.warning(f'Failed to SCP stress_report.json from VM {vm_name}')
-                return
+                raise RuntimeError(f'Failed to SCP stress_report.json from VM {vm_name}')
 
             try:
                 with open(local_result_json, 'r') as f:
                     report = json.load(f)
             except (json.JSONDecodeError, FileNotFoundError) as e:
-                logger.warning(f'Failed to parse stress report from {local_result_json}: {e}')
-                return
+                raise RuntimeError(f'Failed to parse stress report from {local_result_json}: {e}')
 
             vm_node = self._oc.get_vm_node(vm_name=vm_name) or ''
             workload_name = self._environment_variables_dict.get('workload', '').replace('_', '-')
@@ -119,7 +118,6 @@ class LinstressVm(BootstormVM):
             logger.info(f'Stress results for {vm_name}: throughput={result["total_ops_per_sec"]:.0f} ops/sec, avg_per_cpu={result["avg_ops_per_cpu"]:.0f} ops/sec')
 
         except Exception as err:
-            self.save_error_logs()
             raise err
 
     def _delete_vm(self, vm_num: str):
@@ -127,7 +125,6 @@ class LinstressVm(BootstormVM):
             vm_name = self._get_vm_name(vm_num)
             self._oc.delete_vm_sync(yaml=self._get_vm_yaml(vm_num), vm_name=vm_name)
         except Exception as err:
-            self.save_error_logs()
             raise err
 
     def _upload_results(self, vm_count: int):
