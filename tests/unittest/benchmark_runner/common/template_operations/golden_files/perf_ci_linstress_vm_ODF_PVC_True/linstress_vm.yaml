@@ -43,7 +43,7 @@ stringData:
                   size = min(chunk_size, alloc_bytes - allocated)
                   blocks.append(bytearray(size))
                   allocated += size
-                  print(f'Allocated {allocated // (1024*1024)}MB / {alloc_bytes // (1024*1024)}MB ({psutil.virtual_memory().percent}%)')
+                  print(f'Allocated {allocated // (1024*1024)}MiB / {alloc_bytes // (1024*1024)}MiB ({psutil.virtual_memory().percent}%)')
               print(f'Memory at {psutil.virtual_memory().percent}%, holding for {duration}s...')
               time.sleep(duration)
 
@@ -55,7 +55,7 @@ stringData:
 
               print(f'CPU count: {cpu_total}')
               print(f'Stressing {cpu_count} CPUs (100%) and {mem_target}% memory for {duration}s')
-              print(f'Total memory: {psutil.virtual_memory().total // (1024**3)}GB')
+              print(f'Total memory: {psutil.virtual_memory().total // (1024**3)}GiB')
               print(f'Memory before: {psutil.virtual_memory().percent}%')
               print(f'CPU before: {psutil.cpu_percent(interval=1)}%')
 
@@ -87,7 +87,7 @@ stringData:
                       'mem_total_gb': round(mem.total / (1024**3), 1)
                   }
                   samples.append(sample)
-                  print(f"At {sample['time_sec']}s: CPU={cpu_pct}% MEM={mem.percent}% ({sample['mem_used_gb']}GB/{sample['mem_total_gb']}GB)")
+                  print(f"At {sample['time_sec']}s: CPU={cpu_pct}% MEM={mem.percent}% ({sample['mem_used_gb']}GiB/{sample['mem_total_gb']}GiB)")
 
               [p.join() for p in cpu_procs]
               if mem_proc:
@@ -127,7 +127,7 @@ stringData:
               print('Done')
     runcmd:
       - export HOME=/root
-      - dnf install -y python3-psutil || true
+      - dnf install -y python3-psutil
       - python3 /tmp/stress.py
 ---
 apiVersion: kubevirt.io/v1
@@ -148,8 +148,8 @@ spec:
         kubernetes.io/hostname: 'None'
       domain:
         cpu:
-          sockets: 8
-          cores: 1
+          sockets: 1
+          cores: 16
           threads: 1
         devices:
           disks:
@@ -167,8 +167,8 @@ spec:
           type: ""
         resources:
           requests:
-            cpu: 8
-            memory: 8Gi
+            cpu: 1
+            memory: 32Gi
       terminationGracePeriodSeconds: 180
       networks:
         - name: default

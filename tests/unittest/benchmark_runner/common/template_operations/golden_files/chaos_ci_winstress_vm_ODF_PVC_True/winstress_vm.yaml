@@ -26,8 +26,8 @@ spec:
               tickPolicy: catchup
           utc: {}
         cpu:
-          cores: 1
-          sockets: 2
+          cores: 2
+          sockets: 1
           threads: 1
         devices:
           autoattachMemBalloon: false

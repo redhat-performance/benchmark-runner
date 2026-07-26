@@ -63,21 +63,23 @@ if __name__ == '__main__':
     cpu_procs = [multiprocessing.Process(target=burn_cpu, args=(duration, result_dict, i)) for i in range(cpu_count)]
     [p.start() for p in cpu_procs]
 
-    intervals = max(1, duration // 30)
     samples = []
-    for i in range(intervals):
-        time.sleep(30)
+    elapsed_total = 0
+    while elapsed_total < duration:
+        step = min(30, duration - elapsed_total)
+        time.sleep(step)
+        elapsed_total += step
         mem = psutil.virtual_memory()
         cpu_pct = psutil.cpu_percent(interval=1)
         sample = {
-            'time_sec': (i+1)*30,
+            'time_sec': elapsed_total,
             'cpu_percent': cpu_pct,
             'mem_percent': mem.percent,
             'mem_used_gb': round(mem.used / (1024**3), 1),
             'mem_total_gb': round(mem.total / (1024**3), 1)
         }
         samples.append(sample)
-        print(f"At {sample['time_sec']}s: CPU={cpu_pct}% MEM={mem.percent}% ({sample['mem_used_gb']}GB/{sample['mem_total_gb']}GB)")
+        print(f"At {sample['time_sec']}s: CPU={cpu_pct}% MEM={mem.percent}% ({sample['mem_used_gb']}GiB/{sample['mem_total_gb']}GiB)")
 
     [p.join() for p in cpu_procs]
     if mem_proc:
