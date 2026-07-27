@@ -3,7 +3,6 @@ tests:
     metadata:
       kind: vm
       run_status: complete
-      vm_os_version: windows_server_2k25
     metrics:
       - name: total-iops
         metric_of_interest: total_iops
@@ -18,7 +17,7 @@ tests:
         threshold: 10
         direction: -1
       - name: bandwidth
-        metric_of_interest: bandwidth_MiBsec
+        metric_of_interest: total_bw_kbs
         agg:
           agg_type: avg
         threshold: 10

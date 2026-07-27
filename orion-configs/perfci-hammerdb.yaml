@@ -1,10 +1,11 @@
 tests:
-  - name: hammerdb-vm-mssql-odf
+  - name: hammerdb-vm-mssql-odf-1vu
     metadata:
       kind: vm
       run_status: complete
       db_type: mssql
       storage_type: odf
+      current_worker: 1
     metrics:
       - name: tpm
         metric_of_interest: tpm
@@ -12,12 +13,83 @@ tests:
           agg_type: avg
         threshold: 10
         direction: 1
-  - name: hammerdb-vm-mariadb-odf
+  - name: hammerdb-vm-mssql-odf-2vu
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mssql
+      storage_type: odf
+      current_worker: 2
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-vm-mssql-odf-4vu
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mssql
+      storage_type: odf
+      current_worker: 4
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-vm-mssql-odf-8vu
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mssql
+      storage_type: odf
+      current_worker: 8
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-vm-mssql-odf-16vu
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mssql
+      storage_type: odf
+      current_worker: 16
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-vm-mssql-odf-32vu
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mssql
+      storage_type: odf
+      current_worker: 32
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-vm-mariadb-odf-1vu
     metadata:
       kind: vm
       run_status: complete
       db_type: mariadb
       storage_type: odf
+      current_worker: 1
     metrics:
       - name: tpm
         metric_of_interest: tpm
@@ -25,12 +97,83 @@ tests:
           agg_type: avg
         threshold: 10
         direction: 1
-  - name: hammerdb-vm-pg-odf
+  - name: hammerdb-vm-mariadb-odf-2vu
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mariadb
+      storage_type: odf
+      current_worker: 2
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-vm-mariadb-odf-4vu
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mariadb
+      storage_type: odf
+      current_worker: 4
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-vm-mariadb-odf-8vu
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mariadb
+      storage_type: odf
+      current_worker: 8
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-vm-mariadb-odf-16vu
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mariadb
+      storage_type: odf
+      current_worker: 16
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-vm-mariadb-odf-32vu
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mariadb
+      storage_type: odf
+      current_worker: 32
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-vm-pg-odf-1vu
     metadata:
       kind: vm
       run_status: complete
       db_type: pg
       storage_type: odf
+      current_worker: 1
     metrics:
       - name: tpm
         metric_of_interest: tpm
@@ -38,12 +181,83 @@ tests:
           agg_type: avg
         threshold: 10
         direction: 1
-  - name: hammerdb-pod-mssql-odf
+  - name: hammerdb-vm-pg-odf-2vu
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: pg
+      storage_type: odf
+      current_worker: 2
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-vm-pg-odf-4vu
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: pg
+      storage_type: odf
+      current_worker: 4
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-vm-pg-odf-8vu
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: pg
+      storage_type: odf
+      current_worker: 8
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-vm-pg-odf-16vu
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: pg
+      storage_type: odf
+      current_worker: 16
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-vm-pg-odf-32vu
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: pg
+      storage_type: odf
+      current_worker: 32
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-pod-mssql-odf-1vu
     metadata:
       kind: pod
       run_status: complete
       db_type: mssql
       storage_type: odf
+      current_worker: 1
     metrics:
       - name: tpm
         metric_of_interest: tpm
@@ -51,12 +265,83 @@ tests:
           agg_type: avg
         threshold: 10
         direction: 1
-  - name: hammerdb-pod-mariadb-odf
+  - name: hammerdb-pod-mssql-odf-2vu
+    metadata:
+      kind: pod
+      run_status: complete
+      db_type: mssql
+      storage_type: odf
+      current_worker: 2
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-pod-mssql-odf-4vu
+    metadata:
+      kind: pod
+      run_status: complete
+      db_type: mssql
+      storage_type: odf
+      current_worker: 4
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-pod-mssql-odf-8vu
+    metadata:
+      kind: pod
+      run_status: complete
+      db_type: mssql
+      storage_type: odf
+      current_worker: 8
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-pod-mssql-odf-16vu
+    metadata:
+      kind: pod
+      run_status: complete
+      db_type: mssql
+      storage_type: odf
+      current_worker: 16
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-pod-mssql-odf-32vu
+    metadata:
+      kind: pod
+      run_status: complete
+      db_type: mssql
+      storage_type: odf
+      current_worker: 32
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-pod-mariadb-odf-1vu
     metadata:
       kind: pod
       run_status: complete
       db_type: mariadb
       storage_type: odf
+      current_worker: 1
     metrics:
       - name: tpm
         metric_of_interest: tpm
@@ -64,12 +349,83 @@ tests:
           agg_type: avg
         threshold: 10
         direction: 1
-  - name: hammerdb-pod-pg-odf
+  - name: hammerdb-pod-mariadb-odf-2vu
+    metadata:
+      kind: pod
+      run_status: complete
+      db_type: mariadb
+      storage_type: odf
+      current_worker: 2
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-pod-mariadb-odf-4vu
+    metadata:
+      kind: pod
+      run_status: complete
+      db_type: mariadb
+      storage_type: odf
+      current_worker: 4
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-pod-mariadb-odf-8vu
+    metadata:
+      kind: pod
+      run_status: complete
+      db_type: mariadb
+      storage_type: odf
+      current_worker: 8
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-pod-mariadb-odf-16vu
+    metadata:
+      kind: pod
+      run_status: complete
+      db_type: mariadb
+      storage_type: odf
+      current_worker: 16
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-pod-mariadb-odf-32vu
+    metadata:
+      kind: pod
+      run_status: complete
+      db_type: mariadb
+      storage_type: odf
+      current_worker: 32
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-pod-pg-odf-1vu
     metadata:
       kind: pod
       run_status: complete
       db_type: pg
       storage_type: odf
+      current_worker: 1
     metrics:
       - name: tpm
         metric_of_interest: tpm
@@ -77,12 +433,83 @@ tests:
           agg_type: avg
         threshold: 10
         direction: 1
-  - name: hammerdb-vm-mssql-lso
+  - name: hammerdb-pod-pg-odf-2vu
+    metadata:
+      kind: pod
+      run_status: complete
+      db_type: pg
+      storage_type: odf
+      current_worker: 2
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-pod-pg-odf-4vu
+    metadata:
+      kind: pod
+      run_status: complete
+      db_type: pg
+      storage_type: odf
+      current_worker: 4
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-pod-pg-odf-8vu
+    metadata:
+      kind: pod
+      run_status: complete
+      db_type: pg
+      storage_type: odf
+      current_worker: 8
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-pod-pg-odf-16vu
+    metadata:
+      kind: pod
+      run_status: complete
+      db_type: pg
+      storage_type: odf
+      current_worker: 16
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-pod-pg-odf-32vu
+    metadata:
+      kind: pod
+      run_status: complete
+      db_type: pg
+      storage_type: odf
+      current_worker: 32
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-vm-mssql-lso-1vu
     metadata:
       kind: vm
       run_status: complete
       db_type: mssql
       storage_type: lso
+      current_worker: 1
     metrics:
       - name: tpm
         metric_of_interest: tpm
@@ -90,12 +517,83 @@ tests:
           agg_type: avg
         threshold: 10
         direction: 1
-  - name: hammerdb-vm-mariadb-lso
+  - name: hammerdb-vm-mssql-lso-2vu
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mssql
+      storage_type: lso
+      current_worker: 2
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-vm-mssql-lso-4vu
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mssql
+      storage_type: lso
+      current_worker: 4
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-vm-mssql-lso-8vu
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mssql
+      storage_type: lso
+      current_worker: 8
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-vm-mssql-lso-16vu
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mssql
+      storage_type: lso
+      current_worker: 16
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-vm-mssql-lso-32vu
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mssql
+      storage_type: lso
+      current_worker: 32
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-vm-mariadb-lso-1vu
     metadata:
       kind: vm
       run_status: complete
       db_type: mariadb
       storage_type: lso
+      current_worker: 1
     metrics:
       - name: tpm
         metric_of_interest: tpm
@@ -103,12 +601,83 @@ tests:
           agg_type: avg
         threshold: 10
         direction: 1
-  - name: hammerdb-vm-pg-lso
+  - name: hammerdb-vm-mariadb-lso-2vu
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mariadb
+      storage_type: lso
+      current_worker: 2
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-vm-mariadb-lso-4vu
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mariadb
+      storage_type: lso
+      current_worker: 4
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-vm-mariadb-lso-8vu
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mariadb
+      storage_type: lso
+      current_worker: 8
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-vm-mariadb-lso-16vu
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mariadb
+      storage_type: lso
+      current_worker: 16
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-vm-mariadb-lso-32vu
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mariadb
+      storage_type: lso
+      current_worker: 32
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-vm-pg-lso-1vu
     metadata:
       kind: vm
       run_status: complete
       db_type: pg
       storage_type: lso
+      current_worker: 1
     metrics:
       - name: tpm
         metric_of_interest: tpm
@@ -116,12 +685,83 @@ tests:
           agg_type: avg
         threshold: 10
         direction: 1
-  - name: hammerdb-pod-mssql-lso
+  - name: hammerdb-vm-pg-lso-2vu
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: pg
+      storage_type: lso
+      current_worker: 2
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-vm-pg-lso-4vu
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: pg
+      storage_type: lso
+      current_worker: 4
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-vm-pg-lso-8vu
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: pg
+      storage_type: lso
+      current_worker: 8
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-vm-pg-lso-16vu
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: pg
+      storage_type: lso
+      current_worker: 16
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-vm-pg-lso-32vu
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: pg
+      storage_type: lso
+      current_worker: 32
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-pod-mssql-lso-1vu
     metadata:
       kind: pod
       run_status: complete
       db_type: mssql
       storage_type: lso
+      current_worker: 1
     metrics:
       - name: tpm
         metric_of_interest: tpm
@@ -129,12 +769,83 @@ tests:
           agg_type: avg
         threshold: 10
         direction: 1
-  - name: hammerdb-pod-mariadb-lso
+  - name: hammerdb-pod-mssql-lso-2vu
+    metadata:
+      kind: pod
+      run_status: complete
+      db_type: mssql
+      storage_type: lso
+      current_worker: 2
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-pod-mssql-lso-4vu
+    metadata:
+      kind: pod
+      run_status: complete
+      db_type: mssql
+      storage_type: lso
+      current_worker: 4
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-pod-mssql-lso-8vu
+    metadata:
+      kind: pod
+      run_status: complete
+      db_type: mssql
+      storage_type: lso
+      current_worker: 8
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-pod-mssql-lso-16vu
+    metadata:
+      kind: pod
+      run_status: complete
+      db_type: mssql
+      storage_type: lso
+      current_worker: 16
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-pod-mssql-lso-32vu
+    metadata:
+      kind: pod
+      run_status: complete
+      db_type: mssql
+      storage_type: lso
+      current_worker: 32
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-pod-mariadb-lso-1vu
     metadata:
       kind: pod
       run_status: complete
       db_type: mariadb
       storage_type: lso
+      current_worker: 1
     metrics:
       - name: tpm
         metric_of_interest: tpm
@@ -142,12 +853,83 @@ tests:
           agg_type: avg
         threshold: 10
         direction: 1
-  - name: hammerdb-pod-pg-lso
+  - name: hammerdb-pod-mariadb-lso-2vu
+    metadata:
+      kind: pod
+      run_status: complete
+      db_type: mariadb
+      storage_type: lso
+      current_worker: 2
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-pod-mariadb-lso-4vu
+    metadata:
+      kind: pod
+      run_status: complete
+      db_type: mariadb
+      storage_type: lso
+      current_worker: 4
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-pod-mariadb-lso-8vu
+    metadata:
+      kind: pod
+      run_status: complete
+      db_type: mariadb
+      storage_type: lso
+      current_worker: 8
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-pod-mariadb-lso-16vu
+    metadata:
+      kind: pod
+      run_status: complete
+      db_type: mariadb
+      storage_type: lso
+      current_worker: 16
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-pod-mariadb-lso-32vu
+    metadata:
+      kind: pod
+      run_status: complete
+      db_type: mariadb
+      storage_type: lso
+      current_worker: 32
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-pod-pg-lso-1vu
     metadata:
       kind: pod
       run_status: complete
       db_type: pg
       storage_type: lso
+      current_worker: 1
     metrics:
       - name: tpm
         metric_of_interest: tpm
@@ -155,12 +937,153 @@ tests:
           agg_type: avg
         threshold: 10
         direction: 1
-  - name: hammerdb-vm-mssql-scale
+  - name: hammerdb-pod-pg-lso-2vu
+    metadata:
+      kind: pod
+      run_status: complete
+      db_type: pg
+      storage_type: lso
+      current_worker: 2
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-pod-pg-lso-4vu
+    metadata:
+      kind: pod
+      run_status: complete
+      db_type: pg
+      storage_type: lso
+      current_worker: 4
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-pod-pg-lso-8vu
+    metadata:
+      kind: pod
+      run_status: complete
+      db_type: pg
+      storage_type: lso
+      current_worker: 8
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-pod-pg-lso-16vu
+    metadata:
+      kind: pod
+      run_status: complete
+      db_type: pg
+      storage_type: lso
+      current_worker: 16
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-pod-pg-lso-32vu
+    metadata:
+      kind: pod
+      run_status: complete
+      db_type: pg
+      storage_type: lso
+      current_worker: 32
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-vm-mssql-scale-1vu
     metadata:
       kind: vm
       run_status: complete
       db_type: mssql
       storage_type: scale
+      current_worker: 1
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-vm-mssql-scale-2vu
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mssql
+      storage_type: scale
+      current_worker: 2
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-vm-mssql-scale-4vu
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mssql
+      storage_type: scale
+      current_worker: 4
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-vm-mssql-scale-8vu
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mssql
+      storage_type: scale
+      current_worker: 8
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-vm-mssql-scale-16vu
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mssql
+      storage_type: scale
+      current_worker: 16
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: 1
+  - name: hammerdb-vm-mssql-scale-32vu
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mssql
+      storage_type: scale
+      current_worker: 32
     metrics:
       - name: tpm
         metric_of_interest: tpm

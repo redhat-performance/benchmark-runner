@@ -19,6 +19,8 @@ declare -A INDEX_MAP=(
   [fio]="fio-results"
   [vdbench]="vdbench-results"
   [sysbench]="sysbench-results"
+  [winmssql]="hammerdb-results"
+  [winfio]="fio-results"
 )
 
 mkdir -p "$REPORTS"
