@@ -1,0 +1,27 @@
+metadata:
+  name: linstress
+template_data:
+  shared:
+    pin_node: {{ pin_node0 }}
+    odf_pvc: {{ odf_pvc }}
+    uuid: {{ uuid }}
+    fedora_container_disk: {{ fedora_container_disk }}
+    vm_user: fedora
+    vm_password: fedora
+    stress_cpu: 100
+    stress_memory: 50
+    stress_duration: 600
+    guest_memory: ''
+  run_type:
+    perf_ci:
+      requests_memory: 32Gi
+      requests_cpu: 1
+      cores: 16
+      sockets: 1
+      threads: 1
+    default:
+      requests_memory: 4Gi
+      requests_cpu: 1
+      cores: 2
+      sockets: 1
+      threads: 1

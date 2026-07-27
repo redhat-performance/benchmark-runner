@@ -1,0 +1,33 @@
+metadata:
+  name: windows
+files:
+  - name: 01_run_stress.ps1
+    template: 01_run_stress_template.ps1
+template_data:
+  shared:
+    pin_node: {{ pin_node0 }}
+    odf_pvc: {{ odf_pvc }}
+    uuid: {{ uuid }}
+    url: {{ windows_url }}
+    cdi_source_type: {{ cdi_source_type }}
+    cdi_source_s3_cred: {{ cdi_source_s3_cred }}
+    windows_storage_class: {{ windows_storage_class }}
+    stress_cpu: 100
+    stress_memory: 50
+    stress_duration: 600
+    guest_memory: ''
+  run_type:
+    perf_ci:
+      requests_memory: 32G
+      requests_cpu: 1
+      cores: 16
+      sockets: 1
+      threads: 1
+      storage: 76Gi
+    default:
+      requests_memory: 4G
+      requests_cpu: 1
+      cores: 2
+      sockets: 1
+      threads: 1
+      storage: 76Gi

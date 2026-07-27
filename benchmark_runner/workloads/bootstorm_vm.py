@@ -221,6 +221,7 @@ class BootstormVM(WorkloadsOperations):
             try:
                 self._oc.save_to_yaml(vm_name, str(access_status).lower() == 'true', output_dir=self._run_artifacts_path)
                 self._oc.save_describe_yaml(vm_name, str(access_status).lower() == 'true', output_dir=self._run_artifacts_path)
+                self._oc.save_pod_logs(vm_name, output_dir=self._run_artifacts_path)
                 with open(error_log_path, "w") as error_log_file:
                     error_log_file.write(self._oc.get_vm_status(vm_name=vm_name) + "\n")
                     error_log_file.write("VM Status: " + access_status + "\n")
