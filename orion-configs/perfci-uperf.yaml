@@ -1,49 +1,625 @@
 tests:
-  - name: uperf-vm
-    metadata:
-      kind: vm
-      run_status: complete
-      test_type: stream
-    metrics:
-      - name: throughput
-        metric_of_interest: norm_byte
-        agg:
-          agg_type: avg
-        threshold: 10
-        direction: 1
-      - name: latency
-        metric_of_interest: norm_ltcy
-        agg:
-          agg_type: avg
-        threshold: 10
-        direction: -1
-      - name: operations
-        metric_of_interest: norm_ops
-        agg:
-          agg_type: avg
-        threshold: 10
-        direction: 1
-  - name: uperf-pod
-    metadata:
-      kind: pod
-      run_status: complete
-      test_type: stream
-    metrics:
-      - name: throughput
-        metric_of_interest: norm_byte
-        agg:
-          agg_type: avg
-        threshold: 10
-        direction: 1
-      - name: latency
-        metric_of_interest: norm_ltcy
-        agg:
-          agg_type: avg
-        threshold: 10
-        direction: -1
-      - name: operations
-        metric_of_interest: norm_ops
-        agg:
-          agg_type: avg
-        threshold: 10
-        direction: 1
+- name: uperf-vm-stream-1thr-64b
+  metadata:
+    kind: vm
+    run_status: complete
+    test_type: stream
+    num_threads: 1
+    message_size: 64
+  metrics:
+  - name: throughput
+    metric_of_interest: norm_byte
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: norm_ltcy
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: operations
+    metric_of_interest: norm_ops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: uperf-vm-stream-1thr-1024b
+  metadata:
+    kind: vm
+    run_status: complete
+    test_type: stream
+    num_threads: 1
+    message_size: 1024
+  metrics:
+  - name: throughput
+    metric_of_interest: norm_byte
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: norm_ltcy
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: operations
+    metric_of_interest: norm_ops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: uperf-vm-stream-1thr-8192b
+  metadata:
+    kind: vm
+    run_status: complete
+    test_type: stream
+    num_threads: 1
+    message_size: 8192
+  metrics:
+  - name: throughput
+    metric_of_interest: norm_byte
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: norm_ltcy
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: operations
+    metric_of_interest: norm_ops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: uperf-vm-stream-8thr-64b
+  metadata:
+    kind: vm
+    run_status: complete
+    test_type: stream
+    num_threads: 8
+    message_size: 64
+  metrics:
+  - name: throughput
+    metric_of_interest: norm_byte
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: norm_ltcy
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: operations
+    metric_of_interest: norm_ops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: uperf-vm-stream-8thr-1024b
+  metadata:
+    kind: vm
+    run_status: complete
+    test_type: stream
+    num_threads: 8
+    message_size: 1024
+  metrics:
+  - name: throughput
+    metric_of_interest: norm_byte
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: norm_ltcy
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: operations
+    metric_of_interest: norm_ops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: uperf-vm-stream-8thr-8192b
+  metadata:
+    kind: vm
+    run_status: complete
+    test_type: stream
+    num_threads: 8
+    message_size: 8192
+  metrics:
+  - name: throughput
+    metric_of_interest: norm_byte
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: norm_ltcy
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: operations
+    metric_of_interest: norm_ops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: uperf-vm-rr-1thr-64b
+  metadata:
+    kind: vm
+    run_status: complete
+    test_type: rr
+    num_threads: 1
+    message_size: 64
+  metrics:
+  - name: throughput
+    metric_of_interest: norm_byte
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: norm_ltcy
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: operations
+    metric_of_interest: norm_ops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: uperf-vm-rr-1thr-1024b
+  metadata:
+    kind: vm
+    run_status: complete
+    test_type: rr
+    num_threads: 1
+    message_size: 1024
+  metrics:
+  - name: throughput
+    metric_of_interest: norm_byte
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: norm_ltcy
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: operations
+    metric_of_interest: norm_ops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: uperf-vm-rr-1thr-8192b
+  metadata:
+    kind: vm
+    run_status: complete
+    test_type: rr
+    num_threads: 1
+    message_size: 8192
+  metrics:
+  - name: throughput
+    metric_of_interest: norm_byte
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: norm_ltcy
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: operations
+    metric_of_interest: norm_ops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: uperf-vm-rr-8thr-64b
+  metadata:
+    kind: vm
+    run_status: complete
+    test_type: rr
+    num_threads: 8
+    message_size: 64
+  metrics:
+  - name: throughput
+    metric_of_interest: norm_byte
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: norm_ltcy
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: operations
+    metric_of_interest: norm_ops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: uperf-vm-rr-8thr-1024b
+  metadata:
+    kind: vm
+    run_status: complete
+    test_type: rr
+    num_threads: 8
+    message_size: 1024
+  metrics:
+  - name: throughput
+    metric_of_interest: norm_byte
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: norm_ltcy
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: operations
+    metric_of_interest: norm_ops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: uperf-vm-rr-8thr-8192b
+  metadata:
+    kind: vm
+    run_status: complete
+    test_type: rr
+    num_threads: 8
+    message_size: 8192
+  metrics:
+  - name: throughput
+    metric_of_interest: norm_byte
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: norm_ltcy
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: operations
+    metric_of_interest: norm_ops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: uperf-pod-stream-1thr-64b
+  metadata:
+    kind: pod
+    run_status: complete
+    test_type: stream
+    num_threads: 1
+    message_size: 64
+  metrics:
+  - name: throughput
+    metric_of_interest: norm_byte
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: norm_ltcy
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: operations
+    metric_of_interest: norm_ops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: uperf-pod-stream-1thr-1024b
+  metadata:
+    kind: pod
+    run_status: complete
+    test_type: stream
+    num_threads: 1
+    message_size: 1024
+  metrics:
+  - name: throughput
+    metric_of_interest: norm_byte
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: norm_ltcy
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: operations
+    metric_of_interest: norm_ops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: uperf-pod-stream-1thr-8192b
+  metadata:
+    kind: pod
+    run_status: complete
+    test_type: stream
+    num_threads: 1
+    message_size: 8192
+  metrics:
+  - name: throughput
+    metric_of_interest: norm_byte
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: norm_ltcy
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: operations
+    metric_of_interest: norm_ops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: uperf-pod-stream-8thr-64b
+  metadata:
+    kind: pod
+    run_status: complete
+    test_type: stream
+    num_threads: 8
+    message_size: 64
+  metrics:
+  - name: throughput
+    metric_of_interest: norm_byte
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: norm_ltcy
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: operations
+    metric_of_interest: norm_ops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: uperf-pod-stream-8thr-1024b
+  metadata:
+    kind: pod
+    run_status: complete
+    test_type: stream
+    num_threads: 8
+    message_size: 1024
+  metrics:
+  - name: throughput
+    metric_of_interest: norm_byte
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: norm_ltcy
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: operations
+    metric_of_interest: norm_ops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: uperf-pod-stream-8thr-8192b
+  metadata:
+    kind: pod
+    run_status: complete
+    test_type: stream
+    num_threads: 8
+    message_size: 8192
+  metrics:
+  - name: throughput
+    metric_of_interest: norm_byte
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: norm_ltcy
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: operations
+    metric_of_interest: norm_ops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: uperf-pod-rr-1thr-64b
+  metadata:
+    kind: pod
+    run_status: complete
+    test_type: rr
+    num_threads: 1
+    message_size: 64
+  metrics:
+  - name: throughput
+    metric_of_interest: norm_byte
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: norm_ltcy
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: operations
+    metric_of_interest: norm_ops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: uperf-pod-rr-1thr-1024b
+  metadata:
+    kind: pod
+    run_status: complete
+    test_type: rr
+    num_threads: 1
+    message_size: 1024
+  metrics:
+  - name: throughput
+    metric_of_interest: norm_byte
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: norm_ltcy
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: operations
+    metric_of_interest: norm_ops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: uperf-pod-rr-1thr-8192b
+  metadata:
+    kind: pod
+    run_status: complete
+    test_type: rr
+    num_threads: 1
+    message_size: 8192
+  metrics:
+  - name: throughput
+    metric_of_interest: norm_byte
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: norm_ltcy
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: operations
+    metric_of_interest: norm_ops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: uperf-pod-rr-8thr-64b
+  metadata:
+    kind: pod
+    run_status: complete
+    test_type: rr
+    num_threads: 8
+    message_size: 64
+  metrics:
+  - name: throughput
+    metric_of_interest: norm_byte
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: norm_ltcy
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: operations
+    metric_of_interest: norm_ops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: uperf-pod-rr-8thr-1024b
+  metadata:
+    kind: pod
+    run_status: complete
+    test_type: rr
+    num_threads: 8
+    message_size: 1024
+  metrics:
+  - name: throughput
+    metric_of_interest: norm_byte
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: norm_ltcy
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: operations
+    metric_of_interest: norm_ops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: uperf-pod-rr-8thr-8192b
+  metadata:
+    kind: pod
+    run_status: complete
+    test_type: rr
+    num_threads: 8
+    message_size: 8192
+  metrics:
+  - name: throughput
+    metric_of_interest: norm_byte
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: norm_ltcy
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: operations
+    metric_of_interest: norm_ops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1

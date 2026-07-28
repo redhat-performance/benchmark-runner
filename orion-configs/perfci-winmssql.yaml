@@ -3,11 +3,10 @@ tests:
     metadata:
       kind: vm
       run_status: complete
-      vm_os_version: winmssql2025
     metrics:
-      - name: bootstorm-time
-        metric_of_interest: bootstorm_time
+      - name: tpm
+        metric_of_interest: tpm
         agg:
           agg_type: avg
         threshold: 10
-        direction: -1
+        direction: 1

@@ -1,35 +1,505 @@
 tests:
-  - name: vdbench-vm
-    metadata:
-      kind: vm
-      run_status: complete
-    metrics:
-      - name: iops
-        metric_of_interest: Rate
-        agg:
-          agg_type: avg
-        threshold: 10
-        direction: 1
-      - name: latency
-        metric_of_interest: Resp
-        agg:
-          agg_type: avg
-        threshold: 10
-        direction: -1
-  - name: vdbench-pod
-    metadata:
-      kind: pod
-      run_status: complete
-    metrics:
-      - name: iops
-        metric_of_interest: Rate
-        agg:
-          agg_type: avg
-        threshold: 10
-        direction: 1
-      - name: latency
-        metric_of_interest: Resp
-        agg:
-          agg_type: avg
-        threshold: 10
-        direction: -1
+- name: vdbench-vm-fillup
+  metadata:
+    kind: vm
+    run_status: complete
+    Run: fillup
+  metrics:
+  - name: iops
+    metric_of_interest: Rate
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: Resp
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+- name: vdbench-vm-oltp1
+  metadata:
+    kind: vm
+    run_status: complete
+    Run: oltp1
+  metrics:
+  - name: iops
+    metric_of_interest: Rate
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: Resp
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+- name: vdbench-vm-oltp2
+  metadata:
+    kind: vm
+    run_status: complete
+    Run: oltp2
+  metrics:
+  - name: iops
+    metric_of_interest: Rate
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: Resp
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+- name: vdbench-vm-oltphw
+  metadata:
+    kind: vm
+    run_status: complete
+    Run: oltphw
+  metrics:
+  - name: iops
+    metric_of_interest: Rate
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: Resp
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+- name: vdbench-vm-odss2
+  metadata:
+    kind: vm
+    run_status: complete
+    Run: odss2
+  metrics:
+  - name: iops
+    metric_of_interest: Rate
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: Resp
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+- name: vdbench-vm-odss128
+  metadata:
+    kind: vm
+    run_status: complete
+    Run: odss128
+  metrics:
+  - name: iops
+    metric_of_interest: Rate
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: Resp
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+- name: vdbench-vm-4kb_cache_read_32threads
+  metadata:
+    kind: vm
+    run_status: complete
+    Run: 4kb_cache_read_32threads
+  metrics:
+  - name: iops
+    metric_of_interest: Rate
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: Resp
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+- name: vdbench-vm-4kb_cache_write_32threads
+  metadata:
+    kind: vm
+    run_status: complete
+    Run: 4kb_cache_write_32threads
+  metrics:
+  - name: iops
+    metric_of_interest: Rate
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: Resp
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+- name: vdbench-vm-4kb_read_16threads
+  metadata:
+    kind: vm
+    run_status: complete
+    Run: 4kb_read_16threads
+  metrics:
+  - name: iops
+    metric_of_interest: Rate
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: Resp
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+- name: vdbench-vm-4kb_write_16threads
+  metadata:
+    kind: vm
+    run_status: complete
+    Run: 4kb_write_16threads
+  metrics:
+  - name: iops
+    metric_of_interest: Rate
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: Resp
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+- name: vdbench-vm-64kb_cache_read_4threads
+  metadata:
+    kind: vm
+    run_status: complete
+    Run: 64kb_cache_read_4threads
+  metrics:
+  - name: iops
+    metric_of_interest: Rate
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: Resp
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+- name: vdbench-vm-64kb_cache_write_4threads
+  metadata:
+    kind: vm
+    run_status: complete
+    Run: 64kb_cache_write_4threads
+  metrics:
+  - name: iops
+    metric_of_interest: Rate
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: Resp
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+- name: vdbench-vm-64kb_read_4threads
+  metadata:
+    kind: vm
+    run_status: complete
+    Run: 64kb_read_4threads
+  metrics:
+  - name: iops
+    metric_of_interest: Rate
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: Resp
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+- name: vdbench-vm-64kb_write_4threads
+  metadata:
+    kind: vm
+    run_status: complete
+    Run: 64kb_write_4threads
+  metrics:
+  - name: iops
+    metric_of_interest: Rate
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: Resp
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+- name: vdbench-pod-fillup
+  metadata:
+    kind: pod
+    run_status: complete
+    Run: fillup
+  metrics:
+  - name: iops
+    metric_of_interest: Rate
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: Resp
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+- name: vdbench-pod-oltp1
+  metadata:
+    kind: pod
+    run_status: complete
+    Run: oltp1
+  metrics:
+  - name: iops
+    metric_of_interest: Rate
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: Resp
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+- name: vdbench-pod-oltp2
+  metadata:
+    kind: pod
+    run_status: complete
+    Run: oltp2
+  metrics:
+  - name: iops
+    metric_of_interest: Rate
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: Resp
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+- name: vdbench-pod-oltphw
+  metadata:
+    kind: pod
+    run_status: complete
+    Run: oltphw
+  metrics:
+  - name: iops
+    metric_of_interest: Rate
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: Resp
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+- name: vdbench-pod-odss2
+  metadata:
+    kind: pod
+    run_status: complete
+    Run: odss2
+  metrics:
+  - name: iops
+    metric_of_interest: Rate
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: Resp
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+- name: vdbench-pod-odss128
+  metadata:
+    kind: pod
+    run_status: complete
+    Run: odss128
+  metrics:
+  - name: iops
+    metric_of_interest: Rate
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: Resp
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+- name: vdbench-pod-4kb_cache_read_32threads
+  metadata:
+    kind: pod
+    run_status: complete
+    Run: 4kb_cache_read_32threads
+  metrics:
+  - name: iops
+    metric_of_interest: Rate
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: Resp
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+- name: vdbench-pod-4kb_cache_write_32threads
+  metadata:
+    kind: pod
+    run_status: complete
+    Run: 4kb_cache_write_32threads
+  metrics:
+  - name: iops
+    metric_of_interest: Rate
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: Resp
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+- name: vdbench-pod-4kb_read_16threads
+  metadata:
+    kind: pod
+    run_status: complete
+    Run: 4kb_read_16threads
+  metrics:
+  - name: iops
+    metric_of_interest: Rate
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: Resp
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+- name: vdbench-pod-4kb_write_16threads
+  metadata:
+    kind: pod
+    run_status: complete
+    Run: 4kb_write_16threads
+  metrics:
+  - name: iops
+    metric_of_interest: Rate
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: Resp
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+- name: vdbench-pod-64kb_cache_read_4threads
+  metadata:
+    kind: pod
+    run_status: complete
+    Run: 64kb_cache_read_4threads
+  metrics:
+  - name: iops
+    metric_of_interest: Rate
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: Resp
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+- name: vdbench-pod-64kb_cache_write_4threads
+  metadata:
+    kind: pod
+    run_status: complete
+    Run: 64kb_cache_write_4threads
+  metrics:
+  - name: iops
+    metric_of_interest: Rate
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: Resp
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+- name: vdbench-pod-64kb_read_4threads
+  metadata:
+    kind: pod
+    run_status: complete
+    Run: 64kb_read_4threads
+  metrics:
+  - name: iops
+    metric_of_interest: Rate
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: Resp
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+- name: vdbench-pod-64kb_write_4threads
+  metadata:
+    kind: pod
+    run_status: complete
+    Run: 64kb_write_4threads
+  metrics:
+  - name: iops
+    metric_of_interest: Rate
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: latency
+    metric_of_interest: Resp
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1

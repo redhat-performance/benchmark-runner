@@ -1,47 +1,801 @@
 tests:
-  - name: fio-vm
-    metadata:
-      kind: vm
-      run_status: complete
-    metrics:
-      - name: total-iops
-        metric_of_interest: total_iops
-        agg:
-          agg_type: avg
-        threshold: 10
-        direction: 1
-      - name: lat-avg
-        metric_of_interest: lat_avg_usec
-        agg:
-          agg_type: avg
-        threshold: 10
-        direction: -1
-      - name: bandwidth
-        metric_of_interest: total_bw_kbs
-        agg:
-          agg_type: avg
-        threshold: 10
-        direction: 1
-  - name: fio-pod
-    metadata:
-      kind: pod
-      run_status: complete
-    metrics:
-      - name: total-iops
-        metric_of_interest: total_iops
-        agg:
-          agg_type: avg
-        threshold: 10
-        direction: 1
-      - name: lat-avg
-        metric_of_interest: lat_avg_usec
-        agg:
-          agg_type: avg
-        threshold: 10
-        direction: -1
-      - name: bandwidth
-        metric_of_interest: total_bw_kbs
-        agg:
-          agg_type: avg
-        threshold: 10
-        direction: 1
+- name: fio-vm-4k-read
+  metadata:
+    kind: vm
+    run_status: complete
+    block_size: 4k
+    io_operation: read
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: fio-vm-4k-write
+  metadata:
+    kind: vm
+    run_status: complete
+    block_size: 4k
+    io_operation: write
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: fio-vm-4k-randread
+  metadata:
+    kind: vm
+    run_status: complete
+    block_size: 4k
+    io_operation: randread
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: fio-vm-4k-randwrite
+  metadata:
+    kind: vm
+    run_status: complete
+    block_size: 4k
+    io_operation: randwrite
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: fio-vm-8k-read
+  metadata:
+    kind: vm
+    run_status: complete
+    block_size: 8k
+    io_operation: read
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: fio-vm-8k-write
+  metadata:
+    kind: vm
+    run_status: complete
+    block_size: 8k
+    io_operation: write
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: fio-vm-8k-randread
+  metadata:
+    kind: vm
+    run_status: complete
+    block_size: 8k
+    io_operation: randread
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: fio-vm-8k-randwrite
+  metadata:
+    kind: vm
+    run_status: complete
+    block_size: 8k
+    io_operation: randwrite
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: fio-vm-32k-read
+  metadata:
+    kind: vm
+    run_status: complete
+    block_size: 32k
+    io_operation: read
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: fio-vm-32k-write
+  metadata:
+    kind: vm
+    run_status: complete
+    block_size: 32k
+    io_operation: write
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: fio-vm-32k-randread
+  metadata:
+    kind: vm
+    run_status: complete
+    block_size: 32k
+    io_operation: randread
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: fio-vm-32k-randwrite
+  metadata:
+    kind: vm
+    run_status: complete
+    block_size: 32k
+    io_operation: randwrite
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: fio-vm-1M-read
+  metadata:
+    kind: vm
+    run_status: complete
+    block_size: 1M
+    io_operation: read
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: fio-vm-1M-write
+  metadata:
+    kind: vm
+    run_status: complete
+    block_size: 1M
+    io_operation: write
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: fio-vm-1M-randread
+  metadata:
+    kind: vm
+    run_status: complete
+    block_size: 1M
+    io_operation: randread
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: fio-vm-1M-randwrite
+  metadata:
+    kind: vm
+    run_status: complete
+    block_size: 1M
+    io_operation: randwrite
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: fio-pod-4k-read
+  metadata:
+    kind: pod
+    run_status: complete
+    block_size: 4k
+    io_operation: read
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: fio-pod-4k-write
+  metadata:
+    kind: pod
+    run_status: complete
+    block_size: 4k
+    io_operation: write
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: fio-pod-4k-randread
+  metadata:
+    kind: pod
+    run_status: complete
+    block_size: 4k
+    io_operation: randread
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: fio-pod-4k-randwrite
+  metadata:
+    kind: pod
+    run_status: complete
+    block_size: 4k
+    io_operation: randwrite
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: fio-pod-8k-read
+  metadata:
+    kind: pod
+    run_status: complete
+    block_size: 8k
+    io_operation: read
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: fio-pod-8k-write
+  metadata:
+    kind: pod
+    run_status: complete
+    block_size: 8k
+    io_operation: write
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: fio-pod-8k-randread
+  metadata:
+    kind: pod
+    run_status: complete
+    block_size: 8k
+    io_operation: randread
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: fio-pod-8k-randwrite
+  metadata:
+    kind: pod
+    run_status: complete
+    block_size: 8k
+    io_operation: randwrite
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: fio-pod-32k-read
+  metadata:
+    kind: pod
+    run_status: complete
+    block_size: 32k
+    io_operation: read
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: fio-pod-32k-write
+  metadata:
+    kind: pod
+    run_status: complete
+    block_size: 32k
+    io_operation: write
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: fio-pod-32k-randread
+  metadata:
+    kind: pod
+    run_status: complete
+    block_size: 32k
+    io_operation: randread
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: fio-pod-32k-randwrite
+  metadata:
+    kind: pod
+    run_status: complete
+    block_size: 32k
+    io_operation: randwrite
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: fio-pod-1M-read
+  metadata:
+    kind: pod
+    run_status: complete
+    block_size: 1M
+    io_operation: read
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: fio-pod-1M-write
+  metadata:
+    kind: pod
+    run_status: complete
+    block_size: 1M
+    io_operation: write
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: fio-pod-1M-randread
+  metadata:
+    kind: pod
+    run_status: complete
+    block_size: 1M
+    io_operation: randread
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: fio-pod-1M-randwrite
+  metadata:
+    kind: pod
+    run_status: complete
+    block_size: 1M
+    io_operation: randwrite
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
