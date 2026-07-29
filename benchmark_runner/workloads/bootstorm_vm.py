@@ -113,6 +113,9 @@ class BootstormVM(WorkloadsOperations):
             return data
         return {}
 
+    def _boot_time_path(self, vm_name: str) -> str:
+        return os.path.join(self._run_artifacts_path, f'{vm_name}_boot_time.txt')
+
     def _create_vm_scale(self, vm_num: str):
         """
         This method creates VMs in parallel

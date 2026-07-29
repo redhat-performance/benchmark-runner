@@ -3,7 +3,7 @@ import json
 import os
 import time
 
-from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
+from benchmark_runner.common.logger.logger_time_stamp import logger
 from benchmark_runner.common.elasticsearch.elasticsearch_exceptions import ElasticSearchDataNotUploaded
 from benchmark_runner.workloads.bootstorm_vm import BootstormVM
 from benchmark_runner.common.oc.oc import OC
@@ -35,9 +35,15 @@ class LinstressVm(BootstormVM):
     def _create_vm(self, vm_num: str):
         try:
             vm_name = self._get_vm_name(vm_num)
+            self._set_bootstorm_vm_start_time(vm_name=vm_name)
             self._oc.create_async(yaml=self._get_vm_yaml(vm_num))
             self._oc.wait_for_vm_create(vm_name=vm_name)
-            logger.info(f'VM {vm_name} created, stress script running via cloud-init')
+            vm_node = self._wait_vm_access(vm_name)
+            data = self._get_bootstorm_vm_elapsed_time(vm_name=vm_name, vm_node=vm_node)
+            bootstorm_time = data.get('bootstorm_time', 0)
+            with open(self._boot_time_path(vm_name), 'w') as f:
+                f.write(str(bootstorm_time))
+            logger.info(f'VM {vm_name} created (boot time: {bootstorm_time:.1f} ms), stress script running via cloud-init')
         except Exception as err:
             self._save_vm_artifacts(vm_num)
             raise err
@@ -98,6 +104,13 @@ class LinstressVm(BootstormVM):
             workload = self._get_workload_file_name(workload=self._get_run_artifacts_hierarchy(workload_name=workload_name, is_file=True))
             run_artifacts_url = os.path.join(self._run_artifacts_url, f'{workload}.tar.gz')
 
+            bootstorm_time = 0
+            try:
+                with open(self._boot_time_path(vm_name), 'r') as f:
+                    bootstorm_time = float(f.read().strip())
+            except (FileNotFoundError, ValueError):
+                logger.warning(f'No boot time recorded for VM {vm_name}')
+
             result = {
                 'cpu_total': report.get('config', {}).get('cpu_total', 0),
                 'cpu_stressed': report.get('config', {}).get('cpu_stressed', 0),
@@ -108,6 +121,7 @@ class LinstressVm(BootstormVM):
                 'total_ops': report.get('throughput', {}).get('total_ops', 0),
                 'total_ops_per_sec': report.get('throughput', {}).get('total_ops_per_sec', 0),
                 'avg_ops_per_cpu': report.get('throughput', {}).get('avg_ops_per_cpu', 0),
+                'bootstorm_time': bootstorm_time,
                 'vm_name': vm_name,
                 'node': vm_node,
                 'run_artifacts_url': run_artifacts_url,
@@ -115,7 +129,7 @@ class LinstressVm(BootstormVM):
 
             with open(local_result_json, 'w') as f:
                 json.dump(result, f, indent=2)
-            logger.info(f'Stress results for {vm_name}: throughput={result["total_ops_per_sec"]:.0f} ops/sec, avg_per_cpu={result["avg_ops_per_cpu"]:.0f} ops/sec')
+            logger.info(f'Stress results for {vm_name}: bootstorm_time={result["bootstorm_time"]:.1f} sec, throughput={result["total_ops_per_sec"]:.0f} ops/sec, avg_per_cpu={result["avg_ops_per_cpu"]:.0f} ops/sec')
 
         except Exception as err:
             raise err
