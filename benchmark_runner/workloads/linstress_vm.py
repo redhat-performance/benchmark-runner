@@ -41,7 +41,7 @@ class LinstressVm(BootstormVM):
             vm_node = self._wait_vm_access(vm_name)
             data = self._get_bootstorm_vm_elapsed_time(vm_name=vm_name, vm_node=vm_node)
             bootstorm_time = data.get('bootstorm_time', 0)
-            with open(self._boot_time_path(vm_name), 'w') as f:
+            with open(os.path.join(self._run_artifacts_path, f'{vm_name}_boot_time.txt'), 'w') as f:
                 f.write(str(bootstorm_time))
             logger.info(f'VM {vm_name} created (boot time: {bootstorm_time:.1f} ms), stress script running via cloud-init')
         except Exception as err:
@@ -106,7 +106,7 @@ class LinstressVm(BootstormVM):
 
             bootstorm_time = 0
             try:
-                with open(self._boot_time_path(vm_name), 'r') as f:
+                with open(os.path.join(self._run_artifacts_path, f'{vm_name}_boot_time.txt'), 'r') as f:
                     bootstorm_time = float(f.read().strip())
             except (FileNotFoundError, ValueError):
                 logger.warning(f'No boot time recorded for VM {vm_name}')
