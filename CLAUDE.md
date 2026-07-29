@@ -33,6 +33,11 @@ PYTHONPATH=. python3 -m pytest -v tests/unittest/benchmark_runner/common/templat
 python -m benchmark_runner.main.main
 ```
 
+## Branch and Release Rules
+
+- **Never commit directly to `main`** — always create a feature branch first, then open a PR.
+- **Use `/release` to release** — never manually edit the version in `pyproject.toml` or run `bumpversion` outside the `/release` skill.
+
 ## Before Every Push
 
 Always run these two steps before pushing any commit:
