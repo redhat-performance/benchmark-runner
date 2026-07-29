@@ -68,6 +68,9 @@ class WinstressVm(BootstormVM):
             self._set_bootstorm_vm_start_time(vm_name=vm_name)
             self._virtctl.start_vm_sync(vm_name=vm_name)
             vm_node = self._wait_vm_access(vm_name)
+            if not vm_node:
+                self._save_vm_artifacts(vm_num)
+                raise RuntimeError(f'VM {vm_name} access failed')
             data = self._get_bootstorm_vm_elapsed_time(vm_name=vm_name, vm_node=vm_node)
             bootstorm_time = data.get('bootstorm_time', 0)
             with open(os.path.join(self._run_artifacts_path, f'{vm_name}_boot_time.txt'), 'w') as f:
@@ -171,7 +174,7 @@ class WinstressVm(BootstormVM):
             with open(local_result_json, 'w') as f:
                 json.dump(result, f, indent=2)
             logger.info(f'Stress results saved to {local_result_json}')
-            logger.info(f'  bootstorm_time: {result["bootstorm_time"]:.1f} sec, throughput: {result["total_ops_per_sec"]:.0f} ops/sec, avg_per_cpu: {result["avg_ops_per_cpu"]:.0f} ops/sec')
+            logger.info(f'  bootstorm_time: {result["bootstorm_time"]:.1f} ms, throughput: {result["total_ops_per_sec"]:.0f} ops/sec, avg_per_cpu: {result["avg_ops_per_cpu"]:.0f} ops/sec')
 
         except Exception as err:
             raise err
