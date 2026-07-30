@@ -81,8 +81,6 @@ jobs:
           workload: [ 'files', 'fio', 'uperf', 'cpusoaker']
     steps:
     - uses: actions/checkout@v6
-    - name: Fix crun for Podman 5.x
-      run: sudo apt-get install -y crun
     - name: Set up Python 3.14
       uses: actions/setup-python@v6
       with:
@@ -163,8 +161,6 @@ jobs:
     needs: [initialize_nightly, workload]
     steps:
     - uses: actions/checkout@v6
-    - name: Fix crun for Podman 5.x
-      run: sudo apt-get install -y crun
     - name: Set up Python 3.9
       uses: actions/setup-python@v6
       with:
