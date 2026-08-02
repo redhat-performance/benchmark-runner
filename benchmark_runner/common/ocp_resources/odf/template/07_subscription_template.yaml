@@ -7,5 +7,5 @@ spec:
   channel: "stable-{{ odf_version }}"
   installPlanApproval: Automatic
   name: odf-operator
-  source: "{% if odf_version.split('.')[1] | int >= 21 %}redhat-operators-v{{ odf_version | replace('.', '') }}{% else %}redhat-operators{% endif %}"
+  source: "redhat-operators-v{{ odf_version | replace('.', '') }}"
   sourceNamespace: openshift-marketplace
