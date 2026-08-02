@@ -33,10 +33,22 @@ reviews:
       instructions: >
         Verify workload lifecycle: creation, monitoring, data collection, cleanup.
         Check timeout handling and retry logic.
+        Flag any code that makes HTTPS calls (Elasticsearch, Prometheus) in the main process
+        before spawning multiprocessing.Process children that also need HTTPS — this corrupts
+        OpenSSL state across process boundaries and causes SIGSEGV (exitcode=-11).
+        Safe pattern: do all HTTPS in child processes, or only after all child processes complete.
     - path: "benchmark_runner/common/template_operations/**"
       instructions: >
         Verify Jinja2 template variable substitution is correct.
         Check that YAML templates are well-formed.
+    - path: ".claude/skills/**"
+      instructions: >
+        Verify shell commands are correct and will not silently fail.
+        Check that each skill includes the pre-push checklist: rebase onto main and run all unit tests before pushing.
+    - path: "benchmark_runner/main/environment_variables.py"
+      instructions: >
+        Flag any PR that commits local dev defaults into this file — kubeadmin passwords, Elasticsearch hosts,
+        scale node IPs, or any other environment-specific values. These must never be committed.
     - path: ".github/workflows/**"
       instructions: >
         Check for proper secret handling, job dependencies, and workflow triggers.
