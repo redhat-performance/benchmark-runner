@@ -401,6 +401,7 @@ class OC(SSH):
         env['kata_channel'] = self._get_kata_channel()
         env['kata_catalog_source'] = self._get_kata_catalog_source()
         env['kata_namespace'] = self._get_kata_namespace()
+        env['ocp_version'] = self.get_ocp_server_version()
 
     def is_cnv_installed(self):
         """
