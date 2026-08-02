@@ -37,7 +37,7 @@ def test_get_ocp_minor_version():
     """
     oc = OC(kubeadmin_password=test_environment_variable['kubeadmin_password'])
 
-    assert oc.get_ocp_minor_version()
+    assert isinstance(oc.get_ocp_minor_version(), int)
 
 
 def test_get_virtctl_version():
