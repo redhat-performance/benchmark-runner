@@ -96,6 +96,9 @@ spec:
           bootloader:
             efi:
               secureBoot: false
+        ioThreads:
+          supplementalPoolThreadCount: 8
+        ioThreadsPolicy: supplementalPool
         machine:
           type: q35
         resources:

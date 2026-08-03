@@ -24,7 +24,7 @@ spec:
               tickPolicy: catchup
           utc: {}
         cpu:
-          cores: 2
+          cores: 8
           sockets: 1
           threads: 1
         devices:
@@ -74,11 +74,14 @@ spec:
           bootloader:
             efi:
               secureBoot: false
+        ioThreads:
+          supplementalPoolThreadCount: 8
+        ioThreadsPolicy: supplementalPool
         machine:
           type: q35
         resources:
           requests:
-            cpu: 1
+            cpu: 8
             memory: 4G
       evictionStrategy: LiveMigrate
       networks:
