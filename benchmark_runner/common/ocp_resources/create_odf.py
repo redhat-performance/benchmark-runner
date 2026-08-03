@@ -49,7 +49,17 @@ class CreateODF(CreateOCPResourceOperations):
                     else:
                         self.__oc.run(cmd=f'chmod +x {os.path.join(self.__path, resource)}; {self.__path}/./{resource}')
                 else:  # yaml
-                    self.__oc.create_async(yaml=os.path.join(self.__path, resource))
+                    yaml_path = os.path.join(self.__path, resource)
+                    # skip empty rendered templates (e.g. catalog source when odf_catalog_image is not set)
+                    if not open(yaml_path).read().strip():
+                        logger.info(f'Skipping empty template: {resource}')
+                        continue
+                    self.__oc.create_async(yaml=yaml_path)
+                    if '00_catalog_source.yaml' in resource:
+                        # wait for catalog source to be ready before subscribing
+                        self.wait_for_ocp_resource_create(operator='odf',
+                                                          verify_cmd="oc get catalogsource odf-catalog-source -n openshift-marketplace -o jsonpath='{.status.connectionState.lastObservedState}' | grep -c READY || true",
+                                                          count_openshift_storage=True)
                     if '04_local_volume_set.yaml' in resource:
                         # openshift local storage - diskmaker
                         self.wait_for_ocp_resource_create(operator='odf',
