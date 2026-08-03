@@ -33,8 +33,8 @@ template_data:
       PAUSE: 15
       SIZE: 4G
       requests_memory: 4G
-      requests_cpu: 1
-      cores: 2
+      requests_cpu: 8
+      cores: 8
       storage: 76Gi
       data_disk_storage: 64Gi
     default:
