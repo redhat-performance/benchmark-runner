@@ -145,7 +145,7 @@ spec:
         kubevirt.io/vm: linstress-vm-deadbeef
     spec:
       nodeSelector:
-        kubernetes.io/hostname: 'worker-0'
+        kubernetes.io/hostname: 'None'
       domain:
         cpu:
           sockets: 1

@@ -13,7 +13,7 @@ spec:
         kubevirt.io/vm: winstress-vm-deadbeef
     spec:
       nodeSelector:
-        kubernetes.io/hostname: 'worker-0'
+        kubernetes.io/hostname: 'None'
       domain:
         clock:
           timer:
