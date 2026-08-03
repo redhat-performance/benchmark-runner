@@ -12,19 +12,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: latency
     metric_of_interest: norm_ltcy
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: operations
     metric_of_interest: norm_ops
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: uperf-vm-stream-1thr-1024b
   metadata:
     kind: vm
@@ -38,19 +38,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: latency
     metric_of_interest: norm_ltcy
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: operations
     metric_of_interest: norm_ops
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: uperf-vm-stream-1thr-8192b
   metadata:
     kind: vm
@@ -64,19 +64,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: latency
     metric_of_interest: norm_ltcy
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: operations
     metric_of_interest: norm_ops
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: uperf-vm-stream-8thr-64b
   metadata:
     kind: vm
@@ -90,19 +90,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: latency
     metric_of_interest: norm_ltcy
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: operations
     metric_of_interest: norm_ops
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: uperf-vm-stream-8thr-1024b
   metadata:
     kind: vm
@@ -116,19 +116,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: latency
     metric_of_interest: norm_ltcy
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: operations
     metric_of_interest: norm_ops
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: uperf-vm-stream-8thr-8192b
   metadata:
     kind: vm
@@ -142,19 +142,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: latency
     metric_of_interest: norm_ltcy
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: operations
     metric_of_interest: norm_ops
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: uperf-vm-rr-1thr-64b
   metadata:
     kind: vm
@@ -168,19 +168,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: latency
     metric_of_interest: norm_ltcy
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: operations
     metric_of_interest: norm_ops
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: uperf-vm-rr-1thr-1024b
   metadata:
     kind: vm
@@ -194,19 +194,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: latency
     metric_of_interest: norm_ltcy
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: operations
     metric_of_interest: norm_ops
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: uperf-vm-rr-1thr-8192b
   metadata:
     kind: vm
@@ -220,19 +220,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: latency
     metric_of_interest: norm_ltcy
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: operations
     metric_of_interest: norm_ops
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: uperf-vm-rr-8thr-64b
   metadata:
     kind: vm
@@ -246,19 +246,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: latency
     metric_of_interest: norm_ltcy
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: operations
     metric_of_interest: norm_ops
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: uperf-vm-rr-8thr-1024b
   metadata:
     kind: vm
@@ -272,19 +272,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: latency
     metric_of_interest: norm_ltcy
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: operations
     metric_of_interest: norm_ops
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: uperf-vm-rr-8thr-8192b
   metadata:
     kind: vm
@@ -298,19 +298,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: latency
     metric_of_interest: norm_ltcy
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: operations
     metric_of_interest: norm_ops
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: uperf-pod-stream-1thr-64b
   metadata:
     kind: pod
@@ -324,19 +324,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: latency
     metric_of_interest: norm_ltcy
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: operations
     metric_of_interest: norm_ops
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: uperf-pod-stream-1thr-1024b
   metadata:
     kind: pod
@@ -350,19 +350,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: latency
     metric_of_interest: norm_ltcy
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: operations
     metric_of_interest: norm_ops
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: uperf-pod-stream-1thr-8192b
   metadata:
     kind: pod
@@ -376,19 +376,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: latency
     metric_of_interest: norm_ltcy
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: operations
     metric_of_interest: norm_ops
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: uperf-pod-stream-8thr-64b
   metadata:
     kind: pod
@@ -402,19 +402,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: latency
     metric_of_interest: norm_ltcy
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: operations
     metric_of_interest: norm_ops
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: uperf-pod-stream-8thr-1024b
   metadata:
     kind: pod
@@ -428,19 +428,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: latency
     metric_of_interest: norm_ltcy
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: operations
     metric_of_interest: norm_ops
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: uperf-pod-stream-8thr-8192b
   metadata:
     kind: pod
@@ -454,19 +454,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: latency
     metric_of_interest: norm_ltcy
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: operations
     metric_of_interest: norm_ops
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: uperf-pod-rr-1thr-64b
   metadata:
     kind: pod
@@ -480,19 +480,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: latency
     metric_of_interest: norm_ltcy
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: operations
     metric_of_interest: norm_ops
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: uperf-pod-rr-1thr-1024b
   metadata:
     kind: pod
@@ -506,19 +506,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: latency
     metric_of_interest: norm_ltcy
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: operations
     metric_of_interest: norm_ops
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: uperf-pod-rr-1thr-8192b
   metadata:
     kind: pod
@@ -532,19 +532,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: latency
     metric_of_interest: norm_ltcy
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: operations
     metric_of_interest: norm_ops
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: uperf-pod-rr-8thr-64b
   metadata:
     kind: pod
@@ -558,19 +558,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: latency
     metric_of_interest: norm_ltcy
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: operations
     metric_of_interest: norm_ops
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: uperf-pod-rr-8thr-1024b
   metadata:
     kind: pod
@@ -584,19 +584,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: latency
     metric_of_interest: norm_ltcy
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: operations
     metric_of_interest: norm_ops
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: uperf-pod-rr-8thr-8192b
   metadata:
     kind: pod
@@ -610,16 +610,16 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: latency
     metric_of_interest: norm_ltcy
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: operations
     metric_of_interest: norm_ops
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1

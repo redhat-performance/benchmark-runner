@@ -9,13 +9,13 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: cpu-latency-p95
     metric_of_interest: cpu_latency_95th
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
 - name: sysbench-vm-memory
   metadata:
     kind: vm
@@ -26,13 +26,13 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: memory-latency-p95
     metric_of_interest: memory_latency_95th
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
 - name: sysbench-pod-cpu
   metadata:
     kind: pod
@@ -43,13 +43,13 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: cpu-latency-p95
     metric_of_interest: cpu_latency_95th
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
 - name: sysbench-pod-memory
   metadata:
     kind: pod
@@ -60,10 +60,10 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: memory-latency-p95
     metric_of_interest: memory_latency_95th
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
