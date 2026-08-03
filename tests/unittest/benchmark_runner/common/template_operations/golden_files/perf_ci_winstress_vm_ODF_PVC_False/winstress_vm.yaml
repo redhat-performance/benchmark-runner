@@ -13,7 +13,7 @@ spec:
         kubevirt.io/vm: winstress-vm-deadbeef
     spec:
       nodeSelector:
-        kubernetes.io/hostname: 'None'
+        kubernetes.io/hostname: 'worker-0'
       domain:
         clock:
           timer:
@@ -73,9 +73,6 @@ spec:
           bootloader:
             efi:
               secureBoot: false
-        ioThreads:
-          supplementalPoolThreadCount: 8
-        ioThreadsPolicy: supplementalPool
         machine:
           type: q35
         resources:
