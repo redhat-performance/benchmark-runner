@@ -9,4 +9,4 @@ tests:
         agg:
           agg_type: avg
         threshold: 10
-        direction: 1
+        direction: -1

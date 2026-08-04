@@ -10,13 +10,13 @@ tests:
         agg:
           agg_type: avg
         threshold: 10
-        direction: -1
+        direction: 1
       - name: total-run-time
         metric_of_interest: total_run_time
         agg:
           agg_type: avg
         threshold: 10
-        direction: -1
+        direction: 1
   - name: windows-bootstorm-server2022
     metadata:
       kind: vm
@@ -28,13 +28,13 @@ tests:
         agg:
           agg_type: avg
         threshold: 10
-        direction: -1
+        direction: 1
       - name: total-run-time
         metric_of_interest: total_run_time
         agg:
           agg_type: avg
         threshold: 10
-        direction: -1
+        direction: 1
   - name: windows-bootstorm-server2025
     metadata:
       kind: vm
@@ -46,10 +46,10 @@ tests:
         agg:
           agg_type: avg
         threshold: 10
-        direction: -1
+        direction: 1
       - name: total-run-time
         metric_of_interest: total_run_time
         agg:
           agg_type: avg
         threshold: 10
-        direction: -1
+        direction: 1

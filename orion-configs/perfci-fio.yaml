@@ -11,19 +11,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: lat-avg
     metric_of_interest: lat_avg_usec
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: bandwidth
     metric_of_interest: total_bw_kbs
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: fio-vm-4k-write
   metadata:
     kind: vm
@@ -36,19 +36,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: lat-avg
     metric_of_interest: lat_avg_usec
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: bandwidth
     metric_of_interest: total_bw_kbs
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: fio-vm-4k-randread
   metadata:
     kind: vm
@@ -61,19 +61,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: lat-avg
     metric_of_interest: lat_avg_usec
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: bandwidth
     metric_of_interest: total_bw_kbs
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: fio-vm-4k-randwrite
   metadata:
     kind: vm
@@ -86,19 +86,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: lat-avg
     metric_of_interest: lat_avg_usec
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: bandwidth
     metric_of_interest: total_bw_kbs
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: fio-vm-8k-read
   metadata:
     kind: vm
@@ -111,19 +111,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: lat-avg
     metric_of_interest: lat_avg_usec
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: bandwidth
     metric_of_interest: total_bw_kbs
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: fio-vm-8k-write
   metadata:
     kind: vm
@@ -136,19 +136,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: lat-avg
     metric_of_interest: lat_avg_usec
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: bandwidth
     metric_of_interest: total_bw_kbs
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: fio-vm-8k-randread
   metadata:
     kind: vm
@@ -161,19 +161,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: lat-avg
     metric_of_interest: lat_avg_usec
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: bandwidth
     metric_of_interest: total_bw_kbs
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: fio-vm-8k-randwrite
   metadata:
     kind: vm
@@ -186,19 +186,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: lat-avg
     metric_of_interest: lat_avg_usec
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: bandwidth
     metric_of_interest: total_bw_kbs
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: fio-vm-32k-read
   metadata:
     kind: vm
@@ -211,19 +211,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: lat-avg
     metric_of_interest: lat_avg_usec
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: bandwidth
     metric_of_interest: total_bw_kbs
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: fio-vm-32k-write
   metadata:
     kind: vm
@@ -236,19 +236,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: lat-avg
     metric_of_interest: lat_avg_usec
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: bandwidth
     metric_of_interest: total_bw_kbs
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: fio-vm-32k-randread
   metadata:
     kind: vm
@@ -261,19 +261,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: lat-avg
     metric_of_interest: lat_avg_usec
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: bandwidth
     metric_of_interest: total_bw_kbs
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: fio-vm-32k-randwrite
   metadata:
     kind: vm
@@ -286,19 +286,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: lat-avg
     metric_of_interest: lat_avg_usec
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: bandwidth
     metric_of_interest: total_bw_kbs
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: fio-vm-1M-read
   metadata:
     kind: vm
@@ -311,19 +311,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: lat-avg
     metric_of_interest: lat_avg_usec
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: bandwidth
     metric_of_interest: total_bw_kbs
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: fio-vm-1M-write
   metadata:
     kind: vm
@@ -336,19 +336,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: lat-avg
     metric_of_interest: lat_avg_usec
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: bandwidth
     metric_of_interest: total_bw_kbs
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: fio-vm-1M-randread
   metadata:
     kind: vm
@@ -361,19 +361,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: lat-avg
     metric_of_interest: lat_avg_usec
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: bandwidth
     metric_of_interest: total_bw_kbs
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: fio-vm-1M-randwrite
   metadata:
     kind: vm
@@ -386,19 +386,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: lat-avg
     metric_of_interest: lat_avg_usec
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: bandwidth
     metric_of_interest: total_bw_kbs
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: fio-pod-4k-read
   metadata:
     kind: pod
@@ -411,19 +411,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: lat-avg
     metric_of_interest: lat_avg_usec
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: bandwidth
     metric_of_interest: total_bw_kbs
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: fio-pod-4k-write
   metadata:
     kind: pod
@@ -436,19 +436,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: lat-avg
     metric_of_interest: lat_avg_usec
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: bandwidth
     metric_of_interest: total_bw_kbs
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: fio-pod-4k-randread
   metadata:
     kind: pod
@@ -461,19 +461,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: lat-avg
     metric_of_interest: lat_avg_usec
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: bandwidth
     metric_of_interest: total_bw_kbs
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: fio-pod-4k-randwrite
   metadata:
     kind: pod
@@ -486,19 +486,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: lat-avg
     metric_of_interest: lat_avg_usec
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: bandwidth
     metric_of_interest: total_bw_kbs
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: fio-pod-8k-read
   metadata:
     kind: pod
@@ -511,19 +511,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: lat-avg
     metric_of_interest: lat_avg_usec
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: bandwidth
     metric_of_interest: total_bw_kbs
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: fio-pod-8k-write
   metadata:
     kind: pod
@@ -536,19 +536,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: lat-avg
     metric_of_interest: lat_avg_usec
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: bandwidth
     metric_of_interest: total_bw_kbs
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: fio-pod-8k-randread
   metadata:
     kind: pod
@@ -561,19 +561,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: lat-avg
     metric_of_interest: lat_avg_usec
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: bandwidth
     metric_of_interest: total_bw_kbs
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: fio-pod-8k-randwrite
   metadata:
     kind: pod
@@ -586,19 +586,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: lat-avg
     metric_of_interest: lat_avg_usec
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: bandwidth
     metric_of_interest: total_bw_kbs
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: fio-pod-32k-read
   metadata:
     kind: pod
@@ -611,19 +611,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: lat-avg
     metric_of_interest: lat_avg_usec
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: bandwidth
     metric_of_interest: total_bw_kbs
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: fio-pod-32k-write
   metadata:
     kind: pod
@@ -636,19 +636,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: lat-avg
     metric_of_interest: lat_avg_usec
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: bandwidth
     metric_of_interest: total_bw_kbs
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: fio-pod-32k-randread
   metadata:
     kind: pod
@@ -661,19 +661,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: lat-avg
     metric_of_interest: lat_avg_usec
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: bandwidth
     metric_of_interest: total_bw_kbs
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: fio-pod-32k-randwrite
   metadata:
     kind: pod
@@ -686,19 +686,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: lat-avg
     metric_of_interest: lat_avg_usec
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: bandwidth
     metric_of_interest: total_bw_kbs
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: fio-pod-1M-read
   metadata:
     kind: pod
@@ -711,19 +711,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: lat-avg
     metric_of_interest: lat_avg_usec
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: bandwidth
     metric_of_interest: total_bw_kbs
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: fio-pod-1M-write
   metadata:
     kind: pod
@@ -736,19 +736,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: lat-avg
     metric_of_interest: lat_avg_usec
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: bandwidth
     metric_of_interest: total_bw_kbs
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: fio-pod-1M-randread
   metadata:
     kind: pod
@@ -761,19 +761,19 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: lat-avg
     metric_of_interest: lat_avg_usec
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: bandwidth
     metric_of_interest: total_bw_kbs
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
 - name: fio-pod-1M-randwrite
   metadata:
     kind: pod
@@ -786,16 +786,16 @@ tests:
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
   - name: lat-avg
     metric_of_interest: lat_avg_usec
     agg:
       agg_type: avg
     threshold: 10
-    direction: -1
+    direction: 1
   - name: bandwidth
     metric_of_interest: total_bw_kbs
     agg:
       agg_type: avg
     threshold: 10
-    direction: 1
+    direction: -1
