@@ -309,6 +309,12 @@ spec:
     imagePullPolicy: Always
     command: ["/bin/sh", "-c"]
     args: ["dnf install -y uperf > /dev/null && uperf -s -v -P 30000"]
+    readinessProbe:
+      tcpSocket:
+        port: 30000
+      initialDelaySeconds: 5
+      periodSeconds: 3
+      failureThreshold: 10
   restartPolicy: Never
   nodeSelector:
     kubernetes.io/hostname: 'pin-node-1'
