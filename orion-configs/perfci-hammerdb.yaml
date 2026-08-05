@@ -1,11 +1,12 @@
 tests:
-  - name: hammerdb-vm-mssql-odf-1vu
+  - name: hammerdb-vm-mssql-odf-1vu-centos
     metadata:
       kind: vm
       run_status: complete
       db_type: mssql
       storage_type: odf
       current_worker: 1
+      vm_os_version: centos-stream10
     metrics:
       - name: tpm
         metric_of_interest: tpm
@@ -13,13 +14,29 @@ tests:
           agg_type: avg
         threshold: 10
         direction: -1
-  - name: hammerdb-vm-mssql-odf-2vu
+  - name: hammerdb-vm-mssql-odf-1vu-win2k25
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mssql
+      storage_type: odf
+      current_worker: 1
+      vm_os_version: windows_server_2k25
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: -1
+  - name: hammerdb-vm-mssql-odf-2vu-centos
     metadata:
       kind: vm
       run_status: complete
       db_type: mssql
       storage_type: odf
       current_worker: 2
+      vm_os_version: centos-stream10
     metrics:
       - name: tpm
         metric_of_interest: tpm
@@ -27,13 +44,29 @@ tests:
           agg_type: avg
         threshold: 10
         direction: -1
-  - name: hammerdb-vm-mssql-odf-4vu
+  - name: hammerdb-vm-mssql-odf-2vu-win2k25
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mssql
+      storage_type: odf
+      current_worker: 2
+      vm_os_version: windows_server_2k25
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: -1
+  - name: hammerdb-vm-mssql-odf-4vu-centos
     metadata:
       kind: vm
       run_status: complete
       db_type: mssql
       storage_type: odf
       current_worker: 4
+      vm_os_version: centos-stream10
     metrics:
       - name: tpm
         metric_of_interest: tpm
@@ -41,13 +74,29 @@ tests:
           agg_type: avg
         threshold: 10
         direction: -1
-  - name: hammerdb-vm-mssql-odf-8vu
+  - name: hammerdb-vm-mssql-odf-4vu-win2k25
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mssql
+      storage_type: odf
+      current_worker: 4
+      vm_os_version: windows_server_2k25
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: -1
+  - name: hammerdb-vm-mssql-odf-8vu-centos
     metadata:
       kind: vm
       run_status: complete
       db_type: mssql
       storage_type: odf
       current_worker: 8
+      vm_os_version: centos-stream10
     metrics:
       - name: tpm
         metric_of_interest: tpm
@@ -55,13 +104,29 @@ tests:
           agg_type: avg
         threshold: 10
         direction: -1
-  - name: hammerdb-vm-mssql-odf-16vu
+  - name: hammerdb-vm-mssql-odf-8vu-win2k25
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mssql
+      storage_type: odf
+      current_worker: 8
+      vm_os_version: windows_server_2k25
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: -1
+  - name: hammerdb-vm-mssql-odf-16vu-centos
     metadata:
       kind: vm
       run_status: complete
       db_type: mssql
       storage_type: odf
       current_worker: 16
+      vm_os_version: centos-stream10
     metrics:
       - name: tpm
         metric_of_interest: tpm
@@ -69,13 +134,44 @@ tests:
           agg_type: avg
         threshold: 10
         direction: -1
-  - name: hammerdb-vm-mssql-odf-32vu
+  - name: hammerdb-vm-mssql-odf-16vu-win2k25
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mssql
+      storage_type: odf
+      current_worker: 16
+      vm_os_version: windows_server_2k25
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: -1
+  - name: hammerdb-vm-mssql-odf-32vu-centos
     metadata:
       kind: vm
       run_status: complete
       db_type: mssql
       storage_type: odf
       current_worker: 32
+      vm_os_version: centos-stream10
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: -1
+  - name: hammerdb-vm-mssql-odf-32vu-win2k25
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mssql
+      storage_type: odf
+      current_worker: 32
+      vm_os_version: windows_server_2k25
     metrics:
       - name: tpm
         metric_of_interest: tpm
@@ -503,13 +599,14 @@ tests:
           agg_type: avg
         threshold: 10
         direction: -1
-  - name: hammerdb-vm-mssql-lso-1vu
+  - name: hammerdb-vm-mssql-lso-1vu-centos
     metadata:
       kind: vm
       run_status: complete
       db_type: mssql
       storage_type: lso
       current_worker: 1
+      vm_os_version: centos-stream10
     metrics:
       - name: tpm
         metric_of_interest: tpm
@@ -517,13 +614,29 @@ tests:
           agg_type: avg
         threshold: 10
         direction: -1
-  - name: hammerdb-vm-mssql-lso-2vu
+  - name: hammerdb-vm-mssql-lso-1vu-win2k25
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mssql
+      storage_type: lso
+      current_worker: 1
+      vm_os_version: windows_server_2k25
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: -1
+  - name: hammerdb-vm-mssql-lso-2vu-centos
     metadata:
       kind: vm
       run_status: complete
       db_type: mssql
       storage_type: lso
       current_worker: 2
+      vm_os_version: centos-stream10
     metrics:
       - name: tpm
         metric_of_interest: tpm
@@ -531,13 +644,29 @@ tests:
           agg_type: avg
         threshold: 10
         direction: -1
-  - name: hammerdb-vm-mssql-lso-4vu
+  - name: hammerdb-vm-mssql-lso-2vu-win2k25
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mssql
+      storage_type: lso
+      current_worker: 2
+      vm_os_version: windows_server_2k25
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: -1
+  - name: hammerdb-vm-mssql-lso-4vu-centos
     metadata:
       kind: vm
       run_status: complete
       db_type: mssql
       storage_type: lso
       current_worker: 4
+      vm_os_version: centos-stream10
     metrics:
       - name: tpm
         metric_of_interest: tpm
@@ -545,13 +674,29 @@ tests:
           agg_type: avg
         threshold: 10
         direction: -1
-  - name: hammerdb-vm-mssql-lso-8vu
+  - name: hammerdb-vm-mssql-lso-4vu-win2k25
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mssql
+      storage_type: lso
+      current_worker: 4
+      vm_os_version: windows_server_2k25
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: -1
+  - name: hammerdb-vm-mssql-lso-8vu-centos
     metadata:
       kind: vm
       run_status: complete
       db_type: mssql
       storage_type: lso
       current_worker: 8
+      vm_os_version: centos-stream10
     metrics:
       - name: tpm
         metric_of_interest: tpm
@@ -559,13 +704,29 @@ tests:
           agg_type: avg
         threshold: 10
         direction: -1
-  - name: hammerdb-vm-mssql-lso-16vu
+  - name: hammerdb-vm-mssql-lso-8vu-win2k25
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mssql
+      storage_type: lso
+      current_worker: 8
+      vm_os_version: windows_server_2k25
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: -1
+  - name: hammerdb-vm-mssql-lso-16vu-centos
     metadata:
       kind: vm
       run_status: complete
       db_type: mssql
       storage_type: lso
       current_worker: 16
+      vm_os_version: centos-stream10
     metrics:
       - name: tpm
         metric_of_interest: tpm
@@ -573,13 +734,44 @@ tests:
           agg_type: avg
         threshold: 10
         direction: -1
-  - name: hammerdb-vm-mssql-lso-32vu
+  - name: hammerdb-vm-mssql-lso-16vu-win2k25
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mssql
+      storage_type: lso
+      current_worker: 16
+      vm_os_version: windows_server_2k25
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: -1
+  - name: hammerdb-vm-mssql-lso-32vu-centos
     metadata:
       kind: vm
       run_status: complete
       db_type: mssql
       storage_type: lso
       current_worker: 32
+      vm_os_version: centos-stream10
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: -1
+  - name: hammerdb-vm-mssql-lso-32vu-win2k25
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mssql
+      storage_type: lso
+      current_worker: 32
+      vm_os_version: windows_server_2k25
     metrics:
       - name: tpm
         metric_of_interest: tpm
@@ -1007,13 +1199,14 @@ tests:
           agg_type: avg
         threshold: 10
         direction: -1
-  - name: hammerdb-vm-mssql-scale-1vu
+  - name: hammerdb-vm-mssql-scale-1vu-centos
     metadata:
       kind: vm
       run_status: complete
       db_type: mssql
       storage_type: scale
       current_worker: 1
+      vm_os_version: centos-stream10
     metrics:
       - name: tpm
         metric_of_interest: tpm
@@ -1021,13 +1214,29 @@ tests:
           agg_type: avg
         threshold: 10
         direction: -1
-  - name: hammerdb-vm-mssql-scale-2vu
+  - name: hammerdb-vm-mssql-scale-1vu-win2k25
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mssql
+      storage_type: scale
+      current_worker: 1
+      vm_os_version: windows_server_2k25
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: -1
+  - name: hammerdb-vm-mssql-scale-2vu-centos
     metadata:
       kind: vm
       run_status: complete
       db_type: mssql
       storage_type: scale
       current_worker: 2
+      vm_os_version: centos-stream10
     metrics:
       - name: tpm
         metric_of_interest: tpm
@@ -1035,13 +1244,29 @@ tests:
           agg_type: avg
         threshold: 10
         direction: -1
-  - name: hammerdb-vm-mssql-scale-4vu
+  - name: hammerdb-vm-mssql-scale-2vu-win2k25
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mssql
+      storage_type: scale
+      current_worker: 2
+      vm_os_version: windows_server_2k25
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: -1
+  - name: hammerdb-vm-mssql-scale-4vu-centos
     metadata:
       kind: vm
       run_status: complete
       db_type: mssql
       storage_type: scale
       current_worker: 4
+      vm_os_version: centos-stream10
     metrics:
       - name: tpm
         metric_of_interest: tpm
@@ -1049,13 +1274,29 @@ tests:
           agg_type: avg
         threshold: 10
         direction: -1
-  - name: hammerdb-vm-mssql-scale-8vu
+  - name: hammerdb-vm-mssql-scale-4vu-win2k25
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mssql
+      storage_type: scale
+      current_worker: 4
+      vm_os_version: windows_server_2k25
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: -1
+  - name: hammerdb-vm-mssql-scale-8vu-centos
     metadata:
       kind: vm
       run_status: complete
       db_type: mssql
       storage_type: scale
       current_worker: 8
+      vm_os_version: centos-stream10
     metrics:
       - name: tpm
         metric_of_interest: tpm
@@ -1063,13 +1304,29 @@ tests:
           agg_type: avg
         threshold: 10
         direction: -1
-  - name: hammerdb-vm-mssql-scale-16vu
+  - name: hammerdb-vm-mssql-scale-8vu-win2k25
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mssql
+      storage_type: scale
+      current_worker: 8
+      vm_os_version: windows_server_2k25
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: -1
+  - name: hammerdb-vm-mssql-scale-16vu-centos
     metadata:
       kind: vm
       run_status: complete
       db_type: mssql
       storage_type: scale
       current_worker: 16
+      vm_os_version: centos-stream10
     metrics:
       - name: tpm
         metric_of_interest: tpm
@@ -1077,13 +1334,44 @@ tests:
           agg_type: avg
         threshold: 10
         direction: -1
-  - name: hammerdb-vm-mssql-scale-32vu
+  - name: hammerdb-vm-mssql-scale-16vu-win2k25
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mssql
+      storage_type: scale
+      current_worker: 16
+      vm_os_version: windows_server_2k25
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: -1
+  - name: hammerdb-vm-mssql-scale-32vu-centos
     metadata:
       kind: vm
       run_status: complete
       db_type: mssql
       storage_type: scale
       current_worker: 32
+      vm_os_version: centos-stream10
+    metrics:
+      - name: tpm
+        metric_of_interest: tpm
+        agg:
+          agg_type: avg
+        threshold: 10
+        direction: -1
+  - name: hammerdb-vm-mssql-scale-32vu-win2k25
+    metadata:
+      kind: vm
+      run_status: complete
+      db_type: mssql
+      storage_type: scale
+      current_worker: 32
+      vm_os_version: windows_server_2k25
     metrics:
       - name: tpm
         metric_of_interest: tpm
