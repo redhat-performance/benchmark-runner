@@ -46,12 +46,12 @@ class WinstressVm(BootstormVM):
             verify = self._virtctl.virtctl_ssh(vm_name=vm_name,
                                                command=f'powershell -Command "if (Test-Path \'{remote_path}\') {{ echo exists }}"',
                                                namespace=self.__namespace, key_path=self.__ssh_key_path,
-                                               username=self.__username, timeout=60)
+                                               username=self.__username, timeout=300)
             if verify and 'exists' in verify:
                 logger.info(f'Copied and verified {script} on VM {vm_name}')
                 return
             logger.warning(f'SCP verify failed for {script} on VM {vm_name} (attempt {attempt}/{self.SCP_RETRIES})')
-            time.sleep(5)
+            time.sleep(10)
         raise RuntimeError(f'Failed to SCP {script} to VM {vm_name} after {self.SCP_RETRIES} attempts')
 
     def _create_vm(self, vm_num: str):
@@ -65,13 +65,17 @@ class WinstressVm(BootstormVM):
     def _prepare_vm(self, vm_num: str):
         try:
             vm_name = self._get_vm_name(vm_num)
+            self._set_bootstorm_vm_start_time(vm_name=vm_name)
             self._virtctl.start_vm_sync(vm_name=vm_name)
-            if not self._virtctl._wait_for_virtctl_ssh(vm_name=vm_name, namespace=self.__namespace,
-                                                       key_path=self.__ssh_key_path, username=self.__username,
-                                                       timeout=OC.SHORT_TIMEOUT):
+            vm_node = self._wait_vm_access(vm_name)
+            if not vm_node:
                 self._save_vm_artifacts(vm_num)
-                raise RuntimeError(f'SSH never became ready on VM {vm_name}')
-
+                raise RuntimeError(f'VM {vm_name} access failed')
+            data = self._get_bootstorm_vm_elapsed_time(vm_name=vm_name, vm_node=vm_node)
+            bootstorm_time = data.get('bootstorm_time', 0)
+            with open(os.path.join(self._run_artifacts_path, f'{vm_name}_boot_time.txt'), 'w') as f:
+                f.write(str(bootstorm_time))
+            logger.info(f'VM {vm_name} boot time: {bootstorm_time:.1f} ms')
         except Exception as err:
             self._save_vm_artifacts(vm_num)
             raise err
@@ -144,6 +148,13 @@ class WinstressVm(BootstormVM):
             workload = self._get_workload_file_name(workload=self._get_run_artifacts_hierarchy(workload_name=workload_name, is_file=True))
             run_artifacts_url = os.path.join(self._run_artifacts_url, f'{workload}.tar.gz')
 
+            bootstorm_time = 0
+            try:
+                with open(os.path.join(self._run_artifacts_path, f'{vm_name}_boot_time.txt'), 'r') as f:
+                    bootstorm_time = float(f.read().strip())
+            except (FileNotFoundError, ValueError):
+                logger.warning(f'No boot time recorded for VM {vm_name}')
+
             result = {
                 'cpu_total': report.get('config', {}).get('cpu_total', 0),
                 'cpu_stressed': report.get('config', {}).get('cpu_stressed', 0),
@@ -154,6 +165,7 @@ class WinstressVm(BootstormVM):
                 'total_ops': report.get('throughput', {}).get('total_ops', 0),
                 'total_ops_per_sec': report.get('throughput', {}).get('total_ops_per_sec', 0),
                 'avg_ops_per_cpu': report.get('throughput', {}).get('avg_ops_per_cpu', 0),
+                'bootstorm_time': bootstorm_time,
                 'vm_name': vm_name,
                 'node': vm_node,
                 'run_artifacts_url': run_artifacts_url,
@@ -162,7 +174,7 @@ class WinstressVm(BootstormVM):
             with open(local_result_json, 'w') as f:
                 json.dump(result, f, indent=2)
             logger.info(f'Stress results saved to {local_result_json}')
-            logger.info(f'  throughput: {result["total_ops_per_sec"]:.0f} ops/sec, avg_per_cpu: {result["avg_ops_per_cpu"]:.0f} ops/sec')
+            logger.info(f'  bootstorm_time: {result["bootstorm_time"]:.1f} ms, throughput: {result["total_ops_per_sec"]:.0f} ops/sec, avg_per_cpu: {result["avg_ops_per_cpu"]:.0f} ops/sec')
 
         except Exception as err:
             raise err
