@@ -104,7 +104,7 @@ spec:
   {%- if storage_type == 'lso' %}
   storageClassName: local-sc
   {%- else %}
-  storageClassName: ocs-storagecluster-ceph-rbd
+  storageClassName: {{ vm_storage_class }}
   {%- endif %}
   accessModes: [ "ReadWriteOnce" ]
   volumeMode: Block

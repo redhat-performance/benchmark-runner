@@ -71,7 +71,7 @@ metadata:
   name: hammerdb-mssql-pvc-claim
   namespace: benchmark-runner
 spec:
-  storageClassName: ocs-storagecluster-ceph-rbd
+  storageClassName: ocs-storagecluster-ceph-rbd-virtualization
   accessModes: [ "ReadWriteOnce" ]
   volumeMode: Block
   resources:

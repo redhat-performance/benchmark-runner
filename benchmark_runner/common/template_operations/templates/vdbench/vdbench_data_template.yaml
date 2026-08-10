@@ -4,6 +4,7 @@ template_data:
   shared:
     pin_node: {{ pin_node1 }}
     odf_pvc: {{ odf_pvc }}
+    vm_storage_class: {{ vm_storage_class }}
     uuid: {{ uuid }}
     vdbench_image: quay.io/benchmark-runner/vdbench5.04.07:f43
     fedora_container_disk: {{ fedora_container_disk }}
