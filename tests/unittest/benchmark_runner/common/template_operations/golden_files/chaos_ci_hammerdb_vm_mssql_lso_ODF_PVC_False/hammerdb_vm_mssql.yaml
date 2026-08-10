@@ -77,7 +77,7 @@ spec:
         - key: kubernetes.io/hostname
           operator: In
           values:
-          -
+          - pin-node-2
   storageClassDevices:
     - storageClassName: local-sc
       volumeMode: Block
