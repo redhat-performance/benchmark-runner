@@ -91,6 +91,38 @@ stringData:
       - python3 /parse-results/parse_results.py
       - echo @@~@@END-WORKLOAD@@~@@
 ---
+apiVersion: local.storage.openshift.io/v1
+kind: LocalVolume
+metadata:
+  name: local-disks
+  namespace: openshift-local-storage
+spec:
+  nodeSelector:
+    nodeSelectorTerms:
+    - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          -
+  storageClassDevices:
+    - storageClassName: local-sc
+      volumeMode: Block
+      devicePaths:
+        - /dev/disk/by-id/
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: hammerdb-mariadb-pvc-claim
+  namespace: benchmark-runner
+spec:
+  storageClassName: local-sc
+  accessModes: [ "ReadWriteOnce" ]
+  volumeMode: Block
+  resources:
+    requests:
+      storage: 10Gi
+---
 apiVersion: kubevirt.io/v1
 kind: VirtualMachine
 metadata:
@@ -121,6 +153,10 @@ spec:
             - disk:
                 bus: virtio
               name: cloudinitdisk
+            - disk:
+                bus: virtio
+              name: data-volume
+              serial: data
             - disk: {}
               name: hammerdb-creator-volume
               serial: CVLY623300HK240C
@@ -144,6 +180,9 @@ spec:
             secretRef:
               name: hammerdb-mariadb-cloudinit
           name: cloudinitdisk
+        - persistentVolumeClaim:
+            claimName: hammerdb-mariadb-pvc-claim
+          name: data-volume
         - configMap:
             name: hammerdb-mariadb-creator
           name: hammerdb-creator-volume

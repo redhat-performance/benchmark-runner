@@ -79,6 +79,7 @@ class GoldenFiles:
                         environment_variables.environment_variables_dict['namespace'] = environment_variables.get_workload_namespace(workload)
                         environment_variables.environment_variables_dict['cdi_source_type'] = cdi_source
                         environment_variables.environment_variables_dict['cdi_source_s3_cred'] = 's3-test-credentials' if cdi_source == 's3' else ''
+                        environment_variables.environment_variables_dict['storage_type'] = 'lso' if workload.endswith('_lso') else ''
                         template = TemplateOperations(workload)
                         srcdir = template.get_current_run_path()
                         self.__clear_directory_yaml(srcdir)
