@@ -2482,25 +2482,9 @@
                            "index": 607,
                            "text": "4.22.6-3"
                         },
-                        "42268": {
-                           "index": 609,
-                           "text": "4.22.6-8"
-                        },
-                        "42269": {
-                           "index": 611,
-                           "text": "4.22.6-9"
-                        },
                         "4227": {
                            "index": 603,
                            "text": "4.22.7"
-                        },
-                        "4228": {
-                           "index": 608,
-                           "text": "4.22.8"
-                        },
-                        "4229": {
-                           "index": 612,
-                           "text": "4.22.9"
                         },
                         "4814": {
                            "index": 6,
@@ -2557,10 +2541,6 @@
                         "50004": {
                            "index": 606,
                            "text": "5.0.0-ec.4"
-                        },
-                        "50005": {
-                           "index": 610,
-                           "text": "5.0.0-ec.5"
                         },
                         "CNV": {
                            "index": 112,
@@ -3154,22 +3134,11 @@
                "pluginVersion": "v10.0.0",
                "targets": [
                   {
-                     "alias": "{{term vm_os_version.keyword}} : {{term vm_name_num.keyword}} : {{term node.keyword}} : {{term db_type.keyword}}",
+                     "alias": "{{term vm_os_version.keyword}} : {{term vm_name_num.keyword}} : {{term db_type.keyword}}",
                      "bucketAggs": [
                         {
                            "field": "vm_name_num.keyword",
                            "id": "3",
-                           "settings": {
-                              "min_doc_count": "1",
-                              "order": "asc",
-                              "orderBy": "_term",
-                              "size": "50"
-                           },
-                           "type": "terms"
-                        },
-                        {
-                           "field": "node.keyword",
-                           "id": "6",
                            "settings": {
                               "min_doc_count": "1",
                               "order": "asc",
