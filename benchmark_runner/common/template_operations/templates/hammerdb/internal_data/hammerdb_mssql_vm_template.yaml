@@ -82,7 +82,7 @@ spec:
         - key: kubernetes.io/hostname
           operator: In
           values:
-          - {{ lso_node }}
+          - {{ lso_node | trim }}
   storageClassDevices:
     - storageClassName: local-sc
       volumeMode: Block

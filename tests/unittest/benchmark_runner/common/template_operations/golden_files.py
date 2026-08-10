@@ -59,8 +59,9 @@ class GoldenFiles:
             for file in os.listdir(src):
                 if file.endswith('.yaml'):
                     with open(os.path.join(src, file), 'r') as r:
-                        with open(os.path.join(dest, file), 'w') as w:
-                            w.write(r.read())
+                        content = '\n'.join(line.rstrip() for line in r.read().splitlines()) + '\n'
+                    with open(os.path.join(dest, file), 'w') as w:
+                        w.write(content)
 
     def __generate_golden_yaml_files__(self, dest: str=None):
         if not dest:
