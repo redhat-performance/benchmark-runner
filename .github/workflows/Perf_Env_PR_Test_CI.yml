@@ -110,6 +110,9 @@ jobs:
         cp $RUNNER_PATH/virtctl /usr/local/bin/virtctl
         rm -rf $RUNNER_PATH/virtctl
 
+        # refresh oc token before running tests to prevent mid-test expiry
+        oc login -u kubeadmin -p "$KUBEADMIN_PASSWORD" --insecure-skip-tls-verify=true
+
         # run pytest
         pytest
 
