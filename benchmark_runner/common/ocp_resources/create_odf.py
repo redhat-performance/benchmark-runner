@@ -13,13 +13,14 @@ class CreateODF(CreateOCPResourceOperations):
     """
     ODF_CSV_NUM = 4
 
-    def __init__(self, oc: OC, path: str, resource_list: list, worker_disk_ids: list, worker_disk_prefix: str):
+    def __init__(self, oc: OC, path: str, resource_list: list, worker_disk_ids: list, worker_disk_prefix: str, odf_catalog_image: str = ''):
         super().__init__(oc)
         self.__oc = oc
         self.__path = path
         self.__resource_list = resource_list
         self.__worker_disk_ids = worker_disk_ids
         self.__worker_disk_prefix = worker_disk_prefix
+        self.__odf_catalog_image = odf_catalog_image
 
     @logger_time_stamp
     def create_odf(self, upgrade_version: str):
@@ -33,6 +34,19 @@ class CreateODF(CreateOCPResourceOperations):
             logger.info(f'Wait till ODF upgrade to version: {upgrade_version}')
             self.verify_csv_installation(namespace='openshift-storage', operator='odf', upgrade_version=upgrade_version, csv_num=self.ODF_CSV_NUM)
         else:
+            if self.__odf_catalog_image:
+                idms_path = os.path.join(self.__path, 'idms.yaml')
+                logger.info(f'Extracting idms.yaml from catalog image: {self.__odf_catalog_image}')
+                self.__oc.run(cmd=f"cd {self.__path} && oc image extract '{self.__odf_catalog_image}' --file='/idms.yaml' --confirm")
+                if os.path.exists(idms_path) and open(idms_path).read().strip():
+                    logger.info('Applying IDMS for catalog image mirrors')
+                    self.__oc.run(cmd=f'oc apply -f {idms_path}')
+                    logger.info('Waiting for MCP rollout after IDMS apply')
+                    self.wait_for_ocp_resource_create(operator='odf',
+                                                      verify_cmd="oc get mcp -o jsonpath='{range .items[*]}{.status.conditions[?(@.type==\"Updated\")].status}{\"\\n\"}{end}' | grep -c True || true",
+                                                      status=str(len(['master', 'worker'])))
+                else:
+                    logger.info(f'No idms.yaml found in catalog image, skipping IDMS apply')
             for resource in self.__resource_list:
                 logger.info(f'run {resource}')
                 if resource.endswith('.sh'):

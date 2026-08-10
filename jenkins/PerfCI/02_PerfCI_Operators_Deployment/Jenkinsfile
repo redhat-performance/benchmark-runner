@@ -79,6 +79,28 @@ END
             }
         }
 
+        stage('ODF Registered') {
+            when {
+                expression { env.ODF_CATALOG_IMAGE?.trim() }
+            }
+            steps {
+                script {
+                    withCredentials([string(credentialsId: 'perfci_quay_username', variable: 'QUAY_USERNAME'), string(credentialsId: 'perfci_quay_password', variable: 'QUAY_PASSWORD')]) {
+                        sh '''
+                            oc get secret pull-secret -n openshift-config -o json | jq -r '.data.".dockerconfigjson"' | base64 -d > global-pull-secret.json
+                            QUAY_AUTH=$(echo -n "${QUAY_USERNAME}:${QUAY_PASSWORD}" | base64 -w 0)
+                            podman login quay.io -u $QUAY_USERNAME -p $QUAY_PASSWORD
+                            jq --arg QUAY_AUTH "$QUAY_AUTH" '.auths += {"quay.io/rhceph-dev": {"auth":$QUAY_AUTH,"email":""}}' global-pull-secret.json > global-pull-secret.json.tmp
+                            mv -f global-pull-secret.json.tmp global-pull-secret.json
+                            oc set data secret/pull-secret -n openshift-config --from-file=.dockerconfigjson=global-pull-secret.json
+                            rm -f global-pull-secret.json
+                            oc wait mcp master worker --for condition=updated --timeout=20m
+                        '''
+                    }
+                }
+            }
+        }
+
         stage('CNV Nightly Registered') {
             steps {
                 script {

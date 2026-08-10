@@ -91,7 +91,7 @@ class CreateOCPResource:
             create_lso = CreateLSO(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files, lso_node=self.__lso_node, lso_disk_id=self.__lso_disk_id, ceph_version=self.__ceph_version)
             create_lso.create_lso(upgrade_version)
         elif 'odf' == resource:
-            create_odf = CreateODF(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files, worker_disk_ids=self.__worker_disk_ids, worker_disk_prefix=self.__worker_disk_prefix)
+            create_odf = CreateODF(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files, worker_disk_ids=self.__worker_disk_ids, worker_disk_prefix=self.__worker_disk_prefix, odf_catalog_image=self.__environment_variables_dict.get('odf_catalog_image', ''))
             create_odf.create_odf(upgrade_version)
         elif 'kata' == resource:
             create_kata = CreateKata(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files)
