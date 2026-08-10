@@ -113,7 +113,7 @@ Not mandatory:
 
 **optional:** CDI_SOURCE_S3_CRED=$CDI_SOURCE_S3_CRED [K8s secret name containing `accessKeyId` and `secretKey` for S3 authentication. Secret must exist in benchmark-runner namespace before workload runs. Create with: `oc create secret generic <secret-name> --from-literal=accessKeyId=AKIA... --from-literal=secretKey=CLj4... -n benchmark-runner`]
 
-**optional:** WINDOWS_STORAGE_CLASS=$WINDOWS_STORAGE_CLASS [Storage class for Windows DataVolume PVCs. Default: `ocs-storagecluster-ceph-rbd-virtualization`]
+**optional:** VM_STORAGE_CLASS=$VM_STORAGE_CLASS [Storage class for all VM workload PVCs (Windows and Linux). Default: `ocs-storagecluster-ceph-rbd-virtualization`]
 
 For example:
 
