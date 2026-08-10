@@ -72,6 +72,7 @@ jobs:
           mkdir -p "$RUNNER_PATH/.kube/"
           echo "$KUBECONFIG_CONTENTS" > "$RUNNER_PATH/.kube/config"
           echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
+          echo "KUBECONFIG=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
           sudo tee -a /etc/hosts <<< "$OCP_HOSTS" > /dev/null
     - name: 📃 Integration test with pytest
       env:
