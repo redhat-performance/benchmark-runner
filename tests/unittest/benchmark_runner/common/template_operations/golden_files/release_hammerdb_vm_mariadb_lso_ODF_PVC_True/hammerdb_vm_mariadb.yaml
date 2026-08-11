@@ -108,7 +108,7 @@ spec:
     - storageClassName: local-sc
       volumeMode: Block
       devicePaths:
-        - /dev/disk/by-id/
+        - /dev/disk/by-id/test-disk-id-0000
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

@@ -17,7 +17,7 @@ spec:
       volumeMode: Filesystem
       fsType: ext4
       devicePaths:
-        - /dev/disk/by-id/
+        - /dev/disk/by-id/test-disk-id-0000
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1
