@@ -3,6 +3,7 @@ tests:
     metadata:
       kind: vm
       run_status: complete
+      vm_os_version: windows_server_2k25
     metrics:
       - name: tpm
         metric_of_interest: tpm

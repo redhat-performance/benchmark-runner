@@ -1,10 +1,11 @@
 tests:
-- name: fio-vm-4k-read
+- name: fio-vm-4k-read-centos
   metadata:
     kind: vm
     run_status: complete
     block_size: 4k
     io_operation: read
+    vm_os_version: centos-stream10
   metrics:
   - name: total-iops
     metric_of_interest: total_iops
@@ -24,12 +25,39 @@ tests:
       agg_type: avg
     threshold: 10
     direction: -1
-- name: fio-vm-4k-write
+- name: fio-vm-4k-read-win2k25
+  metadata:
+    kind: vm
+    run_status: complete
+    block_size: 4k
+    io_operation: read
+    vm_os_version: windows_server_2k25
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+- name: fio-vm-4k-write-centos
   metadata:
     kind: vm
     run_status: complete
     block_size: 4k
     io_operation: write
+    vm_os_version: centos-stream10
   metrics:
   - name: total-iops
     metric_of_interest: total_iops
@@ -49,12 +77,39 @@ tests:
       agg_type: avg
     threshold: 10
     direction: -1
-- name: fio-vm-4k-randread
+- name: fio-vm-4k-write-win2k25
+  metadata:
+    kind: vm
+    run_status: complete
+    block_size: 4k
+    io_operation: write
+    vm_os_version: windows_server_2k25
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+- name: fio-vm-4k-randread-centos
   metadata:
     kind: vm
     run_status: complete
     block_size: 4k
     io_operation: randread
+    vm_os_version: centos-stream10
   metrics:
   - name: total-iops
     metric_of_interest: total_iops
@@ -74,12 +129,39 @@ tests:
       agg_type: avg
     threshold: 10
     direction: -1
-- name: fio-vm-4k-randwrite
+- name: fio-vm-4k-randread-win2k25
+  metadata:
+    kind: vm
+    run_status: complete
+    block_size: 4k
+    io_operation: randread
+    vm_os_version: windows_server_2k25
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+- name: fio-vm-4k-randwrite-centos
   metadata:
     kind: vm
     run_status: complete
     block_size: 4k
     io_operation: randwrite
+    vm_os_version: centos-stream10
   metrics:
   - name: total-iops
     metric_of_interest: total_iops
@@ -99,12 +181,39 @@ tests:
       agg_type: avg
     threshold: 10
     direction: -1
-- name: fio-vm-8k-read
+- name: fio-vm-4k-randwrite-win2k25
+  metadata:
+    kind: vm
+    run_status: complete
+    block_size: 4k
+    io_operation: randwrite
+    vm_os_version: windows_server_2k25
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+- name: fio-vm-8k-read-centos
   metadata:
     kind: vm
     run_status: complete
     block_size: 8k
     io_operation: read
+    vm_os_version: centos-stream10
   metrics:
   - name: total-iops
     metric_of_interest: total_iops
@@ -124,12 +233,39 @@ tests:
       agg_type: avg
     threshold: 10
     direction: -1
-- name: fio-vm-8k-write
+- name: fio-vm-8k-read-win2k25
+  metadata:
+    kind: vm
+    run_status: complete
+    block_size: 8k
+    io_operation: read
+    vm_os_version: windows_server_2k25
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+- name: fio-vm-8k-write-centos
   metadata:
     kind: vm
     run_status: complete
     block_size: 8k
     io_operation: write
+    vm_os_version: centos-stream10
   metrics:
   - name: total-iops
     metric_of_interest: total_iops
@@ -149,12 +285,39 @@ tests:
       agg_type: avg
     threshold: 10
     direction: -1
-- name: fio-vm-8k-randread
+- name: fio-vm-8k-write-win2k25
+  metadata:
+    kind: vm
+    run_status: complete
+    block_size: 8k
+    io_operation: write
+    vm_os_version: windows_server_2k25
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+- name: fio-vm-8k-randread-centos
   metadata:
     kind: vm
     run_status: complete
     block_size: 8k
     io_operation: randread
+    vm_os_version: centos-stream10
   metrics:
   - name: total-iops
     metric_of_interest: total_iops
@@ -174,12 +337,39 @@ tests:
       agg_type: avg
     threshold: 10
     direction: -1
-- name: fio-vm-8k-randwrite
+- name: fio-vm-8k-randread-win2k25
+  metadata:
+    kind: vm
+    run_status: complete
+    block_size: 8k
+    io_operation: randread
+    vm_os_version: windows_server_2k25
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+- name: fio-vm-8k-randwrite-centos
   metadata:
     kind: vm
     run_status: complete
     block_size: 8k
     io_operation: randwrite
+    vm_os_version: centos-stream10
   metrics:
   - name: total-iops
     metric_of_interest: total_iops
@@ -199,12 +389,39 @@ tests:
       agg_type: avg
     threshold: 10
     direction: -1
-- name: fio-vm-32k-read
+- name: fio-vm-8k-randwrite-win2k25
+  metadata:
+    kind: vm
+    run_status: complete
+    block_size: 8k
+    io_operation: randwrite
+    vm_os_version: windows_server_2k25
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+- name: fio-vm-32k-read-centos
   metadata:
     kind: vm
     run_status: complete
     block_size: 32k
     io_operation: read
+    vm_os_version: centos-stream10
   metrics:
   - name: total-iops
     metric_of_interest: total_iops
@@ -224,12 +441,39 @@ tests:
       agg_type: avg
     threshold: 10
     direction: -1
-- name: fio-vm-32k-write
+- name: fio-vm-32k-read-win2k25
+  metadata:
+    kind: vm
+    run_status: complete
+    block_size: 32k
+    io_operation: read
+    vm_os_version: windows_server_2k25
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+- name: fio-vm-32k-write-centos
   metadata:
     kind: vm
     run_status: complete
     block_size: 32k
     io_operation: write
+    vm_os_version: centos-stream10
   metrics:
   - name: total-iops
     metric_of_interest: total_iops
@@ -249,12 +493,39 @@ tests:
       agg_type: avg
     threshold: 10
     direction: -1
-- name: fio-vm-32k-randread
+- name: fio-vm-32k-write-win2k25
+  metadata:
+    kind: vm
+    run_status: complete
+    block_size: 32k
+    io_operation: write
+    vm_os_version: windows_server_2k25
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+- name: fio-vm-32k-randread-centos
   metadata:
     kind: vm
     run_status: complete
     block_size: 32k
     io_operation: randread
+    vm_os_version: centos-stream10
   metrics:
   - name: total-iops
     metric_of_interest: total_iops
@@ -274,12 +545,39 @@ tests:
       agg_type: avg
     threshold: 10
     direction: -1
-- name: fio-vm-32k-randwrite
+- name: fio-vm-32k-randread-win2k25
+  metadata:
+    kind: vm
+    run_status: complete
+    block_size: 32k
+    io_operation: randread
+    vm_os_version: windows_server_2k25
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+- name: fio-vm-32k-randwrite-centos
   metadata:
     kind: vm
     run_status: complete
     block_size: 32k
     io_operation: randwrite
+    vm_os_version: centos-stream10
   metrics:
   - name: total-iops
     metric_of_interest: total_iops
@@ -299,12 +597,39 @@ tests:
       agg_type: avg
     threshold: 10
     direction: -1
-- name: fio-vm-1M-read
+- name: fio-vm-32k-randwrite-win2k25
+  metadata:
+    kind: vm
+    run_status: complete
+    block_size: 32k
+    io_operation: randwrite
+    vm_os_version: windows_server_2k25
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+- name: fio-vm-1M-read-centos
   metadata:
     kind: vm
     run_status: complete
     block_size: 1M
     io_operation: read
+    vm_os_version: centos-stream10
   metrics:
   - name: total-iops
     metric_of_interest: total_iops
@@ -324,12 +649,39 @@ tests:
       agg_type: avg
     threshold: 10
     direction: -1
-- name: fio-vm-1M-write
+- name: fio-vm-1M-read-win2k25
+  metadata:
+    kind: vm
+    run_status: complete
+    block_size: 1M
+    io_operation: read
+    vm_os_version: windows_server_2k25
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+- name: fio-vm-1M-write-centos
   metadata:
     kind: vm
     run_status: complete
     block_size: 1M
     io_operation: write
+    vm_os_version: centos-stream10
   metrics:
   - name: total-iops
     metric_of_interest: total_iops
@@ -349,12 +701,39 @@ tests:
       agg_type: avg
     threshold: 10
     direction: -1
-- name: fio-vm-1M-randread
+- name: fio-vm-1M-write-win2k25
+  metadata:
+    kind: vm
+    run_status: complete
+    block_size: 1M
+    io_operation: write
+    vm_os_version: windows_server_2k25
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+- name: fio-vm-1M-randread-centos
   metadata:
     kind: vm
     run_status: complete
     block_size: 1M
     io_operation: randread
+    vm_os_version: centos-stream10
   metrics:
   - name: total-iops
     metric_of_interest: total_iops
@@ -374,12 +753,65 @@ tests:
       agg_type: avg
     threshold: 10
     direction: -1
-- name: fio-vm-1M-randwrite
+- name: fio-vm-1M-randread-win2k25
+  metadata:
+    kind: vm
+    run_status: complete
+    block_size: 1M
+    io_operation: randread
+    vm_os_version: windows_server_2k25
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+- name: fio-vm-1M-randwrite-centos
   metadata:
     kind: vm
     run_status: complete
     block_size: 1M
     io_operation: randwrite
+    vm_os_version: centos-stream10
+  metrics:
+  - name: total-iops
+    metric_of_interest: total_iops
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+  - name: lat-avg
+    metric_of_interest: lat_avg_usec
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: bandwidth
+    metric_of_interest: total_bw_kbs
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: -1
+- name: fio-vm-1M-randwrite-win2k25
+  metadata:
+    kind: vm
+    run_status: complete
+    block_size: 1M
+    io_operation: randwrite
+    vm_os_version: windows_server_2k25
   metrics:
   - name: total-iops
     metric_of_interest: total_iops
