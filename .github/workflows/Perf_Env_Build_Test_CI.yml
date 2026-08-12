@@ -114,6 +114,7 @@ jobs:
           mkdir -p "$RUNNER_PATH/.kube/"
           echo "$KUBECONFIG_CONTENTS" > "$RUNNER_PATH/.kube/config"
           echo "KUBECONFIG_PATH=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
+          echo "KUBECONFIG=$RUNNER_PATH/.kube/config" >> "$GITHUB_ENV"
           sudo tee -a /etc/hosts <<< "$OCP_HOSTS" > /dev/null
     - name: 📃 Integration test with pytest
       env:
@@ -153,6 +154,9 @@ jobs:
         chmod +x $RUNNER_PATH/virtctl
         cp $RUNNER_PATH/virtctl /usr/local/bin/virtctl
         rm -rf $RUNNER_PATH/virtctl
+
+        # refresh oc token before running tests to prevent mid-test expiry
+        [[ -z "$KUBEADMIN_PASSWORD" ]] || oc login -u kubeadmin -p "$KUBEADMIN_PASSWORD"
 
         # run pytest
         pytest -v tests --cov=benchmark_runner --cov-report=term-missing
