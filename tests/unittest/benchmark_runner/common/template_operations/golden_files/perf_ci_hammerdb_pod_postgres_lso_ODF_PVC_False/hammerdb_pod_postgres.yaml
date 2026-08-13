@@ -1,4 +1,37 @@
 
+apiVersion: local.storage.openshift.io/v1
+kind: LocalVolume
+metadata:
+  name: local-disks
+  namespace: openshift-local-storage
+spec:
+  nodeSelector:
+    nodeSelectorTerms:
+    - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - pin-node-2
+  storageClassDevices:
+    - storageClassName: local-sc
+      volumeMode: Filesystem
+      fsType: ext4
+      devicePaths:
+        - /dev/disk/by-id/test-disk-id-0000
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+    name: postgres-persistent-storage
+    namespace: benchmark-runner
+spec:
+    storageClassName: local-sc
+    accessModes: [ "ReadWriteOnce" ]
+    volumeMode: Filesystem
+    resources:
+      requests:
+        storage: 100Gi
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -62,10 +95,16 @@ spec:
             - name: postgres-custom-config
               mountPath: /opt/app-root/src/postgresql-cfg/perf.conf
               subPath: custom.perf.conf
+            - name: postgres-persistent-storage
+              mountPath: /var/lib/pgsql/data
+              readOnly: false
       volumes:
         - name: postgres-custom-config
           configMap:
             name: postgres-custom-config
+        - name: postgres-persistent-storage
+          persistentVolumeClaim:
+            claimName: postgres-persistent-storage
 ---
 apiVersion: v1
 kind: Service

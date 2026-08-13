@@ -93,8 +93,8 @@ class EnvironmentVariables:
         self._environment_variables_dict['cdi_source_type'] = EnvironmentVariables.get_env('CDI_SOURCE_TYPE', 'http').lower()
         # K8s secret name with accessKeyId + secretKey for S3 auth (must exist in benchmark-runner namespace)
         self._environment_variables_dict['cdi_source_s3_cred'] = EnvironmentVariables.get_env('CDI_SOURCE_S3_CRED', '')
-        # Storage class for Windows DataVolume PVCs (override for clusters with different ODF config)
-        self._environment_variables_dict['windows_storage_class'] = EnvironmentVariables.get_env('WINDOWS_STORAGE_CLASS', 'ocs-storagecluster-ceph-rbd-virtualization')
+        # Storage class for all VM workloads PVCs (override for clusters with different ODF config)
+        self._environment_variables_dict['vm_storage_class'] = EnvironmentVariables.get_env('VM_STORAGE_CLASS', 'ocs-storagecluster-ceph-rbd-virtualization')
         # Delete all resources before and after the run, default True
         self._environment_variables_dict['delete_all'] = EnvironmentVariables.get_boolean_from_environment('DELETE_ALL', True)
         # RunStrategy: Always can be set to True or False (default: False). Set it to True for VMs that need to start in a running state

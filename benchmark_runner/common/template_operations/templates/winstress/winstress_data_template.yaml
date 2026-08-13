@@ -11,7 +11,7 @@ template_data:
     url: {{ windows_url }}
     cdi_source_type: {{ cdi_source_type }}
     cdi_source_s3_cred: {{ cdi_source_s3_cred }}
-    windows_storage_class: {{ windows_storage_class }}
+    vm_storage_class: {{ vm_storage_class }}
     stress_cpu: 100
     stress_memory: 50
     stress_duration: 600

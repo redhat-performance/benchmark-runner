@@ -2,6 +2,7 @@
 import difflib
 import filecmp
 import os
+import re
 import shutil
 import tempfile
 from benchmark_runner.main.environment_variables import environment_variables
@@ -59,8 +60,9 @@ class GoldenFiles:
             for file in os.listdir(src):
                 if file.endswith('.yaml'):
                     with open(os.path.join(src, file), 'r') as r:
-                        with open(os.path.join(dest, file), 'w') as w:
-                            w.write(r.read())
+                        content = re.sub(r'[ \t]+$', '', r.read(), flags=re.MULTILINE)
+                    with open(os.path.join(dest, file), 'w') as w:
+                        w.write(content)
 
     def __generate_golden_yaml_files__(self, dest: str=None):
         if not dest:
@@ -72,13 +74,16 @@ class GoldenFiles:
             environment_variables.environment_variables_dict['odf_pvc'] = odf_pvc
             for run_type in environment_variables.run_types_list:
                 environment_variables.environment_variables_dict['run_type'] = run_type
-                for workload in environment_variables.workloads_list:
+                for workload in environment_variables.environment_variables_dict['workloads']:
                     cdi_sources = ['http', 's3'] if workload in _WINDOWS_WORKLOADS else ['http']
                     for cdi_source in cdi_sources:
                         environment_variables.environment_variables_dict['fedora_container_disk'] = 'quay.io/benchmark-runner/fedora-container-disk:43'
                         environment_variables.environment_variables_dict['namespace'] = environment_variables.get_workload_namespace(workload)
                         environment_variables.environment_variables_dict['cdi_source_type'] = cdi_source
                         environment_variables.environment_variables_dict['cdi_source_s3_cred'] = 's3-test-credentials' if cdi_source == 's3' else ''
+                        environment_variables.environment_variables_dict['storage_type'] = 'lso' if workload.endswith('_lso') else ''
+                        environment_variables.environment_variables_dict['lso_node'] = 'pin-node-2' if workload.endswith('_lso') else ''
+                        environment_variables.environment_variables_dict['lso_disk_id'] = 'test-disk-id-0000' if workload.endswith('_lso') else ''
                         template = TemplateOperations(workload)
                         srcdir = template.get_current_run_path()
                         self.__clear_directory_yaml(srcdir)

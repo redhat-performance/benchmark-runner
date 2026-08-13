@@ -158,7 +158,7 @@ spec:
           requests:
             storage: {{ storage }}
         volumeMode: Block
-        storageClassName: {{ windows_storage_class }}
+        storageClassName: {{ vm_storage_class }}
       source:
         pvc:
           namespace: {{ namespace }}
@@ -179,6 +179,6 @@ spec:
           requests:
             storage: {{ data_storage }}
         volumeMode: Block
-        storageClassName: {{ windows_storage_class }}
+        storageClassName: {{ vm_storage_class }}
       source:
         blank: {}
