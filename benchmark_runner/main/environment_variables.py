@@ -95,6 +95,9 @@ class EnvironmentVariables:
         self._environment_variables_dict['cdi_source_s3_cred'] = EnvironmentVariables.get_env('CDI_SOURCE_S3_CRED', '')
         # Storage class for all VM workloads PVCs (override for clusters with different ODF config)
         self._environment_variables_dict['vm_storage_class'] = EnvironmentVariables.get_env('VM_STORAGE_CLASS', 'ocs-storagecluster-ceph-rbd-virtualization')
+        self._environment_variables_dict['vm_access_mode'] = EnvironmentVariables.get_env('VM_ACCESS_MODE', 'ReadWriteMany')
+        self._environment_variables_dict['eviction_strategy'] = EnvironmentVariables.get_env('EVICTION_STRATEGY', 'LiveMigrate')
+        self._environment_variables_dict['per_node_dv'] = EnvironmentVariables.get_boolean_from_environment('PER_NODE_DV', False)
         # Delete all resources before and after the run, default True
         self._environment_variables_dict['delete_all'] = EnvironmentVariables.get_boolean_from_environment('DELETE_ALL', True)
         # RunStrategy: Always can be set to True or False (default: False). Set it to True for VMs that need to start in a running state

@@ -3,7 +3,11 @@ kind: DataVolume
 metadata:
   annotations:
     cdi.kubevirt.io/storage.deleteAfterCompletion: "false"
-  name: windows-clone-dv
+    {%- if per_node_dv and scale_node %}
+    cdi.kubevirt.io/storage.bind.immediate.requested: "true"
+    volume.kubernetes.io/selected-node: {{ scale_node }}
+    {%- endif %}
+  name: {{ dv_source_name }}
   namespace: {{ namespace }}
 spec:
   source:
@@ -19,7 +23,7 @@ spec:
     {%- endif %}
   pvc:
     accessModes:
-      - ReadWriteMany
+      - {{ vm_access_mode }}
     resources:
       requests:
         storage: {{ storage }}

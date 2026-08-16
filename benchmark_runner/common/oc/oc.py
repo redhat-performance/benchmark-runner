@@ -425,29 +425,33 @@ class OC(SSH):
 
     def check_dv_status(self,
                         status: str,
-                        namespace: str = environment_variables.environment_variables_dict['namespace']):
+                        namespace: str = environment_variables.environment_variables_dict['namespace'],
+                        dv_name: str = ''):
         """
         This method checks dv status
         :return:
         """
-        namespace = f'-n {namespace}' if namespace else ''
-        verify_cmd = f"{self._cli} get dv {namespace} -o jsonpath='{{.items[].status.phase}}'"
+        namespace_flag = f'-n {namespace}' if namespace else ''
+        if dv_name:
+            verify_cmd = f"{self._cli} get dv {dv_name} {namespace_flag} -o jsonpath='{{.status.phase}}'"
+        else:
+            verify_cmd = f"{self._cli} get dv {namespace_flag} -o jsonpath='{{.items[].status.phase}}'"
         if status in self.run(verify_cmd):
             return True
         return False
 
-    @typechecked
     @logger_time_stamp
     def wait_for_dv_status(self,
                            status: str = 'Succeeded',
-                           timeout: int = int(environment_variables.environment_variables_dict['timeout'])):
+                           timeout: int = int(environment_variables.environment_variables_dict['timeout']),
+                           dv_name: str = ''):
         """
         This method waits for methods status
         @return: True/ False if reach to status
         """
         current_wait_time = 0
         while timeout <= 0 or current_wait_time <= timeout:
-            if self.check_dv_status(status=status):
+            if self.check_dv_status(status=status, dv_name=dv_name):
                 return True
             # sleep for x seconds
             time.sleep(OC.SLEEP_TIME)

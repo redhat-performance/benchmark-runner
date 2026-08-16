@@ -9,6 +9,9 @@ template_data:
     cdi_source_type: {{ cdi_source_type }}
     cdi_source_s3_cred: {{ cdi_source_s3_cred }}
     vm_storage_class: {{ vm_storage_class }}
+    vm_access_mode: {{ vm_access_mode }}
+    eviction_strategy: {{ eviction_strategy }}
+    per_node_dv: {{ per_node_dv }}
   run_type:
     perf_ci:
       requests_memory: 2G
