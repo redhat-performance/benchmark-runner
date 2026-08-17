@@ -488,7 +488,7 @@ class OC(SSH):
         health_check = f"{self._cli} -n {namespace} rsh {self._get_pod_name(pod_name=pod_name, namespace=namespace)} ceph health"
 
         while timeout <= 0 or current_wait_time <= timeout:
-            if 'HEALTH_OK' == self.run(health_check).strip():
+            if self.run(health_check).strip().startswith('HEALTH_OK'):
                 return True
 
             # Sleep for a defined interval and update the wait time
