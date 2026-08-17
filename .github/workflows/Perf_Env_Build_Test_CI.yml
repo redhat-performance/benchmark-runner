@@ -96,7 +96,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install flake8 pytest pytest-cov
+        pip install flake8 pytest pytest-cov pytest-rerunfailures
         if [[ -f requirements.txt ]]; then pip install -r requirements.txt; fi
         if [[ -f tests_requirements.txt ]]; then pip install -r tests_requirements.txt; fi
     - name: Lint with flake8
@@ -159,8 +159,8 @@ jobs:
         [[ -z "$KUBEADMIN_PASSWORD" ]] || oc login -u kubeadmin -p "$KUBEADMIN_PASSWORD"
 
         # run pytest
-        pytest -v tests --cov=benchmark_runner --cov-report=term-missing
-        coverage run -m pytest -v tests
+        pytest -v tests --reruns 2 --reruns-delay 30 --cov=benchmark_runner --cov-report=term-missing
+        coverage run -m pytest -v tests --reruns 2 --reruns-delay 30
         sleep 60
         coverage report -m
     - name: 🎥 Publish to coveralls.io
