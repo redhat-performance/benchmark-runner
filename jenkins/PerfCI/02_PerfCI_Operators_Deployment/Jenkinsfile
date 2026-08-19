@@ -93,7 +93,6 @@ END
                             oc get secret pull-secret -n openshift-config -o json | jq -r '.data.".dockerconfigjson"' | base64 -d > global-pull-secret.json
                             QUAY_AUTH=$(python3 -c "import base64; print(base64.b64encode(b'${QUAY_USERNAME}:${QUAY_PASSWORD}').decode(), end='')")
                             echo "$QUAY_PASSWORD" | podman login quay.io -u $QUAY_USERNAME --password-stdin
-                            set -x
                             jq --arg QUAY_AUTH "$QUAY_AUTH" '.auths += {"quay.io/rhceph-dev": {"auth":$QUAY_AUTH,"email":""}}' global-pull-secret.json > global-pull-secret.json.tmp
                             mv -f global-pull-secret.json.tmp global-pull-secret.json
                             oc set data secret/pull-secret -n openshift-config --from-file=.dockerconfigjson=global-pull-secret.json
