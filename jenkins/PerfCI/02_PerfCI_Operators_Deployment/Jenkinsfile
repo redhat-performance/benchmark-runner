@@ -87,7 +87,6 @@ END
                 script {
                     withCredentials([string(credentialsId: 'perfci_quay_username', variable: 'QUAY_USERNAME'), string(credentialsId: 'perfci_quay_password', variable: 'QUAY_PASSWORD')]) {
                         sh '''
-                            set +x
                             trap "rm -f global-pull-secret.json global-pull-secret.json.tmp" EXIT
                             install -m 600 /dev/null global-pull-secret.json
                             oc get secret pull-secret -n openshift-config -o json | jq -r '.data.".dockerconfigjson"' | base64 -d > global-pull-secret.json
