@@ -43,7 +43,7 @@ class CreateODF(CreateOCPResourceOperations):
                     self.__oc.run(cmd=f'oc apply -f {idms_path}')
                     logger.info('Waiting for MCP rollout after IDMS apply')
                     self.wait_for_ocp_resource_create(operator='odf',
-                                                      verify_cmd="oc get mcp -o jsonpath='{range .items[*]}{.status.conditions[?(@.type==\"Updated\")].status}{\"\\n\"}{end}' | grep -c True || true",
+                                                      verify_cmd="oc get mcp master worker -o jsonpath='{range .items[*]}{.status.conditions[?(@.type==\"Updated\")].status}{\"\\n\"}{end}' | grep -cx True || true",
                                                       status=str(len(['master', 'worker'])))
                 else:
                     logger.info(f'No idms.yaml found in catalog image, skipping IDMS apply')
