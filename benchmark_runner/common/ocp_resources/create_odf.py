@@ -46,7 +46,7 @@ class CreateODF(CreateOCPResourceOperations):
                                                       verify_cmd="oc get mcp master worker -o jsonpath='{range .items[*]}{.status.conditions[?(@.type==\"Updated\")].status}{\"\\n\"}{end}' | grep -cx True || true",
                                                       status=str(len(['master', 'worker'])))
                 else:
-                    logger.info(f'No idms.yaml found in catalog image, skipping IDMS apply')
+                    logger.info('No idms.yaml found in catalog image, skipping IDMS apply')
             for resource in self.__resource_list:
                 logger.info(f'run {resource}')
                 if resource.endswith('.sh'):
