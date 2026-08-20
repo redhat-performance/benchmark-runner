@@ -334,6 +334,7 @@ class EnvironmentVariables:
         self._environment_variables_dict['lso_version'] = EnvironmentVariables.get_env('LSO_VERSION', '')
         # odf version
         self._environment_variables_dict['odf_version'] = EnvironmentVariables.get_env('ODF_VERSION', '')
+        self._environment_variables_dict['odf_catalog_image'] = EnvironmentVariables.get_env('ODF_CATALOG_IMAGE', '')
         # custom kata version, if empty fetch auto latest version
         self._environment_variables_dict['kata_csv'] = EnvironmentVariables.get_env('KATA_CSV', '')
         # number of odf disk for discovery

@@ -1,0 +1,15 @@
+{% if odf_catalog_image %}
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  name: odf-catalog-source
+  namespace: openshift-marketplace
+spec:
+  displayName: ODF Custom Catalog
+  image: {{ odf_catalog_image }}
+  publisher: Red Hat
+  sourceType: grpc
+  updateStrategy:
+    registryPoll:
+      interval: 30m
+{% endif %}

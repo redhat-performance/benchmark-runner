@@ -9,6 +9,7 @@ pipeline {
         WORKER_DISK_IDS = credentials('perfci_worker_disk_ids')
         CNV_VERSION = credentials('perfci_cnv_version')
         ODF_VERSION = credentials('perfci_odf_version')
+        ODF_CATALOG_IMAGE = credentials('perfci_odf_catalog_image')
         LSO_VERSION = credentials('perfci_lso_version')
         EXPECTED_NODES = credentials('perfci_expected_nodes')
         QUAY_BENCHMARK_RUNNER_REPOSITORY = credentials('perfci_quay_repository')
@@ -78,6 +79,29 @@ END
             }
         }
 
+        stage('ODF Registered') {
+            when {
+                expression { env.ODF_CATALOG_IMAGE?.trim() }
+            }
+            steps {
+                script {
+                    withCredentials([string(credentialsId: 'perfci_quay_username', variable: 'QUAY_USERNAME'), string(credentialsId: 'perfci_quay_password', variable: 'QUAY_PASSWORD')]) {
+                        sh '''
+                            trap "rm -f global-pull-secret.json global-pull-secret.json.tmp" EXIT
+                            install -m 600 /dev/null global-pull-secret.json
+                            oc get secret pull-secret -n openshift-config -o json | jq -r '.data.".dockerconfigjson"' | base64 -d > global-pull-secret.json
+                            QUAY_AUTH=$(QUAY_USERNAME="$QUAY_USERNAME" QUAY_PASSWORD="$QUAY_PASSWORD" python3 -c "import base64, os; print(base64.b64encode(f'{os.environ[\"QUAY_USERNAME\"]}:{os.environ[\"QUAY_PASSWORD\"]}'.encode()).decode(), end='')")
+                            printf '%s' "$QUAY_PASSWORD" | podman login quay.io -u $QUAY_USERNAME --password-stdin
+                            QUAY_AUTH="$QUAY_AUTH" jq '.auths += {"quay.io/rhceph-dev": {"auth":$ENV.QUAY_AUTH,"email":""}}' global-pull-secret.json > global-pull-secret.json.tmp
+                            mv -f global-pull-secret.json.tmp global-pull-secret.json
+                            oc set data secret/pull-secret -n openshift-config --from-file=.dockerconfigjson=global-pull-secret.json
+                            oc wait mcp master worker --for condition=updated --timeout=20m
+                        '''
+                    }
+                }
+            }
+        }
+
         stage('CNV Nightly Registered') {
             steps {
                 script {
@@ -125,6 +149,7 @@ END
                                                             -e CNV_VERSION='${CNV_VERSION}' \
                                                             -e LSO_VERSION='${LSO_VERSION}' \
                                                             -e ODF_VERSION='${ODF_VERSION}' \
+                                                            -e ODF_CATALOG_IMAGE='${ODF_CATALOG_IMAGE}' \
                                                             -e NUM_ODF_DISK='${NUM_ODF_DISK}' \
                                                             -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' \
                                                             -e PROVISION_IP='${PROVISION_IP}' \
