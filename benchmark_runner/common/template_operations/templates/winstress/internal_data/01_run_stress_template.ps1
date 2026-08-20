@@ -10,14 +10,21 @@ New-Item -ItemType Directory -Force -Path $stressDir | Out-Null
 $scriptContent = @"
 import multiprocessing, time, psutil, json
 
-def burn_cpu(d, result_dict, idx):
-    ops = 0
-    start = time.time()
+def cpu_work():
+    x = 1
+    for _ in range(100):
+        x = x * 1000003 % 999999937
+    return x
+
+def burn_cpu(d, result_dict, idx, batch=10000):
+    start = time.perf_counter()
     end = start + d
-    while time.time() < end:
-        _ = 2**32
-        ops += 1
-    elapsed = time.time() - start
+    ops = 0
+    while time.perf_counter() < end:
+        for _ in range(batch):
+            cpu_work()
+        ops += batch
+    elapsed = time.perf_counter() - start
     result_dict[idx] = {'ops': ops, 'elapsed': elapsed, 'ops_per_sec': ops / elapsed}
 
 def burn_memory(target_percent, duration):
