@@ -1,0 +1,24 @@
+apiVersion: lvm.topolvm.io/v1alpha1
+kind: LVMCluster
+metadata:
+  name: lvms-nvme
+  namespace: openshift-storage
+spec:
+  storage:
+    deviceClasses:
+    - name: nvme
+      default: false
+      thinPoolConfig:
+        name: thin-pool-nvme
+        sizePercent: 90
+        overprovisionRatio: 10
+      deviceSelector:
+        paths:
+{%- for device in lvms_devices %}
+        - {{ device }}
+{%- endfor %}
+      nodeSelector:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: node-role.kubernetes.io/worker
+            operator: Exists

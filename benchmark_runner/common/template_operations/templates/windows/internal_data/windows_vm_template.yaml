@@ -98,7 +98,7 @@ spec:
           limits:
             cpu: {{ limit_cpu }}
             memory: {{ limit_memory }}
-      evictionStrategy: LiveMigrate
+      evictionStrategy: {{ eviction_strategy }}
       networks:
       - name: nic-0
         pod: {}
@@ -119,6 +119,9 @@ spec:
   - metadata:
       annotations:
         descheduler.alpha.kubernetes.io/evict: "true"
+        {%- if per_node_dv and scale_node %}
+        volume.kubernetes.io/selected-node: {{ scale_node }}
+        {%- endif %}
       {% if scale -%}
       name: windows-{{ kind }}-root-disk-{{ trunc_uuid }}-{{ scale }}
       {%- else -%}
@@ -127,7 +130,7 @@ spec:
     spec:
       pvc:
         accessModes:
-        - ReadWriteMany
+        - {{ vm_access_mode }}
         resources:
           requests:
             storage: {{ storage }}
@@ -136,4 +139,4 @@ spec:
       source:
         pvc:
           namespace: {{ namespace }}
-          name: windows-clone-dv
+          name: {{ dv_source_name }}

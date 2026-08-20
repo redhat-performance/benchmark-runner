@@ -153,6 +153,11 @@ class TemplateOperations:
 
         render_data = self.__build_template_data(template_render_data, workload_data)
 
+        if render_data.get('per_node_dv') and scale_node:
+            render_data['dv_source_name'] = f'windows-clone-dv-{scale_node}'
+        else:
+            render_data['dv_source_name'] = 'windows-clone-dv'
+
         hammerdb_config = self.__environment_variables_dict.get('hammerdb_config', {})
         if hammerdb_config and ('hammerdb' in self.__workload_name or 'winmssql' in self.__workload_name):
             hammerdb_config = {k: v for k, v in hammerdb_config.items() if v != ''}
@@ -195,7 +200,8 @@ class TemplateOperations:
                 answer['namespace.yaml'] = render_yaml_file(dir_path=self.__dir_path, yaml_file='namespace_template.yaml', environment_variable_dict=self.__environment_variables_dict)
             # windows workload
             if 'win' in self.__workload_name:
-                answer['windows_dv.yaml'] = render_yaml_file(dir_path=os.path.join(workload_dir_path, 'internal_data'), yaml_file='windows_dv_template.yaml', environment_variable_dict=render_data)
+                dv_filename = f'windows_dv_{scale_node}.yaml' if render_data.get('per_node_dv') and scale_node else 'windows_dv.yaml'
+                answer[dv_filename] = render_yaml_file(dir_path=os.path.join(workload_dir_path, 'internal_data'), yaml_file='windows_dv_template.yaml', environment_variable_dict=render_data)
             # vdbench scale
             if scale and redis and 'vdbench' in self.__workload_name:
                     answer['redis.yaml'] = render_yaml_file(dir_path=os.path.join(self.__dir_path, 'scale'), yaml_file='redis_template.yaml', environment_variable_dict=self.__environment_variables_dict)

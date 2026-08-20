@@ -10,6 +10,7 @@ from benchmark_runner.common.ocp_resources.create_kata import CreateKata
 from benchmark_runner.common.ocp_resources.create_cnv import CreateCNV
 from benchmark_runner.common.ocp_resources.create_nhc_far import CreateNHCFAR
 from benchmark_runner.common.ocp_resources.create_custom import CreateCustom
+from benchmark_runner.common.ocp_resources.create_lvms import CreateLVMS
 from benchmark_runner.common.ocp_resources.migrate_infra import MigrateInfra
 
 
@@ -105,6 +106,11 @@ class CreateOCPResource:
         elif 'infra' == resource:
             create_infra = MigrateInfra(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files)
             create_infra.migrate_infra()
+        elif 'lvms' == resource:
+            lvms_version = self.__environment_variables_dict.get('lvms_version', '')
+            lvms_devices = ast.literal_eval(self.__environment_variables_dict.get('lvms_devices', "['/dev/nvme0n1', '/dev/nvme1n1']"))
+            create_lvms = CreateLVMS(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files, lvms_version=lvms_version, lvms_devices=lvms_devices)
+            create_lvms.create_lvms(upgrade_version)
         elif 'custom' == resource:
             create_custom = CreateCustom(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files)
             create_custom.create_custom()
