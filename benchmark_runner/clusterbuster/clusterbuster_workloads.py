@@ -66,7 +66,8 @@ class ClusterBusterWorkloads(WorkloadsOperations):
         :return:
         """
         self.delete_all()
-        self.clear_nodes_cache()
+        if self._clear_cache:
+            self.clear_nodes_cache()
         if self._enable_prometheus_snapshot:
             self.start_prometheus()
 

@@ -97,6 +97,8 @@ class EnvironmentVariables:
         self._environment_variables_dict['vm_storage_class'] = EnvironmentVariables.get_env('VM_STORAGE_CLASS', 'ocs-storagecluster-ceph-rbd-virtualization')
         # Delete all resources before and after the run, default True
         self._environment_variables_dict['delete_all'] = EnvironmentVariables.get_boolean_from_environment('DELETE_ALL', True)
+        # Clear nodes cache before running workload, default True
+        self._environment_variables_dict['clear_cache'] = EnvironmentVariables.get_boolean_from_environment('CLEAR_CACHE', True)
         # RunStrategy: Always can be set to True or False (default: False). Set it to True for VMs that need to start in a running state
         self._environment_variables_dict['run_strategy'] = EnvironmentVariables.get_boolean_from_environment('RUN_STRATEGY', False)
         # Creating VMs only, default False (when True: configure RUN_STRATEGY: True/ DELETE_ALL: False)
