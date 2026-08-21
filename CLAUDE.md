@@ -42,9 +42,9 @@ python -m benchmark_runner.main.main
 
 Always run these two steps before pushing any commit:
 
-1. **Rebase onto main** to stay up to date and avoid conflicts:
+1. **Sync with upstream** to stay up to date and avoid conflicts:
    ```bash
-   git fetch origin main && git rebase origin/main
+   git fetch upstream && git merge upstream/main
    ```
 
 2. **Run all unit tests** to ensure nothing is broken:
