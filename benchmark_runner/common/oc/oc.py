@@ -485,11 +485,20 @@ class OC(SSH):
         @raise ODFHealthCheckTimeout: If health check fails within the timeout.
         """
         current_wait_time = 0
-        health_check = f"{self._cli} -n {namespace} rsh {self._get_pod_name(pod_name=pod_name, namespace=namespace)} ceph health"
+        mgr_restarted = False
+        mgr_restart_delay = 180  # wait 3 minutes before restarting MGR pods
+        health_check = f"{self._cli} -n {namespace} rsh {self._get_pod_name(pod_name=pod_name, namespace=namespace)} ceph health detail"
 
         while timeout <= 0 or current_wait_time <= timeout:
-            if self.run(health_check).strip().startswith('HEALTH_OK'):
+            result = self.run(health_check).strip()
+            if result.startswith('HEALTH_OK'):
                 return True
+
+            # Restart MGR pods once after 3 minutes if health check is still not OK
+            if not mgr_restarted and current_wait_time >= mgr_restart_delay:
+                logger.warning(f'Ceph health check not OK after {mgr_restart_delay}s, restarting MGR pods: {result[:200]}')
+                self.run(f"{self._cli} delete pod -n {namespace} -l app=rook-ceph-mgr")
+                mgr_restarted = True
 
             # Sleep for a defined interval and update the wait time
             time.sleep(OC.SLEEP_TIME)
