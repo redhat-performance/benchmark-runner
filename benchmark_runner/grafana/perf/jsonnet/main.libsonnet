@@ -377,7 +377,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
           + elasticsearch.withMetrics([
             elasticsearch.metrics.MetricAggregationWithSettings.Max.withField('ci_minutes_time')
             + elasticsearch.metrics.MetricAggregationWithSettings.Max.withId('1')
-            + elasticsearch.metrics.MetricAggregationWithSettings.Max.settings.withScript('((doc["odf_version.keyword"].size() != 0) ? ((doc["odf_version.keyword"].value.indexOf(\" \") == -1) ? Integer.parseInt(\"0\"+doc["odf_version.keyword"].value.replace(\".\",\"\").replace(\"r\",\"\").replace(\"c\",\"\").replace(\"f\",\"\").replace(\"-\",\"\")) : 0) : 0)')
+            + elasticsearch.metrics.MetricAggregationWithSettings.Max.settings.withScript('((doc["odf_version.keyword"].size() != 0) ? ((doc["odf_version.keyword"].value.indexOf(\" \") == -1) ? Integer.parseInt(\"0\"+doc["odf_version.keyword"].value.replace(\".\",\"\").replace(\"r\",\"\").replace(\"c\",\"\").replace(\"f\",\"\").replace(\"-\",\"\").replace(\"v\",\"\").replace(\"o\",\"\").replace(\"d\",\"\").replace(\"p\",\"\").replace(\"e\",\"\").replace(\"a\",\"\").replace(\"t\",\"\").replace(\"s\",\"\").replace(\"b\",\"\").replace(\"l\",\"\")) : 0) : 0)')
             + elasticsearch.metrics.MetricAggregationWithSettings.Max.withType('max')
 
           ])
