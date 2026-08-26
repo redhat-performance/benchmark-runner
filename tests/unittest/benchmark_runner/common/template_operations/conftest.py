@@ -3,9 +3,3 @@ import tempfile
 from benchmark_runner.main.environment_variables import environment_variables
 
 environment_variables.environment_variables_dict['run_artifacts_path'] = tempfile.mkdtemp()
-
-from tests.unittest.benchmark_runner.common.template_operations.golden_files import GoldenFiles
-
-
-file_generator = GoldenFiles()
-file_generator.generate_golden_files()
