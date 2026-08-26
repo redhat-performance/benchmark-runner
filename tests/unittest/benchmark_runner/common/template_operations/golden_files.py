@@ -42,9 +42,8 @@ class GoldenFiles:
     def __clear_directory_yaml(self, dir):
         if os.path.isdir(dir):
             for file in os.listdir(dir):
-                file_path = os.path.join(dir, file)
-                if os.path.isfile(file_path):
-                    os.remove(file_path)
+                if file.endswith('.yaml'):
+                    os.remove(os.path.join(dir, file))
 
     def __generate_yaml_dir_name(self, run_type: str, workload: str, odf_pvc: str, cdi_source: str='http', dest: str=None):
         if dest is None:
