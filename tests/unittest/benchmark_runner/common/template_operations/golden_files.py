@@ -75,8 +75,6 @@ class GoldenFiles:
             for run_type in environment_variables.run_types_list:
                 environment_variables.environment_variables_dict['run_type'] = run_type
                 for workload in environment_variables.environment_variables_dict['workloads']:
-                    if workload in _EXCLUDED_WORKLOADS:
-                        continue
                     cdi_sources = ['http', 's3'] if workload in _WINDOWS_WORKLOADS else ['http']
                     for cdi_source in cdi_sources:
                         environment_variables.environment_variables_dict['fedora_container_disk'] = 'quay.io/benchmark-runner/fedora-container-disk:43'
@@ -86,7 +84,6 @@ class GoldenFiles:
                         environment_variables.environment_variables_dict['storage_type'] = 'lso' if workload.endswith('_lso') else ''
                         environment_variables.environment_variables_dict['lso_node'] = 'pin-node-2' if workload.endswith('_lso') else ''
                         environment_variables.environment_variables_dict['lso_disk_id'] = 'test-disk-id-0000' if workload.endswith('_lso') else ''
-                        environment_variables.environment_variables_dict['workload'] = workload
                         template = TemplateOperations(workload)
                         srcdir = template.get_current_run_path()
                         self.__clear_directory_yaml(srcdir)
