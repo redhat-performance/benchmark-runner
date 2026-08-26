@@ -126,6 +126,7 @@ class WorkloadsOperations:
         self._windows_url = self._environment_variables_dict.get('windows_url', '')
         self._create_vms_only = self._environment_variables_dict.get('create_vms_only', '')
         self._delete_all = self._environment_variables_dict.get('delete_all', '')
+        self._clear_cache = self._environment_variables_dict.get('clear_cache', True)
         self._verification_only = self._environment_variables_dict.get('verification_only', '')
         self._must_gather_log = self._environment_variables_dict.get('must_gather_log', '')
         self._test_name = self._environment_variables_dict.get('test_name', '')
@@ -625,6 +626,7 @@ class WorkloadsOperations:
             raise KataNotInstalled(workload=self._workload)
         if self._delete_all:
             self.delete_all()
+        if self._clear_cache:
             self.clear_nodes_cache()
         if self._odf_pvc:
             self.odf_workload_verification()
