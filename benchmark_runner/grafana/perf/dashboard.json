@@ -2743,7 +2743,7 @@
                      "field": "ci_minutes_time",
                      "id": "1",
                      "settings": {
-                        "script": "((doc[\"odf_version.keyword\"].size() != 0) ? ((doc[\"odf_version.keyword\"].value.indexOf(\" \") == -1) ? Integer.parseInt(\"0\"+doc[\"odf_version.keyword\"].value.replace(\".\",\"\").replace(\"r\",\"\").replace(\"c\",\"\").replace(\"f\",\"\").replace(\"-\",\"\")) : 0) : 0)"
+                        "script": "((doc[\"odf_version.keyword\"].size() != 0) ? ((doc[\"odf_version.keyword\"].value.indexOf(\" \") == -1) ? Integer.parseInt(\"0\"+doc[\"odf_version.keyword\"].value.replace(\".\",\"\").replace(\"r\",\"\").replace(\"c\",\"\").replace(\"f\",\"\").replace(\"-\",\"\").replace(\"v\",\"\").replace(\"o\",\"\").replace(\"d\",\"\").replace(\"p\",\"\").replace(\"e\",\"\").replace(\"a\",\"\").replace(\"t\",\"\").replace(\"s\",\"\").replace(\"b\",\"\").replace(\"l\",\"\")) : 0) : 0)"
                      },
                      "type": "max"
                   }
