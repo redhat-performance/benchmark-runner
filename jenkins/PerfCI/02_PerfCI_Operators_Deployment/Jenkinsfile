@@ -149,7 +149,7 @@ END
                                                             -e CNV_VERSION='${CNV_VERSION}' \
                                                             -e LSO_VERSION='${LSO_VERSION}' \
                                                             -e ODF_VERSION='${ODF_VERSION}' \
-                                                            -e ODF_CATALOG_IMAGE='${ODF_CATALOG_IMAGE}' \
+                                                            -e ODF_CATALOG_IMAGE='${env.ODF_CATALOG_IMAGE ?: ''}' \
                                                             -e NUM_ODF_DISK='${NUM_ODF_DISK}' \
                                                             -e KUBEADMIN_PASSWORD='${KUBEADMIN_PASSWORD}' \
                                                             -e PROVISION_IP='${PROVISION_IP}' \
