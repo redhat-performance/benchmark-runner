@@ -94,7 +94,7 @@ spec:
           cores: 2
         ioThreadsPolicy: supplementalPool
         ioThreads:
-          supplementalPoolThreadCount: 8
+          supplementalPoolThreadCount: 2
         devices:
           disks:
             - disk:

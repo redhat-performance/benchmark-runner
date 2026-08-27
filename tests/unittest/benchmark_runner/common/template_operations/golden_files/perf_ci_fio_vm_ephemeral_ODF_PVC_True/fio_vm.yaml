@@ -70,7 +70,7 @@ spec:
           threads: 1
         ioThreadsPolicy: supplementalPool
         ioThreads:
-          supplementalPoolThreadCount: 2
+          supplementalPoolThreadCount: 8
         devices:
           disks:
             - disk:

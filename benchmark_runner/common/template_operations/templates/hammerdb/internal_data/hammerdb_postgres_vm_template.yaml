@@ -139,7 +139,7 @@ spec:
           cores: {{ cores }}
         ioThreadsPolicy: supplementalPool
         ioThreads:
-          supplementalPoolThreadCount: {{ io_threads }}
+          supplementalPoolThreadCount: {{ supplementalPoolThreadCount }}
         devices:
           disks:
             - disk:

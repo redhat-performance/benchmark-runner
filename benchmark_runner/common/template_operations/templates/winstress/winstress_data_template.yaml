@@ -23,7 +23,7 @@ template_data:
       cores: 16
       sockets: 1
       threads: 1
-      io_threads: 8
+      supplementalPoolThreadCount: 8
       storage: 76Gi
     default:
       requests_memory: 4G
@@ -31,5 +31,5 @@ template_data:
       cores: 2
       sockets: 1
       threads: 1
-      io_threads: 8
+      supplementalPoolThreadCount: 8
       storage: 76Gi

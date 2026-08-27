@@ -31,7 +31,7 @@ template_data:
       database_requests_memory: 32G
       database_requests_cpu: 32
       cores: 32
-      io_threads: 8
+      supplementalPoolThreadCount: 8
       storage: 76Gi
     default:
       db_num_workers: 2
@@ -39,5 +39,5 @@ template_data:
       database_requests_memory: 16G
       database_requests_cpu: 16
       cores: 16
-      io_threads: 8
+      supplementalPoolThreadCount: 8
       storage: 76Gi
