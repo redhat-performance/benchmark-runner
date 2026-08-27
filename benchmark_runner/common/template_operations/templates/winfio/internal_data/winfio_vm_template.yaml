@@ -97,7 +97,7 @@ spec:
             efi:
               secureBoot: false
         ioThreads:
-          supplementalPoolThreadCount: 8
+          supplementalPoolThreadCount: {{ io_threads }}
         ioThreadsPolicy: supplementalPool
         machine:
           type: q35

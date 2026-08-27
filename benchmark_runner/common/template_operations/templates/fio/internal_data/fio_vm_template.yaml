@@ -97,6 +97,9 @@ spec:
           sockets: {{ sockets }}
           cores: 1
           threads: 1
+        ioThreadsPolicy: supplementalPool
+        ioThreads:
+          supplementalPoolThreadCount: {{ io_threads }}
         devices:
           disks:
             - disk:
