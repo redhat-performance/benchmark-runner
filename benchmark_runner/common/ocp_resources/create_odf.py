@@ -20,7 +20,7 @@ class CreateODF(CreateOCPResourceOperations):
         self.__resource_list = resource_list
         self.__worker_disk_ids = worker_disk_ids
         self.__worker_disk_prefix = worker_disk_prefix
-        self.__odf_catalog_image = odf_catalog_image
+        self.__odf_catalog_image = odf_catalog_image.strip() if odf_catalog_image else ''
 
     @logger_time_stamp
     def create_odf(self, upgrade_version: str):
