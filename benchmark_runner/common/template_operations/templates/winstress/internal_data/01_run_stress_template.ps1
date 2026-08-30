@@ -10,14 +10,21 @@ New-Item -ItemType Directory -Force -Path $stressDir | Out-Null
 $scriptContent = @"
 import multiprocessing, time, psutil, json
 
-def burn_cpu(d, result_dict, idx):
-    ops = 0
-    start = time.time()
+def cpu_work():
+    x = 1
+    for _ in range(100):
+        x = x * 1000003 % 999999937
+    return x
+
+def burn_cpu(d, result_dict, idx, batch=10000):
+    start = time.perf_counter()
     end = start + d
-    while time.time() < end:
-        _ = 2**32
-        ops += 1
-    elapsed = time.time() - start
+    ops = 0
+    while time.perf_counter() < end:
+        for _ in range(batch):
+            cpu_work()
+        ops += batch
+    elapsed = time.perf_counter() - start
     result_dict[idx] = {'ops': ops, 'elapsed': elapsed, 'ops_per_sec': ops / elapsed}
 
 def burn_memory(target_percent, duration):
@@ -47,7 +54,7 @@ if __name__ == '__main__':
 
     print(f'CPU count: {cpu_total}')
     print(f'Stressing {cpu_count} CPUs ({{"{{ stress_cpu }}"}}%) and {mem_target}% memory for {duration}s')
-    print(f'Total memory: {psutil.virtual_memory().total // (1024**3)}GB')
+    print(f'Total memory: {psutil.virtual_memory().total // (1024**2)}MB')
     print(f'Memory before: {psutil.virtual_memory().percent}%')
     print(f'CPU before: {psutil.cpu_percent(interval=1)}%')
 
@@ -63,23 +70,23 @@ if __name__ == '__main__':
     cpu_procs = [multiprocessing.Process(target=burn_cpu, args=(duration, result_dict, i)) for i in range(cpu_count)]
     [p.start() for p in cpu_procs]
 
+    intervals = max(1, duration // 30)
     samples = []
-    elapsed_total = 0
-    while elapsed_total < duration:
-        step = min(30, duration - elapsed_total)
-        time.sleep(step)
-        elapsed_total += step
+    for i in range(intervals):
+        time.sleep(30)
         mem = psutil.virtual_memory()
         cpu_pct = psutil.cpu_percent(interval=1)
         sample = {
-            'time_sec': elapsed_total,
+            'time_sec': (i+1)*30,
             'cpu_percent': cpu_pct,
             'mem_percent': mem.percent,
+            'mem_used_mb': round(mem.used / (1024**2), 1),
+            'mem_total_mb': round(mem.total / (1024**2), 1),
             'mem_used_gb': round(mem.used / (1024**3), 1),
             'mem_total_gb': round(mem.total / (1024**3), 1)
         }
         samples.append(sample)
-        print(f"At {sample['time_sec']}s: CPU={cpu_pct}% MEM={mem.percent}% ({sample['mem_used_gb']}GiB/{sample['mem_total_gb']}GiB)")
+        print(f"At {sample['time_sec']}s: CPU={cpu_pct}% MEM={mem.percent}% ({sample['mem_used_mb']}MB/{sample['mem_total_mb']}MB)")
 
     [p.join() for p in cpu_procs]
     if mem_proc:
@@ -102,7 +109,8 @@ if __name__ == '__main__':
             'stress_cpu_percent': {{ stress_cpu }},
             'stress_memory_percent': mem_target,
             'duration_sec': duration,
-            'total_memory_gb': round(psutil.virtual_memory().total / (1024**3), 1)
+            'total_memory_gb': round(psutil.virtual_memory().total / (1024**3), 1),
+            'total_memory_mb': round(psutil.virtual_memory().total / (1024**2), 1)
         },
         'throughput': {
             'total_ops': total_ops,
