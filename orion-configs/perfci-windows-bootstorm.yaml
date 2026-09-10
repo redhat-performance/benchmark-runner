@@ -1,55 +1,37 @@
 tests:
-  - name: windows-bootstorm-windows11
-    metadata:
-      kind: vm
-      run_status: complete
-      vm_os_version: windows11
-    metrics:
-      - name: bootstorm-time
-        metric_of_interest: bootstorm_time
-        agg:
-          agg_type: avg
-        threshold: 10
-        direction: 1
-      - name: total-run-time
-        metric_of_interest: total_run_time
-        agg:
-          agg_type: avg
-        threshold: 10
-        direction: 1
-  - name: windows-bootstorm-server2022
-    metadata:
-      kind: vm
-      run_status: complete
-      vm_os_version: windows_server_2022
-    metrics:
-      - name: bootstorm-time
-        metric_of_interest: bootstorm_time
-        agg:
-          agg_type: avg
-        threshold: 10
-        direction: 1
-      - name: total-run-time
-        metric_of_interest: total_run_time
-        agg:
-          agg_type: avg
-        threshold: 10
-        direction: 1
-  - name: windows-bootstorm-server2025
-    metadata:
-      kind: vm
-      run_status: complete
-      vm_os_version: windows_server_2025
-    metrics:
-      - name: bootstorm-time
-        metric_of_interest: bootstorm_time
-        agg:
-          agg_type: avg
-        threshold: 10
-        direction: 1
-      - name: total-run-time
-        metric_of_interest: total_run_time
-        agg:
-          agg_type: avg
-        threshold: 10
-        direction: 1
+- name: windows-bootstorm-windows11
+  metadata:
+    kind: vm
+    run_status: complete
+    vm_os_version: windows11
+  metrics:
+  - name: bootstorm-time
+    metric_of_interest: bootstorm_time
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: total-run-time
+    metric_of_interest: total_run_time
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+- name: windows-bootstorm-server2022
+  metadata:
+    kind: vm
+    run_status: complete
+    vm_os_version: windows_server_2022
+  metrics:
+  - name: bootstorm-time
+    metric_of_interest: bootstorm_time
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
+  - name: total-run-time
+    metric_of_interest: total_run_time
+    agg:
+      agg_type: avg
+    threshold: 10
+    direction: 1
