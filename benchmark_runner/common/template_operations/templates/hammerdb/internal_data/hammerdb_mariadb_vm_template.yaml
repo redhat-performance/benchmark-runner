@@ -171,6 +171,9 @@ spec:
         cpu:
           sockets: {{ sockets }}
           cores: {{ cores }}
+        ioThreadsPolicy: supplementalPool
+        ioThreads:
+          supplementalPoolThreadCount: {{ supplementalPoolThreadCount }}
         devices:
           disks:
             - disk:
