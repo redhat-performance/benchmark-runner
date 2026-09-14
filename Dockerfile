@@ -3,6 +3,7 @@ FROM quay.io/centos/centos:stream10
 ARG python_version=3.14
 ARG OCP_CLIENT_VERSION
 ARG VIRTCTL_VERSION
+ARG OPENSHIFT_MIRROR_VERSION=v5
 ARG OPENSHIFT4_TOOLS_VERSION=v1.2.2-kata-ci
 
 ENV PYTHON_VERSION=${python_version}
@@ -23,7 +24,7 @@ RUN python_patch=$(python3 /tmp/get_latest_python_patch.py ${python_version}) \
     && rm -rf Python-${python_full_version} Python-${python_full_version}.tgz \
     && python${python_version} -m pip install --upgrade pip \
     && python${python_version} -m pip install --upgrade benchmark-runner \
-    && curl -L "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${OCP_CLIENT_VERSION}/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz" -o "/tmp/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz" \
+    && curl -L "https://mirror.openshift.com/pub/openshift-${OPENSHIFT_MIRROR_VERSION}/clients/ocp/${OCP_CLIENT_VERSION}/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz" -o "/tmp/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz" \
     && tar -xzf /tmp/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz -C /usr/local/bin kubectl oc \
     && rm /tmp/openshift-client-linux-${OCP_CLIENT_VERSION}.tar.gz \
     && curl -L "https://github.com/kubevirt/kubevirt/releases/download/v${VIRTCTL_VERSION}/virtctl-v${VIRTCTL_VERSION}-linux-amd64" -o /usr/local/bin/virtctl \
