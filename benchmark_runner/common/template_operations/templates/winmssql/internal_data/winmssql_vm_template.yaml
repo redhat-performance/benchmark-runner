@@ -145,6 +145,9 @@ spec:
   - metadata:
       annotations:
         descheduler.alpha.kubernetes.io/evict: "true"
+        {%- if odf_pvc %}
+        cdi.kubevirt.io/cloneType: "snapshot"
+        {%- endif %}
       {% if scale -%}
       name: windows-{{ kind }}-root-disk-{{ trunc_uuid }}-{{ scale }}
       {%- else -%}

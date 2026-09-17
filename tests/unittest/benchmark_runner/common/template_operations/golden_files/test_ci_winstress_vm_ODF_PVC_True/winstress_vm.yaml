@@ -103,6 +103,7 @@ spec:
   - metadata:
       annotations:
         descheduler.alpha.kubernetes.io/evict: "true"
+        cdi.kubevirt.io/cloneType: "snapshot"
       name: winstress-vm-root-disk-deadbeef
     spec:
       pvc:

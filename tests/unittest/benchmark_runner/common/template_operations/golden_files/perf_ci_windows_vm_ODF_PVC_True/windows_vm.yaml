@@ -93,6 +93,7 @@ spec:
   - metadata:
       annotations:
         descheduler.alpha.kubernetes.io/evict: "true"
+        cdi.kubevirt.io/cloneType: "snapshot"
       name: windows-vm-root-disk-deadbeef
     spec:
       pvc:
