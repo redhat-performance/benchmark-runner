@@ -1,5 +1,8 @@
 metadata:
   name: windows
+files:
+  - name: windows_snapshot.yaml
+    template: windows_snapshot_template.yaml
 template_data:
   shared:
     pin_node: {{ pin_node1 }}

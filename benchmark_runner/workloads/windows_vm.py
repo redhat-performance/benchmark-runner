@@ -19,6 +19,24 @@ class WindowsVM(BootstormVM):
             raise ValueError('Missing Windows DV URL')
 
     @logger_time_stamp
+    def _wait_for_snapshot_ready(self, snapshot_name: str, timeout: int = 600):
+        """
+        Wait for VolumeSnapshot to be ready
+        @param snapshot_name: Name of the VolumeSnapshot
+        @param timeout: Timeout in seconds
+        """
+        namespace = self._environment_variables_dict.get('namespace', 'benchmark-runner')
+        current_wait_time = 0
+        while current_wait_time <= timeout:
+            result = self._oc.run(f'oc get volumesnapshot {snapshot_name} -n {namespace} -o jsonpath="{{.status.readyToUse}}"')
+            if result and result.strip() == 'true':
+                logger.info(f'VolumeSnapshot {snapshot_name} is ready')
+                return True
+            time.sleep(5)
+            current_wait_time += 5
+        raise Exception(f'VolumeSnapshot {snapshot_name} not ready within {timeout} seconds')
+
+    @logger_time_stamp
     def run(self):
         """
         This method runs the workload
@@ -34,8 +52,15 @@ class WindowsVM(BootstormVM):
                 # create windows dv
                 self._oc.create_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'windows_dv.yaml'))
                 self._oc.wait_for_dv_status(status='Succeeded')
+                # create snapshot if using ODF
+                if self._odf_pvc:
+                    self._oc.create_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'windows_snapshot.yaml'))
+                    self._wait_for_snapshot_ready(f'windows-golden-snapshot-{self._trunc_uuid}')
             self.run_vm_workload()
             if self._delete_all:
+                # delete snapshot if using ODF
+                if self._odf_pvc:
+                    self._oc.delete_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'windows_snapshot.yaml'))
                 # delete windows dv
                 self._oc.delete_async(yaml=os.path.join(f'{self._run_artifacts_path}', 'windows_dv.yaml'))
                 # delete namespace

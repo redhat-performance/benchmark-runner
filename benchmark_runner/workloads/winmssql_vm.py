@@ -44,6 +44,23 @@ class WinMSSQLVM(BootstormVM):
             return os.path.join(self._run_artifacts_path, f'{base_name}_{vm_num}.yaml')
         return os.path.join(self._run_artifacts_path, f'{base_name}.yaml')
 
+    @logger_time_stamp
+    def _wait_for_snapshot_ready(self, snapshot_name: str, timeout: int = 600):
+        """
+        Wait for VolumeSnapshot to be ready
+        @param snapshot_name: Name of the VolumeSnapshot
+        @param timeout: Timeout in seconds
+        """
+        current_wait_time = 0
+        while current_wait_time <= timeout:
+            result = self._oc.run(f'oc get volumesnapshot {snapshot_name} -n {self.__namespace} -o jsonpath="{{.status.readyToUse}}"')
+            if result and result.strip() == 'true':
+                logger.info(f'VolumeSnapshot {snapshot_name} is ready')
+                return True
+            time.sleep(5)
+            current_wait_time += 5
+        raise Exception(f'VolumeSnapshot {snapshot_name} not ready within {timeout} seconds')
+
     SCP_RETRIES = 3
 
     def _scp_to_vm_with_verify(self, vm_name: str, local_path: str, remote_path: str):
@@ -256,6 +273,11 @@ class WinMSSQLVM(BootstormVM):
             self._oc.create_async(yaml=os.path.join(self._run_artifacts_path, 'windows_dv.yaml'))
             self._oc.wait_for_dv_status(status='Succeeded')
 
+            # create snapshot if using ODF
+            if self._odf_pvc:
+                self._oc.create_async(yaml=os.path.join(self._run_artifacts_path, 'winmssql_snapshot.yaml'))
+                self._wait_for_snapshot_ready(f'windows-golden-snapshot-{self._trunc_uuid}')
+
             self._data_dict = {}
             self._data_dict['run_artifacts_url'] = os.path.join(self._run_artifacts_url,
                                                                 f'{self._get_run_artifacts_hierarchy(workload_name=self._workload_name, is_file=True)}-{self._time_stamp_format}.tar.gz')
@@ -285,6 +307,9 @@ class WinMSSQLVM(BootstormVM):
             self._upload_results(vm_count)
 
             if self._delete_all:
+                # delete snapshot if using ODF
+                if self._odf_pvc:
+                    self._oc.delete_async(yaml=os.path.join(self._run_artifacts_path, 'winmssql_snapshot.yaml'))
                 self._oc.delete_async(yaml=os.path.join(self._run_artifacts_path, 'windows_dv.yaml'))
                 self._oc.delete_async(yaml=os.path.join(self._run_artifacts_path, 'namespace.yaml'))
         except ElasticSearchDataNotUploaded as err:

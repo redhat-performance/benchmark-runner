@@ -134,6 +134,12 @@ spec:
         volumeMode: Block
         storageClassName: {{ vm_storage_class }}
       source:
+        {%- if odf_pvc %}
+        snapshot:
+          name: windows-golden-snapshot-{{ trunc_uuid }}
+          namespace: {{ namespace }}
+        {%- else %}
         pvc:
           namespace: {{ namespace }}
           name: windows-clone-dv
+        {%- endif %}
