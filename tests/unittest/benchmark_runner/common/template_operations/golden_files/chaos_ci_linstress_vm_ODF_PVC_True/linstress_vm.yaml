@@ -16,24 +16,45 @@ stringData:
       - path: /tmp/stress.py
         permissions: '0755'
         content: |
-          import multiprocessing, time, psutil, json
+          import multiprocessing, time, psutil, json, datetime
 
-          def cpu_work():
-              x = 1
-              for _ in range(100):
-                  x = x * 1000003 % 999999937
-              return x
+          MEM_BUFFER_MB = 1024
 
-          def burn_cpu(d, result_dict, idx, batch=10000):
+          def burn_cpu(d, result_dict, idx, bucket_sec=10):
+              # Sequential write over a memory block larger than L3, per rlk's suggestion:
+              # a plain counter-write loop defeats cache residency without relying on
+              # random access, so throughput reflects real memory write bandwidth.
+              size = MEM_BUFFER_MB * 1024 * 1024
+              buf = bytearray(b'a')
+              buf *= size
+              counter = 0
               start = time.perf_counter()
               end = start + d
               ops = 0
+              buckets = []
+              next_bucket_at = start + bucket_sec
+              bucket_start_ops = 0
+              bucket_start_time = start
               while time.perf_counter() < end:
-                  for _ in range(batch):
-                      cpu_work()
-                  ops += batch
+                  for i in range(size):
+                      buf[i] = counter & 0xff
+                      counter += 1
+                  ops += size
+                  now = time.perf_counter()
+                  if now >= next_bucket_at:
+                      b_ops = ops - bucket_start_ops
+                      b_elapsed = now - bucket_start_time
+                      buckets.append({'ops': b_ops, 'elapsed': b_elapsed, 'ops_per_sec': b_ops / b_elapsed if b_elapsed > 0 else 0})
+                      bucket_start_ops = ops
+                      bucket_start_time = now
+                      next_bucket_at = now + bucket_sec
+              final_now = time.perf_counter()
+              if final_now > bucket_start_time:
+                  b_ops = ops - bucket_start_ops
+                  b_elapsed = final_now - bucket_start_time
+                  buckets.append({'ops': b_ops, 'elapsed': b_elapsed, 'ops_per_sec': b_ops / b_elapsed if b_elapsed > 0 else 0})
               elapsed = time.perf_counter() - start
-              result_dict[idx] = {'ops': ops, 'elapsed': elapsed, 'ops_per_sec': ops / elapsed}
+              result_dict[idx] = {'ops': ops, 'elapsed': elapsed, 'ops_per_sec': ops / elapsed, 'buckets': buckets}
 
           def burn_memory(target_percent, duration):
               total = psutil.virtual_memory().total
@@ -55,6 +76,7 @@ stringData:
               time.sleep(duration)
 
           if __name__ == '__main__':
+              run_start_time = datetime.datetime.utcnow().isoformat()
               cpu_total = multiprocessing.cpu_count()
               cpu_count = max(1, int(cpu_total * 100 / 100))
               duration = 600
@@ -110,6 +132,7 @@ stringData:
               print(f'Total throughput: {total_ops_per_sec:,.0f} ops/sec')
               print(f'Avg per CPU: {avg_ops_per_sec:,.0f} ops/sec')
 
+              run_end_time = datetime.datetime.utcnow().isoformat()
               report = {
                   'config': {
                       'cpu_total': cpu_total,
@@ -118,13 +141,17 @@ stringData:
                       'stress_memory_percent': mem_target,
                       'duration_sec': duration,
                       'total_memory_gb': round(psutil.virtual_memory().total / (1024**3), 1),
-                      'total_memory_mb': round(psutil.virtual_memory().total / (1024**2), 1)
+                      'total_memory_mb': round(psutil.virtual_memory().total / (1024**2), 1),
+                      'run_start_time_utc': run_start_time,
+                      'run_end_time_utc': run_end_time
                   },
                   'throughput': {
                       'total_ops': total_ops,
                       'total_ops_per_sec': round(total_ops_per_sec, 2),
                       'avg_ops_per_cpu': round(avg_ops_per_sec, 2),
-                      'per_cpu': [{'cpu': i, 'ops': r['ops'], 'ops_per_sec': round(r['ops_per_sec'], 2)} for i, r in sorted(result_dict.items())]
+                      'per_cpu': [{'cpu': i, 'ops': r['ops'], 'ops_per_sec': round(r['ops_per_sec'], 2),
+                                   'buckets': [{'ops': b['ops'], 'elapsed': round(b['elapsed'], 3), 'ops_per_sec': round(b['ops_per_sec'], 2)} for b in r.get('buckets', [])]}
+                                  for i, r in sorted(result_dict.items())]
                   },
                   'samples': samples
               }
@@ -135,8 +162,17 @@ stringData:
               print('Done')
     runcmd:
       - export HOME=/root
-      - dnf install -y python3-psutil
-      - python3 /tmp/stress.py
+      - dnf install -y python3-psutil || true
+      - |
+        touch /tmp/vm_ready
+        end=$((SECONDS+700))
+        while [ $SECONDS -lt $end ]; do
+          if nc -w 900 10.26.8.107 29999 < /dev/null > /dev/null 2>&1; then
+            break
+          fi
+          sleep 0.5
+        done
+        python3 /tmp/stress.py
 ---
 apiVersion: kubevirt.io/v1
 kind: VirtualMachine

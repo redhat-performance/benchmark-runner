@@ -11,6 +11,7 @@ template_data:
     stress_cpu: 100
     stress_memory: 50
     stress_duration: 600
+    mem_buffer_mb: 1024
     guest_memory: ''
   run_type:
     perf_ci:

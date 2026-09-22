@@ -1,12 +1,13 @@
-
 import json
 import os
+import subprocess
+import threading
 import time
 
 from benchmark_runner.common.logger.logger_time_stamp import logger
 from benchmark_runner.common.elasticsearch.elasticsearch_exceptions import ElasticSearchDataNotUploaded
 from benchmark_runner.workloads.bootstorm_vm import BootstormVM
-from benchmark_runner.common.oc.oc import OC
+from benchmark_runner.common.oc.oc import OC, VMStatus
 
 
 class LinstressVm(BootstormVM):
@@ -49,6 +50,7 @@ class LinstressVm(BootstormVM):
             logger.info(f'VM {vm_name} created (boot time: {bootstorm_time:.1f} ms), stress script running via cloud-init')
         except Exception as err:
             self._save_vm_artifacts(vm_num)
+            self.save_error_logs()
             raise err
 
     def _save_vm_artifacts_by_name(self, vm_name: str):
@@ -67,6 +69,37 @@ class LinstressVm(BootstormVM):
             logger.info(f'Saved VM artifacts for {vm_name}')
         except Exception as err:
             logger.warning(f'Failed to save VM artifacts for {self._get_vm_name(vm_num)}: {err}')
+
+    def _trigger_stress(self, vm_num: str):
+        try:
+            vm_name = self._get_vm_name(vm_num)
+            self._virtctl.virtctl_ssh(vm_name=vm_name, command='touch /tmp/go_stress',
+                                      namespace=self.__namespace, key_path=self.__ssh_key_path,
+                                      username=self.__username, timeout=60)
+        except Exception as err:
+            logger.warning(f'TRIGGER: failed to start stress on {vm_name}: {err}')
+            raise err
+
+    def _run_barrier_server(self, vm_count, port=29999, timeout=900):
+        result_path = os.path.join(self._run_artifacts_path, 'barrier_result.txt')
+        if os.path.exists(result_path):
+            os.remove(result_path)
+
+        cmd = ['podman', 'run', '--rm', '--network=host',
+               '-v', f'{self._run_artifacts_path}:/result:Z',
+               'barrier-server:latest', str(port), str(vm_count), str(timeout), '/result/barrier_result.txt']
+        start = time.time()
+        proc = subprocess.run(cmd, capture_output=True, timeout=timeout + 60)
+        if proc.returncode != 0:
+            logger.warning(f'BARRIER: barrier-server container failed: {proc.stderr.decode()}')
+
+        released = 0
+        if os.path.exists(result_path):
+            with open(result_path) as f:
+                released = int(f.read().strip())
+
+        logger.info(f'BARRIER: {released}/{vm_count} VMs connected, released (elapsed {time.time()-start:.1f}s)')
+        return released
 
     def _collect_results(self, vm_num: str):
         try:
@@ -121,9 +154,13 @@ class LinstressVm(BootstormVM):
                 'stress_memory_percent': report.get('config', {}).get('stress_memory_percent', 0),
                 'duration_sec': report.get('config', {}).get('duration_sec', 0),
                 'total_memory_gb': report.get('config', {}).get('total_memory_gb', 0),
+                'total_memory_mb': report.get('config', {}).get('total_memory_mb', 0),
+                'run_start_time_utc': report.get('config', {}).get('run_start_time_utc', ''),
+                'run_end_time_utc': report.get('config', {}).get('run_end_time_utc', ''),
                 'total_ops': report.get('throughput', {}).get('total_ops', 0),
                 'total_ops_per_sec': report.get('throughput', {}).get('total_ops_per_sec', 0),
                 'avg_ops_per_cpu': report.get('throughput', {}).get('avg_ops_per_cpu', 0),
+                'per_cpu': report.get('throughput', {}).get('per_cpu', []),
                 'bootstorm_time': bootstorm_time,
                 'vm_name': vm_name,
                 'node': vm_node,
@@ -135,6 +172,7 @@ class LinstressVm(BootstormVM):
             logger.info(f'Stress results for {vm_name}: bootstorm_time={result["bootstorm_time"]:.1f} ms, throughput={result["total_ops_per_sec"]:.0f} ops/sec, avg_per_cpu={result["avg_ops_per_cpu"]:.0f} ops/sec')
 
         except Exception as err:
+            self.save_error_logs()
             raise err
 
     def _delete_vm(self, vm_num: str):
@@ -142,6 +180,7 @@ class LinstressVm(BootstormVM):
             vm_name = self._get_vm_name(vm_num)
             self._oc.delete_vm_sync(yaml=self._get_vm_yaml(vm_num), vm_name=vm_name)
         except Exception as err:
+            self.save_error_logs()
             raise err
 
     def _upload_results(self, vm_count: int):
@@ -161,8 +200,32 @@ class LinstressVm(BootstormVM):
                                           status='complete', result=result)
         self._verify_elasticsearch_data_uploaded(index=self._es_index, uuid=self._uuid)
 
+    def _autopilot_watchdog(self, stop_event):
+        while not stop_event.is_set():
+            try:
+                out = subprocess.run(
+                    ['oc', 'get', 'pod', '-n', 'openshift-cnv', '-l', 'app=virt-platform-autopilot',
+                     '-o', 'jsonpath={.items[0].status.containerStatuses[0].state.waiting.reason}'],
+                    capture_output=True, text=True
+                ).stdout
+                if 'CrashLoopBackOff' in out or 'Error' in out:
+                    subprocess.run(
+                        ['oc', 'delete', 'pod', '-n', 'openshift-cnv', '-l', 'app=virt-platform-autopilot', '--ignore-not-found'],
+                        capture_output=True
+                    )
+            except Exception:
+                pass
+            stop_event.wait(10)
+
     def run(self):
+        _stop_watchdog = threading.Event()
+        _watchdog_thread = threading.Thread(target=self._autopilot_watchdog, args=(_stop_watchdog,), daemon=True)
+        _watchdog_thread.start()
         try:
+            subprocess.run(
+                ['oc', 'delete', 'pod', '-n', 'openshift-cnv', '-l', 'app=virt-platform-autopilot', '--ignore-not-found'],
+                capture_output=True
+            )
             logger.info(f'Running {self._workload} workload uuid={self._uuid} run_type={self._run_type} scale={self._scale}')
             if self._run_type in ('test_ci', 'chaos_ci', 'func_ci'):
                 self._es_index = f"linstress-{self._run_type.replace('_', '-')}-results"
@@ -195,7 +258,26 @@ class LinstressVm(BootstormVM):
 
             bulks = tuple(self.split_run_bulks(iterable=range(vm_count), limit=threads_limit))
 
-            steps = [self._create_vm, self._save_vm_artifacts, self._collect_results]
+            self._run_parallel_phases([self._create_vm], bulks, bulk_sleep)
+
+            all_vm_names = [self._get_vm_name(str(n)) for n in range(vm_count)]
+            ready = 0
+            for _vm in all_vm_names:
+                try:
+                    self._oc.wait_for_vm_status(vm_name=_vm, status=VMStatus.Running, namespace=self.__namespace)
+                    ready += 1
+                except Exception as _e:
+                    logger.warning(f'BARRIER: {_vm} not Running: {_e}')
+            logger.info(f'BARRIER: {ready}/{vm_count} VMs Running before stress start')
+
+            released = self._run_barrier_server(vm_count)
+            logger.info(f'TRIGGER: released {released}/{vm_count} VMs from network barrier')
+            if released < vm_count:
+                logger.warning(f'TRIGGER: WARNING - only {released}/{vm_count} VMs synchronized. '
+                               f'{vm_count - released} VM(s) missed the barrier and will run unsynchronized. '
+                               f'Results for this run are NOT valid for simultaneity analysis.')
+
+            steps = [self._collect_results]
             if self._delete_all:
                 steps.append(self._delete_vm)
             self._run_parallel_phases(steps, bulks, bulk_sleep)
@@ -210,3 +292,5 @@ class LinstressVm(BootstormVM):
         except Exception as err:
             self.save_error_logs()
             raise err
+        finally:
+            _stop_watchdog.set()

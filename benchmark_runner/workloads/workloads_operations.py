@@ -620,7 +620,14 @@ class WorkloadsOperations:
         """
         # Verify that CNV operator in installed for CNV workloads
         if '_vm' in self._workload and not self._oc.is_cnv_installed():
-            raise CNVNotInstalled(workload=self._workload)
+            import subprocess as _sp
+            for _attempt in range(6):
+                _sp.run(['oc', 'delete', 'pod', '-n', 'openshift-cnv', '-l', 'app=virt-platform-autopilot', '--ignore-not-found'], capture_output=True)
+                time.sleep(15)
+                if self._oc.is_cnv_installed():
+                    break
+            else:
+                raise CNVNotInstalled(workload=self._workload)
         # Verify that Kata operator in installed for kata workloads
         if '_kata' in self._workload and not self._oc.is_kata_installed():
             raise KataNotInstalled(workload=self._workload)
