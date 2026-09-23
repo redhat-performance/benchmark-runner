@@ -49,8 +49,8 @@ class EnvironmentVariables:
         self._environment_variables_dict['cluster'] = EnvironmentVariables.get_env('CLUSTER', 'openshift')
 
         # dynamic parameters - configure for local run
-        self._environment_variables_dict['workload'] = EnvironmentVariables.get_env('WORKLOAD', 'winstress_vm')
-        self._environment_variables_dict['kubeadmin_password'] = EnvironmentVariables.get_env('KUBEADMIN_PASSWORD', open('/root/.kube/kubeadmin-password').read().strip())
+        self._environment_variables_dict['workload'] = EnvironmentVariables.get_env('WORKLOAD', '')
+        self._environment_variables_dict['kubeadmin_password'] = EnvironmentVariables.get_env('KUBEADMIN_PASSWORD', '')
         # PIN=node selector
         self._environment_variables_dict['pin_node0'] = EnvironmentVariables.get_env('PIN_NODE0', '')
         self._environment_variables_dict['pin_node1'] = EnvironmentVariables.get_env('PIN_NODE1', '')
@@ -88,7 +88,7 @@ class EnvironmentVariables:
         self._environment_variables_dict['fedora'] = EnvironmentVariables.get_env(
             'FEDORA', 'quay.io/benchmark-runner/fedora:43')
         # windows url
-        self._environment_variables_dict['windows_url'] = EnvironmentVariables.get_env('WINDOWS_URL', 'http://10.26.8.107:8083/windows_server_2k22.qcow2')
+        self._environment_variables_dict['windows_url'] = EnvironmentVariables.get_env('WINDOWS_URL', '')
         # CDI DataVolume source type: http (default) or s3. URL must be path-style HTTPS for S3.
         self._environment_variables_dict['cdi_source_type'] = EnvironmentVariables.get_env('CDI_SOURCE_TYPE', 'http').lower()
         # K8s secret name with accessKeyId + secretKey for S3 auth (must exist in benchmark-runner namespace)
@@ -96,7 +96,7 @@ class EnvironmentVariables:
         # Storage class for all VM workloads PVCs (override for clusters with different ODF config)
         self._environment_variables_dict['vm_storage_class'] = EnvironmentVariables.get_env('VM_STORAGE_CLASS', 'ocs-storagecluster-ceph-rbd-virtualization')
         # Delete all resources before and after the run, default True
-        self._environment_variables_dict['delete_all'] = EnvironmentVariables.get_boolean_from_environment('DELETE_ALL', False)
+        self._environment_variables_dict['delete_all'] = EnvironmentVariables.get_boolean_from_environment('DELETE_ALL', True)
         # Clear nodes cache before running workload, default True
         self._environment_variables_dict['clear_cache'] = EnvironmentVariables.get_boolean_from_environment('CLEAR_CACHE', True)
         # RunStrategy: Always can be set to True or False (default: False). Set it to True for VMs that need to start in a running state
@@ -181,10 +181,10 @@ class EnvironmentVariables:
         # The workload_namespaces dict is the source of truth for where each workload runs.
         # NAMESPACE env var is only used as a fallback for unknown workloads.
         base_workload = self._environment_variables_dict['workload'].split('_')[0]
-        if EnvironmentVariables.get_env('NAMESPACE'):
-            self._environment_variables_dict['namespace'] = EnvironmentVariables.get_env('NAMESPACE')
-        elif base_workload in self._environment_variables_dict['workload_namespaces']:
+        if base_workload in self._environment_variables_dict['workload_namespaces']:
             self._environment_variables_dict['namespace'] = self._environment_variables_dict['workload_namespaces'][base_workload]
+        elif EnvironmentVariables.get_env('NAMESPACE'):
+            self._environment_variables_dict['namespace'] = EnvironmentVariables.get_env('NAMESPACE')
         else:
             self._environment_variables_dict['namespace'] = 'benchmark-runner'
 
@@ -240,7 +240,7 @@ class EnvironmentVariables:
             self._environment_variables_dict['run_artifacts_path'] = os.path.join(self._environment_variables_dict['run_artifacts'],f"{self._environment_variables_dict['workload'].replace('_', '-')}-{self._environment_variables_dict['time_stamp_format']}")
 
         # True/False: default False
-        self._environment_variables_dict['save_artifacts_local'] = EnvironmentVariables.get_boolean_from_environment('SAVE_ARTIFACTS_LOCAL', True)
+        self._environment_variables_dict['save_artifacts_local'] = EnvironmentVariables.get_boolean_from_environment('SAVE_ARTIFACTS_LOCAL', False)
         # True/False: default False
         self._environment_variables_dict['enable_prometheus_snapshot'] = EnvironmentVariables.get_boolean_from_environment('ENABLE_PROMETHEUS_SNAPSHOT', False)
         # end dynamic parameters - configure for local run
