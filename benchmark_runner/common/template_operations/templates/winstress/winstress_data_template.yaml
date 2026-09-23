@@ -1,6 +1,8 @@
 metadata:
   name: windows
 files:
+  - name: winstress_snapshot.yaml
+    template: winstress_snapshot_template.yaml
   - name: 01_run_stress.ps1
     template: 01_run_stress_template.ps1
 template_data:

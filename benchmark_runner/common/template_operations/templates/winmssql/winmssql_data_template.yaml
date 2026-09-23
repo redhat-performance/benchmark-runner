@@ -1,6 +1,8 @@
 metadata:
   name: windows
 files:
+  - name: winmssql_snapshot.yaml
+    template: winmssql_snapshot_template.yaml
   - name: "run_prepare_hammerdb.ps1"
   - name: "run_hammerdb_benchmark.ps1"
   - name: "01_provision-data-disk.ps1"

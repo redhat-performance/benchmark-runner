@@ -118,9 +118,9 @@ spec:
         volumeMode: Block
         storageClassName: ocs-storagecluster-ceph-rbd-virtualization
       source:
-        pvc:
+        snapshot:
+          name: windows-golden-snapshot-deadbeef
           namespace: benchmark-runner
-          name: windows-clone-dv
   - metadata:
       annotations:
         descheduler.alpha.kubernetes.io/evict: "true"

@@ -1,6 +1,8 @@
 metadata:
   name: windows
 files:
+  - name: winfio_snapshot.yaml
+    template: winfio_snapshot_template.yaml
   - name: 01_provision-data-disk.ps1
     template: 01_provision-data-disk_template.ps1
   - name: 02_run_fio_benchmark.ps1
