@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "benchmark-runner"
-version = "1.0.1050"
+version = "1.0.1051"
 description = "Benchmark Runner Tool"
 readme = "README.md"
 license = "Apache-2.0"
