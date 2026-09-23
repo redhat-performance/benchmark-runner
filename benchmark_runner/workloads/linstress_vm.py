@@ -1,7 +1,6 @@
 import json
 import os
 import subprocess
-import threading
 import time
 
 from benchmark_runner.common.logger.logger_time_stamp import logger
@@ -70,33 +69,54 @@ class LinstressVm(BootstormVM):
         except Exception as err:
             logger.warning(f'Failed to save VM artifacts for {self._get_vm_name(vm_num)}: {err}')
 
-    def _trigger_stress(self, vm_num: str):
-        try:
-            vm_name = self._get_vm_name(vm_num)
-            self._virtctl.virtctl_ssh(vm_name=vm_name, command='touch /tmp/go_stress',
-                                      namespace=self.__namespace, key_path=self.__ssh_key_path,
-                                      username=self.__username, timeout=60)
-        except Exception as err:
-            logger.warning(f'TRIGGER: failed to start stress on {vm_name}: {err}')
-            raise err
-
     def _run_barrier_server(self, vm_count, port=29999, timeout=900):
-        result_path = os.path.join(self._run_artifacts_path, 'barrier_result.txt')
-        if os.path.exists(result_path):
-            os.remove(result_path)
+        # Runs as an in-cluster Pod (not on the bastion) so VMs can reach the
+        # barrier even when the bastion sits behind a firewall.
+        barrier_yaml = os.path.join(self._run_artifacts_path, 'linstress_barrier.yaml')
+        pod_name = f'linstress-barrier-{self._trunc_uuid}'
+        sync_namespace = 'linstress-sync'
 
-        cmd = ['podman', 'run', '--rm', '--network=host',
-               '-v', f'{self._run_artifacts_path}:/result:Z',
-               'barrier-server:latest', str(port), str(vm_count), str(timeout), '/result/barrier_result.txt']
-        start = time.time()
-        proc = subprocess.run(cmd, capture_output=True, timeout=timeout + 60)
-        if proc.returncode != 0:
-            logger.warning(f'BARRIER: barrier-server container failed: {proc.stderr.decode()}')
+        with open(barrier_yaml) as f:
+            rendered = f.read()
+        rendered = rendered.replace('__BARRIER_VM_COUNT__', str(vm_count))
+        with open(barrier_yaml, 'w') as f:
+            f.write(rendered)
+
+        self._oc.create_async(yaml=barrier_yaml)
 
         released = 0
-        if os.path.exists(result_path):
-            with open(result_path) as f:
-                released = int(f.read().strip())
+        start = time.time()
+        deadline = start + timeout + 60
+        try:
+            while time.time() < deadline:
+                phase = subprocess.run(
+                    ['oc', 'get', 'pod', pod_name, '-n', sync_namespace,
+                     '-o', 'jsonpath={.status.phase}'],
+                    capture_output=True, text=True
+                ).stdout.strip()
+                if phase in ('Succeeded', 'Failed'):
+                    break
+                time.sleep(OC.DELAY)
+            else:
+                logger.warning(f'BARRIER: barrier pod {pod_name} did not complete before timeout')
+
+            logs = subprocess.run(
+                ['oc', 'logs', pod_name, '-n', sync_namespace],
+                capture_output=True, text=True
+            ).stdout
+            for line in logs.splitlines():
+                if line.startswith('BARRIER_RESULT:'):
+                    released = int(line.split(':', 1)[1].strip())
+                    break
+            else:
+                logger.warning(f'BARRIER: no BARRIER_RESULT line found in barrier pod logs')
+        finally:
+            subprocess.run(['oc', 'delete', 'pod', pod_name, '-n', sync_namespace,
+                             '--ignore-not-found', '--wait=false'], capture_output=True)
+            subprocess.run(['oc', 'delete', 'service', pod_name, '-n', sync_namespace,
+                             '--ignore-not-found', '--wait=false'], capture_output=True)
+            subprocess.run(['oc', 'delete', 'service', pod_name, '-n', self.__namespace,
+                             '--ignore-not-found', '--wait=false'], capture_output=True)
 
         logger.info(f'BARRIER: {released}/{vm_count} VMs connected, released (elapsed {time.time()-start:.1f}s)')
         return released
@@ -200,32 +220,8 @@ class LinstressVm(BootstormVM):
                                           status='complete', result=result)
         self._verify_elasticsearch_data_uploaded(index=self._es_index, uuid=self._uuid)
 
-    def _autopilot_watchdog(self, stop_event):
-        while not stop_event.is_set():
-            try:
-                out = subprocess.run(
-                    ['oc', 'get', 'pod', '-n', 'openshift-cnv', '-l', 'app=virt-platform-autopilot',
-                     '-o', 'jsonpath={.items[0].status.containerStatuses[0].state.waiting.reason}'],
-                    capture_output=True, text=True
-                ).stdout
-                if 'CrashLoopBackOff' in out or 'Error' in out:
-                    subprocess.run(
-                        ['oc', 'delete', 'pod', '-n', 'openshift-cnv', '-l', 'app=virt-platform-autopilot', '--ignore-not-found'],
-                        capture_output=True
-                    )
-            except Exception:
-                pass
-            stop_event.wait(10)
-
     def run(self):
-        _stop_watchdog = threading.Event()
-        _watchdog_thread = threading.Thread(target=self._autopilot_watchdog, args=(_stop_watchdog,), daemon=True)
-        _watchdog_thread.start()
         try:
-            subprocess.run(
-                ['oc', 'delete', 'pod', '-n', 'openshift-cnv', '-l', 'app=virt-platform-autopilot', '--ignore-not-found'],
-                capture_output=True
-            )
             logger.info(f'Running {self._workload} workload uuid={self._uuid} run_type={self._run_type} scale={self._scale}')
             if self._run_type in ('test_ci', 'chaos_ci', 'func_ci'):
                 self._es_index = f"linstress-{self._run_type.replace('_', '-')}-results"
@@ -292,5 +288,3 @@ class LinstressVm(BootstormVM):
         except Exception as err:
             self.save_error_logs()
             raise err
-        finally:
-            _stop_watchdog.set()

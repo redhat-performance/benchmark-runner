@@ -35,19 +35,27 @@ stringData:
               next_bucket_at = start + bucket_sec
               bucket_start_ops = 0
               bucket_start_time = start
-              while time.perf_counter() < end:
-                  for i in range(size):
-                      buf[i] = counter & 0xff
-                      counter += 1
-                  ops += size
-                  now = time.perf_counter()
-                  if now >= next_bucket_at:
-                      b_ops = ops - bucket_start_ops
-                      b_elapsed = now - bucket_start_time
-                      buckets.append({'ops': b_ops, 'elapsed': b_elapsed, 'ops_per_sec': b_ops / b_elapsed if b_elapsed > 0 else 0})
-                      bucket_start_ops = ops
-                      bucket_start_time = now
-                      next_bucket_at = now + bucket_sec
+              chunk = 1024 * 1024
+              stop = False
+              while not stop:
+                  for chunk_start in range(0, size, chunk):
+                      chunk_end = min(chunk_start + chunk, size)
+                      for i in range(chunk_start, chunk_end):
+                          buf[i] = counter & 0xff
+                          counter += 1
+                      ops += chunk_end - chunk_start
+                      now = time.perf_counter()
+                      if now >= end:
+                          stop = True
+                      if now >= next_bucket_at or stop:
+                          b_ops = ops - bucket_start_ops
+                          b_elapsed = now - bucket_start_time
+                          buckets.append({'ops': b_ops, 'elapsed': b_elapsed, 'ops_per_sec': b_ops / b_elapsed if b_elapsed > 0 else 0})
+                          bucket_start_ops = ops
+                          bucket_start_time = now
+                          next_bucket_at = now + bucket_sec
+                      if stop:
+                          break
               final_now = time.perf_counter()
               if final_now > bucket_start_time:
                   b_ops = ops - bucket_start_ops
@@ -165,9 +173,9 @@ stringData:
       - dnf install -y python3-psutil || true
       - |
         touch /tmp/vm_ready
-        end=$((SECONDS+700))
-        while [ $SECONDS -lt $end ]; do
-          if nc -w 900 10.26.8.107 29999 < /dev/null > /dev/null 2>&1; then
+        end=$((SECONDS+900))
+        while ((SECONDS < end)); do
+          if nc -w 900 linstress-barrier-deadbeef 29999 < /dev/null > /dev/null 2>&1; then
             break
           fi
           sleep 0.5

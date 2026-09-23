@@ -1,4 +1,3 @@
-
 import os
 import time
 import yaml
@@ -190,16 +189,23 @@ class TemplateOperations:
             except TemplateSyntaxError as err:
                 raise SyntaxError(f"Error while rendering {template_file}: {err}")
             answer[filename] = f"{template.render(render_data)}"
-            # namespace
-            if os.path.isfile(os.path.join(self.__dir_path, f'namespace_template.yaml')):
-                answer['namespace.yaml'] = render_yaml_file(dir_path=self.__dir_path, yaml_file='namespace_template.yaml', environment_variable_dict=self.__environment_variables_dict)
-            # windows workload
-            if 'win' in self.__workload_name:
-                answer['windows_dv.yaml'] = render_yaml_file(dir_path=os.path.join(workload_dir_path, 'internal_data'), yaml_file='windows_dv_template.yaml', environment_variable_dict=render_data)
-            # vdbench scale
-            if scale and redis and 'vdbench' in self.__workload_name:
-                    answer['redis.yaml'] = render_yaml_file(dir_path=os.path.join(self.__dir_path, 'scale'), yaml_file='redis_template.yaml', environment_variable_dict=self.__environment_variables_dict)
-                    answer['state_signals_exporter_pod.yaml'] = render_yaml_file(dir_path=os.path.join(self.__dir_path, 'scale'), yaml_file='state_signals_exporter_pod_template.yaml', environment_variable_dict=self.__environment_variables_dict)
+        # namespace
+        if os.path.isfile(os.path.join(self.__dir_path, f'namespace_template.yaml')):
+            answer['namespace.yaml'] = render_yaml_file(dir_path=self.__dir_path, yaml_file='namespace_template.yaml', environment_variable_dict=self.__environment_variables_dict)
+        # windows workload
+        if 'win' in self.__workload_name:
+            answer['windows_dv.yaml'] = render_yaml_file(dir_path=os.path.join(workload_dir_path, 'internal_data'), yaml_file='windows_dv_template.yaml', environment_variable_dict=render_data)
+        # vdbench scale
+        if scale and redis and 'vdbench' in self.__workload_name:
+            answer['redis.yaml'] = render_yaml_file(dir_path=os.path.join(self.__dir_path, 'scale'), yaml_file='redis_template.yaml', environment_variable_dict=self.__environment_variables_dict)
+            answer['state_signals_exporter_pod.yaml'] = render_yaml_file(dir_path=os.path.join(self.__dir_path, 'scale'), yaml_file='state_signals_exporter_pod_template.yaml', environment_variable_dict=self.__environment_variables_dict)
+        # linstress network barrier (in-cluster sync pod + services), replaces
+        # the old bastion-hosted podman barrier so the sync point is reachable
+        # from clusters whose run host sits behind a firewall
+        if self.__workload_name == 'linstress':
+            with open(os.path.join(os.path.dirname(benchmark_runner.__file__), 'containers', 'barrier', 'barrier_server.py')) as f:
+                render_data['barrier_server_py'] = f.read().rstrip('\n')
+            answer['linstress_barrier.yaml'] = render_yaml_file(dir_path=os.path.join(workload_dir_path, 'internal_data'), yaml_file='linstress_barrier_template.yaml', environment_variable_dict=render_data)
         for filename, data in answer.items():
             with open(os.path.join(self.__run_artifacts_path, filename), 'w') as f:
                 f.write(data)

@@ -5,7 +5,7 @@ import sys
 port = int(sys.argv[1])
 vm_count = int(sys.argv[2])
 timeout = int(sys.argv[3])
-result_path = sys.argv[4]
+result_path = sys.argv[4] if len(sys.argv) > 4 else ''
 
 srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -25,13 +25,13 @@ try:
             conns.append(conn)
         except socket.timeout:
             break
-    for c in conns:
-        try:
-            c.close()
-        except Exception:
-            pass
 finally:
     srv.close()
 
-with open(result_path, 'w') as f:
-    f.write(str(len(conns)))
+if result_path:
+    with open(result_path, 'w') as f:
+        f.write(str(len(conns)))
+
+# Printed as the last line so callers without a shared filesystem (e.g. a
+# Kubernetes pod, whose result is read back via `oc logs`) can parse it.
+print(f'BARRIER_RESULT:{len(conns)}')
