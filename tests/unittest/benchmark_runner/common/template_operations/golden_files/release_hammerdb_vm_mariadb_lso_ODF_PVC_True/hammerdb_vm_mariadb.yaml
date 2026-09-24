@@ -145,6 +145,9 @@ spec:
         cpu:
           sockets: 1
           cores: 2
+        ioThreadsPolicy: supplementalPool
+        ioThreads:
+          supplementalPoolThreadCount: 2
         devices:
           disks:
             - disk:

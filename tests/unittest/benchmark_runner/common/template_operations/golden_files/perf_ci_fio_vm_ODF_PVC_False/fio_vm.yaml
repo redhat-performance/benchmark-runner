@@ -55,6 +55,9 @@ spec:
           sockets: 2
           cores: 1
           threads: 1
+        ioThreadsPolicy: supplementalPool
+        ioThreads:
+          supplementalPoolThreadCount: 8
         devices:
           disks:
             - disk:
