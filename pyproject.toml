@@ -38,7 +38,7 @@ dependencies = [
     "openshift-client==1.0.17",
     "prometheus-api-client==0.5.1",
     "pandas",
-    "paramiko==3.4.0",
+    "paramiko==5.0.0",
     "PyGitHub==1.55",
     "PySocks>=1.7.1",
     "PyYAML==6.0.1",
