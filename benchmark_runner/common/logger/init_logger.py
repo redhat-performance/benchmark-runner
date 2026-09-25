@@ -16,8 +16,12 @@ if not os.path.isdir(run_artifacts_path):
     os.makedirs(run_artifacts, exist_ok=True)
     os.mkdir(run_artifacts_path)
 fileHandler = logging.FileHandler(filename=f'{run_artifacts_path}/benchmark_runner.log', mode='w+')
+_formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+handler.setFormatter(_formatter)
+fileHandler.setFormatter(_formatter)
 logger.addHandler(handler)
 logger.addHandler(fileHandler)
+logger.setLevel(logging.INFO)
 
 
 def get_log_path():
