@@ -408,7 +408,8 @@ class OC(SSH):
         This method checks if cnv operator is installed
         :return:
         """
-        verify_cmd = f"{self._cli} get csv -n openshift-cnv -o jsonpath='{{.items[0].status.phase}}'"
+        # Check specifically for kubevirt-hyperconverged operator, not just the first CSV alphabetically
+        verify_cmd = f"{self._cli} get csv -n openshift-cnv -o jsonpath='{{.items[?(@.spec.displayName==\"OpenShift Virtualization\")].status.phase}}'"
         if 'Succeeded' in self.run(verify_cmd):
             return True
         return False
