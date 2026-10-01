@@ -41,7 +41,7 @@ class PrometheusMetricsOperation:
             with openshift.project('openshift-monitoring'):
                 return f"https://{openshift.selector(['route/prometheus-k8s']).objects()[0].as_dict()['spec']['host']}"
         except Exception as err:
-            raise f'Unable to retrieve prometheus-k8s route: {err}'
+            raise Exception(f'Unable to retrieve prometheus-k8s route: {err}')
 
     def __get_prometheus_token(self):
         """
@@ -51,7 +51,7 @@ class PrometheusMetricsOperation:
         try:
             return f'Bearer {self.__get_prometheus_token_by_version()}'
         except Exception as err:
-            raise f'Unable to retrieve prometheus-k8s token: {err}'
+            raise Exception(f'Unable to retrieve prometheus-k8s token: {err}')
 
     @staticmethod
     def __get_prometheus_token_by_version():
@@ -82,7 +82,7 @@ class PrometheusMetricsOperation:
                     return datetime.datetime.fromtimestamp(float(result.out()))
             except Exception as err:
                 if retries <= 0:
-                    raise f'Unable to retrieve date: {err}'
+                    raise Exception(f'Unable to retrieve date: {err}')
                 else:
                     time.sleep(5)
 
@@ -149,7 +149,7 @@ class PrometheusMetricsOperation:
                     metric_result = (self.__prometheus.custom_query(metric['query']))
                 self.__metric_results[metric['metricName']] = metric_result
             except Exception as err:
-                raise f"Query {metric['metricName']} ({metric['query']}) failed: {err}"
+                raise Exception(f"Query {metric['metricName']} ({metric['query']}) failed: {err}")
         return self.__metric_results
 
     #  @todo TBD: verify before uploading if it visualize correctly
