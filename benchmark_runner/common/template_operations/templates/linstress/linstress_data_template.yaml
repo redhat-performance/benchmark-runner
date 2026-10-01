@@ -11,7 +11,10 @@ template_data:
     stress_cpu: 100
     stress_memory: 50
     stress_duration: 600
+    mem_buffer_mb: 1024
     guest_memory: ''
+    barrier_timeout: 900
+    barrier_container_image: registry.access.redhat.com/ubi9/python-311:latest
   run_type:
     perf_ci:
       requests_memory: 32Gi
