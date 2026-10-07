@@ -69,7 +69,7 @@ class LinstressVm(BootstormVM):
         except Exception as err:
             logger.warning(f'Failed to save VM artifacts for {self._get_vm_name(vm_num)}: {err}')
 
-    def _run_barrier_server(self, vm_count, port=29999, timeout=900):
+    def _run_barrier_server(self, vm_count, port=29999, timeout=3600):
         barrier_yaml = os.path.join(self._run_artifacts_path, 'linstress_barrier.yaml')
         pod_name = f'linstress-barrier-{self._trunc_uuid}'
         sync_namespace = 'linstress-sync'
@@ -175,6 +175,7 @@ class LinstressVm(BootstormVM):
                 'total_memory_mb': report.get('config', {}).get('total_memory_mb', 0),
                 'run_start_time_utc': report.get('config', {}).get('run_start_time_utc', ''),
                 'run_end_time_utc': report.get('config', {}).get('run_end_time_utc', ''),
+                'stress_start_time_utc': report.get('config', {}).get('stress_start_time_utc', ''),
                 'total_ops': report.get('throughput', {}).get('total_ops', 0),
                 'total_ops_per_sec': report.get('throughput', {}).get('total_ops_per_sec', 0),
                 'avg_ops_per_cpu': report.get('throughput', {}).get('avg_ops_per_cpu', 0),

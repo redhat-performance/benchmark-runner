@@ -16,19 +16,49 @@ stringData:
     {%- endif %}
     packages:
       - python3-psutil
+      - python3-numpy
     write_files:
       - path: /tmp/stress.py
         permissions: '0755'
         content: |
-          import multiprocessing, time, psutil, json, datetime
+          import multiprocessing, time, psutil, json, datetime, socket
+          import numpy as np
 
           MEM_BUFFER_MB = {{ mem_buffer_mb }}
+          BLOCK_BYTES = {{ block_bytes | default(64) }}
+          STRIDE = {{ stride | default(1111) }}
 
-          def burn_cpu(d, result_dict, idx, bucket_sec=10):
-              size = MEM_BUFFER_MB * 1024 * 1024
-              buf = bytearray(b'a')
-              buf *= size
-              counter = 0
+          def wait_barrier(host, port, timeout):
+              deadline = time.time() + timeout
+              while time.time() < deadline:
+                  try:
+                      s = socket.create_connection((host, port), timeout=30)
+                      s.settimeout(max(1, deadline - time.time()))
+                      s.recv(1)
+                      s.close()
+                      return True
+                  except Exception:
+                      time.sleep(0.5)
+              return False
+
+          def burn_cpu(d, result_dict, idx, ready, go, bucket_sec=10):
+              size = (MEM_BUFFER_MB * 1024 * 1024) // 8
+              block_size = max(1, BLOCK_BYTES // 8)
+              stride = STRIDE
+              if stride <= block_size:
+                  stride = block_size * 8 + 1
+              if stride % 2 == 0:
+                  stride += 1
+              rng = np.random.default_rng()
+              array = rng.integers(0, (1 << 64) - 1, size=size, dtype=np.uint64)
+              dest = np.zeros(size, dtype=np.uint64)
+              dest[:] = 1
+              batch = max(1, 65536 // block_size)
+              bytes_per_copy = block_size * 8
+              with ready.get_lock():
+                  ready.value += 1
+              go.wait()
+              stress_start = datetime.datetime.utcnow().isoformat()
               start = time.perf_counter()
               end = start + d
               ops = 0
@@ -36,36 +66,32 @@ stringData:
               next_bucket_at = start + bucket_sec
               bucket_start_ops = 0
               bucket_start_time = start
-              chunk = 1024 * 1024
+              c = 0
               stop = False
               while not stop:
-                  for chunk_start in range(0, size, chunk):
-                      chunk_end = min(chunk_start + chunk, size)
-                      for i in range(chunk_start, chunk_end):
-                          buf[i] = (counter ^ (counter >> 8) ^ (counter >> 16) ^ (counter >> 24)) & 0xff
-                          counter += 1
-                      ops += chunk_end - chunk_start
-                      now = time.perf_counter()
-                      if now >= end:
-                          stop = True
-                      if now >= next_bucket_at or stop:
-                          b_ops = ops - bucket_start_ops
-                          b_elapsed = now - bucket_start_time
-                          buckets.append({'ops': b_ops, 'elapsed': b_elapsed, 'ops_per_sec': b_ops / b_elapsed if b_elapsed > 0 else 0})
-                          bucket_start_ops = ops
-                          bucket_start_time = now
-                          next_bucket_at = now + bucket_sec
-                      if stop:
-                          break
+                  for _ in range(batch):
+                      dest[c:c + block_size] = array[c:c + block_size]
+                      c = (c + stride) % size
+                  ops += batch * bytes_per_copy
+                  now = time.perf_counter()
+                  if now >= end:
+                      stop = True
+                  if now >= next_bucket_at or stop:
+                      b_ops = ops - bucket_start_ops
+                      b_elapsed = now - bucket_start_time
+                      buckets.append({'ops': b_ops, 'elapsed': b_elapsed, 'ops_per_sec': b_ops / b_elapsed if b_elapsed > 0 else 0})
+                      bucket_start_ops = ops
+                      bucket_start_time = now
+                      next_bucket_at = now + bucket_sec
               final_now = time.perf_counter()
               if final_now > bucket_start_time:
                   b_ops = ops - bucket_start_ops
                   b_elapsed = final_now - bucket_start_time
                   buckets.append({'ops': b_ops, 'elapsed': b_elapsed, 'ops_per_sec': b_ops / b_elapsed if b_elapsed > 0 else 0})
               elapsed = time.perf_counter() - start
-              result_dict[idx] = {'ops': ops, 'elapsed': elapsed, 'ops_per_sec': ops / elapsed, 'buckets': buckets}
+              result_dict[idx] = {'ops': ops, 'elapsed': elapsed, 'ops_per_sec': ops / elapsed, 'buckets': buckets, 'stress_start_utc': stress_start}
 
-          def burn_memory(target_percent, duration):
+          def burn_memory(target_percent, duration, go=None):
               total = psutil.virtual_memory().total
               target_bytes = int(total * target_percent / 100)
               current_used = psutil.virtual_memory().used
@@ -82,6 +108,8 @@ stringData:
                   allocated += size
                   print(f'Allocated {allocated // (1024*1024)}MB / {alloc_bytes // (1024*1024)}MB ({psutil.virtual_memory().percent}%)')
               print(f'Memory at {psutil.virtual_memory().percent}%, holding for {duration}s...')
+              if go is not None:
+                  go.wait()
               time.sleep(duration)
 
           if __name__ == '__main__':
@@ -97,17 +125,28 @@ stringData:
               print(f'Memory before: {psutil.virtual_memory().percent}%')
               print(f'CPU before: {psutil.cpu_percent(interval=1)}%')
 
+              ready = multiprocessing.Value('i', 0)
+              go = multiprocessing.Event()
+
               mem_proc = None
               if mem_target > 0:
-                  mem_proc = multiprocessing.Process(target=burn_memory, args=(mem_target, duration))
+                  mem_proc = multiprocessing.Process(target=burn_memory, args=(mem_target, duration, go))
                   mem_proc.start()
                   time.sleep(5)
 
               manager = multiprocessing.Manager()
               result_dict = manager.dict()
 
-              cpu_procs = [multiprocessing.Process(target=burn_cpu, args=(duration, result_dict, i)) for i in range(cpu_count)]
+              cpu_procs = [multiprocessing.Process(target=burn_cpu, args=(duration, result_dict, i, ready, go)) for i in range(cpu_count)]
               [p.start() for p in cpu_procs]
+
+              while ready.value < cpu_count:
+                  time.sleep(0.5)
+              print(f'All {cpu_count} workers allocated, connecting to barrier')
+              wait_barrier('linstress-barrier-{{ trunc_uuid }}', 29999, {{ barrier_timeout }})
+              stress_start_time = datetime.datetime.utcnow().isoformat()
+              go.set()
+              print(f'Barrier released, stress start {stress_start_time}')
 
               intervals = max(1, duration // 30)
               samples = []
@@ -152,7 +191,8 @@ stringData:
                       'total_memory_gb': round(psutil.virtual_memory().total / (1024**3), 1),
                       'total_memory_mb': round(psutil.virtual_memory().total / (1024**2), 1),
                       'run_start_time_utc': run_start_time,
-                      'run_end_time_utc': run_end_time
+                      'run_end_time_utc': run_end_time,
+                      'stress_start_time_utc': stress_start_time
                   },
                   'throughput': {
                       'total_ops': total_ops,
@@ -172,15 +212,9 @@ stringData:
     runcmd:
       - export HOME=/root
       - dnf install -y python3-psutil || true
+      - dnf install -y python3-numpy || pip3 install numpy || true
       - |
         touch /tmp/vm_ready
-        end=$((SECONDS+{{ barrier_timeout }}))
-        while ((SECONDS < end)); do
-          if nc -w 900 linstress-barrier-{{ trunc_uuid }} 29999 < /dev/null > /dev/null 2>&1; then
-            break
-          fi
-          sleep 0.5
-        done
         python3 /tmp/stress.py
 ---
 apiVersion: kubevirt.io/v1

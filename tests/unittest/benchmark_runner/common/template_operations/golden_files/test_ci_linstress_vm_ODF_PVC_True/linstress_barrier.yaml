@@ -62,7 +62,7 @@ spec:
   containers:
     - name: barrier
       image: registry.access.redhat.com/ubi9/python-311:latest
-      command: ["python3", "/barrier/barrier_server.py", "29999", "__BARRIER_VM_COUNT__", "900"]
+      command: ["python3", "/barrier/barrier_server.py", "29999", "__BARRIER_VM_COUNT__", "3600"]
       volumeMounts:
         - name: barrier-script
           mountPath: /barrier
