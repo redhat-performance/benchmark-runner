@@ -28,17 +28,42 @@ stringData:
           BLOCK_BYTES = {{ block_bytes | default(64) }}
           STRIDE = {{ stride | default(1111) }}
 
+          barrier_stats = {'attempts': 0, 'errors': [], 'connected_at': 0, 'released_at': 0, 'start_epoch': 0, 'late_by': 0}
+
           def wait_barrier(host, port, timeout):
               deadline = time.time() + timeout
               while time.time() < deadline:
+                  barrier_stats['attempts'] += 1
                   try:
-                      s = socket.create_connection((host, port), timeout=30)
-                      s.settimeout(max(1, deadline - time.time()))
-                      s.recv(1)
-                      s.close()
-                      return True
-                  except Exception:
-                      time.sleep(0.5)
+                      s = socket.create_connection((host, port), timeout=10)
+                      if not barrier_stats['connected_at']:
+                          barrier_stats['connected_at'] = time.time()
+                      s.sendall((socket.gethostname() + '\n').encode())
+                      s.settimeout(5)
+                      _buf = b''
+                      while b'\n' not in _buf and len(_buf) < 64:
+                          _c = s.recv(64)
+                          if not _c:
+                              break
+                          _buf += _c
+                      try:
+                          s.close()
+                      except Exception:
+                          pass
+                      _p = _buf.decode(errors='ignore').strip().split()
+                      if len(_p) >= 2 and _p[0] == 'GO':
+                          _t0 = float(_p[1])
+                          barrier_stats['released_at'] = time.time()
+                          barrier_stats['start_epoch'] = _t0
+                          barrier_stats['late_by'] = round(max(0.0, time.time() - _t0), 3)
+                          while time.time() < _t0:
+                              time.sleep(min(0.02, max(0.0, _t0 - time.time())))
+                          return True
+                      time.sleep(1.0)
+                  except Exception as _e:
+                      if len(barrier_stats['errors']) < 20:
+                          barrier_stats['errors'].append(f'{time.time():.1f} {type(_e).__name__}: {_e}')
+                      time.sleep(1.0)
               return False
 
           def burn_cpu(d, result_dict, idx, ready, go, bucket_sec=10):
@@ -143,7 +168,11 @@ stringData:
               while ready.value < cpu_count:
                   time.sleep(0.5)
               print(f'All {cpu_count} workers allocated, connecting to barrier')
+              _steal_before = psutil.cpu_times().steal
+              _t_before = time.time()
               wait_barrier('linstress-barrier-{{ trunc_uuid }}', 29999, {{ barrier_timeout }})
+              _steal_after = psutil.cpu_times().steal
+              _t_after = time.time()
               stress_start_time = datetime.datetime.utcnow().isoformat()
               go.set()
               print(f'Barrier released, stress start {stress_start_time}')
@@ -192,7 +221,16 @@ stringData:
                       'total_memory_mb': round(psutil.virtual_memory().total / (1024**2), 1),
                       'run_start_time_utc': run_start_time,
                       'run_end_time_utc': run_end_time,
-                      'stress_start_time_utc': stress_start_time
+                      'stress_start_time_utc': stress_start_time,
+                      'steal_before_barrier': _steal_before,
+                      'steal_after_barrier': _steal_after,
+                      'barrier_wait_sec': round(_t_after - _t_before, 3),
+                      'barrier_connected_at': barrier_stats['connected_at'],
+                      'barrier_released_at': barrier_stats['released_at'],
+                      'barrier_attempts': barrier_stats['attempts'],
+                      'barrier_errors': barrier_stats['errors'],
+                      'barrier_start_epoch': barrier_stats['start_epoch'],
+                      'barrier_late_by': barrier_stats['late_by']
                   },
                   'throughput': {
                       'total_ops': total_ops,
