@@ -52,7 +52,10 @@ stringData:
                           pass
                       _p = _buf.decode(errors='ignore').strip().split()
                       if len(_p) >= 2 and _p[0] == 'GO':
-                          _t0 = float(_p[1])
+                          _now = time.time()
+                          _t0 = _now + float(_p[2]) if len(_p) >= 3 else float(_p[1])
+                          if _t0 - _now > 120:
+                              _t0 = _now
                           barrier_stats['released_at'] = time.time()
                           barrier_stats['start_epoch'] = _t0
                           barrier_stats['late_by'] = round(max(0.0, time.time() - _t0), 3)
@@ -170,7 +173,7 @@ stringData:
               print(f'All {cpu_count} workers allocated, connecting to barrier')
               _steal_before = psutil.cpu_times().steal
               _t_before = time.time()
-              wait_barrier('linstress-barrier-{{ trunc_uuid }}', 29999, {{ barrier_timeout }})
+              wait_barrier('linstress-barrier-{{ trunc_uuid }}', {{ barrier_port | default(29999) }}, {{ barrier_timeout | default(3600) }})
               _steal_after = psutil.cpu_times().steal
               _t_after = time.time()
               stress_start_time = datetime.datetime.utcnow().isoformat()

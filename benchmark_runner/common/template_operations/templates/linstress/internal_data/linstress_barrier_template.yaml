@@ -28,7 +28,12 @@ spec:
   containers:
     - name: barrier
       image: {{ barrier_container_image | default('registry.access.redhat.com/ubi9/python-311:latest', true) }}
-      command: ["python3", "/barrier/barrier_server.py", "29999", "__BARRIER_VM_COUNT__", "{{ barrier_timeout }}"]
+      command: ["python3", "/barrier/barrier_server.py", "{{ barrier_port | default(29999) }}", "__BARRIER_VM_COUNT__", "{{ barrier_timeout | default(3600) }}"]
+      env:
+        - name: BARRIER_LEAD_SEC
+          value: "{{ barrier_lead_sec | default(15) }}"
+        - name: BARRIER_GRACE_SEC
+          value: "{{ barrier_grace_sec | default(20) }}"
       volumeMounts:
         - name: barrier-script
           mountPath: /barrier
@@ -47,10 +52,10 @@ spec:
   selector:
     app: linstress-barrier-{{ trunc_uuid }}
   ports:
-    - name: tcp-29999
-      port: 29999
+    - name: barrier
+      port: {{ barrier_port | default(29999) }}
       protocol: TCP
-      targetPort: 29999
+      targetPort: {{ barrier_port | default(29999) }}
 ---
 apiVersion: v1
 kind: Service
@@ -61,5 +66,5 @@ spec:
   type: ExternalName
   externalName: linstress-barrier-{{ trunc_uuid }}.linstress-sync.svc.cluster.local
   ports:
-    - name: tcp-29999
-      port: 29999
+    - name: barrier
+      port: {{ barrier_port | default(29999) }}

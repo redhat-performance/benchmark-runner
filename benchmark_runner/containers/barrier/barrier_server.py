@@ -1,12 +1,13 @@
 import socket
 import time
 import sys
+import os
 
 port = int(sys.argv[1])
 vm_count = int(sys.argv[2])
 timeout = int(sys.argv[3])
-result_path = sys.argv[4] if len(sys.argv) > 4 else ''
-LEAD = 15.0
+LEAD = float(os.environ.get('BARRIER_LEAD_SEC', 15))
+GRACE = float(os.environ.get('BARRIER_GRACE_SEC', 20))
 
 srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -23,7 +24,7 @@ while True:
     now = time.time()
     if now - start > timeout:
         break
-    if t0 and now > t0 + 20 and registered.issubset(told):
+    if t0 and now > t0 + GRACE and registered.issubset(told):
         break
     srv.settimeout(1.0)
     try:
@@ -44,7 +45,7 @@ while True:
         if not t0 and len(registered) >= vm_count:
             t0 = time.time() + LEAD
         if t0:
-            conn.sendall(f'GO {t0:.3f}\n'.encode())
+            conn.sendall(f'GO {t0:.3f} {max(0.0, t0 - time.time()):.3f}\n'.encode())
             told.add(ip)
         else:
             conn.sendall(b'WAIT\n')
@@ -56,10 +57,6 @@ while True:
         pass
 
 srv.close()
-
-if result_path:
-    with open(result_path, 'w') as f:
-        f.write(str(len(registered)))
 
 print(f'BARRIER_START_EPOCH:{t0:.3f}')
 print(f'BARRIER_POLLS:{polls}')

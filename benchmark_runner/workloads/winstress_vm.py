@@ -1,6 +1,7 @@
 
 import json
 import os
+import subprocess
 import time
 
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
@@ -83,6 +84,10 @@ class WinstressVm(BootstormVM):
     def _run_stress(self, vm_num: str):
         try:
             vm_name = self._get_vm_name(vm_num)
+            self._virtctl.virtctl_ssh(vm_name=vm_name,
+                                      command=f'powershell -Command "New-Item -ItemType Directory -Force -Path {self.__remote_dir} | Out-Null"',
+                                      namespace=self.__namespace, key_path=self.__ssh_key_path,
+                                      username=self.__username, timeout=300)
             self._scp_to_vm_with_verify(vm_name=vm_name,
                                          local_path=os.path.join(self._run_artifacts_path, '01_run_stress.ps1'),
                                          remote_path=f'{self.__remote_dir}/01_run_stress.ps1')
@@ -112,6 +117,57 @@ class WinstressVm(BootstormVM):
             logger.info(f'Saved VM artifacts for {vm_name}')
         except Exception as err:
             logger.warning(f'Failed to save VM artifacts for {self._get_vm_name(vm_num)}: {err}')
+
+    def _run_barrier_server(self, vm_count, timeout=None):
+        timeout = int(timeout or self._environment_variables_dict.get('barrier_timeout') or 3600)
+        barrier_yaml = os.path.join(self._run_artifacts_path, 'winstress_barrier.yaml')
+        pod_name = f'winstress-barrier-{self._trunc_uuid}'
+        sync_namespace = 'winstress-sync'
+
+        with open(barrier_yaml) as f:
+            rendered = f.read()
+        rendered = rendered.replace('__BARRIER_VM_COUNT__', str(vm_count))
+        with open(barrier_yaml, 'w') as f:
+            f.write(rendered)
+
+        self._oc.create_async(yaml=barrier_yaml)
+
+        released = 0
+        start = time.time()
+        deadline = start + timeout + 60
+        try:
+            while time.time() < deadline:
+                phase = subprocess.run(
+                    ['oc', 'get', 'pod', pod_name, '-n', sync_namespace,
+                     '-o', 'jsonpath={.status.phase}'],
+                    capture_output=True, text=True
+                ).stdout.strip()
+                if phase in ('Succeeded', 'Failed'):
+                    break
+                time.sleep(OC.DELAY)
+            else:
+                logger.warning(f'BARRIER: barrier pod {pod_name} did not complete before timeout')
+
+            logs = subprocess.run(
+                ['oc', 'logs', pod_name, '-n', sync_namespace],
+                capture_output=True, text=True
+            ).stdout
+            for line in logs.splitlines():
+                if line.startswith('BARRIER_RESULT:'):
+                    released = int(line.split(':', 1)[1].strip())
+                    break
+            else:
+                logger.warning('BARRIER: no BARRIER_RESULT line found in barrier pod logs')
+        finally:
+            subprocess.run(['oc', 'delete', 'pod', pod_name, '-n', sync_namespace,
+                            '--ignore-not-found', '--wait=false'], capture_output=True)
+            subprocess.run(['oc', 'delete', 'service', pod_name, '-n', sync_namespace,
+                            '--ignore-not-found', '--wait=false'], capture_output=True)
+            subprocess.run(['oc', 'delete', 'service', pod_name, '-n', self.__namespace,
+                            '--ignore-not-found', '--wait=false'], capture_output=True)
+
+        logger.info(f'BARRIER: {released}/{vm_count} VMs connected, released (elapsed {time.time()-start:.1f}s)')
+        return released
 
     def _collect_results(self, vm_num: str):
         try:
@@ -162,6 +218,22 @@ class WinstressVm(BootstormVM):
                 'stress_memory_percent': report.get('config', {}).get('stress_memory_percent', 0),
                 'duration_sec': report.get('config', {}).get('duration_sec', 0),
                 'total_memory_gb': report.get('config', {}).get('total_memory_gb', 0),
+                'block_bytes': report.get('config', {}).get('block_bytes', 0),
+                'stride': report.get('config', {}).get('stride', 0),
+                'mem_buffer_mb': report.get('config', {}).get('mem_buffer_mb', 0),
+                'run_start_time_utc': report.get('config', {}).get('run_start_time_utc', ''),
+                'run_end_time_utc': report.get('config', {}).get('run_end_time_utc', ''),
+                'stress_start_time_utc': report.get('config', {}).get('stress_start_time_utc', ''),
+                'steal_before_barrier': report.get('config', {}).get('steal_before_barrier', 0),
+                'steal_after_barrier': report.get('config', {}).get('steal_after_barrier', 0),
+                'barrier_wait_sec': report.get('config', {}).get('barrier_wait_sec', 0),
+                'barrier_connected_at': report.get('config', {}).get('barrier_connected_at', 0),
+                'barrier_released_at': report.get('config', {}).get('barrier_released_at', 0),
+                'barrier_attempts': report.get('config', {}).get('barrier_attempts', 0),
+                'barrier_errors': report.get('config', {}).get('barrier_errors', []),
+                'barrier_start_epoch': report.get('config', {}).get('barrier_start_epoch', 0),
+                'barrier_late_by': report.get('config', {}).get('barrier_late_by', 0),
+                'per_cpu': report.get('throughput', {}).get('per_cpu', []),
                 'total_ops': report.get('throughput', {}).get('total_ops', 0),
                 'total_ops_per_sec': report.get('throughput', {}).get('total_ops_per_sec', 0),
                 'avg_ops_per_cpu': report.get('throughput', {}).get('avg_ops_per_cpu', 0),
@@ -240,7 +312,26 @@ class WinstressVm(BootstormVM):
 
             bulks = tuple(self.split_run_bulks(iterable=range(vm_count), limit=threads_limit))
 
-            steps = [self._create_vm, self._prepare_vm, self._run_stress, self._save_vm_artifacts, self._collect_results]
+            self._run_parallel_phases([self._create_vm, self._prepare_vm, self._run_stress, self._save_vm_artifacts], bulks, bulk_sleep)
+
+            all_vm_names = [self._get_vm_name(str(n)) for n in range(vm_count)]
+            ready = 0
+            for _vm in all_vm_names:
+                try:
+                    self._oc.wait_for_vm_status(vm_name=_vm, status=VMStatus.Running, namespace=self.__namespace)
+                    ready += 1
+                except Exception as _e:
+                    logger.warning(f'BARRIER: {_vm} not Running: {_e}')
+            logger.info(f'BARRIER: {ready}/{vm_count} VMs Running before stress start')
+
+            released = self._run_barrier_server(vm_count)
+            logger.info(f'TRIGGER: released {released}/{vm_count} VMs from network barrier')
+            if released < vm_count:
+                logger.warning(f'TRIGGER: WARNING - only {released}/{vm_count} VMs synchronized. '
+                               f'{vm_count - released} VM(s) missed the barrier and will run unsynchronized. '
+                               f'Results for this run are NOT valid for simultaneity analysis.')
+
+            steps = [self._collect_results]
             if self._delete_all:
                 steps.append(self._delete_vm)
             self._run_parallel_phases(steps, bulks, bulk_sleep)

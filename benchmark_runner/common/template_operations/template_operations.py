@@ -199,10 +199,10 @@ class TemplateOperations:
         if scale and redis and 'vdbench' in self.__workload_name:
             answer['redis.yaml'] = render_yaml_file(dir_path=os.path.join(self.__dir_path, 'scale'), yaml_file='redis_template.yaml', environment_variable_dict=self.__environment_variables_dict)
             answer['state_signals_exporter_pod.yaml'] = render_yaml_file(dir_path=os.path.join(self.__dir_path, 'scale'), yaml_file='state_signals_exporter_pod_template.yaml', environment_variable_dict=self.__environment_variables_dict)
-        if self.__workload_name == 'linstress':
+        if self.__workload_name in ('linstress', 'winstress'):
             with open(os.path.join(os.path.dirname(benchmark_runner.__file__), 'containers', 'barrier', 'barrier_server.py')) as f:
                 render_data['barrier_server_py'] = f.read().rstrip('\n')
-            answer['linstress_barrier.yaml'] = render_yaml_file(dir_path=os.path.join(workload_dir_path, 'internal_data'), yaml_file='linstress_barrier_template.yaml', environment_variable_dict=render_data)
+            answer[f'{self.__workload_name}_barrier.yaml'] = render_yaml_file(dir_path=os.path.join(workload_dir_path, 'internal_data'), yaml_file=f'{self.__workload_name}_barrier_template.yaml', environment_variable_dict=render_data)
         for filename, data in answer.items():
             with open(os.path.join(self.__run_artifacts_path, filename), 'w') as f:
                 f.write(data)
