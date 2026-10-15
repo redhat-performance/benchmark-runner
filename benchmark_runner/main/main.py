@@ -1,4 +1,3 @@
-
 import ast  # change string list to list
 from enum import Enum
 import multiprocessing
@@ -27,55 +26,70 @@ logger.setLevel(level=log_level)
 SYSTEM_EXIT_BENCHMARK_FAILED = 1
 SYSTEM_EXIT_UNKNOWN_EXECUTION_TYPE = 2
 
-benchmark_runner_workload = None
-clusterbuster_workload = None
-krknhub_workload = None
-
-environment_variables_dict = environment_variables.environment_variables_dict
-# environment variables data
-provision_user = environment_variables_dict.get('provision_user', '')
-workload = environment_variables_dict.get('workload', '')
-azure_cluster_operation = environment_variables_dict.get('azure_cluster_operation', '')
-ci_status = environment_variables_dict.get('ci_status', '')
-install_ocp_version = environment_variables_dict.get('install_ocp_version', '')
-upgrade_ocp_version = environment_variables_dict.get('upgrade_ocp_version', '')
-kubeadmin_password = environment_variables_dict.get('kubeadmin_password', '')
-odf_version = environment_variables_dict.get('odf_version', '')
-lso_version = environment_variables_dict.get('lso_version', '')
-cnv_version = environment_variables_dict.get('cnv_version', '')
-install_ocp_resources = environment_variables_dict.get('install_ocp_resources', False)
-run_type = environment_variables_dict.get('run_type', '')
-
-is_benchmark_runner_workload = 'benchmark-runner' in (
-    environment_variables.get_workload_namespace(workload), environment_variables_dict.get("runner_type"))
-is_clusterbuster_workload = 'clusterbuster' in (
-    environment_variables.get_workload_namespace(workload), environment_variables_dict.get("runner_type"))
-is_krknhub_workload = 'krknhub' in (
-    environment_variables.get_workload_namespace(workload), environment_variables_dict.get("runner_type"))
-
-# workload name validation
-if workload and not ci_status:
-    if workload not in environment_variables.workloads_list:
-        logger.info(f'Enter valid workload name {environment_variables.workloads_list}')
-        raise Exception(
-            f'Not valid workload name: {workload} \n, choose one from the list: {environment_variables.workloads_list}')
-    # run type validation
-    if run_type not in environment_variables.run_types_list:
-        logger.info(f'Enter valid run type {environment_variables.run_types_list}')
-        raise Exception(
-            f'Invalid run type: {run_type} \n, choose one from the list: {environment_variables.run_types_list}')
-    if is_clusterbuster_workload:
-        clusterbuster_workload = ClusterBusterWorkloads()
-    elif is_krknhub_workload:
-        krknhub_workload = KrknHubWorkloads()
-    elif is_benchmark_runner_workload:
-        benchmark_runner_workload = Workloads()
-
 
 # Define the Enum for cluster operations
 class ClusterOperation(Enum):
     START = 'START'
     STOP = 'STOP'
+
+
+def _evaluate_runtime_configuration():
+    """
+    Read live environment configuration and validate workload/run_type for this
+    invocation. Does not construct workload instances — construction happens only
+    in the workload dispatch branches so non-workload paths (Azure/install/etc.)
+    avoid WorkloadsOperations.__init__ side effects.
+
+    Must run at main() time (not import time) so TemporaryEnvironmentVariables
+    overrides affect dispatch. Also refreshes workload-derived fields (namespace,
+    storage_type, odf_pvc, run_artifacts_path) so they match the live workload.
+    """
+    # Keep derived fields aligned when TemporaryEnvironmentVariables changes workload
+    environment_variables.refresh_workload_derived_fields()
+    environment_variables_dict = environment_variables.environment_variables_dict
+    workload = environment_variables_dict.get('workload', '')
+    ci_status = environment_variables_dict.get('ci_status', '')
+    run_type = environment_variables_dict.get('run_type', '')
+
+    is_benchmark_runner_workload = False
+    is_clusterbuster_workload = False
+    is_krknhub_workload = False
+
+    # workload name validation and actionable dispatch flags
+    if workload and not ci_status:
+        if workload not in environment_variables.workloads_list:
+            logger.info(f'Enter valid workload name {environment_variables.workloads_list}')
+            raise Exception(
+                f'Not valid workload name: {workload} \n, choose one from the list: {environment_variables.workloads_list}')
+        # run type validation
+        if run_type not in environment_variables.run_types_list:
+            logger.info(f'Enter valid run type {environment_variables.run_types_list}')
+            raise Exception(
+                f'Invalid run type: {run_type} \n, choose one from the list: {environment_variables.run_types_list}')
+        # Preserve runner priority: clusterbuster > krknhub > benchmark-runner
+        if 'clusterbuster' in (
+                environment_variables.get_workload_namespace(workload), environment_variables_dict.get("runner_type")):
+            is_clusterbuster_workload = True
+        elif 'krknhub' in (
+                environment_variables.get_workload_namespace(workload), environment_variables_dict.get("runner_type")):
+            is_krknhub_workload = True
+        elif 'benchmark-runner' in (
+                environment_variables.get_workload_namespace(workload), environment_variables_dict.get("runner_type")):
+            is_benchmark_runner_workload = True
+
+    return {
+        'environment_variables_dict': environment_variables_dict,
+        'workload': workload,
+        'azure_cluster_operation': environment_variables_dict.get('azure_cluster_operation', ''),
+        'ci_status': ci_status,
+        'install_ocp_version': environment_variables_dict.get('install_ocp_version', ''),
+        'upgrade_ocp_version': environment_variables_dict.get('upgrade_ocp_version', ''),
+        'install_ocp_resources': environment_variables_dict.get('install_ocp_resources', False),
+        'run_type': run_type,
+        'is_benchmark_runner_workload': is_benchmark_runner_workload,
+        'is_clusterbuster_workload': is_clusterbuster_workload,
+        'is_krknhub_workload': is_krknhub_workload,
+    }
 
 
 @logger_time_stamp
@@ -85,6 +99,7 @@ def azure_cluster_operations(cluster_operation: str):
     @param cluster_operation: START/ STOP
     @return:
     """
+    environment_variables_dict = environment_variables.environment_variables_dict
     azure_operation = AzureOperations(
         azure_clientid=environment_variables_dict.get('azure_clientid', ''),
         azure_secret=environment_variables_dict.get('azure_secret', ''),
@@ -110,6 +125,9 @@ def install_ocp_ibm_cloud(step: str):
     This method runs IBM cloud OCP installation
     :return:
     """
+    environment_variables_dict = environment_variables.environment_variables_dict
+    provision_user = environment_variables_dict.get('provision_user', '')
+    install_ocp_version = environment_variables_dict.get('install_ocp_version', '')
     ibm_operations = IBMOperations(user=provision_user)
     ibm_operations.connect_to_provisioner()
     if step == 'run_ibm_ocp_installer':
@@ -135,6 +153,9 @@ def install_ocp_bare_metal(step: str):
     This method runs Bare Metal OCP installation
     :return:
     """
+    environment_variables_dict = environment_variables.environment_variables_dict
+    provision_user = environment_variables_dict.get('provision_user', '')
+    install_ocp_version = environment_variables_dict.get('install_ocp_version', '')
     bm_operations = BareMetalOperations(user=provision_user)
     bm_operations.connect_to_provisioner()
     if step == 'run_bare_metal_ocp_installer':
@@ -157,6 +178,12 @@ def upgrade_ocp_bare_metal(step: str):
     This method runs Bare Metal OCP upgrade
     :return:
     """
+    environment_variables_dict = environment_variables.environment_variables_dict
+    kubeadmin_password = environment_variables_dict.get('kubeadmin_password', '')
+    upgrade_ocp_version = environment_variables_dict.get('upgrade_ocp_version', '')
+    odf_version = environment_variables_dict.get('odf_version', '')
+    lso_version = environment_variables_dict.get('lso_version', '')
+    cnv_version = environment_variables_dict.get('cnv_version', '')
     bare_metal_operations = BareMetalOperations()
     oc = bare_metal_operations.get_oc(kubeadmin_password=kubeadmin_password)
     if step == 'run_bare_metal_ocp_upgrade':
@@ -182,6 +209,8 @@ def install_resources():
     This method installs OpenShift resources
     :return:
     """
+    environment_variables_dict = environment_variables.environment_variables_dict
+    provision_user = environment_variables_dict.get('provision_user', '')
     bare_metal_operations = BareMetalOperations(user=provision_user)
     bare_metal_operations.connect_to_provisioner()
     install_resources_list = environment_variables_dict.get('install_resources_list', '')
@@ -205,6 +234,8 @@ def update_ci_status():
     This method updates ci status
     :return:
     """
+    environment_variables_dict = environment_variables.environment_variables_dict
+    ci_status = environment_variables_dict.get('ci_status', '')
     ci_minutes_time = environment_variables_dict.get('ci_minutes_time', '')
     benchmark_runner_id = environment_variables_dict.get('benchmark_runner_id', '')
     benchmark_runner = Workloads()
@@ -218,8 +249,8 @@ def run_benchmark_runner_workload():
     This method runs benchmark-runner workload
     :return:
     """
-    # benchmark-runner node selector
-    return benchmark_runner_workload.run()
+    # Construct only on the workload dispatch path
+    return Workloads().run()
 
 
 @logger_time_stamp
@@ -228,8 +259,7 @@ def run_clusterbuster_workload():
     This method runs clusterbuster workload
     :return:
     """
-    # benchmark-runner node selector
-    return clusterbuster_workload.run()
+    return ClusterBusterWorkloads().run()
 
 
 @logger_time_stamp
@@ -238,8 +268,7 @@ def run_krknhub_workload():
     This method runs krknhub workload
     :return:
     """
-    # run krknhub
-    return krknhub_workload.run()
+    return KrknHubWorkloads().run()
 
 
 @logger_time_stamp
@@ -247,6 +276,18 @@ def main():
     """
     MAIN of benchmark-runner framework
     """
+    # Evaluate live configuration at invocation time so TemporaryEnvironmentVariables overrides apply
+    runtime = _evaluate_runtime_configuration()
+    environment_variables_dict = runtime['environment_variables_dict']
+    azure_cluster_operation = runtime['azure_cluster_operation']
+    install_ocp_version = runtime['install_ocp_version']
+    upgrade_ocp_version = runtime['upgrade_ocp_version']
+    install_ocp_resources = runtime['install_ocp_resources']
+    ci_status = runtime['ci_status']
+    is_benchmark_runner_workload = runtime['is_benchmark_runner_workload']
+    is_clusterbuster_workload = runtime['is_clusterbuster_workload']
+    is_krknhub_workload = runtime['is_krknhub_workload']
+
     success = True
     # START/ STOP Azure cluster
     if azure_cluster_operation:

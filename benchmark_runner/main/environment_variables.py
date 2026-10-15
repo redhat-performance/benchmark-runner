@@ -177,35 +177,6 @@ class EnvironmentVariables:
         # winstress/linstress: 'requests_memory' and 'guest_memory' are optional - omit or set to '' to leave them out of the rendered VM resources/domain memory sections
         self._environment_variables_dict['workload_config'] = literal_eval(EnvironmentVariables.get_env('WORKLOAD_CONFIG', '{}'))
 
-        # Set namespace based on workload.
-        # The workload_namespaces dict is the source of truth for where each workload runs.
-        # NAMESPACE env var is only used as a fallback for unknown workloads.
-        base_workload = self._environment_variables_dict['workload'].split('_')[0]
-        if base_workload in self._environment_variables_dict['workload_namespaces']:
-            self._environment_variables_dict['namespace'] = self._environment_variables_dict['workload_namespaces'][base_workload]
-        elif EnvironmentVariables.get_env('NAMESPACE'):
-            self._environment_variables_dict['namespace'] = EnvironmentVariables.get_env('NAMESPACE')
-        else:
-            self._environment_variables_dict['namespace'] = 'benchmark-runner'
-
-        # run workload with odf pvc True/False. True=ODF, False=Ephemeral
-        self._environment_variables_dict['odf_pvc'] = EnvironmentVariables.get_boolean_from_environment('ODF_PVC', True)
-        workload_parts = self._environment_variables_dict['workload'].split('_')
-        if workload_parts[-1] == 'ephemeral':
-            self._environment_variables_dict['storage_type'] = 'ephemeral'
-            self._environment_variables_dict['odf_pvc'] = False
-        elif base_workload == 'hammerdb' or base_workload == 'winmssql':
-            if len(workload_parts) == self.HAMMERDB_LSO_LEN:
-                storage_type = workload_parts[self.HAMMERDB_LSO_LEN - 1]
-                self._environment_variables_dict['storage_type'] = storage_type
-            elif self._environment_variables_dict['odf_pvc']:
-                self._environment_variables_dict['storage_type'] = 'odf'
-            else:
-                self._environment_variables_dict['storage_type'] = 'ephemeral'
-                self._environment_variables_dict['odf_pvc'] = False
-        elif not self._environment_variables_dict['odf_pvc']:
-            self._environment_variables_dict['storage_type'] = 'ephemeral'
-
         # LSO Disk id - auto-detect when located on worker-2, put only the id not full ( i.e. /dev/disk/by-id/{{ lso_disk_id }} )
         self._environment_variables_dict['lso_disk_id'] = EnvironmentVariables.get_env('LSO_DISK_ID', '')
         self._environment_variables_dict['lso_node'] = EnvironmentVariables.get_env('LSO_NODE', '')
@@ -234,10 +205,6 @@ class EnvironmentVariables:
         self._environment_variables_dict['date_key'] = datetime.datetime.now().strftime("%Y/%m/%d")
         self._environment_variables_dict['time_stamp_format'] = os.path.join(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d-%H-%M-%S'))
         # Benchmark runner local run artifacts path with time stamp format
-
-        self._environment_variables_dict['run_artifacts_path'] = EnvironmentVariables.get_env('RUN_ARTIFACTS_PATH')
-        if not self._environment_variables_dict['run_artifacts_path']:
-            self._environment_variables_dict['run_artifacts_path'] = os.path.join(self._environment_variables_dict['run_artifacts'],f"{self._environment_variables_dict['workload'].replace('_', '-')}-{self._environment_variables_dict['time_stamp_format']}")
 
         # True/False: default False
         self._environment_variables_dict['save_artifacts_local'] = EnvironmentVariables.get_boolean_from_environment('SAVE_ARTIFACTS_LOCAL', False)
@@ -408,10 +375,64 @@ class EnvironmentVariables:
         # OpenShift or kubernetes support, OpenShift: oc, kubectl || kubernetes: kubectl
         if self._environment_variables_dict['cluster'] == 'kubernetes':
             self._environment_variables_dict['cli'] = 'kubectl'
-            self._environment_variables_dict['odf_pvc'] = False
             self._environment_variables_dict['enable_prometheus_snapshot'] = None
         else:
             self._environment_variables_dict['cli'] = EnvironmentVariables.get_env('CLI', 'oc')
+
+        # Derive namespace / storage / artifacts from workload after base fields exist
+        self.refresh_workload_derived_fields()
+
+    def refresh_workload_derived_fields(self):
+        """
+        Recompute fields derived from the current workload value.
+
+        EnvironmentVariables.__init__ sets these once from the process WORKLOAD.
+        Call again after TemporaryEnvironmentVariables (or other) updates workload
+        so namespace, storage_type, odf_pvc, and run_artifacts_path stay consistent
+        with the live workload. template_in_workload_dir is env-driven
+        (TEMPLATE_IN_WORKLOAD_DIR), not recomputed from workload.
+        """
+        env = self._environment_variables_dict
+        workload = env.get('workload', '')
+        base_workload = workload.split('_')[0]
+
+        # Explicit NAMESPACE (env/CLI) overrides the hard-coded workload mapping.
+        # Otherwise use workload_namespaces; default to benchmark-runner.
+        explicit_namespace = EnvironmentVariables.get_env('NAMESPACE')
+        if explicit_namespace:
+            env['namespace'] = explicit_namespace
+        elif base_workload in env.get('workload_namespaces', {}):
+            env['namespace'] = env['workload_namespaces'][base_workload]
+        else:
+            env['namespace'] = 'benchmark-runner'
+
+        # run workload with odf pvc True/False. True=ODF, False=Ephemeral
+        env['odf_pvc'] = EnvironmentVariables.get_boolean_from_environment('ODF_PVC', True)
+        env.pop('storage_type', None)
+        workload_parts = workload.split('_')
+        if workload_parts[-1] == 'ephemeral':
+            env['storage_type'] = 'ephemeral'
+            env['odf_pvc'] = False
+        elif base_workload == 'hammerdb' or base_workload == 'winmssql':
+            if len(workload_parts) == self.HAMMERDB_LSO_LEN:
+                storage_type = workload_parts[self.HAMMERDB_LSO_LEN - 1]
+                env['storage_type'] = storage_type
+            elif env['odf_pvc']:
+                env['storage_type'] = 'odf'
+            else:
+                env['storage_type'] = 'ephemeral'
+                env['odf_pvc'] = False
+        elif not env['odf_pvc']:
+            env['storage_type'] = 'ephemeral'
+
+        env['run_artifacts_path'] = EnvironmentVariables.get_env('RUN_ARTIFACTS_PATH')
+        if not env['run_artifacts_path']:
+            env['run_artifacts_path'] = os.path.join(
+                env['run_artifacts'],
+                f"{workload.replace('_', '-')}-{env['time_stamp_format']}")
+
+        if env.get('cluster') == 'kubernetes':
+            env['odf_pvc'] = False
 
     @property
     def workloads_list(self):
