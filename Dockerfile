@@ -1,6 +1,6 @@
 FROM quay.io/centos/centos:stream10
 
-ARG python_version=3.14
+ARG python_version=3.15
 ARG OCP_CLIENT_VERSION
 ARG VIRTCTL_VERSION
 ARG OPENSHIFT_MIRROR_VERSION=v5
