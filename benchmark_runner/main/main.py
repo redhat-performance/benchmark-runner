@@ -11,7 +11,6 @@ warnings.filterwarnings("ignore", category=CryptographyDeprecationWarning)
 from benchmark_runner.main.environment_variables import *
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 from benchmark_runner.workloads.workloads import Workloads
-from benchmark_runner.main.environment_variables import environment_variables
 from benchmark_runner.common.clouds.Azure.azure_operations import AzureOperations
 from benchmark_runner.common.clouds.IBM.ibm_operations import IBMOperations
 from benchmark_runner.common.clouds.BareMetal.bare_metal_operations import BareMetalOperations
