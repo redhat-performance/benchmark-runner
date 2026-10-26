@@ -36,7 +36,7 @@ python -m benchmark_runner.main.main
 ## Branch and Release Rules
 
 - **Never commit directly to `main`** — always create a feature branch first, then open a PR.
-- **Use `/release` to release** — never manually edit the version in `pyproject.toml` or run `bumpversion` outside the `/release` skill.
+- **Use `/release` to release** — never manually edit the version in `pyproject.toml` or run `bump-my-version` outside the `/release` skill.
 
 ## Before Every Push
 

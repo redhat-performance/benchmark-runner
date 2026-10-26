@@ -308,14 +308,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.AUTOPUSH }}
         run: |
-          pip install bumpversion
-          version=$(python3 -c "import tomllib; print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")
+          pip install bump-my-version
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
           git config pull.rebase false  # merge (the default strategy)
-          bumpversion patch
           # GITHUB_REPOSITORY already taken => GIT_REPOSITORY
-          git commit .bumpversion.cfg pyproject.toml -m "bump version to exist version v${version} [skip ci]"
+          bump-my-version bump patch --commit -m "bump version to v{new_version} [skip ci]"
           git pull origin HEAD --no-rebase  # fetch & merge remote changes
           git push origin HEAD
 
