@@ -27,10 +27,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v6
-    - name: Set up Python 3.14
+    - name: Set up Python 3.15
       uses: actions/setup-python@v6
       with:
-        python-version: 3.14
+        python-version: 3.15
     - name: 🔨 Build and publish distribution 📦 to PyPI
       env:
         TWINE_USERNAME: __token__
@@ -47,10 +47,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v6
-    - name: Set up Python 3.14
+    - name: Set up Python 3.15
       uses: actions/setup-python@v6
       with:
-        python-version: 3.14
+        python-version: 3.15
     - name: Validate upload to PyPI
       env:
         TWINE_USERNAME: __token__
@@ -90,10 +90,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - name: Set up Python 3.14
+      - name: Set up Python 3.15
         uses: actions/setup-python@v6
         with:
-          python-version: 3.14
+          python-version: 3.15
       - name: ⌛ Build and Upload 🐋 to quay.io
         run: |
           version=$(python3 -c "import tomllib; print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")
@@ -111,10 +111,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - name: Set up Python 3.14
+      - name: Set up Python 3.15
         uses: actions/setup-python@v6
         with:
-          python-version: 3.14
+          python-version: 3.15
       - name: ⌛ Build and Upload 🐋 to quay.io
         run: |
           sudo docker build --build-arg OCP_CLIENT_VERSION=${{ secrets.PERF_OCP_CLIENT_VERSION }} --build-arg VIRTCTL_VERSION=${{ secrets.PERF_VIRTCTL_VERSION }} -t ${{ secrets.QUAY_BENCHMARK_RUNNER_REPOSITORY }}:latest .
@@ -129,7 +129,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [ '3.14' ]
+        python-version: [ '3.15' ]
     steps:
       - uses: actions/checkout@main
         with:
