@@ -27,7 +27,7 @@ dependencies = [
     "botocore==1.41.0",
     "cryptography==50.0.0",
     "elasticsearch==7.17.13",
-    "elasticsearch-dsl==7.4.0",
+    "elasticsearch-dsl==7.4.1",
     "google-auth==2.30.0",
     "google-auth-httplib2==0.2.0",
     "google-auth-oauthlib==1.2.0",
