@@ -301,6 +301,12 @@ class EnvironmentVariables:
         self._environment_variables_dict['quay_password'] = EnvironmentVariables.get_env('QUAY_PASSWORD', '')
         # lso version
         self._environment_variables_dict['lso_version'] = EnvironmentVariables.get_env('LSO_VERSION', '')
+        # lvms (LVM Storage) version - must be set to install/upgrade LVMS
+        self._environment_variables_dict['lvms_version'] = EnvironmentVariables.get_env('LVMS_VERSION', '')
+        # comma-separated NVMe devices used by the LVMS thin pool
+        self._environment_variables_dict['lvms_device_paths'] = EnvironmentVariables.get_env('LVMS_DEVICE_PATHS', '')
+        # name of the LVMCluster CR created by the installer
+        self._environment_variables_dict['lvms_cluster_name'] = EnvironmentVariables.get_env('LVMS_CLUSTER_NAME', 'lvms-nvme')
         # odf version
         self._environment_variables_dict['odf_version'] = EnvironmentVariables.get_env('ODF_VERSION', '')
         self._environment_variables_dict['odf_catalog_image'] = EnvironmentVariables.get_env('ODF_CATALOG_IMAGE', '')
@@ -310,7 +316,7 @@ class EnvironmentVariables:
         self._environment_variables_dict['num_odf_disk'] = EnvironmentVariables.get_env('NUM_ODF_DISK', 4)
         self._environment_variables_dict['worker_disk_ids'] = EnvironmentVariables.get_env('WORKER_DISK_IDS', "")
         self._environment_variables_dict['worker_disk_prefix'] = EnvironmentVariables.get_env('WORKER_DISK_PREFIX', '')
-        # install resources list "[ 'lso', 'odf', 'cnv', 'infra', 'custom', 'kata', 'nhc_far' ]"
+        # install resources list "[ 'lso', 'odf', 'lvms', 'cnv', 'infra', 'custom', 'kata', 'nhc_far' ]"
         self._environment_variables_dict['install_resources_list'] = EnvironmentVariables.get_env('INSTALL_RESOURCES_LIST', "")
         # for 'nhc_far' operator
         self._environment_variables_dict['bmc_user'] = EnvironmentVariables.get_env('BMC_USER', '')

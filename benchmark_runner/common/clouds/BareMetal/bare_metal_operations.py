@@ -289,7 +289,7 @@ class BareMetalOperations:
             return True
 
     def is_cluster_upgraded(self, oc: OC, cnv_version: str = None, odf_version: str = None,
-                            lso_version: str = None) -> bool:
+                            lso_version: str = None, lvms_version: str = None) -> bool:
         """
         Checks if the cluster and the specified operators were successfully upgraded.
 
@@ -297,6 +297,7 @@ class BareMetalOperations:
         :param cnv_version: (Optional) Target CNV operator version
         :param odf_version: (Optional) Target ODF operator version
         :param lso_version: (Optional) Target LSO operator version
+        :param lvms_version: (Optional) Target LVMS operator version
         :return: True if the upgrade (cluster + specified operators) is successful, otherwise False
         """
         if oc.get_upgrade_version() != self._upgrade_ocp_version:
@@ -307,6 +308,7 @@ class BareMetalOperations:
             "cnv": (cnv_version, "openshift-cnv", "kubevirt-hyperconverged-operator"),
             "odf": (odf_version, "openshift-storage", "odf-operator"),
             "lso": (lso_version, "openshift-local-storage", "local-storage-operator"),
+            "lvms": (lvms_version, "openshift-storage", "lvms-operator"),
         }
 
         upgrade_checks = [
@@ -376,7 +378,7 @@ class BareMetalOperations:
     @typechecked
     def install_ocp_resources(resources: list, upgrade_version: str = None):
         """
-        This method installs OCP resources 'cnv', 'lso', 'odf'
+        This method installs OCP resources 'cnv', 'lso', 'odf', 'lvms'
         :param resources:
         :param upgrade_version: upgrade version, default None
         :return:
