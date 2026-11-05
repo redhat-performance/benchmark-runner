@@ -11,6 +11,9 @@ pipeline {
         ODF_VERSION = credentials('perfci_odf_version')
         ODF_CATALOG_IMAGE = credentials('perfci_odf_catalog_image')
         LSO_VERSION = credentials('perfci_lso_version')
+        LVMS_VERSION = credentials('perfci_lvms_version')
+        // NVMe devices dedicated to LVMS, never the ODF disks: the installer runs wipefs on these
+        LVMS_DEVICE_PATHS = credentials('perfci_lvms_devices')
         EXPECTED_NODES = credentials('perfci_expected_nodes')
         QUAY_BENCHMARK_RUNNER_REPOSITORY = credentials('perfci_quay_repository')
         KUBEADMIN_PASSWORD = readFile('/home/jenkins/.kube/kubeadmin-password').trim()
@@ -126,7 +129,7 @@ END
         steps {
             script {
                 // cnv first for “-virtualization” storage class name for Win bootstorm
-                def resources = ['cnv', 'lso', 'odf', 'infra', 'custom']
+                def resources = ['cnv', 'lso', 'odf', 'lvms', 'infra', 'custom']
 
                 for (resource in resources) {
                     echo "Run Operator Deployment for ${resource}"
@@ -148,6 +151,8 @@ END
                                                             -e EXPECTED_NODES='${EXPECTED_NODES}' \
                                                             -e CNV_VERSION='${CNV_VERSION}' \
                                                             -e LSO_VERSION='${LSO_VERSION}' \
+                                                            -e LVMS_VERSION='${LVMS_VERSION}' \
+                                                            -e LVMS_DEVICE_PATHS='${LVMS_DEVICE_PATHS}' \
                                                             -e ODF_VERSION='${ODF_VERSION}' \
                                                             -e ODF_CATALOG_IMAGE='${env.ODF_CATALOG_IMAGE ?: ''}' \
                                                             -e NUM_ODF_DISK='${NUM_ODF_DISK}' \

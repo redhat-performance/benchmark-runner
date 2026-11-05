@@ -5,6 +5,7 @@ from jinja2 import Template
 from benchmark_runner.common.oc.oc import OC
 from benchmark_runner.main.environment_variables import environment_variables
 from benchmark_runner.common.ocp_resources.create_lso import CreateLSO
+from benchmark_runner.common.ocp_resources.create_lvms import CreateLVMS
 from benchmark_runner.common.ocp_resources.create_odf import CreateODF
 from benchmark_runner.common.ocp_resources.create_kata import CreateKata
 from benchmark_runner.common.ocp_resources.create_cnv import CreateCNV
@@ -28,6 +29,9 @@ class CreateOCPResource:
         self.__lso_disk_id = self.__environment_variables_dict.get('lso_disk_id', '')
         self.__lso_node = self.__environment_variables_dict.get('lso_node', '')
         self.__ceph_version = self.__environment_variables_dict.get('ceph_version', '')
+        self.__lvms_version = self.__environment_variables_dict.get('lvms_version', '')
+        self.__lvms_cluster_name = self.__environment_variables_dict.get('lvms_cluster_name', '')
+        self.__lvms_device_paths = [device.strip() for device in self.__environment_variables_dict.get('lvms_device_paths', '').split(',') if device.strip()]
         if self.__worker_disk_ids:
             if self.__worker_disk_ids:
                 # Solved GitHub Actions issue that env variable detect as string instead of dict/ list -skip for Jenkins
@@ -93,6 +97,9 @@ class CreateOCPResource:
         elif 'odf' == resource:
             create_odf = CreateODF(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files, worker_disk_ids=self.__worker_disk_ids, worker_disk_prefix=self.__worker_disk_prefix, odf_catalog_image=self.__environment_variables_dict.get('odf_catalog_image', ''))
             create_odf.create_odf(upgrade_version)
+        elif 'lvms' == resource:
+            create_lvms = CreateLVMS(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files, lvms_version=self.__lvms_version, lvms_device_paths=self.__lvms_device_paths, lvms_cluster_name=self.__lvms_cluster_name)
+            create_lvms.create_lvms(upgrade_version)
         elif 'kata' == resource:
             create_kata = CreateKata(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files)
             create_kata.create_kata()
