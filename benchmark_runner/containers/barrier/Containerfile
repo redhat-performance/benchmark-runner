@@ -1,0 +1,4 @@
+FROM registry.fedoraproject.org/fedora:43
+RUN dnf install -y python3 && dnf clean all
+COPY barrier_server.py /barrier_server.py
+ENTRYPOINT ["python3", "/barrier_server.py"]
