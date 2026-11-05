@@ -12,10 +12,12 @@ class SingletonOCLogin:
     _lock = threading.Lock()  # Create a class-level lock
 
     def __new__(cls, oc_instance):
+        '''Return the singleton only after authentication succeeds.'''
         with cls._lock:  # Acquire the lock for instance creation
             if cls._instance is None:
-                cls._instance = super(SingletonOCLogin, cls).__new__(cls)
-                cls._instance.__init_instance(oc_instance)
+                instance = super(SingletonOCLogin, cls).__new__(cls)
+                instance.__init_instance(oc_instance)
+                cls._instance = instance
             return cls._instance
 
     def __init_instance(self, oc_instance):
@@ -28,19 +30,30 @@ class SingletonOCLogin:
         self.DELAY = oc_instance.DELAY
 
         # Attempt to log in during initialization
-        try:
-            self._login()
-        except RuntimeError as e:
-            logger.error(f"Initialization failed: {e}")
-            # Handle the exception as needed (e.g., re-raise, log, etc.)
+        self._login()
 
     @logger_time_stamp
     def _login(self):
+        '''Validate an admin context or log in with a password and retries.'''
         # Check for empty or whitespace-only password
         if not self._kubeadmin_password or not self._kubeadmin_password.strip():
-            raise LoginFailed(msg="Empty password")
+            try:
+                identity = self.__oc_instance.run(
+                    f'{self._cli} whoami', is_check=True,
+                ).strip()
+            except Exception as error:
+                raise LoginFailed(
+                    msg=('Empty KUBEADMIN_PASSWORD and KUBECONFIG authentication failed.'),
+                ) from error
+            if identity not in (
+                'kube:admin', 'system:admin',
+                b'kube:admin', b'system:admin',
+            ):
+                raise LoginFailed(
+                    msg=('Empty KUBEADMIN_PASSWORD and KUBECONFIG identity is not `kube:admin` or `system:admin`.'),
+                )
+            return True
 
-        """Logs in to the cluster with retries, ensuring only a single login per execution."""
         for attempt in range(self.RETRIES):
             try:
                 if self._kubeadmin_password and self._kubeadmin_password.strip():
