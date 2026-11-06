@@ -55,5 +55,7 @@ template_data:
       run_type:
         perf_ci:
           sockets: 2
+          supplementalPoolThreadCount: 8
         default:
           sockets: 2
+          supplementalPoolThreadCount: 2
