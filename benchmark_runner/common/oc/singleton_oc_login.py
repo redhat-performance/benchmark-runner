@@ -35,26 +35,6 @@ class SingletonOCLogin:
     @logger_time_stamp
     def _login(self):
         '''Validate an admin context or log in with a password and retries.'''
-        # Check for empty or whitespace-only password
-        if not self._kubeadmin_password or not self._kubeadmin_password.strip():
-            try:
-                identity = self.__oc_instance.run(
-                    f'{self._cli} auth whoami -ojsonpath=\'{{.status.userInfo.username}}{{"\\n"}}\'',
-                    is_check=True,
-                ).strip()
-            except Exception as error:
-                raise LoginFailed(
-                    msg=('Empty KUBEADMIN_PASSWORD and KUBECONFIG authentication failed.'),
-                ) from error
-            if identity not in (
-                'kube:admin', 'system:admin',
-                b'kube:admin', b'system:admin',
-            ):
-                raise LoginFailed(
-                    msg=('Empty KUBEADMIN_PASSWORD and KUBECONFIG identity is not `kube:admin` or `system:admin`.'),
-                )
-            return True
-
         for attempt in range(self.RETRIES):
             try:
                 if self._kubeadmin_password and self._kubeadmin_password.strip():
@@ -63,9 +43,31 @@ class SingletonOCLogin:
                         is_check=True
                     )
                     return True  # Success
+                else:   # Empty or whitespace-only password.
+                    try:
+                        identity = self.__oc_instance.run(
+                            f'{self._cli} auth whoami -ojsonpath=\'{{.status.userInfo.username}}{{"\\n"}}\'',
+                            is_check=True,
+                        ).strip()
+                    except Exception as error:
+                        raise LoginFailed(
+                            msg=('Empty KUBEADMIN_PASSWORD and KUBECONFIG authentication failed.'),
+                        ) from error
+                    if identity not in (
+                        'kube:admin', 'system:admin',
+                        b'kube:admin', b'system:admin',
+                    ):
+                        raise LoginFailed(msg=(
+                            'Empty KUBEADMIN_PASSWORD and KUBECONFIG identity is not `kube:admin` or `system:admin`.'
+                        ))
+                    return True
             except Exception as err:
+                if (login_failed := isinstance(err, LoginFailed)) and (err.__cause__ is None):
+                    raise   # Rejected KUBECONFIG identity, do not retry.
                 logger.warning(f"Login attempt {attempt + 1} failed: {err}")
                 if attempt < self.RETRIES - 1:
                     time.sleep(self.DELAY)
+                elif login_failed:
+                    raise
                 else:
-                    raise LoginFailed(msg="Login failed after multiple attempts")
+                    raise LoginFailed(msg="Login failed after multiple attempts") from err
