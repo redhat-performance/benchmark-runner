@@ -48,15 +48,15 @@ class SingletonOCLogin:
                         identity = self.__oc_instance.run(
                             f'{self._cli} auth whoami -ojsonpath=\'{{.status.userInfo.username}}{{"\\n"}}\'',
                             is_check=True,
-                        ).strip()
+                        )
+                        if isinstance(identity, bytes):
+                            identity = identity.decode('utf-8')
+                        identity = identity.strip()
                     except Exception as error:
                         raise LoginFailed(
                             msg=('Empty KUBEADMIN_PASSWORD and KUBECONFIG authentication failed.'),
                         ) from error
-                    if identity not in (
-                        'kube:admin', 'system:admin',
-                        b'kube:admin', b'system:admin',
-                    ):
+                    if identity not in ('kube:admin', 'system:admin'):
                         raise LoginFailed(msg=(
                             'Empty KUBEADMIN_PASSWORD and KUBECONFIG identity is not `kube:admin` or `system:admin`.'
                         ))

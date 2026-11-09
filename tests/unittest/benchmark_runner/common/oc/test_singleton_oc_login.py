@@ -180,6 +180,7 @@ def test_oc_rejects_unauthenticated_context(password, identity, mock_sleep):
 
 @pytest.mark.parametrize('response', [
     Exception('Invalid kubeconfig'), RuntimeError('CLI failed'), None,
+    b'\xff\n',
 ])
 def test_oc_retries_failed_context_command(response, mock_sleep):
     '''Retry KUBECONFIG command errors while preserving the error cause.'''
@@ -199,6 +200,8 @@ def test_oc_retries_failed_context_command(response, mock_sleep):
 
     if response is None:
         assert isinstance(failure.value.__cause__, AttributeError)
+    elif isinstance(response, bytes):
+        assert isinstance(failure.value.__cause__, UnicodeDecodeError)
     else:
         assert failure.value.__cause__ is response
     assert SingletonOCLogin._instance is None
