@@ -699,7 +699,7 @@ g.dashboard.new('PerfCI-Regression-Summary')
         + g.panel.row.withId(300)
         + g.panel.row.withPanels([
 
-          g.panel.stateTimeline.new('HammerDB KTPM (Scale)')
+          g.panel.stateTimeline.new('HammerDB KTPM (Scale: avg threads TPM)')
             + stateTimeline.queryOptions.withDatasource('Elasticsearch-hammerdb-results')
             + stateTimeline.withDescription("HammerDB Scale: KTPM per VM\nLinux: hammerdb_vm_mssql_scale\nWindows: winmssql_vm_scale")
             + stateTimeline.standardOptions.color.withMode('thresholds')
