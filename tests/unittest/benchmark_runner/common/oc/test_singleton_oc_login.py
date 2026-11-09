@@ -165,12 +165,17 @@ def test_oc_rejects_unauthenticated_context(password, identity, mock_sleep):
         'benchmark_runner.common.oc.oc.environment_variables.'
         'environment_variables_dict', {'cli': 'oc', 'kubeadmin_password': ''},
     ), patch.object(OC, 'run', return_value=identity) as run:
-        with pytest.raises(
-            LoginFailed, match=('Empty KUBEADMIN_PASSWORD and KUBECONFIG identity '
-                                'is not `kube:admin` or `system:admin`.'),
-        ) as failure:
+        with pytest.raises(LoginFailed) as failure:
             OC(kubeadmin_password=password)
 
+    normalized = (
+        identity.decode('utf-8') if isinstance(identity, bytes) else identity
+    ).strip()
+    assert str(failure.value) == (
+        f'Empty KUBEADMIN_PASSWORD and KUBECONFIG identity {normalized!r} '
+        'is not `kube:admin` or `system:admin`.'
+    )
+    assert '\n' not in str(failure.value)
     assert failure.value.__cause__ is None
     assert failure.value.__context__ is None
     assert SingletonOCLogin._instance is None

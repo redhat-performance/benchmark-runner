@@ -58,7 +58,8 @@ class SingletonOCLogin:
                         ) from error
                     if identity not in ('kube:admin', 'system:admin'):
                         raise LoginFailed(msg=(
-                            'Empty KUBEADMIN_PASSWORD and KUBECONFIG identity is not `kube:admin` or `system:admin`.'
+                            f'Empty KUBEADMIN_PASSWORD and KUBECONFIG identity {identity!r} '
+                            'is not `kube:admin` or `system:admin`.'
                         ))
                     return True
             except Exception as err:
