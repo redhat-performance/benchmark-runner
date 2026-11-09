@@ -202,7 +202,6 @@ fabric.properties
 
 # Terraform
 .terraform
-.terraform.lock.hcl
 terraform.tfstate
 
 # custom file configuration
