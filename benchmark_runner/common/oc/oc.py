@@ -194,7 +194,9 @@ class OC(SSH):
         @param operator_name: str - The name of the operator to search for.
         @return: major version
         """
-        cmd = f"""{self._cli} get csv -n {namespace} -o json | jq -r '.items[] | select(.metadata.name | startswith("{operator_name}")) | .spec.version'"""
+        # Require Succeeded: a Pending or Failed CSV already carries the target version, so a
+        # version-only match would report the operator as installed before it is ready
+        cmd = f"""{self._cli} get csv -n {namespace} -o json | jq -r '.items[] | select(.metadata.name | startswith("{operator_name}")) | select(.status.phase == "Succeeded") | .spec.version'"""
         version = self.run(cmd)
         return '.'.join(version.split('.')[:2])
 
