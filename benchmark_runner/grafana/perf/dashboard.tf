@@ -2,7 +2,7 @@ terraform {
   required_providers {
     jsonnet = {
       source  = "alxrem/jsonnet"
-      version = ">= 2.2.0"
+      version = "2.5.0"
     }
   }
 }

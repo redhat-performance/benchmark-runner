@@ -19,7 +19,7 @@ RUN dnf update -y && \
 # Warm the jsonnet provider into TF_PLUGIN_DIR at build time so the runtime
 # never has to query the provider registry for packages or checksums.
 RUN mkdir -p ${TF_PLUGIN_DIR} /tmp/warm && \
-    printf 'terraform {\n  required_providers {\n    jsonnet = {\n      source  = "alxrem/jsonnet"\n      version = ">= 2.2.0"\n    }\n  }\n}\n' > /tmp/warm/main.tf && \
+    printf 'terraform {\n  required_providers {\n    jsonnet = {\n      source  = "alxrem/jsonnet"\n      version = "2.5.0"\n    }\n  }\n}\n' > /tmp/warm/main.tf && \
     cd /tmp/warm && \
     terraform init -backend=false && \
     cp -r /tmp/warm/.terraform/providers/* ${TF_PLUGIN_DIR}/ && \
