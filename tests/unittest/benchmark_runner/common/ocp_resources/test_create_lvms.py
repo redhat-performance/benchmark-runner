@@ -75,6 +75,8 @@ def test_clean_devices_guards_every_device_before_wiping():
         assert len(checks) == 1
         assert f'findmnt -rn -S {device}' in checks[0]
         assert f'pvs --noheadings -o vg_name --select pv_name={device}' in checks[0]
+        # a PV with no VG prints a whitespace-only vg_name line, which must not be read as a VG
+        assert 'grep -q "[^[:space:]]"' in checks[0]
         assert f"echo '{device} is not a block device'" in checks[0]
         assert f"echo '{device} is mounted'" in checks[0]
         assert f"echo '{device} belongs to a volume group'" in checks[0]

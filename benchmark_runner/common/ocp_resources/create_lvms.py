@@ -135,7 +135,9 @@ class CreateLVMS(CreateOCPResourceOperations):
                 (f'check {device}',
                  f'if test -b {device}; then :; else echo \'{device} is not a block device\' >&2; exit 1; fi; '
                  f'if findmnt -rn -S {device} >/dev/null 2>&1; then echo \'{device} is mounted\' >&2; exit 1; fi; '
-                 f'if pvs --noheadings -o vg_name --select pv_name={device} 2>/dev/null | grep -q .; then '
+                 # A PV without a VG still prints a whitespace-only vg_name line, so match a
+                 # non-space character: only a real VG name must stop the cleanup
+                 f'if pvs --noheadings -o vg_name --select pv_name={device} 2>/dev/null | grep -q "[^[:space:]]"; then '
                  f'echo \'{device} belongs to a volume group\' >&2; exit 1; fi'),
                 (f'remove the PV label from {device}',
                  f'if pvs --noheadings -o pv_name --select pv_name={device} 2>/dev/null | grep -q .; then pvremove -ff {device}; fi'),
