@@ -23,3 +23,10 @@ class ODFInstallationFailed(OCPResourceError):
     def __init__(self):
         self.message = f'ODF installation failed'
         super(ODFInstallationFailed, self).__init__(self.message)
+
+
+class UnknownOCPResource(OCPResourceError):
+    """This exception returns error for an unsupported OCP resource name"""
+    def __init__(self, resource, supported_resources):
+        self.message = f'Unknown OCP resource {resource!r}: expected one of {supported_resources}'
+        super(UnknownOCPResource, self).__init__(self.message)
