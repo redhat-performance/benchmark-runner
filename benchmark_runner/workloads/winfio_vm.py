@@ -128,7 +128,7 @@ class WinfioVM(BootstormVM):
             f"$files = Get-ChildItem '{self.__remote_dir}/results/*.json' | "
             "Where-Object { $_.Name -ne 'fio_summary.json' } | "
             'ForEach-Object { $_.FullName }; '
-            f"if ($files) {{ Compress-Archive -Path $files -DestinationPath '{remote_zip}' -Force; echo zipped }} "
+            f"if ($files) {{ Compress-Archive -Path $files -DestinationPath '{remote_zip}' -Force -ErrorAction Stop; echo zipped }} "
             'else { echo no-raw-files }"'
         )
         try:
