@@ -1,7 +1,9 @@
 
 import json
 import os
+import shutil
 import time
+import zipfile
 
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp, logger
 from benchmark_runner.common.elasticsearch.elasticsearch_exceptions import ElasticSearchDataNotUploaded
@@ -113,6 +115,46 @@ class WinfioVM(BootstormVM):
         except Exception as err:
             logger.warning(f'FIO failed on VM {self._get_vm_name(vm_num)}: {err}')
 
+    @logger_time_stamp
+    def _collect_raw_fio_results(self, vm_num: str, vm_name: str):
+        """
+        Package the raw per-job FIO JSON files (results/<bs>_<op>.json) on the VM and copy them
+        into the run artifacts, so they are included in the uploaded tar.gz.
+        """
+        remote_zip = f'{self.__remote_dir}/results/raw_fio_results.zip'
+        local_zip = os.path.join(self._run_artifacts_path, f'{vm_name}-raw_fio_results.zip')
+        zip_cmd = (
+            'powershell -NoProfile -Command "'
+            f"$files = Get-ChildItem '{self.__remote_dir}/results/*.json' | "
+            "Where-Object { $_.Name -ne 'fio_summary.json' } | "
+            'ForEach-Object { $_.FullName }; '
+            f"if ($files) {{ Compress-Archive -Path $files -DestinationPath '{remote_zip}' -Force; echo zipped }} "
+            'else { echo no-raw-files }"'
+        )
+        try:
+            output = self._virtctl.virtctl_ssh(vm_name=vm_name, command=zip_cmd,
+                                               namespace=self.__namespace, key_path=self.__ssh_key_path,
+                                               username=self.__username, timeout=OC.SHORT_TIMEOUT)
+            if not output or 'zipped' not in output:
+                logger.warning(f'No raw FIO JSON files to collect on VM {vm_name}: {output}')
+                return
+            if not self._virtctl._scp_file(vm_name=vm_name, remote_path=remote_zip, local_path=local_zip,
+                                           namespace=self.__namespace, key_path=self.__ssh_key_path,
+                                           username=self.__username):
+                logger.warning(f'Failed to SCP raw FIO results from VM {vm_name}')
+                return
+            raw_dir = os.path.join(self._run_artifacts_path, 'raw_fio_results', vm_name)
+            os.makedirs(raw_dir, exist_ok=True)
+            with zipfile.ZipFile(local_zip) as archive:
+                for member in archive.namelist():
+                    if member.endswith('.json'):
+                        with archive.open(member) as src, open(os.path.join(raw_dir, os.path.basename(member)), 'wb') as dst:
+                            shutil.copyfileobj(src, dst)
+            os.remove(local_zip)
+            logger.info(f'Raw FIO results saved to {raw_dir}')
+        except Exception as err:
+            logger.warning(f'Failed to collect raw FIO results from VM {vm_name}: {err}')
+
     def _collect_results(self, vm_num: str):
         try:
             vm_name = self._get_vm_name(vm_num)
@@ -137,6 +179,8 @@ class WinfioVM(BootstormVM):
                 logger.info(f'run_fio_benchmark.log copied to {local_log_file}')
             else:
                 logger.warning(f'Failed to SCP run_fio_benchmark.log from VM {vm_name}')
+
+            self._collect_raw_fio_results(vm_num=vm_num, vm_name=vm_name)
 
             if not self._virtctl._scp_file(vm_name=vm_name,
                                            remote_path=f'{self.__remote_dir}/results/fio_summary.json',
