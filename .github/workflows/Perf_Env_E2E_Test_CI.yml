@@ -22,6 +22,9 @@ concurrency:
   group: performance-environment
   cancel-in-progress: false
 
+permissions:
+  contents: read
+
 jobs:
 
   ocp_operator_installation:
@@ -36,6 +39,14 @@ jobs:
           resource: [ 'custom']
     steps:
       - uses: actions/checkout@v6
+      - name: 🔑 Generate GitHub App token
+        id: github-app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.PERF_GITHUB_APP_ID }}
+          private-key: ${{ secrets.PERF_GITHUB_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ github.event.repository.name }}
       - name: Set up Python 3.15
         uses: actions/setup-python@v6
         with:
@@ -82,7 +93,7 @@ jobs:
           QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
           QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
           IBM_API_KEY: ${{ secrets.IBM_API_KEY }}
-          GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
+          GIT_TOKEN: ${{ steps.github-app-token.outputs.token }}
           WORKER_IDS: ${{ secrets.PERF_WORKER_IDS }}
           PROVISION_IP: ${{ secrets.PERF_PROVISION_IP }}
           PROVISION_USER: ${{ secrets.PERF_PROVISION_USER }}
@@ -122,7 +133,7 @@ jobs:
           QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
           QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
           IBM_API_KEY: ${{ secrets.IBM_API_KEY }}
-          GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
+          GIT_TOKEN: ${{ steps.github-app-token.outputs.token }}
           WORKER_IDS: ${{ secrets.PERF_WORKER_IDS }}
           PROVISION_IP: ${{ secrets.PERF_PROVISION_IP }}
           PROVISION_USER: ${{ secrets.PERF_PROVISION_USER }}
@@ -152,3 +163,7 @@ jobs:
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End OCP Resource Install   >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
           end=$(printf '%(%s)T' -1)
           echo "INSTALL_OCP_RESOURCE_MINUTES_TIME=$(( (( end - start )) / 60))" >> "$GITHUB_ENV"
+      - name: 🧹 Remove SSH private key
+        if: always()
+        run: |
+          if [ -n "$PROVISION_PRIVATE_KEY_PATH" ]; then rm -f "$PROVISION_PRIVATE_KEY_PATH"; fi

@@ -13,6 +13,9 @@ concurrency:
   group: performance-environment
   cancel-in-progress: false
 
+permissions:
+  contents: read
+
 jobs:
   ocp_installer:
     name: OCP
@@ -26,6 +29,14 @@ jobs:
           step: [ 'run_ibm_ocp_installer', 'verify_ibm_install_complete' ]
     steps:
       - uses: actions/checkout@v6
+      - name: 🔑 Generate GitHub App token
+        id: github-app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.PERF_GITHUB_APP_ID }}
+          private-key: ${{ secrets.PERF_GITHUB_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ github.event.repository.name }}
       - name: Fix crun for Podman 5.x
         run: sudo apt-get install -y crun
       - name: Set up Python 3.15
@@ -62,7 +73,7 @@ jobs:
           OCP_BUILD: ${{ secrets.PERF_OCP_BUILD }}
           OCP_CLIENT_VERSION: ${{ secrets.PERF_OCP_CLIENT_VERSION }}
           IBM_API_KEY: ${{ secrets.IBM_API_KEY }}
-          GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
+          GIT_TOKEN: ${{ steps.github-app-token.outputs.token }}
           WORKER_IDS: ${{ secrets.PERF_WORKER_IDS }}
           PROVISION_IP: ${{ secrets.PERF_PROVISION_IP }}
           PROVISION_USER: ${{ secrets.PERF_PROVISION_USER }}
@@ -88,7 +99,7 @@ jobs:
           OCP_BUILD: ${{ secrets.PERF_OCP_BUILD }}
           OCP_CLIENT_VERSION: ${{ secrets.PERF_OCP_CLIENT_VERSION }}
           IBM_API_KEY: ${{ secrets.IBM_API_KEY }}
-          GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
+          GIT_TOKEN: ${{ steps.github-app-token.outputs.token }}
           WORKER_IDS: ${{ secrets.PERF_WORKER_IDS }}
           PROVISION_IP: ${{ secrets.PERF_PROVISION_IP }}
           PROVISION_USER: ${{ secrets.PERF_PROVISION_USER }}
@@ -112,3 +123,7 @@ jobs:
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>> OCP start step: verify_ibm_install_complete >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
           podman run --rm -e OCP_ENV_FLAVOR="PERF" -e IBM_API_KEY="$IBM_API_KEY" -e GIT_TOKEN="$GIT_TOKEN" -e INSTALL_OCP_VERSION="$INSTALL_OCP_VERSION" -e INSTALL_STEP="verify_ibm_install_complete" -e WORKER_IDS="$WORKER_IDS" -e PROVISION_IP="$PROVISION_IP" -e CONTAINER_PRIVATE_KEY_PATH="$CONTAINER_PRIVATE_KEY_PATH" -e CONTAINER_PRIVATE_KEY_PATH="$CONTAINER_PRIVATE_KEY_PATH" -e PROVISION_USER="$PROVISION_USER" -e PROVISION_PORT="$PROVISION_PORT" -e PROVISION_KUBEADMIN_PASSWORD_PATH="$PROVISION_KUBEADMIN_PASSWORD_PATH" -e PROVISION_KUBECONFIG_PATH="$PROVISION_KUBECONFIG_PATH" -e PROVISION_INSTALLER_PATH="$PROVISION_INSTALLER_PATH" -e PROVISION_INSTALLER_CMD="$PROVISION_INSTALLER_CMD" -e PROVISION_INSTALLER_LOG="$PROVISION_INSTALLER_LOG" -e GITHUB_REPOSITORY_SHORT="$GITHUB_REPOSITORY_SHORT" -e PROVISION_TIMEOUT="3600" -e log_level="INFO" -v "$PROVISION_PRIVATE_KEY_PATH":"$CONTAINER_PRIVATE_KEY_PATH" --privileged "${{ secrets.QUAY_BENCHMARK_RUNNER_REPOSITORY }}"
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>> OCP end step: verify_ibm_install_complete >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
+      - name: 🧹 Remove SSH private key
+        if: always()
+        run: |
+          if [ -n "$PROVISION_PRIVATE_KEY_PATH" ]; then rm -f "$PROVISION_PRIVATE_KEY_PATH"; fi
