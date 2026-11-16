@@ -10,7 +10,7 @@ import pytest
 
 import benchmark_runner.common.ocp_resources.create_ocp_resource as create_ocp_resource_module
 from benchmark_runner.common.ocp_resources.create_ocp_resource import CreateOCPResource
-from benchmark_runner.common.ocp_resources.create_ocp_resource_exceptions import UnknownOCPResource
+from benchmark_runner.common.ocp_resources.create_ocp_resource_exceptions import MissingOCPResourceTemplates, UnknownOCPResource
 
 OCP_RESOURCES_PATH = os.path.dirname(os.path.realpath(create_ocp_resource_module.__file__))
 
@@ -41,3 +41,19 @@ def test_unknown_resource_message_lists_supported_resources():
     for resource in ('cnv', 'lso', 'lvms', 'odf'):
         assert resource in message
     assert '__pycache__' not in message
+
+
+def test_create_resource_rejects_resource_without_templates(tmp_path):
+    """
+    A resource dir with an empty template dir must raise MissingOCPResourceTemplates
+    instead of letting the installer apply nothing and report success.
+    """
+    (tmp_path / 'lvms' / 'template').mkdir(parents=True)
+    create_ocp_resource = _create_ocp_resource()
+    create_ocp_resource._CreateOCPResource__dir_path = str(tmp_path)
+
+    with pytest.raises(MissingOCPResourceTemplates) as excinfo:
+        create_ocp_resource.create_resource(resource='lvms', upgrade_version=None)
+
+    # The message must point at the packaging entry that is normally the cause
+    assert 'benchmark_runner.common.ocp_resources.lvms.template' in str(excinfo.value)
