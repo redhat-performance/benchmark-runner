@@ -14,6 +14,9 @@ pipeline {
         LVMS_VERSION = credentials('perfci_lvms_version')
         // NVMe devices dedicated to LVMS, never the ODF disks: the installer runs wipefs on these
         LVMS_DEVICE_PATHS = credentials('perfci_lvms_devices')
+        // Plain value, never empty: the installer deletes and recreates this LVMCluster by name,
+        // and an empty value overrides the default in environment_variables.py
+        LVMS_CLUSTER_NAME = 'lvms-nvme'
         EXPECTED_NODES = credentials('perfci_expected_nodes')
         QUAY_BENCHMARK_RUNNER_REPOSITORY = credentials('perfci_quay_repository')
         KUBEADMIN_PASSWORD = readFile('/home/jenkins/.kube/kubeadmin-password').trim()
@@ -153,6 +156,7 @@ END
                                                             -e LSO_VERSION='${LSO_VERSION}' \
                                                             -e LVMS_VERSION='${env.LVMS_VERSION ?: ''}' \
                                                             -e LVMS_DEVICE_PATHS='${env.LVMS_DEVICE_PATHS ?: ''}' \
+                                                            -e LVMS_CLUSTER_NAME='${LVMS_CLUSTER_NAME}' \
                                                             -e ODF_VERSION='${ODF_VERSION}' \
                                                             -e ODF_CATALOG_IMAGE='${env.ODF_CATALOG_IMAGE ?: ''}' \
                                                             -e NUM_ODF_DISK='${NUM_ODF_DISK}' \

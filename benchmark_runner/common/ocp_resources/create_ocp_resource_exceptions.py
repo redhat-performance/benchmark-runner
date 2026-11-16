@@ -25,6 +25,15 @@ class ODFInstallationFailed(OCPResourceError):
         super(ODFInstallationFailed, self).__init__(self.message)
 
 
+class MissingOCPResourceTemplates(OCPResourceError):
+    """This exception returns error for an OCP resource whose templates are missing"""
+    def __init__(self, resource):
+        self.message = (f'No templates found for OCP resource {resource!r}: check that '
+                        f'benchmark_runner.common.ocp_resources.{resource}.template is listed in '
+                        f'[tool.setuptools.package-data] of pyproject.toml')
+        super(MissingOCPResourceTemplates, self).__init__(self.message)
+
+
 class UnknownOCPResource(OCPResourceError):
     """This exception returns error for an unsupported OCP resource name"""
     def __init__(self, resource, supported_resources):

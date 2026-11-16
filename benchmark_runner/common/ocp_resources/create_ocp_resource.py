@@ -12,7 +12,7 @@ from benchmark_runner.common.ocp_resources.create_cnv import CreateCNV
 from benchmark_runner.common.ocp_resources.create_nhc_far import CreateNHCFAR
 from benchmark_runner.common.ocp_resources.create_custom import CreateCustom
 from benchmark_runner.common.ocp_resources.migrate_infra import MigrateInfra
-from benchmark_runner.common.ocp_resources.create_ocp_resource_exceptions import UnknownOCPResource
+from benchmark_runner.common.ocp_resources.create_ocp_resource_exceptions import MissingOCPResourceTemplates, UnknownOCPResource
 
 
 class CreateOCPResource:
@@ -105,6 +105,12 @@ class CreateOCPResource:
         # remove resource files
         self.remove_resource_files(path=resource_path)
         resource_files = self.get_sorted_resources(resource=resource)
+        if not resource_files:
+            # Every installer below only applies the files it is given: an empty list means the
+            # resource's template dir held nothing to render (for example a template dir that is
+            # missing from the installed package), and each installer would apply nothing and
+            # still report success
+            raise MissingOCPResourceTemplates(resource=resource)
         if 'lso' == resource:
             create_lso = CreateLSO(self.__oc, path=os.path.join(self.__dir_path, resource), resource_list=resource_files, lso_node=self.__lso_node, lso_disk_id=self.__lso_disk_id, ceph_version=self.__ceph_version)
             create_lso.create_lso(upgrade_version)
