@@ -13,7 +13,8 @@ concurrency:
   group: performance-environment
   cancel-in-progress: false
 
-permissions: write-all
+permissions:
+  contents: read
 jobs:
   unittest:
     # run all python versions, in other jobs run the latest python
@@ -172,6 +173,11 @@ jobs:
     name: pypi_upload
     needs: [unittest, integration_test]
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    environment:
+      name: pypi
     strategy:
       matrix:
         python-version: [ '3.15' ]
@@ -181,15 +187,13 @@ jobs:
       uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.python-version }}
-    - name: 🔨 Build and publish distribution 📦 to PyPI
-      env:
-        TWINE_USERNAME: __token__
-        TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+    - name: 🔨 Build distribution 📦
       run: |
         python -m pip install --upgrade pip
-        pip install build twine
+        pip install build
         python -m build
-        twine upload dist/*
+    - name: 🚀 Publish distribution 📦 to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
 
   pypi_validate:
     name: pypi_validate
@@ -205,9 +209,6 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Validate upload to PyPI
-      env:
-        TWINE_USERNAME: __token__
-        TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
       run: |
         echo '⌛ Wait till package will be updated in PyPI'
         # Verify and wait till latest benchmark-runner version will be updated in Pypi (timeout 900 seconds)
