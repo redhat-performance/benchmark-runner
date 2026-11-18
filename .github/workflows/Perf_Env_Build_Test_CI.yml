@@ -169,15 +169,14 @@ jobs:
         pip install coveralls
         COVERALLS_REPO_TOKEN=${{ secrets.COVERALLS_REPO_TOKEN }} coveralls
 
-  pypi_upload:
-    name: pypi_upload
+  # Build runs without id-token: write, so a compromised build dependency
+  # cannot mint an OIDC token and publish to PyPI.
+  build:
+    name: build
     needs: [unittest, integration_test]
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write
-    environment:
-      name: pypi
     strategy:
       matrix:
         python-version: [ '3.15' ]
@@ -192,6 +191,27 @@ jobs:
         python -m pip install --upgrade pip
         pip install build
         python -m build
+    - name: 📤 Upload distribution
+      uses: actions/upload-artifact@v4
+      with:
+        name: dist
+        path: dist/
+
+  pypi_upload:
+    name: pypi_upload
+    needs: [build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    environment:
+      name: pypi
+    steps:
+    - name: 📥 Download distribution
+      uses: actions/download-artifact@v4
+      with:
+        name: dist
+        path: dist/
     - name: 🚀 Publish distribution 📦 to PyPI
       uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # release/v1
 
