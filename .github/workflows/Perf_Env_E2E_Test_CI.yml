@@ -41,7 +41,7 @@ jobs:
       - uses: actions/checkout@v6
       - name: 🔑 Generate GitHub App token
         id: github-app-token
-        uses: actions/create-github-app-token@v2
+        uses: actions/create-github-app-token@fee1f7d63c2ff003460e3d139729b119787bc349 # v2.2.2
         with:
           app-id: ${{ secrets.PERF_GITHUB_APP_ID }}
           private-key: ${{ secrets.PERF_GITHUB_APP_PRIVATE_KEY }}
@@ -163,7 +163,9 @@ jobs:
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End OCP Resource Install   >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
           end=$(printf '%(%s)T' -1)
           echo "INSTALL_OCP_RESOURCE_MINUTES_TIME=$(( (( end - start )) / 60))" >> "$GITHUB_ENV"
-      - name: 🧹 Remove SSH private key
+      - name: 🧹 Remove SSH private key and kubeconfig
         if: always()
+        env:
+          RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
         run: |
-          if [ -n "$PROVISION_PRIVATE_KEY_PATH" ]; then rm -f "$PROVISION_PRIVATE_KEY_PATH"; fi
+          rm -f "$RUNNER_PATH/private_key.txt" "$RUNNER_PATH/.kube/config"
