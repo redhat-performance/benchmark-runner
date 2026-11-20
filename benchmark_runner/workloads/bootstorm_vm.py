@@ -72,15 +72,24 @@ class BootstormVM(WorkloadsOperations):
         This method waits for VM access and returns the VM node on success, or False if it fails
         @return:
         """
-        if self._oc.get_vm_node(vm_name=vm_name):
+        # get_vm_node has no retry of its own, and under parallel VM creation the
+        # VM is often not yet scheduled (no nodeName) at the first check, so poll
+        # here until it is or self._timeout elapses.
+        vm_node = None
+        deadline = time.time() + self._timeout
+        while time.time() < deadline:
             vm_node = self._oc.get_vm_node(vm_name=vm_name)
-            try:
-                if self._oc.wait_for_vm_access(vm_name=vm_name, timeout=self._timeout):
-                    logger.info(f"Successfully virtctl into VM: '{vm_name}' in node {vm_node} ")
-            except VMStateTimeout:
-                logger.warning(f"VM '{vm_name}' on node {vm_node} not accessible within timeout, recording as failed")
-            return vm_node
-        return False
+            if vm_node:
+                break
+            time.sleep(2)
+        if not vm_node:
+            return False
+        try:
+            if self._oc.wait_for_vm_access(vm_name=vm_name, timeout=self._timeout):
+                logger.info(f"Successfully virtctl into VM: '{vm_name}' in node {vm_node} ")
+        except VMStateTimeout:
+            logger.warning(f"VM '{vm_name}' on node {vm_node} not accessible within timeout, recording as failed")
+        return vm_node
 
     @logger_time_stamp
     def _wait_ssh_vm(self, vm_name: str):
