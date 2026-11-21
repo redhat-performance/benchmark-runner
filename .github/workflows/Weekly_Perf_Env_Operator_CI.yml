@@ -21,6 +21,9 @@ concurrency:
   group: performance-environment
   cancel-in-progress: false
 
+permissions:
+  contents: read
+
 jobs:
 
   ocp_operator_installation:
@@ -35,6 +38,14 @@ jobs:
           resource: [ 'cnv', 'lso', 'infra', 'custom']
     steps:
       - uses: actions/checkout@v6
+      - name: 🔑 Generate GitHub App token
+        id: github-app-token
+        uses: actions/create-github-app-token@fee1f7d63c2ff003460e3d139729b119787bc349 # v2.2.2
+        with:
+          app-id: ${{ secrets.PERF_GITHUB_APP_ID }}
+          private-key: ${{ secrets.PERF_GITHUB_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ github.event.repository.name }}
       - name: Set up Python 3.15
         uses: actions/setup-python@v6
         with:
@@ -83,7 +94,7 @@ jobs:
           QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
           QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
           IBM_API_KEY: ${{ secrets.IBM_API_KEY }}
-          GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
+          GIT_TOKEN: ${{ steps.github-app-token.outputs.token }}
           WORKER_IDS: ${{ secrets.PERF_WORKER_IDS }}
           PROVISION_IP: ${{ secrets.PERF_PROVISION_IP }}
           PROVISION_USER: ${{ secrets.PERF_PROVISION_USER }}
@@ -124,3 +135,15 @@ jobs:
           echo '>>>>>>>>>>>>>>>>>>>>>>>>>> End  ${{ matrix.resource }} installation   >>>>>>>>>>>>>>>>>>>>>>>>>>>>'
           end=$(printf '%(%s)T' -1)
           echo "INSTALL_OCP_RESOURCE_MINUTES_TIME=$(( (( end - start )) / 60))" >> "$GITHUB_ENV"
+      - name: 🧹 Remove SSH private key and kubeconfig
+        if: always()
+        env:
+          RUNNER_PATH: ${{ secrets.RUNNER_PATH }}
+          CONTAINER_PRIVATE_KEY_PATH: ${{ secrets.CONTAINER_PRIVATE_KEY_PATH }}
+          CONTAINER_KUBECONFIG_PATH: ${{ secrets.CONTAINER_KUBECONFIG_PATH }}
+        run: |
+          # remote deletion first: ssh still needs the local key
+          for remote_path in "$CONTAINER_PRIVATE_KEY_PATH" "$CONTAINER_KUBECONFIG_PATH"; do
+            if [ -n "$remote_path" ]; then ssh -o BatchMode=yes provision "rm -f '$remote_path'" || true; fi
+          done
+          rm -f "$RUNNER_PATH/private_key.txt" "$RUNNER_PATH/.kube/config"

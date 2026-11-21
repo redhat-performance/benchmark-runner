@@ -1,0 +1,7 @@
+version: 2
+updates:
+  # Keep SHA-pinned GitHub Actions current
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
