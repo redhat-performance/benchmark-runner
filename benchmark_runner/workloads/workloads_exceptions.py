@@ -41,6 +41,15 @@ class EmptyLSOPath(BenchmarkRunnerError):
         super(EmptyLSOPath, self).__init__(self.message)
 
 
+class LVMSNotInstalled(BenchmarkRunnerError):
+    """
+    This class raises an error that the LVMS storage class or the target node is missing
+    """
+    def __init__(self, message: str):
+        self.message = f'LVMS verification failed: {message}'
+        super(LVMSNotInstalled, self).__init__(self.message)
+
+
 class MissingScaleNodes(BenchmarkRunnerError):
     """
     This class raises an error for missing scale nodes

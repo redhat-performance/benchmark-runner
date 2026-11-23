@@ -25,14 +25,17 @@ class Workloads(WorkloadsOperations):
 
         # kata use pod module - replace kata to pod
         workload = self._workload.replace('kata', 'pod')
-        # Strip storage suffix (ephemeral/lso) and db type for module resolution
+        # Strip storage/scale suffixes and db type for module resolution
         module_workload = workload
         if workload.startswith('hammerdb_'):
             parts = workload.split('_')
             if len(parts) >= 3:
                 module_workload = '_'.join(parts[:2])
-        elif workload.endswith('_ephemeral') or workload.endswith('_lso') or workload.endswith('_scale'):
-            module_workload = '_'.join(workload.split('_')[:-1])
+        else:
+            # strip every trailing suffix so storage variants
+            # (e.g. winmssql_vm_lvms) resolve to their module
+            while module_workload.endswith(('_ephemeral', '_lso', '_lvms', '_scale')):
+                module_workload = '_'.join(module_workload.split('_')[:-1])
         # load the workload module before doing anything else (in case it fails)
         workload_module = importlib.import_module(f'benchmark_runner.workloads.{module_workload}')
 

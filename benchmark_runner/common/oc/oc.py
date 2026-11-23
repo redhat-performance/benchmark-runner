@@ -416,6 +416,16 @@ class OC(SSH):
             return True
         return False
 
+    def is_storage_class_exists(self, storage_class: str) -> bool:
+        """
+        This method checks if a storage class exists
+        :param storage_class: storage class name
+        :return: True/False
+        """
+        if not storage_class:
+            return False
+        return storage_class in self.run(f"{self._cli} get sc {storage_class} -o name")
+
     def is_odf_installed(self):
         """
         This method checks if odf operator is installed

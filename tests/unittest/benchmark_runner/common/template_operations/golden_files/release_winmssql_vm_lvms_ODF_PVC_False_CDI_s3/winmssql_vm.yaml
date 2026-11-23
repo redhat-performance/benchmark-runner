@@ -1,0 +1,147 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: winmssql-vm-deadbeef
+  labels:
+    kubevirt.io/vm: winmssql-vm-deadbeef
+  namespace: benchmark-runner
+spec:
+  runStrategy: Halted
+  template:
+    metadata:
+      labels:
+        kubevirt.io/vm: windows-vm-deadbeef
+    spec:
+      # LVMS is node-local: the VM must run on the node holding its golden DV
+      nodeSelector:
+        kubernetes.io/hostname: "pin-node-2"
+      domain:
+        clock:
+          timer:
+            hpet:
+              present: false
+            hyperv: {}
+            pit:
+              tickPolicy: delay
+            rtc:
+              tickPolicy: catchup
+          utc: {}
+        cpu:
+          cores: 16
+          sockets: 1
+          threads: 1
+        devices:
+          autoattachMemBalloon: false
+          blockMultiQueue: true
+          disks:
+          - name: windows-vm-root-disk-deadbeef
+            disk:
+              bus: virtio
+            bootOrder: 1
+          - disk:
+              bus: virtio
+            name: windows-vm-data-disk-deadbeef
+          - disk:
+              bus: virtio
+            name: cloudinitdisk
+          inputs:
+          - bus: virtio
+            name: tablet
+            type: tablet
+          tpm: {}
+          interfaces:
+          - name: nic-0
+            masquerade: {}
+            model: virtio
+          networkInterfaceMultiqueue: true
+        features:
+          acpi: {}
+          apic: {}
+          hyperv:
+            ipi: {}
+            synic: {}
+            synictimer:
+              direct: {}
+            spinlocks:
+              spinlocks: 8191
+            reenlightenment: {}
+            reset: {}
+            relaxed: {}
+            vpindex: {}
+            runtime: {}
+            tlbflush: {}
+            frequencies: {}
+            vapic: {}
+          smm: {}
+        firmware:
+          bootloader:
+            efi:
+              secureBoot: false
+        ioThreads:
+          supplementalPoolThreadCount: 8
+        ioThreadsPolicy: supplementalPool
+        machine:
+          type: q35
+        resources:
+          requests:
+            cpu: 16
+            memory: 16G
+      # local storage cannot live-migrate
+      evictionStrategy: None
+      networks:
+      - name: nic-0
+        pod: {}
+      terminationGracePeriodSeconds: 180
+      volumes:
+      - dataVolume:
+          name: windows-vm-root-disk-deadbeef
+        name: windows-vm-root-disk-deadbeef
+      - dataVolume:
+          name: windows-vm-data-disk-deadbeef
+        name: windows-vm-data-disk-deadbeef
+      - cloudInitNoCloud:
+          userData: |
+            #cloud-config
+            runcmd:
+              - powershell -Command "New-Item -ItemType Directory -Force -Path 'C:\ProgramData\ssh' | Out-Null; Set-Content -Path 'C:\ProgramData\ssh\administrators_authorized_keys' -Value '' -Encoding ascii -Force; icacls 'C:\ProgramData\ssh\administrators_authorized_keys' /inheritance:r /grant 'Administrators:F' /grant 'SYSTEM:F'"
+              - cmd /c "mkdir C:\Users\Administrator\.ssh >nul 2>&1 & icacls C:\Users\Administrator\.ssh /grant Everyone:F >nul 2>&1 & takeown /f C:\Users\Administrator\.ssh\authorized_keys >nul 2>&1 & icacls C:\Users\Administrator\.ssh\authorized_keys /grant Everyone:F >nul 2>&1 & del /f C:\Users\Administrator\.ssh\authorized_keys >nul 2>&1"
+              - powershell -Command "Copy-Item 'C:\ProgramData\ssh\administrators_authorized_keys' 'C:\Users\Administrator\.ssh\authorized_keys' -Force; icacls 'C:\Users\Administrator\.ssh\authorized_keys' /inheritance:r /grant 'Administrators:F' /grant 'SYSTEM:F'; icacls 'C:\Users\Administrator\.ssh' /inheritance:r /grant 'Administrators:F' /grant 'SYSTEM:F'"
+        name: cloudinitdisk
+  dataVolumeTemplates:
+  - metadata:
+      annotations:
+        descheduler.alpha.kubernetes.io/evict: "true"
+        # LVMS is node-local: import this VM's image on the node it will run on
+        volume.kubernetes.io/selected-node: pin-node-2
+      name: windows-vm-root-disk-deadbeef
+    spec:
+      pvc:
+        accessModes:
+        # LVMS (node-local block storage) supports ReadWriteOnce only
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 76Gi
+        volumeMode: Block
+        storageClassName: lvms-nvme
+      source:
+        s3:
+          url: http://localhost:8083/winmssql2022.qcow2
+          secretRef: s3-test-credentials
+  - metadata:
+      annotations:
+        descheduler.alpha.kubernetes.io/evict: "true"
+        volume.kubernetes.io/selected-node: pin-node-2
+      name: windows-vm-data-disk-deadbeef
+    spec:
+      pvc:
+        accessModes:
+        # LVMS (node-local block storage) supports ReadWriteOnce only
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 76Gi
+        volumeMode: Block
+        storageClassName: lvms-nvme
+      source:
+        blank: {}

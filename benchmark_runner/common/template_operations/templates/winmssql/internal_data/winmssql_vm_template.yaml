@@ -26,6 +26,11 @@ spec:
         kubevirt.io/vm: windows-{{ kind }}-{{ trunc_uuid }}
         {%- endif %}
     spec:
+      {%- if storage_type == 'lvms' %}
+      # LVMS is node-local: the VM must run on the node holding its golden DV
+      nodeSelector:
+        kubernetes.io/hostname: "{{ scale_node if scale_node else lvms_node }}"
+      {%- endif %}
       domain:
         clock:
           timer:
@@ -105,7 +110,10 @@ spec:
           requests:
             cpu: {{ database_requests_cpu }}
             memory: {{ database_requests_memory }}
-      evictionStrategy: LiveMigrate
+      {%- if storage_type == 'lvms' %}
+      # local storage cannot live-migrate
+      {%- endif %}
+      evictionStrategy: {% if storage_type == 'lvms' %}None{% else %}LiveMigrate{% endif %}
       networks:
       - name: nic-0
         pod: {}
@@ -145,6 +153,10 @@ spec:
   - metadata:
       annotations:
         descheduler.alpha.kubernetes.io/evict: "true"
+        {%- if storage_type == 'lvms' %}
+        # LVMS is node-local: import this VM's image on the node it will run on
+        volume.kubernetes.io/selected-node: {{ scale_node if scale_node else lvms_node }}
+        {%- endif %}
       {% if scale -%}
       name: windows-{{ kind }}-root-disk-{{ trunc_uuid }}-{{ scale }}
       {%- else -%}
@@ -153,7 +165,10 @@ spec:
     spec:
       pvc:
         accessModes:
-        - ReadWriteMany
+        {%- if storage_type == 'lvms' %}
+        # LVMS (node-local block storage) supports ReadWriteOnce only
+        {%- endif %}
+        - {% if storage_type == 'lvms' %}ReadWriteOnce{% else %}ReadWriteMany{% endif %}
         resources:
           requests:
             storage: {{ storage }}
@@ -164,6 +179,17 @@ spec:
         snapshot:
           name: windows-golden-snapshot-{{ trunc_uuid }}
           namespace: {{ namespace }}
+        {%- elif storage_type == 'lvms' %}
+        {%- if cdi_source_type == 's3' %}
+        s3:
+          url: {{ url }}
+          {%- if cdi_source_s3_cred %}
+          secretRef: {{ cdi_source_s3_cred }}
+          {%- endif %}
+        {%- else %}
+        http:
+          url: {{ url }}
+        {%- endif %}
         {%- else %}
         pvc:
           namespace: {{ namespace }}
@@ -172,6 +198,9 @@ spec:
   - metadata:
       annotations:
         descheduler.alpha.kubernetes.io/evict: "true"
+        {%- if storage_type == 'lvms' %}
+        volume.kubernetes.io/selected-node: {{ scale_node if scale_node else lvms_node }}
+        {%- endif %}
       {% if scale -%}
       name: windows-{{ kind }}-data-disk-{{ trunc_uuid }}-{{ scale }}
       {%- else -%}
@@ -180,7 +209,10 @@ spec:
     spec:
       pvc:
         accessModes:
-        - ReadWriteMany
+        {%- if storage_type == 'lvms' %}
+        # LVMS (node-local block storage) supports ReadWriteOnce only
+        {%- endif %}
+        - {% if storage_type == 'lvms' %}ReadWriteOnce{% else %}ReadWriteMany{% endif %}
         resources:
           requests:
             storage: {{ data_storage }}

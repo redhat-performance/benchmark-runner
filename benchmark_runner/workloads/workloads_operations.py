@@ -9,7 +9,7 @@ from datetime import datetime, timezone, timedelta
 from multiprocessing import Process
 
 from benchmark_runner.common.logger.logger_time_stamp import logger_time_stamp
-from benchmark_runner.workloads.workloads_exceptions import ODFNotInstalled, CNVNotInstalled, KataNotInstalled, EmptyLSOPath, MissingScaleNodes, BenchmarkRunnerError
+from benchmark_runner.workloads.workloads_exceptions import ODFNotInstalled, CNVNotInstalled, KataNotInstalled, EmptyLSOPath, LVMSNotInstalled, MissingScaleNodes, BenchmarkRunnerError
 from benchmark_runner.common.oc.oc import OC
 from benchmark_runner.common.virtctl.virtctl import Virtctl
 from benchmark_runner.common.elasticsearch.elasticsearch_operations import ElasticSearchOperations
@@ -228,6 +228,43 @@ class WorkloadsOperations:
         """
         if not self._lso_disk_id:
             raise EmptyLSOPath()
+
+    def get_lvms_node(self) -> str:
+        """
+        Return the node that holds the golden DataVolume for a single-VM LVMS run.
+        Scale runs use SCALE_NODES per VM, single-VM runs fall back to LVMS_NODE,
+        then PIN_NODE1, then the first SCALE_NODES entry, and finally pick the
+        first worker node automatically (LVMS storage is available on all workers).
+        :return: node name, empty if the cluster has no worker nodes
+        """
+        node = self._environment_variables_dict.get('lvms_node', '') or self._environment_variables_dict.get('pin_node1', '')
+        if not node and self._scale_node_list:
+            node = self._scale_node_list[0]
+        if not node:
+            worker_nodes = (self._oc.get_worker_nodes() or '').split()
+            node = worker_nodes[0] if worker_nodes else ''
+        return node
+
+    @logger_time_stamp
+    def verify_lvms(self):
+        """
+        This method verifies that the LVMS storage class exists, resolves the target
+        node for a single-VM run and stores it for template rendering
+        :return:
+        """
+        storage_class = self._environment_variables_dict.get('vm_storage_class', '')
+        if not self._oc.is_storage_class_exists(storage_class=storage_class):
+            raise LVMSNotInstalled(f'storage class {storage_class} not found, set VM_STORAGE_CLASS to the LVMS storage class')
+        if self._scale:
+            # scale runs get a node per generated yaml from SCALE_NODES
+            if not all(self._scale_node_list):
+                raise LVMSNotInstalled(f'empty node in SCALE_NODES: {self._scale_node_list}')
+            return
+        node = self.get_lvms_node()
+        if not node:
+            raise LVMSNotInstalled('no target node, set LVMS_NODE, PIN_NODE1 or SCALE_NODES')
+        # the templates render lvms_node, and generate_yamls runs after this check
+        self._environment_variables_dict['lvms_node'] = node
 
     def _create_vm_log(self, labels: list) -> str:
         """
@@ -632,6 +669,8 @@ class WorkloadsOperations:
             self.odf_workload_verification()
         if 'lso' in self._workload:
             self.verify_lso()
+        if 'lvms' in self._workload:
+            self.verify_lvms()
         self._template.generate_yamls(scale=str(self._scale), scale_nodes=self._scale_node_list, redis=None, thread_limit=self._threads_limit)
         if self._enable_prometheus_snapshot:
             self.start_prometheus()

@@ -19,7 +19,7 @@ spec:
     {%- endif %}
   pvc:
     accessModes:
-      - ReadWriteMany
+      - {% if storage_type == 'lvms' %}ReadWriteOnce{% else %}ReadWriteMany{% endif %}
     resources:
       requests:
         storage: {{ storage }}
