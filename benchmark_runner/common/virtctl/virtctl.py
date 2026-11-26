@@ -241,7 +241,7 @@ class Virtctl(OC):
             if result.returncode == 0:
                 logger.debug(f'SCP {remote_path} from {vm_name} to {local_path}')
                 return True
-            logger.warning(f'virtctl scp failed: {result.stderr.strip()[:200]}')
+            logger.warning(f'virtctl scp failed rc={result.returncode} vm={vm_name} stderr={result.stderr.strip()} stdout={result.stdout.strip()}')
             return False
         except Exception as e:
             logger.warning(f'virtctl scp error: {e}')
@@ -267,7 +267,7 @@ class Virtctl(OC):
             if result.returncode == 0:
                 logger.debug(f'SCP {local_path} to {vm_name}:{remote_path}')
                 return True
-            logger.warning(f'virtctl scp to VM failed: {result.stderr.strip()[:200]}')
+            logger.warning(f'virtctl scp to VM failed rc={result.returncode} vm={vm_name} stderr={result.stderr.strip()} stdout={result.stdout.strip()}')
             return False
         except Exception as e:
             logger.warning(f'virtctl scp to VM error: {e}')
