@@ -11,7 +11,7 @@ class CreateLVMS(CreateOCPResourceOperations):
     """
     This class creates the Logical Volume Manager Storage (LVMS) operator and LVMCluster
     """
-    NAMESPACE = 'openshift-storage'
+    NAMESPACE = 'openshift-lvm-storage'
     OPERATOR_NAME = 'lvms-operator'
     LVMCLUSTER_DELETE_TIMEOUT = 300
     # Graceful delete window before the device cleanup force-removes the volume groups
@@ -64,7 +64,7 @@ class CreateLVMS(CreateOCPResourceOperations):
                 # the device cleanup unblocks its finalizer, so wait for it to be gone before recreating it
                 self.__wait_for_lvmcluster_delete(must_be_deleted=True)
 
-            # apply is idempotent: the openshift-storage namespace and its OperatorGroup are shared with ODF
+            # apply is idempotent: the namespace and its OperatorGroup are created if missing
             self.__oc.apply_async(yaml=resource_path)
 
             if resource == '03_catalogsource.yaml':
@@ -157,7 +157,7 @@ class CreateLVMS(CreateOCPResourceOperations):
 
     def __wait_for_lvms_csv(self, upgrade_version: str = None):
         """
-        This method waits for the LVMS CSV, targeting it by name because openshift-storage also holds ODF CSVs
+        This method waits for the LVMS CSV, targeting it by name to avoid matching other CSVs
         :param upgrade_version: in upgrade mode, wait for this major.minor version
         :return:
         """
