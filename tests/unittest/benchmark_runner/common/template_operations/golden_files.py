@@ -15,7 +15,8 @@ from tests.unittest.benchmark_runner.common.template_operations.golden_files_exc
 # cannot reasonably produce golden files; do NOT maintain a separate allowlist.
 # clusterbuster and krknhub do not use YAML files
 _EXCLUDED_WORKLOADS: set = {'clusterbuster', 'krknhub'}
-_WINDOWS_WORKLOADS: set = {'windows_vm', 'winfio_vm', 'winmssql_vm', 'winmssql_vm_scale'}
+_WINDOWS_WORKLOADS: set = {'windows_vm', 'winfio_vm', 'winmssql_vm', 'winmssql_vm_scale',
+                           'winmssql_vm_lvms'}
 
 
 class GoldenFiles:
@@ -75,15 +76,22 @@ class GoldenFiles:
             for run_type in environment_variables.run_types_list:
                 environment_variables.environment_variables_dict['run_type'] = run_type
                 for workload in environment_variables.environment_variables_dict['workloads']:
+                    workload_tokens = set(workload.split('_')[2:])
+                    is_lvms = 'lvms' in workload_tokens
+                    # LVMS always runs without the ODF snapshot path
+                    if odf_pvc and is_lvms:
+                        continue
                     cdi_sources = ['http', 's3'] if workload in _WINDOWS_WORKLOADS else ['http']
                     for cdi_source in cdi_sources:
                         environment_variables.environment_variables_dict['fedora_container_disk'] = 'quay.io/benchmark-runner/fedora-container-disk:43'
                         environment_variables.environment_variables_dict['namespace'] = environment_variables.get_workload_namespace(workload)
                         environment_variables.environment_variables_dict['cdi_source_type'] = cdi_source
                         environment_variables.environment_variables_dict['cdi_source_s3_cred'] = 's3-test-credentials' if cdi_source == 's3' else ''
-                        environment_variables.environment_variables_dict['storage_type'] = 'lso' if workload.endswith('_lso') else ''
-                        environment_variables.environment_variables_dict['lso_node'] = 'pin-node-2' if workload.endswith('_lso') else ''
-                        environment_variables.environment_variables_dict['lso_disk_id'] = 'test-disk-id-0000' if workload.endswith('_lso') else ''
+                        environment_variables.environment_variables_dict['storage_type'] = 'lso' if 'lso' in workload_tokens else ('lvms' if is_lvms else '')
+                        environment_variables.environment_variables_dict['lso_node'] = 'pin-node-2' if 'lso' in workload_tokens else ''
+                        environment_variables.environment_variables_dict['lso_disk_id'] = 'test-disk-id-0000' if 'lso' in workload_tokens else ''
+                        environment_variables.environment_variables_dict['vm_storage_class'] = 'lvms-nvme' if is_lvms else 'ocs-storagecluster-ceph-rbd-virtualization'
+                        environment_variables.environment_variables_dict['lvms_node'] = 'pin-node-2' if is_lvms else ''
                         template = TemplateOperations(workload)
                         srcdir = template.get_current_run_path()
                         self.__clear_directory_yaml(srcdir)

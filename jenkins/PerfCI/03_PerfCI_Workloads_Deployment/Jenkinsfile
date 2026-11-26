@@ -26,6 +26,8 @@ pipeline {
         WINDOWS_SERVER_MSSQL_2022_URL = credentials('perfci_windows_server_mssql_2022_url')
         WINDOWS_SERVER_MSSQL_2025_URL = credentials('perfci_windows_server_mssql_2025_url')
         LSO_NODE = credentials('perfci_lso_node')
+        // storage class for VM workloads; LVMS runs need the LVMS class (winmssql_vm_lvms)
+        VM_STORAGE_CLASS = 'lvms-nvme'
         QUAY_BENCHMARK_RUNNER_REPOSITORY = credentials('perfci_quay_repository')
         KUBEADMIN_PASSWORD = readFile('/home/jenkins/.kube/kubeadmin-password').trim()
         KUBEADMIN_PASSWORD_PATH = '/home/jenkins/.kube/kubeadmin-password'
@@ -107,12 +109,14 @@ END
         stage('WORKLOADS Deployment') {
             steps {
                 script {
-                    def workloads =  ['sysbench_pod', 'sysbench_vm', 'uperf_pod', 'uperf_vm', 'hammerdb_pod_mariadb', 'hammerdb_vm_mariadb', 'hammerdb_vm_mariadb_scale', 'hammerdb_pod_postgres', 'hammerdb_vm_postgres', 'hammerdb_vm_postgres_scale', 'hammerdb_pod_mssql', 'hammerdb_vm_mssql', 'hammerdb_vm_mssql_scale', 'winmssql_vm', 'winmssql_vm_scale', 'winfio_vm', 'winfio_vm_scale', 'vdbench_pod', 'vdbench_vm', 'vdbench_pod_scale', 'vdbench_vm_scale', 'fio_pod', 'fio_vm', 'fio_pod_scale', 'fio_vm_scale', 'bootstorm_vm_scale', 'windows_vm_scale_windows11', 'windows_vm_scale_windows_server_2022', 'windows_vm_scale_windows_server_2025' ]
+                    def workloads =  ['sysbench_pod', 'sysbench_vm', 'uperf_pod', 'uperf_vm', 'hammerdb_pod_mariadb', 'hammerdb_vm_mariadb', 'hammerdb_vm_mariadb_scale', 'hammerdb_pod_postgres', 'hammerdb_vm_postgres', 'hammerdb_vm_postgres_scale', 'hammerdb_pod_mssql', 'hammerdb_vm_mssql', 'hammerdb_vm_mssql_scale', 'winmssql_vm', 'winmssql_vm_scale', 'winmssql_vm_lvms', 'winmssql_vm_lvms_scale', 'winfio_vm', 'winfio_vm_scale', 'vdbench_pod', 'vdbench_vm', 'vdbench_pod_scale', 'vdbench_vm_scale', 'fio_pod', 'fio_vm', 'fio_pod_scale', 'fio_vm_scale', 'bootstorm_vm_scale', 'windows_vm_scale_windows11', 'windows_vm_scale_windows_server_2022', 'windows_vm_scale_windows_server_2025' ]
                     def build_version = sh(script: 'curl -s "https://pypi.org/pypi/benchmark-runner/json" | jq -r .info.version', returnStdout: true).trim()
                     def WINDOWS_URL = ''
                     def SCALE = ''
                     def workload_name = ''
                     def retryCount = 3 // Number of retries per workload
+                    // extra container env for workloads that need storage selection
+                    def VM_ENV_ARGS = ''
 
                     for (workload in workloads) {
                         boolean success = false
@@ -122,6 +126,7 @@ END
                             // before parsing: otherwise a retried scale workload runs as its non-scale
                             // variant and can be reported as successful
                             workload = originalWorkload
+                            VM_ENV_ARGS = ''
                             try {
                                 // workload full name
                                 workload_name = originalWorkload
@@ -179,6 +184,19 @@ END
                                     if (workload == "winmssql_vm") {
                                         WINDOWS_URL = WINDOWS_SERVER_MSSQL_2025_URL
                                     }
+                                    if (workload == "winmssql_vm_lvms" || workload == "winmssql_vm_lvms_scale") {
+                                        WINDOWS_URL = WINDOWS_SERVER_MSSQL_2025_URL
+                                        if (workload == "winmssql_vm_lvms_scale") {
+                                            // LVMS scale: SCALE VMs per node from SCALE_NODES, each pinned
+                                            // to its own node, so no LVMS_NODE is passed
+                                            SCALE = HAMMERDB_SCALE
+                                            VM_ENV_ARGS = "-e VM_STORAGE_CLASS='${VM_STORAGE_CLASS}'"
+                                            workload = "winmssql_vm_lvms"
+                                        } else {
+                                            // LVMS single VM on PIN_NODE1
+                                            VM_ENV_ARGS = "-e VM_STORAGE_CLASS='${VM_STORAGE_CLASS}' -e LVMS_NODE='${PIN_NODE1}'"
+                                        }
+                                    }
                                     if (workload == "winfio_vm") {
                                         WINDOWS_URL = WINDOWS_SERVER_MSSQL_2025_URL
                                     }
@@ -212,6 +230,7 @@ END
                                         -e SCALE_NODES='${SCALE_NODES}' \
                                         -e THREADS_LIMIT='${THREADS_LIMIT}' \
                                         -e WINDOWS_URL='${WINDOWS_URL}'  \
+                                        ${VM_ENV_ARGS} \
                                         -e LSO_NODE='${LSO_NODE}'  \
                                         -e TIMEOUT='${TIMEOUT}' \
                                         -e log_level='INFO' \

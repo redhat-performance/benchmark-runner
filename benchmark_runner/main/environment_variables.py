@@ -13,8 +13,6 @@ class EnvironmentVariables:
     This class manage environment variable parameters
     """
 
-    HAMMERDB_LSO_LEN = 4
-
     def __init__(self):
 
         self._environment_variables_dict = {}
@@ -95,6 +93,10 @@ class EnvironmentVariables:
         self._environment_variables_dict['cdi_source_s3_cred'] = EnvironmentVariables.get_env('CDI_SOURCE_S3_CRED', '')
         # Storage class for all VM workloads PVCs (override for clusters with different ODF config)
         self._environment_variables_dict['vm_storage_class'] = EnvironmentVariables.get_env('VM_STORAGE_CLASS', 'ocs-storagecluster-ceph-rbd-virtualization')
+        # LVMS: node that holds the golden DataVolume for a single-VM run.
+        # Scale runs derive the node per VM from SCALE_NODES; single-VM runs fall back to
+        # PIN_NODE1 and then to the first worker node (auto-selected), so this is optional.
+        self._environment_variables_dict['lvms_node'] = EnvironmentVariables.get_env('LVMS_NODE', '')
         # Delete all resources before and after the run, default True
         self._environment_variables_dict['delete_all'] = EnvironmentVariables.get_boolean_from_environment('DELETE_ALL', True)
         # Clear nodes cache before running workload, default True
@@ -128,6 +130,7 @@ class EnvironmentVariables:
                                                          'hammerdb_vm_postgres_scale',
                                                          'hammerdb_vm_mssql_scale',
                                                          'winmssql_vm_scale',
+                                                         'winmssql_vm_lvms',
                                                          'vdbench_pod', 'vdbench_vm',
                                                          'vdbench_pod_ephemeral', 'vdbench_vm_ephemeral',
                                                          'fio_pod', 'fio_vm',
@@ -415,14 +418,26 @@ class EnvironmentVariables:
         # run workload with odf pvc True/False. True=ODF, False=Ephemeral
         env['odf_pvc'] = EnvironmentVariables.get_boolean_from_environment('ODF_PVC', True)
         env.pop('storage_type', None)
-        workload_parts = workload.split('_')
-        if workload_parts[-1] == 'ephemeral':
+        # Storage suffixes are matched by token rather than by position, so a
+        # variant such as winmssql_vm_lvms is detected independently of SCALE.
+        suffix_tokens = {part for part in workload.split('_')[2:] if part in ('ephemeral', 'lso', 'lvms', 'scale')}
+        if 'ephemeral' in suffix_tokens:
             env['storage_type'] = 'ephemeral'
             env['odf_pvc'] = False
-        elif base_workload == 'hammerdb' or base_workload == 'winmssql':
-            if len(workload_parts) == self.HAMMERDB_LSO_LEN:
-                storage_type = workload_parts[self.HAMMERDB_LSO_LEN - 1]
-                env['storage_type'] = storage_type
+        elif 'lvms' in suffix_tokens:
+            # LVMS is node-local block storage: no ODF snapshot, per-node golden DVs
+            env['storage_type'] = 'lvms'
+            env['odf_pvc'] = False
+        elif 'lso' in suffix_tokens:
+            env['storage_type'] = 'lso'
+        elif base_workload in ('hammerdb', 'winmssql'):
+            workload_parts = workload.split('_')
+            # Backward compatibility: the old length-based rule made the
+            # hammerdb_vm_<db>_scale names report storage_type='scale' (they use
+            # the same ODF/ephemeral path as any other hammerdb name). Keep that
+            # value so existing Elasticsearch/Grafana data stays consistent.
+            if len(workload_parts) == 4 and workload_parts[3] == 'scale':
+                env['storage_type'] = 'scale'
             elif env['odf_pvc']:
                 env['storage_type'] = 'odf'
             else:

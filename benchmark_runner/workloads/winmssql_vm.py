@@ -39,10 +39,33 @@ class WinMSSQLVM(BootstormVM):
 
     def _get_vm_yaml(self, vm_num: str) -> str:
         """Return the yaml file path for the given vm_num."""
-        base_name = self._name.removesuffix('_scale')
+        # generated yaml files drop the storage/scale suffixes (winmssql_vm[_<num>].yaml)
+        base_name = self._name
+        while base_name.endswith(('_scale', '_lvms')):
+            base_name = base_name.rsplit('_', 1)[0]
         if self._scale:
             return os.path.join(self._run_artifacts_path, f'{base_name}_{vm_num}.yaml')
         return os.path.join(self._run_artifacts_path, f'{base_name}.yaml')
+
+    def _create_golden_dvs(self):
+        """
+        Create the shared golden image DataVolume (ODF path).
+        LVMS is node-local, so each VM's root disk imports the image directly on
+        its own node and no golden DataVolume is created.
+        """
+        if self._storage_type == 'lvms':
+            logger.info('LVMS: each VM imports its own root disk, skipping the golden DataVolume')
+            return
+        self._oc.create_async(yaml=os.path.join(self._run_artifacts_path, 'windows_dv.yaml'))
+        self._oc.wait_for_dv_status(status='Succeeded')
+
+    def _delete_golden_dvs(self):
+        """
+        Delete the shared golden image DataVolume (ODF path only)
+        """
+        if self._storage_type == 'lvms':
+            return
+        self._oc.delete_async(yaml=os.path.join(self._run_artifacts_path, 'windows_dv.yaml'))
 
     @logger_time_stamp
     def _wait_for_snapshot_ready(self, snapshot_name: str, timeout: int = 600):
@@ -269,9 +292,8 @@ class WinMSSQLVM(BootstormVM):
                 self._es_index = 'hammerdb-results'
             self._initialize_run()
 
-            # create windows dv
-            self._oc.create_async(yaml=os.path.join(self._run_artifacts_path, 'windows_dv.yaml'))
-            self._oc.wait_for_dv_status(status='Succeeded')
+            # create the golden windows image data volume(s)
+            self._create_golden_dvs()
 
             # create snapshot if using ODF
             if self._odf_pvc:
@@ -310,7 +332,7 @@ class WinMSSQLVM(BootstormVM):
                 # delete snapshot if using ODF
                 if self._odf_pvc:
                     self._oc.delete_async(yaml=os.path.join(self._run_artifacts_path, 'winmssql_snapshot.yaml'))
-                self._oc.delete_async(yaml=os.path.join(self._run_artifacts_path, 'windows_dv.yaml'))
+                self._delete_golden_dvs()
                 self._oc.delete_async(yaml=os.path.join(self._run_artifacts_path, 'namespace.yaml'))
         except ElasticSearchDataNotUploaded as err:
             raise err

@@ -11,12 +11,13 @@ The following options may be passed via command line flags or set in the environ
 
 Choose one from the following list:
 
-`['stressng_pod', 'stressng_vm', 'uperf_pod', 'uperf_vm', 'sysbench_pod', 'sysbench_vm', 'hammerdb_pod_mariadb', 'hammerdb_vm_mariadb', 'hammerdb_pod_mariadb_lso', 'hammerdb_vm_mariadb_lso', 'hammerdb_pod_mariadb_ephemeral', 'hammerdb_vm_mariadb_ephemeral', 'hammerdb_pod_postgres', 'hammerdb_vm_postgres', 'hammerdb_pod_postgres_lso', 'hammerdb_vm_postgres_lso', 'hammerdb_pod_postgres_ephemeral', 'hammerdb_vm_postgres_ephemeral', 'hammerdb_pod_mssql', 'hammerdb_vm_mssql', 'hammerdb_pod_mssql_lso', 'hammerdb_vm_mssql_lso', 'hammerdb_pod_mssql_ephemeral', 'hammerdb_vm_mssql_ephemeral', 'vdbench_pod', 'vdbench_vm', 'vdbench_pod_ephemeral', 'vdbench_vm_ephemeral', 'fio_pod', 'fio_vm', 'fio_pod_ephemeral', 'fio_vm_ephemeral', 'clusterbuster', 'krknhub', 'bootstorm_vm', 'windows_vm', 'winmssql_vm', 'winfio_vm' ]`
+`['stressng_pod', 'stressng_vm', 'uperf_pod', 'uperf_vm', 'sysbench_pod', 'sysbench_vm', 'hammerdb_pod_mariadb', 'hammerdb_vm_mariadb', 'hammerdb_pod_mariadb_lso', 'hammerdb_vm_mariadb_lso', 'hammerdb_pod_mariadb_ephemeral', 'hammerdb_vm_mariadb_ephemeral', 'hammerdb_pod_postgres', 'hammerdb_vm_postgres', 'hammerdb_pod_postgres_lso', 'hammerdb_vm_postgres_lso', 'hammerdb_pod_postgres_ephemeral', 'hammerdb_vm_postgres_ephemeral', 'hammerdb_pod_mssql', 'hammerdb_vm_mssql', 'hammerdb_pod_mssql_lso', 'hammerdb_vm_mssql_lso', 'hammerdb_pod_mssql_ephemeral', 'hammerdb_vm_mssql_ephemeral', 'vdbench_pod', 'vdbench_vm', 'vdbench_pod_ephemeral', 'vdbench_vm_ephemeral', 'fio_pod', 'fio_vm', 'fio_pod_ephemeral', 'fio_vm_ephemeral', 'clusterbuster', 'krknhub', 'bootstorm_vm', 'windows_vm', 'winmssql_vm', 'winmssql_vm_lvms', 'winfio_vm' ]`
 
 ** clusterbuster workloads: cpusoaker, files, fio, uperf. for more details [see](https://github.com/RobertKrawitz/OpenShift4-tools)
 ** For windows workloads: need to share windows qcow2 image by nginx
 ** For hammerdb mssql must run only once [permission](https://github.com/redhat-performance/benchmark-runner/blob/main/benchmark_runner/common/ocp_resources/custom/template/02_mssql_patch_template.sh)
 ** winmssql_vm: will run hammerdb inside windows server mssql 2022: for more details [see](benchmark_runner/common/template_operations/templates/winmssql/windows_benchmark_runner/readme)
+** winmssql_vm_lvms: same workload on LVMS local storage. Requires the LVMS operator and `VM_STORAGE_CLASS` set to the LVMS storage class (e.g. `lvms-nvme`). A single VM auto-selects a worker node, or uses `LVMS_NODE`/`PIN_NODE1` if set; for scale set `SCALE` and `SCALE_NODES` as usual — each VM imports the image directly on its own node (no shared golden DataVolume, `ReadWriteOnce`, no live migration)
 
 Not mandatory:
 
