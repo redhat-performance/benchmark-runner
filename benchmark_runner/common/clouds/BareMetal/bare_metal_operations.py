@@ -61,7 +61,7 @@ class BareMetalOperations:
                                                     timeout=self._provision_timeout,
                                                     ssh_key=self._container_private_key_path)
             self._remote_ssh = RemoteSsh(self._connection_data)
-            if self._environment_variables_dict.get('github_repository_short', ''):
+            if self._environment_variables_dict.get('git_token', '') and self._environment_variables_dict.get('github_repository_short', ''):
                 self._github_operations = GitHubOperations()
 
     def _get_kubeadmin_password(self):
@@ -308,7 +308,7 @@ class BareMetalOperations:
             "cnv": (cnv_version, "openshift-cnv", "kubevirt-hyperconverged-operator"),
             "odf": (odf_version, "openshift-storage", "odf-operator"),
             "lso": (lso_version, "openshift-local-storage", "local-storage-operator"),
-            "lvms": (lvms_version, "openshift-storage", "lvms-operator"),
+            "lvms": (lvms_version, "openshift-lvm-storage", "lvms-operator"),
         }
 
         upgrade_checks = [
@@ -393,6 +393,8 @@ class BareMetalOperations:
         This method updates GitHub secrets kubeconfig and kubeadmin_password
         :return:
         """
+        if not hasattr(self, '_github_operations'):
+            raise ValueError('GIT_TOKEN must be set to update GitHub credentials (GITHUB_REPOSITORY_SHORT is set but GIT_TOKEN is empty)')
         self._github_operations.create_secret(secret_name=f'{self._ocp_env_flavor}_KUBECONFIG', unencrypted_value=self._get_kubeconfig())
         self._github_operations.create_secret(secret_name=f'{self._ocp_env_flavor}_KUBEADMIN_PASSWORD',
                                               unencrypted_value=self._get_kubeadmin_password())
